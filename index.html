@@ -834,8 +834,26 @@ function rollAllDice(){
 
 function copyDiceResult(){
   if(!diceState.dice.length) return;
-  const text=`*[Результат броска ${diceNotation(true)}: ${currentDiceTotal()} ]*`;
-  copyText(text);
+
+  const groups = {};
+  diceState.dice.forEach(d=>{
+    if(!groups[d.sides]) groups[d.sides] = [];
+    groups[d.sides].push(d.value);
+  });
+  const sidesDesc = Object.keys(groups).map(Number).sort((a,b)=>b-a);
+
+  const lines = sidesDesc.map(sides=>{
+    const vals = groups[sides];
+    return `*[Результат броска ${vals.length}d${sides}: ${vals.join(' | ')} ]*`;
+  });
+
+  if(diceState.modifier){
+    const m = diceState.modifier;
+    lines.push(`*[Результат броска Модификатор: ${m>0?'+':''}${m} ]*`);
+  }
+
+  copyText(lines.join('\n'));
+
   const btn=document.getElementById('copyResultBtn');
   if(btn){
     const old=btn.textContent;
