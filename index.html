@@ -61,6 +61,7 @@
   }
   .app{width:100%;max-width:920px;}
   .app.wide{max-width:1400px;}
+  .app.home-wide{max-width:1060px;}
 
   /* ---------- header / breadcrumb ---------- */
   .crumb{
@@ -103,6 +104,8 @@
 
   /* ---------- menu list (screens 1 & 2) ---------- */
   .menu-list{display:flex;flex-direction:column;gap:12px;}
+  .menu-list.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .menu-list.grid-2 .menu-item{margin-bottom:0;}
   .menu-item{
     display:flex;align-items:center;justify-content:space-between;
     background:var(--steel-1);
@@ -368,7 +371,22 @@
   }
   .map-frame-wrap iframe{
     width:100%;height:100%;border:none;display:block;background:#0b0d10;
+    transition:filter .2s;
   }
+  .map-frame-wrap.inverted iframe{
+    filter:invert(1) hue-rotate(180deg) contrast(0.92);
+  }
+  .map-controls-row{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .map-toggle{
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:.04em;
+    background:var(--steel-1);border:1px solid var(--line);color:var(--ink-dim);
+    padding:9px 16px;border-radius:2px;cursor:pointer;transition:all .15s;
+  }
+  .map-toggle:hover{border-color:var(--brass-dim);color:var(--ink);}
+  .map-toggle.active{background:var(--crimson);border-color:var(--crimson-bright);color:var(--ink);}
   .map-fallback-row{
     display:flex;align-items:center;gap:12px;flex-wrap:wrap;
     margin-top:14px;font-size:14px;color:var(--ink-dim);
@@ -385,6 +403,213 @@
     margin-top:34px;font-size:13.5px;color:var(--ink-dim);font-style:italic;
     border-top:1px solid var(--line);padding-top:16px;
   }
+
+  /* ---------- character tracker ---------- */
+  .char-list-item{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--steel-1);border:1px solid var(--line);border-left:3px solid var(--die);
+    padding:18px 22px;cursor:pointer;margin-bottom:10px;transition:all .15s;
+  }
+  .char-list-item:hover{background:var(--steel-2);border-left-color:var(--brass);}
+  .char-list-item .name{font-family:'Cinzel',serif;font-size:19px;}
+  .char-list-item .desc{font-size:14.5px;color:var(--ink-dim);font-style:italic;margin-top:3px;}
+  .char-empty{color:var(--ink-dim);font-style:italic;padding:24px 0;text-align:center;}
+  .new-char-btn{
+    display:block;width:100%;text-align:center;
+    font-family:'Cinzel',serif;font-weight:700;font-size:16px;letter-spacing:.03em;
+    background:var(--crimson);border:1px solid var(--crimson-bright);color:var(--ink);
+    padding:16px;border-radius:2px;cursor:pointer;margin-bottom:22px;transition:all .15s;
+  }
+  .new-char-btn:hover{background:var(--crimson-bright);}
+  .import-row{margin-bottom:26px;}
+
+  .sheet-actions{
+    display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 30px;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:16px 0;
+  }
+
+  .sheet-section{margin-bottom:32px;}
+  .sheet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field label{
+    font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink-dim);
+  }
+  .field input[type=text],.field input[type=number],.field select,.field textarea{
+    background:var(--steel-0);border:1px solid var(--line);color:var(--ink);
+    padding:9px 10px;font-family:'EB Garamond',serif;font-size:15.5px;border-radius:2px;
+    width:100%;
+  }
+  .field textarea{resize:vertical;min-height:80px;font-size:15px;line-height:1.5;}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:1px solid var(--brass-dim);border-color:var(--brass-dim);}
+
+  .ability-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;}
+  .ability-box{
+    background:var(--steel-1);border:1px solid var(--line);padding:12px;text-align:center;
+  }
+  .ability-box label{
+    display:block;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink-dim);
+    text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;
+  }
+  .ability-box input{
+    width:100%;text-align:center;background:var(--steel-0);border:1px solid var(--line);
+    color:var(--ink);font-family:'Cinzel',serif;font-size:19px;padding:6px 4px;border-radius:2px;
+  }
+  .ability-box .mod{
+    margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--brass);
+  }
+
+  .save-row,.skill-row{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 4px;border-bottom:1px solid var(--line);
+    font-size:14.5px;
+  }
+  .save-row .ab-name,.skill-row .sk-name{flex:1;}
+  .skill-row .sk-ab{
+    width:38px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-dim);
+  }
+  .prof-toggle{
+    width:26px;height:26px;border-radius:50%;border:2px solid var(--line);
+    background:var(--steel-0);cursor:pointer;flex-shrink:0;padding:0;
+  }
+  .prof-toggle[data-state="1"]{background:var(--brass-dim);border-color:var(--brass);}
+  .prof-toggle[data-state="2"]{background:var(--crimson);border-color:var(--crimson-bright);}
+  .bonus-val{
+    width:44px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--ink);
+  }
+
+  .combat-strip{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:16px;
+  }
+  .combat-box{
+    background:var(--steel-1);border:1px solid var(--line);padding:10px;text-align:center;
+  }
+  .combat-box .cb-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;}
+  .combat-box input{width:100%;text-align:center;background:var(--steel-0);border:1px solid var(--line);color:var(--ink);font-family:'Cinzel',serif;font-size:17px;padding:5px;border-radius:2px;}
+  .combat-box .readonly-val{font-family:'Cinzel',serif;font-size:19px;color:var(--brass);}
+
+  .death-row{display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap;}
+  .death-row .dr-cap{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-dim);text-transform:uppercase;}
+  .death-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);background:var(--steel-0);cursor:pointer;padding:0;}
+  .death-dot.on-success{background:var(--brass);border-color:var(--brass);}
+  .death-dot.on-fail{background:var(--crimson);border-color:var(--crimson-bright);}
+
+  .attack-row{
+    display:grid;grid-template-columns:2fr 1fr 1.4fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center;
+  }
+  .attack-row input{background:var(--steel-0);border:1px solid var(--line);color:var(--ink);padding:8px;font-size:14px;border-radius:2px;width:100%;}
+  .row-remove{
+    background:none;border:1px solid var(--line);color:var(--ink-dim);width:30px;height:30px;
+    cursor:pointer;border-radius:2px;flex-shrink:0;
+  }
+  .row-remove:hover{border-color:var(--crimson-bright);color:var(--crimson-bright);}
+  .add-row-btn{
+    font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--steel-1);
+    border:1px dashed var(--line);color:var(--ink-dim);padding:9px 14px;border-radius:2px;
+    cursor:pointer;margin-top:6px;
+  }
+  .add-row-btn:hover{border-color:var(--brass-dim);color:var(--brass);}
+
+  .currency-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+
+  .spell-toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+  .spell-toggle-row input[type=checkbox]{width:18px;height:18px;}
+  .slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:16px;}
+  .slot-box{background:var(--steel-1);border:1px solid var(--line);padding:8px;text-align:center;}
+  .slot-box .sb-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-dim);display:block;margin-bottom:6px;}
+  .slot-box .sb-inputs{display:flex;gap:4px;align-items:center;justify-content:center;}
+  .slot-box input{width:36px;text-align:center;background:var(--steel-0);border:1px solid var(--line);color:var(--ink);padding:4px;border-radius:2px;font-size:13px;}
+  .slot-box .sb-sep{color:var(--ink-dim);font-size:12px;}
+
+  /* ---------- character view (read-only) ---------- */
+  .char-view-header{
+    background:var(--steel-1);border:1px solid var(--line);border-left:4px solid var(--brass);
+    padding:22px 26px;margin-bottom:24px;
+  }
+  .char-view-header .cv-name{font-family:'Cinzel',serif;font-weight:700;font-size:30px;margin-bottom:6px;}
+  .char-view-header .cv-line{color:var(--ink-dim);font-style:italic;font-size:15.5px;}
+  .prof-dot{
+    width:14px;height:14px;border-radius:50%;border:2px solid var(--line);
+    background:var(--steel-0);flex-shrink:0;display:inline-block;
+  }
+  .prof-dot.state1{background:var(--brass-dim);border-color:var(--brass);}
+  .prof-dot.state2{background:var(--crimson);border-color:var(--crimson-bright);}
+  .attack-view-row{
+    display:grid;grid-template-columns:2fr 1fr 2fr;gap:10px;
+    padding:9px 4px;border-bottom:1px solid var(--line);font-size:14.5px;
+  }
+  .attack-view-row .av-bonus{font-family:'JetBrains Mono',monospace;color:var(--brass);}
+  .view-text-block{margin-bottom:16px;}
+  .view-text-block .vtb-label{
+    font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-dim);
+    text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;
+  }
+  .view-text-block .vtb-body{font-size:15px;line-height:1.55;color:var(--ink);white-space:pre-wrap;}
+  .currency-view-strip{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:6px;font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--ink-dim);}
+  .currency-view-strip b{color:var(--brass);}
+
+  /* ---------- alchemy ---------- */
+  .recipe-card{
+    background:var(--steel-1);border:1px solid var(--line);border-left:3px solid var(--die);
+    padding:18px 20px;margin-bottom:12px;position:relative;overflow:hidden;
+  }
+  .recipe-card .rc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+  .recipe-card .rc-name{font-family:'Cinzel',serif;font-size:19px;}
+  .recipe-card .rc-meta{
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-dim);
+    letter-spacing:.04em;margin-top:4px;
+  }
+  .kit-badge{
+    font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    border:1px solid var(--brass-dim);color:var(--brass);padding:3px 8px;border-radius:2px;flex-shrink:0;
+  }
+  .recipe-card .rc-ingredients{margin:12px 0 10px;font-size:14px;}
+  .rc-ing-row{
+    display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);
+  }
+  .rc-ing-row .have{color:var(--brass);}
+  .rc-ing-row .short{color:var(--crimson-bright);}
+  .recipe-card .rc-effect{font-size:14.5px;color:var(--ink-dim);font-style:italic;margin-bottom:12px;}
+  .recipe-card .rc-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .rc-btn{
+    font-family:'JetBrains Mono',monospace;font-size:11.5px;
+    background:var(--steel-0);border:1px solid var(--line);color:var(--ink-dim);
+    padding:8px 14px;border-radius:2px;cursor:pointer;transition:all .15s;
+  }
+  .rc-btn:hover{border-color:var(--brass-dim);color:var(--ink);}
+  .rc-btn.brew{border-color:var(--crimson-bright);color:var(--crimson-bright);}
+  .rc-btn.brew:hover{background:var(--crimson);color:var(--ink);}
+  .rc-missing-note{font-size:13px;color:var(--crimson-bright);margin-top:8px;}
+
+  .brew-overlay{
+    position:absolute;inset:0;background:rgba(14,16,19,.94);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    opacity:0;pointer-events:none;transition:opacity .2s;
+  }
+  .brew-overlay.active{opacity:1;}
+  .brew-overlay .flask{width:64px;height:86px;}
+  .brew-overlay .flask-liquid{transition:y 1s cubic-bezier(.3,.9,.4,1), height 1s cubic-bezier(.3,.9,.4,1);}
+  .brew-overlay .brew-label{font-family:'Cinzel',serif;font-size:14.5px;color:var(--ink);text-align:center;padding:0 10px;}
+
+  .stock-row{
+    display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line);
+  }
+  .stock-row .stock-name{flex:1;font-size:15px;}
+  .stock-qty-ctrl{display:flex;align-items:center;gap:8px;}
+  .stock-qty-ctrl button{
+    width:28px;height:28px;border-radius:2px;border:1px solid var(--line);background:var(--steel-0);
+    color:var(--ink);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:15px;
+  }
+  .stock-qty-ctrl button:hover{border-color:var(--brass-dim);color:var(--brass);}
+  .stock-qty-val{min-width:32px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:15px;}
+  .stock-remove{background:none;border:none;color:var(--ink-dim);cursor:pointer;font-size:15px;padding:4px;}
+  .stock-remove:hover{color:var(--crimson-bright);}
+  .add-ingredient-row{
+    display:flex;gap:10px;margin:18px 0;flex-wrap:wrap;
+  }
+  .add-ingredient-row input[type=text]{flex:2;min-width:160px;}
+  .add-ingredient-row input[type=number]{width:80px;}
 
   @media (prefers-reduced-motion: reduce){
     .stamp span{animation:none;}
@@ -412,6 +637,7 @@
     .menu-item{padding:16px 16px;}
     .menu-item .name{font-size:18px;}
     .menu-item .desc{font-size:13.5px;}
+    .menu-list.grid-2{grid-template-columns:1fr;}
     .section-label{margin:22px 0 10px;}
 
     .grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:11px;}
@@ -946,18 +1172,222 @@ function renderDice(){
   `;
 }
 
+/* ---------- character tracker: data model ---------- */
+const ABILITY_KEYS = ['str','dex','con','int','wis','cha'];
+const ABILITY_RU = {str:'Сила',dex:'Ловкость',con:'Телосложение',int:'Интеллект',wis:'Мудрость',cha:'Харизма'};
+
+const SKILL_DEFS = [
+  {key:'athletics', ru:'Атлетика', ability:'str'},
+  {key:'acrobatics', ru:'Акробатика', ability:'dex'},
+  {key:'sleight', ru:'Ловкость рук', ability:'dex'},
+  {key:'stealth', ru:'Скрытность', ability:'dex'},
+  {key:'arcana', ru:'Магия', ability:'int'},
+  {key:'history', ru:'История', ability:'int'},
+  {key:'investigation', ru:'Расследование', ability:'int'},
+  {key:'nature', ru:'Природа', ability:'int'},
+  {key:'religion', ru:'Религия', ability:'int'},
+  {key:'animal', ru:'Уход за животными', ability:'wis'},
+  {key:'insight', ru:'Проницательность', ability:'wis'},
+  {key:'medicine', ru:'Медицина', ability:'wis'},
+  {key:'perception', ru:'Восприятие', ability:'wis'},
+  {key:'survival', ru:'Выживание', ability:'wis'},
+  {key:'deception', ru:'Обман', ability:'cha'},
+  {key:'intimidation', ru:'Запугивание', ability:'cha'},
+  {key:'performance', ru:'Выступление', ability:'cha'},
+  {key:'persuasion', ru:'Убеждение', ability:'cha'}
+];
+
+function abilityMod(score){ return Math.floor((Number(score||10)-10)/2); }
+function fmtMod(n){ return (n>=0?'+':'')+n; }
+function profBonus(level){ return Math.floor((Number(level||1)-1)/4)+2; }
+
+function newCharacter(){
+  const skillProf={}; SKILL_DEFS.forEach(s=>skillProf[s.key]=0);
+  const saveProf={}; ABILITY_KEYS.forEach(a=>saveProf[a]=false);
+  const slots={}, slotsUsed={};
+  for(let i=1;i<=9;i++){ slots[i]=0; slotsUsed[i]=0; }
+  return {
+    id: null,
+    name:'', playerName:'', className:'', subclass:'', level:1, background:'', species:'', alignment:'', xp:0,
+    abilities:{str:10,dex:10,con:10,int:10,wis:10,cha:10},
+    saveProf, skillProf,
+    ac:10, initMisc:0, speed:30, hpMax:0, hpCurrent:0, hpTemp:0, hitDiceTotal:1, hitDiceType:'d10',
+    deathSuccess:0, deathFail:0,
+    attacks:[{name:'',bonus:'',damage:'',type:''}],
+    cp:0,sp:0,ep:0,gp:0,pp:0,
+    equipment:'', features:'', profArmor:'', profWeapons:'', profTools:'', languages:'',
+    traits:'', ideals:'', bonds:'', flaws:'',
+    age:'', height:'', weight:'', eyes:'', skin:'', hair:'', backstory:'',
+    spellEnabled:false, spellAbility:'int', spellNotes:'', slots, slotsUsed
+  };
+}
+
+function loadCharacters(){
+  try{
+    const raw = localStorage.getItem('ttc_characters');
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+function saveCharactersToStorage(){
+  try{ localStorage.setItem('ttc_characters', JSON.stringify(CHARACTERS)); }catch(e){}
+}
+function genId(){
+  return 'char_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+}
+function setPath(obj, path, value){
+  const parts = path.split('.');
+  let cur = obj;
+  for(let i=0;i<parts.length-1;i++) cur = cur[parts[i]];
+  cur[parts[parts.length-1]] = value;
+}
+function getPath(obj, path){
+  return path.split('.').reduce((o,k)=>(o==null?o:o[k]), obj);
+}
+
+/* ---------- Rules 2024 reference data ---------- */
+const WEAPON_MASTERY = [
+  {ru:"Рассечение", orig:"Cleave", desc:"При попадании рукопашной атакой можно тут же атаковать второе существо в 5 футах от первого и в пределах вашей досягаемости; урон второй атаки без модификатора характеристики (если он не отрицательный)."},
+  {ru:"Царапина", orig:"Graze", desc:"При промахе всё равно наносите цели урон, равный модификатору характеристики, использованному для атаки."},
+  {ru:"Засечка", orig:"Nick", desc:"Атакуя двумя лёгким оружием, можно сделать дополнительную атаку лёгким оружием как часть действия Атака, а не бонусным действием — лишь раз за ход."},
+  {ru:"Толчок", orig:"Push", desc:"При попадании можно оттолкнуть цель (не крупнее Большого размера) на 10 футов от себя."},
+  {ru:"Подрыв", orig:"Sap", desc:"При попадании цель получает помеху на свою следующую атаку до начала вашего следующего хода."},
+  {ru:"Замедление", orig:"Slow", desc:"При попадании и нанесении урона скорость цели уменьшается на 10 футов до начала вашего следующего хода."},
+  {ru:"Опрокидывание", orig:"Topple", desc:"При попадании цель проходит спасбросок Телосложения (СЛ 8 + модификатор + бонус мастерства) или падает и получает состояние «Лежит»."},
+  {ru:"Раздражение", orig:"Vex", desc:"При попадании и нанесении урона получаете преимущество на следующую атаку по этой же цели до конца вашего следующего хода."}
+];
+
+const CONDITIONS_2024 = [
+  {ru:"Ослеплён", orig:"Blinded", desc:"Не видит и автоматически проваливает проверки, требующие зрения; атаки по нему — с преимуществом, его атаки — с помехой."},
+  {ru:"Очарован", orig:"Charmed", desc:"Не может атаковать очаровавшего или использовать против него вредные способности; у очаровавшего преимущество на социальные проверки к нему."},
+  {ru:"Оглохший", orig:"Deafened", desc:"Не слышит и автоматически проваливает проверки, требующие слуха."},
+  {ru:"Испуган", orig:"Frightened", desc:"Помеха на проверки характеристик и броски атаки, пока источник страха в поле зрения; не может по своей воле приближаться к нему."},
+  {ru:"Схвачен", orig:"Grappled", desc:"Скорость становится 0. Заканчивается, если схвативший недееспособен или существо покидает его досягаемость."},
+  {ru:"Недееспособен", orig:"Incapacitated", desc:"Не может совершать действия, бонусные действия или реакции."},
+  {ru:"Невидим", orig:"Invisible", desc:"Не виден без особых средств; атаки по нему — с помехой, его атаки — с преимуществом."},
+  {ru:"Парализован", orig:"Paralyzed", desc:"Недееспособен, не может двигаться и говорить; автоматически проваливает спасброски Силы и Ловкости; атаки по нему — с преимуществом, попадания в упор — критические."},
+  {ru:"Окаменел", orig:"Petrified", desc:"Превращён в твёрдое вещество, недееспособен, не осознаёт окружение; автопровал спасбросков Силы/Ловкости; сопротивление всему урону, иммунитет к яду и болезням."},
+  {ru:"Отравлен", orig:"Poisoned", desc:"Помеха на броски атаки и проверки характеристик."},
+  {ru:"Лежит", orig:"Prone", desc:"Может только ползти (или встать, потратив половину скорости); помеха на броски атаки; рукопашные атаки по нему — с преимуществом, дальнобойные — с помехой."},
+  {ru:"Опутан", orig:"Restrained", desc:"Скорость 0; помеха на броски атаки и спасброски Ловкости; атаки по нему — с преимуществом."},
+  {ru:"Ошеломлён", orig:"Stunned", desc:"Недееспособен, не может двигаться, говорит с запинками; автопровал спасбросков Силы/Ловкости; атаки по нему — с преимуществом."},
+  {ru:"Без сознания", orig:"Unconscious", desc:"Недееспособен, не может двигаться и говорить, роняет предметы, падает и лежит; автопровал спасбросков Силы/Ловкости; атаки по нему — с преимуществом, попадания в упор — критические."}
+];
+
+const EXHAUSTION_LEVELS = Array.from({length:6},(_,i)=>{
+  const lvl = i+1;
+  const penalty = lvl*2;
+  const speed = lvl*5;
+  return {
+    ru: `Истощение ${lvl}`,
+    desc: lvl<6
+      ? `−${penalty} ко всем проверкам d20, скорость −${speed} фт.`
+      : `−${penalty} ко всем проверкам d20, скорость −${speed} фт. Персонаж умирает.`
+  };
+});
+
+const COVER_RULES = [
+  {ru:"Половинное укрытие", desc:"+2 к КД и спасброскам Ловкости."},
+  {ru:"Укрытие на три четверти", desc:"+5 к КД и спасброскам Ловкости."},
+  {ru:"Полное укрытие", desc:"Нельзя быть целью прямой атаки или заклинания."}
+];
+
+const MISC_RULES_2024 = [
+  {ru:"Героическое вдохновение", desc:"Замена преимуществу: потратьте, чтобы перебросить любой один кубик после броска (не только d20) и оставить новый результат. Можно подарить другому игроку."}
+];
+
+/* ---------- alchemy ---------- */
+const ALCHEMY_DC = [
+  {ru:"Определить вещество", desc:"Проверка Интеллекта (Природа/Магия) или мудрости (Медицина) СЛ 10–15 в зависимости от редкости, чтобы опознать неизвестный ингредиент или зелье."},
+  {ru:"Сварить по известному рецепту", desc:"Проверка не требуется, если есть все ингредиенты, время и владение нужным набором — только затраты времени и денег."},
+  {ru:"Сварить без полного рецепта", desc:"Проверка Интеллекта (использование набора) СЛ 15–20 на усмотрение мастера — риск испортить ингредиенты при провале."},
+  {ru:"Стоимость и время (ориентир DMG)", desc:"1 рабочий день (8 часов) на каждые 25 зм рыночной цены предмета; расходуется материалов на половину его цены."},
+  {ru:"Импровизированный яд/кислота в бою", desc:"Проверка Интеллекта (Алхимический набор) СЛ 10–15, чтобы наспех собрать простой эффект из подручных ингредиентов."}
+];
+
+function newRecipe(){
+  return {
+    id:null, name:'', kit:'alchemist', cost:0, time:'', dc:'',
+    ingredients:[{name:'', qty:1}], effect:'', isCustom:true
+  };
+}
+function seedRecipes(){
+  return [
+    {id:genId(), name:'Зелье лечения', kit:'herbalism', cost:25, time:'4 часа', dc:'',
+      ingredients:[{name:'Лечебные травы',qty:2}], effect:'Восстанавливает 2к4+2 хитов при использовании.', isCustom:false},
+    {id:genId(), name:'Противоядие', kit:'herbalism', cost:50, time:'4 часа', dc:'',
+      ingredients:[{name:'Змеиный корень',qty:1},{name:'Дистиллированная вода',qty:1}], effect:'Даёт преимущество на спасброски против яда в течение 1 часа.', isCustom:false},
+    {id:genId(), name:'Алхимический огонь', kit:'alchemist', cost:50, time:'1 рабочий день', dc:'',
+      ingredients:[{name:'Горючая смола',qty:2},{name:'Стеклянная колба',qty:1}], effect:'Бросаемое оружие: 1к4 урона огнём в начале каждого хода цели, пока не потушат (действие).', isCustom:false},
+    {id:genId(), name:'Кислота', kit:'alchemist', cost:25, time:'4 часа', dc:'',
+      ingredients:[{name:'Едкий реагент',qty:1},{name:'Стеклянная колба',qty:1}], effect:'Бросаемое оружие: 2к6 урона кислотой при попадании.', isCustom:false}
+  ];
+}
+function loadRecipes(){
+  try{
+    const raw = localStorage.getItem('ttc_recipes');
+    if(!raw) return seedRecipes();
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) && arr.length ? arr : seedRecipes();
+  }catch(e){ return seedRecipes(); }
+}
+function saveRecipesToStorage(){
+  try{ localStorage.setItem('ttc_recipes', JSON.stringify(RECIPES)); }catch(e){}
+}
+
+function loadIngredients(){
+  try{
+    const raw = localStorage.getItem('ttc_ingredients');
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+function saveIngredientsToStorage(){
+  try{ localStorage.setItem('ttc_ingredients', JSON.stringify(INGREDIENTS)); }catch(e){}
+}
+function findIngredient(name){
+  const norm = name.trim().toLowerCase();
+  return INGREDIENTS.find(i=>i.name.trim().toLowerCase()===norm);
+}
+
+function hashColor(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i)) & 0xffffffff; }
+  const hue = Math.abs(h) % 360;
+  return `hsl(${hue},62%,48%)`;
+}
+
+let RECIPES = loadRecipes();
+let INGREDIENTS = loadIngredients();
+let recipeDraft = null;
+
+let CHARACTERS = loadCharacters();
+let charDraft = null;
+
 let view = {screen:'home'};
 
 function render(){
   const app = document.getElementById('app');
   app.classList.toggle('wide', view.screen === 'map');
+  app.classList.toggle('home-wide', view.screen === 'home');
   if(view.screen === 'home') app.innerHTML = renderHome();
   else if(view.screen === 'commands') app.innerHTML = renderCommands();
+  else if(view.screen === 'rules2024') app.innerHTML = renderRules2024();
+  else if(view.screen === 'alchemy') app.innerHTML = renderAlchemyHub();
+  else if(view.screen === 'recipes') app.innerHTML = renderRecipes();
+  else if(view.screen === 'recipeForm') app.innerHTML = renderRecipeForm();
+  else if(view.screen === 'stock') app.innerHTML = renderStock();
+  else if(view.screen === 'alchemyDC') app.innerHTML = renderAlchemyDC();
   else if(view.screen === 'class') app.innerHTML = renderClass();
   else if(view.screen === 'glossary') app.innerHTML = renderGlossaryHub();
   else if(view.screen === 'weapons') app.innerHTML = renderWeapons();
   else if(view.screen === 'dice') app.innerHTML = renderDice();
   else if(view.screen === 'map') app.innerHTML = renderMap();
+  else if(view.screen === 'characters') app.innerHTML = renderCharacters();
+  else if(view.screen === 'charview') app.innerHTML = renderCharacterView();
+  else if(view.screen === 'sheet') app.innerHTML = renderSheet();
   else if(view.screen === 'sub') app.innerHTML = renderSub();
   wireEvents();
 }
@@ -976,11 +1406,32 @@ function renderHome(){
     <h1>Тактический компендиум</h1>
     <p class="subtitle">Справочник боевых приёмов и техник по правилам 2024 года.</p>
     <div class="rule"></div>
-    <div class="menu-list">
+    <div class="menu-list grid-2">
+      <div class="menu-item util" data-go="characters">
+        <div>
+          <div class="name">Персонажи</div>
+          <div class="desc">Карточки персонажей: создание, просмотр, экспорт</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
       <div class="menu-item util" data-go="commands">
         <div>
           <div class="name">Общие команды</div>
           <div class="desc">Шаблоны бросков: проверки, спасброски, атака, урон</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="menu-item util" data-go="rules2024">
+        <div>
+          <div class="name">Правила 2024</div>
+          <div class="desc">Мастерство оружия, состояния, истощение, укрытие</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="menu-item util" data-go="alchemy">
+        <div>
+          <div class="name">Алхимия</div>
+          <div class="desc">Рецепты, запасы ингредиентов, варение зелий</div>
         </div>
         <div class="arrow">→</div>
       </div>
@@ -1000,7 +1451,7 @@ function renderHome(){
       </div>
     </div>
     <div class="section-label">Классы</div>
-    <div class="menu-list">
+    <div class="menu-list grid-2">
       <div class="menu-item" data-go="class:fighter">
         <div>
           <div class="name">Воин</div>
@@ -1144,7 +1595,11 @@ function renderMap(){
     <h1>Карта Фаэруна</h1>
     <p class="subtitle">Интерактивная карта LoreMaps, встроенная прямо на странице.</p>
     <div class="rule"></div>
-    <div class="map-frame-wrap">
+    <div class="map-controls-row">
+      <button class="map-toggle" id="mapDarkToggle">🌙 Тёмные цвета карты</button>
+      <span style="font-size:12.5px;color:var(--ink-dim);">Инвертирует всю карту целиком — включай, когда просто нужно не слепнуть от белого фона.</span>
+    </div>
+    <div class="map-frame-wrap" id="mapFrameWrap">
       <iframe src="${mapUrl}" title="Карта Фаэруна" loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
         sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
@@ -1152,6 +1607,820 @@ function renderMap(){
     <div class="map-fallback-row">
       <span>Карта не загрузилась? Некоторые сайты запрещают показывать себя внутри других страниц.</span>
       <a href="${mapUrl}" target="_blank" rel="noopener noreferrer">Открыть в новой вкладке ↗</a>
+    </div>
+  `;
+}
+
+function renderCharacters(){
+  const items = CHARACTERS.map(c=>{
+    const bits = [c.className||'Без класса', c.level?('ур. '+c.level):null, c.species||null].filter(Boolean).join(' · ');
+    return `
+      <div class="char-list-item" data-go="charview:${c.id}">
+        <div>
+          <div class="name">${escapeHtml(c.name||'Без имени')}</div>
+          <div class="desc">${escapeHtml(bits||'Черновик')}</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>`;
+  }).join('');
+
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Персонажи'}])}
+    <button class="back" data-go="home">← Назад</button>
+    <h1>Персонажи</h1>
+    <p class="subtitle">Выбери сохранённую карточку или создай новую.</p>
+    <div class="rule"></div>
+    <button class="new-char-btn" data-go="sheet:new">+ Создать нового персонажа</button>
+    ${items || '<div class="char-empty">Пока нет сохранённых персонажей.</div>'}
+    <div class="import-row">
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
+      <button class="btn-ghost" id="importBtn">⬆️ Импортировать из файла</button>
+    </div>
+  `;
+}
+
+function initDraftForView(){
+  if(view.charId && view.charId!=='new'){
+    const existing = CHARACTERS.find(c=>c.id===view.charId);
+    charDraft = existing ? JSON.parse(JSON.stringify(existing)) : newCharacter();
+  } else {
+    charDraft = newCharacter();
+  }
+}
+
+function abilityBoxHtml(key){
+  const d=charDraft;
+  return `
+    <div class="ability-box">
+      <label>${ABILITY_RU[key]}</label>
+      <input type="number" min="1" max="30" data-field="abilities.${key}" value="${d.abilities[key]}">
+      <div class="mod" id="am-${key}">${fmtMod(abilityMod(d.abilities[key]))}</div>
+    </div>`;
+}
+function saveRowHtml(key){
+  const d=charDraft;
+  const prof = d.saveProf[key];
+  const mod = abilityMod(d.abilities[key]) + (prof?profBonus(d.level):0);
+  return `
+    <div class="save-row">
+      <input type="checkbox" data-field="saveProf.${key}" ${prof?'checked':''}>
+      <div class="ab-name">${ABILITY_RU[key]}</div>
+      <div class="bonus-val" id="saveBonus-${key}">${fmtMod(mod)}</div>
+    </div>`;
+}
+function skillRowHtml(def){
+  const d=charDraft;
+  const state = d.skillProf[def.key]||0;
+  const mod = abilityMod(d.abilities[def.ability]) + state*profBonus(d.level);
+  const abAbbr = ABILITY_ABBR[ABILITY_RU[def.ability]]||'';
+  return `
+    <div class="skill-row">
+      <button type="button" class="prof-toggle" data-skill-toggle="${def.key}" data-state="${state}" title="Клик — владение / экспертиза / сброс"></button>
+      <div class="sk-name">${def.ru}</div>
+      <div class="sk-ab">${abAbbr}</div>
+      <div class="bonus-val" id="skillBonus-${def.key}">${fmtMod(mod)}</div>
+    </div>`;
+}
+function attackRowHtml(a, idx){
+  return `
+    <div class="attack-row" data-attack-row="${idx}">
+      <input type="text" placeholder="Название" data-attack-idx="${idx}" data-attack-field="name" value="${escapeAttr(a.name||'')}">
+      <input type="text" placeholder="Бонус" data-attack-idx="${idx}" data-attack-field="bonus" value="${escapeAttr(a.bonus||'')}">
+      <input type="text" placeholder="Урон" data-attack-idx="${idx}" data-attack-field="damage" value="${escapeAttr(a.damage||'')}">
+      <input type="text" placeholder="Тип" data-attack-idx="${idx}" data-attack-field="type" value="${escapeAttr(a.type||'')}">
+      <button type="button" class="row-remove" data-remove-attack="${idx}" title="Убрать">✕</button>
+    </div>`;
+}
+function slotBoxHtml(lvl){
+  const d=charDraft;
+  return `
+    <div class="slot-box">
+      <span class="sb-label">Ур. ${lvl}</span>
+      <div class="sb-inputs">
+        <input type="number" min="0" data-slot-level="${lvl}" data-slot-kind="used" value="${d.slotsUsed[lvl]||0}">
+        <span class="sb-sep">/</span>
+        <input type="number" min="0" data-slot-level="${lvl}" data-slot-kind="max" value="${d.slots[lvl]||0}">
+      </div>
+    </div>`;
+}
+
+function renderSheet(){
+  initDraftForView();
+  const d = charDraft;
+  const isExisting = !!(view.charId && view.charId!=='new' && CHARACTERS.find(c=>c.id===view.charId));
+  const pb = profBonus(d.level);
+  const passivePerception = 10 + abilityMod(d.abilities.wis) + (d.skillProf.perception||0)*pb;
+  const initTotal = abilityMod(d.abilities.dex) + Number(d.initMisc||0);
+
+  const abilityBoxes = ABILITY_KEYS.map(abilityBoxHtml).join('');
+  const saveRows = ABILITY_KEYS.map(saveRowHtml).join('');
+  const skillRows = SKILL_DEFS.map(skillRowHtml).join('');
+  const attackRows = d.attacks.map((a,i)=>attackRowHtml(a,i)).join('');
+  const slotBoxes = Array.from({length:9},(_,i)=>i+1).map(slotBoxHtml).join('');
+
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Персонажи', nav:'characters'},{label: d.name || 'Новый персонаж'}])}
+    <button class="back" data-go="${isExisting ? ('charview:'+d.id) : 'characters'}">← Назад</button>
+    <h1>${escapeHtml(d.name || 'Новый персонаж')}</h1>
+    <p class="subtitle">Изменения применяются сразу, но сохраняются только по кнопке «Сохранить».</p>
+    <div class="rule"></div>
+
+    <div class="sheet-actions">
+      <button class="btn-primary" id="saveCharBtn">💾 Сохранить</button>
+      <button class="btn-ghost" id="exportCharBtn">⬇️ Экспорт JSON</button>
+      <button class="btn-ghost" id="copyCharBtn">📋 Скопировать как текст</button>
+      ${isExisting ? '<button class="btn-ghost" id="deleteCharBtn" style="color:var(--crimson-bright);border-color:var(--crimson-bright);">🗑 Удалить</button>' : ''}
+    </div>
+
+    <div id="sheetRoot">
+
+    <div class="sheet-section">
+      <div class="section-label">Основное</div>
+      <div class="sheet-grid">
+        <div class="field"><label>Имя персонажа</label><input type="text" data-field="name" value="${escapeAttr(d.name)}"></div>
+        <div class="field"><label>Игрок</label><input type="text" data-field="playerName" value="${escapeAttr(d.playerName)}"></div>
+        <div class="field"><label>Класс</label><input type="text" data-field="className" value="${escapeAttr(d.className)}"></div>
+        <div class="field"><label>Архетип</label><input type="text" data-field="subclass" value="${escapeAttr(d.subclass)}"></div>
+        <div class="field"><label>Уровень</label><input type="number" min="1" max="20" data-field="level" value="${d.level}"></div>
+        <div class="field"><label>Предыстория</label><input type="text" data-field="background" value="${escapeAttr(d.background)}"></div>
+        <div class="field"><label>Вид</label><input type="text" data-field="species" value="${escapeAttr(d.species)}"></div>
+        <div class="field"><label>Мировоззрение</label><input type="text" data-field="alignment" value="${escapeAttr(d.alignment)}"></div>
+        <div class="field"><label>Опыт</label><input type="number" min="0" data-field="xp" value="${d.xp}"></div>
+        <div class="field"><label>Бонус мастерства</label><div class="readonly-val" id="pbVal" style="padding-top:9px;">${fmtMod(pb)}</div></div>
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Характеристики</div>
+      <div class="ability-row">${abilityBoxes}</div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Спасброски</div>
+      ${saveRows}
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Навыки</div>
+      ${skillRows}
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Боевые параметры</div>
+      <div class="combat-strip">
+        <div class="combat-box"><span class="cb-label">КД</span><input type="number" data-field="ac" value="${d.ac}"></div>
+        <div class="combat-box"><span class="cb-label">Инициатива</span><div class="readonly-val" id="initTotal">${fmtMod(initTotal)}</div></div>
+        <div class="combat-box"><span class="cb-label">Скорость</span><input type="number" data-field="speed" value="${d.speed}"></div>
+        <div class="combat-box"><span class="cb-label">Хиты (макс)</span><input type="number" data-field="hpMax" value="${d.hpMax}"></div>
+        <div class="combat-box"><span class="cb-label">Хиты (тек.)</span><input type="number" data-field="hpCurrent" value="${d.hpCurrent}"></div>
+        <div class="combat-box"><span class="cb-label">Врем. хиты</span><input type="number" data-field="hpTemp" value="${d.hpTemp}"></div>
+        <div class="combat-box"><span class="cb-label">Кости хитов</span><input type="text" data-field="hitDiceTotal" value="${escapeAttr(String(d.hitDiceTotal))}" style="text-align:center;"></div>
+        <div class="combat-box"><span class="cb-label">Тип кости</span><input type="text" data-field="hitDiceType" value="${escapeAttr(d.hitDiceType)}" style="text-align:center;"></div>
+        <div class="combat-box"><span class="cb-label">Пасс. восприятие</span><div class="readonly-val" id="passivePerception">${passivePerception}</div></div>
+      </div>
+      <div class="death-row">
+        <span class="dr-cap">Спасброски от смерти — успехи</span>
+        ${[1,2,3].map(i=>`<button type="button" class="death-dot ${d.deathSuccess>=i?'on-success':''}" data-death="success:${i}"></button>`).join('')}
+        <span class="dr-cap" style="margin-left:16px;">провалы</span>
+        ${[1,2,3].map(i=>`<button type="button" class="death-dot ${d.deathFail>=i?'on-fail':''}" data-death="fail:${i}"></button>`).join('')}
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Атаки и заклинания в бою</div>
+      <div id="attacksList">${attackRows}</div>
+      <button type="button" class="add-row-btn" id="addAttackBtn">+ Добавить атаку</button>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Снаряжение</div>
+      <div class="currency-row">
+        <div class="field"><label>ММ</label><input type="number" data-field="cp" value="${d.cp}"></div>
+        <div class="field"><label>СМ</label><input type="number" data-field="sp" value="${d.sp}"></div>
+        <div class="field"><label>ЭМ</label><input type="number" data-field="ep" value="${d.ep}"></div>
+        <div class="field"><label>ЗМ</label><input type="number" data-field="gp" value="${d.gp}"></div>
+        <div class="field"><label>ПМ</label><input type="number" data-field="pp" value="${d.pp}"></div>
+      </div>
+      <div class="field" style="margin-top:12px;"><label>Инвентарь</label><textarea data-field="equipment">${escapeHtml(d.equipment)}</textarea></div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Умения и черты</div>
+      <div class="field"><textarea data-field="features" placeholder="Особенности класса, вида, черты...">${escapeHtml(d.features)}</textarea></div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Владения и языки</div>
+      <div class="sheet-grid">
+        <div class="field"><label>Доспехи</label><input type="text" data-field="profArmor" value="${escapeAttr(d.profArmor)}"></div>
+        <div class="field"><label>Оружие</label><input type="text" data-field="profWeapons" value="${escapeAttr(d.profWeapons)}"></div>
+        <div class="field"><label>Инструменты</label><input type="text" data-field="profTools" value="${escapeAttr(d.profTools)}"></div>
+        <div class="field"><label>Языки</label><input type="text" data-field="languages" value="${escapeAttr(d.languages)}"></div>
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Личность</div>
+      <div class="sheet-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">
+        <div class="field"><label>Черты характера</label><textarea data-field="traits">${escapeHtml(d.traits)}</textarea></div>
+        <div class="field"><label>Идеалы</label><textarea data-field="ideals">${escapeHtml(d.ideals)}</textarea></div>
+        <div class="field"><label>Привязанности</label><textarea data-field="bonds">${escapeHtml(d.bonds)}</textarea></div>
+        <div class="field"><label>Слабости</label><textarea data-field="flaws">${escapeHtml(d.flaws)}</textarea></div>
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Внешность и предыстория</div>
+      <div class="sheet-grid">
+        <div class="field"><label>Возраст</label><input type="text" data-field="age" value="${escapeAttr(d.age)}"></div>
+        <div class="field"><label>Рост</label><input type="text" data-field="height" value="${escapeAttr(d.height)}"></div>
+        <div class="field"><label>Вес</label><input type="text" data-field="weight" value="${escapeAttr(d.weight)}"></div>
+        <div class="field"><label>Глаза</label><input type="text" data-field="eyes" value="${escapeAttr(d.eyes)}"></div>
+        <div class="field"><label>Кожа</label><input type="text" data-field="skin" value="${escapeAttr(d.skin)}"></div>
+        <div class="field"><label>Волосы</label><input type="text" data-field="hair" value="${escapeAttr(d.hair)}"></div>
+      </div>
+      <div class="field" style="margin-top:12px;"><label>История персонажа</label><textarea data-field="backstory" style="min-height:120px;">${escapeHtml(d.backstory)}</textarea></div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Заклинания</div>
+      <div class="spell-toggle-row">
+        <input type="checkbox" id="spellEnabledCk" data-field="spellEnabled" ${d.spellEnabled?'checked':''}>
+        <label for="spellEnabledCk" style="font-size:14.5px;color:var(--ink-dim);">Персонаж — заклинатель</label>
+      </div>
+      <div id="spellBlock" style="${d.spellEnabled?'':'display:none;'}">
+        <div class="sheet-grid" style="margin-bottom:16px;">
+          <div class="field">
+            <label>Базовая характеристика</label>
+            <select data-field="spellAbility">
+              ${ABILITY_KEYS.map(k=>`<option value="${k}" ${d.spellAbility===k?'selected':''}>${ABILITY_RU[k]}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field"><label>Сложность спасброска</label><div class="readonly-val" id="spellDC" style="padding-top:9px;">${8+pb+abilityMod(d.abilities[d.spellAbility])}</div></div>
+          <div class="field"><label>Бонус атаки заклинанием</label><div class="readonly-val" id="spellAtk" style="padding-top:9px;">${fmtMod(pb+abilityMod(d.abilities[d.spellAbility]))}</div></div>
+        </div>
+        <div class="slot-grid">${slotBoxes}</div>
+        <div class="field"><label>Известные / подготовленные заклинания</label><textarea data-field="spellNotes" style="min-height:110px;">${escapeHtml(d.spellNotes)}</textarea></div>
+      </div>
+    </div>
+
+    </div>
+  `;
+}
+
+function recomputeDerived(){
+  const d = charDraft;
+  const pb = profBonus(d.level);
+  ABILITY_KEYS.forEach(k=>{
+    const el = document.getElementById('am-'+k);
+    if(el) el.textContent = fmtMod(abilityMod(d.abilities[k]));
+    const sEl = document.getElementById('saveBonus-'+k);
+    if(sEl) sEl.textContent = fmtMod(abilityMod(d.abilities[k]) + (d.saveProf[k]?pb:0));
+  });
+  SKILL_DEFS.forEach(def=>{
+    const el = document.getElementById('skillBonus-'+def.key);
+    if(el){
+      const state = d.skillProf[def.key]||0;
+      el.textContent = fmtMod(abilityMod(d.abilities[def.ability]) + state*pb);
+    }
+  });
+  const pbVal = document.getElementById('pbVal');
+  if(pbVal) pbVal.textContent = fmtMod(pb);
+  const pp = document.getElementById('passivePerception');
+  if(pp) pp.textContent = 10 + abilityMod(d.abilities.wis) + (d.skillProf.perception||0)*pb;
+  const initEl = document.getElementById('initTotal');
+  if(initEl) initEl.textContent = fmtMod(abilityMod(d.abilities.dex) + Number(d.initMisc||0));
+  const dcEl = document.getElementById('spellDC');
+  if(dcEl) dcEl.textContent = 8 + pb + abilityMod(d.abilities[d.spellAbility]);
+  const atkEl = document.getElementById('spellAtk');
+  if(atkEl) atkEl.textContent = fmtMod(pb + abilityMod(d.abilities[d.spellAbility]));
+}
+
+function addAttackRow(){
+  charDraft.attacks.push({name:'',bonus:'',damage:'',type:''});
+  const list = document.getElementById('attacksList');
+  if(list){
+    const idx = charDraft.attacks.length-1;
+    list.insertAdjacentHTML('beforeend', attackRowHtml(charDraft.attacks[idx], idx));
+  }
+}
+function removeAttackRow(idx){
+  charDraft.attacks.splice(idx,1);
+  const list = document.getElementById('attacksList');
+  if(list) list.innerHTML = charDraft.attacks.map((a,i)=>attackRowHtml(a,i)).join('');
+}
+
+function upsertCharacter(){
+  const d = charDraft;
+  if(!d.id) d.id = genId();
+  const i = CHARACTERS.findIndex(c=>c.id===d.id);
+  const copy = JSON.parse(JSON.stringify(d));
+  if(i>=0) CHARACTERS[i]=copy; else CHARACTERS.push(copy);
+  saveCharactersToStorage();
+  view.charId = d.id;
+}
+
+function deleteCharacter(id){
+  CHARACTERS = CHARACTERS.filter(c=>c.id!==id);
+  saveCharactersToStorage();
+}
+
+function exportCharacterJson(){
+  const d = charDraft;
+  const blob = new Blob([JSON.stringify(d, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const safeName = (d.name||'персонаж').toLowerCase().replace(/[^a-zа-я0-9]+/gi,'_').replace(/^_+|_+$/g,'') || 'персонаж';
+  a.href = url; a.download = safeName+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+
+function importCharacterFromFile(file){
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      const base = newCharacter();
+      const merged = Object.assign(base, data, {id:null});
+      merged.id = genId();
+      CHARACTERS.push(merged);
+      saveCharactersToStorage();
+      render();
+    }catch(e){
+      alert('Не удалось прочитать файл — это не корректный JSON карточки персонажа.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function copyCharacterAsText(){
+  const d = charDraft;
+  const pb = profBonus(d.level);
+  const abLine = ABILITY_KEYS.map(k=>`${ABILITY_RU[k]} ${d.abilities[k]} (${fmtMod(abilityMod(d.abilities[k]))})`).join(', ');
+  const skillsProf = SKILL_DEFS.filter(s=>(d.skillProf[s.key]||0)>0)
+    .map(s=>`${s.ru} ${fmtMod(abilityMod(d.abilities[s.ability])+(d.skillProf[s.key])*pb)}${d.skillProf[s.key]===2?' (эксперт.)':''}`)
+    .join(', ') || '—';
+  const attacksText = d.attacks.filter(a=>a.name).map(a=>`  ${a.name}: ${a.bonus||'—'} попадание, ${a.damage||'—'} ${a.type||''}`).join('\n') || '  —';
+  const lines = [
+    `${d.name||'Без имени'} — ${d.className||'?'}${d.subclass?(' ('+d.subclass+')'):''}, уровень ${d.level}`,
+    `${d.species||''} ${d.background?('· '+d.background):''} ${d.alignment?('· '+d.alignment):''}`.trim(),
+    `Бонус мастерства: ${fmtMod(pb)}`,
+    `Характеристики: ${abLine}`,
+    `КД ${d.ac} · Инициатива ${fmtMod(abilityMod(d.abilities.dex)+Number(d.initMisc||0))} · Скорость ${d.speed} фт.`,
+    `Хиты: ${d.hpCurrent}/${d.hpMax}${d.hpTemp?(' (+'+d.hpTemp+' врем.)'):''} · Кости хитов: ${d.hitDiceTotal}${d.hitDiceType}`,
+    `Владение навыками: ${skillsProf}`,
+    `Атаки:\n${attacksText}`
+  ];
+  if(d.spellEnabled){
+    lines.push(`Заклинания (${ABILITY_RU[d.spellAbility]}): СЛ ${8+pb+abilityMod(d.abilities[d.spellAbility])}, атака ${fmtMod(pb+abilityMod(d.abilities[d.spellAbility]))}`);
+    if(d.spellNotes) lines.push(d.spellNotes);
+  }
+  if(d.equipment) lines.push(`Инвентарь: ${d.equipment}`);
+  if(d.features) lines.push(`Умения и черты: ${d.features}`);
+  if(d.backstory) lines.push(`История: ${d.backstory}`);
+  copyText(lines.join('\n'));
+}
+
+function abilityViewBoxHtml(key, d){
+  return `
+    <div class="ability-box">
+      <label>${ABILITY_RU[key]}</label>
+      <div style="font-family:'Cinzel',serif;font-size:19px;color:var(--ink);padding:6px 0;">${d.abilities[key]}</div>
+      <div class="mod">${fmtMod(abilityMod(d.abilities[key]))}</div>
+    </div>`;
+}
+function saveViewRowHtml(key, d, pb){
+  const prof = d.saveProf[key];
+  const mod = abilityMod(d.abilities[key]) + (prof?pb:0);
+  return `
+    <div class="save-row">
+      <span class="prof-dot ${prof?'state1':''}"></span>
+      <div class="ab-name">${ABILITY_RU[key]}</div>
+      <div class="bonus-val">${fmtMod(mod)}</div>
+    </div>`;
+}
+function skillViewRowHtml(def, d, pb){
+  const state = d.skillProf[def.key]||0;
+  const mod = abilityMod(d.abilities[def.ability]) + state*pb;
+  const abAbbr = ABILITY_ABBR[ABILITY_RU[def.ability]]||'';
+  return `
+    <div class="skill-row">
+      <span class="prof-dot ${state===1?'state1':(state===2?'state2':'')}"></span>
+      <div class="sk-name">${def.ru}</div>
+      <div class="sk-ab">${abAbbr}</div>
+      <div class="bonus-val">${fmtMod(mod)}</div>
+    </div>`;
+}
+function attackViewRowHtml(a){
+  return `
+    <div class="attack-view-row">
+      <span>${escapeHtml(a.name)}</span>
+      <span class="av-bonus">${escapeHtml(a.bonus||'—')}</span>
+      <span>${escapeHtml(a.damage||'—')}${a.type?(' '+escapeHtml(a.type)):''}</span>
+    </div>`;
+}
+function viewTextBlock(label, value){
+  if(!value) return '';
+  return `
+    <div class="view-text-block">
+      ${label ? `<div class="vtb-label">${label}</div>` : ''}
+      <div class="vtb-body">${escapeHtml(value)}</div>
+    </div>`;
+}
+
+function renderCharacterView(){
+  const d = CHARACTERS.find(c=>c.id===view.charId);
+  if(!d){
+    view = {screen:'characters'};
+    return renderCharacters();
+  }
+  charDraft = JSON.parse(JSON.stringify(d)); // чтобы экспорт/копирование текста работали с этого экрана тоже
+
+  const pb = profBonus(d.level);
+  const passivePerception = 10 + abilityMod(d.abilities.wis) + (d.skillProf.perception||0)*pb;
+  const initTotal = abilityMod(d.abilities.dex) + Number(d.initMisc||0);
+
+  const abilityBoxes = ABILITY_KEYS.map(k=>abilityViewBoxHtml(k,d)).join('');
+  const saveRows = ABILITY_KEYS.map(k=>saveViewRowHtml(k,d,pb)).join('');
+  const skillRows = SKILL_DEFS.map(def=>skillViewRowHtml(def,d,pb)).join('');
+  const attackRows = d.attacks.filter(a=>a.name).map(attackViewRowHtml).join('') || '<div class="char-empty" style="padding:10px 0;">Нет записанных атак</div>';
+
+  const headerLine1 = [d.className||'Без класса', d.subclass, d.level?('уровень '+d.level):null].filter(Boolean).join(' · ');
+  const headerLine2 = [d.species, d.background, d.alignment].filter(Boolean).join(' · ');
+
+  const currencyBits = [['pp','ПМ'],['gp','ЗМ'],['ep','ЭМ'],['sp','СМ'],['cp','ММ']]
+    .filter(([k])=>Number(d[k])>0).map(([k,label])=>`<span><b>${d[k]}</b> ${label}</span>`).join('');
+
+  const spellBlock = d.spellEnabled ? `
+    <div class="sheet-section">
+      <div class="section-label">Заклинания</div>
+      <div class="combat-strip">
+        <div class="combat-box"><span class="cb-label">Характеристика</span><div class="readonly-val">${ABILITY_RU[d.spellAbility]}</div></div>
+        <div class="combat-box"><span class="cb-label">Сложность спасброска</span><div class="readonly-val">${8+pb+abilityMod(d.abilities[d.spellAbility])}</div></div>
+        <div class="combat-box"><span class="cb-label">Атака заклинанием</span><div class="readonly-val">${fmtMod(pb+abilityMod(d.abilities[d.spellAbility]))}</div></div>
+      </div>
+      <div class="slot-grid">${Array.from({length:9},(_,i)=>i+1).map(lvl=>`
+        <div class="slot-box"><span class="sb-label">Ур. ${lvl}</span><div>${d.slotsUsed[lvl]||0} / ${d.slots[lvl]||0}</div></div>
+      `).join('')}</div>
+      ${viewTextBlock('Известные / подготовленные заклинания', d.spellNotes)}
+    </div>` : '';
+
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Персонажи', nav:'characters'},{label: d.name || 'Без имени'}])}
+    <button class="back" data-go="characters">← Назад</button>
+
+    <div class="char-view-header">
+      <div class="cv-name">${escapeHtml(d.name||'Без имени')}</div>
+      <div class="cv-line">${escapeHtml(headerLine1)}</div>
+      ${headerLine2?`<div class="cv-line">${escapeHtml(headerLine2)}</div>`:''}
+    </div>
+
+    <div class="sheet-actions">
+      <button class="btn-primary" id="editCharBtn" data-go="sheet:${d.id}">✏️ Редактировать</button>
+      <button class="btn-ghost" id="exportCharBtn">⬇️ Экспорт JSON</button>
+      <button class="btn-ghost" id="copyCharBtn">📋 Скопировать как текст</button>
+      <button class="btn-ghost" id="deleteCharBtn" style="color:var(--crimson-bright);border-color:var(--crimson-bright);">🗑 Удалить</button>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Характеристики</div>
+      <div class="ability-row">${abilityBoxes}</div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Боевые параметры</div>
+      <div class="combat-strip">
+        <div class="combat-box"><span class="cb-label">КД</span><div class="readonly-val">${d.ac}</div></div>
+        <div class="combat-box"><span class="cb-label">Инициатива</span><div class="readonly-val">${fmtMod(initTotal)}</div></div>
+        <div class="combat-box"><span class="cb-label">Скорость</span><div class="readonly-val">${d.speed}</div></div>
+        <div class="combat-box"><span class="cb-label">Хиты</span><div class="readonly-val">${d.hpCurrent}/${d.hpMax}${d.hpTemp?(' +'+d.hpTemp):''}</div></div>
+        <div class="combat-box"><span class="cb-label">Кости хитов</span><div class="readonly-val" style="font-size:15px;">${escapeHtml(String(d.hitDiceTotal))}${escapeHtml(d.hitDiceType)}</div></div>
+        <div class="combat-box"><span class="cb-label">Бонус мастерства</span><div class="readonly-val">${fmtMod(pb)}</div></div>
+        <div class="combat-box"><span class="cb-label">Пасс. восприятие</span><div class="readonly-val">${passivePerception}</div></div>
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Спасброски</div>
+      ${saveRows}
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Навыки</div>
+      ${skillRows}
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Атаки</div>
+      ${attackRows}
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Снаряжение</div>
+      ${currencyBits ? `<div class="currency-view-strip">${currencyBits}</div>` : ''}
+      ${viewTextBlock('Инвентарь', d.equipment)}
+    </div>
+
+    ${d.features ? `<div class="sheet-section"><div class="section-label">Умения и черты</div>${viewTextBlock('', d.features)}</div>` : ''}
+
+    <div class="sheet-section">
+      <div class="section-label">Владения и языки</div>
+      <div class="sheet-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));">
+        ${viewTextBlock('Доспехи', d.profArmor)}
+        ${viewTextBlock('Оружие', d.profWeapons)}
+        ${viewTextBlock('Инструменты', d.profTools)}
+        ${viewTextBlock('Языки', d.languages)}
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Личность</div>
+      <div class="sheet-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">
+        ${viewTextBlock('Черты характера', d.traits)}
+        ${viewTextBlock('Идеалы', d.ideals)}
+        ${viewTextBlock('Привязанности', d.bonds)}
+        ${viewTextBlock('Слабости', d.flaws)}
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-label">Внешность и история</div>
+      <div class="sheet-grid" style="margin-bottom:12px;">
+        ${viewTextBlock('Возраст', d.age)}
+        ${viewTextBlock('Рост', d.height)}
+        ${viewTextBlock('Вес', d.weight)}
+        ${viewTextBlock('Глаза', d.eyes)}
+        ${viewTextBlock('Кожа', d.skin)}
+        ${viewTextBlock('Волосы', d.hair)}
+      </div>
+      ${viewTextBlock('История персонажа', d.backstory)}
+    </div>
+
+    ${spellBlock}
+  `;
+}
+
+function renderRules2024(){
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Правила 2024'}])}
+    <button class="back" data-go="home">← Назад</button>
+    <h1>Правила 2024</h1>
+    <p class="subtitle">Ключевые механики редакции 2024 года. Клик по карточке копирует название в буфер.</p>
+    <div class="rule"></div>
+
+    <div class="section-label">Мастерство оружия</div>
+    <div class="grid">${WEAPON_MASTERY.map(termCard).join('')}</div>
+
+    <div class="section-label">Состояния</div>
+    <div class="grid">${CONDITIONS_2024.map(termCard).join('')}</div>
+
+    <div class="section-label">Истощение</div>
+    <div class="grid">${EXHAUSTION_LEVELS.map(termCard).join('')}</div>
+
+    <div class="section-label">Укрытие</div>
+    <div class="grid">${COVER_RULES.map(termCard).join('')}</div>
+
+    <div class="section-label">Прочее</div>
+    <div class="grid">${MISC_RULES_2024.map(termCard).join('')}</div>
+  `;
+}
+
+function flaskSvg(uid, color){
+  const clipId = 'flaskClip_'+uid;
+  const shape = 'M38,8 L38,42 L18,118 Q18,132 33,132 L67,132 Q82,132 82,118 L62,42 L62,8 Z';
+  return `<svg class="flask" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    <defs><clipPath id="${clipId}"><path d="${shape}"/></clipPath></defs>
+    <g clip-path="url(#${clipId})">
+      <rect class="flask-liquid" x="10" y="135" width="80" height="0" fill="${color}"></rect>
+    </g>
+    <path d="${shape}" fill="none" stroke="var(--ink-dim)" stroke-width="3"/>
+    <line x1="30" y1="8" x2="70" y2="8" stroke="var(--ink-dim)" stroke-width="4" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function recipeCardHtml(r){
+  const kitLabel = r.kit==='herbalism' ? 'Набор травника' : 'Алхимический набор';
+  const ingRows = (r.ingredients||[]).filter(i=>i.name).map(ing=>{
+    const stock = findIngredient(ing.name);
+    const have = stock ? stock.qty : 0;
+    const cls = have>=ing.qty ? 'have' : 'short';
+    return `<div class="rc-ing-row"><span>${escapeHtml(ing.name)}</span><span class="${cls}">${have}/${ing.qty}</span></div>`;
+  }).join('') || '<div class="rc-ing-row"><span>Без ингредиентов</span></div>';
+  const uid = 'flask'+Math.random().toString(36).slice(2,8);
+  return `
+    <div class="recipe-card" data-recipe-id="${r.id}">
+      <div class="rc-top">
+        <div>
+          <div class="rc-name">${escapeHtml(r.name||'Без названия')}</div>
+          <div class="rc-meta">${r.cost||0} зм · ${escapeHtml(r.time||'—')}${r.dc?(' · СЛ '+escapeHtml(String(r.dc))):''}</div>
+        </div>
+        <span class="kit-badge">${kitLabel}</span>
+      </div>
+      <div class="rc-ingredients">${ingRows}</div>
+      ${r.effect?`<div class="rc-effect">${escapeHtml(r.effect)}</div>`:''}
+      <div class="rc-actions">
+        <button type="button" class="rc-btn brew" data-brew="${r.id}">⚗️ Сварить</button>
+        <button type="button" class="rc-btn" data-go="recipeForm:${r.id}">Изменить</button>
+        <button type="button" class="rc-btn" data-delete-recipe="${r.id}" style="color:var(--crimson-bright);">Удалить</button>
+      </div>
+      <div class="rc-missing-note" style="display:none;"></div>
+      <div class="brew-overlay">
+        ${flaskSvg(uid, hashColor(r.name||uid))}
+        <div class="brew-label"></div>
+      </div>
+    </div>`;
+}
+
+function attemptBrew(recipeId){
+  const recipe = RECIPES.find(r=>r.id===recipeId);
+  if(!recipe) return;
+  const missing = [];
+  (recipe.ingredients||[]).forEach(ing=>{
+    if(!ing.name) return;
+    const stock = findIngredient(ing.name);
+    const have = stock ? stock.qty : 0;
+    if(have < ing.qty) missing.push(`${ing.name} (нужно ${ing.qty}, есть ${have})`);
+  });
+  const card = document.querySelector(`.recipe-card[data-recipe-id="${recipeId}"]`);
+  if(missing.length){
+    const note = card ? card.querySelector('.rc-missing-note') : null;
+    if(note){ note.textContent = 'Не хватает: '+missing.join(', '); note.style.display='block'; }
+    return;
+  }
+  const note = card ? card.querySelector('.rc-missing-note') : null;
+  if(note) note.style.display='none';
+
+  (recipe.ingredients||[]).forEach(ing=>{
+    if(!ing.name) return;
+    const stock = findIngredient(ing.name);
+    if(stock) stock.qty -= ing.qty;
+  });
+  INGREDIENTS = INGREDIENTS.filter(i=>i.qty>0);
+  saveIngredientsToStorage();
+  copyText(`*[Сварено: ${recipe.name}]*`);
+
+  if(card){
+    const overlay = card.querySelector('.brew-overlay');
+    const label = card.querySelector('.brew-label');
+    const liquid = card.querySelector('.flask-liquid');
+    if(label) label.textContent = 'Сварено: '+recipe.name;
+    if(overlay) overlay.classList.add('active');
+    if(liquid){
+      liquid.setAttribute('y','135'); liquid.setAttribute('height','0');
+      const raf = typeof requestAnimationFrame==='function' ? requestAnimationFrame : (fn)=>setTimeout(fn,16);
+      raf(()=>{ raf(()=>{
+        liquid.setAttribute('y','48'); liquid.setAttribute('height','87');
+      });});
+    }
+    setTimeout(()=>{ if(overlay) overlay.classList.remove('active'); render(); }, 1900);
+  } else {
+    render();
+  }
+}
+
+function renderAlchemyHub(){
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Алхимия'}])}
+    <button class="back" data-go="home">← Назад</button>
+    <h1>Алхимия</h1>
+    <p class="subtitle">Рецепты, запасы ингредиентов и справочник по крафту.</p>
+    <div class="rule"></div>
+    <div class="menu-list">
+      <div class="menu-item" data-go="recipes">
+        <div>
+          <div class="name">Рецепты</div>
+          <div class="desc">Известные и открытые в игре рецепты, варение зелий</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="menu-item" data-go="stock">
+        <div>
+          <div class="name">Запасы ингредиентов</div>
+          <div class="desc">Что реально лежит в рюкзаке — чтобы не полагаться на память</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="menu-item" data-go="alchemyDC">
+        <div>
+          <div class="name">Справочник СЛ и крафта</div>
+          <div class="desc">Сложности проверок, время и стоимость изготовления</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderRecipes(){
+  const cards = RECIPES.map(recipeCardHtml).join('') || '<div class="char-empty">Пока нет рецептов.</div>';
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Алхимия', nav:'alchemy'},{label:'Рецепты'}])}
+    <button class="back" data-go="alchemy">← Назад</button>
+    <h1>Рецепты</h1>
+    <p class="subtitle">«Сварить» списывает ингредиенты из запасов, если их хватает. Добавляй новые по мере открытия в игре.</p>
+    <div class="rule"></div>
+    <button class="new-char-btn" data-go="recipeForm:new">+ Добавить рецепт</button>
+    ${cards}
+  `;
+}
+
+function renderAlchemyDC(){
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Алхимия', nav:'alchemy'},{label:'Справочник СЛ'}])}
+    <button class="back" data-go="alchemy">← Назад</button>
+    <h1>Справочник СЛ и крафта</h1>
+    <p class="subtitle">Ориентировочные сложности и правила изготовления — по DMG, на усмотрение мастера.</p>
+    <div class="rule"></div>
+    <div class="grid">${ALCHEMY_DC.map(termCard).join('')}</div>
+  `;
+}
+
+function ingredientRowHtml(item){
+  return `
+    <div class="stock-row" data-ingredient-id="${item.id}">
+      <div class="stock-name">${escapeHtml(item.name)}</div>
+      <div class="stock-qty-ctrl">
+        <button type="button" data-stock-dec="${item.id}">−</button>
+        <span class="stock-qty-val">${item.qty}</span>
+        <button type="button" data-stock-inc="${item.id}">+</button>
+      </div>
+      <button type="button" class="stock-remove" data-stock-remove="${item.id}" title="Убрать">✕</button>
+    </div>`;
+}
+
+function renderStock(){
+  const rows = INGREDIENTS.map(ingredientRowHtml).join('') || '<div class="char-empty">Пока пусто — добавь то, что реально лежит в рюкзаке.</div>';
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Алхимия', nav:'alchemy'},{label:'Запасы'}])}
+    <button class="back" data-go="alchemy">← Назад</button>
+    <h1>Запасы ингредиентов</h1>
+    <p class="subtitle">То, что реально при себе — чтобы не полагаться на память.</p>
+    <div class="rule"></div>
+    <div class="add-ingredient-row">
+      <input type="text" id="newIngName" placeholder="Название ингредиента">
+      <input type="number" id="newIngQty" placeholder="Кол-во" value="1" min="1">
+      <button class="btn-primary" id="addIngredientBtn">+ Добавить</button>
+    </div>
+    <div id="stockList">${rows}</div>
+  `;
+}
+
+function initRecipeDraft(){
+  if(view.recipeId && view.recipeId!=='new'){
+    const existing = RECIPES.find(r=>r.id===view.recipeId);
+    recipeDraft = existing ? JSON.parse(JSON.stringify(existing)) : newRecipe();
+  } else {
+    recipeDraft = newRecipe();
+  }
+}
+function ingredientFormRowHtml(ing, idx){
+  return `
+    <div class="attack-row" data-ing-row="${idx}" style="grid-template-columns:2fr 1fr auto;">
+      <input type="text" placeholder="Название ингредиента" data-ing-idx="${idx}" data-ing-field="name" value="${escapeAttr(ing.name||'')}">
+      <input type="number" min="1" placeholder="Кол-во" data-ing-idx="${idx}" data-ing-field="qty" value="${ing.qty||1}">
+      <button type="button" class="row-remove" data-remove-ing="${idx}" title="Убрать">✕</button>
+    </div>`;
+}
+
+function renderRecipeForm(){
+  initRecipeDraft();
+  const r = recipeDraft;
+  const isExisting = !!(view.recipeId && view.recipeId!=='new' && RECIPES.find(x=>x.id===view.recipeId));
+  const ingRows = r.ingredients.map(ingredientFormRowHtml).join('');
+
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Алхимия', nav:'alchemy'},{label:'Рецепты', nav:'recipes'},{label:r.name||'Новый рецепт'}])}
+    <button class="back" data-go="recipes">← Назад</button>
+    <h1>${escapeHtml(r.name || 'Новый рецепт')}</h1>
+    <p class="subtitle">Впиши, что узнал в игре — сохранится в общем списке рецептов.</p>
+    <div class="rule"></div>
+
+    <div class="sheet-actions">
+      <button class="btn-primary" id="saveRecipeBtn">💾 Сохранить</button>
+      ${isExisting ? '<button class="btn-ghost" id="deleteRecipeBtn" style="color:var(--crimson-bright);border-color:var(--crimson-bright);">🗑 Удалить</button>' : ''}
+    </div>
+
+    <div id="recipeFormRoot">
+      <div class="sheet-grid" style="margin-bottom:20px;">
+        <div class="field"><label>Название</label><input type="text" data-rfield="name" value="${escapeAttr(r.name)}"></div>
+        <div class="field">
+          <label>Набор инструментов</label>
+          <select data-rfield="kit">
+            <option value="alchemist" ${r.kit==='alchemist'?'selected':''}>Алхимический набор</option>
+            <option value="herbalism" ${r.kit==='herbalism'?'selected':''}>Набор травника</option>
+          </select>
+        </div>
+        <div class="field"><label>Цена (зм)</label><input type="number" min="0" data-rfield="cost" value="${r.cost}"></div>
+        <div class="field"><label>Время</label><input type="text" data-rfield="time" value="${escapeAttr(r.time)}" placeholder="напр. 4 часа"></div>
+        <div class="field"><label>СЛ проверки (если есть)</label><input type="text" data-rfield="dc" value="${escapeAttr(String(r.dc||''))}"></div>
+      </div>
+
+      <div class="field" style="margin-bottom:8px;"><label>Ингредиенты</label></div>
+      <div id="ingList">${ingRows}</div>
+      <button type="button" class="add-row-btn" id="addIngRowBtn">+ Добавить ингредиент</button>
+
+      <div class="field" style="margin-top:20px;"><label>Эффект / описание</label><textarea data-rfield="effect" style="min-height:100px;">${escapeHtml(r.effect)}</textarea></div>
     </div>
   `;
 }
@@ -1273,6 +2542,16 @@ function wireEvents(){
       render();
     });
   });
+  const mapToggle = document.getElementById('mapDarkToggle');
+  if(mapToggle){
+    mapToggle.addEventListener('click', ()=>{
+      const wrap = document.getElementById('mapFrameWrap');
+      if(!wrap) return;
+      const on = wrap.classList.toggle('inverted');
+      mapToggle.classList.toggle('active', on);
+      mapToggle.textContent = on ? '☀️ Вернуть обычные цвета' : '🌙 Тёмные цвета карты';
+    });
+  }
   document.querySelectorAll('.die-btn').forEach(el=>{
     el.addEventListener('click', ()=>addDie(parseInt(el.getAttribute('data-sides'),10)));
   });
@@ -1303,14 +2582,241 @@ function wireEvents(){
     if(mv) mv.textContent=(diceState.modifier>0?'+':'')+diceState.modifier;
     updateDiceReadout();
   });
+
+  /* ---------- character tracker events ---------- */
+  const importBtn = document.getElementById('importBtn');
+  const importFile = document.getElementById('importFile');
+  if(importBtn && importFile){
+    importBtn.addEventListener('click', ()=>importFile.click());
+    importFile.addEventListener('change', ()=>{
+      if(importFile.files && importFile.files[0]) importCharacterFromFile(importFile.files[0]);
+    });
+  }
+
+  const sheetRoot = document.getElementById('sheetRoot');
+  if(sheetRoot){
+    sheetRoot.addEventListener('input', (e)=>{
+      const t = e.target;
+      const field = t.getAttribute('data-field');
+      if(field){
+        let val = t.type==='number' ? Number(t.value) : t.value;
+        setPath(charDraft, field, val);
+        recomputeDerived();
+        return;
+      }
+      const aIdx = t.getAttribute('data-attack-idx');
+      if(aIdx!==null){
+        const f = t.getAttribute('data-attack-field');
+        charDraft.attacks[Number(aIdx)][f] = t.value;
+        return;
+      }
+      const slotLvl = t.getAttribute('data-slot-level');
+      if(slotLvl!==null){
+        const kind = t.getAttribute('data-slot-kind');
+        const key = kind==='used' ? 'slotsUsed' : 'slots';
+        charDraft[key][slotLvl] = Number(t.value)||0;
+        return;
+      }
+    });
+    sheetRoot.addEventListener('change', (e)=>{
+      const t = e.target;
+      const field = t.getAttribute('data-field');
+      if(field && t.type==='checkbox'){
+        setPath(charDraft, field, t.checked);
+        recomputeDerived();
+        if(field==='spellEnabled'){
+          const block = document.getElementById('spellBlock');
+          if(block) block.style.display = t.checked ? '' : 'none';
+        }
+      }
+    });
+    sheetRoot.querySelectorAll('.prof-toggle').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const key = btn.getAttribute('data-skill-toggle');
+        const cur = charDraft.skillProf[key]||0;
+        const next = (cur+1)%3;
+        charDraft.skillProf[key]=next;
+        btn.setAttribute('data-state', next);
+        recomputeDerived();
+      });
+    });
+    sheetRoot.querySelectorAll('.death-dot').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const [kind, numStr] = btn.getAttribute('data-death').split(':');
+        const num = Number(numStr);
+        const field = kind==='success' ? 'deathSuccess' : 'deathFail';
+        charDraft[field] = (charDraft[field]===num) ? num-1 : num;
+        const cls = kind==='success' ? 'on-success' : 'on-fail';
+        const group = btn.parentElement.querySelectorAll(`[data-death^="${kind}:"]`);
+        group.forEach(b=>{
+          const n = Number(b.getAttribute('data-death').split(':')[1]);
+          b.classList.toggle(cls, n<=charDraft[field]);
+        });
+      });
+    });
+    const addAttackBtn = document.getElementById('addAttackBtn');
+    if(addAttackBtn) addAttackBtn.addEventListener('click', addAttackRow);
+    sheetRoot.addEventListener('click', (e)=>{
+      const rm = e.target.closest('[data-remove-attack]');
+      if(rm){ removeAttackRow(Number(rm.getAttribute('data-remove-attack'))); }
+    });
+  }
+
+  const saveCharBtn = document.getElementById('saveCharBtn');
+  if(saveCharBtn) saveCharBtn.addEventListener('click', ()=>{
+    upsertCharacter();
+    navigate('charview:'+charDraft.id);
+  });
+  const exportCharBtn = document.getElementById('exportCharBtn');
+  if(exportCharBtn) exportCharBtn.addEventListener('click', exportCharacterJson);
+  const copyCharBtn = document.getElementById('copyCharBtn');
+  if(copyCharBtn) copyCharBtn.addEventListener('click', ()=>{
+    copyCharacterAsText();
+    const old = copyCharBtn.textContent;
+    copyCharBtn.textContent = 'Скопировано ✓';
+    setTimeout(()=>{ copyCharBtn.textContent = old; }, 1000);
+  });
+  const deleteCharBtn = document.getElementById('deleteCharBtn');
+  if(deleteCharBtn) deleteCharBtn.addEventListener('click', ()=>{
+    if(confirm('Удалить персонажа «'+(charDraft.name||'без имени')+'» без возможности восстановления?')){
+      deleteCharacter(charDraft.id);
+      navigate('characters');
+    }
+  });
+
+  /* ---------- alchemy events ---------- */
+  document.querySelectorAll('[data-brew]').forEach(btn=>{
+    btn.addEventListener('click', ()=>attemptBrew(btn.getAttribute('data-brew')));
+  });
+  document.querySelectorAll('[data-delete-recipe]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.getAttribute('data-delete-recipe');
+      const rec = RECIPES.find(r=>r.id===id);
+      if(confirm('Удалить рецепт «'+(rec?rec.name:'')+'»?')){
+        RECIPES = RECIPES.filter(r=>r.id!==id);
+        saveRecipesToStorage();
+        render();
+      }
+    });
+  });
+
+  const recipeFormRoot = document.getElementById('recipeFormRoot');
+  if(recipeFormRoot){
+    recipeFormRoot.addEventListener('input', (e)=>{
+      const t = e.target;
+      const rfield = t.getAttribute('data-rfield');
+      if(rfield){
+        recipeDraft[rfield] = t.type==='number' ? Number(t.value) : t.value;
+        return;
+      }
+      const ingIdx = t.getAttribute('data-ing-idx');
+      if(ingIdx!==null){
+        const f = t.getAttribute('data-ing-field');
+        recipeDraft.ingredients[Number(ingIdx)][f] = f==='qty' ? Number(t.value) : t.value;
+      }
+    });
+    recipeFormRoot.addEventListener('change', (e)=>{
+      const t = e.target;
+      const rfield = t.getAttribute('data-rfield');
+      if(rfield && t.tagName==='SELECT') recipeDraft[rfield] = t.value;
+    });
+    recipeFormRoot.addEventListener('click', (e)=>{
+      const rm = e.target.closest('[data-remove-ing]');
+      if(rm){
+        const idx = Number(rm.getAttribute('data-remove-ing'));
+        recipeDraft.ingredients.splice(idx,1);
+        const list = document.getElementById('ingList');
+        if(list) list.innerHTML = recipeDraft.ingredients.map(ingredientFormRowHtml).join('');
+      }
+    });
+  }
+  const addIngRowBtn = document.getElementById('addIngRowBtn');
+  if(addIngRowBtn) addIngRowBtn.addEventListener('click', ()=>{
+    recipeDraft.ingredients.push({name:'',qty:1});
+    const list = document.getElementById('ingList');
+    if(list) list.innerHTML = recipeDraft.ingredients.map(ingredientFormRowHtml).join('');
+  });
+  const saveRecipeBtn = document.getElementById('saveRecipeBtn');
+  if(saveRecipeBtn) saveRecipeBtn.addEventListener('click', ()=>{
+    if(!recipeDraft.id) recipeDraft.id = genId();
+    recipeDraft.ingredients = recipeDraft.ingredients.filter(i=>i.name && i.name.trim());
+    if(!recipeDraft.ingredients.length) recipeDraft.ingredients.push({name:'',qty:1});
+    const i = RECIPES.findIndex(x=>x.id===recipeDraft.id);
+    const copy = JSON.parse(JSON.stringify(recipeDraft));
+    if(i>=0) RECIPES[i]=copy; else RECIPES.push(copy);
+    saveRecipesToStorage();
+    navigate('recipes');
+  });
+  const deleteRecipeBtn = document.getElementById('deleteRecipeBtn');
+  if(deleteRecipeBtn) deleteRecipeBtn.addEventListener('click', ()=>{
+    if(confirm('Удалить рецепт «'+(recipeDraft.name||'без имени')+'»?')){
+      RECIPES = RECIPES.filter(x=>x.id!==recipeDraft.id);
+      saveRecipesToStorage();
+      navigate('recipes');
+    }
+  });
+
+  const addIngredientBtn = document.getElementById('addIngredientBtn');
+  if(addIngredientBtn) addIngredientBtn.addEventListener('click', ()=>{
+    const nameEl = document.getElementById('newIngName');
+    const qtyEl = document.getElementById('newIngQty');
+    const name = nameEl.value.trim();
+    const qty = Math.max(1, Number(qtyEl.value)||1);
+    if(!name) return;
+    const existing = findIngredient(name);
+    if(existing) existing.qty += qty;
+    else INGREDIENTS.push({id:genId(), name, qty});
+    saveIngredientsToStorage();
+    render();
+  });
+  document.querySelectorAll('[data-stock-inc]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const item = INGREDIENTS.find(i=>i.id===btn.getAttribute('data-stock-inc'));
+      if(item){
+        item.qty++;
+        saveIngredientsToStorage();
+        const row = btn.closest('.stock-row');
+        const val = row ? row.querySelector('.stock-qty-val') : null;
+        if(val) val.textContent = item.qty;
+      }
+    });
+  });
+  document.querySelectorAll('[data-stock-dec]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const item = INGREDIENTS.find(i=>i.id===btn.getAttribute('data-stock-dec'));
+      if(item){
+        item.qty = Math.max(0, item.qty-1);
+        saveIngredientsToStorage();
+        const row = btn.closest('.stock-row');
+        const val = row ? row.querySelector('.stock-qty-val') : null;
+        if(val) val.textContent = item.qty;
+      }
+    });
+  });
+  document.querySelectorAll('[data-stock-remove]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      INGREDIENTS = INGREDIENTS.filter(i=>i.id!==btn.getAttribute('data-stock-remove'));
+      saveIngredientsToStorage();
+      render();
+    });
+  });
 }
 
 function navigate(val){
   const parts = val.split(':');
   if(parts[0]==='home') view = {screen:'home'};
   else if(parts[0]==='commands') view = {screen:'commands'};
+  else if(parts[0]==='rules2024') view = {screen:'rules2024'};
+  else if(parts[0]==='alchemy') view = {screen:'alchemy'};
+  else if(parts[0]==='recipes') view = {screen:'recipes'};
+  else if(parts[0]==='recipeForm') view = {screen:'recipeForm', recipeId: parts[1]};
+  else if(parts[0]==='stock') view = {screen:'stock'};
+  else if(parts[0]==='alchemyDC') view = {screen:'alchemyDC'};
   else if(parts[0]==='dice') view = {screen:'dice'};
   else if(parts[0]==='map') view = {screen:'map'};
+  else if(parts[0]==='characters') view = {screen:'characters'};
+  else if(parts[0]==='charview') view = {screen:'charview', charId: parts[1]};
+  else if(parts[0]==='sheet') view = {screen:'sheet', charId: parts[1]};
   else if(parts[0]==='glossary') view = {screen:'glossary'};
   else if(parts[0]==='weapons') view = {screen:'weapons', weapon: view.weapon || 'longsword'};
   else if(parts[0]==='class') view = {screen:'class', cls:parts[1]};
