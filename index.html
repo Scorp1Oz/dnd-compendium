@@ -2402,8 +2402,11 @@ function renderRecipeForm(){
     </div>
 
     <div id="recipeFormRoot">
+      <div class="field" style="margin-bottom:16px;">
+        <label>Название</label>
+        <input type="text" data-rfield="name" value="${escapeAttr(r.name)}" style="font-size:19px;padding:12px 14px;">
+      </div>
       <div class="sheet-grid" style="margin-bottom:20px;">
-        <div class="field"><label>Название</label><input type="text" data-rfield="name" value="${escapeAttr(r.name)}"></div>
         <div class="field">
           <label>Набор инструментов</label>
           <select data-rfield="kit">
