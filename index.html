@@ -712,6 +712,11 @@ const DATA = {
           {ru:"Размашистый удар", en:"Sweeping Attack", die:"1d8", cat:"offense", desc:"При попадании по цели рукопашной атакой: ещё одно существо рядом получает урон, равный броску кости, если исходная атака задела бы и его."},
           {ru:"Тактическая оценка", en:"Tactical Assessment", die:"1d8", cat:"tactics", desc:"Проверка Интеллекта (История, Расследование) или Мудрости (Проницательность): прибавьте кость превосходства к результату."},
           {ru:"Атака с подсечкой", en:"Trip Attack", die:"1d8", cat:"offense", desc:"При попадании прибавьте кость к урону; цель (не крупнее Большого размера) проходит спасбросок Силы или получает состояние «Лежит»."}
+        ],
+        extraManeuvers: [
+          {ru:"Стойка", en:"Brace", die:"1d8", cat:"defense", desc:"Реакцией, когда существо входит в вашу досягаемость рукопашным оружием: одна атака этим оружием по нему, прибавьте кость к урону."},
+          {ru:"Захват в клинче", en:"Grappling Strike", die:"1d8", cat:"offense", desc:"Сразу после попадания рукопашной атакой — бонусным действием попытка захвата; прибавьте кость к проверке Силы (Атлетика)."},
+          {ru:"Быстрый бросок", en:"Quick Toss", die:"1d8", cat:"offense", desc:"Бонусным действием: дальнобойная атака метательным оружием (можно выхватить его как часть атаки); при попадании прибавьте кость к урону."}
         ]
       }
     }
@@ -1587,26 +1592,36 @@ function renderWeapons(){
   `;
 }
 
+const MAP_SOURCES = [
+  {id:'loremaps', label:'LoreMaps', url:'https://loremaps.azurewebsites.net/Maps/Faerun'},
+  {id:'frwiki', label:'Forgotten Realms Wiki', url:'https://forgottenrealms.fandom.com/wiki/Map:Faer%C3%BBn_%E2%80%93_Full_Map'}
+];
+
 function renderMap(){
-  const mapUrl = 'https://loremaps.azurewebsites.net/Maps/Faerun';
+  if(!view.mapId) view.mapId = 'loremaps';
+  const current = MAP_SOURCES.find(m=>m.id===view.mapId) || MAP_SOURCES[0];
+  const pills = MAP_SOURCES.map(m=>
+    `<button class="pill map-source-pill ${m.id===view.mapId?'active':''}" data-map-src="${m.id}">${m.label}</button>`
+  ).join('');
   return `
     ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Карта Фаэруна'}])}
     <button class="back" data-go="home">← Назад</button>
     <h1>Карта Фаэруна</h1>
-    <p class="subtitle">Интерактивная карта LoreMaps, встроенная прямо на странице.</p>
+    <p class="subtitle">Выбери источник карты — встроена прямо на странице.</p>
     <div class="rule"></div>
+    <div class="pill-row" style="margin-bottom:14px;">${pills}</div>
     <div class="map-controls-row">
       <button class="map-toggle" id="mapDarkToggle">🌙 Тёмные цвета карты</button>
       <span style="font-size:12.5px;color:var(--ink-dim);">Инвертирует всю карту целиком — включай, когда просто нужно не слепнуть от белого фона.</span>
     </div>
     <div class="map-frame-wrap" id="mapFrameWrap">
-      <iframe src="${mapUrl}" title="Карта Фаэруна" loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"
-        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+      <iframe id="mapIframe" src="${current.url}" title="Карта Фаэруна" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade" allowfullscreen allow="fullscreen"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"></iframe>
     </div>
     <div class="map-fallback-row">
-      <span>Карта не загрузилась? Некоторые сайты запрещают показывать себя внутри других страниц.</span>
-      <a href="${mapUrl}" target="_blank" rel="noopener noreferrer">Открыть в новой вкладке ↗</a>
+      <span>Карта не загрузилась? Некоторые сайты (особенно Fandom) запрещают показывать себя внутри других страниц.</span>
+      <a id="mapFallbackLink" href="${current.url}" target="_blank" rel="noopener noreferrer">Открыть в новой вкладке ↗</a>
     </div>
   `;
 }
@@ -2481,8 +2496,8 @@ function renderSub(){
       <div class="gen-stamp"><div class="gen-die"></div></div>
     </div>
   `;};
-  const groupSection = (title, cat)=>{
-    const items = sub.maneuvers.filter(m=>m.cat===cat);
+  const groupSection = (title, cat, list)=>{
+    const items = list.filter(m=>m.cat===cat);
     if(!items.length) return '';
     return `
       <div class="section-label">${title}</div>
@@ -2496,9 +2511,13 @@ function renderSub(){
     <h1>Мастер боя</h1>
     <p class="subtitle">Клик по карточке копирует название приёма; кнопка ниже — сразу бросает кость превосходства и копирует готовый результат.</p>
     <div class="rule"></div>
-    ${groupSection('Атакующие', 'offense')}
-    ${groupSection('Защитные', 'defense')}
-    ${groupSection('Тактические', 'tactics')}
+    ${groupSection('Атакующие', 'offense', sub.maneuvers)}
+    ${groupSection('Защитные', 'defense', sub.maneuvers)}
+    ${groupSection('Тактические', 'tactics', sub.maneuvers)}
+    <div class="section-label">Дополнительно (Tasha's Cauldron of Everything)</div>
+    <p style="font-size:13px;color:var(--ink-dim);font-style:italic;margin:-6px 0 14px;">Эти три приёма не входят в базовые 20 из PHB 2024 — они были вырезаны при обновлении правил. Многие столы всё равно разрешают их по договорённости с мастером.</p>
+    ${groupSection('Атакующие', 'offense', sub.extraManeuvers)}
+    ${groupSection('Защитные', 'defense', sub.extraManeuvers)}
     <div class="footnote">Правила 2024 г. · Player's Handbook · Combat Superiority</div>
   `;
 }
@@ -2539,10 +2558,27 @@ function wireEvents(){
       handleGenerateClick(el);
     });
   });
-  document.querySelectorAll('.pill').forEach(el=>{
+  document.querySelectorAll('.pill[data-weapon]').forEach(el=>{
     el.addEventListener('click', ()=>{
       view.weapon = el.getAttribute('data-weapon');
       render();
+    });
+  });
+  document.querySelectorAll('.map-source-pill').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const id = el.getAttribute('data-map-src');
+      view.mapId = id;
+      const src = MAP_SOURCES.find(m=>m.id===id);
+      if(!src) return;
+      document.querySelectorAll('.map-source-pill').forEach(p=>p.classList.toggle('active', p===el));
+      const iframe = document.getElementById('mapIframe');
+      if(iframe) iframe.src = src.url;
+      const fallback = document.getElementById('mapFallbackLink');
+      if(fallback) fallback.href = src.url;
+      const wrap = document.getElementById('mapFrameWrap');
+      if(wrap) wrap.classList.remove('inverted');
+      const darkBtn = document.getElementById('mapDarkToggle');
+      if(darkBtn){ darkBtn.classList.remove('active'); darkBtn.textContent = '🌙 Тёмные цвета карты'; }
     });
   });
   const mapToggle = document.getElementById('mapDarkToggle');
