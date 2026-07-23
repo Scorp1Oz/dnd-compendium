@@ -718,6 +718,42 @@ const DATA = {
           {ru:"Захват в клинче", en:"Grappling Strike", die:"1d8", cat:"offense", desc:"Сразу после попадания рукопашной атакой — бонусным действием попытка захвата; прибавьте кость к проверке Силы (Атлетика)."},
           {ru:"Быстрый бросок", en:"Quick Toss", die:"1d8", cat:"offense", desc:"Бонусным действием: дальнобойная атака метательным оружием (можно выхватить его как часть атаки); при попадании прибавьте кость к урону."}
         ]
+      },
+      champion: {
+        name: "Чемпион",
+        features: [
+          {ru:"Улучшенный крит", level:3, desc:"Атаки оружием и безоружные удары наносят критическое попадание уже при выпадении 19 или 20 на д20."},
+          {ru:"Выдающийся атлет", level:3, desc:"Преимущество на броски инициативы и проверки Силы (Атлетика). Сразу после критического попадания можно переместиться на половину скорости, не провоцируя атаки возможности."},
+          {ru:"Дополнительный боевой стиль", level:7, desc:"Получаете ещё один талант боевого стиля на выбор."},
+          {ru:"Героический воин", level:10, desc:"В бою, если в начале своего хода у вас нет героического вдохновения — получаете его автоматически."},
+          {ru:"Превосходный крит", level:15, desc:"Атаки оружием и безоружные удары наносят критическое попадание при выпадении 18, 19 или 20 на д20."},
+          {ru:"Выживший", level:18, desc:"В начале хода восстанавливаете 5 + модификатор Телосложения хитов, если у вас осталось не больше половины максимума (и они не равны нулю). Также преимущество на спасброски от смерти, а результат 18–20 на них считается критическим успехом."}
+        ]
+      },
+      psiwarrior: {
+        name: "Псионический воин",
+        features: [
+          {ru:"Психическая сила", level:3, desc:"Пул костей психической энергии (d6, растёт с уровнем до d12). Восстанавливаете одну после короткого отдыха, все — после длинного."},
+          {ru:"Защитное поле", level:3, roll:{sides:6}, desc:"Реакцией: потратьте кость психической энергии, чтобы уменьшить урон себе или существу в 30 футах на бросок кости + модификатор Интеллекта."},
+          {ru:"Психический удар", level:3, roll:{sides:6}, desc:"При попадании оружейной атакой: потратьте кость, чтобы нанести дополнительный урон силовым полем — бросок кости + модификатор Интеллекта."},
+          {ru:"Телекинетическое перемещение", level:3, desc:"Действием бесплатно перемещаете телекинезом предмет или существо (не крупнее Большого) на 30 футов."},
+          {ru:"Телекинетический прыжок", level:7, desc:"Действием даёте существу в 30 футах скорость полёта, равную его обычной скорости, на 10 минут."},
+          {ru:"Телекинетический бросок", level:7, roll:{sides:6}, desc:"При попадании оружейной атакой: потратьте кость, чтобы толкнуть цель (не крупнее Большого) на 10 футов и свалить с ног; добавьте кость к урону силой."},
+          {ru:"Защищённый разум", level:10, desc:"Сопротивление психическому урону. Если в начале хода вы очарованы или испуганы — бесплатно тратите кость, чтобы снять оба состояния."},
+          {ru:"Бастион силы", level:15, desc:"Бонусным действием: щит из силовой энергии на себя или союзника в 30 футах, поглощающий урон в объёме 5 × уровень Воина."},
+          {ru:"Телекинетический мастер", level:18, desc:"У вас всегда подготовлено заклинание «Телекинез» (Интеллект); можно кастовать без ячейки и компонентов раз за длинный отдых, либо повторно за кость."}
+        ]
+      },
+      eldritchknight: {
+        name: "Мистический рыцарь",
+        features: [
+          {ru:"Заклинания волшебника", level:3, isLink:true, linkTo:"magic", desc:"Получаете подготавливаемые заклинания из списка Волшебника (Интеллект). Открыть общий раздел «Магия» — школы и список заклинаний там же →"},
+          {ru:"Боевая связь", level:3, desc:"Ритуалом за 1 час связываете до двух оружий с собой; их нельзя обезоружить (если вы не недееспособны), и можно призвать связанное оружие в руку бонусным действием."},
+          {ru:"Боевая магия", level:7, desc:"Когда берёте действие Атака — можно заменить одну из атак на каст заговора Волшебника с временем накладывания 1 действие."},
+          {ru:"Мистический удар", level:10, desc:"При попадании оружейной атакой: цель получает помеху на следующий спасбросок против вашего заклинания до конца вашего следующего хода."},
+          {ru:"Магический рывок", level:15, desc:"При использовании Всплеска действия можно телепортироваться на 30 футов в видимую точку — до или после дополнительного действия."},
+          {ru:"Улучшенная боевая магия", level:18, desc:"Когда берёте действие Атака — можно заменить сразу две атаки на каст заклинания Волшебника 1 или 2 уровня с временем накладывания 1 действие."}
+        ]
       }
     }
   }
@@ -1368,6 +1404,70 @@ let RECIPES = loadRecipes();
 let INGREDIENTS = loadIngredients();
 let recipeDraft = null;
 
+/* ---------- magic ---------- */
+const MAGIC_SCHOOLS = [
+  {key:'abjuration', ru:'Ограждение'},
+  {key:'conjuration', ru:'Вызов'},
+  {key:'divination', ru:'Прорицание'},
+  {key:'enchantment', ru:'Очарование'},
+  {key:'illusion', ru:'Иллюзия'},
+  {key:'necromancy', ru:'Некромантия'},
+  {key:'transmutation', ru:'Преобразование'},
+  {key:'evocation', ru:'Воплощение'}
+];
+function schoolName(key){
+  const s = MAGIC_SCHOOLS.find(x=>x.key===key);
+  return s ? s.ru : key;
+}
+function levelLabel(lvl){
+  return lvl===0 ? 'Заговор' : ('Ур. '+lvl);
+}
+function newSpell(schoolKey){
+  return { id:null, name:'', school:schoolKey||'evocation', level:1, effect:'', isCustom:true };
+}
+function seedSpells(){
+  const s = [
+    ['Щит','abjuration',1,'Реакция на попадание или Волшебную стрелу: +5 к КД до начала следующего хода, отменяет попадание Волшебной стрелы.'],
+    ['Контрзаклинание','abjuration',3,'Реакцией прерываете каст заклинания существом в 60 футах, если оно видит или слышит вас.'],
+    ['Свобода передвижения','abjuration',4,'Цель игнорирует опутывание и обездвиживание, а сложная местность не замедляет её передвижение.'],
+    ['Туманное облако','conjuration',1,'Создаёт сферу густого тумана радиусом 20 футов, сильно ограничивающую обзор внутри себя.'],
+    ['Паутина','conjuration',2,'Заполняет область липкой паутиной, опутывающей существ и затрудняющей передвижение.'],
+    ['Телепортация','conjuration',7,'Мгновенно переносит вас и спутников в знакомое место, даже на другом плане бытия.'],
+    ['Обнаружение магии','divination',1,'10 минут ощущаете присутствие магии в 30 футах от себя и видите её слабую ауру.'],
+    ['Ясновидение','divination',3,'Создаёт невидимый сенсор зрения или слуха в знакомом месте на 10 минут.'],
+    ['Гадание','divination',5,'Позволяет видеть и слышать выбранное существо на расстоянии, если оно провалит спасбросок.'],
+    ['Очарование личности','enchantment',1,'Гуманоид, проваливший спасбросок Мудрости, считает вас другом в течение часа.'],
+    ['Удержание личности','enchantment',2,'Гуманоид, проваливший спасбросок Мудрости, получает состояние «Парализован» до конца заклинания.'],
+    ['Доминирование над личностью','enchantment',5,'Берёте под ментальный контроль гуманоида, провалившего спасбросок Мудрости.'],
+    ['Малая иллюзия','illusion',0,'Создаёт небольшой беззвучный образ или звук без образа в пределах 30 футов.'],
+    ['Незримость','illusion',2,'Существо становится невидимым на час или пока не атакует либо не скастует заклинание.'],
+    ['Большая иллюзия','illusion',3,'Создаёт реалистичный образ со звуком, запахом и движением, живущий до 10 минут.'],
+    ['Ложная жизнь','necromancy',1,'Даёт 1к4+4 временных хитов в дополнение к обычным.'],
+    ['Оживление мертвецов','necromancy',3,'Поднимает скелет или зомби из останков, подчиняющегося вашим приказам.'],
+    ['Перст смерти','necromancy',7,'Наносит тяжёлый некротический урон; убитый им гуманоид восстаёт зомби на вашей стороне.'],
+    ['Полёт','transmutation',3,'Даёт цели скорость полёта 60 футов на 10 минут.'],
+    ['Ускорение','transmutation',3,'Удваивает скорость цели, +2 к КД, преимущество на спасброски Ловкости, доп. действие.'],
+    ['Полиморф','transmutation',4,'Превращает цель в выбранное животное; её игровые характеристики заменяются характеристиками зверя.'],
+    ['Волшебная стрела','evocation',1,'Три силовых снаряда наносят по 1к4+1 урона каждый и попадают автоматически.'],
+    ['Обжигающие руки','evocation',1,'Конус пламени наносит урон огнём существам в области и поджигает горючие предметы.'],
+    ['Огненный шар','evocation',3,'Взрыв пламени в области радиусом 20 футов наносит крупный урон огнём всем внутри.']
+  ];
+  return s.map(([name,school,level,effect])=>({id:genId(), name, school, level, effect, isCustom:false}));
+}
+function loadSpells(){
+  try{
+    const raw = localStorage.getItem('ttc_spells');
+    if(!raw) return seedSpells();
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) && arr.length ? arr : seedSpells();
+  }catch(e){ return seedSpells(); }
+}
+function saveSpellsToStorage(){
+  try{ localStorage.setItem('ttc_spells', JSON.stringify(SPELLS)); }catch(e){}
+}
+let SPELLS = loadSpells();
+let spellDraft = null;
+
 let CHARACTERS = loadCharacters();
 let charDraft = null;
 
@@ -1385,6 +1485,10 @@ function render(){
   else if(view.screen === 'recipeForm') app.innerHTML = renderRecipeForm();
   else if(view.screen === 'stock') app.innerHTML = renderStock();
   else if(view.screen === 'alchemyDC') app.innerHTML = renderAlchemyDC();
+  else if(view.screen === 'subclass') app.innerHTML = renderSubclassFeatures();
+  else if(view.screen === 'magic') app.innerHTML = renderMagicHub();
+  else if(view.screen === 'schoolSpells') app.innerHTML = renderSchoolSpells();
+  else if(view.screen === 'spellForm') app.innerHTML = renderSpellForm();
   else if(view.screen === 'class') app.innerHTML = renderClass();
   else if(view.screen === 'glossary') app.innerHTML = renderGlossaryHub();
   else if(view.screen === 'weapons') app.innerHTML = renderWeapons();
@@ -1437,6 +1541,13 @@ function renderHome(){
         <div>
           <div class="name">Алхимия</div>
           <div class="desc">Рецепты, запасы ингредиентов, варение зелий</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="menu-item util" data-go="magic">
+        <div>
+          <div class="name">Магия</div>
+          <div class="desc">Заклинания по школам — общая база для всех заклинателей</div>
         </div>
         <div class="arrow">→</div>
       </div>
@@ -2443,6 +2554,153 @@ function renderRecipeForm(){
   `;
 }
 
+function subclassFeatureCard(f){
+  if(f.isLink){
+    return `
+      <div class="card" data-go="${f.linkTo}">
+        <div class="top-row">
+          <div class="name">${f.ru}</div>
+          <div class="die-badge">Ур. ${f.level}</div>
+        </div>
+        <div class="desc">${f.desc}</div>
+      </div>`;
+  }
+  const genBtn = f.roll ? `<button class="gen-btn" data-template="${escapeAttr('*[Результат броска '+f.ru+' 1d'+f.roll.sides+': ]*')}" data-count="1" data-sides="${f.roll.sides}" data-mode="sum">Сгенерировать и скопировать результат</button>` : '';
+  const genOverlay = f.roll ? `<div class="gen-stamp"><div class="gen-die"></div></div>` : '';
+  return `
+    <div class="card" data-copy="${escapeAttr(f.ru)}">
+      <div class="top-row">
+        <div class="name">${f.ru}</div>
+        <div class="die-badge">Ур. ${f.level}</div>
+      </div>
+      <div class="desc">${f.desc}</div>
+      ${genBtn}
+      <div class="stamp"><span>Скопировано</span></div>
+      ${genOverlay}
+    </div>`;
+}
+
+function renderSubclassFeatures(){
+  const clsKey = view.clsKey, subKey = view.subKey;
+  const cls = DATA[clsKey];
+  const sub = cls ? cls.subclasses[subKey] : null;
+  if(!sub){
+    view = {screen:'class', cls:clsKey};
+    return renderClass();
+  }
+  const features = [...sub.features].sort((a,b)=>a.level-b.level);
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:cls.name, nav:'class:'+clsKey},{label:sub.name}])}
+    <button class="back" data-go="class:${clsKey}">← Назад</button>
+    <h1>${sub.name}</h1>
+    <p class="subtitle">Умения архетипа по уровням получения.</p>
+    <div class="rule"></div>
+    <div class="grid">${features.map(subclassFeatureCard).join('')}</div>
+  `;
+}
+
+/* ---------- magic screens ---------- */
+function spellCardHtml(s){
+  return `
+    <div class="card" data-copy="${escapeAttr(s.name)}">
+      <div class="top-row">
+        <div class="name">${escapeHtml(s.name)}</div>
+        <div class="die-badge">${levelLabel(s.level)}</div>
+      </div>
+      <div class="desc">${escapeHtml(s.effect)}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button type="button" class="rc-btn spell-edit-btn" data-spell-edit="${s.id}" data-spell-school="${s.school}">Изменить</button>
+        <button type="button" class="rc-btn spell-delete-btn" data-spell-delete="${s.id}" style="color:var(--crimson-bright);">Удалить</button>
+      </div>
+      <div class="stamp"><span>Скопировано</span></div>
+    </div>`;
+}
+
+function renderMagicHub(){
+  const items = MAGIC_SCHOOLS.map(sc=>{
+    const count = SPELLS.filter(s=>s.school===sc.key).length;
+    return `
+      <div class="menu-item" data-go="schoolSpells:${sc.key}">
+        <div>
+          <div class="name">${sc.ru}</div>
+          <div class="desc">${count} заклинани${count===1?'е':(count>=2&&count<=4?'я':'й')} в списке</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>`;
+  }).join('');
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Магия'}])}
+    <button class="back" data-go="home">← Назад</button>
+    <h1>Магия</h1>
+    <p class="subtitle">Общая база заклинаний по школам — сюда ссылаются все заклинатели компендиума.</p>
+    <div class="rule"></div>
+    <div class="menu-list grid-2">${items}</div>
+  `;
+}
+
+function renderSchoolSpells(){
+  const key = view.schoolKey;
+  const school = MAGIC_SCHOOLS.find(s=>s.key===key);
+  if(!school){ view = {screen:'magic'}; return renderMagicHub(); }
+  const spells = SPELLS.filter(s=>s.school===key).sort((a,b)=>a.level-b.level || a.name.localeCompare(b.name,'ru'));
+  const cards = spells.map(spellCardHtml).join('') || '<div class="char-empty">Пока нет заклинаний этой школы.</div>';
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Магия', nav:'magic'},{label:school.ru}])}
+    <button class="back" data-go="magic">← Назад</button>
+    <h1>${school.ru}</h1>
+    <p class="subtitle">Клик по карточке копирует название заклинания в буфер.</p>
+    <div class="rule"></div>
+    <button class="new-char-btn" data-go="spellForm:new:${key}">+ Добавить заклинание</button>
+    ${cards}
+  `;
+}
+
+function initSpellDraft(){
+  if(view.spellId && view.spellId!=='new'){
+    const existing = SPELLS.find(s=>s.id===view.spellId);
+    spellDraft = existing ? JSON.parse(JSON.stringify(existing)) : newSpell(view.schoolKey);
+  } else {
+    spellDraft = newSpell(view.schoolKey);
+  }
+}
+
+function renderSpellForm(){
+  initSpellDraft();
+  const s = spellDraft;
+  const isExisting = !!(view.spellId && view.spellId!=='new' && SPELLS.find(x=>x.id===view.spellId));
+  const schoolOptions = MAGIC_SCHOOLS.map(sc=>`<option value="${sc.key}" ${s.school===sc.key?'selected':''}>${sc.ru}</option>`).join('');
+  const levelOptions = Array.from({length:10},(_,i)=>i).map(l=>`<option value="${l}" ${s.level===l?'selected':''}>${levelLabel(l)}</option>`).join('');
+
+  return `
+    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Магия', nav:'magic'},{label:schoolName(s.school), nav:'schoolSpells:'+s.school},{label:s.name||'Новое заклинание'}])}
+    <button class="back" data-go="schoolSpells:${s.school}">← Назад</button>
+    <h1>${escapeHtml(s.name || 'Новое заклинание')}</h1>
+    <p class="subtitle">Впиши заклинание, которое открылось в игре — сохранится в общей базе.</p>
+    <div class="rule"></div>
+    <div class="sheet-actions">
+      <button class="btn-primary" id="saveSpellBtn">💾 Сохранить</button>
+      ${isExisting ? '<button class="btn-ghost" id="deleteSpellBtn" style="color:var(--crimson-bright);border-color:var(--crimson-bright);">🗑 Удалить</button>' : ''}
+    </div>
+    <div id="spellFormRoot">
+      <div class="field" style="margin-bottom:16px;">
+        <label>Название</label>
+        <input type="text" data-sfield="name" value="${escapeAttr(s.name)}" style="font-size:19px;padding:12px 14px;">
+      </div>
+      <div class="sheet-grid" style="margin-bottom:20px;">
+        <div class="field">
+          <label>Школа</label>
+          <select data-sfield="school">${schoolOptions}</select>
+        </div>
+        <div class="field">
+          <label>Уровень</label>
+          <select data-sfield="level">${levelOptions}</select>
+        </div>
+      </div>
+      <div class="field"><label>Эффект / описание</label><textarea data-sfield="effect" style="min-height:100px;">${escapeHtml(s.effect)}</textarea></div>
+    </div>
+  `;
+}
+
 function renderClass(){
   return `
     ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Воин'}])}
@@ -2450,7 +2708,7 @@ function renderClass(){
     <h1>Воин</h1>
     <p class="subtitle">Выберите боевой архетип.</p>
     <div class="rule"></div>
-    <div class="menu-list">
+    <div class="menu-list grid-2">
       <div class="menu-item" data-go="sub:fighter:battlemaster">
         <div>
           <div class="name">Мастер боя</div>
@@ -2458,12 +2716,26 @@ function renderClass(){
         </div>
         <div class="arrow">→</div>
       </div>
-      <div class="menu-item disabled">
+      <div class="menu-item" data-go="subclass:fighter:champion">
         <div>
-          <div class="name">Другие архетипы</div>
-          <div class="desc">Чемпион, Мистический рыцарь, Псионический воин...</div>
+          <div class="name">Чемпион</div>
+          <div class="desc">Расширенные критические попадания, простота и надёжность</div>
         </div>
-        <div class="tag-soon">скоро</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="menu-item" data-go="subclass:fighter:psiwarrior">
+        <div>
+          <div class="name">Псионический воин</div>
+          <div class="desc">Телекинез и силовые поля на костях психической энергии</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="menu-item" data-go="subclass:fighter:eldritchknight">
+        <div>
+          <div class="name">Мистический рыцарь</div>
+          <div class="desc">Боец с заклинаниями Волшебника и боевой магией</div>
+        </div>
+        <div class="arrow">→</div>
       </div>
     </div>
     <div class="section-label">Справочники</div>
@@ -2544,6 +2816,7 @@ function wireEvents(){
   document.querySelectorAll('.card').forEach(el=>{
     el.addEventListener('click', ()=>{
       const text = el.getAttribute('data-copy');
+      if(text===null) return; // карточка-ссылка (data-go) обрабатывается отдельно
       copyText(text);
       el.classList.remove('stamped');
       void el.offsetWidth; // restart animation
@@ -2795,6 +3068,57 @@ function wireEvents(){
     }
   });
 
+  /* ---------- magic events ---------- */
+  document.querySelectorAll('.spell-edit-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      navigate('spellForm:'+btn.getAttribute('data-spell-edit')+':'+btn.getAttribute('data-spell-school'));
+    });
+  });
+  document.querySelectorAll('.spell-delete-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const id = btn.getAttribute('data-spell-delete');
+      const sp = SPELLS.find(s=>s.id===id);
+      if(confirm('Удалить заклинание «'+(sp?sp.name:'')+'»?')){
+        SPELLS = SPELLS.filter(s=>s.id!==id);
+        saveSpellsToStorage();
+        render();
+      }
+    });
+  });
+  const spellFormRoot = document.getElementById('spellFormRoot');
+  if(spellFormRoot){
+    spellFormRoot.addEventListener('input', (e)=>{
+      const t = e.target;
+      const sfield = t.getAttribute('data-sfield');
+      if(sfield) spellDraft[sfield] = sfield==='level' ? Number(t.value) : t.value;
+    });
+    spellFormRoot.addEventListener('change', (e)=>{
+      const t = e.target;
+      const sfield = t.getAttribute('data-sfield');
+      if(sfield && t.tagName==='SELECT') spellDraft[sfield] = sfield==='level' ? Number(t.value) : t.value;
+    });
+  }
+  const saveSpellBtn = document.getElementById('saveSpellBtn');
+  if(saveSpellBtn) saveSpellBtn.addEventListener('click', ()=>{
+    if(!spellDraft.id) spellDraft.id = genId();
+    const i = SPELLS.findIndex(x=>x.id===spellDraft.id);
+    const copy = JSON.parse(JSON.stringify(spellDraft));
+    if(i>=0) SPELLS[i]=copy; else SPELLS.push(copy);
+    saveSpellsToStorage();
+    navigate('schoolSpells:'+spellDraft.school);
+  });
+  const deleteSpellBtn = document.getElementById('deleteSpellBtn');
+  if(deleteSpellBtn) deleteSpellBtn.addEventListener('click', ()=>{
+    if(confirm('Удалить заклинание «'+(spellDraft.name||'без имени')+'»?')){
+      const school = spellDraft.school;
+      SPELLS = SPELLS.filter(x=>x.id!==spellDraft.id);
+      saveSpellsToStorage();
+      navigate('schoolSpells:'+school);
+    }
+  });
+
   const addIngredientBtn = document.getElementById('addIngredientBtn');
   if(addIngredientBtn) addIngredientBtn.addEventListener('click', ()=>{
     const nameEl = document.getElementById('newIngName');
@@ -2851,6 +3175,10 @@ function navigate(val){
   else if(parts[0]==='recipeForm') view = {screen:'recipeForm', recipeId: parts[1]};
   else if(parts[0]==='stock') view = {screen:'stock'};
   else if(parts[0]==='alchemyDC') view = {screen:'alchemyDC'};
+  else if(parts[0]==='subclass') view = {screen:'subclass', clsKey:parts[1], subKey:parts[2]};
+  else if(parts[0]==='magic') view = {screen:'magic'};
+  else if(parts[0]==='schoolSpells') view = {screen:'schoolSpells', schoolKey:parts[1]};
+  else if(parts[0]==='spellForm') view = {screen:'spellForm', spellId:parts[1], schoolKey:parts[2]};
   else if(parts[0]==='dice') view = {screen:'dice'};
   else if(parts[0]==='map') view = {screen:'map'};
   else if(parts[0]==='characters') view = {screen:'characters'};
