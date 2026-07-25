@@ -345,6 +345,46 @@
   }
   .mod-btn:hover{border-color:var(--brass-dim);color:var(--brass);}
   .mod-val{font-family:'JetBrains Mono',monospace;font-size:15px;min-width:36px;text-align:center;color:var(--ink);}
+  .hero-dice{
+    display:flex;align-items:center;gap:22px;
+    background:linear-gradient(135deg, var(--steel-2) 0%, var(--steel-1) 60%);
+    border:1px solid var(--brass-dim);
+    border-left:4px solid var(--brass);
+    padding:24px 28px;
+    cursor:pointer;
+    margin-bottom:8px;
+    transition:all .16s;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-dice:hover{
+    border-left-color:var(--crimson-bright);
+    background:linear-gradient(135deg, var(--steel-2) 0%, var(--steel-2) 60%);
+  }
+  .hero-dice:active{transform:translateX(2px);}
+  .hero-dice-icon{width:64px;height:64px;flex-shrink:0;}
+  .hero-dice-icon svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.45));}
+  .hero-dice-text{flex:1;}
+  .hero-dice-name{
+    font-family:'Cinzel',serif;font-weight:700;font-size:26px;letter-spacing:.02em;margin-bottom:5px;
+  }
+  .hero-dice-desc{color:var(--ink-dim);font-style:italic;font-size:15px;}
+  .hero-dice-arrow{font-family:'JetBrains Mono',monospace;color:var(--brass);font-size:22px;flex-shrink:0;}
+
+  .label-picker{
+    display:flex;gap:12px;flex-wrap:wrap;
+    margin:6px 0 10px;
+  }
+  .label-picker select,.label-picker input[type=text]{
+    background:var(--steel-0);border:1px solid var(--line);color:var(--ink);
+    padding:9px 10px;font-family:'EB Garamond',serif;font-size:15.5px;border-radius:2px;width:100%;
+  }
+  .label-picker select:focus,.label-picker input:focus{outline:1px solid var(--brass-dim);border-color:var(--brass-dim);}
+  .label-preview{
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--brass);
+    background:var(--steel-0);border:1px solid var(--line);
+    padding:10px 12px;margin-bottom:18px;word-break:break-word;
+  }
   .dice-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
   .btn-primary{
     font-family:'Cinzel',serif;font-weight:700;font-size:15px;letter-spacing:.05em;
@@ -663,6 +703,12 @@
     .menu-item .name{font-size:18px;}
     .menu-item .desc{font-size:13.5px;}
     .menu-list.grid-2{grid-template-columns:1fr;}
+    .hero-dice{gap:14px;padding:18px 18px;}
+    .hero-dice-icon{width:48px;height:48px;}
+    .hero-dice-name{font-size:21px;}
+    .hero-dice-desc{font-size:13.5px;}
+    .label-picker{gap:10px;}
+    .label-preview{font-size:11.5px;padding:9px 10px;}
     .section-label{margin:22px 0 10px;}
 
     .grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:11px;}
@@ -818,6 +864,10 @@ const ABILITY_ABBR = {
   "Сила":"СИЛ","Ловкость":"ЛОВ","Телосложение":"ТЕЛ",
   "Интеллект":"ИНТ","Мудрость":"МДР","Харизма":"ХАР"
 };
+const ABILITY_GENITIVE = {
+  "Сила":"Силы","Ловкость":"Ловкости","Телосложение":"Телосложения",
+  "Интеллект":"Интеллекта","Мудрость":"Мудрости","Харизма":"Харизмы"
+};
 
 const SKILLS = [
   {ru:"Атлетика", ability:"Сила"},
@@ -846,11 +896,19 @@ const SKILLS = [
   desc: `Проверка навыка (${s.ability}).`
 }));
 
+const ABILITY_CHECKS = Object.keys(ABILITY_ABBR).map(ability=>({
+  ru: `Проверка ${ABILITY_GENITIVE[ability]}`,
+  die: ABILITY_ABBR[ability],
+  roll: {count:1,sides:20},
+  template: `*[Результат броска Проверка ${ABILITY_GENITIVE[ability]} 1d20: ]*`,
+  desc: `Общая проверка характеристики без привязки к конкретному навыку — когда мастер не уточняет, какой именно.`
+}));
+
 const SAVES = Object.keys(ABILITY_ABBR).map(ability=>({
-  ru: `Спасбросок ${ability}`,
+  ru: `Спасбросок ${ABILITY_GENITIVE[ability]}`,
   die: "1d20",
   roll: {count:1,sides:20},
-  template: `*[Результат броска Спасбросок ${ability} 1d20: ]*`,
+  template: `*[Результат броска Спасбросок ${ABILITY_GENITIVE[ability]} 1d20: ]*`,
   desc: `Спасбросок против эффектов, воздействующих на ${ability.toLowerCase()}.`
 }));
 
@@ -995,7 +1053,7 @@ const DICE_COLORS = {
   20:{light:'#e09a45',dark:'#8a561d'}
 };
 const DICE_LABEL_Y = {4:76,6:62,8:60,10:54,12:64,20:60};
-let diceState = {dice:[], modifier:0, counter:0};
+let diceState = {dice:[], modifier:0, counter:0, label:'', customLabel:''};
 
 function dieShapeSvg(sides, uid, label){
   const c = DICE_COLORS[sides];
@@ -1052,11 +1110,21 @@ function animateDie(el, sides, finalValue, dur){
   },70);
 }
 
+function updateLabelPreview(){
+  const el = document.getElementById('labelPreview');
+  if(!el) return;
+  const label = currentDiceLabel();
+  const notation = diceState.dice.length ? diceNotation(true) : '1d20';
+  const total = diceState.dice.length ? currentDiceTotal() : '…';
+  el.textContent = `*[Результат броска ${label?label+' ':''}${notation}: ${total} ]*`;
+}
+
 function updateDiceReadout(){
   const totalEl=document.getElementById('diceTotal');
   const notEl=document.getElementById('diceNotation');
   if(totalEl) totalEl.textContent = diceState.dice.length ? currentDiceTotal() : '—';
   if(notEl) notEl.textContent = diceState.dice.length ? diceNotation(false) : '';
+  updateLabelPreview();
 }
 
 function updateDiceControls(){
@@ -1124,8 +1192,16 @@ function rollAllDice(){
   setTimeout(updateDiceReadout, maxDur+90);
 }
 
+function currentDiceLabel(){
+  if(diceState.label==='__custom__') return (diceState.customLabel||'').trim();
+  return diceState.label || '';
+}
+
 function copyDiceResult(){
   if(!diceState.dice.length) return;
+
+  const label = currentDiceLabel();
+  const prefix = label ? (label+' ') : '';
 
   const groups = {};
   diceState.dice.forEach(d=>{
@@ -1136,12 +1212,12 @@ function copyDiceResult(){
 
   const lines = sidesDesc.map(sides=>{
     const vals = groups[sides];
-    return `*[Результат броска ${vals.length}d${sides}: ${vals.join(' | ')} ]*`;
+    return `*[Результат броска ${prefix}${vals.length}d${sides}: ${vals.join(' | ')} ]*`;
   });
 
   if(diceState.modifier){
     const m = diceState.modifier;
-    lines.push(`*[Результат броска Модификатор: ${m>0?'+':''}${m} ]*`);
+    lines.push(`*[Результат броска ${prefix}Модификатор: ${m>0?'+':''}${m} ]*`);
   }
 
   copyText(lines.join('\n'));
@@ -1202,6 +1278,28 @@ function handleGenerateClick(btn){
   overlay._genT = setTimeout(()=>{ overlay.classList.remove('active'); }, dur+950);
 }
 
+function diceLabelOptionsHtml(){
+  const sel = diceState.label;
+  const opt = (val, text)=>`<option value="${escapeAttr(val)}" ${sel===val?'selected':''}>${escapeHtml(text)}</option>`;
+  const coreLabels = ['Попадание','Урон','Инициатива','Кость превосходства','Спасбросок от смерти','Преимущество','Помеха'];
+  return `
+    ${opt('', '— без подписи —')}
+    <optgroup label="Основное">
+      ${coreLabels.map(l=>opt(l,l)).join('')}
+    </optgroup>
+    <optgroup label="Характеристики">
+      ${Object.keys(ABILITY_ABBR).map(a=>opt('Проверка '+ABILITY_GENITIVE[a], 'Проверка '+ABILITY_GENITIVE[a])).join('')}
+    </optgroup>
+    <optgroup label="Навыки">
+      ${SKILLS.map(s=>opt(s.ru, s.ru)).join('')}
+    </optgroup>
+    <optgroup label="Спасброски">
+      ${Object.keys(ABILITY_ABBR).map(a=>opt('Спасбросок '+ABILITY_GENITIVE[a], 'Спасбросок '+ABILITY_GENITIVE[a])).join('')}
+    </optgroup>
+    ${opt('__custom__', '✎ Своя подпись…')}
+  `;
+}
+
 function renderDice(){
   const hasDice = diceState.dice.length>0;
   const trayContent = hasDice
@@ -1211,6 +1309,8 @@ function renderDice(){
     `<button class="die-btn" data-sides="${s}" title="Добавить d${s}">${dieShapeSvg(s,'pick'+s,s)}</button>`
   ).join('');
   const m = diceState.modifier;
+  const label = currentDiceLabel();
+  const previewNotation = hasDice ? diceNotation(true) : '1d20';
 
   return `
     ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Бросок костей'}])}
@@ -1221,6 +1321,19 @@ function renderDice(){
     <div class="dice-tray">${trayContent}</div>
     <div class="dice-total-row"><span class="cap">Итого</span><span class="sum" id="diceTotal">${hasDice?currentDiceTotal():'—'}</span></div>
     <div class="dice-notation" id="diceNotation">${hasDice?diceNotation(false):''}</div>
+
+    <div class="label-picker">
+      <div class="field" style="flex:1;min-width:200px;">
+        <label>Подпись броска</label>
+        <select id="diceLabelSelect">${diceLabelOptionsHtml()}</select>
+      </div>
+      <div class="field" id="customLabelField" style="flex:1;min-width:200px;${diceState.label==='__custom__'?'':'display:none;'}">
+        <label>Своя подпись</label>
+        <input type="text" id="diceCustomLabel" value="${escapeAttr(diceState.customLabel||'')}" placeholder="напр. Взлом замка">
+      </div>
+    </div>
+    <div class="label-preview" id="labelPreview">*[Результат броска ${escapeHtml(label?label+' ':'')}${escapeHtml(previewNotation)}: … ]*</div>
+
     <div class="die-pick">
       ${pick}
       <div class="mod-ctrl">
@@ -1554,6 +1667,15 @@ function renderHome(){
     <h1>Тактический компендиум</h1>
     <p class="subtitle">Справочник боевых приёмов и техник по правилам 2024 года.</p>
     <div class="rule"></div>
+    <div class="hero-dice" data-go="dice">
+      <div class="hero-dice-icon">${dieShapeSvg(20,'heroDie',20)}</div>
+      <div class="hero-dice-text">
+        <div class="hero-dice-name">Бросок костей</div>
+        <div class="hero-dice-desc">Кости d4–d20, модификатор, подпись броска и копирование готового результата</div>
+      </div>
+      <div class="hero-dice-arrow">→</div>
+    </div>
+    <div class="section-label">Инструменты</div>
     <div class="menu-list grid-2">
       <div class="menu-item util" data-go="characters">
         <div>
@@ -1587,13 +1709,6 @@ function renderHome(){
         <div>
           <div class="name">Магия</div>
           <div class="desc">Заклинания по школам — общая база для всех заклинателей</div>
-        </div>
-        <div class="arrow">→</div>
-      </div>
-      <div class="menu-item util" data-go="dice">
-        <div>
-          <div class="name">Бросок костей</div>
-          <div class="desc">Виртуальные кости d4–d20 с модификатором и анимацией</div>
         </div>
         <div class="arrow">→</div>
       </div>
@@ -1654,6 +1769,10 @@ function renderCommands(){
     <div class="rule"></div>
     ${cardHtml(featured)}
     <div class="grid" style="margin-top:14px;">${rest.map(cardHtml).join('')}</div>
+
+    <div class="section-label">Характеристики</div>
+    <p style="font-size:13px;color:var(--ink-dim);font-style:italic;margin:-6px 0 14px;">Когда мастер просит просто «проверку Харизмы» или «проверку Мудрости», без конкретного навыка.</p>
+    <div class="grid">${ABILITY_CHECKS.map(cardHtml).join('')}</div>
 
     <div class="section-label">Навыки</div>
     <div class="grid">${SKILLS.map(cardHtml).join('')}</div>
@@ -2934,6 +3053,23 @@ function wireEvents(){
     const mv=document.querySelector('.mod-val');
     if(mv) mv.textContent=(diceState.modifier>0?'+':'')+diceState.modifier;
     updateDiceReadout();
+  });
+
+  const diceLabelSelect = document.getElementById('diceLabelSelect');
+  if(diceLabelSelect) diceLabelSelect.addEventListener('change', ()=>{
+    diceState.label = diceLabelSelect.value;
+    const customField = document.getElementById('customLabelField');
+    if(customField) customField.style.display = diceState.label==='__custom__' ? '' : 'none';
+    if(diceState.label==='__custom__'){
+      const inp = document.getElementById('diceCustomLabel');
+      if(inp) inp.focus();
+    }
+    updateLabelPreview();
+  });
+  const diceCustomLabel = document.getElementById('diceCustomLabel');
+  if(diceCustomLabel) diceCustomLabel.addEventListener('input', ()=>{
+    diceState.customLabel = diceCustomLabel.value;
+    updateLabelPreview();
   });
 
   /* ---------- character tracker events ---------- */
