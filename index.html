@@ -371,6 +371,8 @@
   .hero-dice-desc{color:var(--ink-dim);font-style:italic;font-size:15px;}
   .hero-dice-arrow{font-family:'JetBrains Mono',monospace;color:var(--brass);font-size:22px;flex-shrink:0;}
 
+  .card-emoji{margin-right:7px;font-size:15px;filter:saturate(.85);}
+
   .label-picker{
     display:flex;gap:12px;flex-wrap:wrap;
     margin:6px 0 10px;
@@ -831,31 +833,31 @@ const DATA = {
 };
 
 const CORE_COMMANDS = [
-  {ru:"Результат броска", die:"1d20", featured:true, roll:{count:1,sides:20},
+  {ru:"Результат броска", icon:"🎲", die:"1d20", featured:true, roll:{count:1,sides:20},
     template:"*[Результат броска 1d20: ]*",
     desc:"Универсальный шаблон — на любой одиночный бросок кости."},
-  {ru:"Бросок атаки", die:"1d20", roll:{count:1,sides:20},
+  {ru:"Бросок атаки", icon:"🎯", die:"1d20", roll:{count:1,sides:20},
     template:"*[Результат броска Попадание 1d20: ]*",
     desc:"Атака оружием, заклинанием или безоружным ударом."},
-  {ru:"Бросок урона", die:"XdY",
+  {ru:"Бросок урона", icon:"💥", die:"XdY",
     template:"*[Результат броска Урон XdY: ]*",
     desc:"Замените XdY на кости и модификатор источника урона."},
-  {ru:"Инициатива", die:"1d20", roll:{count:1,sides:20},
+  {ru:"Инициатива", icon:"⚡", die:"1d20", roll:{count:1,sides:20},
     template:"*[Результат броска Инициатива 1d20: ]*",
     desc:"Бросок инициативы в начале столкновения."},
-  {ru:"Кость превосходства", die:"1d8", roll:{count:1,sides:8},
+  {ru:"Кость превосходства", icon:"⭐", die:"1d8", roll:{count:1,sides:8},
     template:"*[Результат броска Кость превосходства 1d8: ]*",
     desc:"Бросок кости превосходства для приёма Мастера боя."},
-  {ru:"Спасбросок от смерти", die:"1d20", roll:{count:1,sides:20},
+  {ru:"Спасбросок от смерти", icon:"💀", die:"1d20", roll:{count:1,sides:20},
     template:"*[Результат броска Спасбросок от смерти 1d20: ]*",
     desc:"Спасбросок при 0 хитов на грани смерти."},
-  {ru:"Проверка с преимуществом", die:"2d20", roll:{count:2,sides:20,mode:'max'},
+  {ru:"Проверка с преимуществом", icon:"⬆️", die:"2d20", roll:{count:2,sides:20,mode:'max'},
     template:"*[Результат броска Преимущество 2d20: ]*",
     desc:"Бросьте дважды, используйте больший результат."},
-  {ru:"Проверка с помехой", die:"2d20", roll:{count:2,sides:20,mode:'min'},
+  {ru:"Проверка с помехой", icon:"⬇️", die:"2d20", roll:{count:2,sides:20,mode:'min'},
     template:"*[Результат броска Помеха 2d20: ]*",
     desc:"Бросьте дважды, используйте меньший результат."},
-  {ru:"Пассивное восприятие", die:"—",
+  {ru:"Пассивное восприятие", icon:"👀", die:"—",
     template:"*[Результат броска Пассивное восприятие: ]*",
     desc:"Фиксированное значение без броска кости."}
 ];
@@ -867,6 +869,17 @@ const ABILITY_ABBR = {
 const ABILITY_GENITIVE = {
   "Сила":"Силы","Ловкость":"Ловкости","Телосложение":"Телосложения",
   "Интеллект":"Интеллекта","Мудрость":"Мудрости","Харизма":"Харизмы"
+};
+
+const ABILITY_ICONS = {
+  "Сила":"💪","Ловкость":"🤸","Телосложение":"❤️",
+  "Интеллект":"🧠","Мудрость":"🦉","Харизма":"💬"
+};
+const SKILL_ICONS = {
+  "Атлетика":"🏋️","Акробатика":"🤸","Ловкость рук":"🤲","Скрытность":"🌑",
+  "Магия":"✨","История":"📜","Расследование":"🔍","Природа":"🌿","Религия":"🙏",
+  "Уход за животными":"🐾","Проницательность":"👁️","Медицина":"⚕️","Восприятие":"👀","Выживание":"🏕️",
+  "Обман":"🎭","Запугивание":"😠","Выступление":"🎵","Убеждение":"🗣️"
 };
 
 const SKILLS = [
@@ -890,6 +903,7 @@ const SKILLS = [
   {ru:"Убеждение", ability:"Харизма"}
 ].map(s=>({
   ru: s.ru,
+  icon: SKILL_ICONS[s.ru]||'',
   die: ABILITY_ABBR[s.ability],
   roll: {count:1,sides:20},
   template: `*[Результат броска ${s.ru} 1d20: ]*`,
@@ -898,6 +912,7 @@ const SKILLS = [
 
 const ABILITY_CHECKS = Object.keys(ABILITY_ABBR).map(ability=>({
   ru: `Проверка ${ABILITY_GENITIVE[ability]}`,
+  icon: ABILITY_ICONS[ability]||'',
   die: ABILITY_ABBR[ability],
   roll: {count:1,sides:20},
   template: `*[Результат броска Проверка ${ABILITY_GENITIVE[ability]} 1d20: ]*`,
@@ -906,6 +921,7 @@ const ABILITY_CHECKS = Object.keys(ABILITY_ABBR).map(ability=>({
 
 const SAVES = Object.keys(ABILITY_ABBR).map(ability=>({
   ru: `Спасбросок ${ABILITY_GENITIVE[ability]}`,
+  icon: '🛡️',
   die: "1d20",
   roll: {count:1,sides:20},
   template: `*[Результат броска Спасбросок ${ABILITY_GENITIVE[ability]} 1d20: ]*`,
@@ -1053,7 +1069,7 @@ const DICE_COLORS = {
   20:{light:'#e09a45',dark:'#8a561d'}
 };
 const DICE_LABEL_Y = {4:76,6:62,8:60,10:54,12:64,20:60};
-let diceState = {dice:[], modifier:0, counter:0, label:'', customLabel:''};
+let diceState = {dice:[], modifier:0, counter:0, labelCat:'', label:'', customLabel:''};
 
 function dieShapeSvg(sides, uid, label){
   const c = DICE_COLORS[sides];
@@ -1193,7 +1209,8 @@ function rollAllDice(){
 }
 
 function currentDiceLabel(){
-  if(diceState.label==='__custom__') return (diceState.customLabel||'').trim();
+  if(diceState.labelCat==='custom') return (diceState.customLabel||'').trim();
+  if(!diceState.labelCat) return '';
   return diceState.label || '';
 }
 
@@ -1278,26 +1295,42 @@ function handleGenerateClick(btn){
   overlay._genT = setTimeout(()=>{ overlay.classList.remove('active'); }, dur+950);
 }
 
-function diceLabelOptionsHtml(){
-  const sel = diceState.label;
-  const opt = (val, text)=>`<option value="${escapeAttr(val)}" ${sel===val?'selected':''}>${escapeHtml(text)}</option>`;
-  const coreLabels = ['Попадание','Урон','Инициатива','Кость превосходства','Спасбросок от смерти','Преимущество','Помеха'];
-  return `
-    ${opt('', '— без подписи —')}
-    <optgroup label="Основное">
-      ${coreLabels.map(l=>opt(l,l)).join('')}
-    </optgroup>
-    <optgroup label="Характеристики">
-      ${Object.keys(ABILITY_ABBR).map(a=>opt('Проверка '+ABILITY_GENITIVE[a], 'Проверка '+ABILITY_GENITIVE[a])).join('')}
-    </optgroup>
-    <optgroup label="Навыки">
-      ${SKILLS.map(s=>opt(s.ru, s.ru)).join('')}
-    </optgroup>
-    <optgroup label="Спасброски">
-      ${Object.keys(ABILITY_ABBR).map(a=>opt('Спасбросок '+ABILITY_GENITIVE[a], 'Спасбросок '+ABILITY_GENITIVE[a])).join('')}
-    </optgroup>
-    ${opt('__custom__', '✎ Своя подпись…')}
-  `;
+const DICE_LABEL_CATEGORIES = [
+  {key:'core', icon:'⚔️', ru:'Основное', items:[
+    {icon:'🎯', ru:'Попадание'},
+    {icon:'💥', ru:'Урон'},
+    {icon:'⚡', ru:'Инициатива'},
+    {icon:'⭐', ru:'Кость превосходства'},
+    {icon:'💀', ru:'Спасбросок от смерти'},
+    {icon:'⬆️', ru:'Преимущество'},
+    {icon:'⬇️', ru:'Помеха'},
+    {icon:'🎲', ru:'Проверка концентрации'}
+  ]},
+  {key:'ability', icon:'💪', ru:'Характеристики', items:
+    Object.keys(ABILITY_ABBR).map(a=>({icon:ABILITY_ICONS[a], ru:'Проверка '+ABILITY_GENITIVE[a]}))
+  },
+  {key:'skill', icon:'🎯', ru:'Навыки', items:
+    SKILLS.map(s=>({icon:SKILL_ICONS[s.ru]||'▫️', ru:s.ru}))
+  },
+  {key:'save', icon:'🛡️', ru:'Спасброски', items:
+    Object.keys(ABILITY_ABBR).map(a=>({icon:ABILITY_ICONS[a], ru:'Спасбросок '+ABILITY_GENITIVE[a]}))
+  },
+  {key:'custom', icon:'✎', ru:'Своя подпись', items:[]}
+];
+
+function diceCategoryOptionsHtml(){
+  const cur = diceState.labelCat || '';
+  const opt = (val, text)=>`<option value="${escapeAttr(val)}" ${cur===val?'selected':''}>${escapeHtml(text)}</option>`;
+  return opt('', '— без подписи —') +
+    DICE_LABEL_CATEGORIES.map(c=>opt(c.key, c.icon+'  '+c.ru)).join('');
+}
+
+function diceItemOptionsHtml(){
+  const cat = DICE_LABEL_CATEGORIES.find(c=>c.key===diceState.labelCat);
+  if(!cat || !cat.items.length) return '';
+  const cur = diceState.label || '';
+  return `<option value="">— выберите —</option>` +
+    cat.items.map(it=>`<option value="${escapeAttr(it.ru)}" ${cur===it.ru?'selected':''}>${escapeHtml(it.icon+'  '+it.ru)}</option>`).join('');
 }
 
 function renderDice(){
@@ -1323,11 +1356,15 @@ function renderDice(){
     <div class="dice-notation" id="diceNotation">${hasDice?diceNotation(false):''}</div>
 
     <div class="label-picker">
-      <div class="field" style="flex:1;min-width:200px;">
-        <label>Подпись броска</label>
-        <select id="diceLabelSelect">${diceLabelOptionsHtml()}</select>
+      <div class="field" style="flex:1;min-width:180px;">
+        <label>Категория подписи</label>
+        <select id="diceCatSelect">${diceCategoryOptionsHtml()}</select>
       </div>
-      <div class="field" id="customLabelField" style="flex:1;min-width:200px;${diceState.label==='__custom__'?'':'display:none;'}">
+      <div class="field" id="labelItemField" style="flex:1;min-width:200px;${(diceState.labelCat && diceState.labelCat!=='custom')?'':'display:none;'}">
+        <label>Что бросаем</label>
+        <select id="diceLabelSelect">${diceItemOptionsHtml()}</select>
+      </div>
+      <div class="field" id="customLabelField" style="flex:1;min-width:200px;${diceState.labelCat==='custom'?'':'display:none;'}">
         <label>Своя подпись</label>
         <input type="text" id="diceCustomLabel" value="${escapeAttr(diceState.customLabel||'')}" placeholder="напр. Взлом замка">
       </div>
@@ -1743,10 +1780,11 @@ function renderHome(){
 function cardHtml(c){
   const genBtn = c.roll ? `<button class="gen-btn" data-template="${escapeAttr(c.template)}" data-count="${c.roll.count}" data-sides="${c.roll.sides}" data-mode="${c.roll.mode||'sum'}">Сгенерировать и скопировать результат</button>` : '';
   const genOverlay = c.roll ? `<div class="gen-stamp"><div class="gen-die"></div></div>` : '';
+  const icon = c.icon ? `<span class="card-emoji">${c.icon}</span>` : '';
   return `
     <div class="card ${c.featured?'featured':''}" data-copy="${escapeAttr(c.template)}">
       <div class="top-row">
-        <div class="name">${c.ru}</div>
+        <div class="name">${icon}${c.ru}</div>
         <div class="die-badge">${c.die}</div>
       </div>
       <div class="tmpl">${escapeHtml(c.template)}</div>
@@ -3055,15 +3093,29 @@ function wireEvents(){
     updateDiceReadout();
   });
 
+  const diceCatSelect = document.getElementById('diceCatSelect');
+  if(diceCatSelect) diceCatSelect.addEventListener('change', ()=>{
+    diceState.labelCat = diceCatSelect.value;
+    diceState.label = '';
+    const itemField = document.getElementById('labelItemField');
+    const itemSelect = document.getElementById('diceLabelSelect');
+    const customField = document.getElementById('customLabelField');
+    const isCustom = diceState.labelCat==='custom';
+    const hasItems = !!(diceState.labelCat && !isCustom);
+    if(itemSelect) itemSelect.innerHTML = diceItemOptionsHtml();
+    if(itemField) itemField.style.display = hasItems ? '' : 'none';
+    if(customField) customField.style.display = isCustom ? '' : 'none';
+    if(isCustom){
+      const inp = document.getElementById('diceCustomLabel');
+      if(inp) inp.focus();
+    } else if(hasItems && itemSelect){
+      itemSelect.focus();
+    }
+    updateLabelPreview();
+  });
   const diceLabelSelect = document.getElementById('diceLabelSelect');
   if(diceLabelSelect) diceLabelSelect.addEventListener('change', ()=>{
     diceState.label = diceLabelSelect.value;
-    const customField = document.getElementById('customLabelField');
-    if(customField) customField.style.display = diceState.label==='__custom__' ? '' : 'none';
-    if(diceState.label==='__custom__'){
-      const inp = document.getElementById('diceCustomLabel');
-      if(inp) inp.focus();
-    }
     updateLabelPreview();
   });
   const diceCustomLabel = document.getElementById('diceCustomLabel');
