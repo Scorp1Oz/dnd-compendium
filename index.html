@@ -319,11 +319,51 @@
     100%{transform:rotate(-10deg) scale(1.06);}
   }
   .dice-total-row{
-    display:flex;align-items:baseline;justify-content:flex-end;gap:14px;
-    margin:14px 0 2px;
+    display:flex;align-items:flex-end;justify-content:flex-end;gap:14px;
+    margin:14px 0 2px;position:relative;
   }
   .dice-total-row .cap{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);}
   .dice-total-row .sum{font-family:'Cinzel',serif;font-weight:700;font-size:44px;color:var(--ink);line-height:1;}
+
+  .dice-history{
+    flex:1;min-width:0;height:46px;
+    display:flex;align-items:center;justify-content:flex-end;gap:9px;
+    overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg, transparent 0, rgba(0,0,0,.35) 40px, #000 110px, #000 100%);
+    mask-image:linear-gradient(90deg, transparent 0, rgba(0,0,0,.35) 40px, #000 110px, #000 100%);
+  }
+  .hist-die{
+    width:34px;height:34px;position:relative;flex-shrink:0;
+  }
+  .hist-die svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.45));}
+  .hist-die .hv{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:'Cinzel',serif;font-weight:700;font-size:13px;color:#fff;
+    text-shadow:0 1px 2px rgba(0,0,0,.6);
+  }
+  .hist-die .he{
+    position:absolute;top:-5px;right:-6px;font-size:12px;line-height:1;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.7));
+  }
+  .hist-die.hist-new{animation:histIn .38s cubic-bezier(.2,.9,.3,1);}
+  @keyframes histIn{
+    0%{transform:translateX(26px) scale(.7);opacity:0;}
+    100%{transform:translateX(0) scale(1);opacity:1;}
+  }
+  .hist-tip{
+    position:absolute;bottom:calc(100% - 4px);
+    background:var(--steel-2);border:1px solid var(--brass-dim);color:var(--ink);
+    font-family:'EB Garamond',serif;font-size:13.5px;line-height:1.3;
+    padding:6px 10px;border-radius:2px;white-space:nowrap;
+    opacity:0;pointer-events:none;transition:opacity .13s;
+    z-index:60;box-shadow:0 4px 12px rgba(0,0,0,.5);
+    transform:translateX(-50%);
+  }
+  .hist-tip::after{
+    content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);
+    border:5px solid transparent;border-top-color:var(--brass-dim);
+  }
+  .hist-tip.show{opacity:1;}
   .dice-notation{
     text-align:right;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--ink-dim);
     min-height:18px;margin-bottom:16px;
@@ -689,6 +729,7 @@
     .stamp span{animation:none;}
     .die.rolling{animation:none;}
     .gen-die.rolling{animation:none;}
+    .hist-die.hist-new{animation:none;}
     *{transition:none !important;}
   }
 
@@ -740,6 +781,10 @@
     .die{width:74px;height:74px;}
     .die .val{font-size:23px;}
     .dice-total-row .sum{font-size:36px;}
+    .dice-history{height:38px;gap:7px;}
+    .hist-die{width:28px;height:28px;}
+    .hist-die .hv{font-size:11px;}
+    .hist-die .he{font-size:10px;top:-4px;right:-5px;}
     .die-pick{gap:8px;padding-top:16px;}
     .die-btn svg{width:40px;height:40px;}
     .mod-ctrl{margin-left:6px;padding-left:10px;flex-basis:100%;justify-content:center;margin-top:6px;}
@@ -1076,7 +1121,8 @@ const DICE_COLORS = {
   20:{light:'#e09a45',dark:'#8a561d'}
 };
 const DICE_LABEL_Y = {4:76,6:62,8:60,10:54,12:64,20:60};
-let diceState = {dice:[], modifier:0, counter:0, labelCat:'', label:'', customLabel:''};
+let diceState = {dice:[], modifier:0, counter:0, labelCat:'', label:'', customLabel:'', history:[]};
+const DICE_HISTORY_MAX = 16;
 
 function dieShapeSvg(sides, uid, label){
   const c = DICE_COLORS[sides];
@@ -1160,6 +1206,53 @@ function updateDiceControls(){
   });
 }
 
+function currentLabelEmojiFor(sides){
+  if(!diceState.labelCat) return '';
+  if(diceState.labelCat==='custom') return (diceState.customLabel||'').trim() ? '✎' : '';
+  const cat = DICE_LABEL_CATEGORIES.find(c=>c.key===diceState.labelCat);
+  if(!cat) return '';
+  const item = cat.items.find(i=>i.ru===diceState.label);
+  if(!item) return '';
+  const applies = item.std===null || sides===item.std;
+  return applies ? item.icon : '';
+}
+
+function currentLabelAppliedTo(sides){
+  const label = currentDiceLabel();
+  if(!label) return '';
+  if(diceState.labelCat==='custom') return label;
+  const std = currentLabelStd();
+  return (std===null || sides===std) ? label : '';
+}
+
+function pushDiceHistory(entries){
+  entries.forEach(e=>diceState.history.push(e));
+  if(diceState.history.length > DICE_HISTORY_MAX){
+    diceState.history = diceState.history.slice(-DICE_HISTORY_MAX);
+  }
+  updateDiceHistory();
+}
+
+function histDieHtml(h, isNew){
+  const tip = `${h.emoji?h.emoji+' ':''}${h.label ? h.label+' · ' : ''}d${h.sides} = ${h.value}`;
+  return `<div class="hist-die${isNew?' hist-new':''}" data-tip="${escapeAttr(tip)}">
+    ${dieShapeSvg(h.sides, 'h'+h.uid)}
+    <div class="hv">${h.value}</div>
+    ${h.emoji?`<div class="he">${h.emoji}</div>`:''}
+  </div>`;
+}
+
+function updateDiceHistory(){
+  const box = document.getElementById('diceHistory');
+  if(!box) return;
+  const n = diceState.history.length;
+  box.innerHTML = diceState.history.map((h,i)=>histDieHtml(h, i===n-1)).join('');
+  const clearBtn = document.getElementById('clearHistBtn');
+  if(clearBtn) clearBtn.disabled = !n;
+}
+
+let histUid = 0;
+
 function addDie(sides){
   const tray = document.querySelector('.dice-tray');
   if(!tray){ render(); return; } // подстраховка, если экран ещё не отрисован
@@ -1183,7 +1276,10 @@ function addDie(sides){
 
   const dur=520+Math.random()*300;
   animateDie(el,sides,value,dur);
-  setTimeout(updateDiceReadout, dur+90);
+  setTimeout(()=>{
+    updateDiceReadout();
+    pushDiceHistory([{sides, value, uid:++histUid, emoji:currentLabelEmojiFor(sides), label:currentLabelAppliedTo(sides)}]);
+  }, dur+90);
 }
 
 function removeDie(id){
@@ -1214,7 +1310,13 @@ function rollAllDice(){
     maxDur=Math.max(maxDur,dur);
     animateDie(el,d.sides,d.value,dur);
   });
-  setTimeout(updateDiceReadout, maxDur+90);
+  setTimeout(()=>{
+    updateDiceReadout();
+    pushDiceHistory(diceState.dice.map(d=>({
+      sides:d.sides, value:d.value, uid:++histUid,
+      emoji:currentLabelEmojiFor(d.sides), label:currentLabelAppliedTo(d.sides)
+    })));
+  }, maxDur+90);
 }
 
 function currentDiceLabel(){
@@ -1380,7 +1482,11 @@ function renderDice(){
     <p class="subtitle">Виртуальные кости — как за столом, только d4 не теряется под диваном.</p>
     <div class="rule"></div>
     <div class="dice-tray">${trayContent}</div>
-    <div class="dice-total-row"><span class="cap">Итого</span><span class="sum" id="diceTotal">${hasDice?currentDiceTotal():'—'}</span></div>
+    <div class="dice-total-row">
+      <div class="hist-tip" id="histTip"></div>
+      <div class="dice-history" id="diceHistory">${diceState.history.map((h,i)=>histDieHtml(h,false)).join('')}</div>
+      <span class="cap">Итого</span><span class="sum" id="diceTotal">${hasDice?currentDiceTotal():'—'}</span>
+    </div>
     <div class="dice-notation" id="diceNotation">${hasDice?diceNotation(false):''}</div>
 
     <div class="die-pick">
@@ -1413,6 +1519,7 @@ function renderDice(){
       <button class="btn-primary" id="rollAllBtn" ${hasDice?'':'disabled'}>Кинуть кубики</button>
       <button class="btn-ghost" id="clearDiceBtn" ${hasDice?'':'disabled'}>Очистить</button>
       <button class="btn-ghost" id="copyResultBtn" ${hasDice?'':'disabled'}>Скопировать результат</button>
+      <button class="btn-ghost" id="clearHistBtn" ${diceState.history.length?'':'disabled'} title="Очистить ленту истории бросков">🕘 Очистить историю</button>
     </div>
   `;
 }
@@ -3107,6 +3214,40 @@ function wireEvents(){
   });
   const copyBtn=document.getElementById('copyResultBtn');
   if(copyBtn) copyBtn.addEventListener('click', copyDiceResult);
+  const clearHistBtn=document.getElementById('clearHistBtn');
+  if(clearHistBtn) clearHistBtn.addEventListener('click', ()=>{
+    diceState.history = [];
+    updateDiceHistory();
+  });
+  const histBox = document.getElementById('diceHistory');
+  const histTip = document.getElementById('histTip');
+  if(histBox && histTip){
+    const showTip = (die)=>{
+      const text = die.getAttribute('data-tip');
+      if(!text) return;
+      histTip.textContent = text;
+      const row = histBox.parentElement;
+      const rowRect = row.getBoundingClientRect();
+      const dieRect = die.getBoundingClientRect();
+      histTip.style.left = (dieRect.left - rowRect.left + dieRect.width/2) + 'px';
+      histTip.classList.add('show');
+    };
+    const hideTip = ()=>histTip.classList.remove('show');
+    histBox.addEventListener('mouseover', (e)=>{
+      const die = e.target.closest('.hist-die');
+      if(die) showTip(die);
+    });
+    histBox.addEventListener('mouseout', (e)=>{
+      const die = e.target.closest('.hist-die');
+      if(die && !histBox.contains(e.relatedTarget)) hideTip();
+      else if(die && !e.relatedTarget?.closest?.('.hist-die')) hideTip();
+    });
+    histBox.addEventListener('click', (e)=>{
+      const die = e.target.closest('.hist-die');
+      if(die) showTip(die); // на телефоне — по тапу
+    });
+    histBox.addEventListener('mouseleave', hideTip);
+  }
   const modMinus=document.getElementById('modMinus');
   if(modMinus) modMinus.addEventListener('click', ()=>{
     diceState.modifier--;
