@@ -4390,16 +4390,18 @@ function escA(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g
 function uid(p){ return (p||'sh')+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function nl2br(s){ return esc(s).replace(/\n/g,'<br>'); }
 
-var SH = { techs:[], moves:[], meta:{name:'', note:''}, draft:null };
+var SH = { techs:[], moves:[], skills:[], meta:{name:'', note:''}, draft:null };
 window.SH = SH;
 
 function load(){
   try{ var t=JSON.parse(localStorage.getItem('ttc_sh_techs')||'[]'); SH.techs=Array.isArray(t)?t:[]; }catch(e){ SH.techs=[]; }
   try{ var m=JSON.parse(localStorage.getItem('ttc_sh_moves')||'[]'); SH.moves=Array.isArray(m)?m:[]; }catch(e){ SH.moves=[]; }
+  try{ var s=JSON.parse(localStorage.getItem('ttc_sh_skills')||'[]'); SH.skills=Array.isArray(s)?s:[]; }catch(e){ SH.skills=[]; }
   try{ var w=JSON.parse(localStorage.getItem('ttc_sh_meta')||'null'); if(w) SH.meta=w; }catch(e){}
 }
 function saveT(){ try{ localStorage.setItem('ttc_sh_techs', JSON.stringify(SH.techs)); }catch(e){} }
 function saveM(){ try{ localStorage.setItem('ttc_sh_moves', JSON.stringify(SH.moves)); }catch(e){} }
+function saveS(){ try{ localStorage.setItem('ttc_sh_skills', JSON.stringify(SH.skills)); }catch(e){} }
 function saveMeta(){ try{ localStorage.setItem('ttc_sh_meta', JSON.stringify(SH.meta)); }catch(e){} }
 
 /* ---------- справочные данные (только чтение) ---------- */
@@ -4470,6 +4472,18 @@ var REF = {
       {k:'Инь и Ян',       v:'Не боевые природы: Инь — воображение и форма (основа гендзюцу), Ян — жизненная сила и телесность. Их слияние даёт создание из ничего.'}
     ]},
 
+  navyki: {t:'Навыки и знания', icon:'🛠️', lead:'Всё, что персонаж умеет помимо боя. Шиноби — не только оружие: деревня живёт ремеслом, торговлей и хозяйством, и половина заданий низкого ранга — это работа руками. Навык берётся от того, что персонаж этим занимался, и ни от чего больше.',
+    rows:[
+      {k:'ОТКУДА БЕРУТСЯ', v:'Из биографии и из игры. Кто-то рос при кузне, кто-то месяц таскал мешки у торговца, кого-то научила соседка. Навык не начисляется за уровень и не покупается: его дают время, наставник и повторение. Появление нового навыка — это событие в игре, а не строчка в листе.'},
+      {k:'УРОВНИ', v:'Начатки — видел и повторит под присмотром, результат кривой.\nУченик — делает сам простое, портит материал.\nПодмастерье — делает надёжно, знает, где ошибётся.\nУмелец — работает быстро и на продажу.\nМастер — учит других и делает то, чего не умеют прочие.'},
+      {k:'КОГДА НУЖЕН БРОСОК', v:'Только когда исход под вопросом и цена ошибки существенна. Подмастерье не бросает на обычный узел и обычный суп — он их просто делает. Бросают на срок, на редкий материал, на чужую технологию, на работу в плохих условиях.'},
+      {k:'ЧТО НАВЫК ДАЁТ ПОМИМО БРОСКА', v:'Право знать. Кузнец видит по кромке, чем рубили; повар отличает свежее от порченого; ткач узнаёт, из какой страны ткань. Это не проверка, а сведения, которые ДМ обязан выдать носителю навыка и не выдавать остальным.'},
+      {k:'ДЕНЬГИ И БЫТ', v:'Ремесло кормит. Навык уровня подмастерья и выше — законный способ заработать между заданиями, чинить своё снаряжение и не платить за то, что делаешь сам. Это же повод для знакомств: у ремесла всегда есть заказчик.'},
+      {k:'СВЯЗЬ С ТЕХНИКАМИ', v:'Навык не заменяет технику и не даёт скидки на чакру. Но он определяет, что персонаж вообще способен задумать: не зная кузнечного дела, техникой металл не выкуешь — форма будет, качества не будет.'},
+      {k:'ЯЗЫКИ И ГРАМОТА', v:'Считаются навыками знания. Грамота у шиноби предполагается — отчёты пишут все. Чужой язык, шифр, чтение карт, счёт больших чисел — отдельные навыки, и их отсутствие ДМ обязан отыгрывать честно.'},
+      {k:'ПОТЕРЯ', v:'Навыки не ржавеют сами по себе. Но руки помнят хуже головы: после долгого перерыва первый раз идёт на уровень ниже, пока персонаж не разомнётся.'}
+    ]},
+
   kategorii: {t:'Категории и происхождение', icon:'🗂️', lead:'Категория говорит, ЧТО это за техника. Происхождение — откуда у носителя право ею владеть. Одна техника принадлежит ровно одной категории происхождения; не путай их между собой.',
     rows:[
       {k:'Ниндзюцу',      v:'Техники чакры: природы, формы, призывы, барьеры. Основная масса.'},
@@ -4480,6 +4494,7 @@ var REF = {
       {k:'Ирьениндзюцу',  v:'Медицинские техники: лечение, диагностика, точное вмешательство. Требуют высочайшего контроля.'},
       {k:'Кучиёсэ',       v:'Призыв. Требует контракта, крови и согласия призываемого.'},
       {k:'Сендзюцу',      v:'Природная энергия. Крайне опасно без наставника: перебор превращает носителя в камень.'},
+      {k:'ПРОИСХОЖДЕНИЕ — Общая', v:'Базовая техника без привязки. Не требует ни сродства к стихии, ни крови, ни принадлежности к роду. Осваивается любым, кто способен управлять чакрой; этому учат в Академии. Поле «Природа / род» у таких техник пустое.'},
       {k:'ПРОИСХОЖДЕНИЕ — Природа чакры', v:'Предрасположенность. Осваивается кем угодно с нужным сродством.'},
       {k:'ПРОИСХОЖДЕНИЕ — Кеккей генкай', v:'КРОВЬ. Слияние двух природ или додзюцу. Либо есть с рождения, либо нет никогда, за уровни не покупается.'},
       {k:'ПРОИСХОЖДЕНИЕ — Хиден',         v:'СЕКРЕТ. Клановая тайная техника, передаётся обучением внутри рода, а не рождением. Посторонний способен освоить — потому род и держит её в тайне. Конечный родовой каталог; пополнение — событие масштаба поколения. Утечка наружу равна потере.'}
@@ -4680,7 +4695,11 @@ var CALC = {
 /* ---------- вспомогательное ---------- */
 function techById(id){ for(var i=0;i<SH.techs.length;i++) if(SH.techs[i].id===id) return SH.techs[i]; return null; }
 function moveById(id){ for(var i=0;i<SH.moves.length;i++) if(SH.moves[i].id===id) return SH.moves[i]; return null; }
-function newTech(){ return {id:null,name:'',rank:'D',cat:'Ниндзюцу',origin:'Природа чакры',nature:'',effect:'uron',cost:'',upkeep:'',windows:[],counter:'',req:'',desc:''}; }
+function skillById(id){ var a=SH.skills||[]; for(var i=0;i<a.length;i++) if(a[i].id===id) return a[i]; return null; }
+var SKILL_KINDS=['Ремесло','Быт','Знание','Искусство','Выживание','Общение','Другое'];
+var SKILL_LEVELS=['Начатки','Ученик','Подмастерье','Умелец','Мастер'];
+function newSkill(){ return {id:null,name:'',kind:'Ремесло',level:'Начатки',abil:'',mod:'',src:'',gives:'',desc:''}; }
+function newTech(){ return {id:null,name:'',rank:'D',cat:'Ниндзюцу',origin:'Общая',nature:'',effect:'uron',cost:'',upkeep:'',windows:[],counter:'',req:'',desc:''}; }
 function newMove(){ return {id:null,name:'',state:'СБИТ',atk:'',def:'',dur:'один ход',pay:'кость',desc:''}; }
 function crumbSh(parts){
   return '<div class="crumb">'+parts.map(function(p,i){
@@ -4700,6 +4719,7 @@ function shHome(){
   var items = [
     {nav:'shTechs', icon:'🌀', t:'Техники',   d:SH.techs.length ? SH.techs.length+' в списке' : 'Ранг, стоимость, окно, счётчик'},
     {nav:'shMoves', icon:'👊', t:'Приёмы тайдзюцу', d:SH.moves.length ? SH.moves.length+' в списке' : 'Какое состояние навязывает и чем оплачивается'},
+    {nav:'shSkills', icon:'🛠️', t:'Навыки и знания', d:(SH.skills&&SH.skills.length) ? SH.skills.length+' в списке' : 'Ремёсла, быт, языки, всё непрофильное'},
     {nav:'shCmds',  icon:'⌨️', t:'Кнопки',    d:'к1–к7 — тапни, чтобы скопировать'},
     {nav:'shCalc',  icon:'🧮', t:'Калькулятор стоимости', d:'Процедура назначения цены по эффекту'},
     {nav:'shRef',   icon:'📚', t:'Справочник', d:'Окна, ранги, природы, чакра, клоны, служба, мир'},
@@ -4734,6 +4754,57 @@ function shMoves(){
   }).join('') : '<div class="char-empty">Пусто. Приёмы изучаются поштучно — у мастера, тренировками, спаррингами.</div>';
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы'}])+
     '<h1>Приёмы тайдзюцу</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shMoveEdit:new">Добавить приём</button></div>'+body;
+}
+
+function shSkills(){
+  var arr = SH.skills||[];
+  var groups = {};
+  arr.forEach(function(s){ var k=s.kind||'Другое'; (groups[k]=groups[k]||[]).push(s); });
+  var body = arr.length ? SKILL_KINDS.filter(function(k){return groups[k];}).map(function(k){
+    return '<div class="section-label">'+esc(k)+'</div>'+groups[k].map(function(s){
+      var line = [s.level, (s.abil||''), (s.mod?('модификатор '+s.mod):'')].filter(function(x){return x;}).join(' · ');
+      return '<div class="card" data-nav="shSkillView:'+s.id+'">'+
+        '<div class="name">'+esc(s.name||'Без названия')+'</div>'+
+        '<div class="desc">'+esc(line)+'</div></div>';
+    }).join('');
+  }).join('') : '<div class="char-empty">Пусто. Сюда идёт всё, что персонаж умеет помимо боя: ремесло, быт, языки, счёт, готовка, уход за животными. Навык появляется от того, что персонаж этим занимался, а не от уровня.</div>';
+  return crumbSh([{label:'Шиноби',nav:'home'},{label:'Навыки'}])+
+    '<h1>Навыки и знания</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shSkillEdit:new">Добавить навык</button></div>'+body;
+}
+
+function shSkillEdit(){
+  var isNew = view.shId==='new';
+  var d = SH.draft || (SH.draft = isNew ? newSkill() : JSON.parse(JSON.stringify(skillById(view.shId)||newSkill())));
+  return crumbSh([{label:'Шиноби',nav:'home'},{label:'Навыки',nav:'shSkills'},{label:isNew?'Новый':'Правка'}])+
+    '<h1>'+esc(d.name||'Новый навык')+'</h1><div class="sheet-section">'+
+    fld('Название','<input id="shSName" type="text" value="'+escA(d.name)+'">','Ковка, ткачество, готовка, счёт, язык страны Волн, уход за собаками.')+
+    fld('Тип', sel('shSKind',SKILL_KINDS,d.kind))+
+    fld('Уровень', sel('shSLvl',SKILL_LEVELS,d.level),'Начатки — видел и повторит под присмотром. Мастер — учит других и делает то, чего не умеют прочие.')+
+    fld('Характеристика','<input id="shSAbil" type="text" value="'+escA(d.abil)+'">','На чём держится: Ловкость, Сила, Интеллект, Мудрость, Харизма.')+
+    fld('Модификатор','<input id="shSMod" type="text" value="'+escA(d.mod)+'">','Что прибавляется к броску, если ДМ его требует. Пусто — навык работает без броска.')+
+    fld('Откуда','<input id="shSSrc" type="text" value="'+escA(d.src)+'">','Кто научил, где и когда. Это же зацепка для ДМа.')+
+    fld('Что даёт','<textarea id="shSGives" rows="3">'+esc(d.gives)+'</textarea>','Конкретно: что персонаж благодаря этому МОЖЕТ сделать и чего не сможет без навыка.')+
+    fld('Заметки','<textarea id="shSDesc" rows="3">'+esc(d.desc)+'</textarea>')+
+    '<div class="sheet-actions"><button class="btn-primary" id="shSkillSave">Сохранить</button>'+
+    (isNew?'':'<button class="btn-ghost" id="shSkillDel">Удалить</button>')+
+    '<button class="btn-ghost" data-nav="shSkills">Отмена</button></div></div>';
+}
+
+function shSkillView(){
+  var s = skillById(view.shId); if(!s) return shSkills();
+  var rows = [
+    {k:'Тип', v:s.kind}, {k:'Уровень', v:s.level},
+    {k:'Характеристика', v:s.abil||'—'},
+    {k:'Модификатор', v:s.mod||'без броска'},
+    {k:'Откуда', v:s.src||'—'},
+    {k:'Что даёт', v:s.gives||'—'},
+    {k:'Заметки', v:s.desc||'—'}
+  ];
+  return crumbSh([{label:'Шиноби',nav:'home'},{label:'Навыки',nav:'shSkills'},{label:s.name||'Навык'}])+
+    '<h1>'+esc(s.name||'Навык')+'</h1>'+
+    rows.map(function(x){ return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+nl2br(x.v)+'</div></div>'; }).join('')+
+    '<div class="sheet-actions"><button class="btn-ghost" data-nav="shSkillEdit:'+s.id+'">Править</button>'+
+    '<button class="btn-ghost" id="shSkillDelV">Удалить</button></div>';
 }
 
 function shCmds(){
@@ -4787,8 +4858,8 @@ function shTechEdit(){
     fld('Название','<input id="shName" type="text" value="'+escA(d.name)+'">')+
     fld('Ранг', sel('shRank',RANKS,d.rank), 'Ранг — ворота доступа, а не цена применения.')+
     fld('Категория', sel('shCat',['Ниндзюцу','Тайдзюцу','Гендзюцу','Фуиндзюцу','Кендзюцу','Ирьениндзюцу','Кучиёсэ','Сендзюцу'],d.cat))+
-    fld('Происхождение', sel('shOrig',['Природа чакры','Кеккей генкай','Хиден'],d.origin))+
-    fld('Природа / род','<input id="shNature" type="text" value="'+escA(d.nature)+'">','Огонь, ветер, молния, земля, вода — либо название рода для хидена.')+
+    fld('Происхождение', sel('shOrig',['Общая','Природа чакры','Кеккей генкай','Хиден'],d.origin))+
+    fld('Природа / род','<input id="shNature" type="text" value="'+escA(d.nature)+'">','Огонь, ветер, молния, земля, вода — либо название рода для хидена. Для общих техник оставь пустым.')+
     fld('Тип эффекта', sel('shEff',EFFECTS,d.effect), 'Именно эффект определяет цену.')+
     fld('Стоимость активации','<input id="shCost" type="text" value="'+escA(d.cost)+'">')+
     fld('Поддержание за раунд','<input id="shUp" type="text" value="'+escA(d.upkeep)+'">','Заполняется только для длящегося: полей, режимов, усилений.')+
@@ -4815,7 +4886,8 @@ function shTechView(){
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники',nav:'shTechs'},{label:t.name||'Техника'}])+
     '<h1>'+esc(t.name||'Техника')+'</h1>'+
     rows.map(function(x){ return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+nl2br(x.v)+'</div></div>'; }).join('')+
-    '<div class="sheet-actions"><button class="btn-ghost" data-nav="shTechEdit:'+t.id+'">Править</button></div>';
+    '<div class="sheet-actions"><button class="btn-ghost" data-nav="shTechEdit:'+t.id+'">Править</button>'+
+    '<button class="btn-ghost" id="shTechDelV">Удалить</button></div>';
 }
 
 function shMoveEdit(){
@@ -4860,7 +4932,7 @@ function shData(){
     fld('Заметка','<textarea id="shWNote" rows="3">'+esc(SH.meta.note)+'</textarea>')+
     '<div class="sheet-actions"><button class="btn-primary" id="shWSave">Сохранить</button></div></div>'+
     '<div class="sheet-section"><div class="section-label">Экспорт и импорт</div>'+
-    '<div class="desc">Один файл на весь режим: техники, приёмы и заметка. Импорт заменяет текущее содержимое целиком.</div>'+
+    '<div class="desc">Один файл на весь режим: техники, приёмы, навыки и заметка. Импорт заменяет текущее содержимое целиком.</div>'+
     '<div class="sheet-actions"><button class="btn-primary" id="shExport">Экспорт в файл</button>'+
     '<button class="btn-ghost" id="shImportBtn">Импорт из файла</button>'+
     '<input type="file" id="shImportFile" accept="application/json,.json" style="display:none"></div></div>';
@@ -4902,6 +4974,28 @@ function wireSh(){
     SH.moves=SH.moves.filter(function(x){return x.id!==view.shId;}); saveM(); SH.draft=null; navigate('shMoves');
   });
 
+  var ss=g('shSkillSave');
+  if(ss) ss.addEventListener('click', function(){
+    var d=SH.draft||newSkill();
+    d.name=v('shSName'); d.kind=v('shSKind'); d.level=v('shSLvl'); d.abil=v('shSAbil');
+    d.mod=v('shSMod'); d.src=v('shSSrc'); d.gives=v('shSGives'); d.desc=v('shSDesc');
+    if(!SH.skills) SH.skills=[];
+    if(!d.id){ d.id=uid('s'); SH.skills.push(d); } else { var i=SH.skills.findIndex(function(x){return x.id===d.id;}); if(i>=0) SH.skills[i]=d; }
+    saveS(); SH.draft=null; navigate('shSkills');
+  });
+  var delSkill=function(){
+    if(!confirm('Удалить навык?')) return;
+    SH.skills=(SH.skills||[]).filter(function(x){return x.id!==view.shId;}); saveS(); SH.draft=null; navigate('shSkills');
+  };
+  var sd=g('shSkillDel'); if(sd) sd.addEventListener('click', delSkill);
+  var sdv=g('shSkillDelV'); if(sdv) sdv.addEventListener('click', delSkill);
+
+  var tdv=g('shTechDelV');
+  if(tdv) tdv.addEventListener('click', function(){
+    if(!confirm('Удалить технику?')) return;
+    SH.techs=SH.techs.filter(function(x){return x.id!==view.shId;}); saveT(); SH.draft=null; navigate('shTechs');
+  });
+
   var cg=g('cGo');
   if(cg) cg.addEventListener('click', function(){
     var pool=parseFloat(v('cPool'))||0, uses=parseFloat(v('cUses'))||1;
@@ -4928,7 +5022,7 @@ function wireSh(){
 
   var ex=g('shExport');
   if(ex) ex.addEventListener('click', function(){
-    var blob=new Blob([JSON.stringify({kind:'shinobi',meta:SH.meta,techs:SH.techs,moves:SH.moves},null,2)],{type:'application/json'});
+    var blob=new Blob([JSON.stringify({kind:'shinobi',meta:SH.meta,techs:SH.techs,moves:SH.moves,skills:SH.skills||[]},null,2)],{type:'application/json'});
     var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download=(SH.meta.name||'shinobi').replace(/[^\wа-яА-ЯёЁ\- ]/g,'')+'.json';
     document.body.appendChild(a); a.click(); a.remove();
@@ -4943,12 +5037,13 @@ function wireSh(){
       fr.onload=function(){
         try{
           var data=JSON.parse(fr.result);
-          if(!data || (!Array.isArray(data.techs) && !Array.isArray(data.moves))) throw 0;
+          if(!data || (!Array.isArray(data.techs) && !Array.isArray(data.moves) && !Array.isArray(data.skills))) throw 0;
           if(!confirm('Заменить содержимое режима «Шиноби» содержимым файла?')) return;
           SH.techs=Array.isArray(data.techs)?data.techs:[];
           SH.moves=Array.isArray(data.moves)?data.moves:[];
+          SH.skills=Array.isArray(data.skills)?data.skills:[];
           SH.meta=data.meta||{name:'',note:''};
-          saveT(); saveM(); saveMeta(); paintShBar(); render();
+          saveT(); saveM(); saveS(); saveMeta(); paintShBar(); render();
         }catch(e){ alert('Не удалось прочитать файл.'); }
       };
       fr.readAsText(f);
@@ -5003,6 +5098,9 @@ window.render=function(){
   else if(s==='shTechView') html=shTechView();
   else if(s==='shMoves') html=shMoves();
   else if(s==='shMoveEdit') html=shMoveEdit();
+  else if(s==='shSkills') html=shSkills();
+  else if(s==='shSkillEdit') html=shSkillEdit();
+  else if(s==='shSkillView') html=shSkillView();
   else if(s==='shCmds') html=shCmds();
   else if(s==='shCalc') html=shCalc();
   else if(s==='shRef') html=shRef();
@@ -5017,9 +5115,9 @@ window.render=function(){
 window.navigate=function(val){
   var p=String(val||'').split(':');
   if(HB.mode==='sh'){
-    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shMoves:'shMoves',shCmds:'shCmds',shCalc:'shCalc',shRef:'shRef',shData:'shData'};
+    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shCalc:'shCalc',shRef:'shRef',shData:'shData'};
     if(map[p[0]]){ view={screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
-    if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shRefView'){
+    if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
       view={screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
     }
   }
