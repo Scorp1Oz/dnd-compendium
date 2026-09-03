@@ -521,6 +521,7 @@
   .sheet-section{margin-bottom:32px;}
   .sheet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;}
   .field{display:flex;flex-direction:column;gap:5px;}
+  .field[hidden]{display:none !important;}
   .field label{
     font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;
     text-transform:uppercase;color:var(--ink-dim);
@@ -4425,6 +4426,7 @@ var STATES = [
   {ru:'СБИТ',       desc:'Потерял равновесие. Открывает окно на один ход — до конца следующего хода цели.'},
   {ru:'ОБЕЗДВИЖЕН', desc:'Скорость ноль, не может сместиться. Держится, пока держат, либо по длительности техники.'},
   {ru:'ОСЛЕПЛЁН',   desc:'Не видит цель: атаки с помехой, по нему — с преимуществом. Сенсоры и додзюцу могут не подчиняться.'},
+  {ru:'КРОВОТЕЧЕНИЕ',desc:'Открытая рана от режущего или колющего. Урон каждый раунд без броска, пока рану не зажали, не прижгли или не залечили. Окна НЕ открывает: раненый дерётся, просто дороже. Накапливается — два кровотечения текут независимо.'},
   {ru:'ИСТОЩЕНИЕ',  desc:'Накапливается от долга чакры, превышения счётчиков техник и тяжёлых нагрузок. Снимается только отдыхом.'},
   {ru:'ДОЛГ ЧАКРЫ', desc:'Черпание при нулевом пуле: хит за единицу, уровень истощения за каждые 10% пула. Предел долга 30% — дальше обморок.'},
   {ru:'СЛОМ',       desc:'Три трещины подряд на допросе. Персонаж отвечает на вопросы, пока не восстановится. Факт слома остаётся навсегда.'}
@@ -4605,16 +4607,19 @@ REF.akademiya = {t:'Академия', icon:'🎓', lead:'Академия да�
     {k:'Выпускной экзамен',v:'Проверка именно этого пула, а не абстрактная сцена: каждая техника проверяется поимённо, с броском. Провал по одной означает провал экзамена целиком. Пересдача возможна и имеет репутационную цену.'}
   ]};
 
-REF.taidzu = {t:'Тайдзюцу: кости и приёмы', icon:'👊', lead:'Тайдзюцу и инструменты — это то, ЧЕМ СОЗДАЮТСЯ ОКНА. Без них тяжёлую технику некуда вложить. Не каждая атака навязывает состояние: состояния навязываются объявленными ПРИЁМАМИ, обычная атака — это только урон.',
+REF.taidzu = {t:'Приёмы: кости и виды', icon:'👊', lead:'Приём — это объявленное боевое действие без чакры: рукопашное или оружейное. Приёмы и инструменты — то, ЧЕМ СОЗДАЮТСЯ ОКНА, без них тяжёлую технику некуда вложить. Но не каждый приём навязывает состояние: часть просто наносит урон, часть тратится в чужой ход, часть меняет позицию.',
   rows:[
-    {k:'Два источника состояний', v:'Рукопашные приёмы тратят КОСТЬ ТАЙДЗЮЦУ. Инструменты тратят сами себя: дымовая шашка не стоит кости, но шашки кончаются.'},
+    {k:'ПЯТЬ ВИДОВ ПРИЁМОВ', v:'УРОН — просто способ ударить сильнее или точнее, окна не даёт.\nСОСТОЯНИЕ — навязывает окно: сбивает, валит, ослепляет, обезоруживает.\nРЕАКЦИЯ — тратится в чужой ход: перехват, контратака, уход с линии.\nМАНЁВР — перемещение и позиция: разрыв дистанции, заход за спину, смена высоты.\nЗАЩИТА — снижает или отменяет входящее.\nВид определяет, чем приём платится и когда применяется; ранга у приёмов нет вообще.'},
+    {k:'Рукопашные и оружейные', v:'Одна механика, разные проявления. Оружейный приём требует, чтобы нужное оружие было В РУКАХ, и теряется вместе с ним; рукопашный отобрать нельзя. Оружие даёт длину, режущий урон и кровотечение; кулак и захват дают контроль тела — свалить, выкрутить, обезоружить.'},
+    {k:'Два источника состояний', v:'Приёмы тратят КОСТЬ ТАЙДЗЮЦУ — и рукопашные, и оружейные. Инструменты тратят сами себя: дымовая шашка не стоит кости, но шашки кончаются.'},
     {k:'Кости — не чакра', v:'Отдельный ресурс принципиально: иначе тайдзюцу конкурирует с ниндзюцу за один пул, а сталь должна работать именно тогда, когда чакра кончилась.'},
     {k:'Пул костей', v:'Одна при освоении первого приёма, плюс одна за каждые полные три уровня, предел шесть. Без единого приёма костей нет вовсе. 1–2 ур. — 1; 3–5 — 2; 6–8 — 3; 9–11 — 4; 12–14 — 5; 15+ — 6.'},
     {k:'Восстановление костей', v:'Полное действие в бою (отдышаться, поправить стойку) возвращает одну. Минута покоя вне боя — все. Сон — все.'},
     {k:'Изучение приёмов', v:'Поштучно, как техники: у мастера, физическими тренировками, спаррингами, собственной работой. Академия даёт один-два или ни одного.'},
     {k:'Черта «мастер тайдзюцу»', v:'+2 к пулу костей сверх предела и преимущество при изучении приёмов. Цена: ниндзюцу и гендзюцу такому носителю недоступны или почти недоступны.'},
     {k:'Рост', v:'Идёт через КОНТРОЛЬ ЧАКРЫ, а не через увеличение кости урона. Голый кулак остаётся слабым всегда; чакра-усиленный удар масштабируется.'},
-    {k:'Оружие против кулака', v:'Наносят одинаково мало, различаются эффектом. Клинок режет, оставляет кровотечение, бросается, держит проволоку, втыкается меткой. Кулак сбивает, валит, захватывает, выкручивает, обезоруживает.'}
+    {k:'Оружие против кулака', v:'Наносят одинаково мало, различаются эффектом. Клинок режет, оставляет кровотечение, бросается, держит проволоку, втыкается меткой. Кулак сбивает, валит, захватывает, выкручивает, обезоруживает.'},
+    {k:'Школы оружия', v:'Кендзюцу — отдельная категория и отдельная линия обучения: приёмы чокуто, танто, цепи или веера учатся у носителя этой школы, а не осваиваются попутно. Приём одной школы не переносится на другое оружие сам собой.'}
   ]};
 
 REF.zashita = {t:'Защита и уклонение', icon:'🛡️', lead:'Брони в этом мире почти нет — есть уклонение, реакция и подмена. Поэтому защита не сводится к одному числу: атакующий бросает атаку, защищающийся бросает защиту.',
@@ -4700,7 +4705,20 @@ var SKILL_KINDS=['Ремесло','Быт','Знание','Искусство','
 var SKILL_LEVELS=['Начатки','Ученик','Подмастерье','Умелец','Мастер'];
 function newSkill(){ return {id:null,name:'',kind:'Ремесло',level:'Начатки',abil:'',mod:'',src:'',gives:'',desc:''}; }
 function newTech(){ return {id:null,name:'',rank:'D',cat:'Ниндзюцу',origin:'Общая',nature:'',effect:'uron',cost:'',upkeep:'',windows:[],counter:'',req:'',desc:''}; }
-function newMove(){ return {id:null,name:'',state:'СБИТ',atk:'',def:'',dur:'один ход',pay:'кость',desc:''}; }
+var MOVE_KINDS = ['Рукопашный','Оружейный','Смешанный','Передвижение'];
+var MOVE_TYPES = ['Урон','Состояние','Реакция','Манёвр','Защита'];
+var ABILS = ['Сила','Ловкость','Телосложение','Интеллект','Мудрость','Харизма'];
+var DURS  = ['мгновенно','один ход','до конца следующего хода цели','пока держу','до конца боя','пока не снимут','пока не остановят'];
+var MOVE_STATES = ['СБИТ','ОБЕЗДВИЖЕН','ОСЛЕПЛЁН','ДИСТАНЦИЯ','НЕЗАМЕЧЕН','СВЯЗАН','КРОВОТЕЧЕНИЕ','обезоруживание','другое'];
+/* какие поля показывать для каждого вида приёма */
+var MOVE_FIELDS = {
+  'Урон':      ['atk','dmg'],
+  'Состояние': ['atk','def','state','dur'],
+  'Реакция':   ['trigger','atk','dmg'],
+  'Манёвр':    ['atk','reach'],
+  'Защита':    ['trigger','atk']
+};
+function newMove(){ return {id:null,name:'',kind:'Рукопашный',weapon:'',mtype:'Состояние',state:'СБИТ',atk:'',dmg:'',def:'',dur:'один ход',trigger:'',reach:'',pay:'кость',req:'',desc:''}; }
 function crumbSh(parts){
   return '<div class="crumb">'+parts.map(function(p,i){
     var last=i===parts.length-1;
@@ -4718,7 +4736,7 @@ function shHome(){
     '</div><div class="hero-dice-arrow">→</div></div>';
   var items = [
     {nav:'shTechs', icon:'🌀', t:'Техники',   d:SH.techs.length ? SH.techs.length+' в списке' : 'Ранг, стоимость, окно, счётчик'},
-    {nav:'shMoves', icon:'👊', t:'Приёмы тайдзюцу', d:SH.moves.length ? SH.moves.length+' в списке' : 'Какое состояние навязывает и чем оплачивается'},
+    {nav:'shMoves', icon:'👊', t:'Приёмы', d:SH.moves.length ? SH.moves.length+' в списке' : 'Рукопашные и оружейные: что делают и чем оплачиваются'},
     {nav:'shSkills', icon:'🛠️', t:'Навыки и знания', d:(SH.skills&&SH.skills.length) ? SH.skills.length+' в списке' : 'Ремёсла, быт, языки, всё непрофильное'},
     {nav:'shCmds',  icon:'⌨️', t:'Кнопки',    d:'к1–к7 — тапни, чтобы скопировать'},
     {nav:'shCalc',  icon:'🧮', t:'Калькулятор стоимости', d:'Процедура назначения цены по эффекту'},
@@ -4747,13 +4765,21 @@ function shTechs(){
 }
 
 function shMoves(){
-  var body = SH.moves.length ? SH.moves.map(function(m){
-    return '<div class="card" data-nav="shMoveEdit:'+m.id+'">'+
-      '<div class="name">'+esc(m.name||'Без названия')+' → <b>'+esc(m.state)+'</b></div>'+
-      '<div class="desc">'+esc(m.atk||'—')+' против '+esc(m.def||'—')+' · '+esc(m.dur)+' · платится: '+esc(m.pay)+'</div></div>';
-  }).join('') : '<div class="char-empty">Пусто. Приёмы изучаются поштучно — у мастера, тренировками, спаррингами.</div>';
+  var arr = SH.moves;
+  var groups = {};
+  arr.forEach(function(m){ var k=m.kind||'Рукопашный'; (groups[k]=groups[k]||[]).push(m); });
+  var body = arr.length ? MOVE_KINDS.filter(function(k){return groups[k];}).map(function(k){
+    return '<div class="section-label">'+esc(k)+'</div>'+groups[k].map(function(m){
+      var st = (m.mtype==='Состояние' && m.state && m.state!=='не навязывает') ? ' → <b>'+esc(m.state)+'</b>' : '';
+      var line = [ (m.mtype||'—'), (m.weapon||''), (m.atk||''), (m.pay?('платится: '+m.pay):'') ]
+                 .filter(function(x){return x;}).join(' · ');
+      return '<div class="card" data-nav="shMoveView:'+m.id+'">'+
+        '<div class="name">'+esc(m.name||'Без названия')+st+'</div>'+
+        '<div class="desc">'+esc(line)+'</div></div>';
+    }).join('');
+  }).join('') : '<div class="char-empty">Пусто. Приёмы изучаются поштучно — у мастера, тренировками, спаррингами. Сюда идут и рукопашные, и оружейные: всё, что не требует чакры.</div>';
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы'}])+
-    '<h1>Приёмы тайдзюцу</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shMoveEdit:new">Добавить приём</button></div>'+body;
+    '<h1>Приёмы</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shMoveEdit:new">Добавить приём</button></div>'+body;
 }
 
 function shSkills(){
@@ -4842,6 +4868,14 @@ function sel(id,list,cur,fmt){
     return '<option value="'+escA(v)+'"'+(String(v)===String(cur)?' selected':'')+'>'+esc(l)+'</option>';
   }).join('')+'</select>';
 }
+function fldx(fid,l,inner,hint){
+  return '<div class="field" id="'+fid+'"><div class="section-label">'+esc(l)+'</div>'+inner+(hint?'<div class="desc">'+esc(hint)+'</div>':'')+'</div>';
+}
+function inpList(id,list,cur,ph){
+  var lid=id+'_dl';
+  return '<input id="'+id+'" list="'+lid+'" type="text" value="'+escA(cur||'')+'"'+(ph?' placeholder="'+escA(ph)+'"':'')+'>'+
+    '<datalist id="'+lid+'">'+list.map(function(o){ return '<option value="'+escA(o)+'">'; }).join('')+'</datalist>';
+}
 function fld(l,inner,hint){
   return '<div class="field"><div class="section-label">'+esc(l)+'</div>'+inner+(hint?'<div class="desc">'+esc(hint)+'</div>':'')+'</div>';
 }
@@ -4890,17 +4924,54 @@ function shTechView(){
     '<button class="btn-ghost" id="shTechDelV">Удалить</button></div>';
 }
 
+function shMoveView(){
+  var m = moveById(view.shId); if(!m) return shMoves();
+  var want = MOVE_FIELDS[m.mtype] || ['atk'];
+  var opt = {
+    trigger:{k:'На что срабатывает', v:m.trigger},
+    atk:    {k:'Бросок приёма',      v:m.atk},
+    dmg:    {k:'Урон',               v:m.dmg},
+    def:    {k:'Сопротивление цели', v:m.def},
+    state:  {k:'Навязывает состояние', v:m.state},
+    dur:    {k:'Длительность',       v:m.dur},
+    reach:  {k:'Дальность и результат', v:m.reach}
+  };
+  var rows = [
+    {k:'Вид', v:m.kind||'Рукопашный'},
+    {k:'Оружие', v:m.weapon||'без оружия'},
+    {k:'Что делает', v:m.mtype||'—'}
+  ];
+  ['trigger','atk','dmg','def','state','dur','reach'].forEach(function(k){
+    if(want.indexOf(k)>=0 && opt[k].v) rows.push(opt[k]);
+  });
+  rows.push({k:'Чем оплачивается', v:m.pay||'—'});
+  if(m.req) rows.push({k:'Требования', v:m.req});
+  rows.push({k:'Описание', v:m.desc||'—'});
+  return crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы',nav:'shMoves'},{label:m.name||'Приём'}])+
+    '<h1>'+esc(m.name||'Приём')+'</h1>'+
+    rows.map(function(x){ return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+nl2br(x.v)+'</div></div>'; }).join('')+
+    '<div class="sheet-actions"><button class="btn-ghost" data-nav="shMoveEdit:'+m.id+'">Править</button>'+
+    '<button class="btn-ghost" id="shMoveDelV">Удалить</button></div>';
+}
+
 function shMoveEdit(){
   var isNew = view.shId==='new';
   var d = SH.draft || (SH.draft = isNew ? newMove() : JSON.parse(JSON.stringify(moveById(view.shId)||newMove())));
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы',nav:'shMoves'},{label:isNew?'Новый':'Правка'}])+
     '<h1>'+esc(d.name||'Новый приём')+'</h1><div class="sheet-section">'+
     fld('Название','<input id="shMName" type="text" value="'+escA(d.name)+'">')+
-    fld('Навязывает состояние', sel('shMState',['СБИТ','ОБЕЗДВИЖЕН','ОСЛЕПЛЁН','ДИСТАНЦИЯ','НЕЗАМЕЧЕН','СВЯЗАН','обезоруживание','другое'],d.state))+
-    fld('Бросок атакующего','<input id="shMAtk" type="text" value="'+escA(d.atk)+'">','Сила, Ловкость, Харизма — по существу приёма.')+
-    fld('Сопротивление цели','<input id="shMDef" type="text" value="'+escA(d.def)+'">')+
-    fld('Длительность','<input id="shMDur" type="text" value="'+escA(d.dur)+'">','По умолчанию один ход — до конца следующего хода цели.')+
+    fld('Вид', sel('shMKind',MOVE_KINDS,d.kind))+
+    fldx('fMWeapon','Оружие','<input id="shMWeapon" type="text" value="'+escA(d.weapon||'')+'">','Чокуто, танто, кунай, цепь, веер.')+
+    fld('Что делает', sel('shMType',MOVE_TYPES,d.mtype||'Состояние'),'Урон — просто способ ударить. Состояние — навязывает окно. Реакция — тратится в чужой ход. Манёвр — перемещение или позиция. Защита — снижает или отменяет входящее.')+
+    fldx('fMTrigger','На что срабатывает','<input id="shMTrig" type="text" value="'+escA(d.trigger||'')+'">','Что должен сделать противник, чтобы приём сработал: замах, выстрел, рывок в упор, техника.')+
+    fldx('fMAtk','Бросок приёма', inpList('shMAtk',ABILS,d.atk,'Ловкость'),'Характеристика из списка или свой вариант.')+
+    fldx('fMDmg','Урон','<input id="shMDmg" type="text" value="'+escA(d.dmg||'')+'">','Кость и модификатор: 1d8, 2d6+3. Пусто — приём не наносит урона сам по себе.')+
+    fldx('fMDef','Сопротивление цели', inpList('shMDef',ABILS,d.def,'Сила'),'Чем цель отбивается. Пусто — не сопротивляется броском.')+
+    fldx('fMState','Навязывает состояние', sel('shMState',MOVE_STATES,d.state))+
+    fldx('fMDur','Длительность', inpList('shMDur',DURS,d.dur,'один ход'))+
+    fldx('fMReach','Дальность и результат','<input id="shMReach" type="text" value="'+escA(d.reach||'')+'">','Насколько смещает и куда: 10 футов назад, заход за спину, на крышу, разрыв дистанции.')+
     fld('Чем оплачивается', sel('shMPay',['кость','предмет','ничем'],d.pay),'Рукопашные приёмы тратят кость тайдзюцу, инструменты тратят сами себя.')+
+    fld('Требования','<input id="shMReq" type="text" value="'+escA(d.req||'')+'">','Кто научил, что нужно уметь, какое оружие в руках.')+
     fld('Описание','<textarea id="shMDesc" rows="3">'+esc(d.desc)+'</textarea>')+
     '<div class="sheet-actions"><button class="btn-primary" id="shMoveSave">Сохранить</button>'+
     (isNew?'':'<button class="btn-ghost" id="shMoveDel">Удалить</button>')+
@@ -4960,19 +5031,41 @@ function wireSh(){
     SH.techs=SH.techs.filter(function(x){return x.id!==view.shId;}); saveT(); SH.draft=null; navigate('shTechs');
   });
 
+  var mt=g('shMType');
+  if(mt){
+    var MAP={atk:'fMAtk',dmg:'fMDmg',def:'fMDef',state:'fMState',dur:'fMDur',trigger:'fMTrigger',reach:'fMReach'};
+    var paintMoveFields=function(){
+      var want=MOVE_FIELDS[mt.value]||[];
+      Object.keys(MAP).forEach(function(k){
+        var el=g(MAP[k]); if(el) el.hidden = want.indexOf(k)<0;
+      });
+    };
+    var mk=g('shMKind');
+    var paintKind=function(){
+      var w=g('fMWeapon');
+      if(w) w.hidden = !mk || mk.value==='Рукопашный';
+    };
+    if(mk) mk.addEventListener('change', paintKind);
+    mt.addEventListener('change', paintMoveFields);
+    paintMoveFields(); paintKind();
+  }
+
   var ms=g('shMoveSave');
   if(ms) ms.addEventListener('click', function(){
     var d=SH.draft||newMove();
-    d.name=v('shMName'); d.state=v('shMState'); d.atk=v('shMAtk'); d.def=v('shMDef');
-    d.dur=v('shMDur'); d.pay=v('shMPay'); d.desc=v('shMDesc');
+    d.name=v('shMName'); d.kind=v('shMKind'); d.weapon=v('shMWeapon'); d.mtype=v('shMType');
+    d.state=v('shMState'); d.atk=v('shMAtk'); d.def=v('shMDef'); d.dmg=v('shMDmg');
+    d.trigger=v('shMTrig'); d.reach=v('shMReach');
+    d.dur=v('shMDur'); d.pay=v('shMPay'); d.req=v('shMReq'); d.desc=v('shMDesc');
     if(!d.id){ d.id=uid('m'); SH.moves.push(d); } else { var i=SH.moves.findIndex(function(x){return x.id===d.id;}); if(i>=0) SH.moves[i]=d; }
     saveM(); SH.draft=null; navigate('shMoves');
   });
-  var md=g('shMoveDel');
-  if(md) md.addEventListener('click', function(){
+  var delMove=function(){
     if(!confirm('Удалить приём?')) return;
     SH.moves=SH.moves.filter(function(x){return x.id!==view.shId;}); saveM(); SH.draft=null; navigate('shMoves');
-  });
+  };
+  var md=g('shMoveDel'); if(md) md.addEventListener('click', delMove);
+  var mdv=g('shMoveDelV'); if(mdv) mdv.addEventListener('click', delMove);
 
   var ss=g('shSkillSave');
   if(ss) ss.addEventListener('click', function(){
@@ -5098,6 +5191,7 @@ window.render=function(){
   else if(s==='shTechView') html=shTechView();
   else if(s==='shMoves') html=shMoves();
   else if(s==='shMoveEdit') html=shMoveEdit();
+  else if(s==='shMoveView') html=shMoveView();
   else if(s==='shSkills') html=shSkills();
   else if(s==='shSkillEdit') html=shSkillEdit();
   else if(s==='shSkillView') html=shSkillView();
@@ -5117,7 +5211,7 @@ window.navigate=function(val){
   if(HB.mode==='sh'){
     var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shCalc:'shCalc',shRef:'shRef',shData:'shData'};
     if(map[p[0]]){ view={screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
-    if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
+    if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shMoveView'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
       view={screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
     }
   }
