@@ -522,6 +522,9 @@
   .sheet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;}
   .field{display:flex;flex-direction:column;gap:5px;}
   .field[hidden]{display:none !important;}
+  .dmg-row{display:grid;grid-template-columns:90px 90px minmax(0,1fr);gap:8px;align-items:center;}
+  .dmg-row>select,.dmg-row>input{width:100%;min-width:0;}
+  @media (max-width:420px){ .dmg-row{grid-template-columns:1fr 1fr;} .dmg-row>input{grid-column:1 / -1;} }
   .field label{
     font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;
     text-transform:uppercase;color:var(--ink-dim);
@@ -4704,7 +4707,16 @@ function skillById(id){ var a=SH.skills||[]; for(var i=0;i<a.length;i++) if(a[i]
 var SKILL_KINDS=['Ремесло','Быт','Знание','Искусство','Выживание','Общение','Другое'];
 var SKILL_LEVELS=['Начатки','Ученик','Подмастерье','Умелец','Мастер'];
 function newSkill(){ return {id:null,name:'',kind:'Ремесло',level:'Начатки',abil:'',mod:'',src:'',gives:'',desc:''}; }
-function newTech(){ return {id:null,name:'',rank:'D',cat:'Ниндзюцу',origin:'Общая',nature:'',effect:'uron',cost:'',upkeep:'',windows:[],counter:'',req:'',desc:''}; }
+var DICE_N = ['1','2','3','4','5','6','7','8','9','10','12'];
+var DICE_D = ['d4','d6','d8','d10','d12','d20'];
+function dmgText(t){
+  if(!t || t.effect!=='uron') return '';
+  var n=t.dmgN||'', d=t.dmgD||'', m=(t.dmgMod||'').trim();
+  if(!n||!d) return '';
+  if(m && m.charAt(0)!=='+' && m.charAt(0)!=='-') m='+'+m;
+  return n+d+m;
+}
+function newTech(){ return {id:null,name:'',rank:'D',cat:'Ниндзюцу',origin:'Общая',nature:'',effect:'uron',cost:'',upkeep:'',windows:[],counter:'',req:'',desc:'',dmgN:'1',dmgD:'d6',dmgMod:''}; }
 var MOVE_KINDS = ['Рукопашный','Оружейный','Смешанный','Передвижение'];
 var MOVE_TYPES = ['Урон','Состояние','Реакция','Манёвр','Защита'];
 var ABILS = ['Сила','Ловкость','Телосложение','Интеллект','Мудрость','Харизма'];
@@ -4758,7 +4770,7 @@ function shTechs(){
     var c = t.counter ? ' · счётчик '+esc(t.counter)+'/сутки' : '';
     return '<div class="card" data-nav="shTechView:'+t.id+'">'+
       '<div class="name"><span class="die-badge">'+esc(t.rank)+'</span> '+esc(t.name||'Без названия')+'</div>'+
-      '<div class="desc">'+esc(t.cat)+' · '+esc(t.cost||'—')+(t.upkeep?' +'+esc(t.upkeep)+'/раунд':'')+' · окно: '+esc(w)+esc(c)+'</div></div>';
+      '<div class="desc">'+esc(t.cat)+' · '+esc(t.cost||'—')+(t.upkeep?' +'+esc(t.upkeep)+'/раунд':'')+(dmgText(t)?' · '+esc(dmgText(t)):'')+' · окно: '+esc(w)+esc(c)+'</div></div>';
   }).join('') : '<div class="char-empty">Пусто. Техники добавляются по мере изучения — теория плюс практика, ничего не начисляется само.</div>';
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники'}])+
     '<h1>Техники</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shTechEdit:new">Добавить технику</button></div>'+body;
@@ -4895,6 +4907,13 @@ function shTechEdit(){
     fld('Происхождение', sel('shOrig',['Общая','Природа чакры','Кеккей генкай','Хиден'],d.origin))+
     fld('Природа / род','<input id="shNature" type="text" value="'+escA(d.nature)+'">','Огонь, ветер, молния, земля, вода — либо название рода для хидена. Для общих техник оставь пустым.')+
     fld('Тип эффекта', sel('shEff',EFFECTS,d.effect), 'Именно эффект определяет цену.')+
+    fldx('fTDmg','Урон',
+      '<div class="dmg-row">'+
+        sel('shDmgN',DICE_N,d.dmgN||'1')+
+        sel('shDmgD',DICE_D,d.dmgD||'d6')+
+        '<input id="shDmgMod" type="text" value="'+escA(d.dmgMod||'')+'" placeholder="+4">'+
+      '</div>',
+      'Количество костей, кость и модификатор. Модификатор необязателен.')+
     fld('Стоимость активации','<input id="shCost" type="text" value="'+escA(d.cost)+'">')+
     fld('Поддержание за раунд','<input id="shUp" type="text" value="'+escA(d.upkeep)+'">','Заполняется только для длящегося: полей, режимов, усилений.')+
     fld('Окно','<div class="grid">'+wch+'</div>','Ничего не отмечено — окно не требуется. Два и больше — вершинная техника.')+
@@ -4912,11 +4931,14 @@ function shTechView(){
   var ef = EFFECTS.filter(function(e){return e.k===t.effect;})[0];
   var rows = [
     {k:'Ранг', v:t.rank}, {k:'Категория', v:t.cat}, {k:'Происхождение', v:t.origin},
-    {k:'Природа / род', v:t.nature||'—'}, {k:'Тип эффекта', v:ef?ef.ru:'—'},
+    {k:'Природа / род', v:t.nature||'—'}, {k:'Тип эффекта', v:ef?ef.ru:'—'}
+  ];
+  if(dmgText(t)) rows.push({k:'Урон', v:dmgText(t)});
+  rows = rows.concat([
     {k:'Стоимость', v:(t.cost||'—')+(t.upkeep?' + '+t.upkeep+' за раунд':'')},
     {k:'Окно', v:w}, {k:'Дневной счётчик', v:t.counter? t.counter+' применений в сутки' : 'нет'},
     {k:'Требования', v:t.req||'—'}, {k:'Описание', v:t.desc||'—'}
-  ];
+  ]);
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники',nav:'shTechs'},{label:t.name||'Техника'}])+
     '<h1>'+esc(t.name||'Техника')+'</h1>'+
     rows.map(function(x){ return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+nl2br(x.v)+'</div></div>'; }).join('')+
@@ -5015,12 +5037,19 @@ function wireSh(){
   var g=function(id){ return document.getElementById(id); };
   var v=function(id){ var e=g(id); return e?e.value:''; };
 
+  var ef=g('shEff');
+  if(ef){
+    var paintDmg=function(){ var b=g('fTDmg'); if(b) b.hidden = ef.value!=='uron'; };
+    ef.addEventListener('change', paintDmg); paintDmg();
+  }
+
   var ts=g('shTechSave');
   if(ts) ts.addEventListener('click', function(){
     var d=SH.draft||newTech();
     d.name=v('shName'); d.rank=v('shRank'); d.cat=v('shCat'); d.origin=v('shOrig');
     d.nature=v('shNature'); d.effect=v('shEff'); d.cost=v('shCost'); d.upkeep=v('shUp');
     d.counter=v('shCnt'); d.req=v('shReq'); d.desc=v('shDesc');
+    d.dmgN=v('shDmgN'); d.dmgD=v('shDmgD'); d.dmgMod=v('shDmgMod');
     d.windows=[]; document.querySelectorAll('.shWin').forEach(function(c){ if(c.checked) d.windows.push(c.value); });
     if(!d.id){ d.id=uid('t'); SH.techs.push(d); } else { var i=SH.techs.findIndex(function(x){return x.id===d.id;}); if(i>=0) SH.techs[i]=d; }
     saveT(); SH.draft=null; navigate('shTechs');
