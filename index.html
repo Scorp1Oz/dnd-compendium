@@ -855,22 +855,273 @@ body.hb-theme .hb-seg-btn.on{ background:var(--brass); color:#0b0d10; }
 
 /* --- тема режима «Шиноби» --- */
 body.sh-theme{
-  --ink:#e6e2d8;
-  --ink-dim:#96907f;
-  --steel-0:#0a0908;
-  --steel-1:#14120f;
-  --steel-2:#1e1b17;
-  --line:#3b352c;
-  --brass:#c2a15f;
-  --brass-dim:#7a6538;
-  --crimson:#7a2f2a;
-  --crimson-bright:#c0453a;
-  --die:#a8895a;
+  --ink:#e8e3d5;
+  --ink-dim:#9e9786;
+  --steel-0:#0c0a08;
+  --steel-1:#15130f;
+  --steel-2:#201c17;
+  --line:#3d3528;
+  --brass:#c9a45c;
+  --brass-dim:#7d6435;
+  --crimson:#842822;
+  --crimson-bright:#c84337;
+  --die:#b3915c;
   background:
-    repeating-linear-gradient(90deg, rgba(255,255,255,.015) 0px, rgba(255,255,255,.015) 1px, transparent 1px, transparent 34px),
-    linear-gradient(180deg, #14120f 0%, #0a0908 62%);
+    repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0px, rgba(255,255,255,.012) 1px, transparent 1px, transparent 32px),
+    radial-gradient(ellipse at 50% -10%, #221c15 0%, #0c0a08 65%);
 }
 body.sh-theme .hb-seg-btn.on{ background:var(--brass); color:#120f0b; }
+
+/* Стилизация свитков и карточек меню в режиме Шиноби */
+body.sh-theme .menu-item{
+  background:linear-gradient(135deg, rgba(26,22,17,0.95) 0%, rgba(18,15,12,0.95) 100%);
+  border:1px solid var(--line);
+  border-left:4px solid var(--brass-dim);
+  border-radius:4px;
+  position:relative;
+  box-shadow:0 4px 14px rgba(0,0,0,0.4);
+}
+body.sh-theme .menu-item:hover:not(.disabled){
+  background:linear-gradient(135deg, rgba(35,30,23,0.98) 0%, rgba(24,20,16,0.98) 100%);
+  border-color:var(--brass-dim);
+  border-left-color:var(--crimson-bright);
+  box-shadow:0 6px 20px rgba(0,0,0,0.5), inset 0 0 12px rgba(201,164,92,0.08);
+}
+body.sh-theme .card{
+  background:linear-gradient(145deg, rgba(24,21,17,0.95) 0%, rgba(16,14,11,0.95) 100%);
+  border:1px solid var(--line);
+  border-radius:4px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.35);
+  position:relative;
+}
+body.sh-theme .card::before{
+  background:linear-gradient(90deg, var(--crimson-bright), var(--brass));
+  height:2px;
+}
+body.sh-theme .card:hover{
+  background:linear-gradient(145deg, rgba(32,27,21,0.98) 0%, rgba(22,19,15,0.98) 100%);
+  border-color:var(--brass-dim);
+  box-shadow:0 6px 18px rgba(0,0,0,0.5), inset 0 0 10px rgba(200,67,55,0.06);
+}
+
+/* Печати рангов техники (Ханко) */
+.sh-rank-seal{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'JetBrains Mono',monospace;
+  font-weight:700;
+  font-size:11px;
+  line-height:1;
+  padding:3px 6px;
+  border-radius:2px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  border:1px solid var(--crimson-bright);
+  color:#ff7d70;
+  background:rgba(132,40,34,0.2);
+  box-shadow:0 0 6px rgba(200,67,55,0.25), inset 0 0 4px rgba(200,67,55,0.15);
+  flex-shrink:0;
+}
+.sh-rank-seal.rank-S{
+  border-color:var(--brass);
+  color:#ffd875;
+  background:rgba(201,164,92,0.2);
+  box-shadow:0 0 8px rgba(201,164,92,0.4), inset 0 0 4px rgba(201,164,92,0.2);
+}
+.sh-rank-seal.rank-A{
+  border-color:#d85c4b;
+  color:#ffa596;
+  background:rgba(216,92,75,0.2);
+}
+.sh-rank-seal.rank-B{
+  border-color:#aa74e8;
+  color:#cbb2f8;
+  background:rgba(170,116,232,0.16);
+}
+.sh-rank-seal.rank-C{
+  border-color:#4da3d4;
+  color:#8ed0f8;
+  background:rgba(77,163,212,0.16);
+}
+.sh-rank-seal.rank-D{
+  border-color:#61a979;
+  color:#92e0ab;
+  background:rgba(97,169,121,0.16);
+}
+.sh-rank-seal.rank-E{
+  border-color:var(--ink-dim);
+  color:var(--ink-dim);
+  background:rgba(158,151,134,0.12);
+}
+
+/* Кандзи-бейджи стихий и природ чакры */
+.sh-elem-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:11.5px;
+  padding:2px 7px;
+  border-radius:3px;
+  font-weight:500;
+  border:1px solid var(--line);
+  background:rgba(0,0,0,0.3);
+  vertical-align:middle;
+}
+.sh-elem-badge .kanji{
+  font-size:13px;
+  font-weight:700;
+  line-height:1;
+}
+.elem-fire{ border-color:#7a2822; color:#ff8577; background:rgba(122,40,34,0.22); }
+.elem-fire .kanji{ color:#ff5240; text-shadow:0 0 6px rgba(255,82,64,0.5); }
+.elem-wind{ border-color:#2b6343; color:#7be0a6; background:rgba(43,99,67,0.22); }
+.elem-wind .kanji{ color:#4ae088; text-shadow:0 0 6px rgba(74,224,136,0.5); }
+.elem-lightning{ border-color:#84681a; color:#ffd659; background:rgba(132,104,26,0.22); }
+.elem-lightning .kanji{ color:#ffea78; text-shadow:0 0 6px rgba(255,234,120,0.5); }
+.elem-earth{ border-color:#634b32; color:#d4a97b; background:rgba(99,75,50,0.22); }
+.elem-earth .kanji{ color:#d99c59; text-shadow:0 0 6px rgba(217,156,89,0.5); }
+.elem-water{ border-color:#265578; color:#76bcfa; background:rgba(38,85,120,0.22); }
+.elem-water .kanji{ color:#49a8f5; text-shadow:0 0 6px rgba(73,168,245,0.5); }
+.elem-yin{ border-color:#554f68; color:#c4bcd8; background:rgba(85,79,104,0.22); }
+.elem-yang{ border-color:#79663e; color:#f5dfa6; background:rgba(121,102,62,0.22); }
+.elem-hiden{ border-color:#6d3345; color:#e99ab3; background:rgba(109,51,69,0.22); }
+
+/* Бейджи тактических окон */
+.sh-win-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;
+  letter-spacing:.04em;
+  padding:2px 6px;
+  border-radius:2px;
+  border:1px solid rgba(194,161,95,0.4);
+  color:var(--brass);
+  background:rgba(194,161,95,0.08);
+}
+.sh-win-badge.needed{
+  border-color:rgba(200,67,55,0.5);
+  color:#ff9185;
+  background:rgba(200,67,55,0.12);
+}
+
+/* Бейджи ступеней навыков */
+.sh-lvl-badge{
+  display:inline-block;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;
+  letter-spacing:.05em;
+  padding:2px 6px;
+  border-radius:2px;
+  text-transform:uppercase;
+  font-weight:600;
+  border:1px solid var(--line);
+}
+.lvl-Начатки{ border-color:#524c40; color:#8e8777; background:rgba(82,76,64,0.15); }
+.lvl-Ученик{ border-color:#4a6575; color:#8ab1c7; background:rgba(74,101,117,0.15); }
+.lvl-Подмастерье{ border-color:#4d8262; color:#86c7a0; background:rgba(77,130,98,0.15); }
+.lvl-Умелец{ border-color:#a88636; color:#e8c774; background:rgba(168,134,54,0.15); }
+.lvl-Мастер{ border-color:var(--crimson-bright); color:#ff8075; background:rgba(200,67,55,0.18); box-shadow:0 0 6px rgba(200,67,55,0.2); }
+
+/* Интерактивное Колесо стихий */
+.sh-wheel-box{
+  background:linear-gradient(145deg, #181511 0%, #100e0b 100%);
+  border:1px solid var(--line);
+  border-left:3px solid var(--brass);
+  border-radius:4px;
+  padding:20px;
+  margin:16px 0 28px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.4);
+}
+.sh-wheel-title{
+  font-family:'Cinzel',serif;
+  font-size:18px;
+  color:var(--ink);
+  letter-spacing:.04em;
+  text-align:center;
+  margin-bottom:4px;
+}
+.sh-wheel-sub{
+  font-size:13.5px;
+  color:var(--ink-dim);
+  font-style:italic;
+  text-align:center;
+  margin-bottom:18px;
+}
+.sh-wheel-svg-wrap{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:0 auto 16px;
+  max-width:300px;
+}
+.sh-wheel-svg-wrap svg{
+  width:100%;
+  height:auto;
+  overflow:visible;
+}
+.sh-node{
+  cursor:pointer;
+  transition:transform .15s ease, filter .15s ease;
+}
+.sh-node:hover{
+  filter:brightness(1.25);
+}
+.sh-node.active circle.node-bg{
+  stroke:#ffffff;
+  stroke-width:3px;
+  filter:drop-shadow(0 0 6px rgba(255,255,255,0.5));
+}
+.sh-elem-btn-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:6px;
+  margin-bottom:14px;
+}
+.sh-elem-btn{
+  background:rgba(25,21,17,0.8);
+  border:1px solid var(--line);
+  color:var(--ink-dim);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;
+  padding:5px 9px;
+  border-radius:3px;
+  cursor:pointer;
+  transition:all .15s;
+}
+.sh-elem-btn:hover{
+  border-color:var(--brass-dim);
+  color:var(--ink);
+}
+.sh-elem-btn.active{
+  border-color:var(--brass);
+  background:rgba(201,164,92,0.18);
+  color:#ffd875;
+  font-weight:600;
+}
+.sh-wheel-info{
+  background:rgba(10,9,8,0.7);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:12px 16px;
+  font-size:14px;
+  line-height:1.55;
+  min-height:75px;
+  transition:all .2s ease;
+}
+.sh-wheel-info-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:8px;
+  padding-bottom:6px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.sh-wheel-adv{ color:#7be0a6; font-weight:600; }
+.sh-wheel-dis{ color:#ff8577; font-weight:600; }
 
 
 .hb-count{ font-size:13px; color:var(--ink-dim); min-width:22px; text-align:right; }
@@ -4688,17 +4939,35 @@ var CMDS = [
    desc:'Полный System Log без наратива. Время не движется, это не ход. Всё целиком и с количествами. Правки игрока — канон немедленно.'}
 ];
 
-/* ---------- калькулятор стоимости (A93) ---------- */
-var CALC = {
-  uses:  [{v:1,l:'Один раз за бой — решает бой, часто ценой истощения'},
-          {v:3,l:'Три-четыре раза — рабочая, вокруг неё строится стиль'},
-          {v:8,l:'Почти без счёта — дешёвый расходный приём'}],
-  scope: [{v:1,l:'Одна цель'},{v:1.5,l:'Несколько целей'},{v:2,l:'Площадь'}],
-  dur:   [{v:1,l:'Мгновенное'},{v:1.5,l:'Длящееся'}],
-  rel:   [{v:1.3,l:'Срабатывает гарантированно'},{v:1,l:'Цель бросает спасбросок'},{v:0.85,l:'Требует попадания'}],
-  cond:  [{v:1.25,l:'Безусловная'},{v:1,l:'Требует одного окна или материала'},{v:0.8,l:'Требует двух окон или уязвимого положения'}],
-  cnt:   [{v:1,l:'Нет дневного счётчика'},{v:0.6,l:'Есть дневной счётчик — ограничивает он, а не цена'}]
-};
+/* ---------- бейджи и печати (ранги, стихии, уровни) ---------- */
+function rankSeal(r){
+  var rk = String(r||'D').trim().toUpperCase();
+  return '<span class="sh-rank-seal rank-'+escA(rk)+'">'+esc(rk)+'</span>';
+}
+
+function natureBadge(n){
+  if(!n) return '';
+  var s = String(n).toLowerCase();
+  var cls = '', kanji = '', label = n;
+  if(s.indexOf('огонь')>=0 || s.indexOf('катон')>=0 || s.indexOf('fire')>=0){
+    cls = 'elem-fire'; kanji = '火';
+  } else if(s.indexOf('ветер')>=0 || s.indexOf('фуутон')>=0 || s.indexOf('футон')>=0 || s.indexOf('wind')>=0){
+    cls = 'elem-wind'; kanji = '風';
+  } else if(s.indexOf('молни')>=0 || s.indexOf('райтон')>=0 || s.indexOf('lightning')>=0){
+    cls = 'elem-lightning'; kanji = '雷';
+  } else if(s.indexOf('земл')>=0 || s.indexOf('дотон')>=0 || s.indexOf('earth')>=0){
+    cls = 'elem-earth'; kanji = '土';
+  } else if(s.indexOf('вод')>=0 || s.indexOf('суйтон')>=0 || s.indexOf('water')>=0){
+    cls = 'elem-water'; kanji = '水';
+  } else if(s.indexOf('инь')>=0 || s.indexOf('yin')>=0){
+    cls = 'elem-yin'; kanji = '陰';
+  } else if(s.indexOf('ян')>=0 || s.indexOf('yang')>=0){
+    cls = 'elem-yang'; kanji = '陽';
+  } else {
+    cls = 'elem-hiden'; kanji = '秘';
+  }
+  return '<span class="sh-elem-badge '+cls+'"><span class="kanji">'+kanji+'</span> '+esc(label)+'</span>';
+}
 
 /* ---------- вспомогательное ---------- */
 function techById(id){ for(var i=0;i<SH.techs.length;i++) if(SH.techs[i].id===id) return SH.techs[i]; return null; }
@@ -4747,18 +5016,17 @@ function shHome(){
       '<div class="hero-dice-desc">Кости d4–d20, модификатор, подпись броска и копирование готового результата</div>'+
     '</div><div class="hero-dice-arrow">→</div></div>';
   var items = [
-    {nav:'shTechs', icon:'🌀', t:'Техники',   d:SH.techs.length ? SH.techs.length+' в списке' : 'Ранг, стоимость, окно, счётчик'},
-    {nav:'shMoves', icon:'👊', t:'Приёмы', d:SH.moves.length ? SH.moves.length+' в списке' : 'Рукопашные и оружейные: что делают и чем оплачиваются'},
-    {nav:'shSkills', icon:'🛠️', t:'Навыки и знания', d:(SH.skills&&SH.skills.length) ? SH.skills.length+' в списке' : 'Ремёсла, быт, языки, всё непрофильное'},
-    {nav:'shCmds',  icon:'⌨️', t:'Кнопки',    d:'к1–к7 — тапни, чтобы скопировать'},
-    {nav:'shCalc',  icon:'🧮', t:'Калькулятор стоимости', d:'Процедура назначения цены по эффекту'},
-    {nav:'shRef',   icon:'📚', t:'Справочник', d:'Окна, ранги, природы, чакра, клоны, служба, мир'},
-    {nav:'shData',  icon:'💾', t:'Данные',    d:'Экспорт и импорт одним файлом'}
+    {nav:'shTechs', icon:'🌀', t:'Техники',   d:SH.techs.length ? SH.techs.length+' в списке' : 'Ранг, стихия, чакра, окна, счётчики'},
+    {nav:'shMoves', icon:'👊', t:'Приёмы', d:SH.moves.length ? SH.moves.length+' в списке' : 'Рукопашные и оружейные: эффекты и цена приёма'},
+    {nav:'shSkills', icon:'🛠️', t:'Навыки и знания', d:(SH.skills&&SH.skills.length) ? SH.skills.length+' в списке' : 'Ремёсла, ступени мастерства, быт, языки'},
+    {nav:'shCmds',  icon:'⌨️', t:'Кнопки',    d:'к1–к7 — быстрые шаблоны для ИИ-Мастера'},
+    {nav:'shRef',   icon:'📚', t:'Справочник', d:'Интерактивное колесо стихий, окна, ранги, чакра'},
+    {nav:'shData',  icon:'💾', t:'Данные',    d:'Экспорт и импорт всего мира одним файлом'}
   ];
   return '<h1>Шиноби</h1>'+
     '<div class="subtitle">'+esc(SH.meta.name||'Мир скрытых деревень')+'</div>'+
     '<div class="rule"></div>'+ hero +
-    '<div class="section-label">Разделы</div>'+
+    '<div class="section-label">Свитки и разделы</div>'+
     '<div class="menu-list grid-2">'+items.map(function(i){
       return '<div class="menu-item" data-nav="'+i.nav+'"><div class="name">'+i.icon+' '+esc(i.t)+'</div><div class="desc">'+esc(i.d)+'</div><div class="arrow">›</div></div>';
     }).join('')+'</div>';
@@ -4766,11 +5034,22 @@ function shHome(){
 
 function shTechs(){
   var body = SH.techs.length ? SH.techs.map(function(t){
-    var w = (t.windows&&t.windows.length) ? t.windows.join(' / ') : 'не требуется';
-    var c = t.counter ? ' · счётчик '+esc(t.counter)+'/сутки' : '';
+    var w = (t.windows&&t.windows.length) 
+      ? t.windows.map(function(win){ return '<span class="sh-win-badge needed">🎯 '+esc(win)+'</span>'; }).join(' ')
+      : '<span class="sh-win-badge">окно не требуется</span>';
+    var nat = t.nature ? ' '+natureBadge(t.nature) : '';
+    var c = t.counter ? ' · <span style="color:var(--brass)">счётчик '+esc(t.counter)+'/сут</span>' : '';
+    var costStr = t.cost ? '<b>'+esc(t.cost)+'</b>' : '—';
+    if(t.upkeep) costStr += ' +'+esc(t.upkeep)+'/рнд';
+    var dmgStr = dmgText(t) ? ' · урон: <b>'+esc(dmgText(t))+'</b>' : '';
     return '<div class="card" data-nav="shTechView:'+t.id+'">'+
-      '<div class="name"><span class="die-badge">'+esc(t.rank)+'</span> '+esc(t.name||'Без названия')+'</div>'+
-      '<div class="desc">'+esc(t.cat)+' · '+esc(t.cost||'—')+(t.upkeep?' +'+esc(t.upkeep)+'/раунд':'')+(dmgText(t)?' · '+esc(dmgText(t)):'')+' · окно: '+esc(w)+esc(c)+'</div></div>';
+      '<div class="top-row">'+
+        '<div class="name">'+rankSeal(t.rank)+' '+esc(t.name||'Без названия')+'</div>'+
+        nat+
+      '</div>'+
+      '<div class="desc">'+esc(t.cat)+' · затраты: '+costStr+dmgStr+c+'</div>'+
+      '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;">'+w+'</div>'+
+    '</div>';
   }).join('') : '<div class="char-empty">Пусто. Техники добавляются по мере изучения — теория плюс практика, ничего не начисляется само.</div>';
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники'}])+
     '<h1>Техники</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shTechEdit:new">Добавить технику</button></div>'+body;
@@ -4782,12 +5061,13 @@ function shMoves(){
   arr.forEach(function(m){ var k=m.kind||'Рукопашный'; (groups[k]=groups[k]||[]).push(m); });
   var body = arr.length ? MOVE_KINDS.filter(function(k){return groups[k];}).map(function(k){
     return '<div class="section-label">'+esc(k)+'</div>'+groups[k].map(function(m){
-      var st = (m.mtype==='Состояние' && m.state && m.state!=='не навязывает') ? ' → <b>'+esc(m.state)+'</b>' : '';
-      var line = [ (m.mtype||'—'), (m.weapon||''), (m.atk||''), (m.pay?('платится: '+m.pay):'') ]
+      var st = (m.mtype==='Состояние' && m.state && m.state!=='не навязывает') ? ' → <span style="color:var(--brass);font-weight:600;">'+esc(m.state)+'</span>' : '';
+      var payStr = m.pay ? ('оплата: <b>'+esc(m.pay)+'</b>') : '';
+      var line = [ (m.mtype||'—'), (m.weapon||''), (m.atk||''), payStr ]
                  .filter(function(x){return x;}).join(' · ');
       return '<div class="card" data-nav="shMoveView:'+m.id+'">'+
         '<div class="name">'+esc(m.name||'Без названия')+st+'</div>'+
-        '<div class="desc">'+esc(line)+'</div></div>';
+        '<div class="desc">'+line+'</div></div>';
     }).join('');
   }).join('') : '<div class="char-empty">Пусто. Приёмы изучаются поштучно — у мастера, тренировками, спаррингами. Сюда идут и рукопашные, и оружейные: всё, что не требует чакры.</div>';
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы'}])+
@@ -4800,10 +5080,14 @@ function shSkills(){
   arr.forEach(function(s){ var k=s.kind||'Другое'; (groups[k]=groups[k]||[]).push(s); });
   var body = arr.length ? SKILL_KINDS.filter(function(k){return groups[k];}).map(function(k){
     return '<div class="section-label">'+esc(k)+'</div>'+groups[k].map(function(s){
-      var line = [s.level, (s.abil||''), (s.mod?('модификатор '+s.mod):'')].filter(function(x){return x;}).join(' · ');
+      var lvlBadge = '<span class="sh-lvl-badge lvl-'+escA(s.level)+'">'+esc(s.level)+'</span>';
+      var line = [(s.abil||''), (s.mod?('модификатор '+s.mod):'')].filter(function(x){return x;}).join(' · ');
       return '<div class="card" data-nav="shSkillView:'+s.id+'">'+
-        '<div class="name">'+esc(s.name||'Без названия')+'</div>'+
-        '<div class="desc">'+esc(line)+'</div></div>';
+        '<div class="top-row">'+
+          '<div class="name">'+esc(s.name||'Без названия')+'</div>'+
+          lvlBadge+
+        '</div>'+
+        '<div class="desc">'+(line||'без характеристик')+'</div></div>';
     }).join('');
   }).join('') : '<div class="char-empty">Пусто. Сюда идёт всё, что персонаж умеет помимо боя: ремесло, быт, языки, счёт, готовка, уход за животными. Навык появляется от того, что персонаж этим занимался, а не от уровня.</div>';
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Навыки'}])+
@@ -4831,7 +5115,8 @@ function shSkillEdit(){
 function shSkillView(){
   var s = skillById(view.shId); if(!s) return shSkills();
   var rows = [
-    {k:'Тип', v:s.kind}, {k:'Уровень', v:s.level},
+    {k:'Тип', v:s.kind},
+    {k:'Уровень', v:'<span class="sh-lvl-badge lvl-'+escA(s.level)+'">'+esc(s.level)+'</span>', raw:true},
     {k:'Характеристика', v:s.abil||'—'},
     {k:'Модификатор', v:s.mod||'без броска'},
     {k:'Откуда', v:s.src||'—'},
@@ -4840,7 +5125,7 @@ function shSkillView(){
   ];
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Навыки',nav:'shSkills'},{label:s.name||'Навык'}])+
     '<h1>'+esc(s.name||'Навык')+'</h1>'+
-    rows.map(function(x){ return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+nl2br(x.v)+'</div></div>'; }).join('')+
+    rows.map(function(x){ return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+(x.raw?x.v:nl2br(x.v))+'</div></div>'; }).join('')+
     '<div class="sheet-actions"><button class="btn-ghost" data-nav="shSkillEdit:'+s.id+'">Править</button>'+
     '<button class="btn-ghost" id="shSkillDelV">Удалить</button></div>';
 }
@@ -4855,6 +5140,132 @@ function shCmds(){
     }).join('');
 }
 
+/* ---------- колесо стихий ---------- */
+var ELEM_DATA = {
+  katon: {
+    k:'katon', name:'Огонь (Катон)', kanji:'火', color:'#e04838',
+    beats:'fuuton', beatsName:'Ветер (Фуутон)', beatsDesc:'Пламя раздувается и поглощает ветер, увеличивая площадь и жар горения.',
+    weak:'suiton', weakName:'Вода (Суйтон)', weakDesc:'Вода испаряет, охлаждает и гасит пламя.',
+    desc:'Прямой концентрированный урон, поджоги, фронтальные взрывные волны. Разрушительная основа атакующего ниндзюцу.'
+  },
+  fuuton: {
+    k:'fuuton', name:'Ветер (Фуутон)', kanji:'風', color:'#3ec878',
+    beats:'raiton', beatsName:'Молния (Райтон)', beatsDesc:'Потоки ветра рассеивают электрический заряд и отклоняют разряды в сторону.',
+    weak:'katon', weakName:'Огонь (Катон)', weakDesc:'Ветер лишь питает кислородом огонь и усиливает его разрушительность.',
+    desc:'Режущее и дальнобойное ниндзюцу. Тончайшее лезвие чакры, рассечение камня и металла, усиление сюрикенов и клинков.'
+  },
+  raiton: {
+    k:'raiton', name:'Молния (Райтон)', kanji:'雷', color:'#e6be36',
+    beats:'doton', beatsName:'Земля (Дотон)', beatsDesc:'Сверхвысокая частота колебания молнии легко пробивает плотную земляную броню и камень.',
+    weak:'fuuton', weakName:'Ветер (Фуутон)', weakDesc:'Плотные вихревые потоки рассеивают ток и не дают сконцентрировать удар.',
+    desc:'Колоссальная пробивная мощь, максимальная скорость удара, электрический паралич нервной системы и мышц цели.'
+  },
+  doton: {
+    k:'doton', name:'Земля (Дотон)', kanji:'土', color:'#c49156',
+    beats:'suiton', beatsName:'Вода (Суйтон)', beatsDesc:'Земляные дамбы, скалы и рвы поглощают гидро-удары и удерживают водяные массы.',
+    weak:'raiton', weakName:'Молния (Райтон)', weakDesc:'Разряды молнии с лёгкостью раскалывают скалы и обращают земляные стены в щебень.',
+    desc:'Стены, ловушки, изменение ландшафта, перемещение под поверхностью и укрепление прочности тела.'
+  },
+  suiton: {
+    k:'suiton', name:'Вода (Суйтон)', kanji:'水', color:'#3b9ee6',
+    beats:'katon', beatsName:'Огонь (Катон)', beatsDesc:'Водный поток охлаждает, заливает и мгновенно подавляет тепловую энергию пламени.',
+    weak:'doton', weakName:'Земля (Дотон)', weakDesc:'Земляные насыпи и преграды гасят кинетическую силу волн и впитывают воду.',
+    desc:'Гибкость, создание водных клонов, гидро-снаряды и волны. Требует природного источника воды либо развитого контроля чакры.'
+  }
+};
+var activeElemKey = 'katon';
+
+function renderElementWheel(){
+  var cur = ELEM_DATA[activeElemKey] || ELEM_DATA.katon;
+  var coords = {
+    katon:  {x: 140, y: 48,  kanji:'火', color:'#e04838', name:'Катон'},
+    fuuton: {x: 226, y: 110, kanji:'風', color:'#3ec878', name:'Фуутон'},
+    raiton: {x: 193, y: 212, kanji:'雷', color:'#e6be36', name:'Райтон'},
+    doton:  {x: 87,  y: 212, kanji:'土', color:'#c49156', name:'Дотон'},
+    suiton: {x: 54,  y: 110, kanji:'水', color:'#3b9ee6', name:'Суйтон'}
+  };
+
+  var cycle = ['katon', 'fuuton', 'raiton', 'doton', 'suiton'];
+  var arrowsSvg = '';
+  for(var i=0; i<cycle.length; i++){
+    var fromK = cycle[i];
+    var toK = cycle[(i+1)%cycle.length];
+    var c1 = coords[fromK], c2 = coords[toK];
+    var isAdv = (cur.k === fromK);
+    var isWeakRel = (cur.k === toK);
+    var strokeColor = isAdv ? '#7be0a6' : (isWeakRel ? '#ff8577' : 'rgba(255,255,255,0.22)');
+    var strokeWidth = isAdv ? '3.5' : (isWeakRel ? '2.5' : '1.5');
+    var dash = isAdv ? '' : 'stroke-dasharray="4,3"';
+    var dx = c2.x - c1.x, dy = c2.y - c1.y;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    var pad = 25;
+    var x1 = c1.x + (dx/dist)*pad;
+    var y1 = c1.y + (dy/dist)*pad;
+    var x2 = c2.x - (dx/dist)*(pad+5);
+    var y2 = c2.y - (dy/dist)*(pad+5);
+    var marker = isAdv ? 'url(#sh-arrow-adv)' : (isWeakRel ? 'url(#sh-arrow-weak)' : 'url(#sh-arrow)');
+    arrowsSvg += '<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="'+strokeColor+'" stroke-width="'+strokeWidth+'" '+dash+' marker-end="'+marker+'" />';
+  }
+
+  var innerChords = '';
+  for(var j=0; j<cycle.length; j++){
+    var kA = cycle[j], kB = cycle[(j+2)%cycle.length];
+    innerChords += '<line x1="'+coords[kA].x+'" y1="'+coords[kA].y+'" x2="'+coords[kB].x+'" y2="'+coords[kB].y+'" stroke="rgba(255,255,255,0.06)" stroke-width="1" />';
+  }
+
+  var nodesSvg = cycle.map(function(k){
+    var n = coords[k];
+    var isAct = (k === cur.k);
+    var isBeaten = (cur.beats === k);
+    var isWeak = (cur.weak === k);
+    var cls = 'sh-node ' + (isAct ? 'active' : '');
+    var ringColor = isAct ? '#ffffff' : (isBeaten ? '#7be0a6' : (isWeak ? '#ff8577' : n.color));
+    var ringWidth = isAct ? '3.5' : '2';
+    return '<g class="'+cls+'" data-elem="'+k+'">'+
+      '<circle class="node-bg" cx="'+n.x+'" cy="'+n.y+'" r="21" fill="#181512" stroke="'+ringColor+'" stroke-width="'+ringWidth+'" />'+
+      '<circle cx="'+n.x+'" cy="'+n.y+'" r="17" fill="'+n.color+'" fill-opacity="0.28" />'+
+      '<text x="'+n.x+'" y="'+(n.y+6)+'" text-anchor="middle" fill="#ffffff" font-size="16" font-family="serif" font-weight="bold" pointer-events="none">'+n.kanji+'</text>'+
+      '<text x="'+n.x+'" y="'+(n.y+33)+'" text-anchor="middle" fill="'+(isAct?n.color:'#9e9786')+'" font-size="10.5" font-family="JetBrains Mono, monospace" font-weight="bold" pointer-events="none">'+n.name+'</text>'+
+    '</g>';
+  }).join('');
+
+  var svg = '<svg viewBox="0 0 280 280">'+
+    '<defs>'+
+      '<marker id="sh-arrow" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto">'+
+        '<path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,0.3)" />'+
+      '</marker>'+
+      '<marker id="sh-arrow-adv" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto">'+
+        '<path d="M0,0 L8,4 L0,8 Z" fill="#7be0a6" />'+
+      '</marker>'+
+      '<marker id="sh-arrow-weak" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto">'+
+        '<path d="M0,0 L8,4 L0,8 Z" fill="#ff8577" />'+
+      '</marker>'+
+    '</defs>'+
+    innerChords + arrowsSvg + nodesSvg +
+  '</svg>';
+
+  var buttons = cycle.map(function(k){
+    var ed = ELEM_DATA[k];
+    return '<button class="sh-elem-btn '+(k===cur.k?'active':'')+'" data-elem="'+k+'">'+ed.kanji+' '+ed.name.split(' ')[0]+'</button>';
+  }).join('');
+
+  return '<div class="sh-wheel-box">'+
+    '<div class="sh-wheel-title">Колесо стихий и превосходство</div>'+
+    '<div class="sh-wheel-sub">Нажми на стихию, чтобы увидеть круг превосходства и уязвимостей</div>'+
+    '<div class="sh-wheel-svg-wrap">'+svg+'</div>'+
+    '<div class="sh-elem-btn-row">'+buttons+'</div>'+
+    '<div class="sh-wheel-info" id="shWheelInfo">'+
+      '<div class="sh-wheel-info-head">'+
+        '<div style="font-size:16px;font-weight:600;color:'+cur.color+'">'+cur.kanji+' '+esc(cur.name)+'</div>'+
+        '<div style="font-size:12px;color:var(--ink-dim)">Базовая природа</div>'+
+      '</div>'+
+      '<div style="margin-bottom:6px;"><span class="sh-wheel-adv">▲ Превосходит:</span> '+esc(cur.beatsName)+' — '+esc(cur.beatsDesc)+'</div>'+
+      '<div style="margin-bottom:8px;"><span class="sh-wheel-dis">▼ Уступает:</span> '+esc(cur.weakName)+' — '+esc(cur.weakDesc)+'</div>'+
+      '<div style="font-size:13px;color:var(--ink-dim);font-style:italic;line-height:1.45;">'+esc(cur.desc)+'</div>'+
+    '</div>'+
+  '</div>';
+}
+
 function shRef(){
   var keys = Object.keys(REF);
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Справочник'}])+
@@ -4865,9 +5276,11 @@ function shRef(){
 
 function shRefView(){
   var r = REF[view.shKey]; if(!r) return shRef();
+  var extraWidget = (view.shKey === 'priroda') ? renderElementWheel() : '';
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Справочник',nav:'shRef'},{label:r.t}])+
     '<h1>'+r.icon+' '+esc(r.t)+'</h1>'+
     (r.lead?'<div class="subtitle">'+esc(r.lead)+'</div>':'')+
+    extraWidget +
     r.rows.map(function(x){
       return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+nl2br(x.v)+'</div></div>';
     }).join('');
@@ -4927,21 +5340,28 @@ function shTechEdit(){
 
 function shTechView(){
   var t = techById(view.shId); if(!t) return shTechs();
-  var w = (t.windows&&t.windows.length)? t.windows.join(' / ') : 'не требуется';
+  var w = (t.windows&&t.windows.length)
+    ? t.windows.map(function(win){ return '<span class="sh-win-badge needed">🎯 '+esc(win)+'</span>'; }).join(' ')
+    : '<span class="sh-win-badge">окно не требуется</span>';
   var ef = EFFECTS.filter(function(e){return e.k===t.effect;})[0];
   var rows = [
-    {k:'Ранг', v:t.rank}, {k:'Категория', v:t.cat}, {k:'Происхождение', v:t.origin},
-    {k:'Природа / род', v:t.nature||'—'}, {k:'Тип эффекта', v:ef?ef.ru:'—'}
+    {k:'Ранг', v:rankSeal(t.rank)+' <span style="margin-left:8px;font-size:13px;color:var(--ink-dim)">ворота доступа к технике</span>', raw:true},
+    {k:'Категория', v:t.cat},
+    {k:'Происхождение', v:t.origin},
+    {k:'Природа / род', v:t.nature ? natureBadge(t.nature) : '—', raw:!!t.nature},
+    {k:'Тип эффекта', v:ef?ef.ru:'—'}
   ];
-  if(dmgText(t)) rows.push({k:'Урон', v:dmgText(t)});
+  if(dmgText(t)) rows.push({k:'Урон', v:'<b>'+esc(dmgText(t))+'</b>', raw:true});
   rows = rows.concat([
-    {k:'Стоимость', v:(t.cost||'—')+(t.upkeep?' + '+t.upkeep+' за раунд':'')},
-    {k:'Окно', v:w}, {k:'Дневной счётчик', v:t.counter? t.counter+' применений в сутки' : 'нет'},
-    {k:'Требования', v:t.req||'—'}, {k:'Описание', v:t.desc||'—'}
+    {k:'Стоимость', v:(t.cost?('<b>'+esc(t.cost)+'</b>'):'—')+(t.upkeep?' + <b>'+esc(t.upkeep)+'</b> за раунд':''), raw:true},
+    {k:'Окно применения', v:w, raw:true},
+    {k:'Дневной счётчик', v:t.counter? t.counter+' применений в сутки' : 'нет'},
+    {k:'Требования', v:t.req||'—'},
+    {k:'Описание', v:t.desc||'—'}
   ]);
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники',nav:'shTechs'},{label:t.name||'Техника'}])+
     '<h1>'+esc(t.name||'Техника')+'</h1>'+
-    rows.map(function(x){ return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+nl2br(x.v)+'</div></div>'; }).join('')+
+    rows.map(function(x){ return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+(x.raw?x.v:nl2br(x.v))+'</div></div>'; }).join('')+
     '<div class="sheet-actions"><button class="btn-ghost" data-nav="shTechEdit:'+t.id+'">Править</button>'+
     '<button class="btn-ghost" id="shTechDelV">Удалить</button></div>';
 }
@@ -4954,7 +5374,7 @@ function shMoveView(){
     atk:    {k:'Бросок приёма',      v:m.atk},
     dmg:    {k:'Урон',               v:m.dmg},
     def:    {k:'Сопротивление цели', v:m.def},
-    state:  {k:'Навязывает состояние', v:m.state},
+    state:  {k:'Навязывает состояние', v:'<span style="color:var(--brass);font-weight:600;">'+esc(m.state)+'</span>', raw:true},
     dur:    {k:'Длительность',       v:m.dur},
     reach:  {k:'Дальность и результат', v:m.reach}
   };
@@ -4966,12 +5386,12 @@ function shMoveView(){
   ['trigger','atk','dmg','def','state','dur','reach'].forEach(function(k){
     if(want.indexOf(k)>=0 && opt[k].v) rows.push(opt[k]);
   });
-  rows.push({k:'Чем оплачивается', v:m.pay||'—'});
+  rows.push({k:'Чем оплачивается', v:m.pay ? '<b>'+esc(m.pay)+'</b>' : '—', raw:true});
   if(m.req) rows.push({k:'Требования', v:m.req});
   rows.push({k:'Описание', v:m.desc||'—'});
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы',nav:'shMoves'},{label:m.name||'Приём'}])+
     '<h1>'+esc(m.name||'Приём')+'</h1>'+
-    rows.map(function(x){ return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+nl2br(x.v)+'</div></div>'; }).join('')+
+    rows.map(function(x){ return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+(x.raw?x.v:nl2br(x.v))+'</div></div>'; }).join('')+
     '<div class="sheet-actions"><button class="btn-ghost" data-nav="shMoveEdit:'+m.id+'">Править</button>'+
     '<button class="btn-ghost" id="shMoveDelV">Удалить</button></div>';
 }
@@ -5000,22 +5420,7 @@ function shMoveEdit(){
     '<button class="btn-ghost" data-nav="shMoves">Отмена</button></div></div>';
 }
 
-function shCalc(){
-  function opts(id,list){ return '<select id="'+id+'">'+list.map(function(o,i){ return '<option value="'+o.v+'">'+esc(o.l)+'</option>'; }).join('')+'</select>'; }
-  return crumbSh([{label:'Шиноби',nav:'home'},{label:'Калькулятор'}])+
-    '<h1>Калькулятор стоимости</h1>'+
-    '<div class="subtitle">Процедура из шести шагов. Ранг здесь не участвует: цену определяет эффект. База — пул, делённый на число применений за бой, дальше множители.</div>'+
-    '<div class="sheet-section">'+
-    fld('Максимум чакры носителя','<input id="cPool" type="number" value="70" min="1">')+
-    fld('Сколько раз за бой должна применяться', opts('cUses',CALC.uses))+
-    fld('Охват', opts('cScope',CALC.scope))+
-    fld('Длительность', opts('cDur',CALC.dur))+
-    fld('Надёжность', opts('cRel',CALC.rel))+
-    fld('Условия', opts('cCond',CALC.cond))+
-    fld('Дневной счётчик', opts('cCnt',CALC.cnt))+
-    '<div class="sheet-actions"><button class="btn-primary" id="cGo">Посчитать</button></div>'+
-    '<div id="cOut"></div></div>';
-}
+
 
 function shData(){
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Данные'}])+
@@ -5118,25 +5523,16 @@ function wireSh(){
     SH.techs=SH.techs.filter(function(x){return x.id!==view.shId;}); saveT(); SH.draft=null; navigate('shTechs');
   });
 
-  var cg=g('cGo');
-  if(cg) cg.addEventListener('click', function(){
-    var pool=parseFloat(v('cPool'))||0, uses=parseFloat(v('cUses'))||1;
-    var k=parseFloat(v('cScope'))*parseFloat(v('cDur'))*parseFloat(v('cRel'))*parseFloat(v('cCond'))*parseFloat(v('cCnt'));
-    var base=pool/uses, total=Math.max(1, Math.round(base*k));
-    var lasting=parseFloat(v('cDur'))>1;
-    var act=lasting?Math.max(1,Math.round(total*0.6)):total;
-    var up =lasting?Math.max(1,Math.round(total*0.15)):0;
-    var note = lasting
-      ? 'Длящееся: активация <b>'+act+'</b>, поддержание <b>'+up+'</b> за раунд. Одной суммой длящееся не оплачивается никогда.'
-      : 'Разовая цена: <b>'+total+'</b>.';
-    var sanity = (pool/Math.max(1,act)>5)
-      ? 'Проверка здравым смыслом: применяется больше пяти раз подряд — это расходный приём, и только им она и должна быть.'
-      : (pool<act ? 'Применить нельзя без ухода в долг — это вершинная техника. Таких на лист одна-две, а не половина.' : 'Применений подряд примерно '+Math.floor(pool/Math.max(1,act))+'.');
-    g('cOut').innerHTML='<div class="hb-row"><div class="hb-row-k">База</div><div class="hb-row-v">'+Math.round(base)+' — пул '+pool+' делить на '+uses+'</div></div>'+
-      '<div class="hb-row"><div class="hb-row-k">Множитель</div><div class="hb-row-v">×'+k.toFixed(2)+'</div></div>'+
-      '<div class="hb-row"><div class="hb-row-k">Итог</div><div class="hb-row-v">'+note+'</div></div>'+
-      '<div class="hb-row"><div class="hb-row-k">Сверка</div><div class="hb-row-v">'+sanity+'</div></div>'+
-      '<div class="desc">Записав цену в лист, больше её не меняй: она не плавает от сцены к сцене и не пересчитывается при росте уровня.</div>';
+  /* клик по стихии в колесе стихий */
+  document.querySelectorAll('[data-elem]').forEach(function(el){
+    el.addEventListener('click', function(e){
+      if(e && e.stopPropagation) e.stopPropagation();
+      var ek = (this && this.getAttribute ? this.getAttribute('data-elem') : '') || (e && e.currentTarget && e.currentTarget.getAttribute ? e.currentTarget.getAttribute('data-elem') : '');
+      if(ek && ELEM_DATA[ek]){
+        activeElemKey = ek;
+        render();
+      }
+    });
   });
 
   var ws=g('shWSave');
@@ -5225,7 +5621,6 @@ window.render=function(){
   else if(s==='shSkillEdit') html=shSkillEdit();
   else if(s==='shSkillView') html=shSkillView();
   else if(s==='shCmds') html=shCmds();
-  else if(s==='shCalc') html=shCalc();
   else if(s==='shRef') html=shRef();
   else if(s==='shRefView') html=shRefView();
   else if(s==='shData') html=shData();
@@ -5238,7 +5633,7 @@ window.render=function(){
 window.navigate=function(val){
   var p=String(val||'').split(':');
   if(HB.mode==='sh'){
-    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shCalc:'shCalc',shRef:'shRef',shData:'shData'};
+    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shData:'shData'};
     if(map[p[0]]){ view={screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
     if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shMoveView'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
       view={screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
