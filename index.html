@@ -1214,6 +1214,325 @@ body.sh-theme .card:hover{
 .sh-wheel-adv{ color:#7be0a6; font-weight:600; }
 .sh-wheel-dis{ color:#ff8577; font-weight:600; }
 
+/* Фильтры техник и приёмов */
+.sh-filter-bar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  margin:14px 0 18px;
+}
+.sh-filter-pill{
+  background:rgba(20,18,14,0.75);
+  border:1px solid var(--line);
+  color:var(--ink-dim);
+  border-radius:20px;
+  padding:5px 13px;
+  font-size:12.5px;
+  cursor:pointer;
+  transition:all .18s ease;
+  user-select:none;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.sh-filter-pill:hover{
+  border-color:var(--brass);
+  color:var(--ink);
+  background:rgba(30,26,20,0.9);
+}
+.sh-filter-pill.active{
+  border-color:var(--brass);
+  color:var(--ink);
+  background:rgba(200,165,92,0.18);
+  box-shadow:0 0 10px rgba(200,165,92,0.25);
+  font-weight:600;
+}
+.sh-filter-pill .sh-pill-count{
+  font-size:11px;
+  opacity:0.75;
+  background:rgba(0,0,0,0.35);
+  padding:1px 6px;
+  border-radius:10px;
+}
+
+/* Тактический лаунчер применения техник */
+.sh-launcher{
+  background:linear-gradient(145deg, #181511 0%, #100e0b 100%);
+  border:1px solid var(--line);
+  border-left:3px solid var(--crimson-bright);
+  border-radius:6px;
+  padding:18px 20px;
+  margin:12px 0 22px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+}
+.sh-launcher-head{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.sh-launcher-title{
+  font-family:'Cinzel',serif;
+  font-size:17px;
+  color:var(--ink);
+  letter-spacing:.04em;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.sh-launcher-title .sh-badge-tag{
+  font-size:11px;
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:.08em;
+  padding:2px 8px;
+  background:rgba(200,67,55,0.15);
+  border:1px solid var(--crimson-bright);
+  color:#ff9085;
+  border-radius:3px;
+  text-transform:uppercase;
+}
+.sh-launcher-sel-wrap{
+  flex:1;
+  min-width:240px;
+}
+.sh-launcher-sel{
+  width:100%;
+  background:#14120f;
+  border:1px solid var(--line);
+  color:var(--ink);
+  padding:8px 12px;
+  border-radius:4px;
+  font-size:14px;
+  outline:none;
+  transition:border-color .15s;
+}
+.sh-launcher-sel:focus{
+  border-color:var(--brass);
+}
+
+/* Мини-экран костей */
+.sh-launcher-screen{
+  background:radial-gradient(ellipse at center, rgba(35,30,22,0.85) 0%, rgba(12,10,8,0.95) 100%);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px;
+  padding:14px 16px;
+  margin-bottom:14px;
+  min-height:96px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+  box-shadow:inset 0 2px 10px rgba(0,0,0,0.6);
+}
+.sh-screen-dice-tray{
+  display:flex;
+  flex-wrap:wrap;
+  gap:18px;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+}
+.sh-scr-col{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+.sh-scr-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--ink-dim);
+}
+.sh-scr-die{
+  width:56px;
+  height:56px;
+  position:relative;
+  cursor:default;
+}
+.sh-scr-die svg{
+  width:100%;
+  height:100%;
+  display:block;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+}
+.sh-scr-die .val{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Cinzel',serif;
+  font-weight:700;
+  font-size:19px;
+  color:#fff;
+  text-shadow:0 2px 4px rgba(0,0,0,0.7);
+  pointer-events:none;
+}
+.sh-scr-die.s20 .val{ font-size:18px; }
+.sh-scr-die.s10 .val{ padding-bottom:8px; font-size:18px; }
+.sh-scr-die.s4 .val{ padding-top:14px; font-size:16px; }
+.sh-scr-die.rolling{ animation:diceshake .14s linear infinite; }
+.sh-scr-sub{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;
+  color:var(--brass);
+}
+.sh-scr-dmg-group{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  background:rgba(255,255,255,0.02);
+  padding:4px 8px;
+  border-radius:4px;
+  border:1px dashed rgba(255,255,255,0.06);
+}
+.sh-scr-dmg-dice{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  justify-content:center;
+}
+.sh-scr-no-dmg{
+  font-size:13px;
+  color:var(--ink-dim);
+  font-style:italic;
+  padding:10px 14px;
+}
+
+/* Параметры броска */
+.sh-launcher-params{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+  background:rgba(0,0,0,0.25);
+  padding:8px 12px;
+  border-radius:4px;
+  border:1px solid rgba(255,255,255,0.04);
+}
+.sh-launcher-inputs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
+}
+.sh-param-item{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:13px;
+  color:var(--ink-dim);
+}
+.sh-param-item input[type="number"], .sh-param-item input[type="text"]{
+  width:58px;
+  background:#12100d;
+  border:1px solid var(--line);
+  color:var(--ink);
+  text-align:center;
+  padding:4px 6px;
+  border-radius:3px;
+  font-size:13px;
+}
+.sh-exp-check{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  cursor:pointer;
+  font-size:13px;
+  color:var(--ink);
+  user-select:none;
+}
+.sh-exp-check input{
+  cursor:pointer;
+  accent-color:var(--crimson-bright);
+}
+
+/* Кнопки действий лаунчера */
+.sh-launcher-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+}
+.sh-btn-launch{
+  background:linear-gradient(180deg, #99332c 0%, #681f19 100%);
+  border:1px solid var(--crimson-bright);
+  color:#fff;
+  padding:8px 18px;
+  font-size:14px;
+  font-weight:600;
+  border-radius:4px;
+  cursor:pointer;
+  box-shadow:0 3px 10px rgba(180,40,30,0.35);
+  transition:all .15s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.sh-btn-launch:hover{
+  background:linear-gradient(180deg, #b83c34 0%, #7e261f 100%);
+  box-shadow:0 4px 14px rgba(200,67,55,0.5);
+  transform:translateY(-1px);
+}
+.sh-micro-btn{
+  background:rgba(20,18,14,0.85);
+  border:1px solid var(--line);
+  color:var(--ink-dim);
+  padding:7px 12px;
+  font-size:12.5px;
+  border-radius:4px;
+  cursor:pointer;
+  transition:all .15s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+.sh-micro-btn:hover{
+  border-color:var(--brass);
+  color:var(--ink);
+  background:rgba(35,30,22,0.9);
+}
+
+/* Блок результата лаунчера */
+.sh-launcher-result{
+  margin-top:12px;
+  background:#0e0c0a;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:4px;
+  padding:10px 14px;
+  position:relative;
+  display:none;
+}
+.sh-launcher-result.has-result{
+  display:block;
+}
+.sh-launcher-result-text{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  color:#d4cfc7;
+  white-space:pre-wrap;
+  line-height:1.6;
+}
+.sh-copy-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:11.5px;
+  color:#7be0a6;
+  font-family:'JetBrains Mono',monospace;
+  margin-top:6px;
+}
+
 
 .hb-count{ font-size:13px; color:var(--ink-dim); min-width:22px; text-align:right; }
 .hb-active-box{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:18px; }
@@ -4968,7 +5287,11 @@ function escA(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g
 function uid(p){ return (p||'sh')+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function nl2br(s){ return esc(s).replace(/\n/g,'<br>'); }
 
-var SH = { techs:[], moves:[], skills:[], meta:{name:'', note:''}, draft:null };
+var SH = {
+  techs:[], moves:[], skills:[], meta:{name:'', note:''}, draft:null,
+  techFilter:'all', moveFilter:'all',
+  launcher:{ techId:'', isExp:false, atkMod:'', dmgMod:'', lastResult:'' }
+};
 window.SH = SH;
 
 function load(){
@@ -5308,7 +5631,131 @@ function dmgText(t){
   if(m && m.charAt(0)!=='+' && m.charAt(0)!=='-') m='+'+m;
   return n+d+m;
 }
-function newTech(){ return {id:null,name:'',rank:'D',cat:'Ниндзюцу',origin:'Общая',nature:'',effect:'uron',cost:'',upkeep:'',windows:[],counter:'',req:'',desc:'',dmgN:'1',dmgD:'d6',dmgMod:''}; }
+function newTech(){ return {id:null,name:'',rank:'D',cat:'Ниндзюцу',origin:'Общая',nature:'',effect:'uron',cost:'',upkeep:'',windows:[],counter:'',req:'',desc:'',dmgN:'1',dmgD:'d6',dmgMod:'',isExp:false}; }
+
+function renderLauncherDiceHtml(tech, isExp, atkMod, dmgMod){
+  if(!tech) return '<div class="sh-scr-no-dmg">Выберите технику для расчёта</div>';
+  var aModNum = parseInt(atkMod, 10) || 0;
+  var aModStr = aModNum > 0 ? ' +'+aModNum : (aModNum < 0 ? ' '+aModNum : '');
+  var atkDieHtml = 
+    '<div class="sh-scr-col">'+
+      '<div class="sh-scr-label">Попадание</div>'+
+      '<div class="sh-scr-die die s20" id="shScrDieAtk">'+
+        (typeof dieShapeSvg==='function' ? dieShapeSvg(20, 'scratk', null) : '')+
+        '<div class="val">20</div>'+
+      '</div>'+
+      '<div class="sh-scr-sub">1d20'+aModStr+'</div>'+
+    '</div>';
+
+  var dmgBlockHtml = '';
+  if(tech.effect === 'uron'){
+    var dModNum = parseInt(dmgMod, 10) || 0;
+    var dModStr = dModNum > 0 ? ' +'+dModNum : (dModNum < 0 ? ' '+dModNum : '');
+    var n = Math.max(1, Math.min(12, parseInt(tech.dmgN, 10) || 1));
+    var dStr = (tech.dmgD || 'd6').replace('d','');
+    var dSides = parseInt(dStr, 10) || 6;
+    var dmgDiceList = [];
+    for(var i=0; i<n; i++){
+      dmgDiceList.push(
+        '<div class="sh-scr-die die s'+dSides+'" id="shScrDieDmg_'+i+'">'+
+          (typeof dieShapeSvg==='function' ? dieShapeSvg(dSides, 'scrdmg'+i, null) : '')+
+          '<div class="val">'+dSides+'</div>'+
+        '</div>'
+      );
+    }
+    dmgBlockHtml = 
+      '<div class="sh-scr-dmg-group">'+
+        '<div class="sh-scr-label">Урон ('+n+'d'+dSides+')</div>'+
+        '<div class="sh-scr-dmg-dice">'+dmgDiceList.join('')+'</div>'+
+        '<div class="sh-scr-sub">'+(dModStr ? 'мод: '+dModStr : 'без мода')+'</div>'+
+      '</div>';
+  } else {
+    var efObj = EFFECTS.filter(function(e){return e.k===tech.effect;})[0];
+    var efName = efObj ? efObj.ru : tech.effect;
+    dmgBlockHtml = '<div class="sh-scr-no-dmg">Эффект: <b>'+esc(efName)+'</b> (без броска урона)</div>';
+  }
+
+  var expDieHtml = '';
+  if(isExp){
+    expDieHtml = 
+      '<div class="sh-scr-col">'+
+        '<div class="sh-scr-label" style="color:#ff9085;">Контроль</div>'+
+        '<div class="sh-scr-die die s20" id="shScrDieExp">'+
+          (typeof dieShapeSvg==='function' ? dieShapeSvg(20, 'screxp', null) : '')+
+          '<div class="val">20</div>'+
+        '</div>'+
+        '<div class="sh-scr-sub">1d20</div>'+
+      '</div>';
+  }
+
+  return '<div class="sh-screen-dice-tray">'+atkDieHtml + dmgBlockHtml + expDieHtml + '</div>';
+}
+
+function renderTechLauncher(){
+  if(!SH.techs || !SH.techs.length){
+    return '<div class="sh-launcher">'+
+      '<div class="sh-launcher-title">⚔️ Боевой расчёт техники <span class="sh-badge-tag">AI Studio</span></div>'+
+      '<div class="char-empty" style="margin:10px 0 0;padding:12px;">Техники ещё не добавлены. Добавьте первую технику кнопкой ниже, чтобы использовать боевой расчёт.</div>'+
+    '</div>';
+  }
+
+  if(!SH.launcher) SH.launcher = { techId:'', isExp:false, atkMod:'', dmgMod:'', lastResult:'' };
+  var selTech = techById(SH.launcher.techId) || SH.techs[0];
+  if(!SH.launcher.techId && selTech) SH.launcher.techId = selTech.id;
+  var isExp = (SH.launcher.isExp !== undefined) ? SH.launcher.isExp : !!selTech.isExp;
+  var atkMod = (SH.launcher.atkMod !== undefined) ? SH.launcher.atkMod : '';
+  var dmgMod = (SH.launcher.dmgMod !== undefined) ? SH.launcher.dmgMod : (selTech.dmgMod || '');
+
+  var techOpts = SH.techs.map(function(t){
+    var cStr = t.cost ? t.cost+'ч' : '0ч';
+    var nStr = t.nature ? ' ['+t.nature+']' : '';
+    var expStr = t.isExp ? ' [🧪]' : '';
+    return '<option value="'+t.id+'" '+(t.id===selTech.id?'selected':'')+'>'+
+      esc(t.rank)+' · '+esc(t.name||'Без названия')+' ('+cStr+')'+nStr+expStr+
+    '</option>';
+  }).join('');
+
+  var screenHtml = renderLauncherDiceHtml(selTech, isExp, atkMod, dmgMod);
+
+  var paramsHtml = 
+    '<div class="sh-launcher-params">'+
+      '<div class="sh-launcher-inputs">'+
+        '<label class="sh-param-item">Попадание мод: <input type="number" id="shLauncherAtkMod" value="'+escA(atkMod)+'" placeholder="+0"></label>'+
+        '<label class="sh-param-item">Урон мод: <input type="number" id="shLauncherDmgMod" value="'+escA(dmgMod)+'" placeholder="+0"></label>'+
+        '<label class="sh-exp-check"><input type="checkbox" id="shLauncherExp"'+(isExp?' checked':'')+'> 🧪 Экспериментальная (Контроль чакры)</label>'+
+      '</div>'+
+    '</div>';
+
+  var actionsHtml = 
+    '<div class="sh-launcher-actions">'+
+      '<button class="sh-btn-launch" id="shLaunchComboBtn">⚔️ Применить технику</button>'+
+      '<button class="sh-micro-btn" id="shLaunchAtkBtn" title="Бросить только попадание">🎯 Попадание</button>'+
+      (selTech.effect === 'uron' ? '<button class="sh-micro-btn" id="shLaunchDmgBtn" title="Бросить только урон">💥 Урон</button>' : '')+
+      '<button class="sh-micro-btn" id="shLaunchExpBtn" title="Бросить Контроль чакры">🌀 Контроль</button>'+
+      '<button class="sh-micro-btn" id="shLaunchClaimBtn" title="Скопировать только заголовок заявки">📋 Только заявка</button>'+
+    '</div>';
+
+  var hasRes = !!(SH.launcher.lastResult);
+  var resultBoxHtml = 
+    '<div class="sh-launcher-result '+(hasRes?'has-result':'')+'" id="shLauncherResultBox">'+
+      '<div class="sh-launcher-result-text" id="shLauncherResultText">'+esc(SH.launcher.lastResult||'')+'</div>'+
+      '<div class="sh-copy-badge" id="shLauncherCopyBadge"><span>✓ Скопировано в буфер обмена для AI Studio</span></div>'+
+    '</div>';
+
+  return '<div class="sh-launcher">'+
+    '<div class="sh-launcher-head">'+
+      '<div class="sh-launcher-title">⚔️ Боевой расчёт техники <span class="sh-badge-tag">AI Studio</span></div>'+
+      '<div class="sh-launcher-sel-wrap">'+
+        '<select class="sh-launcher-sel" id="shLauncherSelect">'+techOpts+'</select>'+
+      '</div>'+
+    '</div>'+
+    '<div class="sh-launcher-screen" id="shLauncherScreen">'+screenHtml+'</div>'+
+    paramsHtml+
+    actionsHtml+
+    resultBoxHtml+
+  '</div>';
+}
+
 var MOVE_KINDS = ['Рукопашный','Оружейный','Смешанный','Передвижение'];
 var MOVE_TYPES = ['Урон','Состояние','Реакция','Манёвр','Защита'];
 var ABILS = ['Сила','Ловкость','Телосложение','Интеллект','Мудрость','Харизма'];
@@ -5356,7 +5803,41 @@ function shHome(){
 }
 
 function shTechs(){
-  var body = SH.techs.length ? SH.techs.map(function(t){
+  var launcherWidget = renderTechLauncher();
+
+  // Filter bar
+  var natures = {};
+  SH.techs.forEach(function(t){
+    var n = (t.nature||'').trim();
+    if(n) natures[n] = (natures[n] || 0) + 1;
+  });
+  var natKeys = Object.keys(natures);
+  var hasNoNat = SH.techs.some(function(t){ return !(t.nature||'').trim(); });
+  var techFilterBar = '';
+  if(SH.techs.length > 0 && (natKeys.length > 0 || hasNoNat)){
+    var curTF = SH.techFilter || 'all';
+    var pills = [
+      '<div class="sh-filter-pill '+(curTF==='all'?'active':'')+'" data-tech-filter="all">Все <span class="sh-pill-count">'+SH.techs.length+'</span></div>'
+    ];
+    natKeys.forEach(function(k){
+      pills.push('<div class="sh-filter-pill '+(curTF===k?'active':'')+'" data-tech-filter="'+escA(k)+'">'+natureBadge(k)+' <span class="sh-pill-count">'+natures[k]+'</span></div>');
+    });
+    if(hasNoNat && natKeys.length > 0){
+      var noNatCount = SH.techs.filter(function(t){ return !(t.nature||'').trim(); }).length;
+      pills.push('<div class="sh-filter-pill '+(curTF==='none'?'active':'')+'" data-tech-filter="none">Без стихии <span class="sh-pill-count">'+noNatCount+'</span></div>');
+    }
+    techFilterBar = '<div class="sh-filter-bar">'+pills.join('')+'</div>';
+  }
+
+  // Filtered list
+  var filteredTechs = SH.techs.filter(function(t){
+    var curTF = SH.techFilter || 'all';
+    if(curTF === 'all') return true;
+    if(curTF === 'none') return !(t.nature||'').trim();
+    return (t.nature||'').trim() === curTF;
+  });
+
+  var body = SH.techs.length ? (filteredTechs.length ? filteredTechs.map(function(t){
     var w = (t.windows&&t.windows.length) 
       ? t.windows.map(function(win){ return '<span class="sh-win-badge needed">🎯 '+esc(win)+'</span>'; }).join(' ')
       : '<span class="sh-win-badge">окно не требуется</span>';
@@ -5373,16 +5854,42 @@ function shTechs(){
       '<div class="desc">'+esc(t.cat)+' · затраты: '+costStr+dmgStr+c+'</div>'+
       '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;">'+w+'</div>'+
     '</div>';
-  }).join('') : '<div class="char-empty">Пусто. Техники добавляются по мере изучения — теория плюс практика, ничего не начисляется само.</div>';
+  }).join('') : '<div class="char-empty">В выбранной категории нет техник.</div>')
+  : '<div class="char-empty">Пусто. Техники добавляются по мере изучения — теория плюс практика, ничего не начисляется само.</div>';
+
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники'}])+
-    '<h1>Техники</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shTechEdit:new">Добавить технику</button></div>'+body;
+    '<h1>Техники</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shTechEdit:new">Добавить технику</button></div>'+
+    launcherWidget +
+    techFilterBar +
+    body;
 }
 
 function shMoves(){
   var arr = SH.moves;
   var groups = {};
   arr.forEach(function(m){ var k=m.kind||'Рукопашный'; (groups[k]=groups[k]||[]).push(m); });
-  var body = arr.length ? MOVE_KINDS.filter(function(k){return groups[k];}).map(function(k){
+
+  var moveFilterBar = '';
+  if(arr.length > 0){
+    var curMF = SH.moveFilter || 'all';
+    var pills = [
+      '<div class="sh-filter-pill '+(curMF==='all'?'active':'')+'" data-move-filter="all">Все <span class="sh-pill-count">'+arr.length+'</span></div>'
+    ];
+    MOVE_KINDS.forEach(function(k){
+      var cnt = arr.filter(function(m){ return (m.kind||'Рукопашный')===k; }).length;
+      if(cnt > 0){
+        pills.push('<div class="sh-filter-pill '+(curMF===k?'active':'')+'" data-move-filter="'+escA(k)+'">'+esc(k)+' <span class="sh-pill-count">'+cnt+'</span></div>');
+      }
+    });
+    moveFilterBar = '<div class="sh-filter-bar">'+pills.join('')+'</div>';
+  }
+
+  var curMF = SH.moveFilter || 'all';
+  var kindsToRender = (curMF === 'all')
+    ? MOVE_KINDS.filter(function(k){ return groups[k]; })
+    : [curMF].filter(function(k){ return groups[k]; });
+
+  var body = arr.length ? (kindsToRender.length ? kindsToRender.map(function(k){
     return '<div class="section-label">'+esc(k)+'</div>'+groups[k].map(function(m){
       var st = (m.mtype==='Состояние' && m.state && m.state!=='не навязывает') ? ' → <span style="color:var(--brass);font-weight:600;">'+esc(m.state)+'</span>' : '';
       var payStr = m.pay ? ('оплата: <b>'+esc(m.pay)+'</b>') : '';
@@ -5392,9 +5899,13 @@ function shMoves(){
         '<div class="name">'+esc(m.name||'Без названия')+st+'</div>'+
         '<div class="desc">'+line+'</div></div>';
     }).join('');
-  }).join('') : '<div class="char-empty">Пусто. Приёмы изучаются поштучно — у мастера, тренировками, спаррингами. Сюда идут и рукопашные, и оружейные: всё, что не требует чакры.</div>';
+  }).join('') : '<div class="char-empty">В выбранной категории нет приёмов.</div>')
+  : '<div class="char-empty">Пусто. Приёмы изучаются поштучно — у мастера, тренировками, спаррингами. Сюда идут и рукопашные, и оружейные: всё, что не требует чакры.</div>';
+
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы'}])+
-    '<h1>Приёмы</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shMoveEdit:new">Добавить приём</button></div>'+body;
+    '<h1>Приёмы</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shMoveEdit:new">Добавить приём</button></div>'+
+    moveFilterBar +
+    body;
 }
 
 function shSkills(){
@@ -5650,6 +6161,7 @@ function shTechEdit(){
         '<input id="shDmgMod" type="text" value="'+escA(d.dmgMod||'')+'" placeholder="+4">'+
       '</div>',
       'Количество костей, кость и модификатор. Модификатор необязателен.')+
+    fld('Экспериментальная', '<label class="combat-box"><input type="checkbox" id="shExp"'+(d.isExp?' checked':'')+'> <span class="cb-label">🧪 Требует проверки Контроля чакры (d20) при применении</span></label>', 'Отметь, если техника нестабильна, не доведена до мастерства или несёт риск срыва.')+
     fld('Стоимость активации','<input id="shCost" type="text" value="'+escA(d.cost)+'">')+
     fld('Поддержание за раунд','<input id="shUp" type="text" value="'+escA(d.upkeep)+'">','Заполняется только для длящегося: полей, режимов, усилений.')+
     fld('Окно','<div class="grid">'+wch+'</div>','Ничего не отмечено — окно не требуется. Два и больше — вершинная техника.')+
@@ -5675,6 +6187,7 @@ function shTechView(){
     {k:'Тип эффекта', v:ef?ef.ru:'—'}
   ];
   if(dmgText(t)) rows.push({k:'Урон', v:'<b>'+esc(dmgText(t))+'</b>', raw:true});
+  if(t.isExp) rows.push({k:'Статус', v:'<span style="color:#ff9085;font-weight:600;">🧪 Экспериментальная техника (требует Контроля чакры)</span>', raw:true});
   rows = rows.concat([
     {k:'Стоимость', v:(t.cost?('<b>'+esc(t.cost)+'</b>'):'—')+(t.upkeep?' + <b>'+esc(t.upkeep)+'</b> за раунд':''), raw:true},
     {k:'Окно применения', v:w, raw:true},
@@ -5778,6 +6291,7 @@ function wireSh(){
     d.nature=v('shNature'); d.effect=v('shEff'); d.cost=v('shCost'); d.upkeep=v('shUp');
     d.counter=v('shCnt'); d.req=v('shReq'); d.desc=v('shDesc');
     d.dmgN=v('shDmgN'); d.dmgD=v('shDmgD'); d.dmgMod=v('shDmgMod');
+    d.isExp=!!(g('shExp') && g('shExp').checked);
     d.windows=[]; document.querySelectorAll('.shWin').forEach(function(c){ if(c.checked) d.windows.push(c.value); });
     if(!d.id){ d.id=uid('t'); SH.techs.push(d); } else { var i=SH.techs.findIndex(function(x){return x.id===d.id;}); if(i>=0) SH.techs[i]=d; }
     saveT(); SH.draft=null; navigate('shTechs');
@@ -5845,6 +6359,187 @@ function wireSh(){
     if(!confirm('Удалить технику?')) return;
     SH.techs=SH.techs.filter(function(x){return x.id!==view.shId;}); saveT(); SH.draft=null; navigate('shTechs');
   });
+
+  /* фильтры техник и приёмов */
+  document.querySelectorAll('[data-tech-filter]').forEach(function(el){
+    el.addEventListener('click', function(){
+      SH.techFilter = el.getAttribute('data-tech-filter');
+      navigate('shTechs');
+    });
+  });
+  document.querySelectorAll('[data-move-filter]').forEach(function(el){
+    el.addEventListener('click', function(){
+      SH.moveFilter = el.getAttribute('data-move-filter');
+      navigate('shMoves');
+    });
+  });
+
+  /* тактический лаунчер техник */
+  var updateLauncherScreen = function(){
+    var scr = g('shLauncherScreen');
+    if(!scr) return;
+    var t = techById(SH.launcher.techId) || (SH.techs && SH.techs[0]);
+    if(!t) return;
+    scr.innerHTML = renderLauncherDiceHtml(t, SH.launcher.isExp, SH.launcher.atkMod, SH.launcher.dmgMod);
+  };
+
+  var lSel = g('shLauncherSelect');
+  if(lSel){
+    lSel.addEventListener('change', function(){
+      SH.launcher.techId = lSel.value;
+      var t = techById(lSel.value);
+      if(t){
+        SH.launcher.isExp = !!t.isExp;
+        var expCb = g('shLauncherExp');
+        if(expCb) expCb.checked = SH.launcher.isExp;
+        if(t.dmgMod !== undefined){
+          SH.launcher.dmgMod = t.dmgMod;
+          var dmIn = g('shLauncherDmgMod');
+          if(dmIn) dmIn.value = t.dmgMod;
+        }
+      }
+      updateLauncherScreen();
+    });
+  }
+
+  var lExp = g('shLauncherExp');
+  if(lExp){
+    lExp.addEventListener('change', function(){
+      SH.launcher.isExp = lExp.checked;
+      updateLauncherScreen();
+    });
+  }
+
+  var lAtk = g('shLauncherAtkMod');
+  if(lAtk){
+    lAtk.addEventListener('input', function(){
+      SH.launcher.atkMod = lAtk.value;
+      updateLauncherScreen();
+    });
+  }
+
+  var lDmg = g('shLauncherDmgMod');
+  if(lDmg){
+    lDmg.addEventListener('input', function(){
+      SH.launcher.dmgMod = lDmg.value;
+      updateLauncherScreen();
+    });
+  }
+
+  var finishLaunch = function(t, mode, isExp, aMod, dMod){
+    var costStr = t.cost ? (t.cost + (t.cost.toLowerCase().indexOf('чакр')>=0 ? '' : ' чакры')) : 'без затрат';
+    if(t.upkeep) costStr += ' +' + t.upkeep + '/рнд';
+    var header = '*[Техника: '+(t.name||'Без названия')+' | Ранг: '+(t.rank||'D')+' | Затраты: '+costStr+']*';
+    var lines = [];
+
+    if(mode === 'claim'){
+      lines.push(header);
+    } else {
+      lines.push(header);
+
+      if(mode === 'all' || mode === 'atk'){
+        var atkVal = 1 + Math.floor(Math.random() * 20);
+        var atDie = g('shScrDieAtk');
+        if(atDie){
+          var vEl = atDie.querySelector('.val');
+          if(vEl) vEl.textContent = atkVal;
+        }
+        var modStr = aMod > 0 ? ' + '+aMod : (aMod < 0 ? ' − '+Math.abs(aMod) : '');
+        lines.push('*[Результат броска Попадание 1d20: '+atkVal+' ]*'+modStr);
+      }
+
+      if((mode === 'all' || mode === 'dmg') && t.effect === 'uron'){
+        var n = Math.max(1, Math.min(12, parseInt(t.dmgN, 10) || 1));
+        var dSides = parseInt((t.dmgD || 'd6').replace('d', ''), 10) || 6;
+        var rolls = [];
+        for(var i = 0; i < n; i++){
+          var r = 1 + Math.floor(Math.random() * dSides);
+          rolls.push(r);
+          var dmDie = g('shScrDieDmg_'+i);
+          if(dmDie){
+            var vEl = dmDie.querySelector('.val');
+            if(vEl) vEl.textContent = r;
+          }
+        }
+        var modStr = dMod > 0 ? ' + '+dMod : (dMod < 0 ? ' − '+Math.abs(dMod) : '');
+        lines.push('*[Результат броска Урон '+n+'d'+dSides+': '+rolls.join(' | ')+' ]*'+modStr);
+      }
+
+      if((mode === 'all' || mode === 'exp') && isExp){
+        var expVal = 1 + Math.floor(Math.random() * 20);
+        var exDie = g('shScrDieExp');
+        if(exDie){
+          var vEl = exDie.querySelector('.val');
+          if(vEl) vEl.textContent = expVal;
+        }
+        lines.push('*[Результат броска Контроль чакры 1d20: '+expVal+' ]*');
+      }
+    }
+
+    var output = lines.join('\n');
+    SH.launcher.lastResult = output;
+    if(typeof copyText === 'function') copyText(output);
+
+    var rBox = g('shLauncherResultBox');
+    var rTxt = g('shLauncherResultText');
+    var rBdg = g('shLauncherCopyBadge');
+    if(rBox && rTxt){
+      rBox.classList.add('has-result');
+      rTxt.textContent = output;
+      if(rBdg){
+        rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio ('+lines.length+' стр.)</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    }
+  };
+
+  var executeLaunch = function(mode){
+    var t = techById(SH.launcher.techId) || (SH.techs && SH.techs[0]);
+    if(!t) return;
+    var isExp = !!SH.launcher.isExp;
+    var aMod = parseInt(SH.launcher.atkMod, 10) || 0;
+    var dMod = parseInt(SH.launcher.dmgMod, 10) || 0;
+
+    var scr = g('shLauncherScreen');
+    if(scr && mode !== 'claim'){
+      var diceToRoll = [];
+      if(mode==='all' || mode==='atk'){
+        var atDie = g('shScrDieAtk'); if(atDie) diceToRoll.push(atDie);
+      }
+      if((mode==='all' || mode==='dmg') && t.effect==='uron'){
+        var n = Math.max(1, Math.min(12, parseInt(t.dmgN, 10) || 1));
+        for(var i=0; i<n; i++){
+          var dmDie = g('shScrDieDmg_'+i); if(dmDie) diceToRoll.push(dmDie);
+        }
+      }
+      if((mode==='all' || mode==='exp') && isExp){
+        var exDie = g('shScrDieExp'); if(exDie) diceToRoll.push(exDie);
+      }
+      diceToRoll.forEach(function(el){ el.classList.add('rolling'); });
+
+      var rollInterval = setInterval(function(){
+        diceToRoll.forEach(function(el){
+          var vEl = el.querySelector('.val');
+          if(vEl) vEl.textContent = Math.floor(Math.random()*20)+1;
+        });
+      }, 50);
+
+      setTimeout(function(){
+        clearInterval(rollInterval);
+        diceToRoll.forEach(function(el){ el.classList.remove('rolling'); });
+        finishLaunch(t, mode, isExp, aMod, dMod);
+      }, 350);
+    } else {
+      finishLaunch(t, mode, isExp, aMod, dMod);
+    }
+  };
+
+  var btnCombo = g('shLaunchComboBtn'); if(btnCombo) btnCombo.addEventListener('click', function(){ executeLaunch('all'); });
+  var btnAtk = g('shLaunchAtkBtn'); if(btnAtk) btnAtk.addEventListener('click', function(){ executeLaunch('atk'); });
+  var btnDmg = g('shLaunchDmgBtn'); if(btnDmg) btnDmg.addEventListener('click', function(){ executeLaunch('dmg'); });
+  var btnExp = g('shLaunchExpBtn'); if(btnExp) btnExp.addEventListener('click', function(){ executeLaunch('exp'); });
+  var btnClaim = g('shLaunchClaimBtn'); if(btnClaim) btnClaim.addEventListener('click', function(){ executeLaunch('claim'); });
+
 
   /* клик по стихии в колесе стихий */
   document.querySelectorAll('[data-elem]').forEach(function(el){
