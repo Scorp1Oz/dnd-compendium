@@ -1922,6 +1922,218 @@ body.sh-theme .card:hover{
   opacity:1;
 }
 
+/* Shinobi HUD */
+.sh-hud{
+  background:linear-gradient(145deg, #1d1712 0%, #110e0b 100%);
+  border:1px solid var(--line);
+  border-left:3px solid var(--brass);
+  border-radius:6px;
+  padding:14px 18px;
+  margin:12px 0 16px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  position:relative;
+}
+.sh-hud-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:12px;
+}
+.sh-hud-identity{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.sh-hud-name{
+  font-family:'Cinzel',serif;
+  font-size:18px;
+  font-weight:700;
+  color:var(--ink);
+  letter-spacing:.04em;
+}
+.sh-hud-meta{
+  font-size:12.5px;
+  color:var(--ink-dim);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.sh-hud-clan{
+  color:var(--brass);
+}
+.sh-hud-badges{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.sh-hud-rank{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  text-transform:uppercase;
+  padding:3px 9px;
+  background:rgba(200,67,55,0.18);
+  border:1px solid var(--crimson-bright);
+  color:#ff9085;
+  border-radius:4px;
+  font-weight:700;
+  letter-spacing:.06em;
+}
+.sh-hud-edit-btn{
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--line);
+  color:var(--ink-dim);
+  cursor:pointer;
+  padding:4px 9px;
+  border-radius:4px;
+  font-size:12px;
+  transition:all .15s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+.sh-hud-edit-btn:hover{
+  border-color:var(--brass);
+  color:var(--ink);
+  background:rgba(201,168,76,0.12);
+}
+.sh-hud-stats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.sh-hud-stat-pill{
+  background:rgba(0,0,0,0.35);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:4px;
+  padding:5px 12px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  font-size:13px;
+}
+.sh-hud-stat-pill .stat-icon{
+  font-size:14px;
+}
+.sh-hud-stat-pill .stat-label{
+  color:var(--ink-dim);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.sh-hud-stat-pill .stat-val{
+  color:#ffffff;
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  font-weight:700;
+}
+
+/* Форма редактирования HUD */
+.sh-hud-edit-form{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.sh-hud-edit-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+  gap:10px;
+}
+.sh-hud-edit-item label{
+  display:block;
+  font-size:11px;
+  color:var(--ink-dim);
+  text-transform:uppercase;
+  margin-bottom:4px;
+  font-family:'Cinzel',serif;
+}
+.sh-hud-edit-item input, .sh-hud-edit-item select{
+  width:100%;
+  background:#14120f;
+  border:1px solid var(--line);
+  color:var(--ink);
+  padding:6px 9px;
+  border-radius:3px;
+  font-size:13px;
+  outline:none;
+}
+.sh-hud-edit-actions{
+  display:flex;
+  gap:8px;
+  margin-top:6px;
+}
+
+/* Сводка мастерства и арсенала */
+.sh-arsenal-card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:14px 18px;
+  margin:14px 0 20px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.3);
+}
+.sh-arsenal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:12px;
+  padding-bottom:8px;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.sh-arsenal-title{
+  font-family:'Cinzel',serif;
+  font-size:15px;
+  font-weight:600;
+  color:var(--ink);
+  letter-spacing:.04em;
+}
+.sh-arsenal-counts{
+  font-size:12px;
+  color:var(--ink-dim);
+}
+.sh-arsenal-counts b{
+  color:var(--brass);
+}
+.sh-arsenal-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  gap:14px;
+}
+.sh-arsenal-col{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.sh-arsenal-sub{
+  font-size:11px;
+  color:var(--ink-dim);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sh-arsenal-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+.sh-arsenal-pill{
+  font-size:11.5px;
+  font-family:'JetBrains Mono',monospace;
+  padding:2px 7px;
+  border-radius:3px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  color:var(--ink);
+}
+.sh-arsenal-empty{
+  font-size:12px;
+  color:var(--ink-dim);
+  font-style:italic;
+}
+
 .hb-count{ font-size:13px; color:var(--ink-dim); min-width:22px; text-align:right; }
 .hb-active-box{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:18px; }
 .hb-active-box select{ flex:1; min-width:180px; }
@@ -5675,9 +5887,22 @@ function escA(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g
 function uid(p){ return (p||'sh')+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function nl2br(s){ return esc(s).replace(/\n/g,'<br>'); }
 
+var DEFAULT_META = {
+  name: '',
+  note: '',
+  charName: '',
+  clan: '',
+  village: 'Коноха',
+  rank: 'Генин',
+  nature: '',
+  chakra: '30',
+  hp: '28',
+  ac: '14'
+};
+
 var SH = {
-  techs:[], moves:[], skills:[], meta:{name:'', note:''}, draft:null,
-  techFilter:'all', moveFilter:'all',
+  techs:[], moves:[], skills:[], meta: Object.assign({}, DEFAULT_META), draft:null,
+  techFilter:'all', moveFilter:'all', hudEditing:false,
   launcher:{ techId:'', isExp:false, isOpen:false, mods:{ exp:0, atk:0, dmg:0 }, selectedTarget:'atk', rolledValues:null, lastResult:'', lastResultCopied:false }
 };
 window.SH = SH;
@@ -5686,7 +5911,7 @@ function load(){
   try{ var t=JSON.parse(localStorage.getItem('ttc_sh_techs')||'[]'); SH.techs=Array.isArray(t)?t:[]; }catch(e){ SH.techs=[]; }
   try{ var m=JSON.parse(localStorage.getItem('ttc_sh_moves')||'[]'); SH.moves=Array.isArray(m)?m:[]; }catch(e){ SH.moves=[]; }
   try{ var s=JSON.parse(localStorage.getItem('ttc_sh_skills')||'[]'); SH.skills=Array.isArray(s)?s:[]; }catch(e){ SH.skills=[]; }
-  try{ var w=JSON.parse(localStorage.getItem('ttc_sh_meta')||'null'); if(w) SH.meta=w; }catch(e){}
+  try{ var w=JSON.parse(localStorage.getItem('ttc_sh_meta')||'null'); if(w) SH.meta=Object.assign({}, DEFAULT_META, w); else SH.meta=Object.assign({}, DEFAULT_META); }catch(e){ SH.meta=Object.assign({}, DEFAULT_META); }
 }
 function saveT(){ try{ localStorage.setItem('ttc_sh_techs', JSON.stringify(SH.techs)); }catch(e){} }
 function saveM(){ try{ localStorage.setItem('ttc_sh_moves', JSON.stringify(SH.moves)); }catch(e){} }
@@ -6373,8 +6598,198 @@ function crumbSh(parts){
   }).join('')+'</div>';
 }
 
+/* ---------- Shinobi HUD & Arsenal Summary ---------- */
+function renderShinobiHudHtml(){
+  var m = SH.meta || {};
+  if(SH.hudEditing){
+    var ranks = ['Академик','Генин','Чунин','Спец. джонин','Джонин','Нукенин'];
+    var curRank = m.rank || 'Генин';
+    var rankOptions = ranks.map(function(r){
+      return '<option value="'+escA(r)+'" '+(curRank===r?'selected':'')+'>'+esc(r)+'</option>';
+    }).join('');
+    if(ranks.indexOf(curRank) === -1 && curRank){
+      rankOptions = '<option value="'+escA(curRank)+'" selected>'+esc(curRank)+'</option>' + rankOptions;
+    }
+
+    var curNat = m.nature || '';
+    var natList = [
+      {k:'', t:'Без стихии'},
+      {k:'Огонь', t:'Огонь (Катон)'},
+      {k:'Ветер', t:'Ветер (Фуутон)'},
+      {k:'Молния', t:'Молния (Райтон)'},
+      {k:'Земля', t:'Земля (Дотон)'},
+      {k:'Вода', t:'Вода (Суйтон)'},
+      {k:'Инь', t:'Инь'},
+      {k:'Ян', t:'Ян'}
+    ];
+    var natOptions = natList.map(function(item){
+      return '<option value="'+escA(item.k)+'" '+(curNat===item.k?'selected':'')+'>'+esc(item.t)+'</option>';
+    }).join('');
+
+    return '<div class="sh-hud" id="shHud">'+
+      '<div class="sh-hud-edit-form">'+
+        '<div class="sh-hud-edit-grid">'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Имя шиноби</label>'+
+            '<input type="text" id="shHudInCharName" value="'+escA(m.charName||'')+'" placeholder="Например: Саске">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Клан</label>'+
+            '<input type="text" id="shHudInClan" value="'+escA(m.clan||'')+'" placeholder="Например: Учиха">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Деревня</label>'+
+            '<input type="text" id="shHudInVillage" value="'+escA(m.village||'Коноха')+'" placeholder="Коноха">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Ранг</label>'+
+            '<select id="shHudInRank">'+rankOptions+'</select>'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Стихия</label>'+
+            '<select id="shHudInNature">'+natOptions+'</select>'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Чакра</label>'+
+            '<input type="text" id="shHudInChakra" value="'+escA(m.chakra!=null?m.chakra:'30')+'" placeholder="30">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Очки здоровья (ОЗ)</label>'+
+            '<input type="text" id="shHudInHp" value="'+escA(m.hp!=null?m.hp:'28')+'" placeholder="28">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Класс брони (КБ)</label>'+
+            '<input type="text" id="shHudInAc" value="'+escA(m.ac!=null?m.ac:'14')+'" placeholder="14">'+
+          '</div>'+
+        '</div>'+
+        '<div class="sh-hud-edit-actions">'+
+          '<button class="btn btn-primary" id="shHudSaveBtn">✓ Сохранить</button>'+
+          '<button class="btn" id="shHudCancelBtn">Отмена</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+
+  var nameDisplay = m.charName ? esc(m.charName) : 'Безымянный шиноби';
+  var clanHtml = m.clan ? '<span class="sh-hud-clan">Клан ' + esc(m.clan) + '</span> · ' : '';
+  var villageHtml = '<span>' + esc(m.village || 'Коноха') + '</span>';
+  var rankBadgeHtml = m.rank ? '<span class="sh-hud-rank">' + esc(m.rank) + '</span>' : '';
+  var natureBadgeHtml = m.nature ? natureBadge(m.nature) : '';
+
+  return '<div class="sh-hud" id="shHud">'+
+    '<div class="sh-hud-top">'+
+      '<div class="sh-hud-identity">'+
+        '<div class="sh-hud-name">' + nameDisplay + '</div>'+
+        '<div class="sh-hud-meta">' + clanHtml + villageHtml + '</div>'+
+      '</div>'+
+      '<div class="sh-hud-badges">'+
+        rankBadgeHtml +
+        natureBadgeHtml +
+        '<button class="sh-hud-edit-btn" id="shHudEditBtn" title="Настроить профиль">✏️ Профиль</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="sh-hud-stats">'+
+      '<div class="sh-hud-stat-pill">'+
+        '<span class="stat-icon">🌀</span>'+
+        '<span class="stat-label">Чакра</span>'+
+        '<span class="stat-val">' + esc(m.chakra!=null&&m.chakra!==''?m.chakra:'30') + '</span>'+
+      '</div>'+
+      '<div class="sh-hud-stat-pill">'+
+        '<span class="stat-icon">❤️</span>'+
+        '<span class="stat-label">ОЗ</span>'+
+        '<span class="stat-val">' + esc(m.hp!=null&&m.hp!==''?m.hp:'28') + '</span>'+
+      '</div>'+
+      '<div class="sh-hud-stat-pill">'+
+        '<span class="stat-icon">🛡️</span>'+
+        '<span class="stat-label">КБ</span>'+
+        '<span class="stat-val">' + esc(m.ac!=null&&m.ac!==''?m.ac:'14') + '</span>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderArsenalSummaryHtml(){
+  var techs = SH.techs || [];
+  var moves = SH.moves || [];
+  var skills = SH.skills || [];
+
+  var totalTechs = techs.length;
+  var totalMoves = moves.length;
+  var totalSkills = skills.length;
+
+  var rankCounts = {};
+  techs.forEach(function(t){
+    var r = (t.rank || '').toUpperCase().trim();
+    if(r) rankCounts[r] = (rankCounts[r] || 0) + 1;
+  });
+
+  var moveCounts = {};
+  moves.forEach(function(m){
+    var k = (m.kind || '').trim();
+    if(k) moveCounts[k] = (moveCounts[k] || 0) + 1;
+  });
+
+  var skillCounts = {};
+  skills.forEach(function(s){
+    var l = (s.level || '').trim();
+    if(l) skillCounts[l] = (skillCounts[l] || 0) + 1;
+  });
+
+  var rankPills = [];
+  RANKS.forEach(function(r){
+    if(rankCounts[r]){
+      rankPills.push('<span class="sh-arsenal-pill"><b>' + r + '</b>: ' + rankCounts[r] + '</span>');
+    }
+  });
+
+  var movePills = [];
+  MOVE_KINDS.forEach(function(k){
+    if(moveCounts[k]){
+      movePills.push('<span class="sh-arsenal-pill">' + esc(k) + ': ' + moveCounts[k] + '</span>');
+    }
+  });
+
+  var skillPills = [];
+  SKILL_LEVELS.forEach(function(l){
+    if(skillCounts[l]){
+      skillPills.push('<span class="sh-arsenal-pill">' + esc(l) + ': ' + skillCounts[l] + '</span>');
+    }
+  });
+
+  return '<div class="sh-arsenal-card">'+
+    '<div class="sh-arsenal-head">'+
+      '<div class="sh-arsenal-title">📜 Арсенал и мастерство</div>'+
+      '<div class="sh-arsenal-counts"><b>' + totalTechs + '</b> техн. · <b>' + totalMoves + '</b> приём. · <b>' + totalSkills + '</b> навык.</div>'+
+    '</div>'+
+    '<div class="sh-arsenal-grid">'+
+      '<div class="sh-arsenal-col">'+
+        '<div class="sh-arsenal-sub">Техники по рангам</div>'+
+        '<div class="sh-arsenal-tags">'+
+          (rankPills.length ? rankPills.join('') : '<span class="sh-arsenal-empty">нет записей</span>')+
+        '</div>'+
+      '</div>'+
+      '<div class="sh-arsenal-col">'+
+        '<div class="sh-arsenal-sub">Виды приёмов</div>'+
+        '<div class="sh-arsenal-tags">'+
+          (movePills.length ? movePills.join('') : '<span class="sh-arsenal-empty">нет записей</span>')+
+        '</div>'+
+      '</div>'+
+      '<div class="sh-arsenal-col">'+
+        '<div class="sh-arsenal-sub">Ступени навыков</div>'+
+        '<div class="sh-arsenal-tags">'+
+          (skillPills.length ? skillPills.join('') : '<span class="sh-arsenal-empty">нет записей</span>')+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+SH.renderShinobiHudHtml = renderShinobiHudHtml;
+SH.renderArsenalSummaryHtml = renderArsenalSummaryHtml;
+
 /* ---------- экраны ---------- */
 function shHome(){
+  var hudHtml = renderShinobiHudHtml();
   var hero = '<div class="hero-dice" data-go="dice">'+
     '<div class="hero-dice-icon">'+(typeof dieShapeSvg==='function'? dieShapeSvg(20,'shHeroDie',20) : '🎲')+'</div>'+
     '<div class="hero-dice-text">'+
@@ -6390,6 +6805,7 @@ function shHome(){
   ];
   return '<h1>Шиноби</h1>'+
     '<div class="subtitle">'+esc(SH.meta.name||'Мир скрытых деревень')+'</div>'+
+    hudHtml +
     '<div class="rule"></div>'+ hero +
     '<div class="section-label">Свитки и разделы</div>'+
     '<div class="menu-list grid-2">'+items.map(function(i){
@@ -7480,6 +7896,39 @@ function wireSh(){
     });
   });
 
+  /* Shinobi HUD events */
+  var hudEditBtn = g('shHudEditBtn');
+  if(hudEditBtn){
+    hudEditBtn.addEventListener('click', function(){
+      SH.hudEditing = true;
+      render();
+    });
+  }
+  var hudCancelBtn = g('shHudCancelBtn');
+  if(hudCancelBtn){
+    hudCancelBtn.addEventListener('click', function(){
+      SH.hudEditing = false;
+      render();
+    });
+  }
+  var hudSaveBtn = g('shHudSaveBtn');
+  if(hudSaveBtn){
+    hudSaveBtn.addEventListener('click', function(){
+      SH.meta.charName = (v('shHudInCharName') || '').trim();
+      SH.meta.clan = (v('shHudInClan') || '').trim();
+      SH.meta.village = (v('shHudInVillage') || '').trim();
+      SH.meta.rank = (v('shHudInRank') || '').trim();
+      SH.meta.nature = (v('shHudInNature') || '').trim();
+      SH.meta.chakra = (v('shHudInChakra') || '').trim();
+      SH.meta.hp = (v('shHudInHp') || '').trim();
+      SH.meta.ac = (v('shHudInAc') || '').trim();
+
+      saveMeta();
+      SH.hudEditing = false;
+      render();
+    });
+  }
+
   var ws=g('shWSave');
   if(ws) ws.addEventListener('click', function(){ SH.meta.name=v('shWName'); SH.meta.note=v('shWNote'); saveMeta(); paintShBar(); navigate('home'); });
 
@@ -7505,7 +7954,7 @@ function wireSh(){
           SH.techs=Array.isArray(data.techs)?data.techs:[];
           SH.moves=Array.isArray(data.moves)?data.moves:[];
           SH.skills=Array.isArray(data.skills)?data.skills:[];
-          SH.meta=data.meta||{name:'',note:''};
+          SH.meta=Object.assign({}, DEFAULT_META, data.meta||{});
           saveT(); saveM(); saveS(); saveMeta(); paintShBar(); render();
         }catch(e){ alert('Не удалось прочитать файл.'); }
       };
