@@ -1341,6 +1341,25 @@ body.sh-theme .card:hover{
   flex-direction:column;
   align-items:center;
   gap:4px;
+  cursor:pointer;
+  padding:6px 10px;
+  border-radius:6px;
+  border:1px solid transparent;
+  transition:all .18s ease;
+  user-select:none;
+}
+.sh-scr-col:hover{
+  background:rgba(255,255,255,0.04);
+  border-color:rgba(255,255,255,0.12);
+}
+.sh-scr-col.selected{
+  background:rgba(200,165,92,0.14);
+  border-color:var(--brass);
+  box-shadow:0 0 14px rgba(200,165,92,0.3);
+}
+.sh-scr-col.selected .sh-scr-label{
+  color:var(--brass-bright);
+  font-weight:700;
 }
 .sh-scr-label{
   font-family:'JetBrains Mono',monospace;
@@ -1348,12 +1367,13 @@ body.sh-theme .card:hover{
   text-transform:uppercase;
   letter-spacing:.06em;
   color:var(--ink-dim);
+  transition:color .15s;
 }
 .sh-scr-die{
   width:56px;
   height:56px;
   position:relative;
-  cursor:default;
+  cursor:pointer;
 }
 .sh-scr-die svg{
   width:100%;
@@ -1389,9 +1409,26 @@ body.sh-theme .card:hover{
   align-items:center;
   gap:4px;
   background:rgba(255,255,255,0.02);
-  padding:4px 8px;
-  border-radius:4px;
-  border:1px dashed rgba(255,255,255,0.06);
+  padding:6px 10px;
+  border-radius:6px;
+  border:1px dashed rgba(255,255,255,0.1);
+  cursor:pointer;
+  transition:all .18s ease;
+  user-select:none;
+}
+.sh-scr-dmg-group:hover{
+  background:rgba(255,255,255,0.05);
+  border-color:rgba(255,255,255,0.2);
+}
+.sh-scr-dmg-group.selected{
+  background:rgba(200,165,92,0.14);
+  border-color:var(--brass);
+  border-style:solid;
+  box-shadow:0 0 14px rgba(200,165,92,0.3);
+}
+.sh-scr-dmg-group.selected .sh-scr-label{
+  color:var(--brass-bright);
+  font-weight:700;
 }
 .sh-scr-dmg-dice{
   display:flex;
@@ -1407,41 +1444,89 @@ body.sh-theme .card:hover{
   padding:10px 14px;
 }
 
-/* Параметры броска */
-.sh-launcher-params{
+/* Панель настройки модификатора выбранного кубика */
+.sh-mod-bar{
   display:flex;
   flex-wrap:wrap;
   gap:12px;
   align-items:center;
   justify-content:space-between;
   margin-bottom:14px;
-  background:rgba(0,0,0,0.25);
-  padding:8px 12px;
+  background:rgba(0,0,0,0.32);
+  padding:8px 14px;
   border-radius:4px;
-  border:1px solid rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
 }
-.sh-launcher-inputs{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  align-items:center;
-}
-.sh-param-item{
+.sh-mod-target-info{
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:8px;
   font-size:13px;
   color:var(--ink-dim);
 }
-.sh-param-item input[type="number"], .sh-param-item input[type="text"]{
+.sh-mod-target-tag{
+  color:var(--brass-bright);
+  font-family:'Cinzel',serif;
+  font-weight:700;
+  font-size:14px;
+}
+.sh-mod-controls{
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.sh-mod-step{
+  width:32px;
+  height:30px;
+  background:var(--steel-1);
+  border:1px solid var(--line);
+  color:var(--ink);
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  font-weight:600;
+  border-radius:3px;
+  cursor:pointer;
+  transition:all .15s;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.sh-mod-step:hover{
+  border-color:var(--brass);
+  color:var(--brass);
+  background:rgba(200,165,92,0.12);
+}
+.sh-active-mod-input{
   width:58px;
-  background:#12100d;
+  height:30px;
+  background:#100e0b;
   border:1px solid var(--line);
   color:var(--ink);
   text-align:center;
-  padding:4px 6px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  font-weight:600;
   border-radius:3px;
-  font-size:13px;
+}
+.sh-active-mod-input:focus{
+  border-color:var(--brass);
+  outline:none;
+}
+.sh-mod-reset{
+  padding:0 8px;
+  height:30px;
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--ink-dim);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  border-radius:3px;
+  cursor:pointer;
+  transition:all .15s;
+}
+.sh-mod-reset:hover{
+  color:var(--ink);
+  border-color:var(--brass-dim);
 }
 .sh-exp-check{
   display:inline-flex;
@@ -1484,6 +1569,27 @@ body.sh-theme .card:hover{
   box-shadow:0 4px 14px rgba(200,67,55,0.5);
   transform:translateY(-1px);
 }
+.sh-btn-copy-all{
+  background:linear-gradient(180deg, #2a5235 0%, #1c3824 100%);
+  border:1px solid #489b65;
+  color:#e8f7ed;
+  padding:8px 18px;
+  font-size:14px;
+  font-weight:600;
+  border-radius:4px;
+  cursor:pointer;
+  box-shadow:0 3px 10px rgba(40,140,70,0.25);
+  transition:all .15s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.sh-btn-copy-all:hover{
+  background:linear-gradient(180deg, #356743 0%, #24482e 100%);
+  border-color:#5fc584;
+  box-shadow:0 4px 14px rgba(70,180,100,0.4);
+  transform:translateY(-1px);
+}
 .sh-micro-btn{
   background:rgba(20,18,14,0.85);
   border:1px solid var(--line);
@@ -1502,6 +1608,7 @@ body.sh-theme .card:hover{
   color:var(--ink);
   background:rgba(35,30,22,0.9);
 }
+
 
 /* Блок результата лаунчера */
 .sh-launcher-result{
@@ -5290,7 +5397,7 @@ function nl2br(s){ return esc(s).replace(/\n/g,'<br>'); }
 var SH = {
   techs:[], moves:[], skills:[], meta:{name:'', note:''}, draft:null,
   techFilter:'all', moveFilter:'all',
-  launcher:{ techId:'', isExp:false, atkMod:'', dmgMod:'', lastResult:'' }
+  launcher:{ techId:'', isExp:false, mods:{ exp:0, atk:0, dmg:0 }, selectedTarget:'atk', rolledValues:null, lastResult:'', lastResultCopied:false }
 };
 window.SH = SH;
 
@@ -5633,41 +5740,99 @@ function dmgText(t){
 }
 function newTech(){ return {id:null,name:'',rank:'D',cat:'Ниндзюцу',origin:'Общая',nature:'',effect:'uron',cost:'',upkeep:'',windows:[],counter:'',req:'',desc:'',dmgN:'1',dmgD:'d6',dmgMod:'',isExp:false}; }
 
-function renderLauncherDiceHtml(tech, isExp, atkMod, dmgMod){
+function formatLauncherMod(m){
+  var n = parseInt(m, 10) || 0;
+  if(!n) return '';
+  return n > 0 ? '+ ' + n : '− ' + Math.abs(n);
+}
+
+function buildComboText(t, isExp, rolledValues, mods){
+  var costStr = t.cost ? (t.cost + (t.cost.toLowerCase().indexOf('чакр')>=0 ? '' : ' чакры')) : 'без затрат';
+  if(t.upkeep) costStr += ' +' + t.upkeep + '/рнд';
+  var header = '*[Техника: '+(t.name||'Без названия')+' | Ранг: '+(t.rank||'D')+' | Затраты: '+costStr+']*';
+  var lines = [header];
+
+  // 1. Контроль чакры идёт первым!
+  if(isExp && rolledValues && rolledValues.exp){
+    var eMod = parseInt(mods.exp, 10) || 0;
+    var eModStr = eMod > 0 ? ' + '+eMod : (eMod < 0 ? ' − '+Math.abs(eMod) : '');
+    lines.push('*[Результат броска Контроль чакры 1d20: '+rolledValues.exp+' ]*'+eModStr);
+  }
+
+  // 2. Попадание
+  if(rolledValues && rolledValues.atk){
+    var aMod = parseInt(mods.atk, 10) || 0;
+    var aModStr = aMod > 0 ? ' + '+aMod : (aMod < 0 ? ' − '+Math.abs(aMod) : '');
+    lines.push('*[Результат броска Попадание 1d20: '+rolledValues.atk+' ]*'+aModStr);
+  }
+
+  // 3. Урон
+  if(t.effect === 'uron' && rolledValues && rolledValues.dmgRolls && rolledValues.dmgRolls.length){
+    var n = rolledValues.dmgRolls.length;
+    var dSides = rolledValues.dmgSides || 6;
+    var dMod = parseInt(mods.dmg, 10) || 0;
+    var dModStr = dMod > 0 ? ' + '+dMod : (dMod < 0 ? ' − '+Math.abs(dMod) : '');
+    lines.push('*[Результат броска Урон '+n+'d'+dSides+': '+rolledValues.dmgRolls.join(' | ')+' ]*'+dModStr);
+  }
+
+  return lines.join('\n');
+}
+
+function renderLauncherDiceHtml(tech, isExp, selTarget, mods, rolledValues){
   if(!tech) return '<div class="sh-scr-no-dmg">Выберите технику для расчёта</div>';
-  var aModNum = parseInt(atkMod, 10) || 0;
-  var aModStr = aModNum > 0 ? ' +'+aModNum : (aModNum < 0 ? ' '+aModNum : '');
+  mods = mods || { exp: 0, atk: 0, dmg: 0 };
+  rolledValues = rolledValues || {};
+
+  // 1. Контроль чакры (если экспериментальная) - ИДЁТ ПЕРВЫМ!
+  var expDieHtml = '';
+  if(isExp){
+    var eModStr = formatLauncherMod(mods.exp);
+    expDieHtml = 
+      '<div class="sh-scr-col '+(selTarget==='exp'?'selected':'')+'" data-select-roll="exp" title="Кликните для выбора кубика и настройки модификатора">'+
+        '<div class="sh-scr-label" style="color:#ff9085;">Контроль</div>'+
+        '<div class="sh-scr-die die s20" id="shScrDieExp">'+
+          (typeof dieShapeSvg==='function' ? dieShapeSvg(20, 'screxp', null) : '')+
+          '<div class="val">'+(rolledValues.exp || 20)+'</div>'+
+        '</div>'+
+        '<div class="sh-scr-sub" id="shScrSub_exp">1d20'+(eModStr ? ' ' + eModStr : '')+'</div>'+
+      '</div>';
+  }
+
+  // 2. Попадание
+  var aModStr = formatLauncherMod(mods.atk);
   var atkDieHtml = 
-    '<div class="sh-scr-col">'+
+    '<div class="sh-scr-col '+(selTarget==='atk'?'selected':'')+'" data-select-roll="atk" title="Кликните для выбора кубика и настройки модификатора">'+
       '<div class="sh-scr-label">Попадание</div>'+
       '<div class="sh-scr-die die s20" id="shScrDieAtk">'+
         (typeof dieShapeSvg==='function' ? dieShapeSvg(20, 'scratk', null) : '')+
-        '<div class="val">20</div>'+
+        '<div class="val">'+(rolledValues.atk || 20)+'</div>'+
       '</div>'+
-      '<div class="sh-scr-sub">1d20'+aModStr+'</div>'+
+      '<div class="sh-scr-sub" id="shScrSub_atk">1d20'+(aModStr ? ' ' + aModStr : '')+'</div>'+
     '</div>';
 
+  // 3. Урон
   var dmgBlockHtml = '';
   if(tech.effect === 'uron'){
-    var dModNum = parseInt(dmgMod, 10) || 0;
-    var dModStr = dModNum > 0 ? ' +'+dModNum : (dModNum < 0 ? ' '+dModNum : '');
+    var dModStr = formatLauncherMod(mods.dmg);
     var n = Math.max(1, Math.min(12, parseInt(tech.dmgN, 10) || 1));
     var dStr = (tech.dmgD || 'd6').replace('d','');
     var dSides = parseInt(dStr, 10) || 6;
     var dmgDiceList = [];
+    var rolls = rolledValues.dmgRolls || [];
     for(var i=0; i<n; i++){
+      var curVal = rolls[i] || dSides;
       dmgDiceList.push(
         '<div class="sh-scr-die die s'+dSides+'" id="shScrDieDmg_'+i+'">'+
           (typeof dieShapeSvg==='function' ? dieShapeSvg(dSides, 'scrdmg'+i, null) : '')+
-          '<div class="val">'+dSides+'</div>'+
+          '<div class="val">'+curVal+'</div>'+
         '</div>'
       );
     }
     dmgBlockHtml = 
-      '<div class="sh-scr-dmg-group">'+
+      '<div class="sh-scr-dmg-group '+(selTarget==='dmg'?'selected':'')+'" data-select-roll="dmg" title="Кликните для выбора кубика и настройки модификатора">'+
         '<div class="sh-scr-label">Урон ('+n+'d'+dSides+')</div>'+
         '<div class="sh-scr-dmg-dice">'+dmgDiceList.join('')+'</div>'+
-        '<div class="sh-scr-sub">'+(dModStr ? 'мод: '+dModStr : 'без мода')+'</div>'+
+        '<div class="sh-scr-sub" id="shScrSub_dmg">'+n+'d'+dSides+(dModStr ? ' ' + dModStr : '')+'</div>'+
       '</div>';
   } else {
     var efObj = EFFECTS.filter(function(e){return e.k===tech.effect;})[0];
@@ -5675,20 +5840,7 @@ function renderLauncherDiceHtml(tech, isExp, atkMod, dmgMod){
     dmgBlockHtml = '<div class="sh-scr-no-dmg">Эффект: <b>'+esc(efName)+'</b> (без броска урона)</div>';
   }
 
-  var expDieHtml = '';
-  if(isExp){
-    expDieHtml = 
-      '<div class="sh-scr-col">'+
-        '<div class="sh-scr-label" style="color:#ff9085;">Контроль</div>'+
-        '<div class="sh-scr-die die s20" id="shScrDieExp">'+
-          (typeof dieShapeSvg==='function' ? dieShapeSvg(20, 'screxp', null) : '')+
-          '<div class="val">20</div>'+
-        '</div>'+
-        '<div class="sh-scr-sub">1d20</div>'+
-      '</div>';
-  }
-
-  return '<div class="sh-screen-dice-tray">'+atkDieHtml + dmgBlockHtml + expDieHtml + '</div>';
+  return '<div class="sh-screen-dice-tray">'+expDieHtml + atkDieHtml + dmgBlockHtml + '</div>';
 }
 
 function renderTechLauncher(){
@@ -5699,12 +5851,24 @@ function renderTechLauncher(){
     '</div>';
   }
 
-  if(!SH.launcher) SH.launcher = { techId:'', isExp:false, atkMod:'', dmgMod:'', lastResult:'' };
+  if(!SH.launcher) SH.launcher = {};
+  if(!SH.launcher.mods) SH.launcher.mods = { exp: 0, atk: 0, dmg: 0 };
+  if(!SH.launcher.selectedTarget) SH.launcher.selectedTarget = 'atk';
+
   var selTech = techById(SH.launcher.techId) || SH.techs[0];
-  if(!SH.launcher.techId && selTech) SH.launcher.techId = selTech.id;
+  if(!SH.launcher.techId && selTech){
+    SH.launcher.techId = selTech.id;
+    if(selTech.dmgMod) SH.launcher.mods.dmg = parseInt(selTech.dmgMod, 10) || 0;
+  }
   var isExp = (SH.launcher.isExp !== undefined) ? SH.launcher.isExp : !!selTech.isExp;
-  var atkMod = (SH.launcher.atkMod !== undefined) ? SH.launcher.atkMod : '';
-  var dmgMod = (SH.launcher.dmgMod !== undefined) ? SH.launcher.dmgMod : (selTech.dmgMod || '');
+  SH.launcher.isExp = isExp;
+
+  var selTarget = SH.launcher.selectedTarget;
+  if(selTarget === 'exp' && !isExp) selTarget = 'atk';
+
+  var targetNames = { exp: '🌀 Контроль чакры', atk: '🎯 Попадание', dmg: '💥 Урон' };
+  var targetTitle = targetNames[selTarget] || '🎯 Попадание';
+  var curModVal = SH.launcher.mods[selTarget] || 0;
 
   var techOpts = SH.techs.map(function(t){
     var cStr = t.cost ? t.cost+'ч' : '0ч';
@@ -5715,31 +5879,44 @@ function renderTechLauncher(){
     '</option>';
   }).join('');
 
-  var screenHtml = renderLauncherDiceHtml(selTech, isExp, atkMod, dmgMod);
+  var screenHtml = renderLauncherDiceHtml(selTech, isExp, selTarget, SH.launcher.mods, SH.launcher.rolledValues);
 
-  var paramsHtml = 
-    '<div class="sh-launcher-params">'+
-      '<div class="sh-launcher-inputs">'+
-        '<label class="sh-param-item">Попадание мод: <input type="number" id="shLauncherAtkMod" value="'+escA(atkMod)+'" placeholder="+0"></label>'+
-        '<label class="sh-param-item">Урон мод: <input type="number" id="shLauncherDmgMod" value="'+escA(dmgMod)+'" placeholder="+0"></label>'+
-        '<label class="sh-exp-check"><input type="checkbox" id="shLauncherExp"'+(isExp?' checked':'')+'> 🧪 Экспериментальная (Контроль чакры)</label>'+
+  var modBarHtml = 
+    '<div class="sh-mod-bar">'+
+      '<div class="sh-mod-target-info">'+
+        '<span>Выбран кубик:</span>'+
+        '<span class="sh-mod-target-tag" id="shModTargetName">'+targetTitle+'</span>'+
       '</div>'+
+      '<div class="sh-mod-controls">'+
+        '<button class="sh-mod-step" data-mod-delta="-5" title="Уменьшить на 5">−5</button>'+
+        '<button class="sh-mod-step" data-mod-delta="-1" title="Уменьшить на 1">−</button>'+
+        '<input type="number" id="shActiveModInput" class="sh-active-mod-input" value="'+curModVal+'">'+
+        '<button class="sh-mod-step" data-mod-delta="1" title="Увеличить на 1">+</button>'+
+        '<button class="sh-mod-step" data-mod-delta="5" title="Увеличить на 5">+5</button>'+
+        '<button class="sh-mod-reset" id="shModResetBtn" title="Сбросить модификатор в 0">Сброс</button>'+
+      '</div>'+
+      '<label class="sh-exp-check">'+
+        '<input type="checkbox" id="shLauncherExp"'+(isExp?' checked':'')+'> 🧪 Экспериментальная'+
+      '</label>'+
     '</div>';
 
   var actionsHtml = 
     '<div class="sh-launcher-actions">'+
-      '<button class="sh-btn-launch" id="shLaunchComboBtn">⚔️ Применить технику</button>'+
-      '<button class="sh-micro-btn" id="shLaunchAtkBtn" title="Бросить только попадание">🎯 Попадание</button>'+
-      (selTech.effect === 'uron' ? '<button class="sh-micro-btn" id="shLaunchDmgBtn" title="Бросить только урон">💥 Урон</button>' : '')+
-      '<button class="sh-micro-btn" id="shLaunchExpBtn" title="Бросить Контроль чакры">🌀 Контроль</button>'+
-      '<button class="sh-micro-btn" id="shLaunchClaimBtn" title="Скопировать только заголовок заявки">📋 Только заявка</button>'+
+      '<button class="sh-btn-launch" id="shLaunchComboBtn" title="Бросить все кости техники и зафиксировать результат">⚔️ Применить технику</button>'+
+      '<button class="sh-btn-copy-all" id="shCopyAllBtn" title="Скопировать готовый блок в буфер обмена для AI Studio">📋 Скопировать всё</button>'+
+      '<button class="sh-micro-btn" id="shLaunchAtkBtn" title="Бросить и скопировать только попадание">🎯 Попадание</button>'+
+      (selTech.effect === 'uron' ? '<button class="sh-micro-btn" id="shLaunchDmgBtn" title="Бросить и скопировать только урон">💥 Урон</button>' : '')+
+      '<button class="sh-micro-btn" id="shLaunchExpBtn" title="Бросить и скопировать Контроль чакры">🌀 Контроль</button>'+
+      '<button class="sh-micro-btn" id="shLaunchClaimBtn" title="Скопировать только заголовок заявки">📜 Только заявка</button>'+
     '</div>';
 
   var hasRes = !!(SH.launcher.lastResult);
   var resultBoxHtml = 
     '<div class="sh-launcher-result '+(hasRes?'has-result':'')+'" id="shLauncherResultBox">'+
       '<div class="sh-launcher-result-text" id="shLauncherResultText">'+esc(SH.launcher.lastResult||'')+'</div>'+
-      '<div class="sh-copy-badge" id="shLauncherCopyBadge"><span>✓ Скопировано в буфер обмена для AI Studio</span></div>'+
+      '<div class="sh-copy-badge" id="shLauncherCopyBadge" style="display:'+(hasRes?'inline-flex':'none')+';">'+
+        '<span>'+(SH.launcher.lastResultCopied ? '✓ Скопировано в буфер обмена для AI Studio' : '🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»')+'</span>'+
+      '</div>'+
     '</div>';
 
   return '<div class="sh-launcher">'+
@@ -5750,11 +5927,15 @@ function renderTechLauncher(){
       '</div>'+
     '</div>'+
     '<div class="sh-launcher-screen" id="shLauncherScreen">'+screenHtml+'</div>'+
-    paramsHtml+
+    modBarHtml+
     actionsHtml+
     resultBoxHtml+
   '</div>';
 }
+SH.formatLauncherMod = formatLauncherMod;
+SH.buildComboText = buildComboText;
+SH.renderLauncherDiceHtml = renderLauncherDiceHtml;
+SH.renderTechLauncher = renderTechLauncher;
 
 var MOVE_KINDS = ['Рукопашный','Оружейный','Смешанный','Передвижение'];
 var MOVE_TYPES = ['Урон','Состояние','Реакция','Манёвр','Защита'];
@@ -6395,8 +6576,103 @@ function wireSh(){
     if(!scr) return;
     var t = techById(SH.launcher.techId) || (SH.techs && SH.techs[0]);
     if(!t) return;
-    scr.innerHTML = renderLauncherDiceHtml(t, SH.launcher.isExp, SH.launcher.atkMod, SH.launcher.dmgMod);
+    scr.innerHTML = renderLauncherDiceHtml(t, SH.launcher.isExp, SH.launcher.selectedTarget, SH.launcher.mods, SH.launcher.rolledValues);
+    wireScreenDiceClicks();
   };
+
+  var updateLauncherModUI = function(){
+    var targetNames = { exp: '🌀 Контроль чакры', atk: '🎯 Попадание', dmg: '💥 Урон' };
+    var nameEl = g('shModTargetName');
+    if(nameEl) nameEl.textContent = targetNames[SH.launcher.selectedTarget] || '🎯 Попадание';
+
+    var valInput = g('shActiveModInput');
+    if(valInput){
+      var curVal = (SH.launcher.mods && SH.launcher.mods[SH.launcher.selectedTarget]) || 0;
+      valInput.value = curVal;
+    }
+  };
+
+  var wireScreenDiceClicks = function(){
+    var scr = g('shLauncherScreen');
+    if(!scr) return;
+    var selectables = scr.querySelectorAll('[data-select-roll]');
+    selectables.forEach(function(el){
+      el.addEventListener('click', function(){
+        var target = el.getAttribute('data-select-roll');
+        if(!target) return;
+        SH.launcher.selectedTarget = target;
+        selectables.forEach(function(s){ s.classList.remove('selected'); });
+        el.classList.add('selected');
+        updateLauncherModUI();
+      });
+    });
+  };
+  wireScreenDiceClicks();
+
+  var setTargetMod = function(newVal){
+    var target = SH.launcher.selectedTarget || 'atk';
+    if(!SH.launcher.mods) SH.launcher.mods = { exp: 0, atk: 0, dmg: 0 };
+    SH.launcher.mods[target] = newVal;
+    updateLauncherModUI();
+
+    var t = techById(SH.launcher.techId) || (SH.techs && SH.techs[0]);
+    if(target === 'exp'){
+      var sub = g('shScrSub_exp');
+      if(sub) sub.textContent = '1d20' + (formatLauncherMod(newVal) ? ' ' + formatLauncherMod(newVal) : '');
+    } else if(target === 'atk'){
+      var sub = g('shScrSub_atk');
+      if(sub) sub.textContent = '1d20' + (formatLauncherMod(newVal) ? ' ' + formatLauncherMod(newVal) : '');
+    } else if(target === 'dmg' && t){
+      var sub = g('shScrSub_dmg');
+      var n = Math.max(1, Math.min(12, parseInt(t.dmgN, 10) || 1));
+      var dStr = (t.dmgD || 'd6').replace('d','');
+      var dSides = parseInt(dStr, 10) || 6;
+      if(sub) sub.textContent = n + 'd' + dSides + (formatLauncherMod(newVal) ? ' ' + formatLauncherMod(newVal) : '');
+    }
+  };
+
+  document.querySelectorAll('.sh-mod-step').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var delta = parseInt(btn.getAttribute('data-mod-delta'), 10) || 0;
+      var target = SH.launcher.selectedTarget || 'atk';
+      if(!SH.launcher.mods) SH.launcher.mods = { exp: 0, atk: 0, dmg: 0 };
+      var cur = parseInt(SH.launcher.mods[target], 10) || 0;
+      setTargetMod(cur + delta);
+    });
+  });
+
+  var modResetBtn = g('shModResetBtn');
+  if(modResetBtn){
+    modResetBtn.addEventListener('click', function(){
+      setTargetMod(0);
+    });
+  }
+
+  var activeModIn = g('shActiveModInput');
+  if(activeModIn){
+    activeModIn.addEventListener('input', function(){
+      var val = parseInt(activeModIn.value, 10);
+      if(isNaN(val)) val = 0;
+      var target = SH.launcher.selectedTarget || 'atk';
+      if(!SH.launcher.mods) SH.launcher.mods = { exp: 0, atk: 0, dmg: 0 };
+      SH.launcher.mods[target] = val;
+
+      var t = techById(SH.launcher.techId) || (SH.techs && SH.techs[0]);
+      if(target === 'exp'){
+        var sub = g('shScrSub_exp');
+        if(sub) sub.textContent = '1d20' + (formatLauncherMod(val) ? ' ' + formatLauncherMod(val) : '');
+      } else if(target === 'atk'){
+        var sub = g('shScrSub_atk');
+        if(sub) sub.textContent = '1d20' + (formatLauncherMod(val) ? ' ' + formatLauncherMod(val) : '');
+      } else if(target === 'dmg' && t){
+        var sub = g('shScrSub_dmg');
+        var n = Math.max(1, Math.min(12, parseInt(t.dmgN, 10) || 1));
+        var dStr = (t.dmgD || 'd6').replace('d','');
+        var dSides = parseInt(dStr, 10) || 6;
+        if(sub) sub.textContent = n + 'd' + dSides + (formatLauncherMod(val) ? ' ' + formatLauncherMod(val) : '');
+      }
+    });
+  }
 
   var lSel = g('shLauncherSelect');
   if(lSel){
@@ -6408,12 +6684,21 @@ function wireSh(){
         var expCb = g('shLauncherExp');
         if(expCb) expCb.checked = SH.launcher.isExp;
         if(t.dmgMod !== undefined){
-          SH.launcher.dmgMod = t.dmgMod;
-          var dmIn = g('shLauncherDmgMod');
-          if(dmIn) dmIn.value = t.dmgMod;
+          if(!SH.launcher.mods) SH.launcher.mods = { exp: 0, atk: 0, dmg: 0 };
+          SH.launcher.mods.dmg = parseInt(t.dmgMod, 10) || 0;
         }
       }
+      SH.launcher.rolledValues = null;
+      SH.launcher.lastResult = '';
+      SH.launcher.lastResultCopied = false;
+      var rBox = g('shLauncherResultBox');
+      if(rBox) rBox.classList.remove('has-result');
+      var rTxt = g('shLauncherResultText');
+      if(rTxt) rTxt.textContent = '';
+      var rBdg = g('shLauncherCopyBadge');
+      if(rBdg) rBdg.style.display = 'none';
       updateLauncherScreen();
+      updateLauncherModUI();
     });
   }
 
@@ -6421,49 +6706,78 @@ function wireSh(){
   if(lExp){
     lExp.addEventListener('change', function(){
       SH.launcher.isExp = lExp.checked;
+      if(!lExp.checked && SH.launcher.selectedTarget === 'exp'){
+        SH.launcher.selectedTarget = 'atk';
+      }
       updateLauncherScreen();
+      updateLauncherModUI();
     });
   }
 
-  var lAtk = g('shLauncherAtkMod');
-  if(lAtk){
-    lAtk.addEventListener('input', function(){
-      SH.launcher.atkMod = lAtk.value;
-      updateLauncherScreen();
-    });
-  }
-
-  var lDmg = g('shLauncherDmgMod');
-  if(lDmg){
-    lDmg.addEventListener('input', function(){
-      SH.launcher.dmgMod = lDmg.value;
-      updateLauncherScreen();
-    });
-  }
-
-  var finishLaunch = function(t, mode, isExp, aMod, dMod){
+  var finishLaunch = function(t, mode, autoCopy){
     var costStr = t.cost ? (t.cost + (t.cost.toLowerCase().indexOf('чакр')>=0 ? '' : ' чакры')) : 'без затрат';
     if(t.upkeep) costStr += ' +' + t.upkeep + '/рнд';
     var header = '*[Техника: '+(t.name||'Без названия')+' | Ранг: '+(t.rank||'D')+' | Затраты: '+costStr+']*';
     var lines = [];
 
+    if(!SH.launcher.rolledValues) SH.launcher.rolledValues = {};
+    var isExp = !!SH.launcher.isExp;
+    var mods = SH.launcher.mods || { exp: 0, atk: 0, dmg: 0 };
+
     if(mode === 'claim'){
       lines.push(header);
-    } else {
+    } else if(mode === 'atk'){
+      var atkVal = 1 + Math.floor(Math.random() * 20);
+      SH.launcher.rolledValues.atk = atkVal;
+      var atDie = g('shScrDieAtk');
+      if(atDie){ var vEl = atDie.querySelector('.val'); if(vEl) vEl.textContent = atkVal; }
+      var aMod = parseInt(mods.atk, 10) || 0;
+      var aModStr = aMod > 0 ? ' + '+aMod : (aMod < 0 ? ' − '+Math.abs(aMod) : '');
       lines.push(header);
-
-      if(mode === 'all' || mode === 'atk'){
-        var atkVal = 1 + Math.floor(Math.random() * 20);
-        var atDie = g('shScrDieAtk');
-        if(atDie){
-          var vEl = atDie.querySelector('.val');
-          if(vEl) vEl.textContent = atkVal;
-        }
-        var modStr = aMod > 0 ? ' + '+aMod : (aMod < 0 ? ' − '+Math.abs(aMod) : '');
-        lines.push('*[Результат броска Попадание 1d20: '+atkVal+' ]*'+modStr);
+      lines.push('*[Результат броска Попадание 1d20: '+atkVal+' ]*'+aModStr);
+    } else if(mode === 'dmg' && t.effect === 'uron'){
+      var n = Math.max(1, Math.min(12, parseInt(t.dmgN, 10) || 1));
+      var dSides = parseInt((t.dmgD || 'd6').replace('d', ''), 10) || 6;
+      var rolls = [];
+      for(var i = 0; i < n; i++){
+        var r = 1 + Math.floor(Math.random() * dSides);
+        rolls.push(r);
+        var dmDie = g('shScrDieDmg_'+i);
+        if(dmDie){ var vEl = dmDie.querySelector('.val'); if(vEl) vEl.textContent = r; }
+      }
+      SH.launcher.rolledValues.dmgRolls = rolls;
+      SH.launcher.rolledValues.dmgSides = dSides;
+      var dMod = parseInt(mods.dmg, 10) || 0;
+      var dModStr = dMod > 0 ? ' + '+dMod : (dMod < 0 ? ' − '+Math.abs(dMod) : '');
+      lines.push(header);
+      lines.push('*[Результат броска Урон '+n+'d'+dSides+': '+rolls.join(' | ')+' ]*'+dModStr);
+    } else if(mode === 'exp'){
+      var expVal = 1 + Math.floor(Math.random() * 20);
+      SH.launcher.rolledValues.exp = expVal;
+      var exDie = g('shScrDieExp');
+      if(exDie){ var vEl = exDie.querySelector('.val'); if(vEl) vEl.textContent = expVal; }
+      var eMod = parseInt(mods.exp, 10) || 0;
+      var eModStr = eMod > 0 ? ' + '+eMod : (eMod < 0 ? ' − '+Math.abs(eMod) : '');
+      lines.push(header);
+      lines.push('*[Результат броска Контроль чакры 1d20: '+expVal+' ]*'+eModStr);
+    } else {
+      // mode === 'all'
+      // 1. Контроль чакры (если эксп.)
+      if(isExp){
+        var expVal = 1 + Math.floor(Math.random() * 20);
+        SH.launcher.rolledValues.exp = expVal;
+        var exDie = g('shScrDieExp');
+        if(exDie){ var vEl = exDie.querySelector('.val'); if(vEl) vEl.textContent = expVal; }
       }
 
-      if((mode === 'all' || mode === 'dmg') && t.effect === 'uron'){
+      // 2. Попадание
+      var atkVal = 1 + Math.floor(Math.random() * 20);
+      SH.launcher.rolledValues.atk = atkVal;
+      var atDie = g('shScrDieAtk');
+      if(atDie){ var vEl = atDie.querySelector('.val'); if(vEl) vEl.textContent = atkVal; }
+
+      // 3. Урон
+      if(t.effect === 'uron'){
         var n = Math.max(1, Math.min(12, parseInt(t.dmgN, 10) || 1));
         var dSides = parseInt((t.dmgD || 'd6').replace('d', ''), 10) || 6;
         var rolls = [];
@@ -6471,49 +6785,48 @@ function wireSh(){
           var r = 1 + Math.floor(Math.random() * dSides);
           rolls.push(r);
           var dmDie = g('shScrDieDmg_'+i);
-          if(dmDie){
-            var vEl = dmDie.querySelector('.val');
-            if(vEl) vEl.textContent = r;
-          }
+          if(dmDie){ var vEl = dmDie.querySelector('.val'); if(vEl) vEl.textContent = r; }
         }
-        var modStr = dMod > 0 ? ' + '+dMod : (dMod < 0 ? ' − '+Math.abs(dMod) : '');
-        lines.push('*[Результат броска Урон '+n+'d'+dSides+': '+rolls.join(' | ')+' ]*'+modStr);
+        SH.launcher.rolledValues.dmgRolls = rolls;
+        SH.launcher.rolledValues.dmgSides = dSides;
       }
 
-      if((mode === 'all' || mode === 'exp') && isExp){
-        var expVal = 1 + Math.floor(Math.random() * 20);
-        var exDie = g('shScrDieExp');
-        if(exDie){
-          var vEl = exDie.querySelector('.val');
-          if(vEl) vEl.textContent = expVal;
-        }
-        lines.push('*[Результат броска Контроль чакры 1d20: '+expVal+' ]*');
-      }
+      // buildComboText guarantees: Header -> Chakra Control -> Hit -> Damage
+      lines = buildComboText(t, isExp, SH.launcher.rolledValues, mods).split('\n');
     }
 
     var output = lines.join('\n');
     SH.launcher.lastResult = output;
-    if(typeof copyText === 'function') copyText(output);
 
     var rBox = g('shLauncherResultBox');
     var rTxt = g('shLauncherResultText');
     var rBdg = g('shLauncherCopyBadge');
-    if(rBox && rTxt){
-      rBox.classList.add('has-result');
-      rTxt.textContent = output;
+
+    if(autoCopy){
+      if(typeof copyText === 'function') copyText(output);
+      SH.launcher.lastResultCopied = true;
       if(rBdg){
         rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio ('+lines.length+' стр.)</span>';
         rBdg.style.display = 'inline-flex';
       }
+    } else {
+      SH.launcher.lastResultCopied = false;
+      if(rBdg){
+        rBdg.innerHTML = '<span>🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    }
+
+    if(rBox && rTxt){
+      rBox.classList.add('has-result');
+      rTxt.textContent = output;
     }
   };
 
-  var executeLaunch = function(mode){
+  var executeLaunch = function(mode, autoCopy){
     var t = techById(SH.launcher.techId) || (SH.techs && SH.techs[0]);
     if(!t) return;
     var isExp = !!SH.launcher.isExp;
-    var aMod = parseInt(SH.launcher.atkMod, 10) || 0;
-    var dMod = parseInt(SH.launcher.dmgMod, 10) || 0;
 
     var scr = g('shLauncherScreen');
     if(scr && mode !== 'claim'){
@@ -6542,18 +6855,40 @@ function wireSh(){
       setTimeout(function(){
         clearInterval(rollInterval);
         diceToRoll.forEach(function(el){ el.classList.remove('rolling'); });
-        finishLaunch(t, mode, isExp, aMod, dMod);
+        finishLaunch(t, mode, autoCopy);
       }, 350);
     } else {
-      finishLaunch(t, mode, isExp, aMod, dMod);
+      finishLaunch(t, mode, autoCopy);
     }
   };
 
-  var btnCombo = g('shLaunchComboBtn'); if(btnCombo) btnCombo.addEventListener('click', function(){ executeLaunch('all'); });
-  var btnAtk = g('shLaunchAtkBtn'); if(btnAtk) btnAtk.addEventListener('click', function(){ executeLaunch('atk'); });
-  var btnDmg = g('shLaunchDmgBtn'); if(btnDmg) btnDmg.addEventListener('click', function(){ executeLaunch('dmg'); });
-  var btnExp = g('shLaunchExpBtn'); if(btnExp) btnExp.addEventListener('click', function(){ executeLaunch('exp'); });
-  var btnClaim = g('shLaunchClaimBtn'); if(btnClaim) btnClaim.addEventListener('click', function(){ executeLaunch('claim'); });
+  var btnCombo = g('shLaunchComboBtn');
+  if(btnCombo) btnCombo.addEventListener('click', function(){ executeLaunch('all', false); });
+
+  var btnCopyAll = g('shCopyAllBtn');
+  if(btnCopyAll){
+    btnCopyAll.addEventListener('click', function(){
+      var t = techById(SH.launcher.techId) || (SH.techs && SH.techs[0]);
+      if(!t) return;
+      if(!SH.launcher.lastResult){
+        executeLaunch('all', true);
+      } else {
+        if(typeof copyText === 'function') copyText(SH.launcher.lastResult);
+        SH.launcher.lastResultCopied = true;
+        var rBdg = g('shLauncherCopyBadge');
+        if(rBdg){
+          var lineCount = SH.launcher.lastResult.split('\n').length;
+          rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio ('+lineCount+' стр.)</span>';
+          rBdg.style.display = 'inline-flex';
+        }
+      }
+    });
+  }
+
+  var btnAtk = g('shLaunchAtkBtn'); if(btnAtk) btnAtk.addEventListener('click', function(){ executeLaunch('atk', true); });
+  var btnDmg = g('shLaunchDmgBtn'); if(btnDmg) btnDmg.addEventListener('click', function(){ executeLaunch('dmg', true); });
+  var btnExp = g('shLaunchExpBtn'); if(btnExp) btnExp.addEventListener('click', function(){ executeLaunch('exp', true); });
+  var btnClaim = g('shLaunchClaimBtn'); if(btnClaim) btnClaim.addEventListener('click', function(){ executeLaunch('claim', true); });
 
 
   /* клик по стихии в колесе стихий */
