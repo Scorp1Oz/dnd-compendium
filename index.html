@@ -6790,7 +6790,6 @@ SH.renderArsenalSummaryHtml = renderArsenalSummaryHtml;
 /* ---------- экраны ---------- */
 function shHome(){
   var hudHtml = renderShinobiHudHtml();
-  var arsenalHtml = renderArsenalSummaryHtml();
   var hero = '<div class="hero-dice" data-go="dice">'+
     '<div class="hero-dice-icon">'+(typeof dieShapeSvg==='function'? dieShapeSvg(20,'shHeroDie',20) : '🎲')+'</div>'+
     '<div class="hero-dice-text">'+
@@ -6808,7 +6807,6 @@ function shHome(){
     '<div class="subtitle">'+esc(SH.meta.name||'Мир скрытых деревень')+'</div>'+
     hudHtml +
     '<div class="rule"></div>'+ hero +
-    arsenalHtml +
     '<div class="section-label">Свитки и разделы</div>'+
     '<div class="menu-list grid-2">'+items.map(function(i){
       return '<div class="menu-item" data-nav="'+i.nav+'"><div class="name">'+i.icon+' '+esc(i.t)+'</div><div class="desc">'+esc(i.d)+'</div><div class="arrow">›</div></div>';
