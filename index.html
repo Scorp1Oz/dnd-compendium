@@ -310,12 +310,7 @@
     font-family:'Cinzel',serif;font-weight:700;font-size:27px;color:#fff;
     text-shadow:0 2px 4px rgba(0,0,0,.55);pointer-events:none;
   }
-  .die.s2 .coin-sub{
-    position:absolute;bottom:8px;left:0;right:0;text-align:center;
-    font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:#ffd700;
-    letter-spacing:.06em;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.9);
-  }
-  .die.s2 .val{padding-bottom:14px;color:#fff8db;}
+  .die.s2 .val{font-size:32px;font-weight:700;color:#fff8db;text-shadow:0 2px 8px rgba(0,0,0,.85);}
   .die.s4 .val{padding-top:22px;font-size:22px;}
   .die.s10 .val{padding-bottom:12px;}
   .die.rolling{animation:diceshake .14s linear infinite;}
@@ -392,49 +387,95 @@
   .mod-btn:hover{border-color:var(--brass-dim);color:var(--brass);}
   .mod-val{font-family:'JetBrains Mono',monospace;font-size:15px;min-width:36px;text-align:center;color:var(--ink);}
   .custom-die-box{
+    --cust-color: #b78aff;
+    --cust-glow: rgba(140,82,255,0.45);
+    --cust-bg-tint: rgba(140,82,255,0.09);
+    --cust-border-tint: rgba(140,82,255,0.32);
     width:100%;
     display:flex;
     align-items:center;
     gap:18px;
-    background:linear-gradient(135deg, rgba(140,82,255,0.09) 0%, rgba(20,22,28,0.7) 100%);
-    border:1px solid rgba(140,82,255,0.32);
+    background:linear-gradient(135deg, var(--cust-bg-tint) 0%, rgba(20,22,28,0.7) 100%);
+    border:1px solid var(--cust-border-tint);
     border-radius:3px;
     padding:14px 18px;
     margin-top:10px;
+    transition:background .35s ease, border-color .35s ease, box-shadow .35s ease;
   }
-  .custom-die-preview-wrap{flex-shrink:0;}
-  .custom-die-preview-wrap .die-btn{display:flex;align-items:center;justify-content:center;}
+  .custom-die-preview-wrap{
+    position:relative;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .custom-die-glow-aura{
+    position:absolute;
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    background:radial-gradient(circle, var(--cust-glow) 0%, transparent 72%);
+    filter:blur(6px);
+    pointer-events:none;
+    transition:background .35s ease, opacity .35s ease;
+  }
+  .custom-die-preview-wrap .die-btn{
+    position:relative;
+    z-index:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
   .custom-die-preview-wrap .die-btn svg{
     width:56px;height:56px;
-    filter:drop-shadow(0 4px 10px rgba(140,82,255,0.45));
-    transition:transform .15s ease;
+    filter:drop-shadow(0 4px 14px var(--cust-glow));
+    transition:transform .15s ease, filter .35s ease;
   }
   .custom-die-preview-wrap .die-btn:hover svg{transform:scale(1.1) rotate(5deg);}
   .custom-die-ctrls{flex:1;display:flex;flex-direction:column;gap:7px;}
   .custom-die-title{font-family:'Cinzel',serif;font-size:14px;color:var(--ink-dim);letter-spacing:.03em;}
-  .custom-highlight{font-family:'JetBrains Mono',monospace;font-weight:700;color:#b78aff;font-size:15px;margin-left:4px;}
+  .custom-highlight{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    color:var(--cust-color);
+    font-size:15px;
+    margin-left:4px;
+    transition:color .35s ease;
+  }
   .custom-ctrl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .custom-step-btn{font-size:18px;font-weight:700;}
   .custom-input{
     width:58px;text-align:center;
     background:var(--steel-0);border:1px solid var(--line);color:var(--ink);
     font-family:'JetBrains Mono',monospace;font-size:15px;padding:5px 4px;border-radius:2px;
+    transition:border-color .35s ease, outline-color .35s ease;
   }
-  .custom-input:focus{outline:1px solid #b78aff;border-color:#b78aff;}
+  .custom-input:focus{outline:1px solid var(--cust-color);border-color:var(--cust-color);}
   .custom-add-btn{
     padding:5px 14px;font-size:13.5px;
-    border-color:rgba(140,82,255,0.5);color:#d4b8ff;cursor:pointer;
+    border-color:var(--cust-border-tint);
+    color:var(--cust-color);
+    cursor:pointer;
+    transition:all .35s ease;
   }
-  .custom-add-btn:hover{background:rgba(140,82,255,0.2);border-color:#b78aff;color:#fff;}
+  .custom-add-btn:hover{
+    background:var(--cust-bg-tint);
+    border-color:var(--cust-color);
+    color:#fff;
+  }
   .custom-pills{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
   .custom-pills-cap{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.05em;margin-right:2px;}
   .custom-pill{
     background:var(--steel-1);border:1px solid var(--line);color:var(--ink-dim);
     font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:2px 8px;border-radius:12px;
-    cursor:pointer;transition:all .14s;
+    cursor:pointer;transition:all .2s ease;
   }
-  .custom-pill:hover{border-color:#b78aff;color:#fff;}
-  .custom-pill.active{background:rgba(140,82,255,0.28);border-color:#b78aff;color:#e7dbff;}
+  .custom-pill:hover{border-color:var(--cust-color);color:#fff;}
+  .custom-pill.active{
+    background:var(--cust-bg-tint);
+    border-color:var(--cust-color);
+    color:#fff;
+  }
   .hero-dice{
     display:flex;align-items:center;gap:22px;
     background:linear-gradient(135deg, var(--steel-2) 0%, var(--steel-1) 60%);
@@ -1540,8 +1581,9 @@ const DICE_HISTORY_MAX = 16;
 
 function generateCoinSvg(uid, label){
   const gid = 'grad_'+uid;
-  const text = (label!==undefined && label!==null)
-    ? `<text x="50" y="58" text-anchor="middle" font-family="'Cinzel', serif" font-weight="700" font-size="24" fill="#fff8d6">${label}</text>`
+  const dispLabel = (label!==undefined && label!==null) ? label : 'C';
+  const text = dispLabel
+    ? `<text x="50" y="60" text-anchor="middle" font-family="'Cinzel', serif" font-weight="700" font-size="30" fill="#fff8d6" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">${dispLabel}</text>`
     : '';
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -1609,6 +1651,23 @@ function renderCustomFacetShape(sides, uid, label){
   </svg>`;
 }
 
+const CUST_THEMES = {
+  2:  { color:'#fae078', glow:'rgba(250,224,120,0.7)', bg:'rgba(250,224,120,0.12)', border:'rgba(250,224,120,0.45)' },
+  4:  { color:'#58a86a', glow:'rgba(88,168,106,0.7)',  bg:'rgba(88,168,106,0.12)',  border:'rgba(88,168,106,0.45)' },
+  6:  { color:'#43a3b3', glow:'rgba(67,163,179,0.7)',  bg:'rgba(67,163,179,0.12)',  border:'rgba(67,163,179,0.45)' },
+  8:  { color:'#8a67c4', glow:'rgba(138,103,196,0.7)', bg:'rgba(138,103,196,0.12)', border:'rgba(138,103,196,0.45)' },
+  10: { color:'#c45a90', glow:'rgba(196,90,144,0.7)', bg:'rgba(196,90,144,0.12)', border:'rgba(196,90,144,0.45)' },
+  12: { color:'#cc5560', glow:'rgba(204,85,96,0.7)',  bg:'rgba(204,85,96,0.12)',  border:'rgba(204,85,96,0.45)' },
+  20: { color:'#e09a45', glow:'rgba(224,154,69,0.7)', bg:'rgba(224,154,69,0.12)', border:'rgba(224,154,69,0.45)' },
+  default: { color:'#b78aff', glow:'rgba(140,82,255,0.55)', bg:'rgba(140,82,255,0.09)', border:'rgba(140,82,255,0.35)' }
+};
+
+function getCustomPreviewSvg(n, uid){
+  if(n === 2) return generateCoinSvg(uid, 'C');
+  if(DICE_COLORS[n]) return dieShapeSvg(n, uid, n);
+  return renderCustomFacetShape(n, uid, 'd' + n);
+}
+
 function dieShapeSvg(sides, uid, label){
   if(sides===2) return generateCoinSvg(uid, label);
   if(!DICE_COLORS[sides]) return renderCustomFacetShape(sides, uid, label);
@@ -1628,11 +1687,10 @@ function dieShapeSvg(sides, uid, label){
 }
 
 function trayDieHtml(d){
-  const sub = (d.sides === 2) ? `<div class="coin-sub">${d.value === 1 ? 'Решка' : 'Орёл'}</div>` : '';
+  const valText = (d.sides === 2) ? (d.value === 2 ? 'W' : 'L') : d.value;
   return `<div class="die s${d.sides}" data-id="${d.id}" title="Убрать кость">
-    ${dieShapeSvg(d.sides, d.id)}
-    <div class="val">${d.value}</div>
-    ${sub}
+    ${dieShapeSvg(d.sides, d.id, d.sides === 2 ? '' : null)}
+    <div class="val">${valText}</div>
   </div>`;
 }
 
@@ -1644,7 +1702,7 @@ function currentDiceTotal(){
 function diceNotation(compact){
   const groups={};
   diceState.dice.forEach(d=>{groups[d.sides]=(groups[d.sides]||0)+1;});
-  const parts=Object.keys(groups).map(Number).sort((a,b)=>b-a).map(s=>`${groups[s]}d${s}`);
+  const parts=Object.keys(groups).map(Number).sort((a,b)=>b-a).map(s=> (s===2 ? `${groups[s]}C` : `${groups[s]}d${s}`));
   let n=parts.join(compact?'+':' + ');
   const m=diceState.modifier;
   if(m>0) n+=(compact?'+':' + ')+m;
@@ -1659,11 +1717,15 @@ function animateDie(el, sides, finalValue, dur){
   el.classList.add('rolling');
   const start = performance.now();
   el._diceIv = setInterval(()=>{
-    valEl.textContent = 1+Math.floor(Math.random()*sides);
+    if(sides === 2){
+      valEl.textContent = Math.random() < 0.5 ? 'W' : 'L';
+    } else {
+      valEl.textContent = 1+Math.floor(Math.random()*sides);
+    }
     if(performance.now()-start>=dur){
       clearInterval(el._diceIv); el._diceIv=null;
       el.classList.remove('rolling');
-      valEl.textContent=finalValue;
+      valEl.textContent = (sides === 2) ? (finalValue === 2 ? 'W' : 'L') : finalValue;
     }
   },70);
 }
@@ -1725,12 +1787,13 @@ function pushDiceHistory(entries){
 }
 
 function histDieHtml(h, isNew){
+  const valText = (h.sides === 2) ? (h.value === 2 ? 'W' : 'L') : h.value;
   const tip = (h.sides === 2)
-    ? `${h.emoji?h.emoji+' ':''}${h.label ? h.label+' · ' : ''}Монета d2 = ${h.value === 1 ? 'Решка (1)' : 'Орёл (2)'}`
+    ? `${h.emoji?h.emoji+' ':''}${h.label ? h.label+' · ' : ''}Монета C = ${valText}`
     : `${h.emoji?h.emoji+' ':''}${h.label ? h.label+' · ' : ''}d${h.sides} = ${h.value}`;
   return `<div class="hist-die${isNew?' hist-new':''}" data-tip="${escapeAttr(tip)}">
-    ${dieShapeSvg(h.sides, 'h'+h.uid)}
-    <div class="hv">${h.sides === 2 ? (h.value === 1 ? 'Р' : 'О') : h.value}</div>
+    ${dieShapeSvg(h.sides, 'h'+h.uid, h.sides === 2 ? '' : null)}
+    <div class="hv">${valText}</div>
     ${h.emoji?`<div class="he">${h.emoji}</div>`:''}
   </div>`;
 }
@@ -1836,9 +1899,10 @@ function buildDiceResultLines(){
   const appliesTo = (sides)=> !!label && (isCustom || std===null || sides===std);
 
   const lines = sidesDesc.map(sides=>{
-    const vals = groups[sides];
+    const vals = groups[sides].map(v => (sides === 2 ? (v === 2 ? 'W' : 'L') : v));
     const prefix = appliesTo(sides) ? (label+' ') : '';
-    return `*[Результат броска ${prefix}${vals.length}d${sides}: ${vals.join(' | ')} ]*`;
+    const dieName = (sides === 2) ? `${vals.length}C` : `${vals.length}d${sides}`;
+    return `*[Результат броска ${prefix}${dieName}: ${vals.join(' | ')} ]*`;
   });
 
   if(diceState.modifier && lines.length){
@@ -1913,6 +1977,10 @@ function handleGenerateClick(btn){
 }
 
 const DICE_LABEL_CATEGORIES = [
+  {key:'shinobi', icon:'🌀', ru:'Шиноби', items:[
+    {icon:'🌀', ru:'Контроль чакры', std:20},
+    {icon:'🛡️', ru:'Активная защита', std:20}
+  ]},
   {key:'core', icon:'⚔️', ru:'Основное', items:[
     {icon:'🎯', ru:'Попадание', std:20},
     {icon:'💥', ru:'Урон', std:null},
@@ -1964,11 +2032,13 @@ function renderDice(){
     ? diceState.dice.map(trayDieHtml).join('')
     : `<div class="empty-hint">Нажмите на кость внизу — она появится здесь и сразу будет брошена.<br>Клик по кости на поле убирает её.</div>`;
   const pick = DICE_TYPES.map(s=>
-    `<button class="die-btn" data-sides="${s}" title="${s===2?'Бросить монету (d2)':'Добавить d'+s}">${dieShapeSvg(s,'pick'+s,s===2?'d2':s)}</button>`
+    `<button class="die-btn" data-sides="${s}" title="${s===2?'Бросить монету (C)':'Добавить d'+s}">${dieShapeSvg(s,'pick'+s,s===2?'C':s)}</button>`
   ).join('');
   const m = diceState.modifier;
   const label = currentDiceLabel();
   const modPreviewStr = m ? (m > 0 ? (' + ' + m) : (' − ' + Math.abs(m))) : '';
+  const custTheme = CUST_THEMES[diceState.customSides] || CUST_THEMES.default;
+  const custThemeStyles = `--cust-color:${custTheme.color};--cust-glow:${custTheme.glow};--cust-bg-tint:${custTheme.bg};--cust-border-tint:${custTheme.border};`;
 
   return `
     ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Бросок костей'}])}
@@ -1994,23 +2064,24 @@ function renderDice(){
       </div>
     </div>
 
-    <div class="custom-die-box">
+    <div class="custom-die-box" style="${custThemeStyles}">
       <div class="custom-die-preview-wrap">
-        <button class="die-btn" id="addCustomDieBtn" title="Бросить кастомный кубик d${diceState.customSides}">
-          <span id="customDieSvgWrap">${renderCustomFacetShape(diceState.customSides, 'custPick', 'd'+diceState.customSides)}</span>
+        <div class="custom-die-glow-aura"></div>
+        <button class="die-btn" id="addCustomDieBtn" title="${diceState.customSides===2?'Бросить монету C':'Бросить кастомный кубик d'+diceState.customSides}">
+          <span id="customDieSvgWrap">${getCustomPreviewSvg(diceState.customSides, 'custPick')}</span>
         </button>
       </div>
       <div class="custom-die-ctrls">
-        <div class="custom-die-title">Кастомный кубик: <span class="custom-highlight" id="customSidesDisplay">1d${diceState.customSides}</span></div>
+        <div class="custom-die-title">Кастомный кубик: <span class="custom-highlight" id="customSidesDisplay">${diceState.customSides===2?'Монета (C)':'1d'+diceState.customSides}</span></div>
         <div class="custom-ctrl-row">
           <button class="mod-btn custom-step-btn" id="customDieMinus" title="Убрать грань (−1)">−</button>
           <input type="number" id="customDieInput" min="2" max="100" value="${diceState.customSides}" class="custom-input" title="Количество граней">
           <button class="mod-btn custom-step-btn" id="customDiePlus" title="Добавить грань (+1)">+</button>
-          <button class="btn-ghost custom-add-btn" id="customAddDirectBtn">Бросить d<span id="customAddSidesNum">${diceState.customSides}</span></button>
+          <button class="btn-ghost custom-add-btn" id="customAddDirectBtn">Бросить <span id="customAddSidesNum">${diceState.customSides===2?'C':'d'+diceState.customSides}</span></button>
         </div>
         <div class="custom-pills">
           <span class="custom-pills-cap">Быстрый выбор:</span>
-          ${[3,5,7,14,24,30,100].map(n=>`<button class="custom-pill${diceState.customSides===n?' active':''}" data-sides="${n}">d${n}</button>`).join('')}
+          ${[3,4,6,7,8,10,12,14,20,100].map(n=>`<button class="custom-pill${diceState.customSides===n?' active':''}" data-sides="${n}">${n===2?'C':'d'+n}</button>`).join('')}
         </div>
       </div>
     </div>
@@ -3786,19 +3857,28 @@ function wireEvents(){
     diceState.customSides = n;
 
     const svgWrap = document.getElementById('customDieSvgWrap');
-    if(svgWrap) svgWrap.innerHTML = renderCustomFacetShape(n, 'custPick', 'd'+n);
+    if(svgWrap) svgWrap.innerHTML = getCustomPreviewSvg(n, 'custPick');
+
+    const theme = CUST_THEMES[n] || CUST_THEMES.default;
+    const box = document.querySelector('.custom-die-box');
+    if(box){
+      box.style.setProperty('--cust-color', theme.color);
+      box.style.setProperty('--cust-glow', theme.glow);
+      box.style.setProperty('--cust-bg-tint', theme.bg);
+      box.style.setProperty('--cust-border-tint', theme.border);
+    }
 
     const disp = document.getElementById('customSidesDisplay');
-    if(disp) disp.textContent = '1d' + n;
+    if(disp) disp.textContent = (n === 2 ? 'Монета (C)' : ('1d' + n));
 
     const inp = document.getElementById('customDieInput');
     if(inp && parseInt(inp.value,10) !== n) inp.value = n;
 
     const addNum = document.getElementById('customAddSidesNum');
-    if(addNum) addNum.textContent = n;
+    if(addNum) addNum.textContent = (n === 2 ? 'C' : n);
 
     const addBtn = document.getElementById('addCustomDieBtn');
-    if(addBtn) addBtn.title = 'Бросить кастомный кубик d' + n;
+    if(addBtn) addBtn.title = (n === 2 ? 'Бросить монету C' : ('Бросить кастомный кубик d' + n));
 
     document.querySelectorAll('.custom-pill').forEach(pill=>{
       const s = parseInt(pill.getAttribute('data-sides'), 10);
