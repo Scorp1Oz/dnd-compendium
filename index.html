@@ -310,7 +310,7 @@
     font-family:'Cinzel',serif;font-weight:700;font-size:27px;color:#fff;
     text-shadow:0 2px 4px rgba(0,0,0,.55);pointer-events:none;
   }
-  .die.scoin .val{font-size:16px;font-weight:700;color:#fff8db;text-shadow:0 2px 8px rgba(0,0,0,.85);font-family:'Cinzel',serif;text-transform:uppercase;letter-spacing:0.04em;}
+  .die.scoin .val{font-size:32px;font-weight:700;color:#fff8db;text-shadow:0 2px 8px rgba(0,0,0,.85);font-family:'Cinzel',serif;}
   .die.s2 .val{font-size:28px;font-weight:700;color:#ffffff;font-family:'JetBrains Mono',monospace;text-shadow:0 2px 6px rgba(0,0,0,.85);}
   .die.s3 .val, .die.s4 .val{padding-top:22px;font-size:22px;}
   .die.s10 .val{padding-bottom:12px;}
@@ -2502,9 +2502,9 @@ const DICE_HISTORY_MAX = 16;
 
 function generateCoinSvg(uid, label){
   const gid = 'grad_'+uid;
-  const dispLabel = (label!==undefined && label!==null) ? label : '🪙';
+  const dispLabel = (label!==undefined && label!==null) ? label : 'C';
   const text = dispLabel
-    ? `<text x="50" y="62" text-anchor="middle" font-family="'Cinzel', serif" font-weight="700" font-size="28" fill="#fff8d6" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">${dispLabel}</text>`
+    ? `<text x="50" y="60" text-anchor="middle" font-family="'Cinzel', serif" font-weight="700" font-size="30" fill="#fff8d6" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">${dispLabel}</text>`
     : '';
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -2663,7 +2663,7 @@ function dieShapeSvg(sides, uid, label){
 
 function trayDieHtml(d){
   const isCoin = (d.sides === 'coin');
-  const valText = isCoin ? (d.value === 1 ? 'Орёл' : 'Решка') : d.value;
+  const valText = isCoin ? (d.value === 2 ? 'W' : 'L') : d.value;
   return `<div class="die s${d.sides}" data-id="${d.id}" title="Убрать ${isCoin?'монету':'кость'}">
     ${dieShapeSvg(d.sides, d.id, isCoin ? '' : null)}
     <div class="val">${valText}</div>
@@ -2676,13 +2676,13 @@ function currentDiceTotal(){
   const coinDice = diceState.dice.filter(d => d.sides === 'coin');
 
   if(!numDice.length && coinDice.length){
-    return coinDice.map(c => c.value === 1 ? 'Орёл' : 'Решка').join(', ');
+    return coinDice.map(c => c.value === 2 ? 'W' : 'L').join(', ');
   }
 
   const numSum = numDice.reduce((s,d)=>s+d.value,0) + diceState.modifier;
   if(coinDice.length){
-    const coinStr = coinDice.map(c => c.value === 1 ? 'Орёл' : 'Решка').join(', ');
-    return `${numSum} · 🪙 ${coinStr}`;
+    const coinStr = coinDice.map(c => c.value === 2 ? 'W' : 'L').join(', ');
+    return `${numSum} · ${coinStr}`;
   }
   return numSum;
 }
@@ -2695,7 +2695,7 @@ function diceNotation(compact){
     parts.push(`${groups[s]}d${s}`);
   });
   if(groups['coin']){
-    parts.push(groups['coin'] === 1 ? 'Монета' : `${groups['coin']}×Монета`);
+    parts.push(`${groups['coin']}C`);
   }
   let n=parts.join(compact?'+':' + ');
   const m=diceState.modifier;
@@ -2713,14 +2713,14 @@ function animateDie(el, sides, finalValue, dur){
   const start = performance.now();
   el._diceIv = setInterval(()=>{
     if(isCoin){
-      valEl.textContent = Math.random() < 0.5 ? 'Орёл' : 'Решка';
+      valEl.textContent = Math.random() < 0.5 ? 'W' : 'L';
     } else {
       valEl.textContent = 1+Math.floor(Math.random()*sides);
     }
     if(performance.now()-start>=dur){
       clearInterval(el._diceIv); el._diceIv=null;
       el.classList.remove('rolling');
-      valEl.textContent = isCoin ? (finalValue === 1 ? 'Орёл' : 'Решка') : finalValue;
+      valEl.textContent = isCoin ? (finalValue === 2 ? 'W' : 'L') : finalValue;
     }
   },70);
 }
@@ -2783,13 +2783,13 @@ function pushDiceHistory(entries){
 
 function histDieHtml(h, isNew){
   const isCoin = (h.sides === 'coin');
-  const valText = isCoin ? (h.value === 1 ? 'Орёл' : 'Решка') : h.value;
+  const valText = isCoin ? (h.value === 2 ? 'W' : 'L') : h.value;
   const tip = isCoin
-    ? `${h.emoji?h.emoji+' ':''}${h.label ? h.label+' · ' : ''}Монета = ${valText}`
+    ? `${h.emoji?h.emoji+' ':''}${h.label ? h.label+' · ' : ''}Монета C = ${valText}`
     : `${h.emoji?h.emoji+' ':''}${h.label ? h.label+' · ' : ''}d${h.sides} = ${h.value}`;
   return `<div class="hist-die${isNew?' hist-new':''}" data-tip="${escapeAttr(tip)}">
     ${dieShapeSvg(h.sides, 'h'+h.uid, isCoin ? '' : null)}
-    <div class="hv" style="${isCoin?'font-size:11px;font-family:Cinzel,serif;font-weight:700;color:#fff8d6;':''}">${isCoin ? (h.value === 1 ? 'О' : 'Р') : valText}</div>
+    <div class="hv" style="${isCoin?'font-size:14px;font-family:Cinzel,serif;font-weight:700;color:#fff8d6;':''}">${valText}</div>
     ${h.emoji?`<div class="he">${h.emoji}</div>`:''}
   </div>`;
 }
@@ -2905,9 +2905,9 @@ function buildDiceResultLines(){
   });
 
   if(groups['coin']){
-    const coinVals = groups['coin'].map(v => v === 1 ? 'Орёл' : 'Решка');
+    const coinVals = groups['coin'].map(v => v === 2 ? 'W' : 'L');
     const prefix = appliesTo('coin') ? (label+' ') : '';
-    const coinName = groups['coin'].length === 1 ? 'Монета' : `${groups['coin'].length}×Монета`;
+    const coinName = `${groups['coin'].length}C`;
     lines.push(`*[Результат броска ${prefix}${coinName}: ${coinVals.join(' | ')} ]*`);
   }
 
@@ -3044,7 +3044,7 @@ function renderDice(){
     ? diceState.dice.map(trayDieHtml).join('')
     : `<div class="empty-hint">Нажмите на кость внизу — она появится здесь и сразу будет брошена.<br>Клик по кости на поле убирает её.</div>`;
   const pick = DICE_TYPES.map(s=>
-    `<button class="die-btn ${s==='coin'?'die-coin-btn':''}" data-sides="${s}" title="${s==='coin'?'Бросить монету (Орёл / Решка)':'Добавить d'+s}">${dieShapeSvg(s,'pick'+s,s==='coin'?'🪙':s)}</button>`
+    `<button class="die-btn ${s==='coin'?'die-coin-btn':''}" data-sides="${s}" title="${s==='coin'?'Бросить монету (C)':'Добавить d'+s}">${dieShapeSvg(s,'pick'+s,s==='coin'?'C':s)}</button>`
   ).join('');
   const m = diceState.modifier;
   const label = currentDiceLabel();
