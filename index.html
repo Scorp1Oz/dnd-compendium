@@ -614,9 +614,12 @@
   .sheet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;}
   .field{display:flex;flex-direction:column;gap:5px;}
   .field[hidden]{display:none !important;}
-  .dmg-row{display:grid;grid-template-columns:90px 90px minmax(0,1fr);gap:8px;align-items:center;}
-  .dmg-row>select,.dmg-row>input{width:100%;min-width:0;}
-  @media (max-width:420px){ .dmg-row{grid-template-columns:1fr 1fr;} .dmg-row>input{grid-column:1 / -1;} }
+  .dmg-row{display:grid;grid-template-columns:90px 105px minmax(0,1fr);gap:8px;align-items:center;}
+  .dmg-row>select,.dmg-row>input,.dmg-row>.dmg-die-wrap{width:100%;min-width:0;}
+  .dmg-die-wrap{position:relative;display:flex;align-items:center;width:100%;min-width:0;}
+  .dmg-die-wrap .dmg-d-prefix{position:absolute;left:10px;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--accent);pointer-events:none;z-index:1;}
+  .dmg-die-wrap input{padding-left:24px !important;width:100%;min-width:0;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;}
+  @media (max-width:420px){ .dmg-row{grid-template-columns:1fr 1fr;} .dmg-row>input:last-child{grid-column:1 / -1;} }
   .field label{
     font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;
     text-transform:uppercase;color:var(--ink-dim);
@@ -6405,8 +6408,9 @@ var DICE_N = ['1','2','3','4','5','6','7','8','9','10','12'];
 var DICE_D = ['d4','d6','d8','d10','d12','d20'];
 function dmgText(t){
   if(!t || t.effect!=='uron') return '';
-  var n=t.dmgN||'', d=t.dmgD||'', m=(t.dmgMod||'').trim();
+  var n=t.dmgN||'', d=(t.dmgD||'').toString().trim(), m=(t.dmgMod||'').trim();
   if(!n||!d) return '';
+  if(!d.startsWith('d')) d = 'd' + d;
   if(m && m.charAt(0)!=='+' && m.charAt(0)!=='-') m='+'+m;
   return n+d+m;
 }
@@ -7292,6 +7296,7 @@ function shTechEdit(){
     var on = d.windows && d.windows.indexOf(w.ru)>=0;
     return '<label class="combat-box"><input type="checkbox" class="shWin" value="'+escA(w.ru)+'"'+(on?' checked':'')+'> <span class="cb-label">'+esc(w.ru)+'</span></label>';
   }).join('');
+  var curSides = (d.dmgD || '6').toString().replace(/\D/g, '') || '6';
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники',nav:'shTechs'},{label:isNew?'Новая':'Правка'}])+
     '<button class="back" data-nav="'+(isNew?'shTechs':('shTechView:'+d.id))+'">← Назад</button>'+
     '<h1>'+esc(d.name||'Новая техника')+'</h1><div class="sheet-section">'+
@@ -7304,10 +7309,24 @@ function shTechEdit(){
     fldx('fTDmg','Урон',
       '<div class="dmg-row">'+
         sel('shDmgN',DICE_N,d.dmgN||'1')+
-        sel('shDmgD',DICE_D,d.dmgD||'d6')+
+        '<div class="dmg-die-wrap" title="Грань кости: 2, 4, 6, 8, 10, 12, 20 или любая кастомная">'+
+          '<span class="dmg-d-prefix">d</span>'+
+          '<input id="shDmgD" type="number" min="2" max="1000" step="1" value="'+escA(curSides)+'" placeholder="6" list="shDmgSidesList">'+
+          '<datalist id="shDmgSidesList">'+
+            '<option value="2">'+
+            '<option value="3">'+
+            '<option value="4">'+
+            '<option value="6">'+
+            '<option value="8">'+
+            '<option value="10">'+
+            '<option value="12">'+
+            '<option value="20">'+
+            '<option value="100">'+
+          '</datalist>'+
+        '</div>'+
         '<input id="shDmgMod" type="text" value="'+escA(d.dmgMod||'')+'" placeholder="+4">'+
       '</div>',
-      'Количество костей, кость и модификатор. Модификатор необязателен.')+
+      'Количество костей, грань кости (d...) и модификатор. Например: 1d6, 2d8+3 или кастомные d2, d7.')+
     fld('Экспериментальная', '<label class="combat-box"><input type="checkbox" id="shExp"'+(d.isExp?' checked':'')+'> <span class="cb-label">🧪 Требует проверки Контроля чакры (d20) при применении</span></label>', 'Отметь, если техника нестабильна, не доведена до мастерства или несёт риск срыва.')+
     fld('Стоимость активации','<input id="shCost" type="text" value="'+escA(d.cost)+'">')+
     fld('Поддержание за раунд','<input id="shUp" type="text" value="'+escA(d.upkeep)+'">','Заполняется только для длящегося: полей, режимов, усилений.')+
@@ -7442,7 +7461,11 @@ function wireSh(){
     d.name=v('shName'); d.rank=v('shRank'); d.cat=v('shCat'); d.origin=v('shOrig');
     d.nature=v('shNature'); d.effect=v('shEff'); d.cost=v('shCost'); d.upkeep=v('shUp');
     d.counter=v('shCnt'); d.req=v('shReq'); d.desc=v('shDesc');
-    d.dmgN=v('shDmgN'); d.dmgD=v('shDmgD'); d.dmgMod=v('shDmgMod');
+    d.dmgN=v('shDmgN');
+    var rawSides = parseInt(String(v('shDmgD')).replace(/\D/g, ''), 10);
+    if(isNaN(rawSides) || rawSides < 2) rawSides = 6;
+    d.dmgD = 'd' + rawSides;
+    d.dmgMod=v('shDmgMod');
     d.isExp=!!(g('shExp') && g('shExp').checked);
     d.windows=[]; document.querySelectorAll('.shWin').forEach(function(c){ if(c.checked) d.windows.push(c.value); });
     if(!d.id){ d.id=uid('t'); SH.techs.push(d); } else { var i=SH.techs.findIndex(function(x){return x.id===d.id;}); if(i>=0) SH.techs[i]=d; }
