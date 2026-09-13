@@ -1262,9 +1262,57 @@ body.sh-theme .card:hover{
   border:1px solid var(--line);
   border-left:3px solid var(--crimson-bright);
   border-radius:6px;
-  padding:18px 20px;
-  margin:12px 0 22px;
+  padding:16px 20px;
+  margin:10px 0 20px;
   box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  transition:padding .2s ease, margin .2s ease;
+}
+.sh-launcher.collapsed{
+  padding:10px 16px;
+  margin:8px 0 16px;
+  background:linear-gradient(145deg, #161310 0%, #0e0c0a 100%);
+}
+.sh-launcher.collapsed .sh-launcher-body{
+  display:none;
+}
+.sh-launcher-toggle-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  cursor:pointer;
+  user-select:none;
+  padding:2px 0;
+}
+.sh-launcher-toggle-head:hover .sh-launcher-title{
+  color:var(--brass);
+}
+.sh-launcher:not(.collapsed) .sh-launcher-toggle-head{
+  margin-bottom:14px;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.sh-launcher-toggle-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  font-family:'JetBrains Mono',monospace;
+  color:var(--ink-muted);
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--line);
+  padding:4px 10px;
+  border-radius:4px;
+  transition:all .15s ease;
+}
+.sh-launcher-toggle-head:hover .sh-launcher-toggle-btn{
+  color:var(--ink);
+  border-color:var(--brass);
+  background:rgba(201,168,76,0.1);
+}
+.sh-launcher-toggle-arrow{
+  font-size:10px;
+  color:var(--brass);
 }
 .sh-launcher-head{
   display:flex;
@@ -1282,6 +1330,7 @@ body.sh-theme .card:hover{
   display:flex;
   align-items:center;
   gap:8px;
+  margin:0;
 }
 .sh-launcher-title .sh-badge-tag{
   font-size:11px;
@@ -1297,6 +1346,14 @@ body.sh-theme .card:hover{
 .sh-launcher-sel-wrap{
   flex:1;
   min-width:240px;
+}
+.sh-launcher-sel-label{
+  font-size:11px;
+  color:var(--ink-muted);
+  margin-bottom:5px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  font-family:'Cinzel',serif;
 }
 .sh-launcher-sel{
   width:100%;
@@ -5397,7 +5454,7 @@ function nl2br(s){ return esc(s).replace(/\n/g,'<br>'); }
 var SH = {
   techs:[], moves:[], skills:[], meta:{name:'', note:''}, draft:null,
   techFilter:'all', moveFilter:'all',
-  launcher:{ techId:'', isExp:false, mods:{ exp:0, atk:0, dmg:0 }, selectedTarget:'atk', rolledValues:null, lastResult:'', lastResultCopied:false }
+  launcher:{ techId:'', isExp:false, isOpen:false, mods:{ exp:0, atk:0, dmg:0 }, selectedTarget:'atk', rolledValues:null, lastResult:'', lastResultCopied:false }
 };
 window.SH = SH;
 
@@ -5852,6 +5909,8 @@ function renderTechLauncher(){
   }
 
   if(!SH.launcher) SH.launcher = {};
+  if(SH.launcher.isOpen === undefined) SH.launcher.isOpen = false;
+  var isOpen = !!SH.launcher.isOpen;
   if(!SH.launcher.mods) SH.launcher.mods = { exp: 0, atk: 0, dmg: 0 };
   if(!SH.launcher.selectedTarget) SH.launcher.selectedTarget = 'atk';
 
@@ -5919,17 +5978,35 @@ function renderTechLauncher(){
       '</div>'+
     '</div>';
 
-  return '<div class="sh-launcher">'+
-    '<div class="sh-launcher-head">'+
-      '<div class="sh-launcher-title">⚔️ Боевой расчёт техники <span class="sh-badge-tag">AI Studio</span></div>'+
-      '<div class="sh-launcher-sel-wrap">'+
-        '<select class="sh-launcher-sel" id="shLauncherSelect">'+techOpts+'</select>'+
+  var toggleHeadHtml = 
+    '<div class="sh-launcher-toggle-head" id="shLauncherToggle" role="button" tabindex="0" title="Нажмите, чтобы развернуть или свернуть боевой расчёт техники">'+
+      '<div class="sh-launcher-title">'+
+        '<span>⚔️ Боевой расчёт техники</span>'+
+        '<span class="sh-badge-tag">AI Studio</span>'+
       '</div>'+
-    '</div>'+
-    '<div class="sh-launcher-screen" id="shLauncherScreen">'+screenHtml+'</div>'+
-    modBarHtml+
-    actionsHtml+
-    resultBoxHtml+
+      '<div class="sh-launcher-toggle-btn">'+
+        '<span class="sh-launcher-toggle-text">'+(isOpen ? 'Свернуть' : 'Развернуть')+'</span>'+
+        '<span class="sh-launcher-toggle-arrow">'+(isOpen ? '▲' : '▼')+'</span>'+
+      '</div>'+
+    '</div>';
+
+  var bodyHtml = 
+    '<div class="sh-launcher-body" id="shLauncherBody">'+
+      '<div class="sh-launcher-head">'+
+        '<div class="sh-launcher-sel-wrap">'+
+          '<div class="sh-launcher-sel-label">Техника для броска:</div>'+
+          '<select class="sh-launcher-sel" id="shLauncherSelect">'+techOpts+'</select>'+
+        '</div>'+
+      '</div>'+
+      '<div class="sh-launcher-screen" id="shLauncherScreen">'+screenHtml+'</div>'+
+      modBarHtml+
+      actionsHtml+
+      resultBoxHtml+
+    '</div>';
+
+  return '<div class="sh-launcher '+(isOpen ? '' : 'collapsed')+'" id="shLauncherContainer">'+
+    toggleHeadHtml+
+    bodyHtml+
   '</div>';
 }
 SH.formatLauncherMod = formatLauncherMod;
@@ -6571,6 +6648,28 @@ function wireSh(){
   });
 
   /* тактический лаунчер техник */
+  var tHead = g('shLauncherToggle');
+  if(tHead){
+    var toggleLauncher = function(){
+      SH.launcher.isOpen = !SH.launcher.isOpen;
+      var c = g('shLauncherContainer');
+      if(c){
+        c.classList.toggle('collapsed', !SH.launcher.isOpen);
+        var txt = c.querySelector('.sh-launcher-toggle-text');
+        var arr = c.querySelector('.sh-launcher-toggle-arrow');
+        if(txt) txt.textContent = SH.launcher.isOpen ? 'Свернуть' : 'Развернуть';
+        if(arr) arr.textContent = SH.launcher.isOpen ? '▲' : '▼';
+      }
+    };
+    tHead.addEventListener('click', toggleLauncher);
+    tHead.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        toggleLauncher();
+      }
+    });
+  }
+
   var updateLauncherScreen = function(){
     var scr = g('shLauncherScreen');
     if(!scr) return;
