@@ -311,7 +311,7 @@
     text-shadow:0 2px 4px rgba(0,0,0,.55);pointer-events:none;
   }
   .die.s2 .val{font-size:32px;font-weight:700;color:#fff8db;text-shadow:0 2px 8px rgba(0,0,0,.85);}
-  .die.s4 .val{padding-top:22px;font-size:22px;}
+  .die.s3 .val, .die.s4 .val{padding-top:22px;font-size:22px;}
   .die.s10 .val{padding-bottom:12px;}
   .die.rolling{animation:diceshake .14s linear infinite;}
   @keyframes diceshake{
@@ -1604,6 +1604,38 @@ function renderCustomFacetShape(sides, uid, label){
   if(sides === 2) return generateCoinSvg(uid, label);
   const s = Math.max(3, Math.min(100, parseInt(sides,10) || 7));
   const gid = 'grad_'+uid;
+
+  if(s === 3){
+    const pTop = [50, 7], pRight = [93, 89], pLeft = [7, 89];
+    const c = [50, 61];
+    const ipTop = [50, 34], ipRight = [71.5, 75], ipLeft = [28.5, 75];
+    const outerPoints = `${pTop.join(',')} ${pRight.join(',')} ${pLeft.join(',')}`;
+    const innerPoints = `${ipTop.join(',')} ${ipRight.join(',')} ${ipLeft.join(',')}`;
+    const facetPolys = `
+      <polygon points="${ipTop[0]},${ipTop[1]} ${pTop[0]},${pTop[1]} ${pRight[0]},${pRight[1]} ${ipRight[0]},${ipRight[1]}" fill="rgba(255,255,255,0.15)" stroke="rgba(0,0,0,0.28)" stroke-width="0.8"/>
+      <polygon points="${c[0]},${c[1]} ${ipTop[0]},${ipTop[1]} ${ipRight[0]},${ipRight[1]}" fill="rgba(0,0,0,0.12)" stroke="rgba(0,0,0,0.22)" stroke-width="0.7"/>
+      <polygon points="${ipRight[0]},${ipRight[1]} ${pRight[0]},${pRight[1]} ${pLeft[0]},${pLeft[1]} ${ipLeft[0]},${ipLeft[1]}" fill="rgba(0,0,0,0.2)" stroke="rgba(0,0,0,0.28)" stroke-width="0.8"/>
+      <polygon points="${c[0]},${c[1]} ${ipRight[0]},${ipRight[1]} ${ipLeft[0]},${ipLeft[1]}" fill="rgba(255,255,255,0.08)" stroke="rgba(0,0,0,0.22)" stroke-width="0.7"/>
+      <polygon points="${ipLeft[0]},${ipLeft[1]} ${pLeft[0]},${pLeft[1]} ${pTop[0]},${pTop[1]} ${ipTop[0]},${ipTop[1]}" fill="rgba(255,255,255,0.15)" stroke="rgba(0,0,0,0.28)" stroke-width="0.8"/>
+      <polygon points="${c[0]},${c[1]} ${ipLeft[0]},${ipLeft[1]} ${pTop[0]},${pTop[1]}" fill="rgba(0,0,0,0.12)" stroke="rgba(0,0,0,0.22)" stroke-width="0.7"/>
+    `;
+    const text = (label!==undefined && label!==null)
+      ? `<text x="50" y="67" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="28" fill="#ffffff" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.8))">${label}</text>`
+      : '';
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#8c52ff"/>
+          <stop offset="100%" stop-color="#3d1475"/>
+        </linearGradient>
+      </defs>
+      <polygon points="${outerPoints}" fill="url(#${gid})" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/>
+      ${facetPolys}
+      <polygon points="${innerPoints}" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>
+      ${text}
+    </svg>`;
+  }
+
   const cx = 50, cy = 50, r = 44;
   const pts = [];
   for(let i=0; i<s; i++){
@@ -1979,7 +2011,13 @@ function handleGenerateClick(btn){
 const DICE_LABEL_CATEGORIES = [
   {key:'shinobi', icon:'🌀', ru:'Шиноби', items:[
     {icon:'🌀', ru:'Контроль чакры', std:20},
-    {icon:'🛡️', ru:'Активная защита', std:20}
+    {icon:'🛡️', ru:'Активная защита', std:20},
+    {icon:'🎯', ru:'Атака ниндзюцу', std:20},
+    {icon:'👊', ru:'Приём тайдзюцу', std:20},
+    {icon:'👁️', ru:'Развеять гендзюцу (Кай)', std:20},
+    {icon:'🥷', ru:'Скрытность шиноби', std:20},
+    {icon:'📡', ru:'Сенсорика и поиск', std:20},
+    {icon:'💥', ru:'Урон техники / приёма', std:null}
   ]},
   {key:'core', icon:'⚔️', ru:'Основное', items:[
     {icon:'🎯', ru:'Попадание', std:20},
@@ -3875,7 +3913,7 @@ function wireEvents(){
     if(inp && parseInt(inp.value,10) !== n) inp.value = n;
 
     const addNum = document.getElementById('customAddSidesNum');
-    if(addNum) addNum.textContent = (n === 2 ? 'C' : n);
+    if(addNum) addNum.textContent = (n === 2 ? 'C' : 'd' + n);
 
     const addBtn = document.getElementById('addCustomDieBtn');
     if(addBtn) addBtn.title = (n === 2 ? 'Бросить монету C' : ('Бросить кастомный кубик d' + n));
