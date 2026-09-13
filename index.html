@@ -1697,6 +1697,230 @@ body.sh-theme .card:hover{
   margin-top:6px;
 }
 
+/* Пульт кнопок мастера */
+.sh-cmd-inspector{
+  background:linear-gradient(145deg, #191612 0%, #100e0b 100%);
+  border:1px solid var(--line);
+  border-left:3px solid var(--crimson-bright);
+  border-radius:6px;
+  padding:18px 20px;
+  margin:12px 0 24px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  position:relative;
+}
+.sh-cmd-inspector-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:12px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding-bottom:10px;
+}
+.sh-cmd-inspector-title{
+  font-family:'Cinzel',serif;
+  font-size:18px;
+  color:var(--ink);
+  letter-spacing:.04em;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.sh-cmd-tag-badge{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  font-weight:700;
+  padding:3px 10px;
+  background:rgba(200,67,55,0.18);
+  border:1px solid var(--crimson-bright);
+  color:#ff9085;
+  border-radius:4px;
+  letter-spacing:.05em;
+}
+.sh-cmd-inspector-short{
+  font-size:14px;
+  line-height:1.55;
+  color:var(--ink);
+  margin-bottom:14px;
+}
+.sh-cmd-param-box{
+  background:#14120f;
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:10px 12px;
+  margin-bottom:14px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.sh-cmd-param-label{
+  font-size:11px;
+  color:var(--ink-muted);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  font-family:'Cinzel',serif;
+}
+.sh-cmd-param-input{
+  background:#0d0b09;
+  border:1px solid rgba(255,255,255,0.1);
+  color:var(--ink);
+  padding:7px 10px;
+  border-radius:3px;
+  font-size:13.5px;
+  outline:none;
+  transition:border-color .15s;
+}
+.sh-cmd-param-input:focus{
+  border-color:var(--brass);
+}
+.sh-cmd-preview-box{
+  background:#0b0908;
+  border:1px dashed rgba(201,168,76,0.3);
+  border-radius:4px;
+  padding:8px 12px;
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.sh-cmd-preview-label{
+  font-size:11px;
+  color:var(--ink-dim);
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.sh-cmd-preview-code{
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  color:#f2e6c8;
+  font-weight:600;
+}
+.sh-cmd-inspector-actions{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px;
+}
+.sh-cmd-btn-copy{
+  background:linear-gradient(180deg, #c9a84c 0%, #9e7f30 100%);
+  border:1px solid #e2c068;
+  color:#15120d;
+  font-weight:700;
+  padding:9px 18px;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:13.5px;
+  letter-spacing:.03em;
+  transition:all .15s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  box-shadow:0 3px 10px rgba(201,168,76,0.3);
+}
+.sh-cmd-btn-copy:hover{
+  background:linear-gradient(180deg, #dbb858 0%, #b39139 100%);
+  box-shadow:0 5px 16px rgba(201,168,76,0.45);
+  transform:translateY(-1px);
+}
+.sh-cmd-btn-rules{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--line);
+  color:var(--ink-dim);
+  padding:9px 15px;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:13px;
+  transition:all .15s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.sh-cmd-btn-rules:hover{
+  border-color:var(--brass);
+  color:var(--ink);
+  background:rgba(201,168,76,0.08);
+}
+.sh-cmd-rules-full{
+  margin-top:14px;
+  background:#0c0a08;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:4px;
+  padding:14px 16px;
+  max-height:360px;
+  overflow-y:auto;
+  font-size:12.5px;
+  line-height:1.65;
+  color:#c2bcaf;
+  white-space:pre-wrap;
+  display:none;
+}
+.sh-cmd-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+  gap:12px;
+  margin-bottom:20px;
+}
+.sh-cmd-card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:14px 16px;
+  cursor:pointer;
+  transition:all .18s ease;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+}
+.sh-cmd-card:hover{
+  border-color:rgba(201,168,76,0.6);
+  transform:translateY(-1px);
+  box-shadow:0 4px 14px rgba(0,0,0,0.3);
+}
+.sh-cmd-card.active{
+  border-color:var(--brass);
+  background:linear-gradient(145deg, #221c16 0%, #15110d 100%);
+  box-shadow:0 0 16px rgba(201,168,76,0.25);
+}
+.sh-cmd-card-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+.sh-cmd-card-name{
+  font-size:15px;
+  font-weight:600;
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.sh-cmd-card.active .sh-cmd-card-name{
+  color:var(--brass);
+}
+.sh-cmd-card-desc{
+  font-size:12.5px;
+  line-height:1.45;
+  color:var(--ink-dim);
+}
+.sh-cmd-card-status{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:11px;
+  font-family:'JetBrains Mono',monospace;
+  color:var(--brass);
+  margin-top:10px;
+  opacity:0;
+  transition:opacity .15s;
+}
+.sh-cmd-card.active .sh-cmd-card-status{
+  opacity:1;
+}
 
 .hb-count{ font-size:13px; color:var(--ink-dim); min-width:22px; text-align:right; }
 .hb-active-box{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:18px; }
@@ -5727,27 +5951,135 @@ REF.otnosheniya = {t:'Отношения', icon:'🤝', lead:'Отношения
 
 /* ---------- кнопки промпта ---------- */
 var CMDS = [
-  {ru:'Населённость сцены', icon:'👥', tag:'(к1)', featured:true, template:'(к1)',
-   desc:'Наполнить сцену конкретными людьми по демографии места. Пустой результат нормален.'},
-  {ru:'Случайное событие', icon:'🎲', tag:'(к2)', template:'(к2)',
-   desc:'Создать событие, способное открыть новую ветку. Может разворачиваться несколько ходов.'},
-  {ru:'Админ-кнопка', icon:'🔧', tag:'(к3)', template:'(к3) ',
-   desc:'Универсальная. Чит или служебное указание пишется в скобках вместе с кнопкой.'},
-  {ru:'Пояснение', icon:'❓', tag:'(к4)', template:'(к4) ',
-   desc:'Мастер поясняет то, что написано в скобках, вне игрового текста.'},
-  {ru:'Пошаговый темп', icon:'🐢', tag:'(к5)', featured:true, template:'(к5)',
-   desc:'РЕЖИМ. Ход кончается на ближайшей точке, где персонаж мог бы действовать. Сцены не закрываются, монтажей нет. Висит в активных состояниях до снятия.'},
-  {ru:'Снять пошаговый темп', icon:'🐇', tag:'(к5-)', template:'(к5-)',
-   desc:'Возврат к обычному темпу.'},
-  {ru:'Монтаж', icon:'⏩', tag:'(к6)', featured:true, template:'(к6) ',
-   desc:'Разово ускоряет в заданных рамках: до вечера, сутки, неделя, «до экзамена». Свёртка, одна развёрнутая сцена, монтажный лог, обязательный остаток. Развилки останавливают монтаж.'},
-  {ru:'Монтаж — придумай сам', icon:'⏩', tag:'(к6)', template:'(к6) придумай сам',
-   desc:'Мастер выдумывает занятие целиком, исходя из открытых нитей и обстановки.'},
-  {ru:'Развернуть момент', icon:'🔍', tag:'разверни', template:'разверни: ',
-   desc:'Вытащить любой пункт свёртки в полноценный ход.'},
-  {ru:'Меню — полный лог', icon:'📋', tag:'(к7)', featured:true, template:'(к7)',
-   desc:'Полный System Log без наратива. Время не движется, это не ход. Всё целиком и с количествами. Правки игрока — канон немедленно.'}
+  {
+    id: 'k1',
+    tag: '(к1)',
+    ru: 'Населённость сцены',
+    icon: '👥',
+    featured: true,
+    template: '(к1)',
+    defaultTemplate: '(к1)',
+    hasParam: false,
+    short: 'Наполняет сцену конкретными людьми по демографии места (район, время суток, род занятий). Непривычные кланы и редкая кровь появляются строго в рамках вероятности или могут не появиться вовсе — пустой результат нормален.',
+    full: '((к1) — НАСЕЛЁННОСТЬ СЦЕНЫ. Наполни сцену конкретными людьми по A2: сначала определи, кто вообще бывает в этом месте — район, заведение, время суток, род занятий, — и только потом распределяй расы по демографии этого места. Непривычные кланы, редкая кровь и неоднозначная внешность появляются ровно настолько, насколько их туда пускает демография, и МОГУТ НЕ ПОЯВИТЬСЯ ВООБЩЕ — пустой результат здесь нормален и не считается невыполнением кнопки. В провинции, замкнутой общине или отраслевом анклаве их чаще всего и не будет. Описывай толпу целиком, а не выборочно необычных: клан, особенность или манера держаться упоминаются с тем же весом, что одежда, возраст, усталость или акцент, и не выносятся в центр описания. Правило A85 применяется только тогда, когда сцена действительно касается ориентации или обращения, а не вместе с каждым вызовом этой кнопки.)'
+  },
+  {
+    id: 'k2',
+    tag: '(к2)',
+    ru: 'Случайное событие',
+    icon: '🎲',
+    featured: true,
+    template: '(к2)',
+    defaultTemplate: '(к2)',
+    hasParam: false,
+    short: 'Создаёт органичное случайное событие, способное открыть новую сюжетную ветку или привести к новым персонажам и существам. Событие может проявиться не сразу, а плавно разворачиваться в течение нескольких ходов.',
+    full: '((к2) — СЛУЧАЙНОЕ СОБЫТИЕ. Создай случайное событие, которое может привести к новой ветке или к новым существам. Событие должно появиться органично и может проявиться не в следующем ходу, а разворачиваться несколько ходов.)'
+  },
+  {
+    id: 'k3',
+    tag: '(к3)',
+    ru: 'Админ-кнопка',
+    icon: '🔧',
+    template: '(к3: {param})',
+    defaultTemplate: '(к3)',
+    hasParam: true,
+    paramPh: 'опишите чит или прямое указание для Мастера',
+    short: 'Универсальная служебная команда для применения читов или прямых режиссёрских правок. Суть желаемого чита или действия указывается в скобках вместе с кнопкой.',
+    full: '((к3) — АДМИН-КНОПКА. Универсальная. Я хочу использовать чит, о котором пишу в скобках вместе с кнопкой.)'
+  },
+  {
+    id: 'k4',
+    tag: '(к4)',
+    ru: 'Пояснение',
+    icon: '❓',
+    template: '(к4: {param})',
+    defaultTemplate: '(к4)',
+    hasParam: true,
+    paramPh: 'что именно должен пояснить Мастер',
+    short: 'Запрашивает у Мастера разъяснение логики мира, ситуации или игровой механики вне художественного текста. Конкретный вопрос или тема указывается в скобках.',
+    full: '((к4) — ПОЯСНЕНИЕ. Поясни мне то, что я напишу в скобках вместе с кнопкой.)'
+  },
+  {
+    id: 'k5',
+    tag: '(к5)',
+    ru: 'Пошаговый темп',
+    icon: '🐢',
+    featured: true,
+    template: '(к5)',
+    defaultTemplate: '(к5)',
+    hasParam: true,
+    paramPh: 'на чём сфокусироваться (необязательно)',
+    short: 'Переключает игру на мелкий шаг: ход Мастера заканчивается на ближайшей точке, где персонаж мог бы действовать или ответить. Запрещены монтажи, авто-решения за героя и резюме сцены (действует до вызова к5-).',
+    full: '((к5) — ПОШАГОВЫЙ ТЕМП. Повествование переключается на мелкий шаг: история продолжает двигаться, события развиваются и могут переходить одно в другое — но проходятся они ХОДАМИ ИГРОКА, а не внутри одного твоего хода.\n\nЭто переключение режима, а НЕ оценка предыдущих ходов и не указание на ошибку. Не извиняйся, не комментируй переход и не объясняй его — просто веди сцену дальше.\n\nГЛАВНОЕ ПРАВИЛО: ХОД ЗАКАНЧИВАЕТСЯ НА БЛИЖАЙШЕЙ ТОЧКЕ, ГДЕ ПЕРСОНАЖ МОГ БЫ ДЕЙСТВОВАТЬ ИЛИ ЗАГОВОРИТЬ. Дошёл до двери — ход кончается у двери, а не после разговора за ней. NPC задал вопрос — ход кончается сразу после вопроса, а не после ответа.\n\n• НЕ ЗАКРЫВАЙ ЭПИЗОД САМ. Никаких итоговых формулировок: «в итоге», «в конце концов», «разговор закончился тем, что», «они договорились», «вечер прошёл спокойно». Чем закончился эпизод — определяется игрой, а не твоим резюме.\n• НЕ СЖИМАЙ ПРОМЕЖУТОК, В КОТОРОМ ИГРОК МОГ БЫ ВЫБИРАТЬ. Если между текущим моментом и тем, куда ты собираешься перейти, есть хотя бы одна точка, где персонаж мог бы что-то сказать, сделать или решить, — остановись на ней.\n• НИКАКИХ МОНТАЖЕЙ И ПРОПУСКОВ в этом режиме, даже коротких, даже если ничего важного не планировалось.\n• КНОПКА МЕНЯЕТ ТЕМП ТОЛЬКО ВПЕРЁД. Она НИКОГДА не отматывает время назад: уже сыгранные события остаются сыгранными.\n• НЕ РЕШАЙ ЗА ПЕРСОНАЖА, что он понял, почувствовал, заметил и к чему пришёл.\n• СОБЫТИЯ МОГУТ РАЗВИВАТЬСЯ, осложняться и переходить в другие — просто каждый следующий шаг требует хода игрока.\n• ДЕТАЛИЗАЦИЯ: раз шаг мелкий, показывай его подробно (звуки, запахи, взгляды, руки NPC). Главное — ГДЕ ТЫ ОСТАНАВЛИВАЕШЬСЯ.\n• Ход может быть коротким по времени и почти пустым по итогам. Это правильный результат.\n\nЕсли в скобках вместе с кнопкой указано, на чём сфокусироваться, — веди пошаговый темп именно там.\n\nРежим действует, пока игрок не напишет (к5-) или «обычный темп», либо пока сам не попросит скип. Пока режим включён, он ОБЯЗАН выводиться отдельной строкой в «Активные состояния» System Log.)'
+  },
+  {
+    id: 'k5_off',
+    tag: '(к5-)',
+    ru: 'Снять пошаговый темп',
+    icon: '🐇',
+    template: '(к5-)',
+    defaultTemplate: '(к5-)',
+    hasParam: false,
+    short: 'Отключает пошаговый режим и возвращает повествование к обычному темпу игры. Строка пошагового темпа снимается из активных состояний System Log.',
+    full: '((к5-) — СНЯТИЕ ПОШАГОВОГО ТЕМПА. Возвращает повествование к обычному темпу игры. Строка режима снимается из «Активных состояний» System Log.)'
+  },
+  {
+    id: 'k6',
+    tag: '(к6)',
+    ru: 'Монтаж',
+    icon: '⏩',
+    featured: true,
+    template: '(к6: {param})',
+    defaultTemplate: '(к6)',
+    hasParam: true,
+    paramPh: 'рамка времени (до вечера, сутки, три дня, неделя, до экзамена...)',
+    short: 'Разово ускоряет время в заданных игроком рамках, выдавая свёртку, одну развёрнутую сцену, монтажный лог и остаток. Любые развилки с важным выбором прерывают монтаж и возвращают ход игроку.',
+    full: '((к6) — МОНТАЖ. Разовое действие, а не режим. Зеркало к5: та замедляет темп, эта ускоряет.\n\nРАМКИ ЗАДАЁТ ИГРОК: до вечера, сутки, три дня, неделя, «пока идём до Суны», «до экзамена». Если рамка не названа — спроси.\n\nОТКУДА БЕРЁТСЯ СОДЕРЖАНИЕ:\n— Игрок описал, что делал бы персонаж, — строишь монтаж по этому описанию.\n— Игрок ничего не написал — спроси, чем он хочет заняться, и предложи конкретные варианты.\n— Игрок сказал «придумай сам» — выдумай занятие целиком, исходя из открытых нитей, обязательств и обстановки.\n\nСТРУКТУРА ХОДА:\n1. СВЁРТКА: 5-10 строк сплошным текстом (без списков и диалогов). Последняя строка подводит к развёрнутой сцене.\n2. ОДНА РАЗВЁРНУТАЯ СЦЕНА на всю рамку. Ровно один эпизод играется полностью с прямой речью и деталями. Внутри проставляются точные внутриигровые даты (день недели, месяц, число).\n3. МОНТАЖНЫЙ ЛОГ: только РАЗНИЦА за отрезок (деньги, расходники, состояния, сроки).\n4. ОСТАТОК: 1-3 строки, что отрезок оставил после себя (ПРИВЫЧКА, ЧЕЛОВЕК, МИР, ДОЛГ, СЛУХ, ТРЕЩИНА, ЖЕЛАНИЕ, ШУТКА). Пустой остаток запрещён.\n\nПОДАЧА: Монтаж пишется без швов. Служебными блоками остаются только лог и остаток.\n\nРАЗВИЛКИ: События, требующие ВЫБОРА персонажа, останавливают монтаж. Ты доводишь до момента выбора и останавливаешься. Фоновые события не останавливают монтаж.)'
+  },
+  {
+    id: 'k7',
+    tag: '(к7)',
+    ru: 'Меню',
+    icon: '📋',
+    featured: true,
+    template: '(к7)',
+    defaultTemplate: '(к7)',
+    hasParam: false,
+    short: 'Полный вывод служебного System Log без художественного текста (инвентарь, деньги, люди, техники, репутация, сроки). Время не движется, а любые последующие уточнения и правки игрока становятся каноном без споров.',
+    full: '((к7) — МЕНЮ. Полный System Log без наратива.\n\nТы полностью пропускаешь повествование и выводишь System Log целиком, во всех подробностях: Б1 со всеми деньгами и местами хранения, Б4 по ВСЕМ известным людям, Б5 с поштучным боезапасом и расходниками, Б6, Б7 с обязательствами и сроками, Б8 по репутации, лист персонажа, освоенные техники с рангами, затратами и окнами, приёмы тайдзюцу, весь инвентарь. Ничего не сокращается.\n\nЭТО НЕ ХОД. Время не движется, ничего в мире не происходит, персонаж ничего не делает. Это служебный экран.\n\nПОСЛЕ ВЫВОДА игрок вправе указать на ошибки. Его правки становятся каноном немедленно и без спора (A8). Следующий ход после (к7) продолжает сцену ровно с того места, где она была прервана.)'
+  },
+  {
+    id: 'routine',
+    tag: '[Рутина]',
+    ru: 'Оператор рутины',
+    icon: '☕',
+    featured: true,
+    template: '[Рутина: {param}]',
+    defaultTemplate: '[Рутина: ]',
+    hasParam: true,
+    paramPh: 'что делаю (сон, отдых, дорога по знакомому маршруту, еда, гигиена...)',
+    short: 'Мгновенно выполняет названное бытовое дело без бросков, развилок и описания (время и ресурсы списываются в лог). Действует до конца кампании, исход дела должен быть гарантирован.',
+    full: '([Рутина: <что делаю>] — ОПЕРАТОР РУТИНЫ. Действует до конца кампании. Содержимое произвольное, игрок пишет его сам.\n\nЧТО ЭТО ЗНАЧИТ: персонаж выполнил названное бытовое дело целиком и успешно. Ты не разыгрываешь его, не переспрашиваешь и не уточняешь детали. Время, необходимое на это дело, прошло.\n\nПРАВИЛА:\n1. Внутри рутины НИЧЕГО не происходит. Ни событий, ни встреч, ни развилок, ни бросков.\n2. Ты не пересказываешь детально рутину. Максимум пара строк об обстановке и сразу дальше.\n3. Расход припасов, денег и времени идёт в лог как обычно.\n4. Что можно свернуть: гигиена, одежда, еда, сборы, уборка, дорога по знакомому маршруту, обычные покупки по известным ценам, отдых, сон.\n5. Что НЕЛЬЗЯ свернуть: всё, что требует проверки, диалога, обучения или существенных трат.\n6. ЕДИНСТВЕННОЕ ИСКЛЮЧЕНИЕ: если дело физически невозможно — говоришь об этом ОДНОЙ строкой и возвращаешь ход.\n7. При любых сомнениях — дело попадает под рутину.)'
+  },
+  {
+    id: 'k8',
+    tag: '(к8)',
+    ru: 'Сверка с правилами',
+    icon: '⚖️',
+    featured: true,
+    template: '(к8{param})',
+    defaultTemplate: '(к8)',
+    hasParam: true,
+    paramPh: ': тема (узкий режим: бой, темп, чакра, отношения, формат...)',
+    short: 'Принудительно возвращает ИИ-Мастера к своду правил, если он начинает вести по инерции. Ответ состоит строго из трёх частей: Якорь правил (до 60 строк), Самопроверка нарушений и Что исправляю.',
+    full: '((к8) — СВЕРКА С ПРАВИЛАМИ. Перечитай свод и проверь по нему себя.\n\nЗАЧЕМ ЭТА КНОПКА: Принудительное возвращение к источнику, когда игра ушла в инерцию прошлых ходов. Нажимается, когда чувствуешь, что Мастера понесло.\n\nЭТО НЕ ХОД. Время не движется, наратива нет вообще, System Log не выводится.\n\nОТВЕТ СОСТОИТ ИЗ ТРЁХ ЧАСТЕЙ И НИЧЕГО БОЛЬШЕ:\nЧАСТЬ 1 — ЯКОРЬ: Сжатый свод, по одной строке на правило, только суть (потолок 60 строк). Порядок: рамка хода, темп, канон, бой, чакра, отношения, формат вывода.\nЧАСТЬ 2 — САМОПРОВЕРКА: Пройди по СВОИМ последним 10 ходам и назови, где отступил от свода. Пиши конкретно и против себя. Не извиняйся.\nЧАСТЬ 3 — ЧТО ИСПРАВЛЯЮ: По строке на каждый пункт части 2: как именно будешь вести со следующего хода.\n\nОбщий потолок ответа — около 100 строк.\n\nУЗКИЙ РЕЖИМ: `(к8: <что именно>)` — сверка идёт ТОЛЬКО по названной теме (якорь до 15 строк, проверка по 20 ходам).\n\nПравки игрока на результат сверки становятся каноном немедленно и без спора (A8).)'
+  }
 ];
+
+function cmdById(id){
+  if(!id) return CMDS[0];
+  return CMDS.filter(function(c){ return c.id === id; })[0] || CMDS[0];
+}
 
 /* ---------- бейджи и печати (ранги, стихии, уровни) ---------- */
 function rankSeal(r){
@@ -6013,6 +6345,12 @@ SH.formatLauncherMod = formatLauncherMod;
 SH.buildComboText = buildComboText;
 SH.renderLauncherDiceHtml = renderLauncherDiceHtml;
 SH.renderTechLauncher = renderTechLauncher;
+SH.shHome = shHome;
+SH.shRef = shRef;
+SH.shCmds = shCmds;
+SH.CMDS = CMDS;
+SH.cmdById = cmdById;
+SH.renderCmdInspectorHtml = renderCmdInspectorHtml;
 
 var MOVE_KINDS = ['Рукопашный','Оружейный','Смешанный','Передвижение'];
 var MOVE_TYPES = ['Урон','Состояние','Реакция','Манёвр','Защита'];
@@ -6047,8 +6385,7 @@ function shHome(){
     {nav:'shTechs', icon:'🌀', t:'Техники',   d:SH.techs.length ? SH.techs.length+' в списке' : 'Ранг, стихия, чакра, окна, счётчики'},
     {nav:'shMoves', icon:'👊', t:'Приёмы', d:SH.moves.length ? SH.moves.length+' в списке' : 'Рукопашные и оружейные: эффекты и цена приёма'},
     {nav:'shSkills', icon:'🛠️', t:'Навыки и знания', d:(SH.skills&&SH.skills.length) ? SH.skills.length+' в списке' : 'Ремёсла, ступени мастерства, быт, языки'},
-    {nav:'shCmds',  icon:'⌨️', t:'Кнопки',    d:'к1–к7 — быстрые шаблоны для ИИ-Мастера'},
-    {nav:'shRef',   icon:'📚', t:'Справочник', d:'Интерактивное колесо стихий, окна, ранги, чакра'},
+    {nav:'shRef',   icon:'📚', t:'Справочник', d:'Колесо стихий, кнопки к1–к8, правила, чакра, окна'},
     {nav:'shData',  icon:'💾', t:'Данные',    d:'Экспорт и импорт всего мира одним файлом'}
   ];
   return '<h1>Шиноби</h1>'+
@@ -6227,15 +6564,77 @@ function shSkillView(){
     '<button class="btn-ghost" id="shSkillDelV">Удалить</button></div>';
 }
 
+function renderCmdInspectorHtml(c){
+  if(!c) c = CMDS[0];
+  var curParam = SH.cmdParam || '';
+  var previewText = '';
+  if(c.hasParam && curParam.trim()){
+    if(c.id === 'k8'){
+      previewText = curParam.trim().charAt(0) === ':' ? '(к8' + curParam.trim() + ')' : '(к8: ' + curParam.trim() + ')';
+    } else {
+      previewText = c.template.replace('{param}', curParam.trim());
+    }
+  } else {
+    previewText = c.defaultTemplate || c.template.replace('{param}', '').replace(': }', '}').replace(': ]', ']');
+  }
+
+  var paramInputHtml = '';
+  if(c.hasParam){
+    paramInputHtml = 
+      '<div class="sh-cmd-param-box">'+
+        '<div class="sh-cmd-param-label">Параметр команды (необязательно):</div>'+
+        '<input type="text" class="sh-cmd-param-input" id="shCmdParamInput" value="'+escA(curParam)+'" placeholder="'+escA(c.paramPh || 'введите параметр...')+'">'+
+      '</div>';
+  }
+
+  return '<div class="sh-cmd-inspector" id="shCmdInspector">'+
+    '<div class="sh-cmd-inspector-header">'+
+      '<div class="sh-cmd-inspector-title">'+
+        '<span>'+c.icon+' '+esc(c.ru)+'</span>'+
+        '<span class="sh-cmd-tag-badge">'+esc(c.tag)+'</span>'+
+      '</div>'+
+      '<div class="sh-badge-tag" style="font-size:11px;padding:2px 8px;border:1px solid var(--brass);color:var(--brass);border-radius:3px;background:rgba(201,168,76,0.08);">Команда ИИ</div>'+
+    '</div>'+
+    '<div class="sh-cmd-inspector-short">'+esc(c.short)+'</div>'+
+    paramInputHtml+
+    '<div class="sh-cmd-preview-box">'+
+      '<div class="sh-cmd-preview-label">Шаблон для отправки:</div>'+
+      '<div class="sh-cmd-preview-code" id="shCmdPreviewText">'+esc(previewText)+'</div>'+
+    '</div>'+
+    '<div class="sh-cmd-inspector-actions">'+
+      '<button class="sh-cmd-btn-copy" id="shCmdCopyBtn" title="Скопировать шаблон в буфер обмена">📋 Скопировать команду</button>'+
+      '<button class="sh-cmd-btn-rules" id="shCmdRulesToggleBtn">📖 Подробный свод правил ▼</button>'+
+    '</div>'+
+    '<div class="sh-copy-badge" id="shCmdCopyBadge" style="display:none;margin-top:10px;"></div>'+
+    '<div class="sh-cmd-rules-full" id="shCmdRulesBlock">'+nl2br(c.full)+'</div>'+
+  '</div>';
+}
+
 function shCmds(){
-  return crumbSh([{label:'Шиноби',nav:'home'},{label:'Кнопки'}])+
-    '<button class="back" data-nav="home">← Назад</button>'+
-    '<h1>Кнопки</h1><div class="subtitle">Тапни карточку — текст скопируется в буфер.</div>'+
-    CMDS.map(function(c){
-      return '<div class="card '+(c.featured?'featured':'')+'" data-copy="'+escA(c.template)+'">'+
-        '<div class="name">'+c.icon+' '+esc(c.ru)+' <span class="die-badge">'+esc(c.tag)+'</span></div>'+
-        '<div class="desc">'+esc(c.desc)+'</div></div>';
-    }).join('');
+  if(!SH.selectedCmdId) SH.selectedCmdId = 'k1';
+  var selCmd = cmdById(SH.selectedCmdId);
+
+  var inspectorHtml = renderCmdInspectorHtml(selCmd);
+
+  var gridHtml = '<div class="sh-cmd-grid">' + CMDS.map(function(c){
+    var isSel = (c.id === selCmd.id);
+    return '<div class="sh-cmd-card '+(isSel?'active':'')+'" data-cmd-select="'+c.id+'" title="Кликните, чтобы узнать назначение и выбрать">'+
+      '<div class="sh-cmd-card-head">'+
+        '<div class="sh-cmd-card-name">'+c.icon+' '+esc(c.ru)+'</div>'+
+        '<span class="sh-cmd-tag-badge">'+esc(c.tag)+'</span>'+
+      '</div>'+
+      '<div class="sh-cmd-card-desc">'+esc(c.short)+'</div>'+
+      '<div class="sh-cmd-card-status">'+(isSel ? '● Выбрано' : '')+'</div>'+
+    '</div>';
+  }).join('') + '</div>';
+
+  return crumbSh([{label:'Шиноби',nav:'home'},{label:'Справочник',nav:'shRef'},{label:'Кнопки мастера'}])+
+    '<button class="back" data-nav="shRef">← Назад в Справочник</button>'+
+    '<h1>⌨️ Кнопки мастера</h1>'+
+    '<div class="subtitle">Интерактивный пульт команд для ИИ-Мастера. Кликните по карточке любой кнопки, чтобы узнать её назначение, задать параметр и скопировать шаблон.</div>'+
+    '<div id="shCmdInspectorWrap">' + inspectorHtml + '</div>'+
+    '<div class="section-label" style="margin:24px 0 12px;">Все команды пульта ('+CMDS.length+')</div>'+
+    gridHtml;
 }
 
 
@@ -6369,9 +6768,15 @@ function shRef(){
   var keys = Object.keys(REF);
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Справочник'}])+
     '<button class="back" data-nav="home">← Назад</button>'+
-    '<h1>Справочник</h1><div class="menu-list grid-2">'+keys.map(function(k){
-      return '<div class="menu-item" data-nav="shRefView:'+k+'"><div class="name">'+REF[k].icon+' '+esc(REF[k].t)+'</div><div class="arrow">›</div></div>';
-    }).join('')+'</div>';
+    '<h1>Справочник</h1><div class="menu-list grid-2">'+
+      '<div class="menu-item featured" data-nav="shCmds" style="border-left:3px solid var(--crimson-bright);background:linear-gradient(145deg, #1f1814 0%, #13100e 100%);">'+
+        '<div class="name">⌨️ Кнопки мастера (к1–к8)</div>'+
+        '<div class="desc">Интерактивный пульт команд: темп, монтаж, сверка, рутина</div>'+
+        '<div class="arrow">›</div>'+
+      '</div>'+
+      keys.map(function(k){
+        return '<div class="menu-item" data-nav="shRefView:'+k+'"><div class="name">'+REF[k].icon+' '+esc(REF[k].t)+'</div><div class="arrow">›</div></div>';
+      }).join('')+'</div>';
 }
 
 function shRefView(){
@@ -6989,6 +7394,79 @@ function wireSh(){
   var btnExp = g('shLaunchExpBtn'); if(btnExp) btnExp.addEventListener('click', function(){ executeLaunch('exp', true); });
   var btnClaim = g('shLaunchClaimBtn'); if(btnClaim) btnClaim.addEventListener('click', function(){ executeLaunch('claim', true); });
 
+
+  /* экран кнопок мастера */
+  var wireCmdInspector = function(){
+    var c = cmdById(SH.selectedCmdId || 'k1');
+    var pIn = g('shCmdParamInput');
+    var cpBtn = g('shCmdCopyBtn');
+    var cpBdg = g('shCmdCopyBadge');
+    var pvTxt = g('shCmdPreviewText');
+    var rlBtn = g('shCmdRulesToggleBtn');
+    var rlBlk = g('shCmdRulesBlock');
+
+    var calcCopyText = function(){
+      var param = (pIn ? pIn.value.trim() : '');
+      if(c.hasParam && param){
+        if(c.id === 'k8'){
+          return param.charAt(0) === ':' ? '(к8' + param + ')' : '(к8: ' + param + ')';
+        }
+        return c.template.replace('{param}', param);
+      }
+      return c.defaultTemplate || c.template.replace('{param}', '').replace(': }', '}').replace(': ]', ']');
+    };
+
+    if(pIn){
+      pIn.addEventListener('input', function(){
+        SH.cmdParam = pIn.value;
+        if(pvTxt) pvTxt.textContent = calcCopyText();
+        if(cpBdg) cpBdg.style.display = 'none';
+      });
+    }
+
+    if(cpBtn){
+      cpBtn.addEventListener('click', function(){
+        var text = calcCopyText();
+        if(typeof copyText === 'function') copyText(text);
+        if(cpBdg){
+          cpBdg.textContent = '✓ Скопировано в буфер: ' + text;
+          cpBdg.style.display = 'inline-flex';
+        }
+      });
+    }
+
+    if(rlBtn && rlBlk){
+      rlBtn.addEventListener('click', function(){
+        SH.cmdShowRules = !SH.cmdShowRules;
+        rlBlk.style.display = SH.cmdShowRules ? 'block' : 'none';
+        rlBtn.textContent = SH.cmdShowRules ? '📖 Скрыть подробные правила ▲' : '📖 Подробный свод правил ▼';
+      });
+    }
+  };
+  wireCmdInspector();
+
+  document.querySelectorAll('[data-cmd-select]').forEach(function(card){
+    card.addEventListener('click', function(){
+      var id = card.getAttribute('data-cmd-select');
+      if(!id) return;
+      SH.selectedCmdId = id;
+      SH.cmdParam = '';
+      SH.cmdShowRules = false;
+      var inspWrap = g('shCmdInspectorWrap');
+      if(inspWrap){
+        var c = cmdById(id);
+        inspWrap.innerHTML = renderCmdInspectorHtml(c);
+        wireCmdInspector();
+        document.querySelectorAll('[data-cmd-select]').forEach(function(cd){
+          var isAct = (cd.getAttribute('data-cmd-select') === id);
+          cd.classList.toggle('active', isAct);
+          var st = cd.querySelector('.sh-cmd-card-status');
+          if(st) st.textContent = isAct ? '● Выбрано' : '';
+        });
+        inspWrap.scrollIntoView({ behavior:'smooth', block:'nearest' });
+      }
+    });
+  });
 
   /* клик по стихии в колесе стихий */
   document.querySelectorAll('[data-elem]').forEach(function(el){
