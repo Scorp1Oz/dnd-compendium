@@ -6639,6 +6639,233 @@ SH.CMDS = CMDS;
 SH.cmdById = cmdById;
 SH.renderCmdInspectorHtml = renderCmdInspectorHtml;
 
+function parseMoveDmg(str){
+  if(!str || typeof str !== 'string') return null;
+  var s = str.trim().replace(/\s+/g, '');
+  if(!s) return null;
+  var m = s.match(/^(\d*)d(\d+)([+-]\d+)?$/i);
+  if(m){
+    var n = Math.max(1, Math.min(12, parseInt(m[1], 10) || 1));
+    var sides = parseInt(m[2], 10) || 6;
+    var mod = m[3] ? parseInt(m[3], 10) : 0;
+    return { n: n, sides: sides, mod: mod };
+  }
+  return null;
+}
+
+function buildMoveComboText(m, rolledValues, mods){
+  var wpStr = m.weapon ? (' (' + m.weapon + ')') : '';
+  var payStr = m.pay ? (' | Оплата: ' + m.pay) : '';
+  var header = '*[Приём: ' + (m.name || 'Без названия') + ' | Вид: ' + (m.kind || 'Рукопашный') + wpStr + ' | Тип: ' + (m.mtype || 'Урон') + payStr + ']*';
+  var lines = [header];
+
+  // 1. Бросок приёма / атака
+  if(rolledValues && rolledValues.atk){
+    var aMod = parseInt(mods.atk, 10) || 0;
+    var aModStr = aMod > 0 ? ' + ' + aMod : (aMod < 0 ? ' − ' + Math.abs(aMod) : '');
+    var abilStr = m.atk ? (' (' + m.atk + ')') : '';
+    lines.push('*[Результат броска Приём' + abilStr + ' 1d20: ' + rolledValues.atk + ' ]*' + aModStr);
+  }
+
+  // 2. Урон
+  var pDmg = parseMoveDmg(m.dmg);
+  if(pDmg && rolledValues && rolledValues.dmgRolls && rolledValues.dmgRolls.length){
+    var n = rolledValues.dmgRolls.length;
+    var dSides = rolledValues.dmgSides || pDmg.sides;
+    var dMod = (parseInt(mods.dmg, 10) || 0) + (pDmg.mod || 0);
+    var dModStr = dMod > 0 ? ' + ' + dMod : (dMod < 0 ? ' − ' + Math.abs(dMod) : '');
+    lines.push('*[Результат броска Урон ' + n + 'd' + dSides + ': ' + rolledValues.dmgRolls.join(' | ') + ' ]*' + dModStr);
+  }
+
+  // 3. Эффект / Состояние / Манёвр / Реакция
+  if(m.mtype === 'Состояние' || (m.state && m.state !== 'не навязывает' && m.state !== 'другое')){
+    var defStr = m.def ? (' | Спасбросок цели: ' + m.def) : '';
+    lines.push('*[Эффект: Навязывает состояние ' + (m.state || 'СБИТ') + ' (' + (m.dur || 'один ход') + ')' + defStr + ']*');
+  } else if(m.mtype === 'Манёвр'){
+    var reachStr = m.reach ? (' (' + m.reach + ')') : '';
+    lines.push('*[Эффект: Манёвр перемещения' + reachStr + ']*');
+  } else if(m.mtype === 'Реакция'){
+    var trigStr = m.trigger ? ('Триггер: ' + m.trigger) : 'Реакция в чужой ход';
+    lines.push('*[Условие: ' + trigStr + ']*');
+  } else if(m.mtype === 'Защита'){
+    var trigStr = m.trigger ? ('Срабатывает на: ' + m.trigger) : 'Защитное действие';
+    lines.push('*[Защита: ' + trigStr + ']*');
+  }
+
+  return lines.join('\n');
+}
+
+function renderMoveLauncherDiceHtml(move, selTarget, mods, rolledValues){
+  if(!move) return '<div class="sh-scr-no-dmg">Выберите приём для расчёта</div>';
+  mods = mods || { atk: 0, dmg: 0 };
+  rolledValues = rolledValues || {};
+
+  // 1. Атака / Бросок приёма
+  var aModStr = formatLauncherMod(mods.atk);
+  var atkLabel = move.atk ? ('Бросок (' + esc(move.atk) + ')') : 'Бросок приёма';
+  var atkDieHtml = 
+    '<div class="sh-scr-col ' + (selTarget === 'atk' ? 'selected' : '') + '" data-select-move-roll="atk" title="Кликните для выбора кубика и настройки модификатора">' +
+      '<div class="sh-scr-label">' + atkLabel + '</div>' +
+      '<div class="sh-scr-die die s20" id="shScrDieMoveAtk">' +
+        (typeof dieShapeSvg === 'function' ? dieShapeSvg(20, 'scrmvatk', null) : '') +
+        '<div class="val">' + (rolledValues.atk || 20) + '</div>' +
+      '</div>' +
+      '<div class="sh-scr-sub" id="shScrSub_moveAtk">1d20' + (aModStr ? ' ' + aModStr : '') + '</div>' +
+    '</div>';
+
+  // 2. Урон или Эффект
+  var pDmg = parseMoveDmg(move.dmg);
+  var dmgBlockHtml = '';
+  if(pDmg){
+    var n = pDmg.n;
+    var dSides = pDmg.sides;
+    var totalDmgMod = (parseInt(mods.dmg, 10) || 0) + (pDmg.mod || 0);
+    var dModStr = formatLauncherMod(totalDmgMod);
+    var dmgDiceList = [];
+    var rolls = rolledValues.dmgRolls || [];
+    for(var i = 0; i < n; i++){
+      var curVal = rolls[i] || dSides;
+      dmgDiceList.push(
+        '<div class="sh-scr-die die s' + dSides + '" id="shScrDieMoveDmg_' + i + '">' +
+          (typeof dieShapeSvg === 'function' ? dieShapeSvg(dSides, 'scrmvdmg' + i, null) : '') +
+          '<div class="val">' + curVal + '</div>' +
+        '</div>'
+      );
+    }
+    var baseDmgFormula = n + 'd' + dSides + (pDmg.mod ? (pDmg.mod > 0 ? '+' + pDmg.mod : pDmg.mod) : '');
+    dmgBlockHtml = 
+      '<div class="sh-scr-dmg-group ' + (selTarget === 'dmg' ? 'selected' : '') + '" data-select-move-roll="dmg" title="Кликните для выбора кубика и настройки модификатора">' +
+        '<div class="sh-scr-label">Урон (' + baseDmgFormula + ')</div>' +
+        '<div class="sh-scr-dmg-dice">' + dmgDiceList.join('') + '</div>' +
+        '<div class="sh-scr-sub" id="shScrSub_moveDmg">' + n + 'd' + dSides + (dModStr ? ' ' + dModStr : '') + '</div>' +
+      '</div>';
+  } else {
+    var stateInfo = '';
+    if(move.mtype === 'Состояние' || (move.state && move.state !== 'не навязывает')){
+      stateInfo = 'Навязывает: <b>' + esc(move.state || 'СБИТ') + '</b> (' + esc(move.dur || 'один ход') + ')' +
+        (move.def ? ' · спасбросок: <b>' + esc(move.def) + '</b>' : '');
+    } else if(move.mtype === 'Манёвр'){
+      stateInfo = 'Манёвр: <b>' + esc(move.reach || 'перемещение/дистанция') + '</b>';
+    } else if(move.mtype === 'Реакция' || move.mtype === 'Защита'){
+      stateInfo = (move.mtype === 'Защита' ? 'Защита: ' : 'Реакция: ') + '<b>' + esc(move.trigger || 'в чужой ход') + '</b>';
+    } else {
+      stateInfo = 'Приём типа <b>' + esc(move.mtype || 'Особый') + '</b> (без броска урона)';
+    }
+    dmgBlockHtml = '<div class="sh-scr-no-dmg">' + stateInfo + '</div>';
+  }
+
+  return '<div class="sh-screen-dice-tray">' + atkDieHtml + dmgBlockHtml + '</div>';
+}
+
+function renderMoveLauncher(){
+  if(!SH.moves || !SH.moves.length){
+    return '<div class="sh-launcher">' +
+      '<div class="sh-launcher-title">🥋 Боевой расчёт приёма <span class="sh-badge-tag">AI Studio</span></div>' +
+      '<div class="char-empty" style="margin:10px 0 0;padding:12px;">Приёмы ещё не добавлены. Добавьте первый приём кнопкой ниже, чтобы использовать боевой расчёт.</div>' +
+    '</div>';
+  }
+
+  if(!SH.moveLauncher) SH.moveLauncher = {};
+  if(SH.moveLauncher.isOpen === undefined) SH.moveLauncher.isOpen = false;
+  var isOpen = !!SH.moveLauncher.isOpen;
+  if(!SH.moveLauncher.mods) SH.moveLauncher.mods = { atk: 0, dmg: 0 };
+  if(!SH.moveLauncher.selectedTarget) SH.moveLauncher.selectedTarget = 'atk';
+
+  var selMove = moveById(SH.moveLauncher.moveId) || SH.moves[0];
+  if(!SH.moveLauncher.moveId && selMove){
+    SH.moveLauncher.moveId = selMove.id;
+  }
+  var pDmg = parseMoveDmg(selMove ? selMove.dmg : '');
+  var selTarget = SH.moveLauncher.selectedTarget;
+  if(selTarget === 'dmg' && !pDmg) selTarget = 'atk';
+  SH.moveLauncher.selectedTarget = selTarget;
+
+  var targetNames = { atk: '🎯 Бросок приёма', dmg: '💥 Урон' };
+  var targetTitle = targetNames[selTarget] || '🎯 Бросок приёма';
+  var curModVal = SH.moveLauncher.mods[selTarget] || 0;
+
+  var moveOpts = SH.moves.map(function(m){
+    var wpStr = m.weapon ? ' [' + m.weapon + ']' : '';
+    var stStr = (m.mtype === 'Состояние' && m.state && m.state !== 'не навязывает') ? ' → ' + m.state : '';
+    var dmgStr = m.dmg ? ' (' + m.dmg + ')' : '';
+    return '<option value="' + m.id + '" ' + (m.id === selMove.id ? 'selected' : '') + '>' +
+      esc(m.kind || 'Рукопашный') + wpStr + ' · ' + esc(m.name || 'Без названия') + dmgStr + stStr +
+    '</option>';
+  }).join('');
+
+  var screenHtml = renderMoveLauncherDiceHtml(selMove, selTarget, SH.moveLauncher.mods, SH.moveLauncher.rolledValues);
+
+  var modBarHtml = 
+    '<div class="sh-mod-bar">' +
+      '<div class="sh-mod-target-info">' +
+        '<span>Выбран кубик:</span>' +
+        '<span class="sh-mod-target-tag" id="shMoveModTargetName">' + targetTitle + '</span>' +
+      '</div>' +
+      '<div class="sh-mod-controls">' +
+        '<button class="sh-mod-step" data-move-mod-delta="-5" title="Уменьшить на 5">−5</button>' +
+        '<button class="sh-mod-step" data-move-mod-delta="-1" title="Уменьшить на 1">−</button>' +
+        '<input type="number" id="shMoveActiveModInput" class="sh-active-mod-input" value="' + curModVal + '">' +
+        '<button class="sh-mod-step" data-move-mod-delta="1" title="Увеличить на 1">+</button>' +
+        '<button class="sh-mod-step" data-move-mod-delta="5" title="Увеличить на 5">+5</button>' +
+        '<button class="sh-mod-reset" id="shMoveModResetBtn" title="Сбросить модификатор в 0">Сброс</button>' +
+      '</div>' +
+    '</div>';
+
+  var actionsHtml = 
+    '<div class="sh-launcher-actions">' +
+      '<button class="sh-btn-launch" id="shLaunchMoveComboBtn" title="Бросить все кости приёма и зафиксировать результат">⚔️ Применить приём</button>' +
+      '<button class="sh-btn-copy-all" id="shCopyAllMoveBtn" title="Скопировать готовый блок в буфер обмена для AI Studio">📋 Скопировать всё</button>' +
+      '<button class="sh-micro-btn" id="shLaunchMoveAtkBtn" title="Бросить и скопировать только бросок атаки/проверки">🎯 Бросок</button>' +
+      (pDmg ? '<button class="sh-micro-btn" id="shLaunchMoveDmgBtn" title="Бросить и скопировать только урон">💥 Урон</button>' : '') +
+      '<button class="sh-micro-btn" id="shLaunchMoveClaimBtn" title="Скопировать только заголовок заявки">📜 Только заявка</button>' +
+    '</div>';
+
+  var hasRes = !!(SH.moveLauncher.lastResult);
+  var resultBoxHtml = 
+    '<div class="sh-launcher-result ' + (hasRes ? 'has-result' : '') + '" id="shMoveLauncherResultBox">' +
+      '<div class="sh-launcher-result-text" id="shMoveLauncherResultText">' + esc(SH.moveLauncher.lastResult || '') + '</div>' +
+      '<div class="sh-copy-badge" id="shMoveLauncherCopyBadge" style="display:' + (hasRes ? 'inline-flex' : 'none') + ';">' +
+        '<span>' + (SH.moveLauncher.lastResultCopied ? '✓ Скопировано в буфер обмена для AI Studio' : '🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»') + '</span>' +
+      '</div>' +
+    '</div>';
+
+  var toggleHeadHtml = 
+    '<div class="sh-launcher-toggle-head" id="shMoveLauncherToggle" role="button" tabindex="0" title="Нажмите, чтобы развернуть или свернуть боевой расчёт приёма">' +
+      '<div class="sh-launcher-title">' +
+        '<span>🥋 Боевой расчёт приёма</span>' +
+        '<span class="sh-badge-tag">AI Studio</span>' +
+      '</div>' +
+      '<div class="sh-launcher-toggle-btn">' +
+        '<span class="sh-launcher-toggle-text">' + (isOpen ? 'Свернуть' : 'Развернуть') + '</span>' +
+        '<span class="sh-launcher-toggle-arrow">' + (isOpen ? '▲' : '▼') + '</span>' +
+      '</div>' +
+    '</div>';
+
+  var bodyHtml = 
+    '<div class="sh-launcher-body" id="shMoveLauncherBody">' +
+      '<div class="sh-launcher-head">' +
+        '<div class="sh-launcher-sel-wrap">' +
+          '<div class="sh-launcher-sel-label">Приём для броска:</div>' +
+          '<select class="sh-launcher-sel" id="shMoveLauncherSelect">' + moveOpts + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sh-launcher-screen" id="shMoveLauncherScreen">' + screenHtml + '</div>' +
+      modBarHtml +
+      actionsHtml +
+      resultBoxHtml +
+    '</div>';
+
+  return '<div class="sh-launcher ' + (isOpen ? '' : 'collapsed') + '" id="shMoveLauncherContainer">' +
+    toggleHeadHtml +
+    bodyHtml +
+  '</div>';
+}
+
+SH.parseMoveDmg = parseMoveDmg;
+SH.buildMoveComboText = buildMoveComboText;
+SH.renderMoveLauncherDiceHtml = renderMoveLauncherDiceHtml;
+SH.renderMoveLauncher = renderMoveLauncher;
+
 var MOVE_KINDS = ['Рукопашный','Оружейный','Смешанный','Передвижение'];
 var MOVE_TYPES = ['Урон','Состояние','Реакция','Манёвр','Защита'];
 var ABILS = ['Сила','Ловкость','Телосложение','Интеллект','Мудрость','Харизма'];
@@ -6976,9 +7203,11 @@ function shMoves(){
   }).join('') : '<div class="char-empty">В выбранной категории нет приёмов.</div>')
   : '<div class="char-empty">Пусто. Приёмы изучаются поштучно — у мастера, тренировками, спаррингами. Сюда идут и рукопашные, и оружейные: всё, что не требует чакры.</div>';
 
+  var moveLauncherWidget = renderMoveLauncher();
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы'}])+
     '<button class="back" data-nav="home">← Назад</button>'+
     '<h1>Приёмы</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shMoveEdit:new">Добавить приём</button></div>'+
+    moveLauncherWidget +
     moveFilterBar +
     body;
 }
@@ -7890,6 +8119,299 @@ function wireSh(){
   var btnDmg = g('shLaunchDmgBtn'); if(btnDmg) btnDmg.addEventListener('click', function(){ executeLaunch('dmg', true); });
   var btnExp = g('shLaunchExpBtn'); if(btnExp) btnExp.addEventListener('click', function(){ executeLaunch('exp', true); });
   var btnClaim = g('shLaunchClaimBtn'); if(btnClaim) btnClaim.addEventListener('click', function(){ executeLaunch('claim', true); });
+
+  /* тактический лаунчер приёмов */
+  var tMoveHead = g('shMoveLauncherToggle');
+  if(tMoveHead){
+    var toggleMoveLauncher = function(){
+      SH.moveLauncher.isOpen = !SH.moveLauncher.isOpen;
+      var c = g('shMoveLauncherContainer');
+      if(c){
+        c.classList.toggle('collapsed', !SH.moveLauncher.isOpen);
+        var txt = c.querySelector('.sh-launcher-toggle-text');
+        var arr = c.querySelector('.sh-launcher-toggle-arrow');
+        if(txt) txt.textContent = SH.moveLauncher.isOpen ? 'Свернуть' : 'Развернуть';
+        if(arr) arr.textContent = SH.moveLauncher.isOpen ? '▲' : '▼';
+      }
+    };
+    tMoveHead.addEventListener('click', toggleMoveLauncher);
+    tMoveHead.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        toggleMoveLauncher();
+      }
+    });
+  }
+
+  var updateMoveLauncherScreen = function(){
+    var scr = g('shMoveLauncherScreen');
+    if(!scr) return;
+    var m = moveById(SH.moveLauncher.moveId) || (SH.moves && SH.moves[0]);
+    if(!m) return;
+    scr.innerHTML = renderMoveLauncherDiceHtml(m, SH.moveLauncher.selectedTarget, SH.moveLauncher.mods, SH.moveLauncher.rolledValues);
+    wireMoveScreenDiceClicks();
+  };
+
+  var updateMoveLauncherModUI = function(){
+    var targetNames = { atk: '🎯 Бросок приёма', dmg: '💥 Урон' };
+    var nameEl = g('shMoveModTargetName');
+    if(nameEl) nameEl.textContent = targetNames[SH.moveLauncher.selectedTarget] || '🎯 Бросок приёма';
+
+    var valInput = g('shMoveActiveModInput');
+    if(valInput){
+      var curVal = (SH.moveLauncher.mods && SH.moveLauncher.mods[SH.moveLauncher.selectedTarget]) || 0;
+      valInput.value = curVal;
+    }
+  };
+
+  var wireMoveScreenDiceClicks = function(){
+    var scr = g('shMoveLauncherScreen');
+    if(!scr) return;
+    var selectables = scr.querySelectorAll('[data-select-move-roll]');
+    selectables.forEach(function(el){
+      el.addEventListener('click', function(){
+        var target = el.getAttribute('data-select-move-roll');
+        if(!target) return;
+        SH.moveLauncher.selectedTarget = target;
+        selectables.forEach(function(s){ s.classList.remove('selected'); });
+        el.classList.add('selected');
+        updateMoveLauncherModUI();
+      });
+    });
+  };
+  wireMoveScreenDiceClicks();
+
+  var setMoveTargetMod = function(newVal){
+    var target = SH.moveLauncher.selectedTarget || 'atk';
+    if(!SH.moveLauncher.mods) SH.moveLauncher.mods = { atk: 0, dmg: 0 };
+    SH.moveLauncher.mods[target] = newVal;
+    updateMoveLauncherModUI();
+
+    var m = moveById(SH.moveLauncher.moveId) || (SH.moves && SH.moves[0]);
+    if(target === 'atk'){
+      var sub = g('shScrSub_moveAtk');
+      if(sub) sub.textContent = '1d20' + (formatLauncherMod(newVal) ? ' ' + formatLauncherMod(newVal) : '');
+    } else if(target === 'dmg' && m){
+      var pDmg = parseMoveDmg(m.dmg);
+      if(pDmg){
+        var sub = g('shScrSub_moveDmg');
+        var totMod = newVal + (pDmg.mod || 0);
+        if(sub) sub.textContent = pDmg.n + 'd' + pDmg.sides + (formatLauncherMod(totMod) ? ' ' + formatLauncherMod(totMod) : '');
+      }
+    }
+  };
+
+  document.querySelectorAll('[data-move-mod-delta]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var delta = parseInt(btn.getAttribute('data-move-mod-delta'), 10) || 0;
+      var cur = (SH.moveLauncher.mods && SH.moveLauncher.mods[SH.moveLauncher.selectedTarget]) || 0;
+      setMoveTargetMod(cur + delta);
+    });
+  });
+
+  var moveModInput = g('shMoveActiveModInput');
+  if(moveModInput){
+    moveModInput.addEventListener('input', function(){
+      var val = parseInt(moveModInput.value, 10);
+      if(isNaN(val)) val = 0;
+      var target = SH.moveLauncher.selectedTarget || 'atk';
+      if(!SH.moveLauncher.mods) SH.moveLauncher.mods = { atk: 0, dmg: 0 };
+      SH.moveLauncher.mods[target] = val;
+
+      var m = moveById(SH.moveLauncher.moveId) || (SH.moves && SH.moves[0]);
+      if(target === 'atk'){
+        var sub = g('shScrSub_moveAtk');
+        if(sub) sub.textContent = '1d20' + (formatLauncherMod(val) ? ' ' + formatLauncherMod(val) : '');
+      } else if(target === 'dmg' && m){
+        var pDmg = parseMoveDmg(m.dmg);
+        if(pDmg){
+          var sub = g('shScrSub_moveDmg');
+          var totMod = val + (pDmg.mod || 0);
+          if(sub) sub.textContent = pDmg.n + 'd' + pDmg.sides + (formatLauncherMod(totMod) ? ' ' + formatLauncherMod(totMod) : '');
+        }
+      }
+    });
+  }
+
+  var moveResetBtn = g('shMoveModResetBtn');
+  if(moveResetBtn){
+    moveResetBtn.addEventListener('click', function(){
+      setMoveTargetMod(0);
+    });
+  }
+
+  var moveSel = g('shMoveLauncherSelect');
+  if(moveSel){
+    moveSel.addEventListener('change', function(){
+      SH.moveLauncher.moveId = this.value;
+      var m = moveById(this.value);
+      var pDmg = parseMoveDmg(m ? m.dmg : '');
+      if(pDmg){
+        SH.moveLauncher.mods.dmg = pDmg.mod || 0;
+      } else {
+        SH.moveLauncher.mods.dmg = 0;
+        if(SH.moveLauncher.selectedTarget === 'dmg') SH.moveLauncher.selectedTarget = 'atk';
+      }
+      SH.moveLauncher.rolledValues = {};
+      SH.moveLauncher.lastResult = '';
+      SH.moveLauncher.lastResultCopied = false;
+      var rBox = g('shMoveLauncherResultBox');
+      if(rBox) rBox.classList.remove('has-result');
+      var rBdg = g('shMoveLauncherCopyBadge');
+      if(rBdg) rBdg.style.display = 'none';
+      updateMoveLauncherScreen();
+      updateMoveLauncherModUI();
+    });
+  }
+
+  var finishMoveLaunch = function(m, mode, autoCopy){
+    var mods = SH.moveLauncher.mods || { atk: 0, dmg: 0 };
+    var wpStr = m.weapon ? (' (' + m.weapon + ')') : '';
+    var payStr = m.pay ? (' | Оплата: ' + m.pay) : '';
+    var header = '*[Приём: ' + (m.name || 'Без названия') + ' | Вид: ' + (m.kind || 'Рукопашный') + wpStr + ' | Тип: ' + (m.mtype || 'Урон') + payStr + ']*';
+    var lines = [];
+
+    if(mode === 'claim'){
+      lines.push(header);
+    } else if(mode === 'atk'){
+      var atkVal = 1 + Math.floor(Math.random() * 20);
+      SH.moveLauncher.rolledValues.atk = atkVal;
+      var atDie = g('shScrDieMoveAtk');
+      if(atDie){ var vEl = atDie.querySelector('.val'); if(vEl) vEl.textContent = atkVal; }
+      var aMod = parseInt(mods.atk, 10) || 0;
+      var aModStr = aMod > 0 ? ' + ' + aMod : (aMod < 0 ? ' − ' + Math.abs(aMod) : '');
+      var abilStr = m.atk ? (' (' + m.atk + ')') : '';
+      lines.push(header);
+      lines.push('*[Результат броска Приём' + abilStr + ' 1d20: ' + atkVal + ' ]*' + aModStr);
+    } else if(mode === 'dmg'){
+      var pDmg = parseMoveDmg(m.dmg);
+      if(pDmg){
+        var n = pDmg.n;
+        var dSides = pDmg.sides;
+        var rolls = [];
+        for(var i = 0; i < n; i++){
+          var r = 1 + Math.floor(Math.random() * dSides);
+          rolls.push(r);
+          var dmDie = g('shScrDieMoveDmg_' + i);
+          if(dmDie){ var vEl = dmDie.querySelector('.val'); if(vEl) vEl.textContent = r; }
+        }
+        SH.moveLauncher.rolledValues.dmgRolls = rolls;
+        SH.moveLauncher.rolledValues.dmgSides = dSides;
+        var dMod = (parseInt(mods.dmg, 10) || 0) + (pDmg.mod || 0);
+        var dModStr = dMod > 0 ? ' + ' + dMod : (dMod < 0 ? ' − ' + Math.abs(dMod) : '');
+        lines.push(header);
+        lines.push('*[Результат броска Урон ' + n + 'd' + dSides + ': ' + rolls.join(' | ') + ' ]*' + dModStr);
+      }
+    } else { // mode === 'all'
+      var atkVal = 1 + Math.floor(Math.random() * 20);
+      SH.moveLauncher.rolledValues.atk = atkVal;
+      var atDie = g('shScrDieMoveAtk');
+      if(atDie){ var vEl = atDie.querySelector('.val'); if(vEl) vEl.textContent = atkVal; }
+
+      var pDmg = parseMoveDmg(m.dmg);
+      if(pDmg){
+        var n = pDmg.n;
+        var dSides = pDmg.sides;
+        var rolls = [];
+        for(var i = 0; i < n; i++){
+          var r = 1 + Math.floor(Math.random() * dSides);
+          rolls.push(r);
+          var dmDie = g('shScrDieMoveDmg_' + i);
+          if(dmDie){ var vEl = dmDie.querySelector('.val'); if(vEl) vEl.textContent = r; }
+        }
+        SH.moveLauncher.rolledValues.dmgRolls = rolls;
+        SH.moveLauncher.rolledValues.dmgSides = dSides;
+      }
+
+      lines = buildMoveComboText(m, SH.moveLauncher.rolledValues, mods).split('\n');
+    }
+
+    var output = lines.join('\n');
+    SH.moveLauncher.lastResult = output;
+
+    var rBox = g('shMoveLauncherResultBox');
+    var rTxt = g('shMoveLauncherResultText');
+    var rBdg = g('shMoveLauncherCopyBadge');
+    if(rTxt) rTxt.textContent = output;
+    if(rBox) rBox.classList.add('has-result');
+
+    if(autoCopy){
+      if(typeof copyText === 'function') copyText(output);
+      SH.moveLauncher.lastResultCopied = true;
+      if(rBdg){
+        var lineCount = lines.length;
+        rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio (' + lineCount + ' стр.)</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    } else {
+      SH.moveLauncher.lastResultCopied = false;
+      if(rBdg){
+        rBdg.innerHTML = '<span>🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    }
+  };
+
+  var executeMoveLaunch = function(mode, autoCopy){
+    var m = moveById(SH.moveLauncher.moveId) || (SH.moves && SH.moves[0]);
+    if(!m) return;
+
+    if(mode !== 'claim'){
+      var diceToRoll = [];
+      if(mode === 'all' || mode === 'atk'){
+        var atDie = g('shScrDieMoveAtk'); if(atDie) diceToRoll.push(atDie);
+      }
+      var pDmg = parseMoveDmg(m.dmg);
+      if((mode === 'all' || mode === 'dmg') && pDmg){
+        for(var i = 0; i < pDmg.n; i++){
+          var dmDie = g('shScrDieMoveDmg_' + i); if(dmDie) diceToRoll.push(dmDie);
+        }
+      }
+      diceToRoll.forEach(function(el){ el.classList.add('rolling'); });
+
+      var rollInterval = setInterval(function(){
+        diceToRoll.forEach(function(el){
+          var vEl = el.querySelector('.val');
+          if(vEl) vEl.textContent = Math.floor(Math.random() * 20) + 1;
+        });
+      }, 50);
+
+      setTimeout(function(){
+        clearInterval(rollInterval);
+        diceToRoll.forEach(function(el){ el.classList.remove('rolling'); });
+        finishMoveLaunch(m, mode, autoCopy);
+      }, 350);
+    } else {
+      finishMoveLaunch(m, mode, autoCopy);
+    }
+  };
+
+  var btnMoveCombo = g('shLaunchMoveComboBtn');
+  if(btnMoveCombo) btnMoveCombo.addEventListener('click', function(){ executeMoveLaunch('all', false); });
+
+  var btnMoveCopyAll = g('shCopyAllMoveBtn');
+  if(btnMoveCopyAll){
+    btnMoveCopyAll.addEventListener('click', function(){
+      var m = moveById(SH.moveLauncher.moveId) || (SH.moves && SH.moves[0]);
+      if(!m) return;
+      if(!SH.moveLauncher.lastResult){
+        executeMoveLaunch('all', true);
+      } else {
+        if(typeof copyText === 'function') copyText(SH.moveLauncher.lastResult);
+        SH.moveLauncher.lastResultCopied = true;
+        var rBdg = g('shMoveLauncherCopyBadge');
+        if(rBdg){
+          var lineCount = SH.moveLauncher.lastResult.split('\n').length;
+          rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio (' + lineCount + ' стр.)</span>';
+          rBdg.style.display = 'inline-flex';
+        }
+      }
+    });
+  }
+
+  var btnMoveAtk = g('shLaunchMoveAtkBtn'); if(btnMoveAtk) btnMoveAtk.addEventListener('click', function(){ executeMoveLaunch('atk', true); });
+  var btnMoveDmg = g('shLaunchMoveDmgBtn'); if(btnMoveDmg) btnMoveDmg.addEventListener('click', function(){ executeMoveLaunch('dmg', true); });
+  var btnMoveClaim = g('shLaunchMoveClaimBtn'); if(btnMoveClaim) btnMoveClaim.addEventListener('click', function(){ executeMoveLaunch('claim', true); });
 
 
   /* экран кнопок мастера */
