@@ -2179,7 +2179,257 @@ body.sh-theme .card:hover{
   .hb-row{ flex-direction:column; gap:2px; }
   .hb-row-k{ min-width:0; }
   .hb-custom-row{ flex-wrap:wrap; }
-  .hb-custom-row .hb-cust-k{ flex:1 1 100%; }
+/* ---------- Shinobi Interactive Map ---------- */
+.sh-map-container{
+  position:relative;
+  background:#12100d;
+  border:1px solid rgba(197,160,89,0.35);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:inset 0 0 40px rgba(0,0,0,0.8), 0 8px 32px rgba(0,0,0,0.6);
+  margin-bottom:20px;
+}
+.sh-map-toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 16px;
+  background:linear-gradient(180deg, rgba(30,24,18,0.98) 0%, rgba(20,16,12,0.98) 100%);
+  border-bottom:1px solid rgba(197,160,89,0.2);
+}
+.sh-map-search-wrap{
+  flex:1 1 220px;
+  position:relative;
+}
+.sh-map-search-input{
+  width:100%;
+  box-sizing:border-box;
+  padding:7px 12px 7px 32px;
+  background:rgba(15,12,9,0.8);
+  border:1px solid rgba(197,160,89,0.3);
+  border-radius:8px;
+  color:var(--ink,#e0d8cb);
+  font-size:13px;
+  outline:none;
+  transition:border-color 0.2s, box-shadow 0.2s;
+}
+.sh-map-search-input:focus{
+  border-color:var(--brass,#c5a059);
+  box-shadow:0 0 10px rgba(197,160,89,0.3);
+}
+.sh-map-search-icon{
+  position:absolute;
+  left:10px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:13px;
+  opacity:0.6;
+  pointer-events:none;
+}
+.sh-map-controls{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.sh-map-btn{
+  background:rgba(45,36,26,0.85);
+  border:1px solid rgba(197,160,89,0.3);
+  color:var(--ink,#e0d8cb);
+  border-radius:6px;
+  padding:5px 10px;
+  font-size:12px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  transition:all 0.2s;
+}
+.sh-map-btn:hover{
+  background:rgba(70,56,40,0.9);
+  border-color:var(--brass,#c5a059);
+  color:#ffffff;
+}
+.sh-map-btn.active{
+  background:var(--brass,#c5a059);
+  color:#120f0b;
+  font-weight:600;
+}
+.sh-map-chk{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  font-size:12px;
+  color:var(--ink-dim,#a89f91);
+  cursor:pointer;
+  user-select:none;
+}
+.sh-map-chk input{
+  cursor:pointer;
+  accent-color:var(--brass,#c5a059);
+}
+.sh-map-viewport{
+  position:relative;
+  width:100%;
+  height:580px;
+  overflow:hidden;
+  background:#141c17;
+  cursor:grab;
+  user-select:none;
+  touch-action:none;
+}
+.sh-map-viewport.grabbing{
+  cursor:grabbing;
+}
+.sh-map-svg-wrap{
+  width:100%;
+  height:100%;
+  transform-origin:0 0;
+  will-change:transform;
+}
+.sh-country-poly{
+  cursor:pointer;
+  transition:fill 0.25s, stroke 0.25s, fill-opacity 0.25s;
+  vector-effect:non-scaling-stroke;
+}
+.sh-country-poly:hover{
+  fill-opacity:0.92 !important;
+  stroke:#ffffff !important;
+  stroke-width:3.5 !important;
+  filter:drop-shadow(0 0 8px rgba(255,255,255,0.45));
+}
+.sh-country-poly.selected{
+  fill-opacity:0.95 !important;
+  stroke:#f6e58d !important;
+  stroke-width:4 !important;
+  filter:drop-shadow(0 0 14px rgba(246,229,141,0.75));
+}
+.sh-country-poly.dimmed{
+  fill-opacity:0.12 !important;
+  opacity:0.25 !important;
+}
+.sh-village-marker{
+  cursor:pointer;
+  transition:transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+.sh-village-marker:hover{
+  transform:scale(1.4);
+}
+.sh-village-pulse{
+  animation:shPulseRing 2.4s infinite cubic-bezier(0.2,0.8,0.2,1);
+}
+@keyframes shPulseRing{
+  0%{ r:6px; opacity:0.9; }
+  100%{ r:24px; opacity:0; }
+}
+.sh-map-inspector{
+  background:linear-gradient(145deg, #1e1913 0%, #120f0c 100%);
+  border:1px solid rgba(197,160,89,0.4);
+  border-radius:12px;
+  padding:18px 20px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.6);
+  margin-top:14px;
+}
+.sh-map-inspector-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:14px;
+  border-bottom:1px solid rgba(197,160,89,0.2);
+  padding-bottom:12px;
+}
+.sh-map-inspector-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:'Cinzel', serif;
+  font-size:20px;
+  font-weight:700;
+  color:#ffffff;
+}
+.sh-map-inspector-kanji{
+  font-size:15px;
+  color:var(--brass,#c5a059);
+  padding:2px 8px;
+  background:rgba(197,160,89,0.12);
+  border-radius:6px;
+  border:1px solid rgba(197,160,89,0.3);
+}
+.sh-map-inspector-badge{
+  font-size:11px;
+  padding:3px 8px;
+  border-radius:4px;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  font-weight:600;
+}
+.sh-map-village-card{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:rgba(35,28,20,0.6);
+  border:1px solid rgba(197,160,89,0.25);
+  border-radius:8px;
+  padding:10px 14px;
+  margin-bottom:14px;
+}
+.sh-map-village-icon{
+  font-size:24px;
+}
+.sh-map-village-name{
+  font-size:15px;
+  font-weight:700;
+  color:var(--brass,#c5a059);
+}
+.sh-map-village-sub{
+  font-size:12px;
+  color:var(--ink-dim,#a89f91);
+}
+.sh-map-grid-info{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+  gap:10px;
+  margin-bottom:14px;
+}
+.sh-map-info-item{
+  background:rgba(20,16,12,0.5);
+  border:1px solid rgba(197,160,89,0.15);
+  border-radius:8px;
+  padding:8px 12px;
+}
+.sh-map-info-k{
+  font-size:11px;
+  color:var(--brass,#c5a059);
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  margin-bottom:3px;
+}
+.sh-map-info-v{
+  font-size:13px;
+  color:var(--ink,#e0d8cb);
+  line-height:1.45;
+}
+.sh-map-lore-text{
+  font-size:13px;
+  line-height:1.6;
+  color:var(--ink,#e0d8cb);
+  background:rgba(20,16,12,0.6);
+  border-left:3px solid var(--brass,#c5a059);
+  padding:10px 14px;
+  border-radius:0 8px 8px 0;
+  margin-bottom:14px;
+}
+.sh-map-inspector-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+@media (max-width:640px){
+  .sh-map-viewport{ height:420px; }
+  .sh-map-grid-info{ grid-template-columns:1fr; }
 }
 </style>
 </head>
@@ -5886,6 +6136,277 @@ function wire(){
       fr.readAsText(f);
     });
   }
+
+  // Map pan & zoom interaction
+  var vp = g('shMapViewport');
+  var svgWrap = g('shMapSvgWrap');
+  if(vp && svgWrap){
+    if(!SH.map) SH.map = { zoom: 1, panX: 0, panY: 0 };
+    var isDragging = false;
+    var startX = 0, startY = 0;
+    var origPanX = 0, origPanY = 0;
+
+    var updateTransform = function(){
+      if(svgWrap){
+        svgWrap.style.transform = 'translate(' + SH.map.panX + 'px, ' + SH.map.panY + 'px) scale(' + SH.map.zoom + ')';
+      }
+    };
+
+    vp.addEventListener('mousedown', function(e){
+      if(e.button !== 0) return;
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      origPanX = SH.map.panX || 0;
+      origPanY = SH.map.panY || 0;
+      vp.classList.add('grabbing');
+    });
+
+    window.addEventListener('mousemove', function(e){
+      if(!isDragging) return;
+      SH.map.panX = origPanX + (e.clientX - startX);
+      SH.map.panY = origPanY + (e.clientY - startY);
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', function(){
+      if(isDragging){
+        isDragging = false;
+        vp.classList.remove('grabbing');
+      }
+    });
+
+    vp.addEventListener('wheel', function(e){
+      e.preventDefault();
+      var rect = vp.getBoundingClientRect();
+      var mx = e.clientX - rect.left;
+      var my = e.clientY - rect.top;
+      var factor = e.deltaY < 0 ? 1.15 : 0.87;
+      var newZoom = Math.min(Math.max((SH.map.zoom || 1) * factor, 0.7), 4.5);
+      SH.map.panX = mx - (mx - SH.map.panX) * (newZoom / SH.map.zoom);
+      SH.map.panY = my - (my - SH.map.panY) * (newZoom / SH.map.zoom);
+      SH.map.zoom = newZoom;
+      updateTransform();
+    }, { passive: false });
+
+    // Touch support (drag & pinch)
+    var touchDist = 0;
+    vp.addEventListener('touchstart', function(e){
+      if(e.touches.length === 1){
+        isDragging = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        origPanX = SH.map.panX || 0;
+        origPanY = SH.map.panY || 0;
+      } else if(e.touches.length === 2){
+        isDragging = false;
+        touchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      }
+    }, { passive: true });
+
+    vp.addEventListener('touchmove', function(e){
+      if(e.touches.length === 1 && isDragging){
+        SH.map.panX = origPanX + (e.touches[0].clientX - startX);
+        SH.map.panY = origPanY + (e.touches[0].clientY - startY);
+        updateTransform();
+      } else if(e.touches.length === 2 && touchDist > 0){
+        var dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        var factor = dist / touchDist;
+        touchDist = dist;
+        SH.map.zoom = Math.min(Math.max((SH.map.zoom || 1) * factor, 0.7), 4.5);
+        updateTransform();
+      }
+    }, { passive: true });
+
+    vp.addEventListener('touchend', function(){
+      isDragging = false;
+      touchDist = 0;
+    });
+
+    // Zoom buttons
+    var btnIn = g('shMapZoomIn');
+    if(btnIn){
+      btnIn.onclick = function(){
+        SH.map.zoom = Math.min((SH.map.zoom || 1) * 1.25, 4.5);
+        updateTransform();
+      };
+    }
+    var btnOut = g('shMapZoomOut');
+    if(btnOut){
+      btnOut.onclick = function(){
+        SH.map.zoom = Math.max((SH.map.zoom || 1) * 0.8, 0.7);
+        updateTransform();
+      };
+    }
+    var btnReset = g('shMapZoomReset');
+    if(btnReset){
+      btnReset.onclick = function(){
+        SH.map.zoom = 1;
+        SH.map.panX = 0;
+        SH.map.panY = 0;
+        updateTransform();
+      };
+    }
+
+    var wireMapInspector = function(){
+      var btnCopy = g('shBtnCopyMapLore');
+      if(btnCopy){
+        btnCopy.onclick = function(){
+          var cid = btnCopy.getAttribute('data-country');
+          var c = mapCountryById(cid);
+          if(!c) return;
+          var vStr = c.village ? (' | Скрытая Деревня: ' + c.village.name + ' ' + (c.village.symbol||'')) : '';
+          var kgStr = c.kage ? (' | Лидер: ' + c.kage) : '';
+          var natStr = c.nature ? (' | Стихия: ' + c.nature) : '';
+          var text = '*[География: ' + c.name + (c.kanji ? ' (' + c.kanji + ')' : '') + vStr + kgStr + natStr + ']*\n' +
+            (c.clans ? '• Кланы: ' + c.clans + '\n' : '') +
+            (c.terrain ? '• Рельеф: ' + c.terrain + '\n' : '') +
+            (c.military ? '• Военная организация: ' + c.military + '\n' : '') +
+            (c.danger ? '• Режим границы: ' + c.danger + '\n' : '') +
+            (c.lore ? '\n' + c.lore : '');
+          copyText(text);
+          btnCopy.textContent = '✓ Скопировано в буфер!';
+          btnCopy.style.background = 'var(--accent-green, #2ecc71)';
+          btnCopy.style.borderColor = 'var(--accent-green, #2ecc71)';
+          setTimeout(function(){
+            btnCopy.textContent = '📋 Скопировать лор в заявку AI Studio';
+            btnCopy.style.background = '';
+            btnCopy.style.borderColor = '';
+          }, 2000);
+        };
+      }
+      var btnFocus = g('shBtnFocusVillage');
+      var btnFocus2 = g('shBtnFocusVillage2');
+      var doFocus = function(fx, fy){
+        if(isNaN(fx) || isNaN(fy)) return;
+        SH.map.zoom = 2.2;
+        var vw = vp.clientWidth || 800;
+        var vh = vp.clientHeight || 580;
+        var svgScaleX = vw / 1000;
+        var svgScaleY = vh / 825;
+        var actualScale = Math.min(svgScaleX, svgScaleY);
+        SH.map.panX = (vw / 2) - (fx * actualScale * SH.map.zoom);
+        SH.map.panY = (vh / 2) - (fy * actualScale * SH.map.zoom);
+        updateTransform();
+      };
+      if(btnFocus){
+        btnFocus.onclick = function(){
+          doFocus(parseFloat(btnFocus.getAttribute('data-focus-x')), parseFloat(btnFocus.getAttribute('data-focus-y')));
+        };
+      }
+      if(btnFocus2){
+        btnFocus2.onclick = function(){
+          doFocus(parseFloat(btnFocus2.getAttribute('data-focus-x')), parseFloat(btnFocus2.getAttribute('data-focus-y')));
+        };
+      }
+    };
+
+    // Country selection
+    document.querySelectorAll('.sh-country-poly[data-country]').forEach(function(poly){
+      poly.addEventListener('click', function(e){
+        var cid = poly.getAttribute('data-country');
+        if(!cid) return;
+        SH.map.selectedId = cid;
+        document.querySelectorAll('.sh-country-poly').forEach(function(p){
+          var isS = (p.getAttribute('data-country') === cid);
+          p.classList.toggle('selected', isS);
+          var cObj = mapCountryById(p.getAttribute('data-country'));
+          if(cObj){
+            p.setAttribute('fill', isS ? cObj.accent : cObj.color);
+            p.setAttribute('fill-opacity', isS ? '0.95' : '0.45');
+            p.setAttribute('stroke', isS ? '#f6e58d' : 'rgba(25, 18, 12, 0.9)');
+            p.setAttribute('stroke-width', isS ? '4' : '2');
+          }
+        });
+        var insp = g('shMapInspector');
+        if(insp){
+          insp.outerHTML = renderMapInspector(mapCountryById(cid));
+          wireMapInspector();
+        }
+      });
+    });
+
+    // Village selection
+    document.querySelectorAll('[data-village]').forEach(function(el){
+      el.addEventListener('click', function(e){
+        e.stopPropagation();
+        var cid = el.getAttribute('data-village');
+        var poly = document.querySelector('.sh-country-poly[data-country="'+cid+'"]');
+        if(poly) poly.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      });
+    });
+
+    // Layer toggles
+    var tVillages = g('shMapToggleVillages');
+    if(tVillages){
+      tVillages.onchange = function(){
+        SH.map.showVillages = !!tVillages.checked;
+        render();
+      };
+    }
+    var tLabels = g('shMapToggleLabels');
+    if(tLabels){
+      tLabels.onchange = function(){
+        SH.map.showLabels = !!tLabels.checked;
+        render();
+      };
+    }
+    var tOverlay = g('shMapToggleOverlay');
+    if(tOverlay){
+      tOverlay.onchange = function(){
+        SH.map.showOverlay = !!tOverlay.checked;
+        render();
+      };
+    }
+    var rOverlay = g('shMapOverlayRange');
+    if(rOverlay){
+      rOverlay.oninput = function(){
+        SH.map.overlayOpacity = parseInt(rOverlay.value, 10) / 100;
+        var img = vp.querySelector('image');
+        if(img) img.setAttribute('opacity', SH.map.overlayOpacity);
+      };
+    }
+
+    // Filter pills
+    document.querySelectorAll('[data-map-filter]').forEach(function(btn){
+      btn.onclick = function(){
+        var f = btn.getAttribute('data-map-filter');
+        SH.map.filter = f;
+        document.querySelectorAll('.sh-country-poly').forEach(function(poly){
+          var cid = poly.getAttribute('data-country');
+          var cObj = mapCountryById(cid);
+          var match = (f === 'all' || (cObj && cObj.type === f));
+          poly.classList.toggle('dimmed', !match);
+        });
+        document.querySelectorAll('[data-map-filter]').forEach(function(b){
+          b.classList.toggle('active', b === btn);
+        });
+      };
+    });
+
+    // Search input
+    var sInp = g('shMapSearch');
+    if(sInp){
+      sInp.oninput = function(){
+        var q = (sInp.value || '').trim().toLowerCase();
+        SH.map.search = q;
+        document.querySelectorAll('.sh-country-poly').forEach(function(poly){
+          var cid = poly.getAttribute('data-country');
+          var cObj = mapCountryById(cid);
+          if(!cObj) return;
+          var match = !q ||
+            cObj.name.toLowerCase().indexOf(q) !== -1 ||
+            (cObj.kanji && cObj.kanji.indexOf(q) !== -1) ||
+            (cObj.village && cObj.village.name.toLowerCase().indexOf(q) !== -1) ||
+            (cObj.clans && cObj.clans.toLowerCase().indexOf(q) !== -1);
+          poly.classList.toggle('dimmed', !match);
+        });
+      };
+    }
+
+    wireMapInspector();
+  }
+
 }
 
 /* ---------- перехват render / navigate ---------- */
@@ -7091,6 +7612,7 @@ function shHome(){
     {nav:'shTechs', icon:'🌀', t:'Техники',   d:SH.techs.length ? SH.techs.length+' в списке' : 'Ранг, стихия, чакра, окна, счётчики'},
     {nav:'shMoves', icon:'👊', t:'Приёмы', d:SH.moves.length ? SH.moves.length+' в списке' : 'Рукопашные и оружейные: эффекты и цена приёма'},
     {nav:'shSkills', icon:'🛠️', t:'Навыки и знания', d:(SH.skills&&SH.skills.length) ? SH.skills.length+' в списке' : 'Ремёсла, ступени мастерства, быт, языки'},
+    {nav:'shMap',   icon:'🗺️', t:'Карта мира', d:'Векторный атлас: 26 стран, скрытые деревни, лор'},
     {nav:'shRef',   icon:'📚', t:'Справочник', d:'Колесо стихий, кнопки к1–к8, правила, чакра, окна'},
     {nav:'shData',  icon:'💾', t:'Данные',    d:'Экспорт и импорт всего мира одним файлом'}
   ];
@@ -7483,6 +8005,11 @@ function shRef(){
         '<div class="desc">Интерактивный пульт команд: темп, монтаж, сверка, рутина</div>'+
         '<div class="arrow">›</div>'+
       '</div>'+
+      '<div class="menu-item featured" data-nav="shMap" style="border-left:3px solid var(--brass);background:linear-gradient(145deg, #1b1712 0%, #120f0c 100%);">'+
+        '<div class="name">🗺️ Интерактивная карта мира</div>'+
+        '<div class="desc">Векторный атлас: 26 стран, скрытые деревни, подсветка и тактический лор</div>'+
+        '<div class="arrow">›</div>'+
+      '</div>'+
       keys.map(function(k){
         return '<div class="menu-item" data-nav="shRefView:'+k+'"><div class="name">'+REF[k].icon+' '+esc(REF[k].t)+'</div><div class="arrow">›</div></div>';
       }).join('')+'</div>';
@@ -7500,6 +8027,1686 @@ function shRefView(){
       return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+nl2br(x.v)+'</div></div>';
     }).join('');
 }
+
+
+/* ---------- Интерактивная карта мира шиноби ---------- */
+var SH_MAP_DATA = [
+  {
+    "id": "fire",
+    "name": "Страна Огня",
+    "kanji": "火の国",
+    "color": "#c0392b",
+    "accent": "#e74c3c",
+    "type": "great",
+    "village": {
+      "name": "Конохагакуре",
+      "title": "Деревня, Скрытая в Листве",
+      "symbol": "🍃",
+      "x": 348,
+      "y": 317
+    },
+    "labelPoint": {
+      "x": 345,
+      "y": 360
+    },
+    "kage": "Хокаге",
+    "nature": "Стихия Огня (火遁)",
+    "clans": "Учиха, Сенджу, Сарутоби, Хьюга, Нара, Акимачи, Яманака, Абураме, Инузука",
+    "terrain": "Бескрайние леса, умеренный тёплый климат, плодородные долины и полноводные реки.",
+    "military": "АНБУ Конохи, 12 Ниндзя-Защитников Даймё, Военная полиция.",
+    "danger": "Умеренная (пограничные заставы, регулярные патрули на главных трактах).",
+    "lore": "Центральная и наиболее влиятельная держава континента. Обладает мощнейшей скрытой деревней и богатыми ресурсами, из-за чего исторически становилась главным полем битвы в мировых войнах шиноби.",
+    "points": [
+      [
+        250,
+        298
+      ],
+      [
+        258,
+        336
+      ],
+      [
+        303,
+        426
+      ],
+      [
+        338,
+        465
+      ],
+      [
+        369,
+        433
+      ],
+      [
+        410,
+        400
+      ],
+      [
+        435,
+        385
+      ],
+      [
+        415,
+        335
+      ],
+      [
+        435,
+        310
+      ],
+      [
+        410,
+        295
+      ],
+      [
+        430,
+        280
+      ],
+      [
+        415,
+        270
+      ],
+      [
+        405,
+        253
+      ],
+      [
+        372,
+        268
+      ],
+      [
+        337,
+        266
+      ],
+      [
+        306,
+        264
+      ],
+      [
+        250,
+        298
+      ]
+    ]
+  },
+  {
+    "id": "wind",
+    "name": "Страна Ветра",
+    "kanji": "風の国",
+    "color": "#d35400",
+    "accent": "#f39c12",
+    "type": "great",
+    "village": {
+      "name": "Сунагакуре",
+      "title": "Деревня, Скрытая в Песке",
+      "symbol": "⏳",
+      "x": 208,
+      "y": 413
+    },
+    "labelPoint": {
+      "x": 130,
+      "y": 460
+    },
+    "kage": "Казекаге",
+    "nature": "Стихия Ветра (風遁)",
+    "clans": "Казекаге (Магнетизм), Кукловоды, Широгане",
+    "terrain": "Бескрайние песчаные пустыни, каньоны, оазисы, свирепые песчаные бури и резкие перепады температур.",
+    "military": "Корпус кукловодов Суны, следопыты пустыни, отряды дальнего боя.",
+    "danger": "Высокая (без проводника и запаса воды переход через пустыню смертелен).",
+    "lore": "Огромная по площади, но суровая страна. Большую часть территории занимают бесплодные пески. Из-за сокращения военного бюджета Даймё деревня Сунагакуре делала ставку на индивидуальное качество каждого шиноби.",
+    "points": [
+      [
+        168,
+        287
+      ],
+      [
+        244,
+        352
+      ],
+      [
+        268,
+        442
+      ],
+      [
+        220,
+        520
+      ],
+      [
+        170,
+        535
+      ],
+      [
+        130,
+        490
+      ],
+      [
+        140,
+        530
+      ],
+      [
+        20,
+        600
+      ],
+      [
+        6,
+        550
+      ],
+      [
+        6,
+        280
+      ],
+      [
+        40,
+        275
+      ],
+      [
+        65,
+        280
+      ],
+      [
+        100,
+        280
+      ],
+      [
+        168,
+        287
+      ]
+    ]
+  },
+  {
+    "id": "earth",
+    "name": "Страна Земли",
+    "kanji": "土の国",
+    "color": "#7f5539",
+    "accent": "#9c6644",
+    "type": "great",
+    "village": {
+      "name": "Ивагакуре",
+      "title": "Деревня, Скрытая в Камнях",
+      "symbol": "🪨",
+      "x": 221,
+      "y": 210
+    },
+    "labelPoint": {
+      "x": 150,
+      "y": 170
+    },
+    "kage": "Цучикаге",
+    "nature": "Стихия Земли (土遁), Расширенный геном Пыли (塵遁)",
+    "clans": "Камизуру (пчеловоды), отряд Подрывников",
+    "terrain": "Скалы, каменные плато, глубокие ущелья, холодные северные ветра.",
+    "military": "Железная дисциплина, мастера дзюцу изменения веса и фортификаций.",
+    "danger": "Высокая (горные перевалы патрулируются, неприступная естественная защита).",
+    "lore": "Суровая северно-западная держава. Природные каньоны служат естественной крепостью. Шиноби Камня славятся несокрушимой волей камня и беспрекословным выполнением приказов.",
+    "points": [
+      [
+        60,
+        220
+      ],
+      [
+        40,
+        180
+      ],
+      [
+        42,
+        120
+      ],
+      [
+        58,
+        60
+      ],
+      [
+        120,
+        55
+      ],
+      [
+        145,
+        75
+      ],
+      [
+        155,
+        95
+      ],
+      [
+        165,
+        140
+      ],
+      [
+        319,
+        224
+      ],
+      [
+        276,
+        263
+      ],
+      [
+        223,
+        276
+      ],
+      [
+        168,
+        287
+      ],
+      [
+        100,
+        270
+      ],
+      [
+        60,
+        220
+      ]
+    ]
+  },
+  {
+    "id": "lightning",
+    "name": "Страна Молнии",
+    "kanji": "雷の国",
+    "color": "#2471a3",
+    "accent": "#3498db",
+    "type": "great",
+    "village": {
+      "name": "Кумогакуре",
+      "title": "Деревня, Скрытая в Облаках",
+      "symbol": "☁️",
+      "x": 468,
+      "y": 215
+    },
+    "labelPoint": {
+      "x": 520,
+      "y": 160
+    },
+    "kage": "Райкаге",
+    "nature": "Стихия Молнии (雷遁), Стихия Бури (嵐遁)",
+    "clans": "Йоцуки, мастера Нинтайдзюцу и фехтования на мечах",
+    "terrain": "Высокогорные хребты, пики, скрытые в облаках, грозовые фронты и изрезанная береговая линия.",
+    "military": "Агрессивная внешняя политика, высокий приоритет накопления техник и свитков.",
+    "danger": "Очень высокая (высокогорные посты, мгновенная реакция на нарушение границ).",
+    "lore": "Могущественная держава на северо-восточном полуострове. Высокие горы прорезают облака, где бушуют постоянные грозы. Кумогакуре никогда не ослабляла подготовку бойцов даже в мирное время.",
+    "points": [
+      [
+        402,
+        219
+      ],
+      [
+        430,
+        230
+      ],
+      [
+        440,
+        210
+      ],
+      [
+        485,
+        220
+      ],
+      [
+        555,
+        225
+      ],
+      [
+        570,
+        180
+      ],
+      [
+        580,
+        120
+      ],
+      [
+        575,
+        80
+      ],
+      [
+        540,
+        75
+      ],
+      [
+        510,
+        85
+      ],
+      [
+        510,
+        45
+      ],
+      [
+        470,
+        70
+      ],
+      [
+        465,
+        130
+      ],
+      [
+        440,
+        185
+      ],
+      [
+        415,
+        205
+      ],
+      [
+        402,
+        219
+      ]
+    ]
+  },
+  {
+    "id": "water",
+    "name": "Страна Воды",
+    "kanji": "水の国",
+    "color": "#16a085",
+    "accent": "#1abc9c",
+    "type": "great",
+    "village": {
+      "name": "Киригакуре",
+      "title": "Деревня Кровавого Тумана",
+      "symbol": "🌫️",
+      "x": 595,
+      "y": 370
+    },
+    "labelPoint": {
+      "x": 595,
+      "y": 345
+    },
+    "kage": "Мизукаге",
+    "nature": "Стихия Воды (水遁), Лава, Кипение, Лёд",
+    "clans": "Хозуки, Юки, Кагуя, Семь Мечников Тумана",
+    "terrain": "Архипелаг гористых островов в океане, плотные туманы, морские проливы.",
+    "military": "Семь Мечников Тумана, Охотники за головами (Оинины), мастера скрытных убийств.",
+    "danger": "Критическая (островная изоляция, жесткие законы и чистки улучшенных геномов в прошлом).",
+    "lore": "Островное государство на востоке континента. Окружено морем и вечным туманом. Долгое время находилось в глубокой изоляции от остального мира шиноби.",
+    "points": [
+      [
+        560,
+        345
+      ],
+      [
+        610,
+        340
+      ],
+      [
+        635,
+        370
+      ],
+      [
+        620,
+        400
+      ],
+      [
+        570,
+        395
+      ],
+      [
+        550,
+        370
+      ],
+      [
+        560,
+        345
+      ]
+    ]
+  },
+  {
+    "id": "rain",
+    "name": "Страна Дождя",
+    "kanji": "雨の国",
+    "color": "#6c5ce7",
+    "accent": "#a29bfe",
+    "type": "buffer",
+    "village": {
+      "name": "Амегакуре",
+      "title": "Деревня, Скрытая в Дожде",
+      "symbol": "🌧️",
+      "x": 215,
+      "y": 310
+    },
+    "labelPoint": {
+      "x": 215,
+      "y": 310
+    },
+    "kage": "Лидер Аме (Ханзо / Пейн)",
+    "nature": "Стихия Воды, Дождевой сенсоринг",
+    "clans": "Мастера скрытного проникновения и ядов",
+    "terrain": "Индустриальные башни-небоскрёбы из стали и бетона, непрекращающийся кислотный дождь.",
+    "military": "Тотальная сенсорная сеть дождевых капель, закрытый режим въезда.",
+    "danger": "Критическая (полный запрет на несанкционированное нахождение чужаков).",
+    "lore": "Маленькая буферная страна, зажатая между тремя великими державами (Огонь, Ветер, Земля). Долгие годы была полем сражений мировых войн, превратившись в неприступную цитадель под вечным дождём.",
+    "points": [
+      [
+        168,
+        287
+      ],
+      [
+        223,
+        276
+      ],
+      [
+        250,
+        298
+      ],
+      [
+        258,
+        336
+      ],
+      [
+        244,
+        352
+      ],
+      [
+        168,
+        287
+      ]
+    ]
+  },
+  {
+    "id": "grass",
+    "name": "Страна Травы",
+    "kanji": "草の国",
+    "color": "#27ae60",
+    "accent": "#2ecc71",
+    "type": "buffer",
+    "village": {
+      "name": "Кусагакуре",
+      "title": "Деревня, Скрытая в Траве",
+      "symbol": "🌾",
+      "x": 260,
+      "y": 275
+    },
+    "labelPoint": {
+      "x": 260,
+      "y": 275
+    },
+    "kage": "Совет Старейшин Травы",
+    "nature": "Стихия Земли и Воды",
+    "clans": "Шиноби-дипломаты, мастера адаптации и копирования чужих техник",
+    "terrain": "Бескрайние луга, гигантские бамбуковые рощи, густые смешанные леса.",
+    "military": "Разветвленная агентурная сеть, дипломатическое лавирование.",
+    "danger": "Средняя (интриги, шпионаж, частые столкновения агентов чужих деревень).",
+    "lore": "Буферная страна между Землей и Огнем. Официально держит нейтралитет, но активно продаёт разведданные обеим сторонам.",
+    "points": [
+      [
+        223,
+        276
+      ],
+      [
+        276,
+        263
+      ],
+      [
+        306,
+        264
+      ],
+      [
+        250,
+        298
+      ],
+      [
+        223,
+        276
+      ]
+    ]
+  },
+  {
+    "id": "waterfall",
+    "name": "Страна Водопада",
+    "kanji": "滝の国",
+    "color": "#2980b9",
+    "accent": "#54a0ff",
+    "type": "buffer",
+    "village": {
+      "name": "Такигакуре",
+      "title": "Деревня, Скрытая в Водопаде",
+      "symbol": "🌊",
+      "x": 310,
+      "y": 245
+    },
+    "labelPoint": {
+      "x": 310,
+      "y": 245
+    },
+    "kage": "Лидер Таки (Шибуки)",
+    "nature": "Стихия Воды, Священная Вода Героя",
+    "clans": "Хранители Воды Героя",
+    "terrain": "Глубокие каньоны, колоссальные водопады, карстовые пещеры и озёра.",
+    "military": "Единственная малая деревня, которой доверяли хвостатого зверя (Семихвостый Чоумей).",
+    "danger": "Высокая (секретные входы за водопадами, скрытные дозоры).",
+    "lore": "Окружена гигантскими водопадами. Благодаря природной маскировке Такигакуре ни разу не была захвачена врагами за всю историю войн.",
+    "points": [
+      [
+        276,
+        263
+      ],
+      [
+        319,
+        224
+      ],
+      [
+        343,
+        224
+      ],
+      [
+        337,
+        266
+      ],
+      [
+        306,
+        264
+      ],
+      [
+        276,
+        263
+      ]
+    ]
+  },
+  {
+    "id": "iron",
+    "name": "Страна Железа",
+    "kanji": "鉄の国",
+    "color": "#7f8c8d",
+    "accent": "#bdc3c7",
+    "type": "buffer",
+    "village": {
+      "name": "Город Самураев",
+      "title": "Обитель Трёх Волков",
+      "symbol": "⚔️",
+      "x": 350,
+      "y": 195
+    },
+    "labelPoint": {
+      "x": 350,
+      "y": 195
+    },
+    "kage": "Генерал Мифуне",
+    "nature": "Концентрация чакры в клинках (Иайдо)",
+    "clans": "Самурайские кланы Страны Железа",
+    "terrain": "Заснеженные пики трёх гор («Три Волка»), ледяные перевалы, кузницы.",
+    "military": "Армия самураев в тяжелых латах с катанами, проводящими чакру.",
+    "danger": "Умеренная (строгий нейтралитет, законы соблюдаются неукоснительно).",
+    "lore": "Нейтральное заснеженное государство, отказавшееся от услуг шиноби в пользу самурайского кодекса чести. Традиционное место проведения Совета Пяти Каге.",
+    "points": [
+      [
+        319,
+        224
+      ],
+      [
+        290,
+        180
+      ],
+      [
+        315,
+        160
+      ],
+      [
+        350,
+        175
+      ],
+      [
+        375,
+        185
+      ],
+      [
+        402,
+        219
+      ],
+      [
+        369,
+        229
+      ],
+      [
+        343,
+        224
+      ],
+      [
+        319,
+        224
+      ]
+    ]
+  },
+  {
+    "id": "rice",
+    "name": "Страна Рисовых Полей (Звук)",
+    "kanji": "田の国",
+    "color": "#8e44ad",
+    "accent": "#9b59b6",
+    "type": "buffer",
+    "village": {
+      "name": "Отогакуре",
+      "title": "Деревня, Скрытая в Звуке",
+      "symbol": "🎵",
+      "x": 355,
+      "y": 248
+    },
+    "labelPoint": {
+      "x": 355,
+      "y": 248
+    },
+    "kage": "Орочимару",
+    "nature": "Звук, Проклятые печати, Гендзюцу",
+    "clans": "Четвёрка Звука, клан Фума, подопытные Орочимару",
+    "terrain": "Плодородные рисовые террасы, холмы, густая сеть подземных убежищ.",
+    "military": "Фанатично преданные бойцы с проклятыми печатями и звуковыми резонаторами.",
+    "danger": "Критическая (тайные лаборатории, риск похищения для экспериментов).",
+    "lore": "Некогда мирная аграрная страна рисовых полей, захваченная Орочимару и переименованная в Деревню Звука для ведения тайной войны против Конохи.",
+    "points": [
+      [
+        343,
+        224
+      ],
+      [
+        369,
+        229
+      ],
+      [
+        389,
+        250
+      ],
+      [
+        372,
+        268
+      ],
+      [
+        337,
+        266
+      ],
+      [
+        343,
+        224
+      ]
+    ]
+  },
+  {
+    "id": "hot_spring",
+    "name": "Страна Горячих Источников",
+    "kanji": "湯の国",
+    "color": "#e67e22",
+    "accent": "#f39c12",
+    "type": "buffer",
+    "village": {
+      "name": "Югакуре",
+      "title": "Деревня, Скрытая в Горячих Водах",
+      "symbol": "♨️",
+      "x": 395,
+      "y": 260
+    },
+    "labelPoint": {
+      "x": 395,
+      "y": 260
+    },
+    "kage": "Мэр курортного союза",
+    "nature": "Вода и Пар, культ Джашина (Хидан)",
+    "clans": "Курортные гильдии, отступники-сектанты",
+    "terrain": "Вулканические долины, термальные минеральные источники, гейзеры.",
+    "military": "Практически распустила вооруженные силы ради туризма и отдыха.",
+    "danger": "Низкая (курортная зона, однако встречаются фанатики культа Джашина).",
+    "lore": "«Деревня, забывшая войны». Отказалась от военной мощи в пользу процветания курортов с онсэнами, привлекающих шиноби со всего континента.",
+    "points": [
+      [
+        372,
+        268
+      ],
+      [
+        389,
+        250
+      ],
+      [
+        405,
+        253
+      ],
+      [
+        415,
+        270
+      ],
+      [
+        372,
+        268
+      ]
+    ]
+  },
+  {
+    "id": "frost",
+    "name": "Страна Мороза",
+    "kanji": "霜の国",
+    "color": "#48dbfb",
+    "accent": "#0abde3",
+    "type": "buffer",
+    "village": {
+      "name": "Симогакуре",
+      "title": "Деревня, Скрытая в Морозе",
+      "symbol": "❄️",
+      "x": 400,
+      "y": 235
+    },
+    "labelPoint": {
+      "x": 400,
+      "y": 235
+    },
+    "kage": "Старейшина Симо",
+    "nature": "Стихия Ветра и Льда",
+    "clans": "Северные следопыты",
+    "terrain": "Заснеженные тундровые равнины, промёрзшие леса, частые метели.",
+    "military": "Небольшой гарнизон пограничной стражи, партизанские группы.",
+    "danger": "Средняя (суровые морозы, частые транзитные рейды шиноби Кумо).",
+    "lore": "Холодная буферная полоса между Страной Железа и Страной Молнии. Местное население привыкло выживать в условиях затяжных зим.",
+    "points": [
+      [
+        402,
+        219
+      ],
+      [
+        369,
+        229
+      ],
+      [
+        389,
+        250
+      ],
+      [
+        405,
+        253
+      ],
+      [
+        430,
+        230
+      ],
+      [
+        402,
+        219
+      ]
+    ]
+  },
+  {
+    "id": "river",
+    "name": "Страна Реки",
+    "kanji": "川の国",
+    "color": "#16a085",
+    "accent": "#1abc9c",
+    "type": "buffer",
+    "village": {
+      "name": "Танигакуре",
+      "title": "Деревня, Скрытая в Долине",
+      "symbol": "🏞️",
+      "x": 270,
+      "y": 390
+    },
+    "labelPoint": {
+      "x": 270,
+      "y": 390
+    },
+    "kage": "Лорд Речной дельты",
+    "nature": "Стихия Воды и Земли",
+    "clans": "Речные лодочники, ремесленники",
+    "terrain": "Широкие речные дельты, пороги, каньоны, плотины и речные заводи.",
+    "military": "Слабая регулярная армия, наёмные отряды ронинов.",
+    "danger": "Средняя (убежища нукенинов, именно здесь находилось логово Акацуки).",
+    "lore": "Ключевой торговый и транспортный узел между Огнем и Ветром. Из-за отсутствия мощной деревни её территория часто использовалась преступными синдикатами и отступниками.",
+    "points": [
+      [
+        244,
+        352
+      ],
+      [
+        258,
+        336
+      ],
+      [
+        303,
+        426
+      ],
+      [
+        268,
+        442
+      ],
+      [
+        244,
+        352
+      ]
+    ]
+  },
+  {
+    "id": "tea",
+    "name": "Страна Чая",
+    "kanji": "茶の国",
+    "color": "#10ac84",
+    "accent": "#1dd1a1",
+    "type": "buffer",
+    "village": {
+      "name": "Деревня Чая",
+      "title": "Чайные террасы Дегуши",
+      "symbol": "🍵",
+      "x": 365,
+      "y": 550
+    },
+    "labelPoint": {
+      "x": 365,
+      "y": 550
+    },
+    "kage": "Даймё Чая (Босс клана Васаби/Вагараши)",
+    "nature": "Мирное земледелие, чайное искусство",
+    "clans": "Клан Васаби, Клан Вагараши (якудза)",
+    "terrain": "Длинный серповидный полуостров, живописные холмы, чайные плантации, приморские скалы.",
+    "military": "Собственной деревни шиноби нет, нанимает ниндзя из Конохи для защиты.",
+    "danger": "Низкая (спокойные торговые земли, соперничество кланов торговцев за ежегодную гонку Тодороки).",
+    "lore": "Мирный полуостров к югу от Страны Огня. Славится элитными сортами зелёного чая и традиционными праздниками.",
+    "points": [
+      [
+        338,
+        465
+      ],
+      [
+        369,
+        433
+      ],
+      [
+        385,
+        520
+      ],
+      [
+        405,
+        600
+      ],
+      [
+        395,
+        635
+      ],
+      [
+        370,
+        620
+      ],
+      [
+        345,
+        520
+      ],
+      [
+        338,
+        465
+      ]
+    ]
+  },
+  {
+    "id": "snow",
+    "name": "Страна Снега",
+    "kanji": "雪の国",
+    "color": "#c8d6e5",
+    "accent": "#f1f2f6",
+    "type": "buffer",
+    "village": {
+      "name": "Юкигакуре",
+      "title": "Деревня, Скрытая в Снегу",
+      "symbol": "🏔️",
+      "x": 200,
+      "y": 55
+    },
+    "labelPoint": {
+      "x": 200,
+      "y": 55
+    },
+    "kage": "Даймё Снега (Казехана / Коюки)",
+    "nature": "Стихия Льда (氷遁), броня Чакры",
+    "clans": "Шиноби Снега с генераторами чакры",
+    "terrain": "Вечная мерзлота, ледники, айсберги, полярное сияние.",
+    "military": "Высокотехнологичная армия: броня чакры, железнодорожный бронепоезд.",
+    "danger": "Высокая (экстремальный мороз, технологичное вооружение).",
+    "lore": "Далёкая северная земля вечных снегов. Благодаря технологиям семьи Казехана страна развила уникальную броню, отражающую ниндзюцу и гендзюцу.",
+    "points": [
+      [
+        170,
+        15
+      ],
+      [
+        240,
+        15
+      ],
+      [
+        265,
+        55
+      ],
+      [
+        235,
+        105
+      ],
+      [
+        165,
+        95
+      ],
+      [
+        145,
+        45
+      ],
+      [
+        170,
+        15
+      ]
+    ]
+  },
+  {
+    "id": "mountain",
+    "name": "Страна Гор",
+    "kanji": "山の国",
+    "color": "#576574",
+    "accent": "#8395a7",
+    "type": "buffer",
+    "village": {
+      "name": "Кагерогакуре",
+      "title": "Деревня Мерцающего Пламени",
+      "symbol": "⛰️",
+      "x": 25,
+      "y": 230
+    },
+    "labelPoint": {
+      "x": 25,
+      "y": 230
+    },
+    "kage": "Старейшина Гэнно",
+    "nature": "Подрывное дело, ловушки и взрывные печати",
+    "clans": "Мастера ловушек Кагеро",
+    "terrain": "Неприступные скальные пики, глубокие ущелья, лабиринты пещер.",
+    "military": "Мастера скрытного минирования и диверсий.",
+    "danger": "Высокая (смертоносные минные поля и скрытые ловушки).",
+    "lore": "Горное княжество на крайнем западе. Долгие годы вело войну с Конохой, закончившуюся уничтожением их основной скрытой деревни.",
+    "points": [
+      [
+        6,
+        280
+      ],
+      [
+        40,
+        275
+      ],
+      [
+        60,
+        220
+      ],
+      [
+        40,
+        180
+      ],
+      [
+        6,
+        180
+      ],
+      [
+        6,
+        280
+      ]
+    ]
+  },
+  {
+    "id": "ouzu",
+    "name": "Остров Водоворота (Узушио)",
+    "kanji": "渦の国",
+    "color": "#ee5253",
+    "accent": "#ff6b6b",
+    "type": "island",
+    "village": {
+      "name": "Узушиогакуре",
+      "title": "Деревня Долголетия",
+      "symbol": "🌀",
+      "x": 625,
+      "y": 535
+    },
+    "labelPoint": {
+      "x": 625,
+      "y": 535
+    },
+    "kage": "Патриарх клана Узумаки",
+    "nature": "Фуиндзюцу (Запечатывающие техники), гигантский резерв чакры",
+    "clans": "Легендарный клан Узумаки (красноволосые мастера печатей)",
+    "terrain": "Островной хребет, бурные морские водовороты, древние каменные руины.",
+    "military": "Мастера мощнейших запечатывающих техник в мире.",
+    "danger": "Высокая (древние ловушки, проклятые храмы масок шинигами).",
+    "lore": "Родина клана Узумаки. Другие страны объединились и разрушили эту деревню во время войн из-за панического страха перед их мастерством запечатывания.",
+    "points": [
+      [
+        610,
+        460
+      ],
+      [
+        635,
+        475
+      ],
+      [
+        655,
+        545
+      ],
+      [
+        645,
+        605
+      ],
+      [
+        620,
+        600
+      ],
+      [
+        610,
+        520
+      ],
+      [
+        610,
+        460
+      ]
+    ]
+  },
+  {
+    "id": "nagi",
+    "name": "Остров Наги",
+    "kanji": "ナギ島",
+    "color": "#00d2d3",
+    "accent": "#54a0ff",
+    "type": "island",
+    "village": {
+      "name": "Порт Наги",
+      "title": "Морской базар контрабанды",
+      "symbol": "⚓",
+      "x": 545,
+      "y": 455
+    },
+    "labelPoint": {
+      "x": 545,
+      "y": 455
+    },
+    "kage": "Губернатор Наги",
+    "nature": "Морская навигация, Стихия Воды",
+    "clans": "Гильдии мореходов и корсаров",
+    "terrain": "Тропические бухты, коралловые рифы, портовые склады.",
+    "military": "Флот наёмников и береговая артиллерия.",
+    "danger": "Средняя (пираты, контрабанда, черный рынок артефактов шиноби).",
+    "lore": "Торговый порт в проливе между континентом и Страной Воды. Центр морской торговли и нейтральная гавань для всех кораблей.",
+    "points": [
+      [
+        505,
+        430
+      ],
+      [
+        560,
+        425
+      ],
+      [
+        585,
+        455
+      ],
+      [
+        560,
+        480
+      ],
+      [
+        510,
+        465
+      ],
+      [
+        505,
+        430
+      ]
+    ]
+  },
+  {
+    "id": "moon",
+    "name": "Остров Луны",
+    "kanji": "月の国",
+    "color": "#feca57",
+    "accent": "#ff9f43",
+    "type": "island",
+    "village": {
+      "name": "Гэцугакуре",
+      "title": "Деревня, Скрытая под Луной",
+      "symbol": "🌙",
+      "x": 710,
+      "y": 630
+    },
+    "labelPoint": {
+      "x": 710,
+      "y": 630
+    },
+    "kage": "Король Лунной страны",
+    "nature": "Лунное гендзюцу, цирковое тайдзюцу",
+    "clans": "Королевская стража Луны",
+    "terrain": "Полумесячный остров, тропические джунгли, лазурные лагуны.",
+    "military": "Небольшой отряд элитных телохранителей короля.",
+    "danger": "Низкая (богатое курортное королевство в южном океане).",
+    "lore": "Сказочно богатое островное королевство в форме полумесяца. Славится роскошным цирком и редкими животными.",
+    "points": [
+      [
+        690,
+        620
+      ],
+      [
+        725,
+        615
+      ],
+      [
+        730,
+        645
+      ],
+      [
+        695,
+        645
+      ],
+      [
+        690,
+        620
+      ]
+    ]
+  },
+  {
+    "id": "sea",
+    "name": "Страна Моря",
+    "kanji": "海の国",
+    "color": "#2e86de",
+    "accent": "#54a0ff",
+    "type": "island",
+    "village": {
+      "name": "Архипелаг Моря",
+      "title": "Остров Демонического Океана",
+      "symbol": "⛵",
+      "x": 480,
+      "y": 690
+    },
+    "labelPoint": {
+      "x": 480,
+      "y": 690
+    },
+    "kage": "Совет рыбацких старейшин",
+    "nature": "Стихия Воды, трансформация в морских существ",
+    "clans": "Рыбаки и исследователи Орочимару (Амачи)",
+    "terrain": "Россыпь мелких вулканических островов, опасные рифы, штормовой океан.",
+    "military": "Собственной деревни нет, охраняется морскими патрулями.",
+    "danger": "Высокая (морские чудовища, заброшенные подводные лаборатории).",
+    "lore": "Южный архипелаг, где Орочимару проводил первые эксперименты по созданию подводных воинов-амфибий.",
+    "points": [
+      [
+        430,
+        675
+      ],
+      [
+        535,
+        670
+      ],
+      [
+        535,
+        715
+      ],
+      [
+        425,
+        710
+      ],
+      [
+        430,
+        675
+      ]
+    ]
+  },
+  {
+    "id": "sky",
+    "name": "Страна Неба",
+    "kanji": "空の国",
+    "color": "#00d2d3",
+    "accent": "#48dbfb",
+    "type": "east",
+    "village": {
+      "name": "Сорагакуре",
+      "title": "Летающая цитадель Анкор Вантиан",
+      "symbol": "🪽",
+      "x": 660,
+      "y": 215
+    },
+    "labelPoint": {
+      "x": 660,
+      "y": 215
+    },
+    "kage": "Шинно",
+    "nature": "Тёмная Чакра, манипуляция потоками воздуха",
+    "clans": "Авиационный корпус Сора",
+    "terrain": "Горное побережье, летающие платформы, руины древней цивилизации.",
+    "military": "Боевые летательные аппараты, крылатые десантники, летающая крепость.",
+    "danger": "Критическая (авиаудары, бомбардировки чакрой).",
+    "lore": "Высокоразвитая нация, побеждённая Конохой во Второй Мировой Войне, но тайно возродившая технологии воздушных флотов.",
+    "points": [
+      [
+        635,
+        185
+      ],
+      [
+        685,
+        185
+      ],
+      [
+        685,
+        245
+      ],
+      [
+        635,
+        245
+      ],
+      [
+        635,
+        185
+      ]
+    ]
+  },
+  {
+    "id": "bird",
+    "name": "Страна Птиц",
+    "kanji": "鳥の国",
+    "color": "#ff9ff3",
+    "accent": "#f368e0",
+    "type": "east",
+    "village": {
+      "name": "Торигакуре",
+      "title": "Дворец Птичьего Озера",
+      "symbol": "🦅",
+      "x": 715,
+      "y": 215
+    },
+    "labelPoint": {
+      "x": 715,
+      "y": 215
+    },
+    "kage": "Феодал Токи",
+    "nature": "Соколиная охота, Стихия Ветра",
+    "clans": "Клан птицеводов и разведчиков",
+    "terrain": "Огромные пресноводные озёра, гнездовья перелётных птиц, камышовые заросли.",
+    "military": "Гвардейцы даймё, дрессировщики боевых соколов.",
+    "danger": "Низкая (мирные сельскохозяйственные земли востока).",
+    "lore": "Умиротворенная страна перелётных птиц. Известна загадочным инцидентом с «Призрачным Самураем», раскрытым шиноби Конохи.",
+    "points": [
+      [
+        685,
+        185
+      ],
+      [
+        745,
+        185
+      ],
+      [
+        745,
+        245
+      ],
+      [
+        685,
+        245
+      ],
+      [
+        685,
+        185
+      ]
+    ]
+  },
+  {
+    "id": "wolf",
+    "name": "Страна Волка",
+    "kanji": "狼の国",
+    "color": "#8395a7",
+    "accent": "#c8d6e5",
+    "type": "east",
+    "village": {
+      "name": "Логово Волков",
+      "title": "Горная крепость Ооками",
+      "symbol": "🐺",
+      "x": 690,
+      "y": 275
+    },
+    "labelPoint": {
+      "x": 690,
+      "y": 275
+    },
+    "kage": "Вожак стаи",
+    "nature": "Стихия Земли, звериное тайдзюцу",
+    "clans": "Охотники и дрессировщики волков",
+    "terrain": "Тёмные хвойные чащи, каменистые осыпи, глубокие лощины.",
+    "military": "Следопыты в волчьих шкурах со свирепыми боевыми зверями.",
+    "danger": "Высокая (стаи диких хищников, закрытая граница).",
+    "lore": "Таинственные дикие земли к востоку от морского пролива. Люди здесь живут в гармонии со стаями гигантских волков.",
+    "points": [
+      [
+        670,
+        245
+      ],
+      [
+        715,
+        245
+      ],
+      [
+        715,
+        310
+      ],
+      [
+        670,
+        310
+      ],
+      [
+        670,
+        245
+      ]
+    ]
+  },
+  {
+    "id": "marsh",
+    "name": "Страна Болот",
+    "kanji": "沼の国",
+    "color": "#10ac84",
+    "accent": "#1dd1a1",
+    "type": "east",
+    "village": {
+      "name": "Болотная твердыня",
+      "title": "Оплот Нума",
+      "symbol": "🐊",
+      "x": 770,
+      "y": 275
+    },
+    "labelPoint": {
+      "x": 770,
+      "y": 275
+    },
+    "kage": "Даймё Болот Чигумо",
+    "nature": "Стихия Воды и Земли, ядовитые испарения",
+    "clans": "Болотные проводники, травники",
+    "terrain": "Трясины, мангровые топи, непроходимые заводи с ядовитыми миазмами.",
+    "military": "Мастера маскировки под водой и стрельбы ядовитыми дротиками.",
+    "danger": "Высокая (ядовитый туман, зыбучие пески).",
+    "lore": "Труднодоступная территория на востоке, почти полностью покрытая топями. Выжить здесь без особого снаряжения шиноби практически невозможно.",
+    "points": [
+      [
+        715,
+        245
+      ],
+      [
+        825,
+        245
+      ],
+      [
+        825,
+        310
+      ],
+      [
+        715,
+        310
+      ],
+      [
+        715,
+        245
+      ]
+    ]
+  },
+  {
+    "id": "honey",
+    "name": "Страна Мёда",
+    "kanji": "蜜の国",
+    "color": "#feca57",
+    "accent": "#ff9f43",
+    "type": "east",
+    "village": {
+      "name": "Пасеки Мёда",
+      "title": "Золотые долины Мицу",
+      "symbol": "🍯",
+      "x": 680,
+      "y": 335
+    },
+    "labelPoint": {
+      "x": 680,
+      "y": 335
+    },
+    "kage": "Мастер Гильдии Пчеловодов",
+    "nature": "Стихия Земли, техники управления пчёлами",
+    "clans": "Гильдия пасечников",
+    "terrain": "Цветущие луга, фруктовые сады, пасеки, тёплый солнечный климат.",
+    "military": "Оборонительные рои боевых пчёл.",
+    "danger": "Низкая (мирные торговые производители мёда и сладостей).",
+    "lore": "Светлая долина на востоке, известная производством редчайшего королевского мёда и сладостей, поставляемых ко дворам всех Даймё.",
+    "points": [
+      [
+        660,
+        310
+      ],
+      [
+        715,
+        310
+      ],
+      [
+        715,
+        360
+      ],
+      [
+        645,
+        360
+      ],
+      [
+        660,
+        310
+      ]
+    ]
+  },
+  {
+    "id": "demon",
+    "name": "Страна Демонов",
+    "kanji": "鬼の国",
+    "color": "#5f27cd",
+    "accent": "#341f97",
+    "type": "east",
+    "village": {
+      "name": "Храм Мироку",
+      "title": "Священный храм Жрицы",
+      "symbol": "👹",
+      "x": 900,
+      "y": 280
+    },
+    "labelPoint": {
+      "x": 900,
+      "y": 280
+    },
+    "kage": "Верховная Жрица (Шион)",
+    "nature": "Священная чакра печатей и очищения, предвидение смерти",
+    "clans": "Орден стражей Жрицы, последователи Морё",
+    "terrain": "Мрачные вулканические ущелья, древние храмы, запечатанные алтари.",
+    "military": "Гвардия самураев-паладинов Жрицы, барьерные техники.",
+    "danger": "Критическая (запечатанная терракотовая армия демона Морё).",
+    "lore": "Далёкая восточная держава, где правит Жрица, способная запечатывать древних демонов и предсказывать неизбежную гибель шиноби.",
+    "points": [
+      [
+        825,
+        240
+      ],
+      [
+        970,
+        240
+      ],
+      [
+        970,
+        340
+      ],
+      [
+        825,
+        320
+      ],
+      [
+        825,
+        240
+      ]
+    ]
+  }
+];
+
+function mapCountryById(id){
+  if(!SH_MAP_DATA) return null;
+  for(var i=0; i<SH_MAP_DATA.length; i++){
+    if(SH_MAP_DATA[i].id === id) return SH_MAP_DATA[i];
+  }
+  return null;
+}
+
+function renderShinobiMapSvg(countries, activeId, showVillages, showLabels, showOverlay, overlayOpacity){
+  var out = '<svg id="shMapSvg" viewBox="0 0 1000 825" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">';
+  out += '<defs>';
+  out += '<filter id="shMapGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>';
+  out += '<pattern id="shMapGrid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(197,160,89,0.06)" stroke-width="1"/></pattern>';
+  out += '</defs>';
+
+  // Ocean background
+  out += '<rect width="1000" height="825" fill="#141c17" class="sh-map-ocean"/>';
+  out += '<rect width="1000" height="825" fill="url(#shMapGrid)"/>';
+
+  // Optional Reference Overlay
+  if(showOverlay){
+    var op = (typeof overlayOpacity === 'number') ? overlayOpacity : 0.45;
+    out += '<image href="naruto_map_ref.jpg" x="0" y="0" width="1000" height="825" preserveAspectRatio="none" opacity="'+op+'"/>';
+  }
+
+  // Polygons
+  countries.forEach(function(c){
+    var isSel = (c.id === activeId);
+    var pts = c.points.map(function(p){ return p.join(','); }).join(' ');
+    var fillColor = isSel ? c.accent : c.color;
+    var fillOp = isSel ? '0.88' : '0.45';
+    var strokeColor = isSel ? '#f6e58d' : 'rgba(25, 18, 12, 0.9)';
+    var strokeWidth = isSel ? '3.5' : '2';
+    out += '<polygon class="sh-country-poly '+(isSel?'selected':'')+'" data-country="'+escA(c.id)+'" points="'+pts+'" fill="'+fillColor+'" fill-opacity="'+fillOp+'" stroke="'+strokeColor+'" stroke-width="'+strokeWidth+'" />';
+  });
+
+  // Labels
+  if(showLabels){
+    countries.forEach(function(c){
+      var isSel = (c.id === activeId);
+      var lp = c.labelPoint || (c.village ? {x: c.village.x, y: c.village.y + 24} : {x: c.points[0][0], y: c.points[0][1]});
+      out += '<g class="sh-country-label-grp" pointer-events="none">';
+      out += '<text x="'+lp.x+'" y="'+lp.y+'" text-anchor="middle" font-size="'+(isSel?13:11)+'" font-weight="700" fill="#ffffff" stroke="#110d08" stroke-width="3" paint-order="stroke fill" font-family="Cinzel, serif">'+esc(c.name)+'</text>';
+      if(c.kanji){
+        out += '<text x="'+lp.x+'" y="'+(lp.y+12)+'" text-anchor="middle" font-size="9" fill="'+c.accent+'" stroke="#110d08" stroke-width="2" paint-order="stroke fill">'+esc(c.kanji)+'</text>';
+      }
+      out += '</g>';
+    });
+  }
+
+  // Village markers
+  if(showVillages){
+    countries.forEach(function(c){
+      if(!c.village) return;
+      var v = c.village;
+      var isSel = (c.id === activeId);
+      out += '<g class="sh-village-marker '+(isSel?'active':'')+'" data-village="'+escA(c.id)+'" transform="translate('+v.x+', '+v.y+')">';
+      out += '<circle r="12" fill="'+c.accent+'" fill-opacity="0.25" class="sh-village-pulse"/>';
+      out += '<circle r="6" fill="'+(isSel?'#ffffff':c.accent)+'" stroke="#110d08" stroke-width="2" class="sh-village-dot"/>';
+      out += '<text y="-9" text-anchor="middle" font-size="13">'+(v.symbol||'📍')+'</text>';
+      out += '</g>';
+    });
+  }
+
+  // Compass Rose (bottom-right)
+  out += '<g transform="translate(860, 680) scale(0.65)" opacity="0.65" pointer-events="none">';
+  out += '<circle r="50" fill="none" stroke="rgba(197,160,89,0.3)" stroke-width="1"/>';
+  out += '<polygon points="0,-60 12,-15 0,0 -12,-15" fill="#e74c3c"/>';
+  out += '<polygon points="0,60 12,15 0,0 -12,15" fill="#95a5a6"/>';
+  out += '<polygon points="60,0 15,12 0,0 15,-12" fill="#bdc3c7"/>';
+  out += '<polygon points="-60,0 -15,12 0,0 -15,-12" fill="#7f8c8d"/>';
+  out += '<text y="-68" text-anchor="middle" fill="#f6e58d" font-size="14" font-weight="bold">N</text>';
+  out += '</g>';
+
+  out += '</svg>';
+  return out;
+}
+
+function renderMapInspector(c){
+  if(!c) return '<div class="sh-map-inspector" id="shMapInspector"><div class="char-empty">Выберите страну на карте или в списке ниже для просмотра тактических данных.</div></div>';
+
+  var typeLabels = { great: 'Великая держава', buffer: 'Буферная страна', island: 'Островное государство', east: 'Восточные земли' };
+  var typeColors = { great: '#e74c3c', buffer: '#3498db', island: '#1abc9c', east: '#9b59b6' };
+  var tLabel = typeLabels[c.type] || 'Территория';
+  var tCol = typeColors[c.type] || 'var(--brass)';
+
+  var vCard = '';
+  if(c.village){
+    vCard = '<div class="sh-map-village-card">'+
+      '<div class="sh-map-village-icon">'+(c.village.symbol||'📍')+'</div>'+
+      '<div style="flex:1">'+
+        '<div class="sh-map-village-name">'+esc(c.village.name)+'</div>'+
+        '<div class="sh-map-village-sub">'+esc(c.village.title||'')+'</div>'+
+      '</div>'+
+      '<button class="sh-map-btn" id="shBtnFocusVillage" data-focus-x="'+c.village.x+'" data-focus-y="'+c.village.y+'" title="Приблизить камеру к скрытой деревне">🎯 Центрировать</button>'+
+    '</div>';
+  }
+
+  return '<div class="sh-map-inspector" id="shMapInspector">'+
+    '<div class="sh-map-inspector-head">'+
+      '<div class="sh-map-inspector-title">'+
+        '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:'+c.accent+';box-shadow:0 0 8px '+c.accent+'"></span>'+
+        '<span>'+esc(c.name)+'</span>'+
+        (c.kanji ? '<span class="sh-map-inspector-kanji">'+esc(c.kanji)+'</span>' : '')+
+      '</div>'+
+      '<span class="sh-map-inspector-badge" style="background:'+tCol+'22;color:'+tCol+';border:1px solid '+tCol+'44">'+esc(tLabel)+'</span>'+
+    '</div>'+
+    vCard +
+    '<div class="sh-map-grid-info">'+
+      (c.kage ? '<div class="sh-map-info-item"><div class="sh-map-info-k">👑 Правитель / Лидер</div><div class="sh-map-info-v">'+esc(c.kage)+'</div></div>' : '')+
+      (c.nature ? '<div class="sh-map-info-item"><div class="sh-map-info-k">🌀 Родная стихия / Особенности</div><div class="sh-map-info-v">'+esc(c.nature)+'</div></div>' : '')+
+      (c.clans ? '<div class="sh-map-info-item"><div class="sh-map-info-k">🛡️ Известные кланы</div><div class="sh-map-info-v">'+esc(c.clans)+'</div></div>' : '')+
+      (c.danger ? '<div class="sh-map-info-item"><div class="sh-map-info-k">⚠️ Режим границы и опасность</div><div class="sh-map-info-v">'+esc(c.danger)+'</div></div>' : '')+
+      (c.terrain ? '<div class="sh-map-info-item" style="grid-column:1/-1"><div class="sh-map-info-k">🌲 Рельеф и местность</div><div class="sh-map-info-v">'+esc(c.terrain)+'</div></div>' : '')+
+      (c.military ? '<div class="sh-map-info-item" style="grid-column:1/-1"><div class="sh-map-info-k">⚔️ Военная организация</div><div class="sh-map-info-v">'+esc(c.military)+'</div></div>' : '')+
+    '</div>'+
+    (c.lore ? '<div class="sh-map-lore-text">'+esc(c.lore)+'</div>' : '')+
+    '<div class="sh-map-inspector-actions">'+
+      '<button class="btn-primary" id="shBtnCopyMapLore" data-country="'+escA(c.id)+'">📋 Скопировать лор в заявку AI Studio</button>'+
+      (c.village ? '<button class="btn-ghost" id="shBtnFocusVillage2" data-focus-x="'+c.village.x+'" data-focus-y="'+c.village.y+'">🎯 Найти на карте</button>' : '')+
+    '</div>'+
+  '</div>';
+}
+
+function shMap(){
+  if(!SH.map) SH.map = {
+    selectedId: 'fire',
+    filter: 'all',
+    search: '',
+    showVillages: true,
+    showLabels: true,
+    showOverlay: false,
+    overlayOpacity: 0.45,
+    zoom: 1,
+    panX: 0,
+    panY: 0
+  };
+
+  var curC = mapCountryById(SH.map.selectedId) || SH_MAP_DATA[0];
+  var svgHtml = renderShinobiMapSvg(SH_MAP_DATA, SH.map.selectedId, SH.map.showVillages, SH.map.showLabels, SH.map.showOverlay, SH.map.overlayOpacity);
+  var inspectorHtml = renderMapInspector(curC);
+
+  var filterTabs = [
+    { k: 'all', l: 'Все (' + SH_MAP_DATA.length + ')' },
+    { k: 'great', l: 'Пять Великих' },
+    { k: 'buffer', l: 'Буферные страны' },
+    { k: 'island', l: 'Острова' },
+    { k: 'east', l: 'Восточные земли' }
+  ];
+
+  var filterHtml = '<div class="sh-filter-bar" style="margin-top:10px;">' +
+    filterTabs.map(function(t){
+      return '<div class="sh-filter-pill '+(SH.map.filter===t.k?'active':'')+'" data-map-filter="'+t.k+'">'+esc(t.l)+'</div>';
+    }).join('') +
+  '</div>';
+
+  return crumbSh([{label:'Шиноби',nav:'home'},{label:'Справочник',nav:'shRef'},{label:'Карта мира'}])+
+    '<button class="back" data-nav="shRef">← Назад в Справочник</button>'+
+    '<h1>🗺️ Карта мира шиноби</h1>'+
+    '<div class="subtitle">Векторный тактический атлас 26 стран и Скрытых Деревень (AI Studio)</div>'+
+    '<div class="sh-map-container">'+
+      '<div class="sh-map-toolbar">'+
+        '<div class="sh-map-search-wrap">'+
+          '<span class="sh-map-search-icon">🔍</span>'+
+          '<input type="text" class="sh-map-search-input" id="shMapSearch" placeholder="Поиск страны, деревни или клана..." value="'+escA(SH.map.search||'')+'">'+
+        '</div>'+
+        '<div class="sh-map-controls">'+
+          '<label class="sh-map-chk"><input type="checkbox" id="shMapToggleVillages" '+(SH.map.showVillages?'checked':'')+'> Деревни</label>'+
+          '<label class="sh-map-chk"><input type="checkbox" id="shMapToggleLabels" '+(SH.map.showLabels?'checked':'')+'> Названия</label>'+
+          '<label class="sh-map-chk"><input type="checkbox" id="shMapToggleOverlay" '+(SH.map.showOverlay?'checked':'')+'> Сверка с оригиналом</label>'+
+          (SH.map.showOverlay ? '<input type="range" id="shMapOverlayRange" min="10" max="90" value="'+Math.round((SH.map.overlayOpacity||0.45)*100)+'" style="width:70px" title="Прозрачность подложки">' : '')+
+          '<button class="sh-map-btn" id="shMapZoomIn" title="Приблизить">➕</button>'+
+          '<button class="sh-map-btn" id="shMapZoomOut" title="Отдалить">➖</button>'+
+          '<button class="sh-map-btn" id="shMapZoomReset" title="Сбросить масштаб и положение">⟲ 100%</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="sh-map-viewport" id="shMapViewport" title="Зажмите левую кнопку мыши для перемещения карты, колесико для зума">'+
+        '<div class="sh-map-svg-wrap" id="shMapSvgWrap" style="transform: translate('+SH.map.panX+'px, '+SH.map.panY+'px) scale('+SH.map.zoom+');">'+
+          svgHtml +
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    filterHtml +
+    inspectorHtml;
+}
+
 
 function sel(id,list,cur,fmt){
   return '<select id="'+id+'">'+list.map(function(o){
@@ -8623,7 +10830,7 @@ window.render=function(){
   var s=view.screen||'';
   if(s.indexOf('sh')!==0){ paintShBar(); return; }
   var app=document.getElementById('app');
-  app.classList.remove('wide'); app.classList.toggle('home-wide', s==='shHome');
+  app.classList.remove('wide'); app.classList.toggle('home-wide', s==='shHome' || s==='shMap');
   var html='';
   if(s==='shHome') html=shHome();
   else if(s==='shTechs') html=shTechs();
@@ -8638,6 +10845,7 @@ window.render=function(){
   else if(s==='shCmds') html=shCmds();
   else if(s==='shRef') html=shRef();
   else if(s==='shRefView') html=shRefView();
+  else if(s==='shMap') html=shMap();
   else if(s==='shData') html=shData();
   else html=shHome();
   app.innerHTML=html;
@@ -8648,7 +10856,7 @@ window.render=function(){
 window.navigate=function(val){
   var p=String(val||'').split(':');
   if(HB.mode==='sh'){
-    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shData:'shData'};
+    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData'};
     if(map[p[0]]){ view={screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
     if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shMoveView'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
       view={screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
