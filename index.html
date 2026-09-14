@@ -6758,6 +6758,12 @@ function renderMoveLauncherDiceHtml(move, selTarget, mods, rolledValues){
 }
 
 function renderMoveLauncher(){
+  if(!SH.moveLauncher) SH.moveLauncher = {};
+  if(SH.moveLauncher.isOpen === undefined) SH.moveLauncher.isOpen = false;
+  if(!SH.moveLauncher.rolledValues) SH.moveLauncher.rolledValues = {};
+  if(!SH.moveLauncher.mods) SH.moveLauncher.mods = { atk: 0, dmg: 0 };
+  if(!SH.moveLauncher.selectedTarget) SH.moveLauncher.selectedTarget = 'atk';
+
   if(!SH.moves || !SH.moves.length){
     return '<div class="sh-launcher">' +
       '<div class="sh-launcher-title">🥋 Боевой расчёт приёма <span class="sh-badge-tag">AI Studio</span></div>' +
@@ -6765,11 +6771,7 @@ function renderMoveLauncher(){
     '</div>';
   }
 
-  if(!SH.moveLauncher) SH.moveLauncher = {};
-  if(SH.moveLauncher.isOpen === undefined) SH.moveLauncher.isOpen = false;
   var isOpen = !!SH.moveLauncher.isOpen;
-  if(!SH.moveLauncher.mods) SH.moveLauncher.mods = { atk: 0, dmg: 0 };
-  if(!SH.moveLauncher.selectedTarget) SH.moveLauncher.selectedTarget = 'atk';
 
   var selMove = moveById(SH.moveLauncher.moveId) || SH.moves[0];
   if(!SH.moveLauncher.moveId && selMove){
@@ -8199,6 +8201,11 @@ function wireSh(){
         if(sub) sub.textContent = pDmg.n + 'd' + pDmg.sides + (formatLauncherMod(totMod) ? ' ' + formatLauncherMod(totMod) : '');
       }
     }
+    if(SH.moveLauncher.lastResult && SH.moveLauncher.rolledValues && SH.moveLauncher.rolledValues.atk && m){
+      SH.moveLauncher.lastResult = buildMoveComboText(m, SH.moveLauncher.rolledValues, SH.moveLauncher.mods);
+      var rTxt = g('shMoveLauncherResultText');
+      if(rTxt) rTxt.textContent = SH.moveLauncher.lastResult;
+    }
   };
 
   document.querySelectorAll('[data-move-mod-delta]').forEach(function(btn){
@@ -8229,6 +8236,11 @@ function wireSh(){
           var totMod = val + (pDmg.mod || 0);
           if(sub) sub.textContent = pDmg.n + 'd' + pDmg.sides + (formatLauncherMod(totMod) ? ' ' + formatLauncherMod(totMod) : '');
         }
+      }
+      if(SH.moveLauncher.lastResult && SH.moveLauncher.rolledValues && SH.moveLauncher.rolledValues.atk && m){
+        SH.moveLauncher.lastResult = buildMoveComboText(m, SH.moveLauncher.rolledValues, SH.moveLauncher.mods);
+        var rTxt = g('shMoveLauncherResultText');
+        if(rTxt) rTxt.textContent = SH.moveLauncher.lastResult;
       }
     });
   }
@@ -8265,7 +8277,10 @@ function wireSh(){
   }
 
   var finishMoveLaunch = function(m, mode, autoCopy){
-    var mods = SH.moveLauncher.mods || { atk: 0, dmg: 0 };
+    if(!SH.moveLauncher) SH.moveLauncher = {};
+    if(!SH.moveLauncher.rolledValues) SH.moveLauncher.rolledValues = {};
+    if(!SH.moveLauncher.mods) SH.moveLauncher.mods = { atk: 0, dmg: 0 };
+    var mods = SH.moveLauncher.mods;
     var wpStr = m.weapon ? (' (' + m.weapon + ')') : '';
     var payStr = m.pay ? (' | Оплата: ' + m.pay) : '';
     var header = '*[Приём: ' + (m.name || 'Без названия') + ' | Вид: ' + (m.kind || 'Рукопашный') + wpStr + ' | Тип: ' + (m.mtype || 'Урон') + payStr + ']*';
@@ -8353,6 +8368,9 @@ function wireSh(){
   };
 
   var executeMoveLaunch = function(mode, autoCopy){
+    if(!SH.moveLauncher) SH.moveLauncher = {};
+    if(!SH.moveLauncher.rolledValues) SH.moveLauncher.rolledValues = {};
+    if(!SH.moveLauncher.mods) SH.moveLauncher.mods = { atk: 0, dmg: 0 };
     var m = moveById(SH.moveLauncher.moveId) || (SH.moves && SH.moves[0]);
     if(!m) return;
 
