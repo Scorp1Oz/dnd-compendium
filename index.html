@@ -2014,6 +2014,17 @@ body.sh-theme .card:hover{
   font-weight:700;
   letter-spacing:.06em;
 }
+.sh-hud-level{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  padding:3px 9px;
+  background:rgba(201,164,92,0.18);
+  border:1px solid var(--brass);
+  color:#f6e58d;
+  border-radius:4px;
+  font-weight:700;
+  letter-spacing:.04em;
+}
 .sh-hud-edit-btn{
   background:rgba(255,255,255,0.05);
   border:1px solid var(--line);
@@ -6235,6 +6246,7 @@ var DEFAULT_META = {
   clan: '',
   village: 'Коноха',
   rank: 'Генин',
+  level: '1',
   nature: '',
   chakra: '30',
   hp: '28',
@@ -7217,6 +7229,10 @@ function renderShinobiHudHtml(){
             '<select id="shHudInRank">'+rankOptions+'</select>'+
           '</div>'+
           '<div class="sh-hud-edit-item">'+
+            '<label>Уровень</label>'+
+            '<input type="number" min="1" max="100" id="shHudInLevel" value="'+escA(m.level!=null&&m.level!==''?m.level:'1')+'" placeholder="1">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
             '<label>Стихия</label>'+
             '<select id="shHudInNature">'+natOptions+'</select>'+
           '</div>'+
@@ -7244,6 +7260,7 @@ function renderShinobiHudHtml(){
   var nameDisplay = m.charName ? esc(m.charName) : 'Безымянный шиноби';
   var clanHtml = m.clan ? '<span class="sh-hud-clan">Клан ' + esc(m.clan) + '</span> · ' : '';
   var villageHtml = '<span>' + esc(m.village || 'Коноха') + '</span>';
+  var levelBadgeHtml = '<span class="sh-hud-level">Ур. ' + esc(m.level!=null&&m.level!==''?m.level:'1') + '</span>';
   var rankBadgeHtml = m.rank ? '<span class="sh-hud-rank">' + esc(m.rank) + '</span>' : '';
   var natureBadgeHtml = m.nature ? natureBadge(m.nature) : '';
 
@@ -7254,6 +7271,7 @@ function renderShinobiHudHtml(){
         '<div class="sh-hud-meta">' + clanHtml + villageHtml + '</div>'+
       '</div>'+
       '<div class="sh-hud-badges">'+
+        levelBadgeHtml +
         rankBadgeHtml +
         natureBadgeHtml +
         '<button class="sh-hud-edit-btn" id="shHudEditBtn" title="Настроить профиль">✏️ Профиль</button>'+
@@ -13022,6 +13040,7 @@ function wireSh(){
       SH.meta.clan = (v('shHudInClan') || '').trim();
       SH.meta.village = (v('shHudInVillage') || '').trim();
       SH.meta.rank = (v('shHudInRank') || '').trim();
+      SH.meta.level = (v('shHudInLevel') || '1').trim();
       SH.meta.nature = (v('shHudInNature') || '').trim();
       SH.meta.chakra = (v('shHudInChakra') || '').trim();
       SH.meta.hp = (v('shHudInHp') || '').trim();
