@@ -8510,7 +8510,7 @@ function renderChakraMandalaSvg(activeKey, activeFilter){
 
   var out = '<svg viewBox="0 0 540 600" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;">';
   out += '<defs>';
-  out += '<filter id="shChakraGlow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>';
+  out += '<filter id="shChakraGlow" x="-50" y="-50" width="640" height="700" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="5" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>';
   out += '<marker id="sh-arr-norm" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,0.25)" /></marker>';
   out += '<marker id="sh-arr-adv" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#7be0a6" /></marker>';
   out += '<marker id="sh-arr-weak" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#ff8577" /></marker>';
@@ -8571,13 +8571,7 @@ function renderChakraMandalaSvg(activeKey, activeFilter){
     var rayCol = isJtActive ? '#a55eea' : 'rgba(165,94,234,0.25)';
     var rayWidth = isJtActive ? '3.5' : '1.5';
     var rayFilter = isJtActive ? 'filter="url(#shChakraGlow)"' : '';
-    if(pk === 'katon'){
-      // Curved twin energy streams around Hyoton (Ice) so the connection to Fire is vibrant and unobstructed
-      out += '<path d="M '+parPos.x+' '+(parPos.y+parPos.r)+' C 228 105, 228 170, '+jtPos.x+' '+(jtPos.y-jtPos.r)+'" fill="none" stroke="'+rayCol+'" stroke-width="'+rayWidth+'" stroke-dasharray="4,2" '+rayFilter+' />';
-      out += '<path d="M '+parPos.x+' '+(parPos.y+parPos.r)+' C 312 105, 312 170, '+jtPos.x+' '+(jtPos.y-jtPos.r)+'" fill="none" stroke="'+rayCol+'" stroke-width="'+rayWidth+'" stroke-dasharray="4,2" '+rayFilter+' />';
-    } else {
-      out += '<line x1="'+parPos.x+'" y1="'+parPos.y+'" x2="'+jtPos.x+'" y2="'+jtPos.y+'" stroke="'+rayCol+'" stroke-width="'+rayWidth+'" stroke-dasharray="4,2" '+rayFilter+' />';
-    }
+    out += '<line x1="'+parPos.x+'" y1="'+parPos.y+'" x2="'+(pk === 'katon' ? (jtPos.x + 0.01) : jtPos.x)+'" y2="'+jtPos.y+'" stroke="'+rayCol+'" stroke-width="'+rayWidth+'" stroke-dasharray="4,2" '+rayFilter+' />';
   });
 
   // Section divider: Yin-Yang
