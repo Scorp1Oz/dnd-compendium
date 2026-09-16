@@ -8571,7 +8571,13 @@ function renderChakraMandalaSvg(activeKey, activeFilter){
     var rayCol = isJtActive ? '#a55eea' : 'rgba(165,94,234,0.25)';
     var rayWidth = isJtActive ? '3.5' : '1.5';
     var rayFilter = isJtActive ? 'filter="url(#shChakraGlow)"' : '';
-    out += '<line x1="'+parPos.x+'" y1="'+parPos.y+'" x2="'+jtPos.x+'" y2="'+jtPos.y+'" stroke="'+rayCol+'" stroke-width="'+rayWidth+'" stroke-dasharray="4,2" '+rayFilter+' />';
+    if(pk === 'katon'){
+      // Curved twin energy streams around Hyoton (Ice) so the connection to Fire is vibrant and unobstructed
+      out += '<path d="M '+parPos.x+' '+(parPos.y+parPos.r)+' C 228 105, 228 170, '+jtPos.x+' '+(jtPos.y-jtPos.r)+'" fill="none" stroke="'+rayCol+'" stroke-width="'+rayWidth+'" stroke-dasharray="4,2" '+rayFilter+' />';
+      out += '<path d="M '+parPos.x+' '+(parPos.y+parPos.r)+' C 312 105, 312 170, '+jtPos.x+' '+(jtPos.y-jtPos.r)+'" fill="none" stroke="'+rayCol+'" stroke-width="'+rayWidth+'" stroke-dasharray="4,2" '+rayFilter+' />';
+    } else {
+      out += '<line x1="'+parPos.x+'" y1="'+parPos.y+'" x2="'+jtPos.x+'" y2="'+jtPos.y+'" stroke="'+rayCol+'" stroke-width="'+rayWidth+'" stroke-dasharray="4,2" '+rayFilter+' />';
+    }
   });
 
   // Section divider: Yin-Yang
@@ -8621,8 +8627,8 @@ function renderChakraMandalaSvg(activeKey, activeFilter){
     if(activeFilter === 'tota' && d.type !== 'tota') isDimmed = true;
     if(activeFilter === 'yin_yang' && d.type.indexOf('yin') === -1 && d.type.indexOf('yang') === -1 && d.type !== 'onmyo') isDimmed = true;
 
-    var glowRing = isAct ? '#ffffff' : (isParentOfActive ? cd.color : (isChildOfActive ? '#7be0a6' : cd.color));
-    var ringW = isAct ? '3.5' : (isParentOfActive ? '2.5' : '1.8');
+    var glowRing = isAct ? '#ffffff' : (isParentOfActive ? (cur.color || cd.color) : (isChildOfActive ? '#7be0a6' : cd.color));
+    var ringW = isAct ? '3.5' : (isParentOfActive ? '3' : '1.8');
     var pulseClass = isAct ? 'node-bg active' : 'node-bg';
     var dropFilter = isAct ? 'filter="url(#shChakraGlow)"' : '';
     var opacityStyle = isDimmed ? 'opacity:0.2;' : '';
