@@ -1269,6 +1269,648 @@ body.sh-theme .card:hover{
   align-items:center;
   gap:6px;
 }
+
+/* ---------- Визуальный справочник шиноби ---------- */
+.sh-ref-header{
+  margin-bottom:20px;
+}
+.sh-ref-header-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:8px;
+}
+.sh-ref-title-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.sh-ref-header-badge{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  text-transform:uppercase;
+  padding:3px 9px;
+  background:rgba(201,164,92,0.15);
+  border:1px solid var(--brass);
+  color:#f6e58d;
+  border-radius:4px;
+  font-weight:700;
+  letter-spacing:.05em;
+}
+.sh-ref-lead{
+  font-size:14px;
+  line-height:1.55;
+  color:var(--ink-dim);
+  background:rgba(255,255,255,0.02);
+  border-left:3px solid var(--brass);
+  padding:10px 14px;
+  border-radius:0 4px 4px 0;
+  margin-top:6px;
+}
+.sh-ref-copy-btn{
+  padding:6px 14px;
+  font-size:12px;
+  border-color:var(--brass);
+  color:#f6e58d;
+  cursor:pointer;
+  transition:all .18s ease;
+  white-space:nowrap;
+}
+.sh-ref-copy-btn:hover{
+  background:rgba(201,164,92,0.18);
+  border-color:#f6e58d;
+  transform:translateY(-1px);
+}
+.sh-ref-search-wrap{
+  position:relative;
+  margin-top:14px;
+}
+.sh-ref-search-input{
+  width:100%;
+  box-sizing:border-box;
+  padding:10px 14px 10px 38px;
+  background:rgba(15,13,10,0.85);
+  border:1px solid var(--line);
+  border-radius:6px;
+  color:var(--ink);
+  font-size:13.5px;
+  transition:border-color .18s, box-shadow .18s;
+}
+.sh-ref-search-input:focus{
+  outline:none;
+  border-color:var(--brass);
+  box-shadow:0 0 10px rgba(201,164,92,0.25);
+}
+.sh-ref-search-icon{
+  position:absolute;
+  left:12px;
+  top:50%;
+  transform:translateY(-50%);
+  pointer-events:none;
+  color:var(--ink-dim);
+  font-size:14px;
+}
+.sh-ref-group-block{
+  margin-top:24px;
+}
+.sh-ref-group-title{
+  font-family:'Cinzel',serif;
+  font-size:15px;
+  font-weight:700;
+  color:var(--ink);
+  letter-spacing:.04em;
+  padding:4px 0 4px 10px;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.sh-ref-group-count{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:1px 8px;
+  color:var(--ink-dim);
+}
+.sh-ref-item-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  padding:1px 6px;
+  border-radius:3px;
+  background:rgba(201,164,92,0.15);
+  border:1px solid rgba(201,164,92,0.3);
+  color:#f6e58d;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  margin-left:auto;
+}
+.sh-section-tag{
+  font-family:'Cinzel',serif;
+  font-size:13px;
+  color:var(--brass);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin:18px 0 10px;
+  font-weight:700;
+}
+.sh-ref-cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+  gap:12px;
+}
+.sh-ref-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:14px;
+  transition:border-color .18s, transform .15s, box-shadow .15s;
+}
+.sh-ref-card:hover{
+  border-color:rgba(201,164,92,0.45);
+  transform:translateY(-1px);
+  box-shadow:0 4px 14px rgba(0,0,0,0.3);
+}
+.sh-ref-card-k{
+  font-weight:700;
+  font-size:14px;
+  margin-bottom:6px;
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.sh-ref-card-v{
+  font-size:13px;
+  line-height:1.52;
+  color:var(--ink-dim);
+}
+/* Стела рангов */
+.sh-ladder-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.sh-ladder-step{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  border:1px solid;
+  border-radius:6px;
+  padding:12px 16px;
+  transition:transform .15s;
+}
+.sh-ladder-step:hover{
+  transform:translateX(3px);
+}
+.sh-ladder-badge{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-width:64px;
+  padding:6px 8px;
+  border-radius:4px;
+  border:1px solid;
+  font-weight:900;
+  line-height:1;
+  font-family:'Cinzel',serif;
+}
+.sh-ladder-letter{
+  font-size:22px;
+}
+.sh-ladder-tag{
+  font-size:9px;
+  letter-spacing:.05em;
+  margin-top:4px;
+  font-weight:700;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.sh-ladder-desc{
+  font-size:13px;
+  line-height:1.48;
+  color:var(--ink);
+  flex:1;
+}
+/* Тактические состояния */
+.sh-condition-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  gap:10px;
+}
+.sh-condition-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:12px 14px;
+  transition:border-color .15s, transform .15s;
+}
+.sh-condition-card:hover{
+  border-color:var(--brass);
+  transform:translateY(-1px);
+}
+.sh-condition-top{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+}
+.sh-condition-icon{
+  font-size:16px;
+}
+.sh-condition-name{
+  font-family:'Cinzel',serif;
+  font-size:14px;
+  font-weight:700;
+  color:var(--ink);
+  flex:1;
+}
+.sh-condition-badge{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  padding:2px 6px;
+  background:rgba(201,164,92,0.15);
+  border:1px solid var(--brass);
+  color:#f6e58d;
+  border-radius:3px;
+  text-transform:uppercase;
+}
+.sh-condition-desc{
+  font-size:12.5px;
+  line-height:1.48;
+  color:var(--ink-dim);
+}
+/* Чакра потоки */
+.sh-chakra-flow-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+  gap:10px;
+}
+.sh-chakra-flow-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:12px;
+}
+.sh-chakra-flow-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+.sh-chakra-flow-icon{
+  font-size:22px;
+}
+.sh-chakra-flow-title{
+  font-weight:700;
+  font-size:13.5px;
+  color:var(--ink);
+}
+.sh-chakra-flow-rate{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  font-weight:700;
+}
+.sh-chakra-flow-desc{
+  font-size:12px;
+  line-height:1.45;
+  color:var(--ink-dim);
+}
+.sh-debt-zone-box{
+  background:linear-gradient(145deg, rgba(35,15,15,0.6) 0%, rgba(20,10,10,0.8) 100%);
+  border:1px solid var(--crimson-bright);
+  border-radius:6px;
+  padding:16px;
+  margin-top:10px;
+}
+.sh-debt-zone-head{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+}
+.sh-debt-zone-title{
+  font-family:'Cinzel',serif;
+  font-size:14.5px;
+  font-weight:700;
+  color:#ff7675;
+}
+.sh-debt-zone-sub{
+  font-size:12px;
+  color:var(--ink-dim);
+  margin-top:2px;
+}
+/* Предел тела / перегрузка */
+.sh-meter-calc-card{
+  background:linear-gradient(145deg, rgba(28,24,18,0.8) 0%, rgba(18,15,11,0.9) 100%);
+  border:1px solid var(--brass);
+  border-radius:6px;
+  padding:14px;
+}
+.sh-meter-calc-top{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+}
+.sh-meter-calc-icon{
+  font-size:24px;
+}
+.sh-meter-calc-title{
+  font-family:'Cinzel',serif;
+  font-size:14.5px;
+  font-weight:700;
+  color:#f6e58d;
+}
+.sh-meter-calc-desc{
+  font-size:12.5px;
+  line-height:1.48;
+  color:var(--ink-dim);
+  margin-top:4px;
+}
+.sh-stages-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+  gap:10px;
+  margin-top:10px;
+}
+.sh-stage-card{
+  border:1px solid;
+  border-radius:6px;
+  background:rgba(20,15,12,0.8);
+  padding:12px;
+}
+.sh-stage-head{
+  font-family:'Cinzel',serif;
+  font-weight:700;
+  font-size:13.5px;
+  margin-bottom:6px;
+}
+.sh-stage-dmg{
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:4px;
+}
+.sh-stage-debuff{
+  font-size:11.5px;
+  line-height:1.4;
+  color:var(--ink-dim);
+}
+/* Формула познания */
+.sh-formula-banner{
+  background:linear-gradient(145deg, rgba(26,22,17,0.9) 0%, rgba(16,14,10,0.95) 100%);
+  border:1px solid var(--brass);
+  border-radius:6px;
+  padding:16px;
+  text-align:center;
+}
+.sh-formula-equation{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  font-family:'Cinzel',serif;
+  font-size:17px;
+  font-weight:700;
+  color:var(--ink);
+  flex-wrap:wrap;
+}
+.sh-form-part{
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--line);
+  padding:6px 14px;
+  border-radius:4px;
+}
+.sh-form-plus, .sh-form-eq{
+  color:var(--brass);
+  font-size:20px;
+}
+.sh-form-res{
+  background:rgba(201,164,92,0.18);
+  border:1px solid var(--brass);
+  color:#f6e58d;
+  padding:6px 14px;
+  border-radius:4px;
+}
+.sh-formula-sub{
+  font-size:12.5px;
+  color:var(--ink-dim);
+  margin-top:10px;
+  font-style:italic;
+}
+.sh-paths-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  gap:12px;
+}
+.sh-path-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:12px 14px;
+}
+.sh-path-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+.sh-path-icon{
+  font-size:20px;
+}
+.sh-path-title{
+  font-family:'Cinzel',serif;
+  font-size:14px;
+  font-weight:700;
+  color:var(--ink);
+}
+.sh-path-tag{
+  font-size:11px;
+  color:var(--brass);
+}
+.sh-path-meta-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  color:var(--ink-dim);
+  padding:4px 0 6px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  margin-bottom:8px;
+}
+.sh-path-desc{
+  font-size:12.5px;
+  line-height:1.48;
+  color:var(--ink-dim);
+}
+/* Дисциплины и истоки */
+.sh-disc-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+  gap:10px;
+}
+.sh-disc-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:12px;
+  transition:border-color .15s, transform .15s;
+}
+.sh-disc-card:hover{
+  border-color:var(--brass);
+  transform:translateY(-1px);
+}
+.sh-disc-head{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:6px;
+}
+.sh-disc-icon{
+  font-size:18px;
+}
+.sh-disc-name{
+  font-family:'Cinzel',serif;
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--ink);
+}
+.sh-disc-desc{
+  font-size:12px;
+  line-height:1.45;
+  color:var(--ink-dim);
+}
+.sh-origin-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  gap:12px;
+}
+.sh-origin-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--line);
+  border-left:3px solid var(--brass);
+  border-radius:6px;
+  padding:12px 14px;
+}
+.sh-origin-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+.sh-origin-icon{
+  font-size:20px;
+}
+.sh-origin-title{
+  font-family:'Cinzel',serif;
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--ink);
+}
+.sh-origin-badge{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  padding:1px 6px;
+  border-radius:3px;
+  background:rgba(201,164,92,0.15);
+  color:#f6e58d;
+}
+.sh-origin-desc{
+  font-size:12.5px;
+  line-height:1.48;
+  color:var(--ink-dim);
+}
+/* Клоны */
+.sh-clone-class-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:16px;
+}
+.sh-clone-class-title{
+  font-family:'Cinzel',serif;
+  font-size:15px;
+  font-weight:700;
+  color:var(--ink);
+  margin-bottom:4px;
+}
+.sh-clone-class-sub{
+  font-size:12.5px;
+  line-height:1.45;
+  color:var(--ink-dim);
+  margin-bottom:12px;
+}
+/* Доска миссий */
+.sh-mission-board{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  gap:12px;
+}
+.sh-mission-card{
+  border:1px solid;
+  border-radius:6px;
+  padding:14px;
+  transition:transform .15s;
+}
+.sh-mission-card:hover{
+  transform:translateY(-1px);
+}
+.sh-mission-head{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+}
+.sh-mission-rank{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:36px;
+  height:36px;
+  border-radius:4px;
+  font-family:'Cinzel',serif;
+  font-size:20px;
+  font-weight:900;
+  color:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,0.3);
+}
+.sh-mission-req{
+  font-size:11px;
+  color:var(--ink-dim);
+}
+.sh-mission-risk{
+  font-size:12px;
+  font-weight:700;
+  margin-top:2px;
+}
+.sh-mission-desc{
+  font-size:12.5px;
+  line-height:1.48;
+  color:var(--ink);
+}
+/* Служба */
+.sh-service-ladder{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.sh-service-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:12px 16px;
+}
+.sh-service-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:6px;
+}
+.sh-service-icon{
+  font-size:18px;
+}
+.sh-service-title{
+  font-family:'Cinzel',serif;
+  font-size:14px;
+  font-weight:700;
+  color:var(--ink);
+  flex:1;
+}
+.sh-service-step{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;
+  color:var(--ink-dim);
+}
+.sh-service-desc{
+  font-size:12.5px;
+  line-height:1.48;
+  color:var(--ink-dim);
+}
+
 .sh-filter-pill:hover{
   border-color:var(--brass);
   color:var(--ink);
@@ -2013,6 +2655,17 @@ body.sh-theme .card:hover{
   border-radius:4px;
   font-weight:700;
   letter-spacing:.06em;
+}
+.sh-hud-level{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  padding:3px 9px;
+  background:rgba(201,164,92,0.18);
+  border:1px solid var(--brass);
+  color:#f6e58d;
+  border-radius:4px;
+  font-weight:700;
+  letter-spacing:.04em;
 }
 .sh-hud-edit-btn{
   background:rgba(255,255,255,0.05);
@@ -6235,6 +6888,7 @@ var DEFAULT_META = {
   clan: '',
   village: 'Коноха',
   rank: 'Генин',
+  level: '1',
   nature: '',
   chakra: '30',
   hp: '28',
@@ -6914,6 +7568,8 @@ SH.renderLauncherDiceHtml = renderLauncherDiceHtml;
 SH.renderTechLauncher = renderTechLauncher;
 SH.shHome = shHome;
 SH.shRef = shRef;
+SH.shRefView = shRefView;
+SH.REF = REF;
 SH.shCmds = shCmds;
 SH.CMDS = CMDS;
 SH.cmdById = cmdById;
@@ -7217,6 +7873,10 @@ function renderShinobiHudHtml(){
             '<select id="shHudInRank">'+rankOptions+'</select>'+
           '</div>'+
           '<div class="sh-hud-edit-item">'+
+            '<label>Уровень</label>'+
+            '<input type="number" min="1" max="100" id="shHudInLevel" value="'+escA(m.level!=null&&m.level!==''?m.level:'1')+'" placeholder="1">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
             '<label>Стихия</label>'+
             '<select id="shHudInNature">'+natOptions+'</select>'+
           '</div>'+
@@ -7244,6 +7904,7 @@ function renderShinobiHudHtml(){
   var nameDisplay = m.charName ? esc(m.charName) : 'Безымянный шиноби';
   var clanHtml = m.clan ? '<span class="sh-hud-clan">Клан ' + esc(m.clan) + '</span> · ' : '';
   var villageHtml = '<span>' + esc(m.village || 'Коноха') + '</span>';
+  var levelBadgeHtml = '<span class="sh-hud-level">Ур. ' + esc(m.level!=null&&m.level!==''?m.level:'1') + '</span>';
   var rankBadgeHtml = m.rank ? '<span class="sh-hud-rank">' + esc(m.rank) + '</span>' : '';
   var natureBadgeHtml = m.nature ? natureBadge(m.nature) : '';
 
@@ -7254,6 +7915,7 @@ function renderShinobiHudHtml(){
         '<div class="sh-hud-meta">' + clanHtml + villageHtml + '</div>'+
       '</div>'+
       '<div class="sh-hud-badges">'+
+        levelBadgeHtml +
         rankBadgeHtml +
         natureBadgeHtml +
         '<button class="sh-hud-edit-btn" id="shHudEditBtn" title="Настроить профиль">✏️ Профиль</button>'+
@@ -7848,7 +8510,7 @@ function renderChakraMandalaSvg(activeKey, activeFilter){
 
   var out = '<svg viewBox="0 0 540 600" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;">';
   out += '<defs>';
-  out += '<filter id="shChakraGlow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>';
+  out += '<filter id="shChakraGlow" x="-50" y="-50" width="640" height="700" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="5" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>';
   out += '<marker id="sh-arr-norm" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,0.25)" /></marker>';
   out += '<marker id="sh-arr-adv" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#7be0a6" /></marker>';
   out += '<marker id="sh-arr-weak" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#ff8577" /></marker>';
@@ -7909,7 +8571,7 @@ function renderChakraMandalaSvg(activeKey, activeFilter){
     var rayCol = isJtActive ? '#a55eea' : 'rgba(165,94,234,0.25)';
     var rayWidth = isJtActive ? '3.5' : '1.5';
     var rayFilter = isJtActive ? 'filter="url(#shChakraGlow)"' : '';
-    out += '<line x1="'+parPos.x+'" y1="'+parPos.y+'" x2="'+jtPos.x+'" y2="'+jtPos.y+'" stroke="'+rayCol+'" stroke-width="'+rayWidth+'" stroke-dasharray="4,2" '+rayFilter+' />';
+    out += '<line x1="'+parPos.x+'" y1="'+parPos.y+'" x2="'+(pk === 'katon' ? (jtPos.x + 0.01) : jtPos.x)+'" y2="'+jtPos.y+'" stroke="'+rayCol+'" stroke-width="'+rayWidth+'" stroke-dasharray="4,2" '+rayFilter+' />';
   });
 
   // Section divider: Yin-Yang
@@ -7959,8 +8621,8 @@ function renderChakraMandalaSvg(activeKey, activeFilter){
     if(activeFilter === 'tota' && d.type !== 'tota') isDimmed = true;
     if(activeFilter === 'yin_yang' && d.type.indexOf('yin') === -1 && d.type.indexOf('yang') === -1 && d.type !== 'onmyo') isDimmed = true;
 
-    var glowRing = isAct ? '#ffffff' : (isParentOfActive ? cd.color : (isChildOfActive ? '#7be0a6' : cd.color));
-    var ringW = isAct ? '3.5' : (isParentOfActive ? '2.5' : '1.8');
+    var glowRing = isAct ? '#ffffff' : (isParentOfActive ? (cur.color || cd.color) : (isChildOfActive ? '#7be0a6' : cd.color));
+    var ringW = isAct ? '3.5' : (isParentOfActive ? '3' : '1.8');
     var pulseClass = isAct ? 'node-bg active' : 'node-bg';
     var dropFilter = isAct ? 'filter="url(#shChakraGlow)"' : '';
     var opacityStyle = isDimmed ? 'opacity:0.2;' : '';
@@ -8073,39 +8735,824 @@ SH.renderElementWheel = renderElementWheel;
 SH.activeElemKey = activeElemKey;
 SH.activeChakraFilter = activeChakraFilter;
 
+
+// Comprehensive implementation of rich visual renderers for Shinobi Handbook screens
+
+function renderRefHeader(r, key, badgeText){
+  return '<div class="sh-ref-header">'+
+    '<div class="sh-ref-header-top">'+
+      '<div class="sh-ref-title-wrap">'+
+        '<h1 style="margin-bottom:4px;">'+(r.icon||'📖')+' '+esc(r.t)+'</h1>'+
+        (badgeText ? '<span class="sh-ref-header-badge">'+esc(badgeText)+'</span>' : '')+
+      '</div>'+
+      '<button class="sh-elem-btn sh-ref-copy-btn" id="shCopyRefLoreBtn" data-ref-key="'+escA(key)+'" title="Скопировать выжимку правил в буфер">'+
+        '📋 Скопировать правила для AI Studio'+
+      '</button>'+
+    '</div>'+
+    (r.lead ? '<div class="sh-ref-lead">'+esc(r.lead)+'</div>' : '')+
+  '</div>';
+}
+
+function renderRefGeneric(r, key){
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Справочник')+
+    '<div class="sh-ref-cards-grid">'+
+      r.rows.map(function(x){
+        return '<div class="sh-ref-card">'+
+          '<div class="sh-ref-card-k">'+esc(x.k)+'</div>'+
+          '<div class="sh-ref-card-v">'+nl2br(x.v)+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+  '</div>';
+}
+
+// 1. Ранги техник (rangi)
+function renderRefRangi(r, key){
+  var rankColors = {
+    'E': { bg: 'rgba(160, 174, 192, 0.12)', border: '#718096', text: '#cbd5e0', label: 'Академия' },
+    'D': { bg: 'rgba(46, 204, 113, 0.12)',  border: '#27ae60', text: '#2ecc71', label: 'Генин' },
+    'C': { bg: 'rgba(52, 152, 219, 0.12)',  border: '#2980b9', text: '#3498db', label: 'Чунин' },
+    'B': { bg: 'rgba(155, 89, 182, 0.12)',  border: '#8e44ad', text: '#9b59b6', label: 'Джонин' },
+    'A': { bg: 'rgba(230, 126, 34, 0.14)',  border: '#d35400', text: '#e67e22', label: 'Секретная / Род' },
+    'S': { bg: 'rgba(231, 76, 60, 0.18)',   border: '#c0392b', text: '#e74c3c', label: 'Вершинная / Легенда' }
+  };
+
+  var rankRows = [];
+  var ruleRows = [];
+  (r.rows || []).forEach(function(row){
+    if(rankColors[row.k]) rankRows.push(row);
+    else ruleRows.push(row);
+  });
+
+  var ladderHtml = '<div class="sh-ladder-wrap">'+
+    rankRows.map(function(rk){
+      var c = rankColors[rk.k];
+      return '<div class="sh-ladder-step" style="background:'+c.bg+';border-color:'+c.border+';">'+
+        '<div class="sh-ladder-badge" style="color:'+c.text+';border-color:'+c.border+';">'+
+          '<span class="sh-ladder-letter">'+rk.k+'</span>'+
+          '<span class="sh-ladder-tag">'+c.label+'</span>'+
+        '</div>'+
+        '<div class="sh-ladder-desc">'+esc(rk.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  var rulesHtml = '<div class="sh-ref-cards-grid" style="margin-top:20px;">'+
+    ruleRows.map(function(rw){
+      var isKinjutsu = rw.k.indexOf('Запретные') !== -1;
+      var cardBorder = isKinjutsu ? 'var(--crimson-bright)' : 'var(--brass)';
+      var cardBg = isKinjutsu ? 'rgba(192, 57, 43, 0.12)' : 'rgba(201, 164, 92, 0.08)';
+      return '<div class="sh-ref-card" style="border-color:'+cardBorder+';background:'+cardBg+';">'+
+        '<div class="sh-ref-card-k" style="color:'+(isKinjutsu?'#ff7675':'#f6e58d')+';">'+
+          (isKinjutsu ? '☠️ ' : '📜 ') + esc(rw.k) +
+        '</div>'+
+        '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Шкала E–S')+
+    '<div class="sh-section-tag">Стела рангов и уровни доступа</div>'+
+    ladderHtml +
+    '<div class="sh-section-tag" style="margin-top:24px;">Правила разработки, изучения и запретов</div>'+
+    rulesHtml +
+  '</div>';
+}
+
+// 2. Окна возможностей (okna)
+function renderRefOkna(r, key){
+  var condRows = [];
+  var ruleRows = [];
+  var condIcons = {
+    'СВЯЗАН': '⛓️',
+    'ОБЕЗДВИЖЕН': '🪢',
+    'ОСЛЕПЛЁН': '👁️‍🗨️',
+    'СБИТ': '💥',
+    'ДИСТАНЦИЯ': '🏹',
+    'НЕЗАМЕЧЕН': '👤'
+  };
+
+  (r.rows || []).forEach(function(row){
+    if(condIcons[row.k]) condRows.push(row);
+    else ruleRows.push(row);
+  });
+
+  var condsHtml = '<div class="sh-condition-grid">'+
+    condRows.map(function(cr){
+      var icon = condIcons[cr.k] || '🎯';
+      return '<div class="sh-condition-card">'+
+        '<div class="sh-condition-top">'+
+          '<span class="sh-condition-icon">'+icon+'</span>'+
+          '<span class="sh-condition-name">'+esc(cr.k)+'</span>'+
+          '<span class="sh-condition-badge">Окно</span>'+
+        '</div>'+
+        '<div class="sh-condition-desc">'+esc(cr.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  var rulesIcons = {
+    'Длительность': '⏳',
+    'Окно тратится': '🎯',
+    'Повтор дорожает': '📈',
+    'Не складывается': '⛔',
+    'Пассивное сопротивление': '🛡️'
+  };
+
+  var rulesHtml = '<div class="sh-ref-cards-grid" style="margin-top:16px;">'+
+    ruleRows.map(function(rw){
+      var ic = rulesIcons[rw.k] || '⚖️';
+      return '<div class="sh-ref-card" style="border-left:3px solid var(--brass);">'+
+        '<div class="sh-ref-card-k" style="color:#f6e58d;">'+ic+' '+esc(rw.k)+'</div>'+
+        '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Тактические состояния')+
+    '<div class="sh-section-tag">6 Тактических окон боя</div>'+
+    condsHtml +
+    '<div class="sh-section-tag" style="margin-top:24px;">5 Законов тайминга и расхода окон</div>'+
+    rulesHtml +
+  '</div>';
+}
+
+// 3. Чакра: расход и восстановление (chakra)
+function renderRefChakra(r, key){
+  var modes = [];
+  var debtRules = [];
+  (r.rows || []).forEach(function(rw){
+    if(['В бою','Вне боя','Сон','Не идёт'].indexOf(rw.k) !== -1) modes.push(rw);
+    else debtRules.push(rw);
+  });
+
+  var modeIcons = {
+    'В бою': { icon: '⚔️', rate: '+10% / действие', color: '#e67e22' },
+    'Вне боя': { icon: '🍃', rate: '+10% / мин', color: '#2ecc71' },
+    'Сон': { icon: '💤', rate: '100% за 8ч', color: '#3498db' },
+    'Не идёт': { icon: '🚫', rate: '0% (нагрузка)', color: '#e74c3c' }
+  };
+
+  var modesHtml = '<div class="sh-chakra-flow-grid">'+
+    modes.map(function(m){
+      var meta = modeIcons[m.k] || { icon: '🔵', rate: '', color: 'var(--brass)' };
+      return '<div class="sh-chakra-flow-card">'+
+        '<div class="sh-chakra-flow-top">'+
+          '<span class="sh-chakra-flow-icon">'+meta.icon+'</span>'+
+          '<div style="flex:1;"><div class="sh-chakra-flow-title">'+esc(m.k)+'</div><div class="sh-chakra-flow-rate" style="color:'+meta.color+';">'+meta.rate+'</div></div>'+
+        '</div>'+
+        '<div class="sh-chakra-flow-desc">'+esc(m.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  var debtHtml = '<div class="sh-debt-zone-box">'+
+    '<div class="sh-debt-zone-head">'+
+      '<span style="font-size:20px;">⚠️</span>'+
+      '<div>'+
+        '<div class="sh-debt-zone-title">Опасная зона: Уход в долг (до -30% пула)</div>'+
+        '<div class="sh-debt-zone-sub">Каждая единица долга = -1 хит · Каждые 10% долга = +1 истощение · Превышение -30% = обморок</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="sh-ref-cards-grid" style="margin-top:16px;">'+
+      debtRules.map(function(rw){
+        var isPill = rw.k.indexOf('Пилюли') !== -1;
+        return '<div class="sh-ref-card" style="border-color:'+(isPill?'#e67e22':'var(--crimson-bright)')+';background:rgba(20,15,15,0.7);">'+
+          '<div class="sh-ref-card-k" style="color:'+(isPill?'#f39c12':'#ff7675')+';">'+(isPill?'💊 ':'🩸 ')+esc(rw.k)+'</div>'+
+          '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+  '</div>';
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Потоки и резервы')+
+    '<div class="sh-section-tag">Режимы восстановления пула</div>'+
+    modesHtml +
+    '<div class="sh-section-tag" style="margin-top:24px;">Предел истощения и цена заёма</div>'+
+    debtHtml +
+  '</div>';
+}
+
+// 4. Дневной лимит техники (scetchik)
+function renderRefScetchik(r, key){
+  var formulaHtml = '<div class="sh-meter-calc-card">'+
+    '<div class="sh-meter-calc-top">'+
+      '<span class="sh-meter-calc-icon">⏳</span>'+
+      '<div>'+
+        '<div class="sh-meter-calc-title">Формула предела тела: 2 базово + 1 за каждые 4 уровня (макс. 6/сут)</div>'+
+        '<div class="sh-meter-calc-desc">Счётчик индивидуален для техники. Ограничен не чакрой, а телом: связки, каналы циркуляции, зрение.</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+
+  var stages = [
+    { title: '1-е превышение', dmg: '−25% макс. HP', debuff: '+1 уровень истощения', color: '#f39c12', icon: '⚠️' },
+    { title: '2-е превышение', dmg: '−50% макс. HP', debuff: '+2 уровня истощения', color: '#e67e22', icon: '🔥' },
+    { title: '3-е+ превышение', dmg: '−50% HP + обморок', debuff: 'НЕОБРАТИМЫЕ УВЕЧЬЯ КАНАЛОВ', color: '#e74c3c', icon: '☠️' }
+  ];
+
+  var stagesHtml = '<div class="sh-stages-grid">'+
+    stages.map(function(st){
+      return '<div class="sh-stage-card" style="border-color:'+st.color+';">'+
+        '<div class="sh-stage-head" style="color:'+st.color+';">'+
+          '<span>'+st.icon+' '+st.title+'</span>'+
+        '</div>'+
+        '<div class="sh-stage-dmg">'+st.dmg+'</div>'+
+        '<div class="sh-stage-debuff">'+st.debuff+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  var otherRules = (r.rows || []).filter(function(rw){
+    return rw.k.indexOf('Превышение') === -1;
+  });
+
+  var otherHtml = '<div class="sh-ref-cards-grid" style="margin-top:20px;">'+
+    otherRules.map(function(rw){
+      return '<div class="sh-ref-card">'+
+        '<div class="sh-ref-card-k" style="color:var(--brass);">📌 '+esc(rw.k)+'</div>'+
+        '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Предел тела')+
+    formulaHtml +
+    '<div class="sh-section-tag" style="margin-top:20px;">Шкала последствий перегрузки</div>'+
+    stagesHtml +
+    '<div class="sh-section-tag" style="margin-top:24px;">Правила износа и взаимозачёта</div>'+
+    otherHtml +
+  '</div>';
+}
+
+// 5. Как осваиваются техники (teoriya)
+function renderRefTeoriya(r, key){
+  var formulaCard = '<div class="sh-formula-banner">'+
+    '<div class="sh-formula-equation">'+
+      '<span class="sh-form-part">📖 ТЕОРИЯ</span>'+
+      '<span class="sh-form-plus">+</span>'+
+      '<span class="sh-form-part">🥋 ПРАКТИКА</span>'+
+      '<span class="sh-form-eq">=</span>'+
+      '<span class="sh-form-res">🌀 ТЕХНИКА</span>'+
+    '</div>'+
+    '<div class="sh-formula-sub">Нужны оба компонента. Одного недостаточно никогда. Скорость зависит от точности теории и упорства, а не от ранга.</div>'+
+  '</div>';
+
+  var pathIcons = {
+    'Учитель': { icon: '👨‍🏫', tag: 'Быстрейший путь', speed: 'Высокая', cost: 'Доступ и долг' },
+    'Свиток или запись': { icon: '📜', tag: 'Автономия', speed: 'Средняя', cost: 'Деньги / Риск ошибок' },
+    'Наблюдение': { icon: '👁️', tag: 'Ослабленная копия', speed: 'Низкая (Додзюцу: мгновенно)', cost: 'Неполнота' },
+    'Собственная работа': { icon: '🧠', tag: 'Оригинальный стиль', speed: 'Месяцы фокуса', cost: 'Постоянный фокус' },
+    'Практика': { icon: '🥋', tag: 'Фиксация формы', speed: 'Ежедневная', cost: 'Чакра и пот' }
+  };
+
+  var cardsHtml = '<div class="sh-paths-grid">'+
+    (r.rows || []).map(function(rw){
+      var meta = pathIcons[rw.k] || { icon: '💡', tag: 'Метод', speed: '—', cost: '—' };
+      return '<div class="sh-path-card">'+
+        '<div class="sh-path-head">'+
+          '<span class="sh-path-icon">'+meta.icon+'</span>'+
+          '<div style="flex:1;"><div class="sh-path-title">'+esc(rw.k)+'</div><div class="sh-path-tag">'+meta.tag+'</div></div>'+
+        '</div>'+
+        '<div class="sh-path-meta-row">'+
+          '<span>Скорость: <b>'+meta.speed+'</b></span>'+
+          '<span>Цена: <b>'+meta.cost+'</b></span>'+
+        '</div>'+
+        '<div class="sh-path-desc">'+nl2br(rw.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Пути познания')+
+    formulaCard +
+    '<div class="sh-section-tag" style="margin-top:24px;">Источники теории и отработка формы</div>'+
+    cardsHtml +
+  '</div>';
+}
+
+// 6. Категории и происхождение (kategorii)
+function renderRefKategorii(r, key){
+  var disciplines = [];
+  var origins = [];
+  (r.rows || []).forEach(function(rw){
+    if(rw.k.indexOf('ПРОИСХОЖДЕНИЕ') !== -1) origins.push(rw);
+    else disciplines.push(rw);
+  });
+
+  var discIcons = {
+    'Ниндзюцу': '🌀',
+    'Тайдзюцу': '👊',
+    'Гендзюцу': '👁️',
+    'Фуиндзюцу': '📜',
+    'Кендзюцу': '⚔️',
+    'Ирьениндзюцу': '💚',
+    'Кучиёсэ': '🐸',
+    'Сендзюцу': '⛰️'
+  };
+
+  var discHtml = '<div class="sh-disc-grid">'+
+    disciplines.map(function(rw){
+      var ic = discIcons[rw.k] || '✨';
+      return '<div class="sh-disc-card">'+
+        '<div class="sh-disc-head">'+
+          '<span class="sh-disc-icon">'+ic+'</span>'+
+          '<span class="sh-disc-name">'+esc(rw.k)+'</span>'+
+        '</div>'+
+        '<div class="sh-disc-desc">'+esc(rw.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  var originMeta = {
+    'ПРОИСХОЖДЕНИЕ — Общая': { title: 'Общая (Базовая)', icon: '⚪', badge: 'Академия' },
+    'ПРОИСХОЖДЕНИЕ — Природа чакры': { title: 'Природа чакры', icon: '🌿', badge: 'Сродство' },
+    'ПРОИСХОЖДЕНИЕ — Кеккей генкай': { title: 'Кеккей Генкай', icon: '🧬', badge: 'Кровь' },
+    'ПРОИСХОЖДЕНИЕ — Хиден': { title: 'Хиден (Клановый секрет)', icon: '🗃️', badge: 'Секретный свиток' }
+  };
+
+  var originHtml = '<div class="sh-origin-grid">'+
+    origins.map(function(rw){
+      var meta = originMeta[rw.k] || { title: rw.k, icon: '📜', badge: 'Происхождение' };
+      return '<div class="sh-origin-card">'+
+        '<div class="sh-origin-head">'+
+          '<span class="sh-origin-icon">'+meta.icon+'</span>'+
+          '<div><div class="sh-origin-title">'+esc(meta.title)+'</div><span class="sh-origin-badge">'+meta.badge+'</span></div>'+
+        '</div>'+
+        '<div class="sh-origin-desc">'+nl2br(rw.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Таксономия дзюцу')+
+    '<div class="sh-section-tag">8 Боевых дисциплин мира шиноби</div>'+
+    discHtml +
+    '<div class="sh-section-tag" style="margin-top:24px;">4 Истока происхождения права на технику</div>'+
+    originHtml +
+  '</div>';
+}
+
+// 7. Клоны (klony)
+function renderRefKlony(r, key){
+  var massRows = [];
+  var advancedRows = [];
+  var isAdv = false;
+  (r.rows || []).forEach(function(rw){
+    if(rw.k.indexOf('КЛАСС 2') !== -1) isAdv = true;
+    if(isAdv) advancedRows.push(rw);
+    else massRows.push(rw);
+  });
+
+  var massHtml = '<div class="sh-clone-class-card" style="border-left:4px solid #3498db;">'+
+    '<div class="sh-clone-class-title">👥 КЛАСС 1 — Массовые рои</div>'+
+    '<div class="sh-clone-class-sub">Всегда ОДИН участник боя. Единая инициатива, единое действие, общий скалируемый урон. Гибнут от любого удара.</div>'+
+    '<div class="sh-ref-cards-grid" style="margin-top:14px;">'+
+      massRows.slice(1).map(function(rw){
+        var isNum = rw.k.indexOf('Численность') !== -1;
+        return '<div class="sh-ref-card" style="background:rgba(255,255,255,0.02);">'+
+          '<div class="sh-ref-card-k" style="color:'+(isNum?'#68d391':'#cbd5e0')+';">'+esc(rw.k)+'</div>'+
+          '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+  '</div>';
+
+  var advHtml = '<div class="sh-clone-class-card" style="border-left:4px solid #9b59b6;margin-top:20px;">'+
+    '<div class="sh-clone-class-title">👤 КЛАСС 2 — Продвинутые автономные дубли</div>'+
+    '<div class="sh-clone-class-sub">Полноценные отдельные бойцы со своими действиями. Теневые возвращают память и опыт, стихийные взрываются или связывают.</div>'+
+    '<div class="sh-ref-cards-grid" style="margin-top:14px;">'+
+      advancedRows.slice(1).map(function(rw){
+        return '<div class="sh-ref-card" style="background:rgba(255,255,255,0.02);">'+
+          '<div class="sh-ref-card-k" style="color:#d6bcfa;">'+esc(rw.k)+'</div>'+
+          '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+  '</div>';
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Экономика тел')+
+    massHtml +
+    advHtml +
+  '</div>';
+}
+
+// 8. Ранги миссий (missii)
+function renderRefMissii(r, key){
+  var missionColors = {
+    'D': { color: '#2ecc71', bg: 'rgba(46,204,113,0.1)', req: 'Генины', risk: 'Быт и охрана в деревне' },
+    'C': { color: '#3498db', bg: 'rgba(52,152,219,0.1)', req: 'Генины / Чунины', risk: 'Разбойники, звери, вне деревни' },
+    'B': { color: '#9b59b6', bg: 'rgba(155,89,182,0.1)', req: 'Чунины / Джонины', risk: 'Вражеские шиноби, шпионаж' },
+    'A': { color: '#e67e22', bg: 'rgba(230,126,34,0.1)', req: 'Джонины / АНБУ', risk: 'Ликвидация джонинов, межгосударственные' },
+    'S': { color: '#e74c3c', bg: 'rgba(231,76,60,0.15)', req: 'Элита / Каге', risk: 'Угроза деревне, нукенины S-ранга' }
+  };
+
+  var mCards = [];
+  var payRow = null;
+  (r.rows || []).forEach(function(rw){
+    if(missionColors[rw.k]) mCards.push(rw);
+    else payRow = rw;
+  });
+
+  var boardHtml = '<div class="sh-mission-board">'+
+    mCards.map(function(mc){
+      var c = missionColors[mc.k];
+      return '<div class="sh-mission-card" style="border-color:'+c.color+';background:'+c.bg+';">'+
+        '<div class="sh-mission-head">'+
+          '<span class="sh-mission-rank" style="background:'+c.color+';">'+mc.k+'</span>'+
+          '<div style="flex:1;">'+
+            '<div class="sh-mission-req">Допуск: <b>'+c.req+'</b></div>'+
+            '<div class="sh-mission-risk" style="color:'+c.color+';">'+c.risk+'</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="sh-mission-desc">'+nl2br(mc.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  var payHtml = payRow ? ('<div class="sh-ref-card" style="margin-top:20px;border-color:var(--brass);background:rgba(201,164,92,0.08);">'+
+    '<div class="sh-ref-card-k" style="color:#f6e58d;">💰 '+esc(payRow.k)+'</div>'+
+    '<div class="sh-ref-card-v">'+nl2br(payRow.v)+'</div>'+
+  '</div>') : '';
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Доска заказов')+
+    '<div class="sh-section-tag">Классификация миссий деревни</div>'+
+    boardHtml +
+    payHtml +
+  '</div>';
+}
+
+// 9. Служба и ранги (sluzhba) & Академия (akademiya)
+function renderRefSluzhba(r, key){
+  var rankIcons = {
+    'Ученик Академии': '🎓',
+    'Генин': '🔰',
+    'Чунин': '🛡️',
+    'Токубецу-джонин': '⚔️',
+    'Джонин': '👑',
+    'АНБУ': '🎭',
+    'Каге': '🌟',
+    'Нукенин': '🩸',
+    'Отряды': '👥'
+  };
+
+  var listHtml = '<div class="sh-service-ladder">'+
+    (r.rows || []).map(function(rw, idx){
+      var ic = rankIcons[rw.k] || '🥷';
+      var isNuke = rw.k === 'Нукенин';
+      var isKage = rw.k === 'Каге';
+      var border = isNuke ? '#e74c3c' : (isKage ? 'var(--brass)' : 'rgba(255,255,255,0.12)');
+      return '<div class="sh-service-card" style="border-left:4px solid '+border+';">'+
+        '<div class="sh-service-top">'+
+          '<span class="sh-service-icon">'+ic+'</span>'+
+          '<span class="sh-service-title">'+esc(rw.k)+'</span>'+
+          '<span class="sh-service-step">Ступень '+(idx+1)+'</span>'+
+        '</div>'+
+        '<div class="sh-service-desc">'+nl2br(rw.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Иерархия скрытой деревни')+
+    listHtml +
+  '</div>';
+}
+
+// 10. Академия (akademiya)
+function renderRefAkademiya(r, key){
+  var baseJutsu = [];
+  var rules = [];
+  (r.rows || []).forEach(function(rw){
+    if(rw.k.indexOf('но Дзюцу') !== -1) baseJutsu.push(rw);
+    else rules.push(rw);
+  });
+
+  var jutsuHtml = '<div class="sh-condition-grid">'+
+    baseJutsu.map(function(bj){
+      return '<div class="sh-condition-card" style="border-color:var(--brass);">'+
+        '<div class="sh-condition-top">'+
+          '<span class="sh-condition-icon">📜</span>'+
+          '<span class="sh-condition-name" style="font-size:13px;">'+esc(bj.k)+'</span>'+
+        '</div>'+
+        '<div class="sh-condition-desc">'+nl2br(bj.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  var rulesHtml = '<div class="sh-ref-cards-grid" style="margin-top:16px;">'+
+    rules.map(function(rw){
+      return '<div class="sh-ref-card">'+
+        '<div class="sh-ref-card-k" style="color:var(--brass);">🎓 '+esc(rw.k)+'</div>'+
+        '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Школа ниндзя')+
+    '<div class="sh-section-tag">Три обязательных академических дзюцу</div>'+
+    jutsuHtml +
+    '<div class="sh-section-tag" style="margin-top:24px;">Стандарты выпуска и распределение</div>'+
+    rulesHtml +
+  '</div>';
+}
+
+// 11. Приёмы (taidzu) & Защита (zashita)
+function renderRefTaidzu(r, key){
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Боевые искусства')+
+    '<div class="sh-ref-cards-grid">'+
+      (r.rows || []).map(function(rw){
+        var isFive = rw.k.indexOf('ПЯТЬ ВИДОВ') !== -1;
+        return '<div class="sh-ref-card" style="'+(isFive?'border-color:var(--brass);grid-column:1/-1;':'')+'">'+
+          '<div class="sh-ref-card-k" style="color:'+(isFive?'#f6e58d':'var(--accent)')+';">👊 '+esc(rw.k)+'</div>'+
+          '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+  '</div>';
+}
+
+function renderRefZashita(r, key){
+  var reactIcons = {
+    'Глухой блок': '🛡️',
+    'Уворот': '💨',
+    'Парирование оружием': '⚔️',
+    'Защитная техника': '🌀',
+    'Атака гендзюцу': '👁️',
+    'Бросок защиты': '🎲',
+    'Реакция': '⚡',
+    'Каварими': '🪵',
+    'Гендзюцу — развеивание': '✨'
+  };
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Реакции и выживание')+
+    '<div class="sh-condition-grid">'+
+      (r.rows || []).map(function(rw){
+        var ic = reactIcons[rw.k] || '🛡️';
+        return '<div class="sh-condition-card">'+
+          '<div class="sh-condition-top">'+
+            '<span class="sh-condition-icon">'+ic+'</span>'+
+            '<span class="sh-condition-name">'+esc(rw.k)+'</span>'+
+          '</div>'+
+          '<div class="sh-condition-desc">'+nl2br(rw.v)+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+  '</div>';
+}
+
+// 12. Поражение (porazhenie) & Допрос (dopros)
+function renderRefPorazhenie(r, key){
+  var prices = [];
+  var tactics = [];
+  (r.rows || []).forEach(function(rw){
+    if(rw.k.indexOf('ЦЕНА') !== -1) prices.push(rw);
+    else tactics.push(rw);
+  });
+
+  var tacticsHtml = '<div class="sh-ref-cards-grid">'+
+    tactics.map(function(rw){
+      return '<div class="sh-ref-card" style="border-left:3px solid var(--crimson-bright);">'+
+        '<div class="sh-ref-card-k" style="color:#ff7675;">🩸 '+esc(rw.k)+'</div>'+
+        '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  var pricesHtml = '<div class="sh-condition-grid" style="margin-top:16px;">'+
+    prices.map(function(rw){
+      return '<div class="sh-condition-card" style="border-color:#e67e22;">'+
+        '<div class="sh-condition-top">'+
+          '<span class="sh-condition-icon">⚖️</span>'+
+          '<span class="sh-condition-name">'+esc(rw.k)+'</span>'+
+        '</div>'+
+        '<div class="sh-condition-desc">'+nl2br(rw.v)+'</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Травмы и цена поражения')+
+    '<div class="sh-section-tag">Тактический расклад при 0 HP</div>'+
+    tacticsHtml +
+    '<div class="sh-section-tag" style="margin-top:24px;">7 Видов цены за жизнь</div>'+
+    pricesHtml +
+  '</div>';
+}
+
+function renderRefDopros(r, key){
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Протоколы допроса АНБУ')+
+    '<div class="sh-ref-cards-grid">'+
+      (r.rows || []).map(function(rw){
+        var isBreak = rw.k.indexOf('СЛОМ') !== -1 || rw.k.indexOf('ТРЕЩИНА') !== -1;
+        return '<div class="sh-ref-card" style="border-color:'+(isBreak?'var(--crimson-bright)':'var(--line)')+';">'+
+          '<div class="sh-ref-card-k" style="color:'+(isBreak?'#ff7675':'#f6e58d')+';">🔒 '+esc(rw.k)+'</div>'+
+          '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+  '</div>';
+}
+
+// 13. Навыки и знания (navyki)
+function renderRefNavyki(r, key){
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Ремёсла и быт')+
+    '<div class="sh-ref-cards-grid">'+
+      (r.rows || []).map(function(rw){
+        var isLvl = rw.k.indexOf('УРОВНИ') !== -1;
+        return '<div class="sh-ref-card" style="'+(isLvl?'grid-column:1/-1;border-color:var(--brass);background:rgba(201,164,92,0.06);':'')+'">'+
+          '<div class="sh-ref-card-k" style="color:'+(isLvl?'#f6e58d':'var(--accent)')+';">🛠️ '+esc(rw.k)+'</div>'+
+          '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+  '</div>';
+}
+
+// 14. Страны (mir) & Отношения (otnosheniya)
+function renderRefMir(r, key){
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Геополитика')+
+    '<div class="sh-ref-cards-grid">'+
+      (r.rows || []).map(function(rw){
+        return '<div class="sh-ref-card">'+
+          '<div class="sh-ref-card-k" style="color:#68d391;">🗺️ '+esc(rw.k)+'</div>'+
+          '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+  '</div>';
+}
+
+function renderRefOtnosheniya(r, key){
+  return '<div class="sh-ref-box">'+
+    renderRefHeader(r, key, 'Узы и репутация')+
+    '<div class="sh-ref-cards-grid">'+
+      (r.rows || []).map(function(rw){
+        return '<div class="sh-ref-card">'+
+          '<div class="sh-ref-card-k" style="color:#f687b3;">🤝 '+esc(rw.k)+'</div>'+
+          '<div class="sh-ref-card-v">'+nl2br(rw.v)+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+  '</div>';
+}
+
+
+
+
 function shRef(){
-  var keys = Object.keys(REF);
-  return crumbSh([{label:'Шиноби',nav:'home'},{label:'Справочник'}])+
+  var searchVal = (typeof SH !== 'undefined' && SH.refSearch) ? SH.refSearch.toLowerCase().trim() : '';
+
+  var sections = [
+    {
+      group: '🌀 Чакра и техники',
+      color: 'var(--brass)',
+      items: [
+        { nav: 'shRefView:priroda', icon: '🌿', t: 'Природы чакры', tag: 'Мандала', d: 'Интерактивная диаграмма 5 стихий, 8 слияний, Тота и Инь-Ян' },
+        { nav: 'shRefView:rangi', icon: '📶', t: 'Ранги техник', tag: 'Шкала E–S', d: 'Стела рангов от Академии до Вершинных, требования и цепочки разработки' },
+        { nav: 'shRefView:kategorii', icon: '🗂️', t: 'Категории и истоки', tag: '8 дисциплин', d: 'Ниндзюцу, тайдзюцу, гендзюцу, печати + 4 истока права на технику' },
+        { nav: 'shRefView:teoriya', icon: '📖', t: 'Как осваиваются техники', tag: 'Пути познания', d: 'Теория + практика, 4 пути изучения (учитель, свиток, наблюдение, опыт)' },
+        { nav: 'shRefView:chakra', icon: '🔵', t: 'Чакра: расход и восстановление', tag: 'Потоки чакры', d: 'Восстановление в бою, покое и во сне. Опасная зона долга до −30% и пилюли' },
+        { nav: 'shRefView:scetchik', icon: '⏳', t: 'Дневной лимит техники', tag: 'Предел тела', d: 'Формула предела тела (2+1/4 ур.) и 3 стадии физической перегрузки' }
+      ]
+    },
+    {
+      group: '⚔️ Бой и тактика',
+      color: 'var(--crimson-bright)',
+      items: [
+        { nav: 'shRefView:okna', icon: '🎯', t: 'Окна возможностей', tag: '6 состояний', d: 'Тактические окна боя (связан, сбит, ослеплён) и 5 правил их расхода' },
+        { nav: 'shRefView:taidzu', icon: '👊', t: 'Приёмы: кости и виды', tag: 'Тайдзюцу', d: '5 видов приёмов, пул костей мастерства и рукопашное превосходство' },
+        { nav: 'shRefView:zashita', icon: '🛡️', t: 'Защита и уклонение', tag: 'Реакции', d: 'Блок, парирование клинком, уворот, каварими и развеивание гендзюцу' },
+        { nav: 'shRefView:klony', icon: '👥', t: 'Клоны', tag: 'Экономика тел', d: 'Массовые рои с бонусами численности против автономных теневых дублей' }
+      ]
+    },
+    {
+      group: '🥷 Мир шиноби и служба',
+      color: '#68d391',
+      items: [
+        { nav: 'shMap', icon: '🗺️', t: 'Интерактивная карта мира', tag: 'Векторный атлас', d: '26 стран, скрытые деревни, подсветка и тактический лор' },
+        { nav: 'shRefView:sluzhba', icon: '🎖️', t: 'Служба и ранги', tag: 'Иерархия', d: 'Лестница званий: Академик → Генин → Чунин → Джонин → АНБУ → Каге' },
+        { nav: 'shRefView:missii', icon: '📜', t: 'Ранги миссий', tag: 'Доска заказов', d: 'Градация заданий от D до S, распределение оплаты и зоны опасности' },
+        { nav: 'shRefView:akademiya', icon: '🎓', t: 'Академия', tag: 'Основа', d: '3 выпускных дзюцу (Хенге, Буншин, Каварими) и экзаменационные нормативы' },
+        { nav: 'shRefView:porazhenie', icon: '🩸', t: 'Поражение и травмы', tag: '0 HP', d: 'Спасброски, тактический расклад при 0 хитов и 7 видов цены за жизнь' },
+        { nav: 'shRefView:dopros', icon: '🔒', t: 'Давление, допрос и плен', tag: 'Протоколы АНБУ', d: '6 методов допроса, трещина воли, слом и защита от утечки секретов' },
+        { nav: 'shRefView:mir', icon: '🏯', t: 'Страны и деревни', tag: 'Геополитика', d: 'Великая Пятёрка, баланс даймё, малые буферные страны и денежная система' },
+        { nav: 'shRefView:otnosheniya', icon: '🤝', t: 'Отношения и репутация', tag: 'Узы', d: 'Стадии уз, угасание, взаимность и 4 слоя репутации шиноби' }
+      ]
+    },
+    {
+      group: '🛠️ Мастерство и ремесло',
+      color: '#f6ad55',
+      items: [
+        { nav: 'shRefView:navyki', icon: '🛠️', t: 'Навыки и знания', tag: '5 ступеней', d: 'Ступени мастерства (начатки → мастер), право знать без броска и ремесло' }
+      ]
+    },
+    {
+      group: '⌨️ Инструменты мастера',
+      color: '#b794f4',
+      items: [
+        { nav: 'shCmds', icon: '⌨️', t: 'Кнопки мастера (к1–к8)', tag: 'Пульт команд', d: 'Интерактивный пульт команд: темп, монтаж, сверка, рутина, допрос' }
+      ]
+    }
+  ];
+
+  var html = crumbSh([{label:'Шиноби',nav:'home'},{label:'Справочник'}])+
     '<button class="back" data-nav="home">← Назад</button>'+
-    '<h1>Справочник</h1><div class="menu-list grid-2">'+
-      '<div class="menu-item featured" data-nav="shCmds" style="border-left:3px solid var(--crimson-bright);background:linear-gradient(145deg, #1f1814 0%, #13100e 100%);">'+
-        '<div class="name">⌨️ Кнопки мастера (к1–к8)</div>'+
-        '<div class="desc">Интерактивный пульт команд: темп, монтаж, сверка, рутина</div>'+
-        '<div class="arrow">›</div>'+
+    '<div class="sh-ref-header">'+
+      '<h1 style="margin-bottom:6px;">📚 Справочник шиноби</h1>'+
+      '<div class="sh-ref-lead">Тактический свод правил, рангов, чакры, законов мира и боевой механики скрытых деревень.</div>'+
+      '<div class="sh-ref-search-wrap">'+
+        '<span class="sh-ref-search-icon">🔍</span>'+
+        '<input type="text" id="shRefSearch" class="sh-ref-search-input" placeholder="Быстрый поиск по справочнику (ранги, чакра, клоны, миссии, окна...)" value="'+escA(searchVal)+'">'+
       '</div>'+
-      '<div class="menu-item featured" data-nav="shMap" style="border-left:3px solid var(--brass);background:linear-gradient(145deg, #1b1712 0%, #120f0c 100%);">'+
-        '<div class="name">🗺️ Интерактивная карта мира</div>'+
-        '<div class="desc">Векторный атлас: 26 стран, скрытые деревни, подсветка и тактический лор</div>'+
-        '<div class="arrow">›</div>'+
+    '</div>';
+
+  var totalFound = 0;
+
+  sections.forEach(function(sec){
+    var filteredItems = sec.items.filter(function(it){
+      if(!searchVal) return true;
+      var haystack = (it.t + ' ' + it.d + ' ' + (it.tag||'')).toLowerCase();
+      return haystack.indexOf(searchVal) !== -1;
+    });
+
+    if(filteredItems.length === 0) return;
+    totalFound += filteredItems.length;
+
+    html += '<div class="sh-ref-group-block">'+
+      '<div class="sh-ref-group-title" style="border-left:3px solid '+sec.color+';">'+
+        '<span>'+sec.group+'</span>'+
+        '<span class="sh-ref-group-count">'+filteredItems.length+'</span>'+
       '</div>'+
-      keys.map(function(k){
-        return '<div class="menu-item" data-nav="shRefView:'+k+'"><div class="name">'+REF[k].icon+' '+esc(REF[k].t)+'</div><div class="arrow">›</div></div>';
-      }).join('')+'</div>';
+      '<div class="menu-list grid-2">'+
+        filteredItems.map(function(it){
+          return '<div class="menu-item" data-nav="'+it.nav+'" style="position:relative;">'+
+            '<div>'+
+              '<div class="name" style="display:flex;align-items:center;gap:8px;">'+
+                it.icon + ' ' + esc(it.t) +
+                (it.tag ? '<span class="sh-ref-item-tag">'+esc(it.tag)+'</span>' : '')+
+              '</div>'+
+              '<div class="desc">'+esc(it.d)+'</div>'+
+            '</div>'+
+            '<div class="arrow">›</div>'+
+          '</div>';
+        }).join('')+
+      '</div>'+
+    '</div>';
+  });
+
+  if(totalFound === 0 && searchVal){
+    html += '<div class="char-empty" style="margin-top:24px;">По запросу «' + esc(searchVal) + '» ничего не найдено. Попробуйте другой термин.</div>';
+  }
+
+  return html;
 }
 
 function shRefView(){
   var r = REF[view.shKey]; if(!r) return shRef();
-  var extraWidget = (view.shKey === 'priroda') ? renderElementWheel() : '';
-  return crumbSh([{label:'Шиноби',nav:'home'},{label:'Справочник',nav:'shRef'},{label:r.t}])+
-    '<button class="back" data-nav="shRef">← Назад</button>'+
-    '<h1>'+r.icon+' '+esc(r.t)+'</h1>'+
-    (r.lead?'<div class="subtitle">'+esc(r.lead)+'</div>':'')+
-    extraWidget +
-    r.rows.map(function(x){
-      return '<div class="hb-row"><div class="hb-row-k">'+esc(x.k)+'</div><div class="hb-row-v">'+nl2br(x.v)+'</div></div>';
-    }).join('');
-}
+  var crumb = crumbSh([{label:'Шиноби',nav:'home'},{label:'Справочник',nav:'shRef'},{label:r.t}])+
+    '<button class="back" data-nav="shRef">← Назад</button>';
 
+  if(view.shKey === 'priroda'){
+    return crumb + renderElementWheel();
+  }
+
+  var rendererMap = {
+    'rangi': renderRefRangi,
+    'okna': renderRefOkna,
+    'chakra': renderRefChakra,
+    'scetchik': renderRefScetchik,
+    'teoriya': renderRefTeoriya,
+    'kategorii': renderRefKategorii,
+    'klony': renderRefKlony,
+    'missii': renderRefMissii,
+    'sluzhba': renderRefSluzhba,
+    'akademiya': renderRefAkademiya,
+    'taidzu': renderRefTaidzu,
+    'zashita': renderRefZashita,
+    'porazhenie': renderRefPorazhenie,
+    'dopros': renderRefDopros,
+    'navyki': renderRefNavyki,
+    'mir': renderRefMir,
+    'otnosheniya': renderRefOtnosheniya
+  };
+
+  var fn = rendererMap[view.shKey] || renderRefGeneric;
+  return crumb + fn(r, view.shKey);
+}
 
 /* ---------- Интерактивная карта мира шиноби ---------- */
 var SH_MAP_DATA = [
@@ -12976,6 +14423,59 @@ function wireSh(){
   });
 
   /* Скопировать свойства стихии/слияния в буфер */
+  
+  /* Быстрый поиск в Справочнике шиноби */
+  var refSearchInput = g('shRefSearch');
+  if(refSearchInput){
+    refSearchInput.addEventListener('input', function(){
+      if(typeof SH !== 'undefined') SH.refSearch = refSearchInput.value;
+      var query = refSearchInput.value.toLowerCase().trim();
+      var blocks = document.querySelectorAll('.sh-ref-group-block');
+      blocks.forEach(function(block){
+        var items = block.querySelectorAll('.menu-item');
+        var visibleInBlock = 0;
+        items.forEach(function(item){
+          var text = (item.textContent || '').toLowerCase();
+          if(!query || text.indexOf(query) !== -1){
+            item.style.display = '';
+            visibleInBlock++;
+          } else {
+            item.style.display = 'none';
+          }
+        });
+        block.style.display = visibleInBlock ? '' : 'none';
+        var cntBadge = block.querySelector('.sh-ref-group-count');
+        if(cntBadge) cntBadge.textContent = visibleInBlock;
+      });
+    });
+  }
+
+  /* Скопировать правила раздела справочника */
+  var copyRefBtn = g('shCopyRefLoreBtn');
+  if(copyRefBtn){
+    copyRefBtn.addEventListener('click', function(){
+      var rk = copyRefBtn.getAttribute('data-ref-key');
+      var r = (typeof REF !== 'undefined' ? REF[rk] : null);
+      if(!r) return;
+      var lines = ['*[' + (r.icon ? r.icon + ' ' : '') + r.t + ']*'];
+      if(r.lead) lines.push(r.lead);
+      lines.push('');
+      (r.rows || []).forEach(function(rw){
+        lines.push('• ' + rw.k + ': ' + rw.v.replace(/\n/g, ' '));
+      });
+      var text = lines.join('\n');
+      if(typeof copyText === 'function') copyText(text);
+      copyRefBtn.textContent = '✓ Скопировано в буфер!';
+      copyRefBtn.style.background = 'var(--accent-green, #2ecc71)';
+      copyRefBtn.style.borderColor = 'var(--accent-green, #2ecc71)';
+      setTimeout(function(){
+        copyRefBtn.textContent = '📋 Скопировать правила для AI Studio';
+        copyRefBtn.style.background = '';
+        copyRefBtn.style.borderColor = '';
+      }, 2000);
+    });
+  }
+
   var copyChakraBtn = g('shBtnCopyChakraLore');
   if(copyChakraBtn){
     copyChakraBtn.addEventListener('click', function(){
@@ -13022,6 +14522,7 @@ function wireSh(){
       SH.meta.clan = (v('shHudInClan') || '').trim();
       SH.meta.village = (v('shHudInVillage') || '').trim();
       SH.meta.rank = (v('shHudInRank') || '').trim();
+      SH.meta.level = (v('shHudInLevel') || '1').trim();
       SH.meta.nature = (v('shHudInNature') || '').trim();
       SH.meta.chakra = (v('shHudInChakra') || '').trim();
       SH.meta.hp = (v('shHudInHp') || '').trim();
