@@ -2958,8 +2958,9 @@ body.sh-theme .card:hover{
   height:580px;
   overflow:hidden;
   background:#141c17;
-  cursor:grab;
   user-select:none;
+  -webkit-user-select:none;
+  -webkit-user-drag:none;
   touch-action:none;
 }
 .sh-map-viewport.grabbing{
@@ -2968,7 +2969,8 @@ body.sh-theme .card:hover{
 .sh-map-svg-wrap{
   width:100%;
   height:100%;
-  transform-origin:0 0;
+  transform-origin:50% 50%;
+  transition:transform 0.18s cubic-bezier(0.2, 0, 0.2, 1);
   will-change:transform;
 }
 .sh-country-poly{
@@ -36827,7 +36829,8 @@ function shMap(){
     overlayOpacity: 0.45,
     zoom: 1,
     panX: 0,
-    panY: 0
+    panY: 0,
+    allowPan: false
   };
 
   var curC = mapCountryById(SH.map.selectedId) || SH_MAP_DATA[0];
@@ -36867,10 +36870,11 @@ function shMap(){
           '<button class="sh-map-btn" id="shMapZoomIn" title="Приблизить">➕</button>'+
           '<button class="sh-map-btn" id="shMapZoomOut" title="Отдалить">➖</button>'+
           '<button class="sh-map-btn" id="shMapZoomReset" title="Сбросить масштаб и положение">⟲ 100%</button>'+
+          '<button class="sh-map-btn '+(SH.map.allowPan?'active':'')+'" id="shMapToggleLock" title="Переключить режим сдвига (по умолчанию выключен, карта надежно зафиксирована)">'+(SH.map.allowPan ? '✋ Панорама: Вкл' : '🔒 Зафиксирована')+'</button>'+
         '</div>'+
       '</div>'+
-      '<div class="sh-map-viewport" id="shMapViewport" title="Зажмите левую кнопку мыши для перемещения карты, колесико для зума">'+
-        '<div class="sh-map-svg-wrap" id="shMapSvgWrap" style="transform: translate('+SH.map.panX+'px, '+SH.map.panY+'px) scale('+SH.map.zoom+');">'+
+      '<div class="sh-map-viewport" id="shMapViewport" title="Кликните на страну для изучения. Колесико мыши или кнопки для зума">'+
+        '<div class="sh-map-svg-wrap" id="shMapSvgWrap" style="transform: translate('+(SH.map.panX||0)+'px, '+(SH.map.panY||0)+'px) scale('+(SH.map.zoom||1)+');">'+
           svgHtml +
         '</div>'+
       '</div>'+
@@ -38065,7 +38069,7 @@ function wireSh(){
   var vp = g('shMapViewport');
   var svgWrap = g('shMapSvgWrap');
   if(vp && svgWrap){
-    if(!SH.map) SH.map = { zoom: 1, panX: 0, panY: 0, selectedId: 'fire', filter: 'all', search: '', showVillages: true, showLabels: true, showOverlay: false, overlayOpacity: 0.45 };
+    if(!SH.map) SH.map = { zoom: 1, panX: 0, panY: 0, selectedId: 'fire', filter: 'all', search: '', showVillages: true, showLabels: true, showOverlay: false, overlayOpacity: 0.45, allowPan: false };
     var isDragging = false;
     var hasMoved = false;
     var startX = 0, startY = 0;
@@ -38078,14 +38082,15 @@ function wireSh(){
     };
 
     vp.onmousedown = function(e){
-      if(e.button !== 0) return;
+      var canPan = !!SH.map.allowPan || (e.button === 2 || e.button === 1);
+      if(!canPan) return;
       isDragging = true;
       hasMoved = false;
       startX = e.clientX;
       startY = e.clientY;
       origPanX = SH.map.panX || 0;
       origPanY = SH.map.panY || 0;
-      vp.style.cursor = 'grabbing';
+      if(vp) vp.style.cursor = 'grabbing';
     };
 
     var onMouseMove = function(e){
@@ -38093,16 +38098,27 @@ function wireSh(){
       var dx = e.clientX - startX;
       var dy = e.clientY - startY;
       if(Math.abs(dx) > 4 || Math.abs(dy) > 4) hasMoved = true;
-      SH.map.panX = origPanX + dx;
-      SH.map.panY = origPanY + dy;
+      var z = SH.map.zoom || 1;
+      var vw = (vp && vp.clientWidth) || 800;
+      var vh = (vp && vp.clientHeight) || 580;
+      var maxPanX = Math.max(0, (vw * (z - 1)) / 2);
+      var maxPanY = Math.max(0, (vh * (z - 1)) / 2);
+      var nextX = origPanX + dx;
+      var nextY = origPanY + dy;
+      SH.map.panX = Math.max(-maxPanX, Math.min(maxPanX, nextX));
+      SH.map.panY = Math.max(-maxPanY, Math.min(maxPanY, nextY));
       updateTransform();
     };
 
     var onMouseUp = function(){
       if(isDragging){
         isDragging = false;
-        if(vp) vp.style.cursor = 'grab';
+        if(vp) vp.style.cursor = SH.map.allowPan ? 'grab' : 'default';
       }
+    };
+
+    vp.oncontextmenu = function(e){
+      if(hasMoved) e.preventDefault();
     };
 
     if(typeof window.removeEventListener === 'function' && typeof window.addEventListener === 'function'){
@@ -38114,33 +38130,31 @@ function wireSh(){
       window.addEventListener('mouseup', onMouseUp);
     }
 
-    var zoomTo = function(targetZoom, pivotX, pivotY){
+    var zoomTo = function(targetZoom){
       var oldZoom = SH.map.zoom || 1;
-      var newZoom = Math.min(4.0, Math.max(0.5, targetZoom));
+      var newZoom = Math.min(4.0, Math.max(1.0, targetZoom));
       if(Math.abs(newZoom - oldZoom) < 0.001) return;
 
-      var vw = (vp && vp.clientWidth) || 800;
-      var vh = (vp && vp.clientHeight) || 580;
-      if(typeof pivotX !== 'number') pivotX = vw / 2;
-      if(typeof pivotY !== 'number') pivotY = vh / 2;
-
-      var pX = SH.map.panX || 0;
-      var pY = SH.map.panY || 0;
-
-      SH.map.panX = pivotX - (pivotX - pX) * (newZoom / oldZoom);
-      SH.map.panY = pivotY - (pivotY - pY) * (newZoom / oldZoom);
       SH.map.zoom = newZoom;
+      if(newZoom <= 1.01){
+        SH.map.panX = 0;
+        SH.map.panY = 0;
+      } else {
+        var vw = (vp && vp.clientWidth) || 800;
+        var vh = (vp && vp.clientHeight) || 580;
+        var maxPanX = Math.max(0, (vw * (newZoom - 1)) / 2);
+        var maxPanY = Math.max(0, (vh * (newZoom - 1)) / 2);
+        SH.map.panX = Math.max(-maxPanX, Math.min(maxPanX, SH.map.panX || 0));
+        SH.map.panY = Math.max(-maxPanY, Math.min(maxPanY, SH.map.panY || 0));
+      }
       updateTransform();
     };
 
-    // Wheel zoom towards pointer
+    // Wheel zoom
     vp.onwheel = function(e){
       e.preventDefault();
-      var rect = vp.getBoundingClientRect();
-      var mouseX = e.clientX - rect.left;
-      var mouseY = e.clientY - rect.top;
       var factor = e.deltaY < 0 ? 1.15 : 0.87;
-      zoomTo((SH.map.zoom || 1) * factor, mouseX, mouseY);
+      zoomTo((SH.map.zoom || 1) * factor);
     };
 
     // Touch support (PWA / Mobile gestures)
@@ -38148,12 +38162,14 @@ function wireSh(){
     var touchStartZoom = 1;
     vp.ontouchstart = function(e){
       if(e.touches.length === 1){
-        isDragging = true;
-        hasMoved = false;
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        origPanX = SH.map.panX || 0;
-        origPanY = SH.map.panY || 0;
+        if(SH.map.allowPan){
+          isDragging = true;
+          hasMoved = false;
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+          origPanX = SH.map.panX || 0;
+          origPanY = SH.map.panY || 0;
+        }
       } else if(e.touches.length === 2){
         isDragging = false;
         touchStartDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
@@ -38162,20 +38178,22 @@ function wireSh(){
     };
 
     vp.ontouchmove = function(e){
-      if(e.touches.length === 1 && isDragging){
+      if(e.touches.length === 1 && isDragging && SH.map.allowPan){
         var dx = e.touches[0].clientX - startX;
         var dy = e.touches[0].clientY - startY;
         if(Math.abs(dx) > 5 || Math.abs(dy) > 5) hasMoved = true;
-        SH.map.panX = origPanX + dx;
-        SH.map.panY = origPanY + dy;
+        var z = SH.map.zoom || 1;
+        var vw = (vp && vp.clientWidth) || 800;
+        var vh = (vp && vp.clientHeight) || 580;
+        var maxPanX = Math.max(0, (vw * (z - 1)) / 2);
+        var maxPanY = Math.max(0, (vh * (z - 1)) / 2);
+        SH.map.panX = Math.max(-maxPanX, Math.min(maxPanX, origPanX + dx));
+        SH.map.panY = Math.max(-maxPanY, Math.min(maxPanY, origPanY + dy));
         updateTransform();
       } else if(e.touches.length === 2 && touchStartDist > 0){
         var dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-        var rect = vp.getBoundingClientRect();
-        var midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
-        var midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
         var scale = dist / touchStartDist;
-        zoomTo(touchStartZoom * scale, midX, midY);
+        zoomTo(touchStartZoom * scale);
       }
     };
 
@@ -38186,10 +38204,11 @@ function wireSh(){
       }
     };
 
-    // Zoom Buttons
+    // Zoom Buttons & Lock toggle
     var btnIn = g('shMapZoomIn');
     var btnOut = g('shMapZoomOut');
     var btnReset = g('shMapZoomReset');
+    var btnLock = g('shMapToggleLock');
     if(btnIn) btnIn.onclick = function(){
       zoomTo((SH.map.zoom || 1) * 1.25);
     };
@@ -38201,6 +38220,16 @@ function wireSh(){
       SH.map.panX = 0;
       SH.map.panY = 0;
       updateTransform();
+    };
+    if(btnLock) btnLock.onclick = function(){
+      SH.map.allowPan = !SH.map.allowPan;
+      if(!SH.map.allowPan && (SH.map.zoom || 1) <= 1.05){
+        SH.map.panX = 0;
+        SH.map.panY = 0;
+        updateTransform();
+      }
+      if(vp) vp.style.cursor = SH.map.allowPan ? 'grab' : 'default';
+      render();
     };
 
     var wireMapInspector = function(){
@@ -38233,15 +38262,15 @@ function wireSh(){
       var doFocus = function(fx, fy){
         if(isNaN(fx) || isNaN(fy)) return;
         SH.map.zoom = 2.2;
-        var vw = vp.clientWidth || 800;
-        var vh = vp.clientHeight || 580;
-        var svgScaleX = vw / 1024;
-        var svgScaleY = vh / 682;
-        var actualScale = Math.min(svgScaleX, svgScaleY);
-        var offsetX = (vw - 1024 * actualScale) / 2;
-        var offsetY = (vh - 682 * actualScale) / 2;
-        SH.map.panX = (vw / 2) - (offsetX + fx * actualScale) * SH.map.zoom;
-        SH.map.panY = (vh / 2) - (offsetY + fy * actualScale) * SH.map.zoom;
+        var vw = (vp && vp.clientWidth) || 800;
+        var vh = (vp && vp.clientHeight) || 580;
+        var actualScale = Math.min(vw / 1024, vh / 682);
+        var maxPanX = Math.max(0, (vw * (SH.map.zoom - 1)) / 2);
+        var maxPanY = Math.max(0, (vh * (SH.map.zoom - 1)) / 2);
+        var targetPanX = (512 - fx) * actualScale * (SH.map.zoom - 1);
+        var targetPanY = (341 - fy) * actualScale * (SH.map.zoom - 1);
+        SH.map.panX = Math.max(-maxPanX, Math.min(maxPanX, targetPanX));
+        SH.map.panY = Math.max(-maxPanY, Math.min(maxPanY, targetPanY));
         updateTransform();
       };
       var btnFocus = g('shBtnFocusVillage');
