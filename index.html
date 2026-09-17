@@ -38114,23 +38114,33 @@ function wireSh(){
       window.addEventListener('mouseup', onMouseUp);
     }
 
+    var zoomTo = function(targetZoom, pivotX, pivotY){
+      var oldZoom = SH.map.zoom || 1;
+      var newZoom = Math.min(4.0, Math.max(0.5, targetZoom));
+      if(Math.abs(newZoom - oldZoom) < 0.001) return;
+
+      var vw = (vp && vp.clientWidth) || 800;
+      var vh = (vp && vp.clientHeight) || 580;
+      if(typeof pivotX !== 'number') pivotX = vw / 2;
+      if(typeof pivotY !== 'number') pivotY = vh / 2;
+
+      var pX = SH.map.panX || 0;
+      var pY = SH.map.panY || 0;
+
+      SH.map.panX = pivotX - (pivotX - pX) * (newZoom / oldZoom);
+      SH.map.panY = pivotY - (pivotY - pY) * (newZoom / oldZoom);
+      SH.map.zoom = newZoom;
+      updateTransform();
+    };
+
     // Wheel zoom towards pointer
     vp.onwheel = function(e){
       e.preventDefault();
       var rect = vp.getBoundingClientRect();
       var mouseX = e.clientX - rect.left;
       var mouseY = e.clientY - rect.top;
-
-      var oldZoom = SH.map.zoom || 1;
       var factor = e.deltaY < 0 ? 1.15 : 0.87;
-      var newZoom = Math.min(4.0, Math.max(0.5, oldZoom * factor));
-
-      var pX = SH.map.panX || 0;
-      var pY = SH.map.panY || 0;
-      SH.map.panX = mouseX - (mouseX - pX) * (newZoom / oldZoom);
-      SH.map.panY = mouseY - (mouseY - pY) * (newZoom / oldZoom);
-      SH.map.zoom = newZoom;
-      updateTransform();
+      zoomTo((SH.map.zoom || 1) * factor, mouseX, mouseY);
     };
 
     // Touch support (PWA / Mobile gestures)
@@ -38161,9 +38171,11 @@ function wireSh(){
         updateTransform();
       } else if(e.touches.length === 2 && touchStartDist > 0){
         var dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        var rect = vp.getBoundingClientRect();
+        var midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+        var midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
         var scale = dist / touchStartDist;
-        SH.map.zoom = Math.min(4.0, Math.max(0.5, touchStartZoom * scale));
-        updateTransform();
+        zoomTo(touchStartZoom * scale, midX, midY);
       }
     };
 
@@ -38179,12 +38191,10 @@ function wireSh(){
     var btnOut = g('shMapZoomOut');
     var btnReset = g('shMapZoomReset');
     if(btnIn) btnIn.onclick = function(){
-      SH.map.zoom = Math.min(4.0, (SH.map.zoom || 1) * 1.25);
-      updateTransform();
+      zoomTo((SH.map.zoom || 1) * 1.25);
     };
     if(btnOut) btnOut.onclick = function(){
-      SH.map.zoom = Math.max(0.5, (SH.map.zoom || 1) / 1.25);
-      updateTransform();
+      zoomTo((SH.map.zoom || 1) / 1.25);
     };
     if(btnReset) btnReset.onclick = function(){
       SH.map.zoom = 1;
@@ -38225,11 +38235,13 @@ function wireSh(){
         SH.map.zoom = 2.2;
         var vw = vp.clientWidth || 800;
         var vh = vp.clientHeight || 580;
-        var svgScaleX = vw / 1000;
-        var svgScaleY = vh / 825;
+        var svgScaleX = vw / 1024;
+        var svgScaleY = vh / 682;
         var actualScale = Math.min(svgScaleX, svgScaleY);
-        SH.map.panX = (vw / 2) - (fx * actualScale * SH.map.zoom);
-        SH.map.panY = (vh / 2) - (fy * actualScale * SH.map.zoom);
+        var offsetX = (vw - 1024 * actualScale) / 2;
+        var offsetY = (vh - 682 * actualScale) / 2;
+        SH.map.panX = (vw / 2) - (offsetX + fx * actualScale) * SH.map.zoom;
+        SH.map.panY = (vh / 2) - (offsetY + fy * actualScale) * SH.map.zoom;
         updateTransform();
       };
       var btnFocus = g('shBtnFocusVillage');
