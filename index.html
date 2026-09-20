@@ -1445,6 +1445,94 @@ body.sh-theme-uchiha .sh-uchiha-particles {
   background:rgba(200,67,55,0.12);
 }
 
+/* Бейджи категорий техник и Додзюцу */
+.sh-cat-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:11px;
+  padding:2px 7px;
+  border-radius:3px;
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--line);
+  color:var(--ink-dim);
+  vertical-align:middle;
+}
+.sh-cat-badge.is-dojutsu{
+  border-color:rgba(231,76,60,0.6);
+  background:rgba(231,76,60,0.15);
+  color:#ff8577;
+  font-weight:600;
+  text-shadow:0 0 5px rgba(231,76,60,0.45);
+}
+.sh-dojutsu-tag{
+  font-size:10px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+  padding:1px 5px;
+  border-radius:3px;
+  background:rgba(231,76,60,0.22);
+  border:1px solid rgba(231,76,60,0.5);
+  color:#ff9185;
+}
+.sh-tech-card.is-dojutsu{
+  border-left:3px solid #e74c3c !important;
+  background:linear-gradient(135deg, rgba(35, 14, 14, 0.45) 0%, rgba(20, 16, 12, 0.6) 100%) !important;
+  box-shadow:0 2px 10px rgba(231,76,60,0.08), inset 0 0 12px rgba(231,76,60,0.04);
+}
+.sh-tech-card.is-dojutsu:hover{
+  border-left-color:#ff5252 !important;
+  box-shadow:0 4px 16px rgba(231,76,60,0.25), inset 0 0 16px rgba(231,76,60,0.08);
+}
+.sh-tech-section-head.is-dojutsu{
+  background:linear-gradient(90deg, rgba(192,57,43,0.22) 0%, rgba(20,16,12,0.3) 100%);
+  border:1px solid rgba(231,76,60,0.4);
+  border-left:4px solid #e74c3c;
+  border-radius:6px;
+  padding:9px 14px;
+  margin:16px 0 10px 0;
+}
+.sh-tech-section-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:Cinzel,serif;
+  font-size:14px;
+  font-weight:700;
+  color:#ff7675;
+}
+.sh-section-eye-badge{
+  font-size:10.5px;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:rgba(231,76,60,0.25);
+  border:1px solid rgba(231,76,60,0.5);
+  color:#ffbe76;
+  padding:1px 6px;
+  border-radius:3px;
+  font-weight:600;
+  letter-spacing:0.03em;
+}
+.sh-tech-section-sub{
+  font-size:11.5px;
+  color:var(--ink-dim);
+  margin-top:2px;
+}
+.sh-filter-pill.dojutsu-pill{
+  border-color:rgba(231,76,60,0.45);
+  color:#ff8577;
+}
+.sh-filter-pill.dojutsu-pill:hover{
+  border-color:rgba(231,76,60,0.8);
+  background:rgba(231,76,60,0.15);
+}
+.sh-filter-pill.dojutsu-pill.active{
+  background:rgba(231,76,60,0.28);
+  border-color:#e74c3c;
+  color:#fff;
+  box-shadow:0 0 10px rgba(231,76,60,0.45);
+}
+
 /* Бейджи ступеней навыков */
 .sh-lvl-badge{
   display:inline-block;
@@ -8264,6 +8352,7 @@ var REF = {
       {k:'Ниндзюцу',      v:'Техники чакры: природы, формы, призывы, барьеры. Основная масса.'},
       {k:'Тайдзюцу',      v:'Рукопашное и оружейное: скорость, сила, приёмы. Чакрой усиливается, но не требует её обязательно.'},
       {k:'Гендзюцу',      v:'Иллюзии: вмешательство в поток чакры чужого сознания. Защита — своя техника развеивания или сорванная концентрация.'},
+      {k:'Додзюцу',       v:'Техники глаз и зрительного восприятия (Шаринган, Бьякуган, Риннеган). Чтение потоков чакры, предвидение движений, гендзюцу взгляда, пространственные техники и особые способности додзюцу.'},
       {k:'Фуиндзюцу',     v:'Печати: запечатывание, хранение, барьеры, метки. Медленное в бою, мощное в подготовке.'},
       {k:'Кендзюцу',      v:'Оружейное искусство как отдельная школа.'},
       {k:'Ирьениндзюцу',  v:'Медицинские техники: лечение, диагностика, точное вмешательство. Требуют высочайшего контроля.'},
@@ -8613,6 +8702,26 @@ function dmgText(t){
   if(m && m.charAt(0)!=='+' && m.charAt(0)!=='-') m='+'+m;
   return n+d+m;
 }
+var TECH_CATS = ['Додзюцу', 'Ниндзюцу', 'Тайдзюцу', 'Гендзюцу', 'Фуиндзюцу', 'Кендзюцу', 'Ирьениндзюцу', 'Кучиёсэ', 'Сендзюцу'];
+var TECH_CAT_ICONS = {
+  'Додзюцу': '👁️',
+  'Додзютцу': '👁️',
+  'Ниндзюцу': '🌀',
+  'Тайдзюцу': '👊',
+  'Гендзюцу': '🎭',
+  'Фуиндзюцу': '📜',
+  'Кендзюцу': '⚔️',
+  'Ирьениндзюцу': '💚',
+  'Кучиёсэ': '🐸',
+  'Сендзюцу': '⛰️'
+};
+
+function isDojutsu(cat){
+  if(!cat) return false;
+  var c = String(cat).toLowerCase().trim();
+  return c === 'додзюцу' || c === 'додзютцу' || c === 'dojutsu' || c.indexOf('додзюцу') !== -1 || c.indexOf('додзютцу') !== -1;
+}
+
 function newTech(){ return {id:null,name:'',rank:'D',cat:'Ниндзюцу',origin:'Общая',nature:'',effect:'uron',cost:'',upkeep:'',windows:[],counter:'',req:'',desc:'',dmgN:'1',dmgD:'d6',dmgMod:'',isExp:false}; }
 
 function formatLauncherMod(m){
@@ -9251,66 +9360,247 @@ function shHome(){
     }).join('')+'</div>';
 }
 
+function renderTechCard(t){
+  var isDoj = isDojutsu(t.cat);
+  var w = (t.windows && t.windows.length) 
+    ? t.windows.map(function(win){ return '<span class="sh-win-badge needed">🎯 '+esc(win)+'</span>'; }).join(' ')
+    : '<span class="sh-win-badge">окно не требуется</span>';
+  var nat = t.nature ? ' ' + natureBadge(t.nature) : '';
+  var c = t.counter ? ' · <span style="color:var(--brass)">счётчик '+esc(t.counter)+'/сут</span>' : '';
+  var costStr = t.cost ? '<b>'+esc(t.cost)+'</b>' : '—';
+  if(t.upkeep) costStr += ' +' + esc(t.upkeep) + '/рнд';
+  var dmgStr = dmgText(t) ? ' · урон: <b>'+esc(dmgText(t))+'</b>' : '';
+  
+  var catBadge = isDoj
+    ? '<span class="sh-cat-badge is-dojutsu">👁️ Додзюцу</span>'
+    : '<span class="sh-cat-badge">' + (TECH_CAT_ICONS[t.cat] || '🌀') + ' ' + esc(t.cat || 'Ниндзюцу') + '</span>';
+
+  var dojutsuNotice = isDoj ? '<span class="sh-dojutsu-tag">Кеккей Генкай Глаз</span>' : '';
+
+  return '<div class="card sh-tech-card ' + (isDoj ? 'is-dojutsu' : '') + '" data-nav="shTechView:'+t.id+'">'+
+    '<div class="top-row">'+
+      '<div class="name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+
+        rankSeal(t.rank) + ' ' + esc(t.name || 'Без названия') +
+        dojutsuNotice +
+      '</div>'+
+      nat+
+    '</div>'+
+    '<div class="desc" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0;">'+
+      catBadge + ' · затраты: ' + costStr + dmgStr + c +
+    '</div>'+
+    (t.desc ? '<div style="font-size:12px;color:var(--ink-dim);margin:4px 0 6px;line-height:1.4;">' + esc(t.desc) + '</div>' : '') +
+    '<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;">' + w + '</div>'+
+  '</div>';
+}
+
 function shTechs(){
   var launcherWidget = renderTechLauncher();
 
-  // Filter bar
+  // 1. Подсчет категорий и стихий
+  var catCounts = {};
   var natures = {};
   SH.techs.forEach(function(t){
-    var n = (t.nature||'').trim();
+    var c = (t.cat || 'Ниндзюцу').trim();
+    if(isDojutsu(c)) c = 'Додзюцу';
+    catCounts[c] = (catCounts[c] || 0) + 1;
+
+    var n = (t.nature || '').trim();
     if(n) natures[n] = (natures[n] || 0) + 1;
   });
-  var natKeys = Object.keys(natures);
-  var hasNoNat = SH.techs.some(function(t){ return !(t.nature||'').trim(); });
-  var techFilterBar = '';
-  if(SH.techs.length > 0 && (natKeys.length > 0 || hasNoNat)){
-    var curTF = SH.techFilter || 'all';
-    var pills = [
-      '<div class="sh-filter-pill '+(curTF==='all'?'active':'')+'" data-tech-filter="all">Все <span class="sh-pill-count">'+SH.techs.length+'</span></div>'
+
+  var curCatF = SH.techCatFilter || 'all';
+  var curNatF = SH.techFilter || 'all';
+  var curSort = SH.techSort || (function(){
+    try { return localStorage.getItem('sh_tech_sort') || 'category'; } catch(e){ return 'category'; }
+  })();
+  SH.techSort = curSort;
+
+  // 2. Фильтр по категориям (Додзюцу выделено во главе)
+  var catFilterBar = '';
+  if(SH.techs.length > 0){
+    var catPills = [
+      '<div class="sh-filter-pill '+(curCatF==='all'?'active':'')+'" data-tech-cat-filter="all">Все категории <span class="sh-pill-count">'+SH.techs.length+'</span></div>'
     ];
-    natKeys.forEach(function(k){
-      pills.push('<div class="sh-filter-pill '+(curTF===k?'active':'')+'" data-tech-filter="'+escA(k)+'">'+natureBadge(k)+' <span class="sh-pill-count">'+natures[k]+'</span></div>');
+
+    var catKeysToDisplay = [];
+    if(catCounts['Додзюцу']) catKeysToDisplay.push('Додзюцу');
+    TECH_CATS.forEach(function(k){
+      if(k !== 'Додзюцу' && catCounts[k] && catKeysToDisplay.indexOf(k) === -1){
+        catKeysToDisplay.push(k);
+      }
     });
-    if(hasNoNat && natKeys.length > 0){
-      var noNatCount = SH.techs.filter(function(t){ return !(t.nature||'').trim(); }).length;
-      pills.push('<div class="sh-filter-pill '+(curTF==='none'?'active':'')+'" data-tech-filter="none">Без стихии <span class="sh-pill-count">'+noNatCount+'</span></div>');
-    }
-    techFilterBar = '<div class="sh-filter-bar">'+pills.join('')+'</div>';
+    Object.keys(catCounts).forEach(function(k){
+      if(catKeysToDisplay.indexOf(k) === -1) catKeysToDisplay.push(k);
+    });
+
+    catKeysToDisplay.forEach(function(k){
+      var isDoj = isDojutsu(k);
+      var icon = TECH_CAT_ICONS[k] || '🌀';
+      var isAct = (curCatF === k) || (isDoj && isDojutsu(curCatF));
+      var extraCls = isDoj ? ' dojutsu-pill' : '';
+      catPills.push('<div class="sh-filter-pill'+extraCls+' '+(isAct?'active':'')+'" data-tech-cat-filter="'+escA(k)+'">'+icon+' '+esc(k)+' <span class="sh-pill-count">'+catCounts[k]+'</span></div>');
+    });
+
+    catFilterBar = '<div class="sh-filter-bar" style="margin-bottom:6px;">'+catPills.join('')+'</div>';
   }
 
-  // Filtered list
+  // 3. Фильтр по стихиям чакры
+  var natKeys = Object.keys(natures);
+  var hasNoNat = SH.techs.some(function(t){ return !(t.nature||'').trim(); });
+  var natFilterBar = '';
+  if(SH.techs.length > 0 && natKeys.length > 0){
+    var natPills = [
+      '<div class="sh-filter-pill '+(curNatF==='all'?'active':'')+'" data-tech-filter="all">Все стихии <span class="sh-pill-count">'+SH.techs.length+'</span></div>'
+    ];
+    natKeys.forEach(function(k){
+      natPills.push('<div class="sh-filter-pill '+(curNatF===k?'active':'')+'" data-tech-filter="'+escA(k)+'">'+natureBadge(k)+' <span class="sh-pill-count">'+natures[k]+'</span></div>');
+    });
+    if(hasNoNat){
+      var noNatCount = SH.techs.filter(function(t){ return !(t.nature||'').trim(); }).length;
+      natPills.push('<div class="sh-filter-pill '+(curNatF==='none'?'active':'')+'" data-tech-filter="none">Без стихии <span class="sh-pill-count">'+noNatCount+'</span></div>');
+    }
+    natFilterBar = '<div class="sh-filter-bar" style="margin-bottom:10px;">'+natPills.join('')+'</div>';
+  }
+
+  // 4. Фильтрация списка
   var filteredTechs = SH.techs.filter(function(t){
-    var curTF = SH.techFilter || 'all';
-    if(curTF === 'all') return true;
-    if(curTF === 'none') return !(t.nature||'').trim();
-    return (t.nature||'').trim() === curTF;
+    if(curCatF !== 'all'){
+      if(isDojutsu(curCatF)){
+        if(!isDojutsu(t.cat)) return false;
+      } else {
+        if(String(t.cat||'').trim() !== curCatF) return false;
+      }
+    }
+    if(curNatF !== 'all'){
+      if(curNatF === 'none'){
+        if((t.nature||'').trim()) return false;
+      } else {
+        if((t.nature||'').trim() !== curNatF) return false;
+      }
+    }
+    return true;
   });
 
-  var body = SH.techs.length ? (filteredTechs.length ? filteredTechs.map(function(t){
-    var w = (t.windows&&t.windows.length) 
-      ? t.windows.map(function(win){ return '<span class="sh-win-badge needed">🎯 '+esc(win)+'</span>'; }).join(' ')
-      : '<span class="sh-win-badge">окно не требуется</span>';
-    var nat = t.nature ? ' '+natureBadge(t.nature) : '';
-    var c = t.counter ? ' · <span style="color:var(--brass)">счётчик '+esc(t.counter)+'/сут</span>' : '';
-    var costStr = t.cost ? '<b>'+esc(t.cost)+'</b>' : '—';
-    if(t.upkeep) costStr += ' +'+esc(t.upkeep)+'/рнд';
-    var dmgStr = dmgText(t) ? ' · урон: <b>'+esc(dmgText(t))+'</b>' : '';
-    return '<div class="card" data-nav="shTechView:'+t.id+'">'+
-      '<div class="top-row">'+
-        '<div class="name">'+rankSeal(t.rank)+' '+esc(t.name||'Без названия')+'</div>'+
-        nat+
-      '</div>'+
-      '<div class="desc">'+esc(t.cat)+' · затраты: '+costStr+dmgStr+c+'</div>'+
-      '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;">'+w+'</div>'+
+  // 5. Панель сортировки
+  var sortToolbar = '';
+  if(SH.techs.length > 0){
+    sortToolbar = '<div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 8px;flex-wrap:wrap;gap:8px;background:var(--steel-1);padding:8px 12px;border:1px solid var(--line);border-radius:6px;">' +
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+        '<span style="font-size:12px;color:var(--ink-dim);font-weight:600;">Сортировка:</span>' +
+        '<select id="shTechSortSelect" class="sh-route-preset-sel" style="font-size:12px;padding:4px 10px;border-radius:4px;">' +
+          '<option value="category" '+(curSort==='category'?'selected':'')+'>👁️ По категориям (Додзюцу во главе)</option>' +
+          '<option value="rank_desc" '+(curSort==='rank_desc'?'selected':'')+'>⭐ По рангу (S ➔ D)</option>' +
+          '<option value="rank_asc" '+(curSort==='rank_asc'?'selected':'')+'>⭐ По рангу (D ➔ S)</option>' +
+          '<option value="name" '+(curSort==='name'?'selected':'')+'>🔤 По алфавиту (А–Я)</option>' +
+          '<option value="cost" '+(curSort==='cost'?'selected':'')+'>🌀 По затратам чакры</option>' +
+        '</select>' +
+      '</div>' +
+      '<div style="font-size:11.5px;color:var(--ink-dim);">' +
+        'Показано: <b>' + filteredTechs.length + '</b> из <b>' + SH.techs.length + '</b> техник' +
+      '</div>' +
     '</div>';
-  }).join('') : '<div class="char-empty">В выбранной категории нет техник.</div>')
-  : '<div class="char-empty">Пусто. Техники добавляются по мере изучения — теория плюс практика, ничего не начисляется само.</div>';
+  }
+
+  // 6. Отрисовка списка с выделением Додзюцу
+  var body = '';
+  if(!SH.techs.length){
+    body = '<div class="char-empty">Пусто. Техники добавляются по мере изучения — теория плюс практика, ничего не начисляется само.</div>';
+  } else if(!filteredTechs.length){
+    body = '<div class="char-empty">В выбранной категории или стихии нет техник.</div>';
+  } else {
+    var RANK_WEIGHTS = { 'S': 6, 'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1 };
+    var sortRankDesc = function(a, b){
+      var wa = RANK_WEIGHTS[a.rank] || 0;
+      var wb = RANK_WEIGHTS[b.rank] || 0;
+      if(wb !== wa) return wb - wa;
+      return (a.name || '').localeCompare(b.name || '');
+    };
+
+    if(curSort === 'category'){
+      var dojutsuList = [];
+      var otherGroups = {};
+      filteredTechs.forEach(function(t){
+        if(isDojutsu(t.cat)){
+          dojutsuList.push(t);
+        } else {
+          var cName = (t.cat || 'Ниндзюцу').trim();
+          if(!otherGroups[cName]) otherGroups[cName] = [];
+          otherGroups[cName].push(t);
+        }
+      });
+      dojutsuList.sort(sortRankDesc);
+
+      var sectionsHtml = [];
+
+      // 1. Додзюцу выделены в отдельную премьер-секцию во главе
+      if(dojutsuList.length > 0){
+        sectionsHtml.push(
+          '<div class="sh-tech-section-head is-dojutsu">' +
+            '<div class="sh-tech-section-title">' +
+              '<span style="font-size:18px;">👁️</span>' +
+              '<span>Додзюцу (Техники глаз / Зрительные дзюцу)</span>' +
+              '<span class="sh-section-eye-badge">Особый тип техники</span>' +
+              '<span style="font-size:11px;font-weight:normal;color:#ffbe76;margin-left:auto;">' + dojutsuList.length + ' техн.</span>' +
+            '</div>' +
+            '<div class="sh-tech-section-sub">Кеккей Генкай Шарингана, Бьякугана, Риннегана и родовые зрительные техники</div>' +
+          '</div>' +
+          dojutsuList.map(renderTechCard).join('')
+        );
+      }
+
+      // 2. Остальные категории по каноничному порядку
+      var remainingCats = TECH_CATS.filter(function(c){ return c !== 'Додзюцу' && otherGroups[c]; });
+      Object.keys(otherGroups).forEach(function(c){
+        if(remainingCats.indexOf(c) === -1) remainingCats.push(c);
+      });
+
+      remainingCats.forEach(function(cName){
+        var list = otherGroups[cName];
+        if(!list || !list.length) return;
+        list.sort(sortRankDesc);
+        var icon = TECH_CAT_ICONS[cName] || '🌀';
+        sectionsHtml.push(
+          '<div class="section-label" style="display:flex;align-items:center;gap:6px;margin-top:16px;">' +
+            '<span>' + icon + '</span> <span>' + esc(cName) + '</span>' +
+            '<span style="font-size:11px;font-weight:normal;color:var(--ink-dim);margin-left:auto;">' + list.length + ' техн.</span>' +
+          '</div>' +
+          list.map(renderTechCard).join('')
+        );
+      });
+
+      body = sectionsHtml.join('');
+    } else {
+      var sorted = filteredTechs.slice();
+      if(curSort === 'rank_desc'){
+        sorted.sort(sortRankDesc);
+      } else if(curSort === 'rank_asc'){
+        sorted.sort(function(a, b){
+          var wa = RANK_WEIGHTS[a.rank] || 0;
+          var wb = RANK_WEIGHTS[b.rank] || 0;
+          if(wa !== wb) return wa - wb;
+          return (a.name || '').localeCompare(b.name || '');
+        });
+      } else if(curSort === 'name'){
+        sorted.sort(function(a, b){ return (a.name||'').localeCompare(b.name||''); });
+      } else if(curSort === 'cost'){
+        sorted.sort(function(a, b){
+          var ca = parseInt(a.cost, 10) || 0;
+          var cb = parseInt(b.cost, 10) || 0;
+          if(cb !== ca) return cb - ca;
+          return (a.name||'').localeCompare(b.name||'');
+        });
+      }
+      body = sorted.map(renderTechCard).join('');
+    }
+  }
 
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники'}])+
     '<button class="back" data-nav="home">← Назад</button>'+
     '<h1>Техники</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shTechEdit:new">Добавить технику</button></div>'+
     launcherWidget +
-    techFilterBar +
+    catFilterBar +
+    natFilterBar +
+    sortToolbar +
     body;
 }
 
@@ -10252,7 +10542,9 @@ function renderRefKategorii(r, key){
   var discIcons = {
     'Ниндзюцу': '🌀',
     'Тайдзюцу': '👊',
-    'Гендзюцу': '👁️',
+    'Гендзюцу': '🎭',
+    'Додзюцу': '👁️',
+    'Додзютцу': '👁️',
     'Фуиндзюцу': '📜',
     'Кендзюцу': '⚔️',
     'Ирьениндзюцу': '💚',
@@ -10627,7 +10919,7 @@ function shRef(){
       items: [
         { nav: 'shRefView:priroda', icon: '🌿', t: 'Природы чакры', tag: 'Мандала', d: 'Интерактивная диаграмма 5 стихий, 8 слияний, Тота и Инь-Ян' },
         { nav: 'shRefView:rangi', icon: '📶', t: 'Ранги техник', tag: 'Шкала E–S', d: 'Стела рангов от Академии до Вершинных, требования и цепочки разработки' },
-        { nav: 'shRefView:kategorii', icon: '🗂️', t: 'Категории и истоки', tag: '8 дисциплин', d: 'Ниндзюцу, тайдзюцу, гендзюцу, печати + 4 истока права на технику' },
+        { nav: 'shRefView:kategorii', icon: '🗂️', t: 'Категории и истоки', tag: '9 дисциплин', d: 'Ниндзюцу, тайдзюцу, гендзюцу, додзюцу, печати + 4 истока права на технику' },
         { nav: 'shRefView:teoriya', icon: '📖', t: 'Как осваиваются техники', tag: 'Пути познания', d: 'Теория + практика, 4 пути изучения (учитель, свиток, наблюдение, опыт)' },
         { nav: 'shRefView:chakra', icon: '🔵', t: 'Чакра: расход и восстановление', tag: 'Потоки чакры', d: 'Восстановление в бою, покое и во сне. Опасная зона долга до −30% и пилюли' },
         { nav: 'shRefView:scetchik', icon: '⏳', t: 'Дневной лимит техники', tag: 'Предел тела', d: 'Формула предела тела (2+1/4 ур.) и 3 стадии физической перегрузки' }
@@ -12864,6 +13156,12 @@ SH.generateProceduralMission = generateProceduralMission;
 SH.callGeminiMissionGenerator = callGeminiMissionGenerator;
 SH.renderMissionBoard = renderMissionBoard;
 SH.shMap = shMap;
+SH.techCats = TECH_CATS;
+SH.isDojutsu = isDojutsu;
+SH.renderTechCard = renderTechCard;
+SH.shTechs = shTechs;
+SH.shTechEdit = shTechEdit;
+SH.shTechView = shTechView;
 
 
 
@@ -12899,7 +13197,7 @@ function shTechEdit(){
     '<h1>'+esc(d.name||'Новая техника')+'</h1><div class="sheet-section">'+
     fld('Название','<input id="shName" type="text" value="'+escA(d.name)+'">')+
     fld('Ранг', sel('shRank',RANKS,d.rank), 'Ранг — ворота доступа, а не цена применения.')+
-    fld('Категория', sel('shCat',['Ниндзюцу','Тайдзюцу','Гендзюцу','Фуиндзюцу','Кендзюцу','Ирьениндзюцу','Кучиёсэ','Сендзюцу'],d.cat))+
+    fld('Категория', sel('shCat', TECH_CATS, isDojutsu(d.cat) ? 'Додзюцу' : d.cat))+
     fld('Происхождение', sel('shOrig',['Общая','Природа чакры','Кеккей генкай','Хиден'],d.origin))+
     fld('Природа / род','<input id="shNature" type="text" value="'+escA(d.nature)+'">','Огонь, ветер, молния, земля, вода — либо название рода для хидена. Для общих техник оставь пустым.')+
     fld('Тип эффекта', sel('shEff',EFFECTS,d.effect), 'Именно эффект определяет цену.')+
@@ -12942,9 +13240,12 @@ function shTechView(){
     ? t.windows.map(function(win){ return '<span class="sh-win-badge needed">🎯 '+esc(win)+'</span>'; }).join(' ')
     : '<span class="sh-win-badge">окно не требуется</span>';
   var ef = EFFECTS.filter(function(e){return e.k===t.effect;})[0];
+  var catBadgeHtml = isDojutsu(t.cat)
+    ? '<span class="sh-cat-badge is-dojutsu">👁️ Додзюцу</span>'
+    : ('<span class="sh-cat-badge">' + (TECH_CAT_ICONS[t.cat] || '🌀') + ' ' + esc(t.cat || 'Ниндзюцу') + '</span>');
   var rows = [
     {k:'Ранг', v:rankSeal(t.rank)+' <span style="margin-left:8px;font-size:13px;color:var(--ink-dim)">ворота доступа к технике</span>', raw:true},
-    {k:'Категория', v:t.cat},
+    {k:'Категория', v:catBadgeHtml, raw:true},
     {k:'Происхождение', v:t.origin},
     {k:'Природа / род', v:t.nature ? natureBadge(t.nature) : '—', raw:!!t.nature},
     {k:'Тип эффекта', v:ef?ef.ru:'—'}
@@ -13267,12 +13568,26 @@ function wireSh(){
   });
 
   /* фильтры техник и приёмов */
+  document.querySelectorAll('[data-tech-cat-filter]').forEach(function(el){
+    el.addEventListener('click', function(){
+      SH.techCatFilter = el.getAttribute('data-tech-cat-filter');
+      navigate('shTechs');
+    });
+  });
   document.querySelectorAll('[data-tech-filter]').forEach(function(el){
     el.addEventListener('click', function(){
       SH.techFilter = el.getAttribute('data-tech-filter');
       navigate('shTechs');
     });
   });
+  var sTechSort = g('shTechSortSelect');
+  if(sTechSort){
+    sTechSort.addEventListener('change', function(){
+      SH.techSort = sTechSort.value;
+      try{ localStorage.setItem('sh_tech_sort', SH.techSort); }catch(e){}
+      navigate('shTechs');
+    });
+  }
   document.querySelectorAll('[data-move-filter]').forEach(function(el){
     el.addEventListener('click', function(){
       SH.moveFilter = el.getAttribute('data-move-filter');
