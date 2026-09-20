@@ -1001,6 +1001,347 @@ body.sh-theme .card:hover{
   box-shadow:0 6px 18px rgba(0,0,0,0.5), inset 0 0 10px rgba(200,67,55,0.06);
 }
 
+/* ==========================================================================
+   КЛАНОВАЯ ПЕРСОНАЛИЗАЦИЯ: КУРАЯМИ (ТЬМА / БЕЗДНА) И УЧИХА (ОГОНЬ / ШАРИНГАН)
+   ========================================================================== */
+
+/* --- ТЕМА КУРАЯМИ (KURAYAMI VOID / АБСОЛЮТНАЯ ТЬМА И ГРАФИТ) --- */
+body.sh-theme.sh-theme-kurayami {
+  --ink: #e2e2e2;
+  --ink-dim: #909090;
+  --steel-0: #040404;
+  --steel-1: #0a0a0a;
+  --steel-2: #141414;
+  --line: #222222;
+  --brass: #b0b0b0;
+  --brass-dim: #5c5c5c;
+  --crimson: #2b2b2b;
+  --crimson-bright: #d0d0d0;
+  --die: #3a3a3a;
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(255, 255, 255, 0.04) 0%, transparent 60%),
+    radial-gradient(circle at 10% 40%, rgba(30, 30, 30, 0.4) 0%, transparent 45%),
+    radial-gradient(circle at 90% 70%, rgba(18, 18, 18, 0.5) 0%, transparent 50%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.008) 0px, rgba(255, 255, 255, 0.008) 1px, transparent 1px, transparent 32px),
+    linear-gradient(180deg, #090909 0%, #020202 100%);
+}
+
+body.sh-theme.sh-theme-kurayami .hb-seg-btn.on {
+  background: linear-gradient(135deg, #3d3d3d 0%, #171717 100%);
+  color: #ffffff;
+  border: 1px solid #555555;
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.85), 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+body.sh-theme.sh-theme-kurayami .menu-item {
+  background: linear-gradient(135deg, rgba(16, 16, 16, 0.96) 0%, rgba(8, 8, 8, 0.96) 100%);
+  border-color: #242424;
+  border-left-color: #555555;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.85);
+}
+
+body.sh-theme.sh-theme-kurayami .menu-item:hover:not(.disabled) {
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(14, 14, 14, 0.98) 100%);
+  border-color: #707070;
+  border-left-color: #dcdcdc;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.95), 0 0 12px rgba(255, 255, 255, 0.12);
+}
+
+body.sh-theme.sh-theme-kurayami .card {
+  background: linear-gradient(145deg, rgba(14, 14, 14, 0.96) 0%, rgba(7, 7, 7, 0.96) 100%);
+  border-color: #222222;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8);
+}
+
+body.sh-theme.sh-theme-kurayami .card::before {
+  background: linear-gradient(90deg, #b0b0b0 0%, #4a4a4a 50%, #151515 100%);
+}
+
+body.sh-theme.sh-theme-kurayami .card:hover {
+  background: linear-gradient(145deg, rgba(22, 22, 22, 0.98) 0%, rgba(12, 12, 12, 0.98) 100%);
+  border-color: #4a4a4a;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.9), 0 0 12px rgba(255, 255, 255, 0.08);
+}
+
+body.sh-theme.sh-theme-kurayami .sh-hud {
+  background: linear-gradient(135deg, rgba(14, 14, 14, 0.98) 0%, rgba(6, 6, 6, 0.98) 100%);
+  border-color: rgba(100, 100, 100, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 0 18px rgba(0, 0, 0, 0.8);
+}
+
+body.sh-theme.sh-theme-kurayami .sh-hud-stat-pill {
+  border-color: rgba(110, 110, 110, 0.35);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7), 0 0 8px rgba(255, 255, 255, 0.06);
+}
+
+/* --- ТЕМА УЧИХА (UCHIHA INDIGO / ТЁМНО-СИНИЙ И ШАРИНГАН) --- */
+body.sh-theme.sh-theme-uchiha {
+  --ink: #e0e7f6;
+  --ink-dim: #94a3b8;
+  --steel-0: #060911;
+  --steel-1: #0c1220;
+  --steel-2: #141d33;
+  --line: #1e293b;
+  --brass: #6366f1;
+  --brass-dim: #4338ca;
+  --crimson: #991b1b;
+  --crimson-bright: #ef4444;
+  --die: #4f46e5;
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(30, 58, 138, 0.35) 0%, transparent 60%),
+    radial-gradient(circle at 85% 30%, rgba(37, 99, 235, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 15% 75%, rgba(15, 23, 42, 0.55) 0%, transparent 50%),
+    repeating-linear-gradient(90deg, rgba(99, 102, 241, 0.015) 0px, rgba(99, 102, 241, 0.015) 1px, transparent 1px, transparent 32px),
+    linear-gradient(180deg, #090e1c 0%, #050811 100%);
+}
+
+body.sh-theme.sh-theme-uchiha .hb-seg-btn.on {
+  background: linear-gradient(135deg, #4f46e5 0%, #1e1b4b 100%);
+  color: #ffffff;
+  border-color: #6366f1;
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.55);
+}
+
+body.sh-theme.sh-theme-uchiha .menu-item {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(9, 14, 26, 0.95) 100%);
+  border-color: #1e293b;
+  border-left-color: #4f46e5;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(79, 70, 229, 0.12);
+}
+
+body.sh-theme.sh-theme-uchiha .menu-item:hover:not(.disabled) {
+  background: linear-gradient(135deg, rgba(23, 34, 60, 0.98) 0%, rgba(13, 20, 36, 0.98) 100%);
+  border-color: #6366f1;
+  border-left-color: #ef4444;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.75), 0 0 18px rgba(99, 102, 241, 0.35);
+}
+
+body.sh-theme.sh-theme-uchiha .card {
+  background: linear-gradient(145deg, rgba(14, 20, 36, 0.95) 0%, rgba(8, 12, 22, 0.95) 100%);
+  border-color: #1e293b;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55), 0 0 12px rgba(79, 70, 229, 0.14);
+}
+
+body.sh-theme.sh-theme-uchiha .card::before {
+  background: linear-gradient(90deg, #6366f1 0%, #4338ca 60%, #ef4444 100%);
+}
+
+body.sh-theme.sh-theme-uchiha .card:hover {
+  background: linear-gradient(145deg, rgba(20, 28, 50, 0.98) 0%, rgba(12, 17, 32, 0.98) 100%);
+  border-color: #4338ca;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 0 0 16px rgba(99, 102, 241, 0.28);
+}
+
+body.sh-theme.sh-theme-uchiha .sh-hud {
+  background: linear-gradient(135deg, rgba(13, 19, 35, 0.96) 0%, rgba(7, 11, 20, 0.96) 100%);
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(79, 70, 229, 0.18);
+}
+
+body.sh-theme.sh-theme-uchiha .sh-hud-stat-pill {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: inset 0 0 8px rgba(79, 70, 229, 0.15), 0 0 10px rgba(99, 102, 241, 0.22);
+}
+
+/* Фоновые левитирующие частицы-плюсики Тьмы Клана Кураями */
+.sh-kurayami-particles {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  display: none;
+}
+body.sh-theme-kurayami .sh-kurayami-particles {
+  display: block;
+}
+.sh-kurayami-plus-particle {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+  opacity: 0;
+}
+.sh-kurayami-plus-particle::before,
+.sh-kurayami-plus-particle::after {
+  content: '';
+  position: absolute;
+  background: var(--p-col, #a6a6a6);
+  border-radius: 1px;
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.25), 0 0 6px rgba(0, 0, 0, 0.9);
+}
+.sh-kurayami-plus-particle::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: var(--p-th, 1.5px);
+  transform: translateY(-50%);
+}
+.sh-kurayami-plus-particle::after {
+  left: 50%;
+  top: 0;
+  height: 100%;
+  width: var(--p-th, 1.5px);
+  transform: translateX(-50%);
+}
+
+/* Дрейф и мерцание плюсиков Кураями в разные стороны */
+@keyframes kurayamiDrift1 {
+  0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0; }
+  25% { opacity: var(--p-op, 0.18); transform: translate(18px, -24px) rotate(15deg) scale(1); }
+  60% { opacity: var(--p-op, 0.22); transform: translate(32px, -48px) rotate(35deg) scale(1.05); }
+  85% { opacity: var(--p-op, 0.12); }
+  100% { transform: translate(45px, -70px) rotate(55deg) scale(0.7); opacity: 0; }
+}
+
+@keyframes kurayamiDrift2 {
+  0% { transform: translate(0, 0) rotate(0deg) scale(0.7); opacity: 0; }
+  20% { opacity: var(--p-op, 0.16); transform: translate(-20px, 16px) rotate(-18deg) scale(1); }
+  55% { opacity: var(--p-op, 0.20); transform: translate(-38px, 32px) rotate(-38deg) scale(1); }
+  80% { opacity: var(--p-op, 0.10); }
+  100% { transform: translate(-54px, 48px) rotate(-60deg) scale(0.75); opacity: 0; }
+}
+
+@keyframes kurayamiDrift3 {
+  0% { transform: translate(0, 0) rotate(12deg) scale(0.9); opacity: 0; }
+  25% { opacity: var(--p-op, 0.19); transform: translate(-16px, -28px) rotate(-10deg) scale(1); }
+  65% { opacity: var(--p-op, 0.23); transform: translate(-32px, -52px) rotate(-30deg) scale(1.1); }
+  85% { opacity: var(--p-op, 0.11); }
+  100% { transform: translate(-44px, -74px) rotate(-50deg) scale(0.8); opacity: 0; }
+}
+
+@keyframes kurayamiDrift4 {
+  0% { transform: translate(0, 0) rotate(-10deg) scale(0.8); opacity: 0; }
+  22% { opacity: var(--p-op, 0.17); transform: translate(22px, 20px) rotate(15deg) scale(1); }
+  58% { opacity: var(--p-op, 0.21); transform: translate(40px, 38px) rotate(35deg) scale(1); }
+  82% { opacity: var(--p-op, 0.10); }
+  100% { transform: translate(58px, 56px) rotate(60deg) scale(0.7); opacity: 0; }
+}
+
+@keyframes kurayamiDrift5 {
+  0% { transform: translate(0, 0) rotate(0deg) scale(0.7); opacity: 0; }
+  30% { opacity: var(--p-op, 0.24); transform: translate(14px, -18px) rotate(45deg) scale(1.1); }
+  60% { opacity: var(--p-op, 0.18); transform: translate(-12px, -32px) rotate(90deg) scale(1); }
+  85% { opacity: var(--p-op, 0.12); }
+  100% { transform: translate(4px, -46px) rotate(135deg) scale(0.8); opacity: 0; }
+}
+
+/* Фоновые левитирующие веера символики Клана Учиха (эффект пыли / частиц) */
+.sh-uchiha-particles {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  display: none;
+}
+body.sh-theme-uchiha .sh-uchiha-particles {
+  display: block;
+}
+.sh-uchiha-fan-particle {
+  position: absolute;
+  background-image: url('symbols/clans/Uchiha_Symbol.webp');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  filter: brightness(0.55) contrast(1.15) drop-shadow(0 0 5px rgba(99, 102, 241, 0.35));
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+/* Многовекторный дрейф пылинок-вееров в разные стороны с плавным рождением и исчезновением */
+@keyframes uchihaDrift1 {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  20% { opacity: var(--p-op, 0.12); }
+  50% { transform: translate(32px, -36px) rotate(14deg); opacity: var(--p-op, 0.15); }
+  80% { opacity: var(--p-op, 0.09); }
+  100% { transform: translate(58px, -68px) rotate(26deg); opacity: 0; }
+}
+
+@keyframes uchihaDrift2 {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  22% { opacity: var(--p-op, 0.13); }
+  55% { transform: translate(-38px, 28px) rotate(-16deg); opacity: var(--p-op, 0.16); }
+  85% { opacity: var(--p-op, 0.08); }
+  100% { transform: translate(-64px, 52px) rotate(-30deg); opacity: 0; }
+}
+
+@keyframes uchihaDrift3 {
+  0% { transform: translate(0, 0) rotate(-6deg); opacity: 0; }
+  20% { opacity: var(--p-op, 0.11); }
+  50% { transform: translate(-28px, -44px) rotate(12deg); opacity: var(--p-op, 0.14); }
+  80% { opacity: var(--p-op, 0.08); }
+  100% { transform: translate(-52px, -78px) rotate(20deg); opacity: 0; }
+}
+
+@keyframes uchihaDrift4 {
+  0% { transform: translate(0, 0) rotate(8deg); opacity: 0; }
+  24% { opacity: var(--p-op, 0.14); }
+  52% { transform: translate(38px, 34px) rotate(-14deg); opacity: var(--p-op, 0.15); }
+  82% { opacity: var(--p-op, 0.09); }
+  100% { transform: translate(66px, 60px) rotate(-24deg); opacity: 0; }
+}
+
+@keyframes uchihaDrift5 {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  25% { opacity: var(--p-op, 0.12); }
+  50% { transform: translate(22px, -24px) rotate(12deg); opacity: var(--p-op, 0.15); }
+  75% { transform: translate(-16px, -38px) rotate(-8deg); opacity: var(--p-op, 0.10); }
+  100% { transform: translate(8px, -56px) rotate(18deg); opacity: 0; }
+}
+
+/* Обратная совместимость для анимаций uchihaFloat */
+@keyframes uchihaFloat1 {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  20% { opacity: var(--p-op, 0.12); }
+  50% { transform: translate(32px, -36px) rotate(14deg); opacity: var(--p-op, 0.15); }
+  80% { opacity: var(--p-op, 0.09); }
+  100% { transform: translate(58px, -68px) rotate(26deg); opacity: 0; }
+}
+@keyframes uchihaFloat2 {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  22% { opacity: var(--p-op, 0.13); }
+  55% { transform: translate(-38px, 28px) rotate(-16deg); opacity: var(--p-op, 0.16); }
+  85% { opacity: var(--p-op, 0.08); }
+  100% { transform: translate(-64px, 52px) rotate(-30deg); opacity: 0; }
+}
+@keyframes uchihaFloat3 {
+  0% { transform: translate(0, 0) rotate(-6deg); opacity: 0; }
+  20% { opacity: var(--p-op, 0.11); }
+  50% { transform: translate(-28px, -44px) rotate(12deg); opacity: var(--p-op, 0.14); }
+  80% { opacity: var(--p-op, 0.08); }
+  100% { transform: translate(-52px, -78px) rotate(20deg); opacity: 0; }
+}
+
+/* Клановые эмблемы и знаки */
+.sh-clan-special-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.sh-clan-kurayami {
+  background: linear-gradient(135deg, rgba(40, 40, 40, 0.85) 0%, rgba(12, 12, 12, 0.95) 100%);
+  border: 1px solid #777777;
+  color: #e5e5e5;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.9), inset 0 0 6px rgba(255, 255, 255, 0.08);
+}
+.sh-clan-uchiha {
+  background: linear-gradient(135deg, rgba(30, 41, 79, 0.65) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border: 1px solid #6366f1;
+  color: #e0e7ff;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.35);
+}
+
 /* Печати рангов техники (Ханко) */
 .sh-rank-seal{
   display:inline-flex;
@@ -2617,6 +2958,53 @@ body.sh-theme .card:hover{
   flex-wrap:wrap;
   gap:10px;
   margin-bottom:12px;
+}
+.sh-hud-profile-switcher{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(0,0,0,0.35);
+  border:1px solid rgba(201,164,92,0.25);
+  border-radius:4px;
+  padding:4px 8px;
+}
+.sh-hud-profile-label{
+  font-size:11px;
+  color:var(--brass,#c5a059);
+  font-family:'Cinzel',serif;
+  font-weight:700;
+  white-space:nowrap;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.sh-hud-profile-sel{
+  background:#14110d;
+  border:1px solid rgba(201,164,92,0.35);
+  color:var(--ink,#e0d8cb);
+  font-size:12px;
+  padding:3px 8px;
+  border-radius:3px;
+  outline:none;
+  cursor:pointer;
+  max-width:240px;
+}
+.sh-hud-profile-sel:focus{
+  border-color:var(--brass,#c5a059);
+}
+.sh-hud-quick-btn{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(201,164,92,0.3);
+  color:var(--ink,#e0d8cb);
+  font-size:11px;
+  padding:3px 7px;
+  border-radius:3px;
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.sh-hud-quick-btn:hover{
+  background:rgba(201,164,92,0.2);
+  border-color:var(--brass,#c5a059);
+  color:#f6e58d;
 }
 .sh-hud-identity{
   display:flex;
@@ -7376,23 +7764,419 @@ var DEFAULT_META = {
   ac: '14'
 };
 
+var SH_PROFILES_STORAGE_KEY = 'ttc_sh_profiles';
+var SH_ACTIVE_PROFILE_STORAGE_KEY = 'ttc_sh_active_profile';
+
+function newShinobiProfile(opts){
+  opts = opts || {};
+  return {
+    id: opts.id || ('sh_prof_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7)),
+    charName: opts.charName != null ? opts.charName : '',
+    clan: opts.clan != null ? opts.clan : '',
+    village: opts.village != null ? opts.village : 'Коноха',
+    rank: opts.rank != null ? opts.rank : 'Генин',
+    level: opts.level != null ? opts.level : '1',
+    nature: opts.nature != null ? opts.nature : '',
+    chakra: opts.chakra != null ? opts.chakra : '30',
+    hp: opts.hp != null ? opts.hp : '28',
+    ac: opts.ac != null ? opts.ac : '14',
+    notes: opts.notes != null ? opts.notes : '',
+    techs: Array.isArray(opts.techs) ? opts.techs : [],
+    moves: Array.isArray(opts.moves) ? opts.moves : [],
+    skills: Array.isArray(opts.skills) ? opts.skills : [],
+    createdAt: opts.createdAt || new Date().toISOString()
+  };
+}
+
+function loadProfiles(){
+  try{
+    var raw = localStorage.getItem(SH_PROFILES_STORAGE_KEY);
+    if(raw){
+      var list = JSON.parse(raw);
+      if(Array.isArray(list) && list.length > 0) return list;
+    }
+  }catch(e){}
+
+  var legMeta = null;
+  var legT = [], legM = [], legS = [];
+  try{ legMeta = JSON.parse(localStorage.getItem('ttc_sh_meta') || 'null'); }catch(e){}
+  try{ legT = JSON.parse(localStorage.getItem('ttc_sh_techs') || '[]'); }catch(e){}
+  try{ legM = JSON.parse(localStorage.getItem('ttc_sh_moves') || '[]'); }catch(e){}
+  try{ legS = JSON.parse(localStorage.getItem('ttc_sh_skills') || '[]'); }catch(e){}
+
+  var defaultProfile = newShinobiProfile({
+    id: 'sh_prof_primary',
+    charName: (legMeta && legMeta.charName) || 'Наруто Узумаки',
+    clan: (legMeta && legMeta.clan) || 'Узумаки',
+    village: (legMeta && legMeta.village) || 'Коноха',
+    rank: (legMeta && legMeta.rank) || 'Генин',
+    level: (legMeta && legMeta.level) || '1',
+    nature: (legMeta && legMeta.nature) || 'fuuton',
+    chakra: (legMeta && legMeta.chakra) || '30',
+    hp: (legMeta && legMeta.hp) || '28',
+    ac: (legMeta && legMeta.ac) || '14',
+    notes: (legMeta && legMeta.note) || '',
+    techs: Array.isArray(legT) ? legT : [],
+    moves: Array.isArray(legM) ? legM : [],
+    skills: Array.isArray(legS) ? legS : []
+  });
+  var res = [defaultProfile];
+  saveProfilesList(res);
+  return res;
+}
+
+function saveProfilesList(list){
+  try{ localStorage.setItem(SH_PROFILES_STORAGE_KEY, JSON.stringify(list || [])); }catch(e){}
+}
+
+function saveActiveProfileId(id){
+  try{
+    if(id) localStorage.setItem(SH_ACTIVE_PROFILE_STORAGE_KEY, id);
+    else localStorage.removeItem(SH_ACTIVE_PROFILE_STORAGE_KEY);
+  }catch(e){}
+}
+
+function getActiveProfile(){
+  if(!Array.isArray(SH.profiles) || !SH.profiles.length){
+    SH.profiles = loadProfiles();
+  }
+  var act = null;
+  if(SH.activeProfileId){
+    act = SH.profiles.find(function(p){ return p.id === SH.activeProfileId; });
+  }
+  if(!act){
+    act = SH.profiles[0] || newShinobiProfile();
+    SH.activeProfileId = act.id;
+    saveActiveProfileId(act.id);
+  }
+  return act;
+}
+
+function syncActiveProfileFromState(){
+  var act = getActiveProfile();
+  if(!act) return;
+  act.charName = SH.meta.charName || '';
+  act.clan = SH.meta.clan || '';
+  act.village = SH.meta.village || 'Коноха';
+  act.rank = SH.meta.rank || 'Генин';
+  act.level = SH.meta.level || '1';
+  act.nature = SH.meta.nature || '';
+  act.chakra = SH.meta.chakra || '30';
+  act.hp = SH.meta.hp || '28';
+  act.ac = SH.meta.ac || '14';
+  act.notes = SH.meta.notes || '';
+  act.techs = Array.isArray(SH.techs) ? SH.techs : [];
+  act.moves = Array.isArray(SH.moves) ? SH.moves : [];
+  act.skills = Array.isArray(SH.skills) ? SH.skills : [];
+  saveProfilesList(SH.profiles);
+}
+
+function applyProfileToState(prof){
+  if(!prof) return;
+  SH.activeProfileId = prof.id;
+  SH.meta.charName = prof.charName || '';
+  SH.meta.clan = prof.clan || '';
+  SH.meta.village = prof.village || 'Коноха';
+  SH.meta.rank = prof.rank || 'Генин';
+  SH.meta.level = prof.level || '1';
+  SH.meta.nature = prof.nature || '';
+  SH.meta.chakra = prof.chakra || '30';
+  SH.meta.hp = prof.hp || '28';
+  SH.meta.ac = prof.ac || '14';
+  SH.meta.notes = prof.notes || '';
+
+  SH.techs = Array.isArray(prof.techs) ? prof.techs : [];
+  SH.moves = Array.isArray(prof.moves) ? prof.moves : [];
+  SH.skills = Array.isArray(prof.skills) ? prof.skills : [];
+
+  saveT();
+  saveM();
+  saveS();
+  saveMeta();
+  saveActiveProfileId(prof.id);
+  if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
+  if(typeof paintShBar === 'function') paintShBar();
+}
+
+function switchShinobiProfile(newId){
+  if(!newId || newId === SH.activeProfileId) return;
+  syncActiveProfileFromState();
+  var next = (SH.profiles || []).find(function(p){ return p.id === newId; });
+  if(!next) return;
+  applyProfileToState(next);
+  if(typeof render === 'function') render();
+}
+
+function createShinobiProfile(opts){
+  syncActiveProfileFromState();
+  var p = newShinobiProfile(opts || { charName: 'Новый шиноби', village: 'Коноха', rank: 'Генин' });
+  if(!Array.isArray(SH.profiles)) SH.profiles = [];
+  SH.profiles.push(p);
+  saveProfilesList(SH.profiles);
+  applyProfileToState(p);
+  if(typeof render === 'function') render();
+  return p;
+}
+
+function cloneShinobiProfile(id){
+  id = id || SH.activeProfileId;
+  syncActiveProfileFromState();
+  var src = (SH.profiles || []).find(function(p){ return p.id === id; }) || getActiveProfile();
+  if(!src) return null;
+  var copy = JSON.parse(JSON.stringify(src));
+  copy.id = 'sh_prof_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  copy.charName = (copy.charName || 'Шиноби') + ' (Копия)';
+  copy.createdAt = new Date().toISOString();
+  SH.profiles.push(copy);
+  saveProfilesList(SH.profiles);
+  applyProfileToState(copy);
+  if(typeof render === 'function') render();
+  return copy;
+}
+
+function deleteShinobiProfile(id){
+  id = id || SH.activeProfileId;
+  if(!Array.isArray(SH.profiles)) return;
+  if(SH.profiles.length <= 1){
+    resetShinobiProfile(id);
+    return;
+  }
+  var idx = SH.profiles.findIndex(function(p){ return p.id === id; });
+  if(idx === -1) return;
+  SH.profiles.splice(idx, 1);
+  saveProfilesList(SH.profiles);
+
+  if(SH.activeProfileId === id){
+    var next = SH.profiles[Math.max(0, idx - 1)] || SH.profiles[0];
+    applyProfileToState(next);
+  }
+  if(typeof render === 'function') render();
+}
+
+function resetShinobiProfile(id){
+  id = id || SH.activeProfileId;
+  var p = (SH.profiles || []).find(function(item){ return item.id === id; });
+  if(!p) return;
+  p.charName = '';
+  p.clan = '';
+  p.village = 'Коноха';
+  p.rank = 'Генин';
+  p.level = '1';
+  p.nature = '';
+  p.chakra = '30';
+  p.hp = '28';
+  p.ac = '14';
+  p.notes = '';
+  saveProfilesList(SH.profiles);
+  if(SH.activeProfileId === id){
+    applyProfileToState(p);
+  }
+  if(typeof render === 'function') render();
+}
+
+function getShinobiClanTheme(prof){
+  var p = prof || (typeof getActiveProfile === 'function' ? getActiveProfile() : null);
+  var name = (p && p.charName ? p.charName : (typeof SH !== 'undefined' && SH.meta && SH.meta.charName ? SH.meta.charName : '')).toLowerCase();
+  var clan = (p && p.clan ? p.clan : (typeof SH !== 'undefined' && SH.meta && SH.meta.clan ? SH.meta.clan : '')).toLowerCase();
+  var text = (name + ' ' + clan).trim();
+  if(/(кураями|kurayami)/i.test(text)) return 'kurayami';
+  if(/(учиха|uchiha)/i.test(text)) return 'uchiha';
+  return 'default';
+}
+
+function initUchihaParticles(){
+  if(typeof document === 'undefined' || !document.body) return null;
+  var cont = document.getElementById('shUchihaParticles');
+  if(!cont){
+    cont = document.createElement('div');
+    cont.id = 'shUchihaParticles';
+    cont.className = 'sh-uchiha-particles';
+    cont.setAttribute('aria-hidden', 'true');
+    document.body.insertBefore(cont, document.body.firstChild);
+  }
+  if(!cont.children || cont.children.length === 0){
+    var particleCount = 20;
+    for(var i = 0; i < particleCount; i++){
+      var p = document.createElement('div');
+      p.className = 'sh-uchiha-fan-particle';
+      var size = Math.floor(12 + ((i * 7 + 3) % 17)); // 12px to 28px
+      var left = Math.floor((i * 17 + (i % 4) * 6) % 92 + 3); // 3% to 95%
+      var top = Math.floor((i * 23 + (i % 3) * 9) % 90 + 4); // 4% to 94%
+      var duration = (13 + ((i * 3 + 4) % 12)).toFixed(1); // 13s to 24s slow ambient drift
+      var delay = (-1 * ((i * 3.7 + 1.5) % 20)).toFixed(1); // staggered negative delay so they fade in/out continuously
+      var animIndex = (i % 5) + 1;
+      var maxOp = (0.07 + ((i % 5) * 0.02)).toFixed(2);
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.left = left + '%';
+      p.style.top = top + '%';
+      p.style.setProperty('--p-op', maxOp);
+      p.style.animation = 'uchihaDrift' + animIndex + ' ' + duration + 's ease-in-out ' + delay + 's infinite';
+      cont.appendChild(p);
+    }
+  }
+  return cont;
+}
+
+function initKurayamiParticles(){
+  if(typeof document === 'undefined' || !document.body) return null;
+  var cont = document.getElementById('shKurayamiParticles');
+  if(!cont){
+    cont = document.createElement('div');
+    cont.id = 'shKurayamiParticles';
+    cont.className = 'sh-kurayami-particles';
+    cont.setAttribute('aria-hidden', 'true');
+    document.body.insertBefore(cont, document.body.firstChild);
+  }
+  if(!cont.children || cont.children.length === 0){
+    var particleCount = 28;
+    var colors = ['#cfcfcf', '#9e9e9e', '#b8b8b8', '#787878', '#e5e5e5'];
+    for(var i = 0; i < particleCount; i++){
+      var p = document.createElement('div');
+      p.className = 'sh-kurayami-plus-particle';
+      var size = Math.floor(7 + ((i * 5 + 3) % 9)); // 7px to 15px
+      var left = Math.floor((i * 13 + (i % 5) * 7) % 94 + 2); // 2% to 96%
+      var top = Math.floor((i * 19 + (i % 4) * 8) % 92 + 3); // 3% to 95%
+      var duration = (9 + ((i * 3 + 2) % 11)).toFixed(1); // 9s to 19s
+      var delay = (-1 * ((i * 2.9 + 1.1) % 16)).toFixed(1);
+      var animIndex = (i % 5) + 1;
+      var maxOp = (0.12 + ((i % 5) * 0.03)).toFixed(2);
+      var col = colors[i % colors.length];
+      var thickness = (size > 11 ? '1.5px' : '1.2px');
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.left = left + '%';
+      p.style.top = top + '%';
+      p.style.setProperty('--p-op', maxOp);
+      p.style.setProperty('--p-col', col);
+      p.style.setProperty('--p-th', thickness);
+      p.style.animation = 'kurayamiDrift' + animIndex + ' ' + duration + 's ease-in-out ' + delay + 's infinite';
+      cont.appendChild(p);
+    }
+  }
+  return cont;
+}
+
+function updateShinobiTheme(){
+  if(typeof document === 'undefined' || !document.body) return;
+  if(typeof HB === 'undefined' || HB.mode !== 'sh'){
+    document.body.classList.remove('sh-theme-kurayami', 'sh-theme-uchiha');
+    var pKur = document.getElementById('shKurayamiParticles');
+    if(pKur) pKur.style.display = 'none';
+    var pUch = document.getElementById('shUchihaParticles');
+    if(pUch) pUch.style.display = 'none';
+    return;
+  }
+  var theme = getShinobiClanTheme();
+  var isKurayami = (theme === 'kurayami');
+  var isUchiha = (theme === 'uchiha');
+  document.body.classList.toggle('sh-theme-kurayami', isKurayami);
+  document.body.classList.toggle('sh-theme-uchiha', isUchiha);
+
+  if(isKurayami){
+    var pKur = initKurayamiParticles();
+    if(pKur) pKur.style.display = 'block';
+  } else {
+    var pKur = document.getElementById('shKurayamiParticles');
+    if(pKur) pKur.style.display = 'none';
+  }
+
+  if(isUchiha){
+    var pUch = initUchihaParticles();
+    if(pUch) pUch.style.display = 'block';
+  } else {
+    var pUch = document.getElementById('shUchihaParticles');
+    if(pUch) pUch.style.display = 'none';
+  }
+}
+
 var SH = {
+  profiles: [],
+  activeProfileId: null,
   techs:[], moves:[], skills:[], meta: Object.assign({}, DEFAULT_META), draft:null,
   techFilter:'all', moveFilter:'all', hudEditing:false,
-  launcher:{ techId:'', isExp:false, isOpen:false, mods:{ exp:0, atk:0, dmg:0 }, selectedTarget:'atk', rolledValues:null, lastResult:'', lastResultCopied:false }
+  launcher:{ techId:'', isExp:false, isOpen:false, mods:{ exp:0, atk:0, dmg:0 }, selectedTarget:'atk', rolledValues:null, lastResult:'', lastResultCopied:false },
+  newShinobiProfile: newShinobiProfile,
+  loadProfiles: loadProfiles,
+  saveProfilesList: saveProfilesList,
+  getActiveProfile: getActiveProfile,
+  syncActiveProfileFromState: syncActiveProfileFromState,
+  applyProfileToState: applyProfileToState,
+  switchShinobiProfile: switchShinobiProfile,
+  createShinobiProfile: createShinobiProfile,
+  cloneShinobiProfile: cloneShinobiProfile,
+  deleteShinobiProfile: deleteShinobiProfile,
+  resetShinobiProfile: resetShinobiProfile,
+  getShinobiClanTheme: getShinobiClanTheme,
+  updateShinobiTheme: updateShinobiTheme,
+  initKurayamiParticles: initKurayamiParticles,
+  initUchihaParticles: initUchihaParticles,
+  saveT: saveT,
+  saveM: saveM,
+  saveS: saveS,
+  saveMeta: saveMeta
 };
 window.SH = SH;
 
 function load(){
-  try{ var t=JSON.parse(localStorage.getItem('ttc_sh_techs')||'[]'); SH.techs=Array.isArray(t)?t:[]; }catch(e){ SH.techs=[]; }
-  try{ var m=JSON.parse(localStorage.getItem('ttc_sh_moves')||'[]'); SH.moves=Array.isArray(m)?m:[]; }catch(e){ SH.moves=[]; }
-  try{ var s=JSON.parse(localStorage.getItem('ttc_sh_skills')||'[]'); SH.skills=Array.isArray(s)?s:[]; }catch(e){ SH.skills=[]; }
+  SH.profiles = loadProfiles();
+  try{ SH.activeProfileId = localStorage.getItem(SH_ACTIVE_PROFILE_STORAGE_KEY) || null; }catch(e){}
+  var act = getActiveProfile();
+  SH.activeProfileId = act.id;
+
   try{ var w=JSON.parse(localStorage.getItem('ttc_sh_meta')||'null'); if(w) SH.meta=Object.assign({}, DEFAULT_META, w); else SH.meta=Object.assign({}, DEFAULT_META); }catch(e){ SH.meta=Object.assign({}, DEFAULT_META); }
+
+  SH.meta.charName = act.charName || SH.meta.charName || '';
+  SH.meta.clan = act.clan || SH.meta.clan || '';
+  SH.meta.village = act.village || SH.meta.village || 'Коноха';
+  SH.meta.rank = act.rank || SH.meta.rank || 'Генин';
+  SH.meta.level = act.level || SH.meta.level || '1';
+  SH.meta.nature = act.nature || SH.meta.nature || '';
+  SH.meta.chakra = act.chakra || SH.meta.chakra || '30';
+  SH.meta.hp = act.hp || SH.meta.hp || '28';
+  SH.meta.ac = act.ac || SH.meta.ac || '14';
+
+  SH.techs = Array.isArray(act.techs) ? act.techs : [];
+  SH.moves = Array.isArray(act.moves) ? act.moves : [];
+  SH.skills = Array.isArray(act.skills) ? act.skills : [];
+  if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
 }
-function saveT(){ try{ localStorage.setItem('ttc_sh_techs', JSON.stringify(SH.techs)); }catch(e){} }
-function saveM(){ try{ localStorage.setItem('ttc_sh_moves', JSON.stringify(SH.moves)); }catch(e){} }
-function saveS(){ try{ localStorage.setItem('ttc_sh_skills', JSON.stringify(SH.skills)); }catch(e){} }
-function saveMeta(){ try{ localStorage.setItem('ttc_sh_meta', JSON.stringify(SH.meta)); }catch(e){} }
+
+function saveT(){
+  try{ localStorage.setItem('ttc_sh_techs', JSON.stringify(SH.techs)); }catch(e){}
+  var act = (SH.profiles || []).find(function(p){ return p.id === SH.activeProfileId; });
+  if(act){ act.techs = SH.techs; saveProfilesList(SH.profiles); }
+}
+
+function saveM(){
+  try{ localStorage.setItem('ttc_sh_moves', JSON.stringify(SH.moves)); }catch(e){}
+  var act = (SH.profiles || []).find(function(p){ return p.id === SH.activeProfileId; });
+  if(act){ act.moves = SH.moves; saveProfilesList(SH.profiles); }
+}
+
+function saveS(){
+  try{ localStorage.setItem('ttc_sh_skills', JSON.stringify(SH.skills)); }catch(e){}
+  var act = (SH.profiles || []).find(function(p){ return p.id === SH.activeProfileId; });
+  if(act){ act.skills = SH.skills; saveProfilesList(SH.profiles); }
+}
+
+function saveMeta(){
+  try{ localStorage.setItem('ttc_sh_meta', JSON.stringify(SH.meta)); }catch(e){}
+  var act = (SH.profiles || []).find(function(p){ return p.id === SH.activeProfileId; });
+  if(act){
+    act.charName = SH.meta.charName || '';
+    act.clan = SH.meta.clan || '';
+    act.village = SH.meta.village || 'Коноха';
+    act.rank = SH.meta.rank || 'Генин';
+    act.level = SH.meta.level || '1';
+    act.nature = SH.meta.nature || '';
+    act.chakra = SH.meta.chakra || '30';
+    act.hp = SH.meta.hp || '28';
+    act.ac = SH.meta.ac || '14';
+    saveProfilesList(SH.profiles);
+  }
+  if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
+}
 
 /* ---------- справочные данные (только чтение) ---------- */
 var RANKS   = ['E','D','C','B','A','S'];
@@ -8309,77 +9093,12 @@ function crumbSh(parts){
 /* ---------- Shinobi HUD & Arsenal Summary ---------- */
 function renderShinobiHudHtml(){
   var m = SH.meta || {};
-  if(SH.hudEditing){
-    var ranks = ['Академик','Генин','Чунин','Спец. джонин','Джонин','Нукенин'];
-    var curRank = m.rank || 'Генин';
-    var rankOptions = ranks.map(function(r){
-      return '<option value="'+escA(r)+'" '+(curRank===r?'selected':'')+'>'+esc(r)+'</option>';
-    }).join('');
-    if(ranks.indexOf(curRank) === -1 && curRank){
-      rankOptions = '<option value="'+escA(curRank)+'" selected>'+esc(curRank)+'</option>' + rankOptions;
-    }
-
-    var curNat = m.nature || '';
-    var natList = [
-      {k:'', t:'Без стихии'},
-      {k:'Огонь', t:'Огонь (Катон)'},
-      {k:'Ветер', t:'Ветер (Фуутон)'},
-      {k:'Молния', t:'Молния (Райтон)'},
-      {k:'Земля', t:'Земля (Дотон)'},
-      {k:'Вода', t:'Вода (Суйтон)'},
-      {k:'Инь', t:'Инь'},
-      {k:'Ян', t:'Ян'}
-    ];
-    var natOptions = natList.map(function(item){
-      return '<option value="'+escA(item.k)+'" '+(curNat===item.k?'selected':'')+'>'+esc(item.t)+'</option>';
-    }).join('');
-
-    return '<div class="sh-hud" id="shHud">'+
-      '<div class="sh-hud-edit-form">'+
-        '<div class="sh-hud-edit-grid">'+
-          '<div class="sh-hud-edit-item">'+
-            '<label>Имя шиноби</label>'+
-            '<input type="text" id="shHudInCharName" value="'+escA(m.charName||'')+'" placeholder="Например: Саске">'+
-          '</div>'+
-          '<div class="sh-hud-edit-item">'+
-            '<label>Клан</label>'+
-            '<input type="text" id="shHudInClan" value="'+escA(m.clan||'')+'" placeholder="Например: Учиха">'+
-          '</div>'+
-          '<div class="sh-hud-edit-item">'+
-            '<label>Деревня</label>'+
-            '<input type="text" id="shHudInVillage" value="'+escA(m.village||'Коноха')+'" placeholder="Коноха">'+
-          '</div>'+
-          '<div class="sh-hud-edit-item">'+
-            '<label>Ранг</label>'+
-            '<select id="shHudInRank">'+rankOptions+'</select>'+
-          '</div>'+
-          '<div class="sh-hud-edit-item">'+
-            '<label>Уровень</label>'+
-            '<input type="number" min="1" max="100" id="shHudInLevel" value="'+escA(m.level!=null&&m.level!==''?m.level:'1')+'" placeholder="1">'+
-          '</div>'+
-          '<div class="sh-hud-edit-item">'+
-            '<label>Стихия</label>'+
-            '<select id="shHudInNature">'+natOptions+'</select>'+
-          '</div>'+
-          '<div class="sh-hud-edit-item">'+
-            '<label>Чакра</label>'+
-            '<input type="text" id="shHudInChakra" value="'+escA(m.chakra!=null?m.chakra:'30')+'" placeholder="30">'+
-          '</div>'+
-          '<div class="sh-hud-edit-item">'+
-            '<label>Очки здоровья (ОЗ)</label>'+
-            '<input type="text" id="shHudInHp" value="'+escA(m.hp!=null?m.hp:'28')+'" placeholder="28">'+
-          '</div>'+
-          '<div class="sh-hud-edit-item">'+
-            '<label>Класс брони (КБ)</label>'+
-            '<input type="text" id="shHudInAc" value="'+escA(m.ac!=null?m.ac:'14')+'" placeholder="14">'+
-          '</div>'+
-        '</div>'+
-        '<div class="sh-hud-edit-actions">'+
-          '<button class="btn btn-primary" id="shHudSaveBtn">✓ Сохранить</button>'+
-          '<button class="btn" id="shHudCancelBtn">Отмена</button>'+
-        '</div>'+
-      '</div>'+
-    '</div>';
+  var clanTheme = typeof getShinobiClanTheme === 'function' ? getShinobiClanTheme(m) : 'default';
+  var specialClanBadge = '';
+  if(clanTheme === 'kurayami'){
+    specialClanBadge = '<span class="sh-clan-special-badge sh-clan-kurayami" title="Тёмная эстетика Клана Кураями">🌑 Кураями</span>';
+  } else if(clanTheme === 'uchiha'){
+    specialClanBadge = '<span class="sh-clan-special-badge sh-clan-uchiha" title="Эстетика Пламени и Шарингана Клана Учиха">🪭 Учиха</span>';
   }
 
   var nameDisplay = m.charName ? esc(m.charName) : 'Безымянный шиноби';
@@ -8392,14 +9111,17 @@ function renderShinobiHudHtml(){
   return '<div class="sh-hud" id="shHud">'+
     '<div class="sh-hud-top">'+
       '<div class="sh-hud-identity">'+
-        '<div class="sh-hud-name">' + nameDisplay + '</div>'+
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'+
+          '<div class="sh-hud-name">' + nameDisplay + '</div>'+
+          specialClanBadge +
+        '</div>'+
         '<div class="sh-hud-meta">' + clanHtml + villageHtml + '</div>'+
       '</div>'+
       '<div class="sh-hud-badges">'+
         levelBadgeHtml +
         rankBadgeHtml +
         natureBadgeHtml +
-        '<button class="sh-hud-edit-btn" id="shHudEditBtn" title="Настроить профиль">✏️ Профиль</button>'+
+        '<button class="sh-hud-edit-btn" data-nav="shData" title="Перейти к выбору и управлению персонажами на экране Данные">⚙️ Персонажи</button>'+
       '</div>'+
     '</div>'+
     '<div class="sh-hud-stats">'+
@@ -8421,6 +9143,7 @@ function renderShinobiHudHtml(){
     '</div>'+
   '</div>';
 }
+SH.renderShinobiHudHtml = renderShinobiHudHtml;
 
 function renderArsenalSummaryHtml(){
   var techs = SH.techs || [];
@@ -11580,8 +12303,10 @@ function pickMissionTargetCountry(rank, originCid){
   if(rank === 'S'){
     pool = ['myoboku', 'mount_koryu', 'sound', 'rain', 'sea_land', 'iron', 'water', 'red_desert'];
   }
+  var nonLocal = pool.filter(function(id){ return id !== originCid; });
+  if(nonLocal.length) pool = nonLocal;
   var chosen = pool[Math.floor(Math.random() * pool.length)];
-  return chosen || originCid;
+  return chosen || (originCid === 'fire' ? 'wind' : 'fire');
 }
 
 function generateProceduralMission(opts){
@@ -12224,20 +12949,154 @@ function shMoveEdit(){
 
 
 function shData(){
+  var m = SH.meta || {};
+  var profList = SH.profiles || [];
+  if(!profList.length && typeof getActiveProfile === 'function'){
+    getActiveProfile();
+    profList = SH.profiles || [];
+  }
+  var profOptions = profList.map(function(p){
+    var pName = (p.charName || 'Безымянный шиноби') + (p.clan ? ' (' + p.clan + ')' : '') + ' • ' + (p.village || 'Коноха');
+    return '<option value="' + escA(p.id) + '" ' + (p.id === SH.activeProfileId ? 'selected' : '') + '>' + esc(pName) + '</option>';
+  }).join('');
+
+  var ranks = ['Академик','Генин','Чунин','Спец. джонин','Джонин','Нукенин'];
+  var curRank = m.rank || 'Генин';
+  var rankOptions = ranks.map(function(r){
+    return '<option value="'+escA(r)+'" '+(curRank===r?'selected':'')+'>'+esc(r)+'</option>';
+  }).join('');
+  if(ranks.indexOf(curRank) === -1 && curRank){
+    rankOptions = '<option value="'+escA(curRank)+'" selected>'+esc(curRank)+'</option>' + rankOptions;
+  }
+
+  var curNat = m.nature || '';
+  var natList = [
+    {k:'', t:'Без стихии'},
+    {k:'Огонь', t:'Огонь (Катон)'},
+    {k:'Ветер', t:'Ветер (Фуутон)'},
+    {k:'Молния', t:'Молния (Райтон)'},
+    {k:'Земля', t:'Земля (Дотон)'},
+    {k:'Вода', t:'Вода (Суйтон)'},
+    {k:'Инь', t:'Инь'},
+    {k:'Ян', t:'Ян'}
+  ];
+  var natOptions = natList.map(function(item){
+    return '<option value="'+escA(item.k)+'" '+(curNat===item.k?'selected':'')+'>'+esc(item.t)+'</option>';
+  }).join('');
+
+  var clanTheme = typeof getShinobiClanTheme === 'function' ? getShinobiClanTheme(m) : 'default';
+  var themeNotice = '';
+  if(clanTheme === 'kurayami'){
+    themeNotice = '<div style="margin:10px 0;padding:10px 14px;background:rgba(30,30,30,0.6);border:1px solid #666666;border-radius:6px;font-size:13px;color:#e5e5e5;display:flex;align-items:center;gap:8px;box-shadow:0 0 12px rgba(0,0,0,0.85);">'+
+      '<span style="font-size:18px;">🌑</span> <span>Активирована персональная тёмная тема <b>Клана Кураями</b> (глубокие оттенки чёрного, антрацита и серого, монохромный нуар).</span>'+
+    '</div>';
+  } else if(clanTheme === 'uchiha'){
+    themeNotice = '<div style="margin:10px 0;padding:10px 14px;background:rgba(20,29,51,0.6);border:1px solid #6366f1;border-radius:6px;font-size:13px;color:#e0e7ff;display:flex;align-items:center;gap:8px;box-shadow:0 0 12px rgba(99,102,241,0.25);">'+
+      '<span style="font-size:18px;">🪭</span> <span>Активирована персональная тема <b>Клана Учиха</b> (ночной индиго, алые акценты и парящие частицы вееров).</span>'+
+    '</div>';
+  }
+
+  var activeCharDisplay = (m.charName || 'Безымянный шиноби') + (m.clan ? (' (Клан ' + m.clan + ')') : '');
+
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Данные'}])+
     '<button class="back" data-nav="home">← Назад</button>'+
-    '<h1>Данные</h1>'+
+    '<h1>Данные и Ростер Персонажей</h1>'+
 
     '<div class="sheet-section">'+
-    fld('Название мира','<input id="shWName" type="text" value="'+escA(SH.meta.name)+'">')+
-    fld('Заметка','<textarea id="shWNote" rows="3">'+esc(SH.meta.note)+'</textarea>')+
-    '<div class="sheet-actions"><button class="btn-primary" id="shWSave">Сохранить</button></div></div>'+
-    '<div class="sheet-section"><div class="section-label">Экспорт и импорт</div>'+
-    '<div class="desc">Один файл на весь режим: техники, приёмы, навыки и заметка. Импорт заменяет текущее содержимое целиком.</div>'+
-    '<div class="sheet-actions"><button class="btn-primary" id="shExport">Экспорт в файл</button>'+
-    '<button class="btn-ghost" id="shImportBtn">Импорт из файла</button>'+
-    '<input type="file" id="shImportFile" accept="application/json,.json" style="display:none"></div></div>';
+      '<div class="section-label" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">'+
+        '<span>👥 Выбор и управление шиноби</span>'+
+        '<span style="font-size:12px;color:var(--ink-dim);">Всего профилей: ' + profList.length + '</span>'+
+      '</div>'+
+      '<div class="desc">'+
+        'Выберите активного персонажа для игры или создайте нового. Все техники, дзюцу, приёмы и боевые параметры изолированы и сохраняются индивидуально для каждого шиноби.'+
+      '</div>'+
+
+      themeNotice +
+
+      '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:14px 0 12px 0;">'+
+        '<div style="flex:1;min-width:240px;">'+
+          '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">Активный персонаж (переключение на лету):</label>'+
+          '<select id="shDataProfileSelect" class="sh-hud-profile-sel" style="width:100%;font-size:14px;padding:9px 12px;border-radius:4px;">'+
+            profOptions +
+          '</select>'+
+        '</div>'+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+
+          '<button class="btn btn-primary" id="shDataNewProfileBtn" title="Создать нового персонажа">➕ Новый шиноби</button>'+
+          '<button class="btn" id="shDataCloneProfileBtn" title="Клонировать активного шиноби со всеми техниками">📋 Дублировать</button>'+
+        '</div>'+
+      '</div>'+
+
+      '<div style="background:var(--steel-1);border:1px solid var(--line);border-radius:6px;padding:16px;margin-top:14px;">'+
+        '<div style="font-weight:700;margin-bottom:12px;color:var(--ink);font-family:Cinzel,serif;font-size:14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,164,92,0.2);padding-bottom:6px;">'+
+          '<span>Анкета шиноби: <b style="color:var(--brass);">' + esc(activeCharDisplay) + '</b></span>'+
+          '<span style="font-size:11px;color:var(--ink-dim);">' + esc(m.village || 'Коноха') + '</span>'+
+        '</div>'+
+
+        '<div class="sh-hud-edit-grid">'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Имя шиноби</label>'+
+            '<input type="text" id="shDataInCharName" value="'+escA(m.charName||'')+'" placeholder="Например: Саске / Кураями">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Клан</label>'+
+            '<input type="text" id="shDataInClan" value="'+escA(m.clan||'')+'" placeholder="Например: Учиха / Кураями">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Деревня</label>'+
+            '<input type="text" id="shDataInVillage" value="'+escA(m.village||'Коноха')+'" placeholder="Коноха">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Ранг</label>'+
+            '<select id="shDataInRank">'+rankOptions+'</select>'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Уровень</label>'+
+            '<input type="number" min="1" max="100" id="shDataInLevel" value="'+escA(m.level!=null&&m.level!==''?m.level:'1')+'" placeholder="1">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Стихия</label>'+
+            '<select id="shDataInNature">'+natOptions+'</select>'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Чакра</label>'+
+            '<input type="text" id="shDataInChakra" value="'+escA(m.chakra!=null?m.chakra:'30')+'" placeholder="30">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Очки здоровья (ОЗ)</label>'+
+            '<input type="text" id="shDataInHp" value="'+escA(m.hp!=null?m.hp:'28')+'" placeholder="28">'+
+          '</div>'+
+          '<div class="sh-hud-edit-item">'+
+            '<label>Класс брони (КБ)</label>'+
+            '<input type="text" id="shDataInAc" value="'+escA(m.ac!=null?m.ac:'14')+'" placeholder="14">'+
+          '</div>'+
+        '</div>'+
+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px;">'+
+          '<button class="btn btn-primary" id="shDataSaveCharBtn">✓ Сохранить анкету</button>'+
+          '<button class="btn" id="shDataResetProfileBtn" title="Очистить поля текущего профиля">🔄 Сбросить статы</button>'+
+          '<button class="btn" id="shDataDelProfileBtn" style="color:#ff7675;border-color:rgba(231,76,60,0.4);margin-left:auto;" title="Удалить текущий профиль">🗑️ Удалить профиль</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+
+    '<div class="sheet-section">'+
+      '<div class="section-label">Параметры мира и кампании</div>'+
+      fld('Название мира','<input id="shWName" type="text" value="'+escA(SH.meta.name)+'">')+
+      fld('Заметка мира','<textarea id="shWNote" rows="3">'+esc(SH.meta.note)+'</textarea>')+
+      '<div class="sheet-actions"><button class="btn-primary" id="shWSave">Сохранить мир</button></div>'+
+    '</div>'+
+
+    '<div class="sheet-section">'+
+      '<div class="section-label">Экспорт и импорт</div>'+
+      '<div class="desc">Единый файл на весь режим «Шиноби»: все профили, техники, приёмы, навыки и заметка мира. Импорт заменяет текущее содержимое.</div>'+
+      '<div class="sheet-actions">'+
+        '<button class="btn-primary" id="shExport">Экспорт в файл</button>'+
+        '<button class="btn-ghost" id="shImportBtn">Импорт из файла</button>'+
+        '<input type="file" id="shImportFile" accept="application/json,.json" style="display:none">'+
+      '</div>'+
+    '</div>';
 }
+SH.shData = shData;
 
 /* ---------- обработчики ---------- */
 function wireSh(){
@@ -13174,36 +14033,75 @@ function wireSh(){
       }, 2000);
     });
   }
-  /* Shinobi HUD events */
-  var hudEditBtn = g('shHudEditBtn');
-  if(hudEditBtn){
-    hudEditBtn.addEventListener('click', function(){
-      SH.hudEditing = true;
-      render();
+  /* Shinobi Data Screen: Character Selection and Management */
+  var dataProfSel = g('shDataProfileSelect');
+  if(dataProfSel){
+    dataProfSel.addEventListener('change', function(){
+      if(this.value && this.value !== SH.activeProfileId){
+        switchShinobiProfile(this.value);
+      }
     });
   }
-  var hudCancelBtn = g('shHudCancelBtn');
-  if(hudCancelBtn){
-    hudCancelBtn.addEventListener('click', function(){
-      SH.hudEditing = false;
-      render();
+
+  var dataNewProfBtn = g('shDataNewProfileBtn');
+  if(dataNewProfBtn){
+    dataNewProfBtn.addEventListener('click', function(){
+      var name = prompt('Введите имя нового шиноби:', 'Новый шиноби');
+      if(name === null) return;
+      name = name.trim() || 'Новый шиноби';
+      createShinobiProfile({ charName: name });
     });
   }
-  var hudSaveBtn = g('shHudSaveBtn');
-  if(hudSaveBtn){
-    hudSaveBtn.addEventListener('click', function(){
-      SH.meta.charName = (v('shHudInCharName') || '').trim();
-      SH.meta.clan = (v('shHudInClan') || '').trim();
-      SH.meta.village = (v('shHudInVillage') || '').trim();
-      SH.meta.rank = (v('shHudInRank') || '').trim();
-      SH.meta.level = (v('shHudInLevel') || '1').trim();
-      SH.meta.nature = (v('shHudInNature') || '').trim();
-      SH.meta.chakra = (v('shHudInChakra') || '').trim();
-      SH.meta.hp = (v('shHudInHp') || '').trim();
-      SH.meta.ac = (v('shHudInAc') || '').trim();
+
+  var dataCloneBtn = g('shDataCloneProfileBtn');
+  if(dataCloneBtn){
+    dataCloneBtn.addEventListener('click', function(){
+      cloneShinobiProfile(SH.activeProfileId);
+    });
+  }
+
+  var dataResetBtn = g('shDataResetProfileBtn');
+  if(dataResetBtn){
+    dataResetBtn.addEventListener('click', function(){
+      var prof = getActiveProfile();
+      var name = (prof && prof.charName) ? ('«' + prof.charName + '»') : 'текущего персонажа';
+      if(confirm('Сбросить боевые параметры шиноби ' + name + ' к начальным значениям? Техники и приёмы сохранятся.')){
+        resetShinobiProfile(SH.activeProfileId);
+      }
+    });
+  }
+
+  var dataDelBtn = g('shDataDelProfileBtn');
+  if(dataDelBtn){
+    dataDelBtn.addEventListener('click', function(){
+      var prof = getActiveProfile();
+      var name = (prof && prof.charName) ? ('«' + prof.charName + '»') : 'текущего персонажа';
+      var isLast = (SH.profiles || []).length <= 1;
+      var msg = isLast
+        ? 'У вас остался единственный профиль. Удаление сбросит его к пустому шаблону. Продолжить?'
+        : ('Удалить профиль ' + name + ' со всеми персональными техниками и приёмами?');
+      if(confirm(msg)){
+        deleteShinobiProfile(SH.activeProfileId);
+      }
+    });
+  }
+
+  var dataSaveCharBtn = g('shDataSaveCharBtn');
+  if(dataSaveCharBtn){
+    dataSaveCharBtn.addEventListener('click', function(){
+      SH.meta.charName = (v('shDataInCharName') || '').trim();
+      SH.meta.clan = (v('shDataInClan') || '').trim();
+      SH.meta.village = (v('shDataInVillage') || '').trim();
+      SH.meta.rank = (v('shDataInRank') || '').trim();
+      SH.meta.level = (v('shDataInLevel') || '1').trim();
+      SH.meta.nature = (v('shDataInNature') || '').trim();
+      SH.meta.chakra = (v('shDataInChakra') || '').trim();
+      SH.meta.hp = (v('shDataInHp') || '').trim();
+      SH.meta.ac = (v('shDataInAc') || '').trim();
 
       saveMeta();
-      SH.hudEditing = false;
+      if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
+      paintShBar();
       render();
     });
   }
@@ -13213,7 +14111,18 @@ function wireSh(){
 
   var ex=g('shExport');
   if(ex) ex.addEventListener('click', function(){
-    var blob=new Blob([JSON.stringify({kind:'shinobi',meta:SH.meta,techs:SH.techs,moves:SH.moves,skills:SH.skills||[]},null,2)],{type:'application/json'});
+    syncActiveProfileFromState();
+    var exportPayload = {
+      kind: 'shinobi',
+      version: 2,
+      meta: SH.meta,
+      profiles: SH.profiles,
+      activeProfileId: SH.activeProfileId,
+      techs: SH.techs,
+      moves: SH.moves,
+      skills: SH.skills || []
+    };
+    var blob=new Blob([JSON.stringify(exportPayload,null,2)],{type:'application/json'});
     var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download=(SH.meta.name||'shinobi').replace(/[^\wа-яА-ЯёЁ\- ]/g,'')+'.json';
     document.body.appendChild(a); a.click(); a.remove();
@@ -13228,13 +14137,23 @@ function wireSh(){
       fr.onload=function(){
         try{
           var data=JSON.parse(fr.result);
-          if(!data || (!Array.isArray(data.techs) && !Array.isArray(data.moves) && !Array.isArray(data.skills))) throw 0;
+          if(!data || (!Array.isArray(data.techs) && !Array.isArray(data.moves) && !Array.isArray(data.skills) && !Array.isArray(data.profiles))) throw 0;
           if(!confirm('Заменить содержимое режима «Шиноби» содержимым файла?')) return;
-          SH.techs=Array.isArray(data.techs)?data.techs:[];
-          SH.moves=Array.isArray(data.moves)?data.moves:[];
-          SH.skills=Array.isArray(data.skills)?data.skills:[];
-          SH.meta=Object.assign({}, DEFAULT_META, data.meta||{});
-          saveT(); saveM(); saveS(); saveMeta(); paintShBar(); render();
+          if(Array.isArray(data.profiles) && data.profiles.length > 0){
+            SH.profiles = data.profiles;
+            SH.activeProfileId = data.activeProfileId || data.profiles[0].id;
+            saveProfilesList(SH.profiles);
+            saveActiveProfileId(SH.activeProfileId);
+            var actP = getActiveProfile();
+            applyProfileToState(actP);
+          } else {
+            SH.techs=Array.isArray(data.techs)?data.techs:[];
+            SH.moves=Array.isArray(data.moves)?data.moves:[];
+            SH.skills=Array.isArray(data.skills)?data.skills:[];
+            SH.meta=Object.assign({}, DEFAULT_META, data.meta||{});
+            saveT(); saveM(); saveS(); saveMeta();
+          }
+          paintShBar(); render();
         }catch(e){ alert('Не удалось прочитать файл.'); }
       };
       fr.readAsText(f);
@@ -14367,12 +15286,15 @@ function paintShBar(){
   }
   document.body.classList.toggle('sh-theme', HB.mode==='sh');
   if(HB.mode==='sh') document.body.classList.remove('hb-theme');
+  if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
   var lab=bar.querySelector('.hb-bar-world');
   if(HB.mode==='sh'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
-    lab.textContent = SH.meta.name || 'Шиноби';
+    var charInfo = (SH.meta && SH.meta.charName) ? (' • ' + SH.meta.charName) : '';
+    lab.textContent = (SH.meta && SH.meta.name ? SH.meta.name : 'Шиноби') + charInfo;
   }
 }
+SH.paintShBar = paintShBar;
 
 /* ---------- перехват ---------- */
 var _r=window.render, _n=window.navigate, _w=window.wireEvents;
