@@ -4070,6 +4070,349 @@ body.sh-theme-uchiha .sh-uchiha-particles {
   flex-wrap:wrap;
 }
 
+
+/* ===== РЕЖИМ «КОСМОС» (MASS EFFECT) ===== */
+body.me-theme {
+  --ink: #e3f2fd;
+  --ink-dim: #7da5c9;
+  --steel-0: #040812;
+  --steel-1: #091224;
+  --steel-2: #0f1c36;
+  --line: #183354;
+  --brass: #00d2ff;
+  --brass-dim: #0077b3;
+  --crimson: #ff7700;
+  --crimson-bright: #ff9922;
+  --die: #00d2ff;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(0, 210, 255, 0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 15% 100%, rgba(255, 120, 0, 0.08) 0%, transparent 45%),
+    linear-gradient(rgba(0, 210, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 210, 255, 0.025) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 15%, #0d1a33 0%, #040812 75%);
+  background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px, 100% 100%;
+}
+
+body.me-theme .hb-seg-btn.on {
+  background: linear-gradient(135deg, #00d2ff 0%, #0077cc 100%);
+  color: #030814;
+  box-shadow: 0 0 16px rgba(0, 210, 255, 0.55);
+  font-weight: 700;
+}
+
+body.me-theme .hb-bar-world {
+  border-color: rgba(0, 210, 255, 0.4);
+  color: #00d2ff;
+  background: rgba(5, 12, 26, 0.9);
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.2);
+}
+
+body.me-theme h1, body.me-theme h2, body.me-theme h3 {
+  color: #f0f7ff;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 20px rgba(0, 210, 255, 0.25);
+}
+
+body.me-theme .subtitle {
+  color: #7da5c9;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+}
+
+body.me-theme .rule {
+  background: linear-gradient(90deg, #00d2ff 0%, rgba(0, 210, 255, 0.15) 60%, transparent 100%);
+  height: 2px;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+}
+
+body.me-theme .section-label {
+  color: #00d2ff;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+body.me-theme .menu-item {
+  background: linear-gradient(135deg, rgba(12, 22, 42, 0.92) 0%, rgba(6, 12, 26, 0.95) 100%);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-left: 4px solid var(--brass);
+  border-radius: 4px;
+  position: relative;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+body.me-theme .menu-item:hover:not(.disabled) {
+  background: linear-gradient(135deg, rgba(18, 32, 60, 0.95) 0%, rgba(10, 18, 36, 0.98) 100%);
+  border-color: rgba(0, 210, 255, 0.65);
+  border-left-color: var(--crimson-bright);
+  box-shadow: 0 6px 26px rgba(0, 0, 0, 0.75), inset 0 0 16px rgba(0, 210, 255, 0.15), 0 0 16px rgba(0, 210, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+body.me-theme .menu-item .name {
+  color: #eaf4fc;
+}
+
+body.me-theme .menu-item .desc {
+  color: #7da5c9;
+}
+
+body.me-theme .menu-item .arrow {
+  color: #00d2ff;
+}
+
+body.me-theme .hero-dice {
+  background: linear-gradient(135deg, rgba(10, 24, 48, 0.95) 0%, rgba(5, 14, 30, 0.98) 100%);
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  border-left: 5px solid var(--brass);
+  box-shadow: 0 0 22px rgba(0, 210, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.7);
+  position: relative;
+  overflow: hidden;
+}
+
+body.me-theme .hero-dice::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; width: 140px; height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 210, 255, 0.06) 100%);
+  pointer-events: none;
+}
+
+body.me-theme .hero-dice:hover {
+  border-color: var(--brass);
+  border-left-color: var(--crimson-bright);
+  box-shadow: 0 0 30px rgba(0, 210, 255, 0.4), 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+body.me-theme .hero-dice-name {
+  color: #00d2ff;
+  text-shadow: 0 0 14px rgba(0, 210, 255, 0.4);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
+}
+
+body.me-theme .hero-dice-desc {
+  color: #8bb1d6;
+}
+
+body.me-theme .hero-dice-arrow {
+  color: #00d2ff;
+}
+
+/* Стилизация дайсроллера под Sci-Fi интерфейс */
+body.me-theme .die.s20 .val {
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  text-shadow: 0 0 12px rgba(0, 210, 255, 0.9), 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+body.me-theme .dice-tray {
+  background: radial-gradient(circle at 50% 50%, rgba(14, 28, 56, 0.85) 0%, rgba(5, 12, 24, 0.98) 100%);
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  box-shadow: inset 0 0 35px rgba(0, 210, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.7);
+}
+
+body.me-theme .dice-tray .empty-hint {
+  color: #749bc2;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+body.me-theme .dice-total-row .sum {
+  color: #00d2ff;
+  font-family: 'JetBrains Mono', monospace;
+  text-shadow: 0 0 20px rgba(0, 210, 255, 0.65);
+}
+
+body.me-theme .dice-total-row .cap {
+  color: #7da5c9;
+}
+
+body.me-theme .dice-notation {
+  color: #8eb7de;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+body.me-theme .die-btn {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 2px;
+}
+
+body.me-theme .die-btn:hover {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: translateY(-4px);
+}
+
+body.me-theme .die-btn:hover svg {
+  filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.8)) drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+}
+
+body.me-theme .die-coin-btn:hover svg {
+  filter: drop-shadow(0 0 12px rgba(255, 136, 0, 0.85)) drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+}
+
+body.me-theme .btn-primary {
+  background: linear-gradient(135deg, #00d2ff 0%, #0066aa 100%);
+  color: #030814;
+  border: 1px solid #00d2ff;
+  box-shadow: 0 0 16px rgba(0, 210, 255, 0.4);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+body.me-theme .btn-primary:hover {
+  box-shadow: 0 0 24px rgba(0, 210, 255, 0.65);
+  transform: translateY(-1px);
+}
+
+body.me-theme .btn-ghost {
+  border-color: rgba(0, 210, 255, 0.3);
+  color: #7da5c9;
+}
+
+body.me-theme .btn-ghost:hover {
+  border-color: #00d2ff;
+  color: #00d2ff;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.25);
+}
+
+body.me-theme .back {
+  color: #00d2ff;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+body.me-theme .label-picker {
+  background: rgba(9, 18, 36, 0.8);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+body.me-theme .label-picker select, body.me-theme .label-picker input {
+  background: #060b17;
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  color: #eaf4fc;
+}
+
+body.me-theme .label-picker select:focus, body.me-theme .label-picker input:focus {
+  border-color: #00d2ff;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+}
+
+body.me-theme .label-preview {
+  color: #00d2ff;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Специфический HUD терминала Mass Effect */
+.me-hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 18px;
+  padding: 10px 14px;
+  background: rgba(6, 14, 28, 0.85);
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  border-left: 4px solid var(--brass);
+  border-radius: 4px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.me-hud-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  color: #7da5c9;
+}
+
+.me-hud-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00d2ff;
+  box-shadow: 0 0 10px #00d2ff;
+  animation: me-pulse 2s infinite;
+}
+
+@keyframes me-pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 14px #00d2ff; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.me-tag-omni {
+  display: inline-block;
+  padding: 2px 7px;
+  font-size: 10.5px;
+  font-family: 'JetBrains Mono', monospace;
+  border-radius: 2px;
+  background: rgba(255, 136, 0, 0.15);
+  border: 1px solid rgba(255, 136, 0, 0.4);
+  color: #ffaa33;
+}
+
+.me-tag-holo {
+  display: inline-block;
+  padding: 2px 7px;
+  font-size: 10.5px;
+  font-family: 'JetBrains Mono', monospace;
+  border-radius: 2px;
+  background: rgba(0, 210, 255, 0.15);
+  border: 1px solid rgba(0, 210, 255, 0.4);
+  color: #00d2ff;
+}
+
+/* Модальное окно терминала для будущих разделов */
+.me-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(3, 7, 16, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.me-modal-box {
+  background: linear-gradient(135deg, rgba(10, 20, 38, 0.98) 0%, rgba(5, 11, 24, 0.98) 100%);
+  border: 1px solid rgba(0, 210, 255, 0.45);
+  border-left: 5px solid #00d2ff;
+  border-radius: 4px;
+  max-width: 520px;
+  width: 100%;
+  padding: 22px;
+  box-shadow: 0 0 35px rgba(0, 210, 255, 0.25), 0 12px 40px rgba(0, 0, 0, 0.85);
+  animation: me-box-in 0.2s ease-out;
+}
+
+@keyframes me-box-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.me-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
 </style>
 </head>
 <body>
@@ -4538,7 +4881,8 @@ function dieShapeSvg(sides, uid, label){
     </svg>`;
   }
   if(!DICE_COLORS[sides]) return renderCustomFacetShape(sides, uid, label);
-  const c = DICE_COLORS[sides];
+  const isMeTheme = (typeof document !== 'undefined' && document.body && document.body.classList.contains('me-theme'));
+  const c = (isMeTheme && sides === 20) ? {light:'#00d2ff', dark:'#005080'} : DICE_COLORS[sides];
   const gid = 'grad_'+uid;
   let shape='';
   if(sides===4) shape = `<polygon points="50,6 96,90 4,90" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/>`;
@@ -4546,7 +4890,22 @@ function dieShapeSvg(sides, uid, label){
   else if(sides===8) shape = `<polygon points="50,4 96,50 50,96 4,50" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/><line x1="50" y1="4" x2="50" y2="96" stroke="rgba(0,0,0,.14)"/>`;
   else if(sides===10) shape = `<polygon points="50,4 93,42 50,96 7,42" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/><polyline points="7,42 50,58 93,42" fill="none" stroke="rgba(0,0,0,.14)"/><line x1="50" y1="58" x2="50" y2="96" stroke="rgba(0,0,0,.14)"/>`;
   else if(sides===12) shape = `<polygon points="50,4 95,38 78,94 22,94 5,38" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/>`;
-  else shape = `<polygon points="50,3 91,26 91,74 50,97 9,74 9,26" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/><polygon points="50,24 75,63 25,63" fill="rgba(255,255,255,.07)" stroke="rgba(0,0,0,.16)"/>`;
+  else {
+    const isMe = (typeof document !== 'undefined' && document.body && document.body.classList.contains('me-theme'));
+    const strokeColor = isMe ? 'rgba(0,210,255,0.55)' : 'rgba(0,0,0,0.28)';
+    const facetFill = isMe ? 'rgba(0,210,255,0.18)' : 'rgba(255,255,255,0.12)';
+    shape = `<polygon points="50,3 91,26 91,74 50,97 9,74 9,26" fill="url(#${gid})" stroke="${strokeColor}" stroke-width="1.6"/>
+    <polygon points="50,24 75,63 25,63" fill="${facetFill}" stroke="${strokeColor}" stroke-width="1.2"/>
+    <line x1="50" y1="24" x2="50" y2="3" stroke="${strokeColor}" stroke-width="1.2"/>
+    <line x1="50" y1="24" x2="91" y2="26" stroke="${strokeColor}" stroke-width="1.2"/>
+    <line x1="50" y1="24" x2="9" y2="26" stroke="${strokeColor}" stroke-width="1.2"/>
+    <line x1="75" y1="63" x2="91" y2="26" stroke="${strokeColor}" stroke-width="1.2"/>
+    <line x1="75" y1="63" x2="91" y2="74" stroke="${strokeColor}" stroke-width="1.2"/>
+    <line x1="75" y1="63" x2="50" y2="97" stroke="${strokeColor}" stroke-width="1.2"/>
+    <line x1="25" y1="63" x2="50" y2="97" stroke="${strokeColor}" stroke-width="1.2"/>
+    <line x1="25" y1="63" x2="9" y2="74" stroke="${strokeColor}" stroke-width="1.2"/>
+    <line x1="25" y1="63" x2="9" y2="26" stroke="${strokeColor}" stroke-width="1.2"/>`;
+  }
   const text = (label!==undefined && label!==null)
     ? `<text x="50" y="${DICE_LABEL_Y[sides]}" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="32" fill="#fff">${label}</text>`
     : '';
@@ -4697,6 +5056,10 @@ function updateDiceHistory(){
 
 let histUid = 0;
 
+window.addDie = addDie;
+window.removeDie = removeDie;
+window.rollAllDice = rollAllDice;
+window.diceState = diceState;
 function addDie(sides){
   const tray = document.querySelector('.dice-tray');
   if(!tray){ render(); return; } // подстраховка, если экран ещё не отрисован
@@ -4711,7 +5074,7 @@ function addDie(sides){
 
   const holder = document.createElement('div');
   holder.innerHTML = trayDieHtml({id,sides,value});
-  const el = holder.firstElementChild;
+  const el = holder.firstElementChild || holder;
   tray.appendChild(el);
   el.addEventListener('click', ()=>removeDie(id));
 
@@ -4874,7 +5237,21 @@ function handleGenerateClick(btn){
   overlay._genT = setTimeout(()=>{ overlay.classList.remove('active'); }, dur+950);
 }
 
-const DICE_LABEL_CATEGORIES = [
+const DICE_LABEL_CATEGORIES = window.DICE_LABEL_CATEGORIES = [
+  {key:'space', icon:'🪐', ru:'Космос (Mass Effect)', items:[
+    {icon:'🎯', ru:'Атака стрелковым оружием (по AC)', std:20},
+    {icon:'🛡️', ru:'Активная защита (перекат / укрытие)', std:20},
+    {icon:'💥', ru:'Урон оружия / боеприпаса', std:null},
+    {icon:'⚡', ru:'Биотика: проверка контроля (МУД/ХАР)', std:20},
+    {icon:'💻', ru:'Техника: взлом и дешифровка (ИНТ)', std:20},
+    {icon:'🪙', ru:'Монетка шанса W / L (50/50)', std:'coin'},
+    {icon:'🩺', ru:'Медицина и медгель (ИНТ/МУД)', std:20},
+    {icon:'🔥', ru:'Спасбросок: перегрузка / напряжение (ТЕЛ)', std:20},
+    {icon:'👁️', ru:'Омни-скан: оценка защиты цели', std:20},
+    {icon:'🎲', ru:'d100: Таблица крит. попадания', std:100},
+    {icon:'🌌', ru:'d100: Событие космического перелёта', std:100},
+    {icon:'⚠️', ru:'d100: Осложнение взлома терминала', std:100}
+  ]},
   {key:'shinobi', icon:'🌀', ru:'Шиноби', items:[
     {icon:'🌀', ru:'Контроль чакры', std:20},
     {icon:'🛡️', ru:'Активная защита', std:20},
@@ -4945,10 +5322,19 @@ function renderDice(){
   const custThemeStyles = `--cust-color:${custTheme.color};--cust-glow:${custTheme.glow};--cust-bg-tint:${custTheme.bg};--cust-border-tint:${custTheme.border};`;
 
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Бросок костей'}])}
-    <button class="back" data-go="home">← Назад</button>
-    <h1>Бросок костей</h1>
-    <p class="subtitle">Виртуальные кости — как за столом, только d4 не теряется под диваном.</p>
+    ${(function(){
+      if(HB.mode==='me'){
+        
+        return renderCrumb([{label:'Космос', nav:'meHome'},{label:'Тактический симулятор костей'}]) +
+          '<button class="back" data-go="meHome">← Назад в Терминал</button>' +
+          '<h1>ТАКТИЧЕСКИЙ БРОСОК КОСТЕЙ</h1>' +
+          '<p class="subtitle">СИСТЕМЫ АЛЬЯНСА // ТАКТИЧЕСКИЙ СИМУЛЯТОР БРОСКОВ MASS EFFECT</p>';
+      }
+      return renderCrumb([{label:'Компендиум', nav:'home'},{label:'Бросок костей'}]) +
+        '<button class="back" data-go="home">← Назад</button>' +
+        '<h1>Бросок костей</h1>' +
+        '<p class="subtitle">Виртуальные кости — как за столом, только d4 не теряется под диваном.</p>';
+    })()}
     <div class="rule"></div>
     <div class="dice-tray">${trayContent}</div>
     <div class="dice-total-row">
@@ -5287,7 +5673,7 @@ let spellDraft = null;
 let CHARACTERS = loadCharacters();
 let charDraft = null;
 
-let view = {screen:'home'};
+var view = window.view = {screen:'home'};
 
 function render(){
   const app = document.getElementById('app');
@@ -15654,18 +16040,122 @@ function wireSh(){
 }
 SH.wireSh = wireSh;
 
-/* ---------- третья кнопка режима ---------- */
+
+/* ============================================================
+   МОДУЛЬ «КОСМОС» (MASS EFFECT)
+   ============================================================ */
+var ME = window.ME = {
+  meta: {
+    name: 'Космос',
+    universe: 'Mass Effect',
+    status: 'ONLINE'
+  }
+};
+
+function meShowNotice(sectionKey){
+  var titles = {
+    char: 'ДОСЬЕ ОПЕРАТИВНИКА',
+    powers: 'ДРЕВО СПОСОБНОСТЕЙ И КУЛДАУНЫ',
+    arsenal: 'ОРУЖЕЙНЫЙ АРСЕНАЛ И СНАРЯЖЕНИЕ',
+    ship: 'КОРАБЛЬ И ЭКИПАЖ',
+    codex: 'КОДЕКС И СПРАВОЧНИК ПРАВИЛ',
+    missions: 'ТЕРМИНАЛ КОНТРАКТОВ',
+    data: 'ДАННЫЕ И СИСТЕМЫ'
+  };
+  var descs = {
+    char: 'Лист персонажа Mass Effect: виды Совета (Люди, Азари, Турианцы, Саларианцы, Кроганы, Кварианцы...), роли Альянса, биохимия (лево/декстро), 3 слоя защиты (Барьер / Щит / Броня / HP) и расчет вантажа.',
+    powers: 'Дерево способностей: 4 ветви (Биотика, Техника, Бой, Медицина), 6 корней и конструктор производных 1-го и 2-го порядка, система кулдаунов и шкала напряжения биотиков.',
+    arsenal: 'Оружейный арсенал: база стрелкового оружия (пистолеты, ПП, штурмовые винтовки, дробовики, снайперские, тяжелое), тепловые заряды / перегрев стволов, матрица типов урона.',
+    ship: 'Корабль: лист судна, системы (ядро масс-эффекта, двигатели, СЖО), расходы на обслуживание и состав экипажа.',
+    codex: 'Кодекс: справочник лора, бестиарий мехов LOKI/YMIR и наёмников, таблицы критических попаданий d100 и правила активной защиты.',
+    missions: 'Терминал контрактов: процедурные контракты Альянса, Совета Цитадели, Омеги и гильдий Терминуса.',
+    data: 'Управление профилем оперативника и резервное копирование данных кампании.'
+  };
+  var t = titles[sectionKey] || 'ТЕРМИНАЛ СИСТЕМ';
+  var d = descs[sectionKey] || 'Раздел формируется.';
+  
+  var overlay = document.createElement('div');
+  overlay.className = 'me-modal-overlay';
+  overlay.innerHTML = '<div class="me-modal-box">'+
+    '<div class="me-modal-header"><span class="me-tag-holo">[ALLIANCE SECURE LINK]</span><span style="color:#00d2ff;font-family:\'JetBrains Mono\',monospace;font-size:12px;">STATUS: IN PROGRESS</span></div>'+
+    '<h2 style="margin:10px 0 6px;color:#00d2ff;font-family:\'JetBrains Mono\',monospace;">'+t+'</h2>'+
+    '<p style="color:#8bb1d6;font-size:13px;line-height:1.5;margin-bottom:16px;">'+d+'</p>'+
+    '<div style="text-align:right;"><button class="btn-primary" id="meCloseModalBtn" style="padding:6px 18px;">Принято</button></div>'+
+  '</div>';
+  document.body.appendChild(overlay);
+  document.getElementById('meCloseModalBtn').onclick = function(){
+    overlay.remove();
+  };
+  overlay.onclick = function(e){
+    if(e.target === overlay) overlay.remove();
+  };
+}
+
+window.meHome = meHome;
+window.meShowNotice = meShowNotice;
+function meHome(){
+  var hero = '<div class="hero-dice" data-go="dice">'+
+    '<div class="hero-dice-icon">'+(typeof dieShapeSvg==='function'? dieShapeSvg(20,'meHeroDie',20) : '🎲')+'</div>'+
+    '<div class="hero-dice-text">'+
+      '<div class="hero-dice-name">ТАКТИЧЕСКИЙ БРОСОК КОСТЕЙ</div>'+
+      '<div class="hero-dice-desc">Кубики d4–d20, d100 критов и событий перелёта, монетка шанса W/L, модификаторы и подписи ME</div>'+
+    '</div><div class="hero-dice-arrow">→</div></div>';
+
+  var hudHtml = '<div class="me-hud">'+
+    '<div class="me-hud-status">'+
+      '<div class="me-hud-pulse"></div>'+
+      '<span>ТАКТИЧЕСКАЯ СЕТЬ АЛЬЯНСА // ТЕРМИНАЛ ОПЕРАТИВНИКА</span>'+
+    '</div>'+
+    '<div style="display:flex;gap:6px;">'+
+      '<span class="me-tag-holo">EXTRANET ONLINE</span>'+
+      '<span class="me-tag-omni">ЭЛЕМЕНТ НОЛЬ: СТАБИЛЕН</span>'+
+    '</div>'+
+  '</div>';
+
+  var items = [
+    {nav:'meModal:char',     icon:'👤', t:'Досье оперативника',     d:'Расы Совета, роли Альянса, биохимия, барьеры, щиты и броня'},
+    {nav:'meModal:powers',   icon:'⚡', t:'Способности и Древо',    d:'Биотика, Техника, Бой, Медицина: корни, ранги и комбинации'},
+    {nav:'meModal:arsenal',  icon:'🔫', t:'Оружейный арсенал',      d:'Классификация оружия, типы урона, модификации, заряды'},
+    {nav:'meModal:ship',     icon:'🚀', t:'Корабль и Экипаж',       d:'Системы судна, ядро масс-эффекта, СЖО, отряд и лояльность'},
+    {nav:'meModal:codex',    icon:'📖', t:'Кодекс Галактики',       d:'Виды, фракции, матрица урона против слоев защиты, правила боя'},
+    {nav:'meModal:missions', icon:'📋', t:'Терминал контрактов',    d:'Заказы Альянса, СБ Цитадели, Терминуса и наёмных гильдий'},
+    {nav:'meModal:data',     icon:'💾', t:'Данные систем',          d:'Резервное копирование и управление профилем космоса'}
+  ];
+
+  return '<h1>ТЕРМИНАЛ: КОСМОС</h1>'+
+    '<div class="subtitle">СЕТТИНГ MASS EFFECT • ПРОТОКОЛЫ 5E TACTICAL SCI-FI</div>'+
+    hudHtml +
+    '<div class="rule"></div>'+ hero +
+    '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // КОНСОЛЬ</div>'+
+    '<div class="menu-list grid-2">'+items.map(function(i){
+      return '<div class="menu-item" data-nav="'+i.nav+'">'+
+        '<div class="name">'+i.icon+' '+esc(i.t)+'</div>'+
+        '<div class="desc">'+esc(i.d)+'</div>'+
+        '<div class="arrow">›</div>'+
+      '</div>';
+    }).join('')+'</div>';
+}
+
+/* ---------- третья и четвертая кнопки режима ---------- */
 function paintShBar(){
   var bar=document.getElementById('hbModeBar'); if(!bar) return;
   var seg=bar.querySelector('.hb-seg'); if(!seg) return;
+  
   if(!seg.querySelector('[data-hbmode="sh"]')){
     var b=document.createElement('button');
     b.className='hb-seg-btn'; b.setAttribute('data-hbmode','sh'); b.textContent='Шиноби';
     seg.appendChild(b);
   }
+  if(!seg.querySelector('[data-hbmode="me"]')){
+    var bMe=document.createElement('button');
+    bMe.className='hb-seg-btn'; bMe.setAttribute('data-hbmode','me'); bMe.textContent='Космос';
+    seg.appendChild(bMe);
+  }
+
   seg.querySelectorAll('.hb-seg-btn').forEach(function(b){
     b.classList.toggle('on', b.getAttribute('data-hbmode')===HB.mode);
   });
+
   var shBtn = seg.querySelector('[data-hbmode="sh"]');
   if(shBtn && !shBtn.__shBound){
     shBtn.__shBound = true;
@@ -15675,23 +16165,65 @@ function paintShBar(){
       view={screen:'shHome'}; SH.draft=null; render(); window.scrollTo(0,0);
     });
   }
+
+  var meBtn = seg.querySelector('[data-hbmode="me"]');
+  if(meBtn && !meBtn.__meBound){
+    meBtn.__meBound = true;
+    meBtn.addEventListener('click', function(){
+      HB.mode='me';
+      try{ localStorage.setItem('ttc_mode','me'); }catch(e){}
+      window.view=view={screen:'meHome'}; render(); window.scrollTo(0,0);
+    });
+  }
+
   document.body.classList.toggle('sh-theme', HB.mode==='sh');
-  if(HB.mode==='sh') document.body.classList.remove('hb-theme');
+  document.body.classList.toggle('me-theme', HB.mode==='me');
+  if(HB.mode==='sh' || HB.mode==='me') document.body.classList.remove('hb-theme');
   if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
+
   var lab=bar.querySelector('.hb-bar-world');
   if(HB.mode==='sh'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
     var charInfo = (SH.meta && SH.meta.charName) ? (' • ' + SH.meta.charName) : '';
     lab.textContent = (SH.meta && SH.meta.name ? SH.meta.name : 'Шиноби') + charInfo;
+  } else if(HB.mode==='me'){
+    if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
+    lab.textContent = 'Космос • Mass Effect';
   }
 }
 SH.paintShBar = paintShBar;
+ME.paintShBar = paintShBar;
 
 /* ---------- перехват ---------- */
 var _r=window.render, _n=window.navigate, _w=window.wireEvents;
 
 window.render=function(){
-  if(HB.mode!=='sh'){ _r(); paintShBar(); return; }
+  if(HB.mode==='me'){
+    document.body.classList.remove('sh-theme');
+    document.body.classList.remove('hb-theme');
+    document.body.classList.add('me-theme');
+    var s=view.screen||'';
+    if(s==='dice'){
+      _r();
+      paintShBar();
+      return;
+    }
+    var app=document.getElementById('app');
+    app.classList.remove('wide');
+    app.classList.add('home-wide');
+    app.innerHTML = meHome();
+    _w();
+    paintShBar();
+    return;
+  }
+
+  if(HB.mode!=='sh'){
+    document.body.classList.remove('me-theme');
+    _r();
+    paintShBar();
+    return;
+  }
+
   _r();
   var s=view.screen||'';
   if(s.indexOf('sh')!==0){ paintShBar(); return; }
@@ -15721,9 +16253,20 @@ window.render=function(){
 
 window.navigate=function(val){
   var p=String(val||'').split(':');
+  if(HB.mode==='me'){
+    if(p[0]==='home'||p[0]==='meHome'){
+      view={screen:'meHome'}; render(); window.scrollTo(0,0); return;
+    }
+    if(p[0]==='dice'){
+      window.view=view={screen:'dice'}; render(); window.scrollTo(0,0); return;
+    }
+    if(p[0]==='meModal'){
+      meShowNotice(p[1]); return;
+    }
+  }
   if(HB.mode==='sh'){
     var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData'};
-    if(map[p[0]]){ view={screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
+    if(map[p[0]]){ window.view=view={screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
     if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shMoveView'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
       view={screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
     }
@@ -15736,9 +16279,11 @@ load();
 if(HB.mode==='sh'){
   document.body.classList.add('sh-theme');
   if(!view.screen || String(view.screen).indexOf('sh')!==0) view={screen:'shHome'};
+} else if(HB.mode==='me'){
+  document.body.classList.add('me-theme');
+  if(!view.screen || view.screen!=='dice') view={screen:'meHome'};
 }
 render();
-
 })();
 </script>
 
