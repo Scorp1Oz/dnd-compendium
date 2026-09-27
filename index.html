@@ -6563,32 +6563,49 @@ function wireEvents(){
     });
   }
   document.querySelectorAll('.die-btn[data-sides]').forEach(el=>{
+    if(el._wiredSides) return;
+    el._wiredSides = true;
     el.addEventListener('click', ()=>{
       const raw = el.getAttribute('data-sides');
       addDie(raw === 'coin' ? 'coin' : parseInt(raw, 10));
     });
   });
   document.querySelectorAll('.dice-tray .die').forEach(el=>{
+    if(el._wiredDie) return;
+    el._wiredDie = true;
     el.addEventListener('click', ()=>removeDie(el.getAttribute('data-id')));
   });
   const rollBtn=document.getElementById('rollAllBtn');
-  if(rollBtn) rollBtn.addEventListener('click', rollAllDice);
+  if(rollBtn && !rollBtn._wired){
+    rollBtn._wired = true;
+    rollBtn.addEventListener('click', rollAllDice);
+  }
   const clearBtn=document.getElementById('clearDiceBtn');
-  if(clearBtn) clearBtn.addEventListener('click', ()=>{
-    document.querySelectorAll('.dice-tray .die').forEach(el=>{ if(el._diceIv) clearInterval(el._diceIv); });
-    diceState.dice=[];
-    render();
-  });
+  if(clearBtn && !clearBtn._wired){
+    clearBtn._wired = true;
+    clearBtn.addEventListener('click', ()=>{
+      document.querySelectorAll('.dice-tray .die').forEach(el=>{ if(el._diceIv) clearInterval(el._diceIv); });
+      diceState.dice=[];
+      render();
+    });
+  }
   const copyBtn=document.getElementById('copyResultBtn');
-  if(copyBtn) copyBtn.addEventListener('click', copyDiceResult);
+  if(copyBtn && !copyBtn._wired){
+    copyBtn._wired = true;
+    copyBtn.addEventListener('click', copyDiceResult);
+  }
   const clearHistBtn=document.getElementById('clearHistBtn');
-  if(clearHistBtn) clearHistBtn.addEventListener('click', ()=>{
-    diceState.history = [];
-    updateDiceHistory();
-  });
+  if(clearHistBtn && !clearHistBtn._wired){
+    clearHistBtn._wired = true;
+    clearHistBtn.addEventListener('click', ()=>{
+      diceState.history = [];
+      updateDiceHistory();
+    });
+  }
   const histBox = document.getElementById('diceHistory');
   const histTip = document.getElementById('histTip');
-  if(histBox && histTip){
+  if(histBox && histTip && !histBox._wired){
+    histBox._wired = true;
     const showTip = (die)=>{
       const text = die.getAttribute('data-tip');
       if(!text) return;
@@ -6616,19 +6633,25 @@ function wireEvents(){
     histBox.addEventListener('mouseleave', hideTip);
   }
   const modMinus=document.getElementById('modMinus');
-  if(modMinus) modMinus.addEventListener('click', ()=>{
-    diceState.modifier--;
-    const mv=document.querySelector('.mod-val');
-    if(mv) mv.textContent=(diceState.modifier>0?'+':'')+diceState.modifier;
-    updateDiceReadout();
-  });
+  if(modMinus && !modMinus._wired){
+    modMinus._wired = true;
+    modMinus.addEventListener('click', ()=>{
+      diceState.modifier--;
+      const mv=document.querySelector('.mod-val');
+      if(mv) mv.textContent=(diceState.modifier>0?'+':'')+diceState.modifier;
+      updateDiceReadout();
+    });
+  }
   const modPlus=document.getElementById('modPlus');
-  if(modPlus) modPlus.addEventListener('click', ()=>{
-    diceState.modifier++;
-    const mv=document.querySelector('.mod-val');
-    if(mv) mv.textContent=(diceState.modifier>0?'+':'')+diceState.modifier;
-    updateDiceReadout();
-  });
+  if(modPlus && !modPlus._wired){
+    modPlus._wired = true;
+    modPlus.addEventListener('click', ()=>{
+      diceState.modifier++;
+      const mv=document.querySelector('.mod-val');
+      if(mv) mv.textContent=(diceState.modifier>0?'+':'')+diceState.modifier;
+      updateDiceReadout();
+    });
+  }
 
   function setCustomSides(val){
     let n = parseInt(val, 10);
@@ -6667,18 +6690,27 @@ function wireEvents(){
   }
 
   const customMinus = document.getElementById('customDieMinus');
-  if(customMinus) customMinus.addEventListener('click', ()=>setCustomSides(diceState.customSides - 1));
+  if(customMinus && !customMinus._wired){
+    customMinus._wired = true;
+    customMinus.addEventListener('click', ()=>setCustomSides(diceState.customSides - 1));
+  }
 
   const customPlus = document.getElementById('customDiePlus');
-  if(customPlus) customPlus.addEventListener('click', ()=>setCustomSides(diceState.customSides + 1));
+  if(customPlus && !customPlus._wired){
+    customPlus._wired = true;
+    customPlus.addEventListener('click', ()=>setCustomSides(diceState.customSides + 1));
+  }
 
   const customInput = document.getElementById('customDieInput');
-  if(customInput){
+  if(customInput && !customInput._wired){
+    customInput._wired = true;
     customInput.addEventListener('input', ()=>setCustomSides(customInput.value));
     customInput.addEventListener('change', ()=>setCustomSides(customInput.value));
   }
 
   document.querySelectorAll('.custom-pill').forEach(pill=>{
+    if(pill._wired) return;
+    pill._wired = true;
     pill.addEventListener('click', ()=>{
       const s = parseInt(pill.getAttribute('data-sides'), 10);
       setCustomSides(s);
@@ -6686,10 +6718,16 @@ function wireEvents(){
   });
 
   const addCustomBtn = document.getElementById('addCustomDieBtn');
-  if(addCustomBtn) addCustomBtn.addEventListener('click', ()=>addDie(diceState.customSides));
+  if(addCustomBtn && !addCustomBtn._wired){
+    addCustomBtn._wired = true;
+    addCustomBtn.addEventListener('click', ()=>addDie(diceState.customSides));
+  }
 
   const customAddDirect = document.getElementById('customAddDirectBtn');
-  if(customAddDirect) customAddDirect.addEventListener('click', ()=>addDie(diceState.customSides));
+  if(customAddDirect && !customAddDirect._wired){
+    customAddDirect._wired = true;
+    customAddDirect.addEventListener('click', ()=>addDie(diceState.customSides));
+  }
 
   const diceCatSelect = document.getElementById('diceCatSelect');
   if(diceCatSelect) diceCatSelect.addEventListener('change', ()=>{
@@ -41635,7 +41673,6 @@ window.render=function(){
     var s=view.screen||'';
     if(s==='dice'){
       _r();
-      _w();
       paintShBar();
       return;
     }
