@@ -3158,6 +3158,769 @@ body.sh-theme .card:hover{
   .sh-map-viewport{ height:420px; }
   .sh-map-grid-info{ grid-template-columns:1fr; }
 }
+
+/* ===== РЕЖИМ «КОСМОС» (MASS EFFECT) ===== */
+body.me-theme {
+  --ink: #e3f2fd;
+  --ink-dim: #7da5c9;
+  --steel-0: #040812;
+  --steel-1: #091224;
+  --steel-2: #0f1c36;
+  --line: #183354;
+  --brass: #00d2ff;
+  --brass-dim: #0077b3;
+  --crimson: #ff7700;
+  --crimson-bright: #ff9922;
+  --die: #00d2ff;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(0, 210, 255, 0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 15% 100%, rgba(255, 120, 0, 0.08) 0%, transparent 45%),
+    linear-gradient(rgba(0, 210, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 210, 255, 0.025) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 15%, #0d1a33 0%, #040812 75%);
+  background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px, 100% 100%;
+}
+
+body.me-theme .hb-seg-btn.on {
+  background: linear-gradient(135deg, #00d2ff 0%, #0077cc 100%);
+  color: #030814;
+  box-shadow: 0 0 16px rgba(0, 210, 255, 0.55);
+  font-weight: 700;
+}
+
+body.me-theme .hb-bar-world {
+  border-color: rgba(0, 210, 255, 0.4);
+  color: #00d2ff;
+  background: rgba(5, 12, 26, 0.9);
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.2);
+}
+
+body.me-theme h1, body.me-theme h2, body.me-theme h3 {
+  color: #f0f7ff;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 20px rgba(0, 210, 255, 0.25);
+}
+
+body.me-theme .dice-tray {
+  background: rgba(4, 9, 20, 0.88);
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  box-shadow: 0 0 25px rgba(0, 210, 255, 0.15) inset, 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+body.me-theme .dice-total-row .sum {
+  color: #00d2ff;
+  font-family: 'JetBrains Mono', monospace;
+  text-shadow: 0 0 20px rgba(0, 210, 255, 0.65);
+}
+
+body.me-theme .dice-total-row .cap {
+  color: #7da5c9;
+}
+
+body.me-theme .dice-notation {
+  color: #8eb7de;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Кнопки кубиков в ME: прозрачные, без фонового квадрата */
+body.me-theme .die-btn {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 2px;
+}
+
+body.me-theme .die-btn:hover {
+  border: none !important;
+  box-shadow: none !important;
+  transform: translateY(-2px);
+}
+
+body.me-theme .die-coin-btn {
+  border-color: rgba(255, 136, 0, 0.45);
+}
+
+body.me-theme .die-coin-btn:hover {
+  border-color: #ff8800;
+  box-shadow: 0 0 18px rgba(255, 136, 0, 0.5);
+}
+
+body.me-theme .btn-primary {
+  background: linear-gradient(135deg, #00d2ff 0%, #0066aa 100%);
+  color: #030814;
+  border: 1px solid #00d2ff;
+  box-shadow: 0 0 16px rgba(0, 210, 255, 0.4);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+body.me-theme .btn-primary:hover {
+  box-shadow: 0 0 24px rgba(0, 210, 255, 0.65);
+  transform: translateY(-1px);
+}
+
+body.me-theme .btn-ghost {
+  border-color: rgba(0, 210, 255, 0.3);
+  color: #7da5c9;
+}
+
+body.me-theme .btn-ghost:hover {
+  border-color: #00d2ff;
+  color: #00d2ff;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.25);
+}
+
+body.me-theme .back {
+  color: #00d2ff;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+body.me-theme .label-picker {
+  background: rgba(9, 18, 36, 0.8);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+body.me-theme .label-picker select, body.me-theme .label-picker input {
+  background: #060b17;
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  color: #eaf4fc;
+}
+
+body.me-theme .label-picker select:focus, body.me-theme .label-picker input:focus {
+  border-color: #00d2ff;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+}
+
+body.me-theme .label-preview {
+  color: #00d2ff;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Специфический HUD терминала Mass Effect */
+.me-hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 18px;
+  padding: 10px 14px;
+  background: rgba(6, 14, 28, 0.85);
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  border-left: 4px solid #00d2ff;
+  border-radius: 4px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.me-hud-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  color: #7da5c9;
+}
+
+.me-hud-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00d2ff;
+  box-shadow: 0 0 10px #00d2ff;
+  animation: me-pulse 2s infinite;
+}
+
+@keyframes me-pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 14px #00d2ff; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.me-tag-omni {
+  display: inline-block;
+  padding: 2px 7px;
+  font-size: 10.5px;
+  font-family: 'JetBrains Mono', monospace;
+  border-radius: 2px;
+  background: rgba(255, 136, 0, 0.15);
+  border: 1px solid rgba(255, 136, 0, 0.4);
+  color: #ffaa33;
+}
+
+.me-tag-holo {
+  display: inline-block;
+  padding: 2px 7px;
+  font-size: 10.5px;
+  font-family: 'JetBrains Mono', monospace;
+  border-radius: 2px;
+  background: rgba(0, 210, 255, 0.15);
+  border: 1px solid rgba(0, 210, 255, 0.4);
+  color: #00d2ff;
+}
+
+/* ME Sci-Fi UI панели, карточки, таблицы и вкладки */
+.me-panel {
+  background: rgba(6, 14, 28, 0.85);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-radius: 6px;
+  padding: 18px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.me-card {
+  background: rgba(8, 20, 38, 0.75);
+  border: 1px solid rgba(0, 210, 255, 0.2);
+  border-radius: 4px;
+  padding: 12px 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.me-card-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #00d2ff;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 210, 255, 0.15);
+  padding-bottom: 4px;
+}
+
+.me-def-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.me-def-card {
+  background: rgba(5, 12, 24, 0.85);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-radius: 4px;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.me-def-card .def-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: #7da5c9;
+  letter-spacing: 0.5px;
+}
+
+.me-def-card .def-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin: 2px 0;
+}
+
+.me-def-card .def-sub {
+  font-size: 10px;
+  color: #5a7d9f;
+}
+
+.me-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin: 10px 0;
+}
+@media (max-width: 650px) {
+  .me-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.me-stat-box {
+  background: rgba(5, 12, 24, 0.85);
+  border: 1px solid rgba(0, 210, 255, 0.2);
+  border-radius: 4px;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.me-stat-box .stat-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #7da5c9;
+  letter-spacing: 0.5px;
+}
+
+.me-stat-box .stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin: 2px 0;
+}
+
+.me-stat-box .stat-mod {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #00d2ff;
+}
+
+.me-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.me-tab-btn {
+  background: rgba(5, 12, 24, 0.85);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-radius: 3px;
+  padding: 5px 11px;
+  color: #8bb1d6;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.me-tab-btn:hover {
+  border-color: #00d2ff;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
+}
+
+.me-tab-btn.on {
+  background: rgba(0, 210, 255, 0.18);
+  border-color: #00d2ff;
+  color: #00d2ff;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.3);
+}
+
+.me-input {
+  background: rgba(4, 9, 18, 0.95);
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  border-radius: 3px;
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  padding: 5px 8px;
+  outline: none;
+}
+
+.me-input:focus {
+  border-color: #00d2ff;
+  box-shadow: 0 0 8px rgba(0, 210, 255, 0.4);
+}
+
+.me-ranks-box {
+  background: rgba(4, 9, 18, 0.6);
+  border-radius: 3px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #8bb1d6;
+  border-left: 2px solid rgba(0, 210, 255, 0.3);
+}
+
+.me-ranks-box .rank-row {
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.me-ranks-box .rank-row:last-child {
+  margin-bottom: 0;
+}
+
+.me-table th, .me-table td {
+  padding: 6px 8px;
+}
+
+/* ===== ИНТЕРАКТИВНАЯ ГАЛАКТИЧЕСКАЯ КАРТА MASS EFFECT ===== */
+.me-map-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.me-map-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: rgba(6, 14, 28, 0.85);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+.me-map-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.me-filter-btn {
+  background: rgba(5, 12, 24, 0.85);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-radius: 3px;
+  padding: 4px 10px;
+  color: #8bb1d6;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.me-filter-btn:hover {
+  border-color: #00d2ff;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(0, 210, 255, 0.25);
+}
+
+.me-filter-btn.on {
+  background: rgba(0, 210, 255, 0.2);
+  border-color: #00d2ff;
+  color: #00d2ff;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.35);
+}
+
+.me-map-zoom-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.me-zoom-btn {
+  background: rgba(5, 12, 24, 0.85);
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  border-radius: 3px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00d2ff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.me-zoom-btn:hover {
+  background: rgba(0, 210, 255, 0.25);
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+}
+
+.me-map-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 14px;
+  min-height: 560px;
+}
+
+@media (max-width: 960px) {
+  .me-map-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.me-map-viewport {
+  position: relative;
+  background: radial-gradient(ellipse at 50% 50%, #081224 0%, #030610 100%);
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.8) inset, 0 4px 20px rgba(0, 0, 0, 0.6);
+  cursor: grab;
+  user-select: none;
+  min-height: 540px;
+}
+
+.me-map-viewport.grabbing {
+  cursor: grabbing;
+}
+
+.me-map-viewport::before {
+  content: '';
+  position: absolute;
+  top: 8px; left: 8px; width: 18px; height: 18px;
+  border-top: 2px solid #00d2ff;
+  border-left: 2px solid #00d2ff;
+  pointer-events: none;
+  z-index: 10;
+}
+.me-map-viewport::after {
+  content: '';
+  position: absolute;
+  bottom: 8px; right: 8px; width: 18px; height: 18px;
+  border-bottom: 2px solid #00d2ff;
+  border-right: 2px solid #00d2ff;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.me-map-hud-overlay {
+  position: absolute;
+  top: 12px; left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
+  z-index: 12;
+}
+
+.me-map-hud-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: #00d2ff;
+  background: rgba(4, 9, 20, 0.75);
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  border-radius: 2px;
+  padding: 2px 7px;
+  width: fit-content;
+  letter-spacing: 0.5px;
+}
+
+.me-galaxy-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.me-sector-path {
+  fill-opacity: 0.08;
+  stroke: #00d2ff;
+  stroke-width: 1.8px;
+  stroke-dasharray: 6 3;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.me-sector-path:hover {
+  fill-opacity: 0.28;
+  stroke: #ffffff;
+  stroke-width: 3.2px;
+  stroke-dasharray: none;
+  filter: drop-shadow(0 0 10px #00d2ff);
+}
+
+.me-sector-path.selected {
+  fill-opacity: 0.35;
+  stroke: #ffffff;
+  stroke-width: 3.8px;
+  stroke-dasharray: none;
+  filter: drop-shadow(0 0 16px #00ffff);
+}
+
+.me-relay-marker {
+  cursor: pointer;
+}
+
+.me-relay-marker:hover polygon {
+  fill: #ffffff !important;
+  stroke: #00ffff !important;
+  stroke-width: 1.6px !important;
+  filter: drop-shadow(0 0 10px #00ffff);
+}
+
+.me-relay-marker:hover text {
+  fill: #00ffff !important;
+  font-weight: 700;
+  filter: drop-shadow(0 0 6px #00d2ff);
+}
+
+.me-relay-marker circle.pulse {
+  animation: me-relay-pulse 2s infinite ease-out;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+@keyframes me-relay-pulse {
+  0% { r: 5; opacity: 1; }
+  100% { r: 16; opacity: 0; }
+}
+
+.me-relay-marker text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  fill: #e0f2fe;
+  paint-order: stroke;
+  stroke: #040814;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.me-map-sidebar {
+  background: rgba(6, 14, 28, 0.85);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-radius: 4px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+.me-sidebar-header {
+  border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+  padding-bottom: 8px;
+}
+
+.me-sidebar-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 17px;
+  font-weight: 700;
+  color: #00d2ff;
+  letter-spacing: 0.5px;
+}
+
+.me-sidebar-subtitle {
+  font-size: 11.5px;
+  color: #7da5c9;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 2px;
+}
+
+.me-sidebar-prop {
+  font-size: 12.5px;
+  color: #8bb1d6;
+  line-height: 1.5;
+}
+
+.me-sidebar-prop strong {
+  color: #e2f1ff;
+  font-weight: 600;
+}
+
+.me-clusters-badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+/* Стили для настраиваемых модулей корабля, арсенала и способностей */
+.me-slot-card {
+  background: rgba(6, 14, 28, 0.85);
+  border: 1px solid rgba(0, 210, 255, 0.25);
+  border-left: 4px solid #00d2ff;
+  border-radius: 4px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.me-slot-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #7da5c9;
+  letter-spacing: 0.5px;
+}
+
+.me-slot-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  margin: 2px 0;
+}
+
+.me-slot-desc {
+  font-size: 12px;
+  color: #8bb1d6;
+  line-height: 1.45;
+}
+
+.me-empty-box {
+  background: rgba(4, 9, 20, 0.7);
+  border: 1px dashed rgba(0, 210, 255, 0.3);
+  border-radius: 6px;
+  padding: 32px 20px;
+  text-align: center;
+  margin: 14px 0;
+}
+
+.me-empty-box-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.me-empty-box-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: #00d2ff;
+  margin-bottom: 6px;
+}
+
+.me-empty-box-desc {
+  font-size: 12.5px;
+  color: #8bb1d6;
+  max-width: 480px;
+  margin: 0 auto 16px;
+  line-height: 1.5;
+}
+
+
+.me-cluster-badge {
+  background: rgba(0, 210, 255, 0.12);
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  border-radius: 3px;
+  padding: 2px 7px;
+  font-size: 11px;
+  color: #a7d3f8;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+
+
+.me-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(2, 6, 14, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.me-modal-box {
+  background: #061122;
+  border: 1px solid #00d2ff;
+  box-shadow: 0 0 24px rgba(0, 210, 255, 0.35);
+  border-radius: 6px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+  color: #e0f2fe;
+}
+
+.me-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 210, 255, 0.25);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+
 </style>
 </head>
 <body>
@@ -3962,7 +4725,21 @@ function handleGenerateClick(btn){
   overlay._genT = setTimeout(()=>{ overlay.classList.remove('active'); }, dur+950);
 }
 
-const DICE_LABEL_CATEGORIES = [
+var DICE_LABEL_CATEGORIES = window.DICE_LABEL_CATEGORIES = [
+  {key:'space', icon:'🪐', ru:'Космос (Mass Effect)', items:[
+    {icon:'🎯', ru:'Атака стрелковым оружием (по AC)', std:20},
+    {icon:'🛡️', ru:'Активная защита (перекат / укрытие)', std:20},
+    {icon:'💥', ru:'Урон оружия / боеприпаса', std:null},
+    {icon:'⚡', ru:'Биотика: проверка контроля (МУД/ХАР)', std:20},
+    {icon:'💻', ru:'Техника: взлом и дешифровка (ИНТ)', std:20},
+    {icon:'🪙', ru:'Монетка шанса W / L (50/50)', std:'coin'},
+    {icon:'🩺', ru:'Медицина и медгель (ИНТ/МУД)', std:20},
+    {icon:'🔥', ru:'Спасбросок: перегрузка / напряжение (ТЕЛ)', std:20},
+    {icon:'👁️', ru:'Омни-скан: оценка защиты цели', std:20},
+    {icon:'🎲', ru:'d100: Таблица крит. попадания', std:100},
+    {icon:'🌌', ru:'d100: Событие космического перелёта', std:100},
+    {icon:'⚠️', ru:'d100: Осложнение взлома терминала', std:100}
+  ]},
   {key:'shinobi', icon:'🌀', ru:'Шиноби', items:[
     {icon:'🌀', ru:'Контроль чакры', std:20},
     {icon:'🛡️', ru:'Активная защита', std:20},
@@ -4033,10 +4810,18 @@ function renderDice(){
   const custThemeStyles = `--cust-color:${custTheme.color};--cust-glow:${custTheme.glow};--cust-bg-tint:${custTheme.bg};--cust-border-tint:${custTheme.border};`;
 
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Бросок костей'}])}
-    <button class="back" data-go="home">← Назад</button>
-    <h1>Бросок костей</h1>
-    <p class="subtitle">Виртуальные кости — как за столом, только d4 не теряется под диваном.</p>
+    ${(function(){
+      if(HB.mode==='me'){
+        return renderCrumb([{label:'Космос', nav:'meHome'},{label:'Тактический симулятор костей'}]) +
+          '<button class="back" data-go="meHome">← Назад в Терминал</button>' +
+          '<h1>ТАКТИЧЕСКИЙ БРОСОК КОСТЕЙ</h1>' +
+          '<p class="subtitle">СИСТЕМЫ АЛЬЯНСА // ТАКТИЧЕСКИЙ СИМУЛЯТОР БРОСКОВ MASS EFFECT</p>';
+      }
+      return renderCrumb([{label:'Компендиум', nav:'home'},{label:'Бросок костей'}]) +
+        '<button class="back" data-go="home">← Назад</button>' +
+        '<h1>Бросок костей</h1>' +
+        '<p class="subtitle">Виртуальные кости — как за столом, только d4 не теряется под диваном.</p>';
+    })()}
     <div class="rule"></div>
     <div class="dice-tray">${trayContent}</div>
     <div class="dice-total-row">
@@ -38492,18 +39277,2313 @@ function wireSh(){
 }
 SH.wireSh = wireSh;
 
-/* ---------- третья кнопка режима ---------- */
+/* ============================================================
+   МОДУЛЬ «КОСМОС» (MASS EFFECT) — ВСЕ ЭКРАНЫ И ЛОГИКА
+   ============================================================ */
+
+var ME = window.ME = {
+  meta: {
+    name: 'Космос',
+    universe: 'Mass Effect',
+    status: 'ONLINE'
+  },
+  
+  // Базовое досье (статические параметры, без динамических шкал боя)
+  defaultChar: {
+    name: 'Джон Шепард',
+    callsign: 'Коммандер',
+    race: 'Человек',
+    role: 'Солдат',
+    origin: 'N7 / Землянин',
+    biochemistry: 'Левоаминокислотная',
+    level: 1,
+    devPoints: 4,
+    profBonus: 2,
+    stats: { str: 14, dex: 14, con: 15, int: 10, wis: 12, cha: 10 },
+    baseAc: 15,
+    baseShield: 15,
+    baseArmorPoints: 10,
+    damageThreshold: 1,
+    baseBarrier: 0,
+    maxHp: 24,
+    speed: '30 фт (9 м)',
+    omniTool: 'Омнитек Марк-IV',
+    bioAmp: '—',
+    loadout: 'Штурмовая винтовка M-8 Мститель, Тяжелый пистолет M-3 Хищник, Броня N7',
+    background: 'Герой Скиллианского блица. Отличная огневая подготовка, лидерские качества.'
+  },
+
+  char: null,
+
+  getChar: function(){
+    if(ME.char) return ME.char;
+    try {
+      var saved = localStorage.getItem('me_character');
+      if(saved) {
+        ME.char = JSON.parse(saved);
+        return ME.char;
+      }
+    } catch(e){}
+    ME.char = JSON.parse(JSON.stringify(ME.defaultChar));
+    return ME.char;
+  },
+
+  saveChar: function(c){
+    ME.char = c;
+    try {
+      localStorage.setItem('me_character', JSON.stringify(c));
+    } catch(e){}
+  },
+
+  resetChar: function(){
+    ME.char = JSON.parse(JSON.stringify(ME.defaultChar));
+    try {
+      localStorage.setItem('me_character', JSON.stringify(ME.char));
+    } catch(e){}
+    return ME.char;
+  },
+
+  // --- СПОСОБНОСТИ (A92 PROTOCOLS: ВПИСЫВАЮТСЯ И НАСТРАИВАЮТСЯ ИГРОКОМ) ---
+  powersList: null,
+  getPowers: function(){
+    if(ME.powersList) return ME.powersList;
+    try {
+      var saved = localStorage.getItem('me_powers');
+      if(saved) {
+        ME.powersList = JSON.parse(saved);
+        return ME.powersList;
+      }
+    } catch(e){}
+    ME.powersList = [];
+    return ME.powersList;
+  },
+
+  savePowers: function(list){
+    ME.powersList = list;
+    try {
+      localStorage.setItem('me_powers', JSON.stringify(list));
+    } catch(e){}
+  },
+
+  addPower: function(p){
+    var list = ME.getPowers();
+    if(!p.id) p.id = 'pow_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    list.push(p);
+    ME.savePowers(list);
+    return p;
+  },
+
+  updatePower: function(p){
+    var list = ME.getPowers();
+    var idx = list.findIndex(function(item){ return item.id === p.id; });
+    if(idx !== -1){
+      list[idx] = p;
+      ME.savePowers(list);
+    }
+  },
+
+  deletePower: function(id){
+    var list = ME.getPowers().filter(function(item){ return item.id !== id; });
+    ME.savePowers(list);
+  },
+
+  // --- ОРУЖЕЙНЫЙ АРСЕНАЛ (ВПИСЫВАЕТСЯ И НАСТРАИВАЕТСЯ ИГРОКОМ) ---
+  arsenalList: null,
+  getArsenal: function(){
+    if(ME.arsenalList) return ME.arsenalList;
+    try {
+      var saved = localStorage.getItem('me_arsenal');
+      if(saved) {
+        ME.arsenalList = JSON.parse(saved);
+        return ME.arsenalList;
+      }
+    } catch(e){}
+    ME.arsenalList = [];
+    return ME.arsenalList;
+  },
+
+  saveArsenal: function(list){
+    ME.arsenalList = list;
+    try {
+      localStorage.setItem('me_arsenal', JSON.stringify(list));
+    } catch(e){}
+  },
+
+  addWeapon: function(w){
+    var list = ME.getArsenal();
+    if(!w.id) w.id = 'wpn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    list.push(w);
+    ME.saveArsenal(list);
+    return w;
+  },
+
+  updateWeapon: function(w){
+    var list = ME.getArsenal();
+    var idx = list.findIndex(function(item){ return item.id === w.id; });
+    if(idx !== -1){
+      list[idx] = w;
+      ME.saveArsenal(list);
+    }
+  },
+
+  deleteWeapon: function(id){
+    var list = ME.getArsenal().filter(function(item){ return item.id !== id; });
+    ME.saveArsenal(list);
+  },
+
+  // Спецбоеприпасы (справочная матрица Альянса)
+  ammo: [
+    { name: 'Зажигательные патроны', type: 'Огонь', effect: '+1d6 огненного урона, поджог на 2 раунда. Двойной урон (×2) по броне и органике (HP).' },
+    { name: 'Крио-патроны', type: 'Крио', effect: '+1d4 крио-урона, спасбросок ТЕЛ или замедление на 50%. Размягчает броню целей.' },
+    { name: 'Бронебойные патроны', type: 'Кинетика/Пробитие', effect: 'Игнорируют 2 единицы порога брони цели, +1d6 кинетического урона по броне.' },
+    { name: 'Деформирующие патроны', type: 'Биотика', effect: '+1d8 биотического урона. Удвоенный урон (×2) по барьерам и броне; усиливают био-комбо.' },
+    { name: 'Фазовые патроны', type: 'Электро/Импульс', effect: '+2d6 электро-урона по щитам и синтетикам. Снимают кинетические барьеры за секунды.' }
+  ],
+
+  // --- КОРАБЛЬ И ЭКИПАЖ (СТАНДАРТНЫЕ СЛОТЫ МОДУЛЕЙ И КАСТОМНЫЙ ЭКИПАЖ) ---
+  defaultShipData: {
+    name: 'Не зарегистрировано',
+    cls: 'Фрегат / Класс не определен',
+    status: 'Требуется оснащение систем',
+    notes: 'Корабль находится в сухом доке. Заполните стандартные слоты модулей и укомплектуйте экипаж.',
+    modules: [
+      { id: 'core', slot: 'Ядро масс-эффекта и Двигатели', icon: '⚛️', name: 'Слот пуст', stat: 'Не установлено', desc: 'Место под маршевые двигатели и танталовое ядро масс-эффекта.' },
+      { id: 'shields', slot: 'Генератор щитов и Барьеры', icon: '🛡️', name: 'Слот пуст', stat: 'Не установлено', desc: 'Место под многослойные кинетические генераторы барьеров и щитов.' },
+      { id: 'armor', slot: 'Броня корпуса и Защита', icon: '🧱', name: 'Слот пуст', stat: 'Не установлено', desc: 'Место под композитную абляционную броню, нанотрубки и теплоотводы.' },
+      { id: 'weapons', slot: 'Орудийные системы и Калибр', icon: '💥', name: 'Слот пуст', stat: 'Не установлено', desc: 'Место под главный калибр, излучатели частиц или систему ПОИСК.' },
+      { id: 'sensors', slot: 'Сенсоры, Связь и Стелс', icon: '📡', name: 'Слот пуст', stat: 'Не установлено', desc: 'Место под массив сенсоров дальнего обнаружения и систему IES.' },
+      { id: 'life', slot: 'Жизнеобеспечение и Медотсек', icon: '🩺', name: 'Слот пуст', stat: 'Не установлено', desc: 'Место под капсулы СЖО, криокамеры и медотсек с запасом панацелина.' },
+      { id: 'cargo', slot: 'Грузовой трюм и Спецмодули', icon: '📦', name: 'Слот пуст', stat: 'Не установлено', desc: 'Свободный отсек для вспомогательного челнока, зондов или мастерской.' }
+    ],
+    crew: []
+  },
+
+  shipData: null,
+  getShip: function(){
+    if(ME.shipData) return ME.shipData;
+    try {
+      var saved = localStorage.getItem('me_ship_data');
+      if(saved) {
+        ME.shipData = JSON.parse(saved);
+        return ME.shipData;
+      }
+    } catch(e){}
+    ME.shipData = JSON.parse(JSON.stringify(ME.defaultShipData));
+    return ME.shipData;
+  },
+
+  saveShip: function(s){
+    ME.shipData = s;
+    try {
+      localStorage.setItem('me_ship_data', JSON.stringify(s));
+    } catch(e){}
+  },
+
+  resetShip: function(){
+    ME.shipData = JSON.parse(JSON.stringify(ME.defaultShipData));
+    ME.saveShip(ME.shipData);
+    return ME.shipData;
+  },
+
+  updateShipInfo: function(name, cls, status, notes){
+    var s = ME.getShip();
+    s.name = name;
+    s.cls = cls;
+    s.status = status;
+    s.notes = notes;
+    ME.saveShip(s);
+  },
+
+  updateShipModule: function(modId, name, stat, desc){
+    var s = ME.getShip();
+    var m = s.modules.find(function(item){ return item.id === modId; });
+    if(m){
+      m.name = name;
+      m.stat = stat;
+      m.desc = desc;
+      ME.saveShip(s);
+    }
+  },
+
+  addCrewMember: function(c){
+    var s = ME.getShip();
+    if(!c.id) c.id = 'crew_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    s.crew.push(c);
+    ME.saveShip(s);
+    return c;
+  },
+
+  updateCrewMember: function(c){
+    var s = ME.getShip();
+    var idx = s.crew.findIndex(function(item){ return item.id === c.id; });
+    if(idx !== -1){
+      s.crew[idx] = c;
+      ME.saveShip(s);
+    }
+  },
+
+  deleteCrewMember: function(id){
+    var s = ME.getShip();
+    s.crew = s.crew.filter(function(item){ return item.id !== id; });
+    ME.saveShip(s);
+  },
+
+  // Процедурный генератор миссий
+  generateMission: function(){
+    var clients = [
+      { name: 'Альянс Систем', icon: '🎖️', desc: 'Командование 5-го флота' },
+      { name: 'СБ Цитадели (C-Sec)', icon: '🛡️', desc: 'Исполнительный комитет безопасности' },
+      { name: 'STG (ГОР саларианцев)', icon: '🦎', desc: 'Группа Особого Реагирования' },
+      { name: 'Теневой Брокер', icon: '👁️', desc: 'Шифрованный терминал агентурной сети' },
+      { name: 'Ария Т\'Лоак (Омега)', icon: '🍷', desc: 'Контракт станции Омега' }
+    ];
+    var planets = [
+      'Цитадель (Президиум и Трущобы)', 'Илос (Руины протеан)', 'Новерия (Лаборатории Пик 15)',
+      'Омега (Станция Терминуса)', 'Тучанка (Пустоши Кроганов)', 'Ферос (Колония Надежда Чжу)',
+      'Святилище (Сектор Горизонт)', 'Заброшенный дрейфующий фрахтовщик'
+    ];
+    var targets = [
+      'Ликвидировать полевого командира наёмников',
+      'Извлечь зашифрованное ядро экспериментального ВИ',
+      'Освободить исследовательскую группу из захваченного комплекса',
+      'Предотвратить диверсию на охладителе ретранслятора',
+      'Зачистить гнездо мутировавших хасков и спасти образцы',
+      'Перехватить партию контрабандного нулевого элемента'
+    ];
+    var enemies = [
+      'Наёмники «Затмение» (азари-биотики и мехи LOKI)',
+      'Картель «Синие Светила» (батарианские штурмовики и тяжелые орудия)',
+      'Банда «Кровавая Стая» (кроганы и ворча с огнеметами)',
+      'Диверсионная группа «Цербера» (фантомы и центурионы)',
+      'Разведывательный рой Гетов (платформы охотников)',
+      'Коллекционеры (трутни и предвестники)'
+    ];
+    var twists = [
+      'Утечка токсичной радиации: таймер 5 раундов до закрытия шлюзов.',
+      'Генераторы помех: связь с кораблем полностью заглушена.',
+      'Противник активировал стационарную тяжелую турель YMIR.',
+      'Один из заложников оказался замаскированным агентом врага.',
+      'Атмосферный вакуум: повреждение скафандров грозит удушьем.'
+    ];
+
+    var cl = clients[Math.floor(Math.random()*clients.length)];
+    var pl = planets[Math.floor(Math.random()*planets.length)];
+    var tg = targets[Math.floor(Math.random()*targets.length)];
+    var en = enemies[Math.floor(Math.random()*enemies.length)];
+    var tw = twists[Math.floor(Math.random()*twists.length)];
+    var rank = Math.floor(Math.random()*4) + 1;
+    var credits = (rank * 1500) + Math.floor(Math.random()*10)*100;
+    var op = rank;
+
+    return {
+      id: 'mis_' + Date.now() + '_' + Math.floor(Math.random()*100),
+      client: cl.name,
+      clientIcon: cl.icon,
+      location: pl,
+      rank: rank,
+      target: tg,
+      enemy: en,
+      twist: tw,
+      reward: credits + ' кредитов, +' + op + ' ОР',
+      status: 'active'
+    };
+  }
+};
+
+// HTML escape helper
+// Предустановленные шаблоны A92 для опционального быстрого добавления в 1 клик
+var ME_CANON_POWERS_PRESETS = [
+  { branch: 'Биотика', icon: '🌀', name: 'Притяжение', cd: 3, req: 'Узлы L-типа', cost: 1, r1: 'Цель в 40 фт без щита/барьера поднимается в воздух на 20 фт (Обездвижена).', r2: 'Длительность 2 хода.', r3: 'Захватывает сразу две цели в радиусе 15 фт.', desc: 'Микро-гравитационное поле, выдергивающее из укрытия.' },
+  { branch: 'Биотика', icon: '💨', name: 'Отталкивание', cd: 2, req: 'Узлы L-типа', cost: 1, r1: '1d8 биотического урона, отброс на 15 фт (Сбита с ног).', r2: '2d8 урона, отброс на 20 фт.', r3: 'Конус отталкивания 15 фт.', desc: 'Импульсная биотическая волна, активирует био-детонации.' },
+  { branch: 'Биотика', icon: '🛡️', name: 'Барьер', cd: 5, req: 'Узлы L-типа', cost: 1, r1: 'Биотический щит емкостью 10 единиц вокруг себя.', r2: 'Емкость 15 единиц.', r3: 'Емкость 20 единиц или наложение на союзника в 30 фт.', desc: 'Концентрированное защитное силовое поле.' },
+  { branch: 'Биотика', icon: '💥', name: 'Деформация', cd: 3, req: 'Узлы L-типа', cost: 1, r1: '2d6 биотического урона (x2 по барьерам и броне). Порог брони -1.', r2: '3d6 урона.', r3: 'Снижает порог брони цели на -2.', desc: 'Молекулярное гравитационное искажение.' },
+  { branch: 'Биотика', icon: '⚡', name: 'Биотический рывок', cd: 3, req: 'Узлы L-типа', cost: 1, r1: 'Рывок до 40 фт: 1d10 урона, восстанавливает +5 к щиту.', r2: '2d10 урона.', r3: '100% восстановление щитов при ударе.', desc: 'Сближение со скоростью света с таранным импульсом.' },
+  { branch: 'Биотика', icon: '❄️', name: 'Стазис', cd: 4, req: 'Узлы L-типа', cost: 1, r1: 'Цель замирает в пространстве на 1 раунд (спасбр. МУД).', r2: 'Длительность 2 раунда.', r3: 'Срабатывает даже по защищенной цели.', desc: 'Локальная кинетическая остановка цели.' },
+  { branch: 'Техника', icon: '⚡', name: 'Перегрузка', cd: 3, req: 'Омни-инструмент', cost: 1, r1: '2d6 электро-урона (по щитам и синтетикам x2).', r2: '3d6 урона.', r3: 'Цепная дуга на вторую цель в 15 фт.', desc: 'Высоковольтный электромагнитный импульс.' },
+  { branch: 'Техника', icon: '🔥', name: 'Поджог', cd: 3, req: 'Омни-инструмент', cost: 1, r1: '2d6 огненного урона, горение 1d4 (x2 по броне).', r2: '3d6 урона.', r3: 'Радиус взрыва 5 фт вокруг цели.', desc: 'Плазменный термозаряд, выжигающий броню.' },
+  { branch: 'Техника', icon: '🧊', name: 'Заморозка', cd: 3, req: 'Омни-инструмент', cost: 1, r1: '1d6 крио-урона, скорость 0 и помеха на атаки.', r2: '2d6 урона.', r3: 'Радиус заморозки 5 фт.', desc: 'Субнулевое охлаждение, размягчающее броню.' },
+  { branch: 'Техника', icon: '💻', name: 'Взлом синтетиков', cd: 4, req: 'Омни-инструмент', cost: 1, r1: 'Мех, дрон или турель переходят на твою сторону на 2 раунда.', r2: 'Длительность 3 раунда.', r3: 'Постоянный контроль до гибели единицы.', desc: 'Перехват протоколов управления синтетиками.' },
+  { branch: 'Техника', icon: '👤', name: 'Тактическая маскировка', cd: 5, req: 'Омни-инструмент', cost: 1, r1: 'Невидимость на 2 раунда; атака с преимуществом.', r2: 'Длительность 3 раунда.', r3: 'Критический удар на 19-20 из маскировки.', desc: 'Светопреломляющее покрытие костюма.' },
+  { branch: 'Бой', icon: '💉', name: 'Адреналиновый прилив', cd: 4, req: 'Боевая подготовка', cost: 1, r1: 'Замедление времени: дополнительное действие атаки в ход.', r2: '+2 к урону оружием.', r3: 'Снижает весь входящий урон на 25%.', desc: 'Боевой био-стимулятор мышечной реакции.' },
+  { branch: 'Бой', icon: '🎯', name: 'Оглушающий выстрел', cd: 2, req: 'Боевая подготовка', cost: 1, r1: '1d6 урона, цель Сбита с ног; спасбр. СИЛ.', r2: '2d6 урона.', r3: 'Радиус детонации 10 фт.', desc: 'Выстрел микро-снарядом с кинетическим импульсом.' },
+  { branch: 'Медицина', icon: '🩹', name: 'Инъекция омни-геля', cd: 3, req: 'Омни-инструмент', cost: 1, r1: 'Восстанавливает 1d8+ИНТ здоровья союзнику в 5 фт.', r2: '2d8+ИНТ лечения.', r3: 'Снимает эффекты горения и заморозки.', desc: 'Синтез медицинского геля в полевых условиях.' }
+];
+
+// Предустановленные шаблоны оружия Альянса
+var ME_CANON_WEAPONS_PRESETS = [
+  { name: 'M-8 «Мститель»', cat: 'rifles', type: 'Штурмовая винтовка', dmg: '1d8+2 кин.', range: '60/180 фт', clip: 30, desc: 'Надежная стандартная винтовка Альянса. Универсальный выбор пехоты.' },
+  { name: 'M-96 «Мотыга»', cat: 'rifles', type: 'Тяжелая винтовка', dmg: '1d10+2 кин.', range: '80/240 фт', clip: 16, desc: 'Полуавтоматическая штурмовая винтовка с тяжелым ударом и высокой кучностью.' },
+  { name: 'M-3 «Хищник»', cat: 'pistols', type: 'Тяжелый пистолет', dmg: '1d6+1 кин.', range: '40/120 фт', clip: 12, desc: 'Штатный пистолет офицеров флота Альянса. Надежен в любых условиях.' },
+  { name: 'M-6 «Палач»', cat: 'pistols', type: 'Тяжелый пистолет', dmg: '1d8+2 кин.', range: '50/150 фт', clip: 6, desc: 'Ручная пушка. Бронебойные патроны наносят огромный урон броне и металлу.' },
+  { name: 'M-4 «Сюрикен»', cat: 'pistols', type: 'Пистолет-пулемет', dmg: '1d6 кин. (очередь 3)', range: '30/90 фт', clip: 24, desc: 'Легкий ПП с отсечкой по три выстрела. Быстро разрушает щиты.' },
+  { name: 'M-23 «Меч»', cat: 'shotguns', type: 'Дробовик', dmg: '2d6+2 кин.', range: '20/40 фт', clip: 8, desc: 'Классический военный дробовик с колоссальным уроном в упор.' },
+  { name: 'M-92 «Богомол»', cat: 'snipers', type: 'Снайперская винтовка', dmg: '1d12+3 кин.', range: '150/600 фт', clip: 1, desc: 'Снайперская винтовка с ручной перезарядкой. Смертельна в уязвимые точки.' },
+  { name: 'M-98 «Вдова»', cat: 'snipers', type: 'Антиматериальная винтовка', dmg: '2d10+4 кин.', range: '200/800 фт', clip: 1, desc: 'Тяжелая крупнокалиберная винтовка, способная пробить броню бронетранспортера.' },
+  { name: 'М-920 «Каин»', cat: 'heavy', type: 'Тяжелое ядерное орудие', dmg: '10d10 взрывной', range: '100 фт', clip: 1, desc: 'Переносной микро-ускоритель массы. Вызывает локальный ядерный взрыв.' }
+];
+
+// Каноничный пресет судна «Нормандия SR-2»
+var ME_CANON_NORMANDY_PRESET = {
+  name: 'Нормандия SR-2',
+  cls: 'Стелс-фрегат глубокой разведки Альянса',
+  status: '100% НОМИНАЛ // ГОТОВ К ВЫЛЕТУ',
+  notes: 'Флагман тактической разведки Альянса. Оснащен передовой маскировкой IES и орудием Таникс.',
+  modules: [
+    { id: 'core', slot: 'Ядро масс-эффекта и Двигатели', icon: '⚛️', name: 'Танталовое ядро масс-эффекта', stat: 'Номинал (без следа)', desc: 'Ядро увеличенного объема, позволяющее двигаться без выброса тепла и радиации.' },
+    { id: 'shields', slot: 'Генератор щитов и Барьеры', icon: '🛡️', name: 'Щиты «Циклоп»', stat: '100% Заряд', desc: 'Многослойные кинетические щиты по технологии азари, отражающие кинетические снаряды.' },
+    { id: 'armor', slot: 'Броня корпуса и Защита', icon: '🧱', name: 'Броня «Силарис»', stat: '100% Целостность', desc: 'Углеродные нанотрубки с титановым напылением, устойчивые к лазерному нагреву.' },
+    { id: 'weapons', slot: 'Орудийные системы и Калибр', icon: '💥', name: 'Главный калибр «Таникс»', stat: 'Готов к залпу', desc: 'Магнитно-гидродинамическое орудие на основе технологий Властелина.' },
+    { id: 'sensors', slot: 'Сенсоры, Связь и Стелс', icon: '📡', name: 'Стелс-система IES', stat: 'Активна', desc: 'Радиаторы хранения внутреннего тепла. Корабль невидим для дальних сенсоров.' },
+    { id: 'life', slot: 'Жизнеобеспечение и Медотсек', icon: '🩺', name: 'Модульный медотсек', stat: 'Снабжен', desc: 'Капсула крио-восстановления и запас панацелина для полевой хирургии.' },
+    { id: 'cargo', slot: 'Грузовой трюм и Спецмодули', icon: '📦', name: 'Челнок «Кадьяк» UT-47', stat: 'В ангаре', desc: 'Бронированный десантный челнок для оперативной высадки наземных групп.' }
+  ],
+  crew: [
+    { id: 'cr_joker', name: 'Джефф «Джокер» Моро', race: 'Человек', role: 'Главный пилот / Рулевой', loyalty: 'Предан', note: 'Лучший рулевой флота Альянса. Синдром Вролика.' },
+    { id: 'cr_garrus', name: 'Гаррус Вакариан', race: 'Турианец', role: 'Начальник оружейных систем', loyalty: 'Предан', note: 'Калибровка орудия «Таникс» и тактическое прикрытие.' },
+    { id: 'cr_liara', name: 'Лиара Т\'Сони', race: 'Азари', role: 'Научный офицер / Исследователь', loyalty: 'Предана', note: 'Специалист по технологиям протеан и мощный биотик.' },
+    { id: 'cr_tali', name: 'Тали\'Зора вас Нормандия', race: 'Кварианка', role: 'Главный инженер привода', loyalty: 'Предана', note: 'Гениальный инженер двигателей масс-эффекта.' },
+    { id: 'cr_mordin', name: 'Мордин Солус', race: 'Саларианец', role: 'Бортовой врач-генетик', loyalty: 'Предан', note: 'Бывший оперативник STG. Скоростной гений биохимии.' }
+  ]
+};
+
+// Модальное окно для Mass Effect
+function meShowModal(title, subtitle, bodyHtml, onSave){
+  var old = document.querySelector('.me-modal-overlay');
+  if(old) old.remove();
+
+  var overlay = document.createElement('div');
+  overlay.className = 'me-modal-overlay';
+  overlay.innerHTML = '<div class="me-modal-box">' +
+    '<div class="me-modal-header">' +
+      '<div>' +
+        '<div style="font-size:16px;font-weight:700;color:#00d2ff;font-family:monospace;">' + meEsc(title) + '</div>' +
+        (subtitle ? '<div style="font-size:11.5px;color:#7da5c9;margin-top:2px;">' + meEsc(subtitle) + '</div>' : '') +
+      '</div>' +
+      '<button class="btn-subtle" id="meModalCloseBtn" style="font-size:14px;padding:2px 8px;cursor:pointer;">✕</button>' +
+    '</div>' +
+    '<div class="me-modal-body" style="margin-bottom:16px;">' + bodyHtml + '</div>' +
+    '<div style="display:flex;justify-content:flex-end;gap:10px;">' +
+      '<button class="btn-subtle" id="meModalCancelBtn">Отмена</button>' +
+      (onSave ? '<button class="btn-primary" id="meModalSaveBtn">Сохранить</button>' : '') +
+    '</div>' +
+  '</div>';
+
+  document.body.appendChild(overlay);
+
+  var close = function(){ overlay.remove(); };
+  document.getElementById('meModalCloseBtn').onclick = close;
+  document.getElementById('meModalCancelBtn').onclick = close;
+  overlay.onclick = function(e){ if(e.target === overlay) close(); };
+
+  if(onSave){
+    document.getElementById('meModalSaveBtn').onclick = function(){
+      if(onSave() !== false) close();
+    };
+  }
+}
+
+function meEsc(s){
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function meNavHeader(title, tag){
+  return '<div class="me-hud">' +
+    '<div style="display:flex;align-items:center;gap:10px;">' +
+      '<button class="btn-subtle" data-go="meHome" style="color:#00d2ff;border-color:rgba(0,210,255,0.4);font-family:monospace;padding:4px 10px;cursor:pointer;">← В ТЕРМИНАЛ</button>' +
+      '<span class="me-hud-status"><span class="me-hud-pulse"></span>' + meEsc(title) + '</span>' +
+    '</div>' +
+    '<div style="display:flex;gap:6px;">' +
+      '<span class="me-tag-holo">' + meEsc(tag || 'EXTRANET ONLINE') + '</span>' +
+      '<span class="me-tag-omni">СИСТЕМЫ СВЯЗИ</span>' +
+    '</div>' +
+  '</div>';
+}
+
+function meHome(){
+  var hero = '<div class="hero-dice" data-go="dice">'+
+    '<div class="hero-dice-icon">'+(typeof dieShapeSvg==='function'? dieShapeSvg(20,'meHeroDie',20) : '🎲')+'</div>'+
+    '<div class="hero-dice-text">'+
+      '<div class="hero-dice-name">ТАКТИЧЕСКИЙ БРОСОК КОСТЕЙ</div>'+
+      '<div class="hero-dice-desc">Кубики d4–d20, d100 критов и событий перелёта, монетка шанса W/L, модификаторы и подписи ME</div>'+
+    '</div><div class="hero-dice-arrow">→</div></div>';
+
+  var hudHtml = '<div class="me-hud">'+
+    '<div class="me-hud-status">'+
+      '<div class="me-hud-pulse"></div>'+
+      '<span>ТАКТИЧЕСКАЯ СЕТЬ АЛЬЯНСА // ТЕРМИНАЛ ОПЕРАТИВНИКА</span>'+
+    '</div>'+
+    '<div style="display:flex;gap:6px;">'+
+      '<span class="me-tag-holo">EXTRANET ONLINE</span>'+
+      '<span class="me-tag-omni">ЭЛЕМЕНТ НОЛЬ: СТАБИЛЕН</span>'+
+    '</div>'+
+  '</div>';
+
+  var items = [
+    {nav:'meChar',     icon:'👤', t:'Досье оперативника',     d:'Расы Совета, роли Альянса, биохимия, барьеры, щиты и броня'},
+    {nav:'mePowers',   icon:'⚡', t:'Способности и Древо',    d:'Биотика, Техника, Бой, Медицина: корни, ранги и комбинации'},
+    {nav:'meArsenal',  icon:'🔫', t:'Оружейный арсенал',      d:'Классификация оружия, типы урона, модификации, заряды'},
+    {nav:'meShip',     icon:'🚀', t:'Корабль и Экипаж',       d:'Системы судна, ядро масс-эффекта, СЖО, отряд и лояльность'},
+    {nav:'meCodex',    icon:'📖', t:'Кодекс Галактики',       d:'Виды, фракции, матрица урона против слоев защиты, правила боя'},
+    {nav:'meMissions', icon:'📋', t:'Терминал контрактов',    d:'Заказы Альянса, СБ Цитадели, Терминуса и наёмных гильдий'},
+    {nav:'meMap',      icon:'🗺️', t:'Галактическая карта',    d:'Сектора Цитадели, Аттический Траверс, Системы Терминала'},
+    {nav:'meData',     icon:'💾', t:'Данные систем',          d:'Резервное копирование и управление профилем космоса'}
+  ];
+
+  return '<h1>ТЕРМИНАЛ: КОСМОС</h1>'+
+    '<div class="subtitle">СЕТТИНГ MASS EFFECT • ПРОТОКОЛЫ 5E TACTICAL SCI-FI</div>'+
+    hudHtml +
+    '<div class="rule"></div>'+ hero +
+    '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // КОНСОЛЬ</div>'+
+    '<div class="menu-list grid-2">'+items.map(function(i){
+      return '<div class="menu-item" data-nav="'+i.nav+'">'+
+        '<div class="name">'+i.icon+' '+meEsc(i.t)+'</div>'+
+        '<div class="desc">'+meEsc(i.d)+'</div>'+
+        '<div class="arrow">›</div>'+
+      '</div>';
+    }).join('')+'</div>';
+}
+
+// 1. ДОСЬЕ ОПЕРАТИВНИКА
+function meChar(){
+  var c = ME.getChar();
+  function mod(v){
+    var m = Math.floor((v - 10) / 2);
+    return m >= 0 ? '+' + m : String(m);
+  }
+
+  var isEditing = ME._editingChar;
+
+  var statsHtml = [
+    { k: 'str', label: 'СИЛА', val: c.stats.str },
+    { k: 'dex', label: 'ЛОВКОСТЬ', val: c.stats.dex },
+    { k: 'con', label: 'ТЕЛОСЛОЖЕНИЕ', val: c.stats.con },
+    { k: 'int', label: 'ИНТЕЛЛЕКТ', val: c.stats.int },
+    { k: 'wis', label: 'МУДРОСТЬ', val: c.stats.wis },
+    { k: 'cha', label: 'ХАРИЗМА', val: c.stats.cha }
+  ].map(function(s){
+    if(isEditing){
+      return '<div class="me-stat-box">' +
+        '<div class="stat-name">' + s.label + '</div>' +
+        '<input type="number" class="me-input" data-stat="' + s.k + '" value="' + s.val + '" style="width:60px;text-align:center;font-size:16px;margin:4px 0;">' +
+        '<div class="stat-mod">' + mod(s.val) + '</div>' +
+      '</div>';
+    }
+    return '<div class="me-stat-box">' +
+      '<div class="stat-name">' + s.label + '</div>' +
+      '<div class="stat-val">' + s.val + '</div>' +
+      '<div class="stat-mod">' + mod(s.val) + '</div>' +
+    '</div>';
+  }).join('');
+
+  var defenseHtml = '<div class="me-def-grid">' +
+    '<div class="me-def-card"><div class="def-title">КЛАСС БРОНИ (AC)</div><div class="def-num">' + (isEditing ? '<input type="number" class="me-input" id="meEditAc" value="' + c.baseAc + '" style="width:60px;">' : c.baseAc) + '</div><div class="def-sub">Сложность попадания</div></div>' +
+    '<div class="me-def-card"><div class="def-title">ЩИТЫ (SHIELD)</div><div class="def-num" style="color:#00d2ff;">' + (isEditing ? '<input type="number" class="me-input" id="meEditShield" value="' + c.baseShield + '" style="width:60px;">' : c.baseShield) + '</div><div class="def-sub">Ёмкость щита</div></div>' +
+    '<div class="me-def-card"><div class="def-title">БРОНЯ (ARMOR)</div><div class="def-num" style="color:#ffaa33;">' + (isEditing ? '<input type="number" class="me-input" id="meEditArmor" value="' + c.baseArmorPoints + '" style="width:60px;">' : c.baseArmorPoints) + '</div><div class="def-sub">Порог (DT): ' + (isEditing ? '<input type="number" class="me-input" id="meEditDt" value="' + c.damageThreshold + '" style="width:40px;">' : c.damageThreshold) + '</div></div>' +
+    '<div class="me-def-card"><div class="def-title">БАРЬЕР (BARRIER)</div><div class="def-num" style="color:#b266ff;">' + (isEditing ? '<input type="number" class="me-input" id="meEditBarrier" value="' + c.baseBarrier + '" style="width:60px;">' : c.baseBarrier) + '</div><div class="def-sub">Биотический резерв</div></div>' +
+    '<div class="me-def-card"><div class="def-title">ЗДОРОВЬЕ (HP)</div><div class="def-num" style="color:#ff5555;">' + (isEditing ? '<input type="number" class="me-input" id="meEditHp" value="' + c.maxHp + '" style="width:60px;">' : c.maxHp) + '</div><div class="def-sub">Базовое здоровье</div></div>' +
+  '</div>';
+
+  var bodyContent = '';
+  if(isEditing){
+    bodyContent = '<div class="me-panel" style="margin-top:16px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
+        '<h3 style="margin:0;color:#00d2ff;">РЕДАКТИРОВАНИЕ ДОСЬЕ ОПЕРАТИВНИКА</h3>' +
+        '<button class="btn-primary" id="meSaveCharBtn">✓ Сохранить изменения</button>' +
+      '</div>' +
+      '<div class="form-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;">' +
+        '<div><label>Имя оперативника:</label><input class="me-input" id="meEditName" value="' + meEsc(c.name) + '"></div>' +
+        '<div><label>Позывной:</label><input class="me-input" id="meEditCallsign" value="' + meEsc(c.callsign) + '"></div>' +
+        '<div><label>Раса:</label><input class="me-input" id="meEditRace" value="' + meEsc(c.race) + '"></div>' +
+        '<div><label>Роль / Класс:</label><input class="me-input" id="meEditRole" value="' + meEsc(c.role) + '"></div>' +
+        '<div><label>Происхождение / Квалификация:</label><input class="me-input" id="meEditOrigin" value="' + meEsc(c.origin) + '"></div>' +
+        '<div><label>Биохимия:</label><select class="me-input" id="meEditBio"><option ' + (c.biochemistry.indexOf('Лево')>=0?'selected':'') + '>Левоаминокислотная</option><option ' + (c.biochemistry.indexOf('Декстро')>=0?'selected':'') + '>Декстроаминокислотная</option></select></div>' +
+        '<div><label>Уровень:</label><input type="number" class="me-input" id="meEditLevel" value="' + c.level + '"></div>' +
+        '<div><label>Очки развития (ОР):</label><input type="number" class="me-input" id="meEditDevPoints" value="' + c.devPoints + '"></div>' +
+        '<div><label>Бонус мастерства:</label><input type="number" class="me-input" id="meEditProf" value="' + c.profBonus + '"></div>' +
+        '<div><label>Скорость:</label><input class="me-input" id="meEditSpeed" value="' + meEsc(c.speed) + '"></div>' +
+      '</div>' +
+      '<div style="margin-top:16px;">' +
+        '<label>Снаряжение и вооружение:</label>' +
+        '<input class="me-input" id="meEditLoadout" style="width:100%;margin-bottom:8px;" value="' + meEsc(c.loadout) + '">' +
+        '<label>Омни-инструмент:</label>' +
+        '<input class="me-input" id="meEditOmni" style="width:100%;margin-bottom:8px;" value="' + meEsc(c.omniTool) + '">' +
+        '<label>Биотический усилитель (имплантат):</label>' +
+        '<input class="me-input" id="meEditBioAmp" style="width:100%;margin-bottom:8px;" value="' + meEsc(c.bioAmp) + '">' +
+        '<label>Биография и боевые заметки:</label>' +
+        '<textarea class="me-input" id="meEditBg" style="width:100%;height:70px;">' + meEsc(c.background) + '</textarea>' +
+      '</div>' +
+      '<div style="margin-top:16px;text-align:right;">' +
+        '<button class="btn-subtle" id="meCancelEditBtn" style="margin-right:8px;">Отмена</button>' +
+        '<button class="btn-primary" id="meSaveCharBtn2">Сохранить</button>' +
+      '</div>' +
+    '</div>';
+  } else {
+    bodyContent = '<div class="me-panel" style="margin-top:16px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">' +
+        '<div>' +
+          '<div style="font-size:22px;font-weight:700;color:#00d2ff;letter-spacing:0.5px;">' + meEsc(c.name) + ' <span style="font-size:14px;color:#8bb1d6;font-weight:normal;">[Позывной: ' + meEsc(c.callsign) + ']</span></div>' +
+          '<div style="color:#7da5c9;font-size:13px;margin-top:4px;">' + meEsc(c.race) + ' • ' + meEsc(c.role) + ' • ' + meEsc(c.origin) + ' • Биохимия: ' + meEsc(c.biochemistry) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;">' +
+          '<span class="me-tag-holo">УРОВЕНЬ ' + c.level + '</span>' +
+          '<span class="me-tag-omni">ОР: ' + c.devPoints + '</span>' +
+          '<span class="me-tag-holo">МАСТЕРСТВО: +' + c.profBonus + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="rule" style="margin:14px 0;"></div>' +
+      '<div class="section-label">СЛОИ БАЗОВОЙ ЗАЩИТЫ // СТАТИЧЕСКИЙ ПРОФИЛЬ</div>' +
+      defenseHtml +
+      '<div class="section-label" style="margin-top:16px;">ХАРАКТЕРИСТИКИ D&D 5E // БАЗОВЫЕ МОДИФИКАТОРЫ</div>' +
+      '<div class="me-stats-grid">' + statsHtml + '</div>' +
+      '<div class="rule" style="margin:16px 0;"></div>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:14px;">' +
+        '<div class="me-card">' +
+          '<div class="me-card-title">ЭКИПИРОВКА И СНАРЯЖЕНИЕ</div>' +
+          '<div style="font-size:13px;color:#8bb1d6;line-height:1.6;">' +
+            '<div><strong>Оружие:</strong> ' + meEsc(c.loadout) + '</div>' +
+            '<div><strong>Омни-инструмент:</strong> ' + meEsc(c.omniTool) + '</div>' +
+            '<div><strong>Усилитель:</strong> ' + meEsc(c.bioAmp) + '</div>' +
+            '<div><strong>Скорость перемещения:</strong> ' + meEsc(c.speed) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<div class="me-card-title">ЛИЧНОЕ ДЕЛО И БИОГРАФИЯ</div>' +
+          '<div style="font-size:13px;color:#8bb1d6;line-height:1.6;">' + meEsc(c.background) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;">' +
+        '<button class="btn-subtle" id="meResetCharBtn" style="color:#ff7777;">↺ Сбросить к образцу</button>' +
+        '<button class="btn-subtle" id="meCopyDmBriefBtn">📋 Копировать для AI DM</button>' +
+        '<button class="btn-primary" id="meEditCharBtn">✎ Редактировать досье</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  return meNavHeader('ДОСЬЕ ОПЕРАТИВНИКА // ЛИЧНОЕ ДЕЛО', 'СЕКРЕТНО: ДОПУСК СВ-3') +
+    '<h1>ДОСЬЕ ОПЕРАТИВНИКА</h1>' +
+    '<div class="subtitle">СИСТЕМЫ АЛЬЯНСА • СТАТИЧЕСКИЙ ПРОФИЛЬ ПЕРСОНАЖА (5E SCI-FI)</div>' +
+    bodyContent;
+}
+
+// 2. ДРЕВО СПОСОБНОСТЕЙ (A92: ВПИСЫВАЮТСЯ ИГРОКОМ)
+function mePowers(){
+  var allPowers = ME.getPowers();
+  var activeBranch = ME._activeBranch || 'all';
+  var search = (ME._powersSearch || '').toLowerCase().trim();
+
+  // Dynamic branch counts
+  var branchCounts = {};
+  allPowers.forEach(function(p){
+    var b = (p.branch || 'Кастомная').trim();
+    branchCounts[b] = (branchCounts[b] || 0) + 1;
+  });
+
+  var standardBranches = ['Биотика', 'Техника', 'Бой', 'Медицина', 'Производные'];
+  var branchTabs = [
+    { id: 'all', name: 'Все (' + allPowers.length + ')' }
+  ];
+  standardBranches.forEach(function(b){
+    var count = branchCounts[b] || 0;
+    branchTabs.push({ id: b, name: b + ' (' + count + ')' });
+  });
+  Object.keys(branchCounts).forEach(function(b){
+    if(standardBranches.indexOf(b) === -1){
+      branchTabs.push({ id: b, name: b + ' (' + branchCounts[b] + ')' });
+    }
+  });
+
+  var tabsHtml = '<div class="me-tabs">' + branchTabs.map(function(b){
+    var on = activeBranch === b.id ? 'on' : '';
+    return '<button class="me-tab-btn ' + on + '" data-branch="' + meEsc(b.id) + '">' + meEsc(b.name) + '</button>';
+  }).join('') + '</div>';
+
+  var filteredList = allPowers.filter(function(p){
+    if(activeBranch !== 'all' && (p.branch || 'Кастомная') !== activeBranch) return false;
+    if(search && (p.name || '').toLowerCase().indexOf(search) === -1 && (p.desc || '').toLowerCase().indexOf(search) === -1) return false;
+    return true;
+  });
+
+  var contentHtml = '';
+  if(allPowers.length === 0){
+    contentHtml = '<div class="me-empty-box" style="grid-column: 1 / -1;">' +
+      '<div class="me-empty-box-icon">⚡</div>' +
+      '<div class="me-empty-box-title">РЕЕСТР СПОСОБНОСТЕЙ ПУСТ</div>' +
+      '<div class="me-empty-box-desc">Способности и боевые протоколы A92 добавляются по мере обучения и полевой практики оперативника. Создайте новую способность или загрузите проверенные шаблоны Альянса.</div>' +
+      '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
+        '<button class="btn-primary" id="meAddPowerEmptyBtn">+ Добавить способность</button>' +
+        '<button class="btn-subtle" id="mePresetPowerEmptyBtn">⚡ Шаблоны из Кодекса</button>' +
+      '</div>' +
+    '</div>';
+  } else if(filteredList.length === 0){
+    contentHtml = '<div class="me-card" style="grid-column: 1 / -1;text-align:center;color:#8bb1d6;padding:24px;">' +
+      'В выбранной категории или по запросу поиска способностей не найдено.' +
+    '</div>';
+  } else {
+    contentHtml = filteredList.map(function(p){
+      var branchColor = p.branch === 'Биотика' ? '#b266ff' : (p.branch === 'Техника' ? '#00d2ff' : (p.branch === 'Бой' ? '#ffaa33' : (p.branch === 'Медицина' ? '#33cc66' : '#ffd700')));
+      var cdText = (p.cd === 0 || p.cd === '0') ? 'БЕЗ КД' : 'КД: ' + p.cd + ' рнд';
+      var costText = p.cost ? (p.cost + ' ОР') : '1 ОР';
+      return '<div class="me-card" style="border-left:4px solid ' + branchColor + ';">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">' +
+          '<div>' +
+            '<div style="font-size:16px;font-weight:700;color:#fff;">' + (p.icon || '⚡') + ' ' + meEsc(p.name) + '</div>' +
+            '<div style="font-size:11.5px;color:' + branchColor + ';margin-top:2px;">' + meEsc(p.branch || 'Кастомная') + ' • ' + meEsc(p.req || 'Узлы L-типа/Омни') + '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:4px;">' +
+            '<span class="me-tag-holo">' + meEsc(cdText) + '</span>' +
+            '<span class="me-tag-omni">' + meEsc(costText) + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#8bb1d6;margin:10px 0;line-height:1.5;">' + meEsc(p.desc) + '</div>' +
+        '<div class="me-ranks-box">' +
+          (p.r1 ? '<div class="rank-row"><strong>Ранг 1 (1 ОР):</strong> ' + meEsc(p.r1) + '</div>' : '') +
+          (p.r2 ? '<div class="rank-row"><strong>Ранг 2 (2 ОР):</strong> ' + meEsc(p.r2) + '</div>' : '') +
+          (p.r3 ? '<div class="rank-row"><strong>Ранг 3 (3 ОР):</strong> ' + meEsc(p.r3) + '</div>' : '') +
+        '</div>' +
+        '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;border-top:1px solid rgba(0,210,255,0.15);padding-top:8px;">' +
+          '<button class="btn-subtle me-edit-power-btn" data-id="' + p.id + '" style="font-size:11px;padding:3px 8px;">✎ Редактировать</button>' +
+          '<button class="btn-subtle me-del-power-btn" data-id="' + p.id + '" style="font-size:11px;padding:3px 8px;color:#ff5555;border-color:rgba(255,85,85,0.4);">🗑️ Удалить</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  return meNavHeader('ДРЕВО СПОСОБНОСТЕЙ // ПРОТОКОЛЫ A92', 'АКТИВНЫХ: ' + allPowers.length) +
+    '<h1>СПОСОБНОСТИ И ДРЕВО НАВЫКОВ</h1>' +
+    '<div class="subtitle">СИСТЕМА РОСТА A92 • КОРНИ, РАНГИ И ПРОИЗВОДНЫЕ ЗА ОЧКИ РАЗВИТИЯ (ОР)</div>' +
+    '<div class="me-panel" style="margin-top:14px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button class="btn-primary" id="meAddPowerBtn">+ Добавить способность</button>' +
+          '<button class="btn-subtle" id="mePresetPowersBtn">⚡ Шаблоны из Кодекса</button>' +
+        '</div>' +
+        '<input type="text" class="me-input" id="mePowersSearchInput" placeholder="🔍 Поиск способности..." value="' + meEsc(search) + '" style="min-width:200px;">' +
+      '</div>' +
+      '<div style="margin-bottom:12px;">' + tabsHtml + '</div>' +
+      '<div class="grid-2">' + contentHtml + '</div>' +
+    '</div>';
+}
+
+// 3. ОРУЖЕЙНЫЙ АРСЕНАЛ (ВПИСЫВАЕТСЯ ИГРОКОМ)
+function meArsenal(){
+  var allWeapons = ME.getArsenal();
+  var activeCat = ME._activeArsenalCat || 'all';
+
+  var catCounts = {};
+  allWeapons.forEach(function(w){
+    var c = w.cat || 'rifles';
+    catCounts[c] = (catCounts[c] || 0) + 1;
+  });
+
+  var cats = [
+    { id: 'all', name: 'Все оружие (' + allWeapons.length + ')' },
+    { id: 'rifles', name: 'Винтовки (' + (catCounts['rifles'] || 0) + ')' },
+    { id: 'pistols', name: 'Пистолеты/ПП (' + (catCounts['pistols'] || 0) + ')' },
+    { id: 'shotguns', name: 'Дробовики (' + (catCounts['shotguns'] || 0) + ')' },
+    { id: 'snipers', name: 'Снайперские (' + (catCounts['snipers'] || 0) + ')' },
+    { id: 'heavy', name: 'Тяжелое (' + (catCounts['heavy'] || 0) + ')' },
+    { id: 'ammo', name: 'Спецбоеприпасы (5)' }
+  ];
+
+  var tabsHtml = '<div class="me-tabs">' + cats.map(function(c){
+    var on = activeCat === c.id ? 'on' : '';
+    return '<button class="me-tab-btn ' + on + '" data-arsenal-cat="' + c.id + '">' + c.name + '</button>';
+  }).join('') + '</div>';
+
+  var contentHtml = '';
+  if(activeCat === 'ammo'){
+    contentHtml = '<div class="grid-2">' + ME.ammo.map(function(a){
+      return '<div class="me-card">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div style="font-size:15px;font-weight:700;color:#ffaa33;">⚡ ' + meEsc(a.name) + '</div>' +
+          '<span class="me-tag-omni">' + a.type + '</span>' +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#8bb1d6;margin-top:8px;line-height:1.5;">' + meEsc(a.effect) + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  } else {
+    var weapons = allWeapons.filter(function(w){
+      return activeCat === 'all' || w.cat === activeCat;
+    });
+
+    if(allWeapons.length === 0){
+      contentHtml = '<div class="me-empty-box" style="grid-column: 1 / -1;">' +
+        '<div class="me-empty-box-icon">🔫</div>' +
+        '<div class="me-empty-box-title">ОРУЖЕЙНЫЙ АРСЕНАЛ ПУСТ</div>' +
+        '<div class="me-empty-box-desc">Оружие и снаряжение вписываются оперативником вручную. Добавьте кастомное вооружение или загрузите стандартные модели вооружения Альянса Систем.</div>' +
+        '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
+          '<button class="btn-primary" id="meAddWeaponEmptyBtn">+ Вписать оружие</button>' +
+          '<button class="btn-subtle" id="mePresetWeaponEmptyBtn">🔫 Каталог Альянса</button>' +
+        '</div>' +
+      '</div>';
+    } else if(weapons.length === 0){
+      contentHtml = '<div class="me-card" style="grid-column: 1 / -1;text-align:center;color:#8bb1d6;padding:24px;">' +
+        'В выбранной категории оружия не найдено.' +
+      '</div>';
+    } else {
+      contentHtml = '<div class="grid-2">' + weapons.map(function(w){
+        return '<div class="me-card">' +
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+            '<div>' +
+              '<div style="font-size:16px;font-weight:700;color:#fff;">' + meEsc(w.name) + '</div>' +
+              '<div style="font-size:12px;color:#00d2ff;margin-top:2px;">' + meEsc(w.type || 'Огнестрел') + '</div>' +
+            '</div>' +
+            '<span class="me-tag-holo">' + meEsc(w.dmg || '1d8') + '</span>' +
+          '</div>' +
+          '<div style="font-size:12.5px;color:#8bb1d6;margin:10px 0;line-height:1.5;">' + meEsc(w.desc || '—') + '</div>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(0,210,255,0.15);padding-top:8px;font-size:12px;color:#7da5c9;">' +
+            '<div>Дистанция: ' + meEsc(w.range || '—') + ' | Магазин: ' + (w.clip || '—') + '</div>' +
+            '<button class="btn-subtle me-roll-weapon-btn" data-weapon-name="' + meEsc(w.name) + '" data-dmg="' + meEsc(w.dmg || '1d8') + '" style="font-size:11.5px;padding:3px 8px;cursor:pointer;">🎲 Бросить урон</button>' +
+          '</div>' +
+          '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;padding-top:6px;border-top:1px dashed rgba(0,210,255,0.1);">' +
+            '<button class="btn-subtle me-edit-weapon-btn" data-id="' + w.id + '" style="font-size:11px;padding:2px 7px;">✎ Редактировать</button>' +
+            '<button class="btn-subtle me-del-weapon-btn" data-id="' + w.id + '" style="font-size:11px;padding:2px 7px;color:#ff5555;border-color:rgba(255,85,85,0.4);">🗑️ Удалить</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+    }
+  }
+
+  return meNavHeader('ОРУЖЕЙНЫЙ АРСЕНАЛ // СКЛАД СНАРЯЖЕНИЯ', 'АРСЕНАЛ: ' + allWeapons.length) +
+    '<h1>ОРУЖЕЙНЫЙ АРСЕНАЛ</h1>' +
+    '<div class="subtitle">СТРЕЛЬБА, МОДИФИКАЦИИ, СПЕЦБОЕПРИПАСЫ И МАТРИЦА УРОНА</div>' +
+    '<div class="me-panel" style="margin-top:14px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button class="btn-primary" id="meAddWeaponBtn">+ Вписать оружие</button>' +
+          '<button class="btn-subtle" id="mePresetWeaponsBtn">🔫 Каталог Альянса</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-bottom:14px;">' + tabsHtml + '</div>' +
+      contentHtml +
+    '</div>';
+}
+
+// 4. КОРАБЛЬ И ЭКИПАЖ (СТАНДАРТНЫЕ СЛОТЫ МОДУЛЕЙ И КАСТОМНЫЙ ЭКИПАЖ)
+function meShip(){
+  var s = ME.getShip();
+
+  var modulesHtml = '<div class="grid-2">' + s.modules.map(function(m){
+    var isSet = m.name && m.name !== 'Слот пуст';
+    var badgeColor = isSet ? '#00d2ff' : '#7da5c9';
+    var borderStyle = isSet ? 'border-left:4px solid #00d2ff;' : 'border-left:4px solid rgba(0,210,255,0.2);opacity:0.85;';
+    return '<div class="me-slot-card" style="' + borderStyle + '">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">' +
+        '<div>' +
+          '<div class="me-slot-badge">' + (m.icon || '🛰️') + ' ' + meEsc(m.slot) + '</div>' +
+          '<div class="me-slot-name">' + meEsc(m.name || 'Слот пуст') + '</div>' +
+        '</div>' +
+        '<span class="me-tag-holo" style="font-size:11px;color:' + badgeColor + ';">' + meEsc(m.stat || 'Не установлено') + '</span>' +
+      '</div>' +
+      '<div class="me-slot-desc">' + meEsc(m.desc || 'Требуется оснащение.') + '</div>' +
+      '<div style="display:flex;justify-content:flex-end;margin-top:6px;border-top:1px solid rgba(0,210,255,0.15);padding-top:6px;">' +
+        '<button class="btn-subtle me-edit-module-btn" data-mod-id="' + m.id + '" style="font-size:11px;padding:3px 9px;">✎ Настроить модуль</button>' +
+      '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+
+  var crewHtml = '';
+  if(!s.crew || s.crew.length === 0){
+    crewHtml = '<div class="me-empty-box">' +
+      '<div class="me-empty-box-icon">👤</div>' +
+      '<div class="me-empty-box-title">ОТСЕК ЭКИПАЖА ПУСТ</div>' +
+      '<div class="me-empty-box-desc">Команда судна не укомплектована. Добавьте офицеров, пилота, инженеров и соратников отряда.</div>' +
+      '<button class="btn-primary" id="meAddCrewEmptyBtn">+ Добавить члена экипажа</button>' +
+    '</div>';
+  } else {
+    crewHtml = '<div class="grid-2">' + s.crew.map(function(c){
+      return '<div class="me-card">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+          '<div>' +
+            '<div style="font-size:15px;font-weight:700;color:#fff;">👤 ' + meEsc(c.name) + '</div>' +
+            '<div style="font-size:12.5px;color:#00d2ff;margin-top:2px;">' + meEsc(c.race || 'Человек') + ' • ' + meEsc(c.role || 'Специалист') + '</div>' +
+          '</div>' +
+          '<span class="me-tag-omni">' + meEsc(c.loyalty || 'В отряде') + '</span>' +
+        '</div>' +
+        '<div style="font-size:12px;color:#8bb1d6;margin:8px 0;line-height:1.4;">' + meEsc(c.note || '—') + '</div>' +
+        '<div style="display:flex;justify-content:flex-end;gap:8px;border-top:1px solid rgba(0,210,255,0.15);padding-top:6px;">' +
+          '<button class="btn-subtle me-edit-crew-btn" data-id="' + c.id + '" style="font-size:11px;padding:2px 7px;">✎ Редактировать</button>' +
+          '<button class="btn-subtle me-del-crew-btn" data-id="' + c.id + '" style="font-size:11px;padding:2px 7px;color:#ff5555;border-color:rgba(255,85,85,0.4);">🗑️ Удалить</button>' +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
+  return meNavHeader('КОРАБЛЬ И ЭКИПАЖ // СИСТЕМЫ СУДНА', meEsc(s.name)) +
+    '<h1>КОРАБЛЬ И ЭКИПАЖ</h1>' +
+    '<div class="subtitle">МОДУЛЬНЫЕ СИСТЕМЫ СУДНА И ЛИЧНЫЙ СОСТАВ ОТРЯДА</div>' +
+    '<div class="me-panel" style="margin-top:14px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+        '<div>' +
+          '<div style="font-size:20px;font-weight:700;color:#00d2ff;">🚀 ' + meEsc(s.name) + '</div>' +
+          '<div style="font-size:13px;color:#8bb1d6;margin-top:2px;">' + meEsc(s.cls) + '</div>' +
+          (s.notes ? '<div style="font-size:12px;color:#7da5c9;margin-top:4px;">' + meEsc(s.notes) + '</div>' : '') +
+        '</div>' +
+        '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' +
+          '<span class="me-tag-omni" style="font-size:12px;padding:4px 10px;">СТАТУС: ' + meEsc(s.status) + '</span>' +
+          '<button class="btn-subtle" id="meEditShipBtn" style="font-size:12px;">✎ Настроить судно</button>' +
+          '<button class="btn-subtle" id="mePresetShipBtn" style="font-size:12px;color:#ffd700;border-color:rgba(255,215,0,0.3);">🚀 Пресет «Нормандия SR-2»</button>' +
+          '<button class="btn-subtle" id="meResetShipBtn" style="font-size:12px;color:#ff5555;border-color:rgba(255,85,85,0.3);">↺ Очистить всё</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="rule" style="margin:14px 0;"></div>' +
+      '<div class="section-label">СИСТЕМЫ СУДНА // СТАНДАРТНЫЕ МОДУЛЬНЫЕ СЛОТЫ (7 МЕСТ)</div>' +
+      modulesHtml +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px;margin-bottom:10px;">' +
+        '<div class="section-label" style="margin:0;">ЭКИПАЖ И ОФИЦЕРСКИЙ СОСТАВ (' + (s.crew ? s.crew.length : 0) + ')</div>' +
+        '<button class="btn-primary" id="meAddCrewBtn" style="font-size:12px;padding:3px 10px;">+ Добавить члена экипажа</button>' +
+      '</div>' +
+      crewHtml +
+    '</div>';
+}
+
+// 5. КОДЕКС ГАЛАКТИКИ
+function meCodex(){
+  var activeTab = ME._activeCodexTab || 'matrix';
+  var tabs = [
+    { id: 'matrix', name: 'Матрица урона' },
+    { id: 'combos', name: 'Комбо-детонации' },
+    { id: 'races', name: '12 Рас Галактики' },
+    { id: 'factions', name: 'Фракции' },
+    { id: 'rules', name: 'Тактика боя 5e' }
+  ];
+
+  var tabsHtml = '<div class="me-tabs">' + tabs.map(function(t){
+    var on = activeTab === t.id ? 'on' : '';
+    return '<button class="me-tab-btn ' + on + '" data-codex-tab="' + t.id + '">' + t.name + '</button>';
+  }).join('') + '</div>';
+
+  var contentHtml = '';
+  if(activeTab === 'matrix'){
+    contentHtml = '<div class="me-card" style="line-height:1.6;">' +
+      '<h3 style="color:#00d2ff;margin-top:0;">МАТРИЦА ЭФФЕКТИВНОСТИ УРОНА ПРОТИВ СЛОЕВ ЗАЩИТЫ</h3>' +
+      '<p style="color:#8bb1d6;font-size:13px;">В сеттинге Mass Effect каждая цель может обладать несколькими слоями защиты: <strong>Кинетический щит</strong>, <strong>Биотический барьер</strong>, <strong>Броня (с порогом DT)</strong> и <strong>Здоровье (HP)</strong>.</p>' +
+      '<table class="me-table" style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px;">' +
+        '<thead><tr style="border-bottom:1px solid rgba(0,210,255,0.4);text-align:left;color:#00d2ff;"><th>Тип урона</th><th>Щиты (Shields)</th><th>Броня (Armor)</th><th>Барьеры (Barriers)</th><th>Здоровье (Health)</th></tr></thead>' +
+        '<tbody>' +
+          '<tr style="border-bottom:1px solid rgba(0,210,255,0.1);"><td style="font-weight:bold;color:#fff;">Оружие / Кинетика</td><td style="color:#00d2ff;">100%</td><td style="color:#ffaa33;">− Порог брони (DT)</td><td style="color:#b266ff;">50%</td><td style="color:#ff5555;">100%</td></tr>' +
+          '<tr style="border-bottom:1px solid rgba(0,210,255,0.1);"><td style="font-weight:bold;color:#00d2ff;">Электро / Перегрузка</td><td style="color:#00d2ff;font-weight:bold;">200% (×2)</td><td style="color:#ffaa33;">50%</td><td style="color:#b266ff;">100%</td><td style="color:#ff5555;">100% (синтетики ×2)</td></tr>' +
+          '<tr style="border-bottom:1px solid rgba(0,210,255,0.1);"><td style="font-weight:bold;color:#b266ff;">Биотика / Деформация</td><td style="color:#00d2ff;">50%</td><td style="color:#ffaa33;font-weight:bold;">200% (порог −1)</td><td style="color:#b266ff;font-weight:bold;">200% (×2)</td><td style="color:#ff5555;">100%</td></tr>' +
+          '<tr style="border-bottom:1px solid rgba(0,210,255,0.1);"><td style="font-weight:bold;color:#ffaa33;">Огонь / Поджог</td><td style="color:#00d2ff;">50%</td><td style="color:#ffaa33;font-weight:bold;">200% (горение)</td><td style="color:#b266ff;">50%</td><td style="color:#ff5555;font-weight:bold;">200% (органика)</td></tr>' +
+          '<tr><td style="font-weight:bold;color:#70dbdb;">Крио / Заморозка</td><td style="color:#00d2ff;">50%</td><td style="color:#ffaa33;">Хрупкость (порог −2)</td><td style="color:#b266ff;">50%</td><td style="color:#ff5555;">Заморозка/Обездвиж.</td></tr>' +
+        '</tbody>' +
+      '</table>' +
+    '</div>';
+  } else if(activeTab === 'combos'){
+    contentHtml = '<div class="grid-2">' +
+      '<div class="me-card"><h3 style="color:#b266ff;margin-top:0;">💥 БИОТИЧЕСКИЙ ВЗРЫВ</h3><p style="font-size:13px;color:#8bb1d6;"><strong>Маркер:</strong> Деформация, Притяжение или Сингулярность.<br><strong>Детонатор:</strong> Отталкивание, Биотический рывок или Новая.<br><strong>Эффект:</strong> Сокрушительная гравитационная детонация в радиусе 15 фт, наносящая огромный биотический урон и сбивающая цели с ног.</p></div>' +
+      '<div class="me-card"><h3 style="color:#00d2ff;margin-top:0;">⚡ ТЕХНИЧЕСКИЙ ВЗРЫВ</h3><p style="font-size:13px;color:#8bb1d6;"><strong>Маркер:</strong> Перегрузка.<br><strong>Детонатор:</strong> Поджог, Заморозка или Боевой дрон.<br><strong>Эффект:</strong> Цепная вспышка статического электричества, парализующая синтетиков и наносящая урон щитам всей группы противников.</p></div>' +
+      '<div class="me-card"><h3 style="color:#ffaa33;margin-top:0;">🔥 ОГНЕННЫЙ ВЗРЫВ</h3><p style="font-size:13px;color:#8bb1d6;"><strong>Маркер:</strong> Поджог или Зажигательные патроны.<br><strong>Детонатор:</strong> Перегрузка, Отталкивание или Биотический рывок.<br><strong>Эффект:</strong> Огненная волна в радиусе 15 фт, поджигающая всех врагов и размягчающая тяжелую броню.</p></div>' +
+      '<div class="me-card"><h3 style="color:#70dbdb;margin-top:0;">❄️ КРИО-ВЗРЫВ</h3><p style="font-size:13px;color:#8bb1d6;"><strong>Маркер:</strong> Заморозка или Крио-патроны.<br><strong>Детонатор:</strong> Любая наносящая урон способность.<br><strong>Эффект:</strong> Разрыв ледяной корки на осколки, замедляющий врагов и наносящий колющий крио-урон в области.</p></div>' +
+    '</div>';
+  } else if(activeTab === 'races'){
+    var races = [
+      { name: 'Человек', bio: 'Левоамино', desc: 'Универсальность, адаптивность, амбиции. Родина: Земля.' },
+      { name: 'Азари', bio: 'Левоамино', desc: 'Природная биотика, дипломатия, долголетие (до 1000 лет). Родина: Тессия.' },
+      { name: 'Турианец', bio: 'Декстроамино', desc: 'Жесткая воинская дисциплина, честь, хитиновый панцирь. Родина: Палавен.' },
+      { name: 'Саларианец', bio: 'Левоамино', desc: 'Стремительный метаболизм, гениальный интеллект, шпионаж STG. Родина: Сур\'Кеш.' },
+      { name: 'Кроган', bio: 'Левоамино', desc: 'Дублирующие органы, регенерация, колоссальная сила. Родина: Тучанка.' },
+      { name: 'Кварианец', bio: 'Декстроамино', desc: 'Мастера техники и кибернетики, герметичные скафандры. Родина: Раннох.' },
+      { name: 'Дрелл', bio: 'Левоамино', desc: 'Эйдетическая память, скрытность, боевые монахи. Родина: Рахана.' },
+      { name: 'Батарианец', bio: 'Левоамино', desc: 'Четыре глаза, военная кастовая культура, пираты и наёмники. Родина: Хар\'шан.' },
+      { name: 'Волус', bio: 'Аммиачная', desc: 'Мастера торговли и финансов, высокое давление скафандров. Родина: Ирун.' },
+      { name: 'Элкор', bio: 'Левоамино', desc: 'Гигантские неторопливые колоссы, ходячие танки с пушками. Родина: Декууна.' },
+      { name: 'Ханар', bio: 'Водная', desc: 'Медузообразные вежливые глубоководники, почитатели Протеан. Родина: Кахье.' },
+      { name: 'Ворча', bio: 'Левоамино', desc: 'Мгновенная клеточная регенерация, примитивная ярость, огнеметы. Родина: Хешшок.' }
+    ];
+    contentHtml = '<div class="grid-2">' + races.map(function(r){
+      return '<div class="me-card">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div style="font-size:15px;font-weight:700;color:#00d2ff;">' + r.name + '</div>' +
+          '<span class="me-tag-holo">' + r.bio + '</span>' +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#8bb1d6;margin-top:6px;line-height:1.5;">' + r.desc + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  } else if(activeTab === 'factions'){
+    var factions = [
+      { name: 'Альянс Систем', desc: 'Официальное объединенное правительство человечества, 5-й космический флот.' },
+      { name: 'Совет Цитадели и СПЕКТРы', desc: 'Высший руководящий орган пространства Цитадели. СПЕКТРы имеют неограниченные полномочия.' },
+      { name: 'СБ Цитадели (C-Sec)', desc: 'Многовидовая служба правопорядка гигантской станции Цитадель.' },
+      { name: 'STG (Группа Особого Реагирования)', desc: 'Элитная военная разведка и оперативники Саларианского Союза.' },
+      { name: 'Цербер', desc: 'Радикальная военизированная организация за превосходство человечества.' },
+      { name: 'Синие Светила, Затмение, Кровавая Стая', desc: 'Тройка крупнейших наёмных армий и преступных картелей систем Терминала.' },
+      { name: 'Геты', desc: 'Сетевой синтетический разум, созданный кварианцами и восставший за автономию.' }
+    ];
+    contentHtml = '<div class="grid-2">' + factions.map(function(f){
+      return '<div class="me-card">' +
+        '<div style="font-size:15px;font-weight:700;color:#ffaa33;">' + f.name + '</div>' +
+        '<div style="font-size:12.5px;color:#8bb1d6;margin-top:6px;line-height:1.5;">' + f.desc + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  } else if(activeTab === 'rules'){
+    contentHtml = '<div class="me-card" style="line-height:1.6;font-size:13px;color:#8bb1d6;">' +
+      '<h3 style="color:#00d2ff;margin-top:0;">ТАКТИЧЕСКИЕ ПРАВИЛА БОЯ 5E MASS EFFECT</h3>' +
+      '<p><strong>Дистанции:</strong> Ближняя (до 30 фт), Средняя (30–90 фт), Дальняя (90+ фт).</p>' +
+      '<p><strong>Система укрытий:</strong><br>• Половинное укрытие: +2 к AC и спасброскам ЛОВ.<br>• Полное укрытие: +5 к AC или полная защита от прямой линии огня.</p>' +
+      '<p><strong>Активная защита:</strong> Реакция на попадание — бросок ЛОВ (перекат) или ТЕЛ (упорство) для снижения полученного урона.</p>' +
+      '<p><strong>Термозаряды:</strong> Оружие перегревается при непрерывном огне; быстрая замена картриджа действием или бонусным действием возвращает боеспособность.</p>' +
+    '</div>';
+  }
+
+  return meNavHeader('КОДЕКС ГАЛАКТИКИ // АРХИВЫ ЦИТАДЕЛИ', 'БАЗА ДАННЫХ СОВЕТА') +
+    '<h1>КОДЕКС ГАЛАКТИКИ</h1>' +
+    '<div class="subtitle">МАТРИЦА УРОНА • РАСЫ • ФРАКЦИИ • КОМБО-ДЕТОНАЦИИ • ПРАВИЛА БОЯ</div>' +
+    '<div class="me-panel" style="margin-top:14px;">' +
+      '<div style="margin-bottom:14px;">' + tabsHtml + '</div>' +
+      contentHtml +
+    '</div>';
+}
+
+// 6. ТЕРМИНАЛ КОНТРАКТОВ
+function meMissions(){
+  if(!ME._missionsList){
+    ME._missionsList = [
+      ME.generateMission(),
+      ME.generateMission(),
+      ME.generateMission()
+    ];
+  }
+
+  var activeClient = ME._activeMissionClient || 'all';
+  var clients = [
+    { id: 'all', name: 'Все контракты' },
+    { id: 'Альянс Систем', name: 'Альянс' },
+    { id: 'СБ Цитадели (C-Sec)', name: 'СБ Цитадели' },
+    { id: 'STG (ГОР саларианцев)', name: 'STG' },
+    { id: 'Теневой Брокер', name: 'Теневой Брокер' },
+    { id: 'Ария Т\'Лоак (Омега)', name: 'Омега' }
+  ];
+
+  var tabsHtml = '<div class="me-tabs">' + clients.map(function(c){
+    var on = activeClient === c.id ? 'on' : '';
+    return '<button class="me-tab-btn ' + on + '" data-mission-client="' + c.id + '">' + c.name + '</button>';
+  }).join('') + '</div>';
+
+  var filtered = ME._missionsList.filter(function(m){
+    return activeClient === 'all' || m.client === activeClient;
+  });
+
+  var listHtml = filtered.map(function(m){
+    return '<div class="me-card" data-mission-id="' + m.id + '">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">' +
+        '<div>' +
+          '<div style="font-size:16px;font-weight:700;color:#fff;">' + m.clientIcon + ' ' + meEsc(m.target) + '</div>' +
+          '<div style="font-size:12px;color:#00d2ff;margin-top:2px;">Заказчик: ' + meEsc(m.client) + ' • Локация: ' + meEsc(m.location) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:4px;">' +
+          '<span class="me-tag-holo">РАНГ ДОПУСКА: ' + m.rank + '</span>' +
+          '<span class="me-tag-omni">' + meEsc(m.status === 'completed' ? 'ВЫПОЛНЕН' : (m.status === 'accepted' ? 'В РАБОТЕ' : 'ДОСТУПЕН')) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:12.5px;color:#8bb1d6;margin:10px 0;line-height:1.5;">' +
+        '<div><strong>Противник:</strong> ' + meEsc(m.enemy) + '</div>' +
+        '<div><strong>Тактическое осложнение:</strong> ' + meEsc(m.twist) + '</div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(0,210,255,0.15);padding-top:8px;font-size:12px;">' +
+        '<div style="color:#ffd700;">Награда: ' + meEsc(m.reward) + '</div>' +
+        '<div>' +
+          (m.status === 'active' ? '<button class="btn-primary me-accept-mission-btn" data-id="' + m.id + '" style="font-size:11.5px;padding:4px 10px;">Принять контракт</button>' : '') +
+          (m.status === 'accepted' ? '<button class="btn-primary me-complete-mission-btn" data-id="' + m.id + '" style="font-size:11.5px;padding:4px 10px;background:#33cc66;">✓ Завершить</button>' : '') +
+          (m.status === 'completed' ? '<span style="color:#33cc66;font-weight:bold;">Завершен</span>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  return meNavHeader('ТЕРМИНАЛ КОНТРАКТОВ // ТАКТИЧЕСКИЕ ОПЕРАЦИИ', 'СЕТЬ ЗАКАЗОВ') +
+    '<h1>ТЕРМИНАЛ КОНТРАКТОВ</h1>' +
+    '<div class="subtitle">ОПЕРАЦИИ АЛЬЯНСА, СБ ЦИТАДЕЛИ, СИСТЕМ ТЕРМИНУСА И ЧАСТНЫХ КОРПОРАЦИЙ</div>' +
+    '<div class="me-panel" style="margin-top:14px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">' +
+        tabsHtml +
+        '<button class="btn-primary" id="meGenMissionBtn" style="font-size:12px;padding:6px 12px;">⚡ Сгенерировать новый контракт</button>' +
+      '</div>' +
+      '<div class="grid-2">' + listHtml + '</div>' +
+    '</div>';
+}
+
+
+
+// Данные секторов и ретрансляторов Галактики
+ME.galaxySectors = [
+  {
+    "nameRu": "Системы Терминала",
+    "nameEn": "Terminus Systems",
+    "color": "#ffaa00",
+    "borderColor": "#00d2ff",
+    "faction": "Независимые миры / Пиратские кланы",
+    "species": "Батарианцы, Ворча, Кроганы, Наёмники",
+    "threat": "КРАЙНЕ ВЫСОКАЯ (Зона беззакония)",
+    "capital": "Станция Омега",
+    "relay": "Первичный ретранслятор Омеги",
+    "clusters": "Туманность Омега, Разлом Калестон, Системы Терминала, Бездна Пангей",
+    "desc": "Огромный регион за пределами юрисдикции Совета Цитадели. Центр криминала, работорговли и независимых корпораций. Регулярные рейды наемников Синих Светил, Кровавой Стаи и Затмения.",
+    "id": "terminus",
+    "d": "M 739,229 L 708,185 L 665,143 L 674,130 L 624,96 L 632,79 L 588,57 L 541,41 L 494,32 L 453,31 L 453,46 L 459,46 L 455,57 L 448,55 L 448,49 L 369,58 L 327,70 L 321,55 L 275,75 L 238,98 L 197,92 L 146,140 L 118,175 L 90,220 L 72,260 L 82,262 L 110,242 L 133,199 L 163,159 L 170,161 L 194,184 L 161,229 L 136,282 L 188,301 L 232,271 L 312,317 L 338,284 L 359,267 L 403,246 L 447,240 L 449,224 L 478,226 L 482,210 L 529,223 L 556,166 L 588,182 L 618,205 L 652,241 L 671,269 Z",
+    "cx": 398,
+    "cy": 164
+  },
+  {
+    "nameRu": "Аттический Траверс",
+    "nameEn": "Attican Traverse",
+    "color": "#a855f7",
+    "borderColor": "#00d2ff",
+    "faction": "Фронтир / Колонии Альянса / Буфер Совета",
+    "species": "Люди, Азари, Батарианцы, Саларианцы",
+    "threat": "ПОВЫШЕННАЯ (Пиратские набеги)",
+    "capital": "Элизиум (Скиллианский предел)",
+    "relay": "Ретранслятор Надежды Чжу",
+    "clusters": "Предел Исиды, Туманность Конская Голова, Бетта Аттики, Гамма Аида",
+    "desc": "Нестабильная буферная зона между пространством Совета и Системами Терминала. Арена Скиллианского блица. Богата ресурсами нулевого элемента и молодыми колониями Альянса.",
+    "id": "attican",
+    "d": "M 849,327 L 830,266 L 802,276 L 756,261 L 742,236 L 670,277 L 622,217 L 584,188 L 592,200 L 597,199 L 601,203 L 601,209 L 612,209 L 613,212 L 604,217 L 601,229 L 589,219 L 582,220 L 584,225 L 580,222 L 569,227 L 562,225 L 557,197 L 552,195 L 553,188 L 533,230 L 488,216 L 482,232 L 453,230 L 452,245 L 405,252 L 361,274 L 333,300 L 314,325 L 231,277 L 188,308 L 134,288 L 120,343 L 115,345 L 86,339 L 82,366 L 198,375 L 199,397 L 373,398 L 382,365 L 370,354 L 394,327 L 431,310 L 461,309 L 479,313 L 485,298 L 491,297 L 512,308 L 537,331 L 554,361 L 553,367 L 538,372 L 542,402 L 527,403 L 521,432 L 502,457 L 519,478 L 535,467 L 571,497 L 595,454 L 602,452 L 713,493 L 732,529 L 786,554 L 799,525 L 814,530 L 818,526 L 830,488 L 837,449 L 838,404 L 820,402 L 814,335 Z",
+    "cx": 563,
+    "cy": 356
+  },
+  {
+    "nameRu": "Пространство Альянса Систем",
+    "nameEn": "Earth Alliance Space",
+    "color": "#ef4444",
+    "borderColor": "#00d2ff",
+    "faction": "Альянс Систем (Земля)",
+    "species": "Человечество (Люди)",
+    "threat": "НИЗКАЯ / ВОЕННЫЙ ПАТРУЛЬ",
+    "capital": "Земля / Станция Арктур",
+    "relay": "Харон (Солнечная система)",
+    "clusters": "Местный Кластер (Солнечная система), Поток Арктура, Скопление Вояджер, Скопление Исход",
+    "desc": "Суверенная территория объединенного человечества. Включает колыбель цивилизации Землю, военный штаб Арктур и первые колониальные успехи: Терра Нова и Иден Прайм.",
+    "id": "alliance",
+    "d": "M 784,559 L 727,533 L 710,498 L 600,459 L 584,491 L 572,505 L 534,475 L 509,494 L 525,527 L 493,541 L 465,546 L 453,560 L 453,593 L 416,610 L 398,607 L 388,644 L 409,650 L 405,675 L 424,702 L 449,677 L 488,675 L 540,663 L 586,642 L 628,612 L 633,613 L 659,644 L 680,626 L 713,659 L 756,607 Z",
+    "cx": 586,
+    "cy": 579
+  },
+  {
+    "nameRu": "Внутреннее Пространство Совета",
+    "nameEn": "Inner Council Space",
+    "color": "#22c55e",
+    "borderColor": "#00d2ff",
+    "faction": "Совет Цитадели (Республики Азари / Саларианский Союз)",
+    "species": "Азари, Саларианцы, Дреллы, Волусы",
+    "threat": "МИНИМАЛЬНАЯ (Флот Цитадели)",
+    "capital": "Станция Цитадель",
+    "relay": "Ретрансляторы Цитадели (Туманность Змея)",
+    "clusters": "Туманность Змея (Цитадель), Туманность Афина (Тессия), Внутренний Сур'Кеш, Колыбель Сигурда",
+    "desc": "Сердце галактической цивилизации и верховной власти. Высочайший уровень жизни, дипломатический центр галактики и штаб СБ Цитадели (C-Sec).",
+    "id": "inner_council",
+    "d": "M 208,608 L 213,638 L 236,659 L 216,686 L 251,712 L 294,735 L 319,768 L 314,784 L 389,803 L 427,807 L 483,806 L 480,774 L 447,774 L 447,738 L 506,731 L 496,679 L 452,683 L 425,710 L 419,711 L 420,707 L 399,677 L 403,653 L 382,648 L 392,606 L 371,598 L 364,602 L 365,596 L 361,594 L 356,602 L 359,614 L 351,615 L 353,607 L 349,605 L 349,599 L 338,603 L 339,607 L 335,609 L 334,604 L 302,582 L 269,583 L 255,569 Z",
+    "cx": 347,
+    "cy": 693
+  },
+  {
+    "nameRu": "Внешнее Пространство Совета",
+    "nameEn": "Outer Council Space",
+    "color": "#0ea5e9",
+    "borderColor": "#00d2ff",
+    "faction": "Турианская Иерархия / Демилитаризованная Зона",
+    "species": "Турианцы, Кроганы, Батарианцы",
+    "threat": "УМЕРЕННАЯ (Патрули миротворцев)",
+    "capital": "Палавен (Апийский крест)",
+    "relay": "Ретранслятор Палавена",
+    "clusters": "Апийский Крест (Палавен), ДМЗ Кроганов (Тучанка), Граница Иерархии, Пространство Ару",
+    "desc": "Милитаризованное пространство Турианской Иерархии и контролируемые территории Кроганов. Мощнейший космический флот поддержания галактического порядка.",
+    "id": "outer_council",
+    "d": "M 82,372 L 81,424 L 82,430 L 87,428 L 87,433 L 81,436 L 68,470 L 50,475 L 52,485 L 59,485 L 53,491 L 67,537 L 118,519 L 142,572 L 159,567 L 176,593 L 176,597 L 164,605 L 182,626 L 171,642 L 211,680 L 228,660 L 208,642 L 201,606 L 224,582 L 234,578 L 291,529 L 291,522 L 297,521 L 292,514 L 271,504 L 269,496 L 273,493 L 267,491 L 266,480 L 264,486 L 260,484 L 261,476 L 267,475 L 266,470 L 256,476 L 254,469 L 258,466 L 258,459 L 254,468 L 253,453 L 243,454 L 249,440 L 246,435 L 250,429 L 257,431 L 255,425 L 259,420 L 254,419 L 249,428 L 238,428 L 241,414 L 237,411 L 227,415 L 223,407 L 221,412 L 225,418 L 222,419 L 215,413 L 218,409 L 209,410 L 211,404 L 195,404 L 194,382 L 134,377 L 134,389 L 127,392 L 123,390 L 122,375 Z",
+    "cx": 170,
+    "cy": 492
+  },
+  {
+    "nameRu": "Галактическое Ядро",
+    "nameEn": "Galactic Core",
+    "color": "#f97316",
+    "borderColor": "#00d2ff",
+    "faction": "Коллекционеры / Жнецы / Неизведанно",
+    "species": "Синтетики, Коллекционеры",
+    "threat": "СМЕРТЕЛЬНАЯ (Нестабильные гравитационные поля)",
+    "capital": "База Коллекционеров",
+    "relay": "Ретранслятор Омега-4",
+    "clusters": "Сверхмассивная Черная Дыра, Центр Галактики, Радиоактивные скопления",
+    "desc": "Сверхплотное звездное ядро Млечного Пути. Экстремальная гравитация, радиация и единственная точка входа — зашифрованный ретранслятор Омега-4, из которого никто не возвращался живым.",
+    "id": "core",
+    "d": "M 490,303 L 482,320 L 450,314 L 416,321 L 393,336 L 377,355 L 389,362 L 379,393 L 380,416 L 367,434 L 353,441 L 371,470 L 407,496 L 412,497 L 423,467 L 457,471 L 491,458 L 512,435 L 520,414 L 521,398 L 536,396 L 535,385 L 531,386 L 533,376 L 527,367 L 548,362 L 526,328 Z",
+    "cx": 449,
+    "cy": 395
+  },
+  {
+    "nameRu": "Внутренние Рукава / Магистраль",
+    "nameEn": "Inner Relay Corridor",
+    "color": "#6366f1",
+    "borderColor": "#00d2ff",
+    "faction": "Смешанная юрисдикция торговых путей",
+    "species": "Все виды Совета",
+    "threat": "НИЗКАЯ / КОММЕРЧЕСКИЙ ТРАФИК",
+    "capital": "Узлы ретрансляторов 1-го порядка",
+    "relay": "Магистральные Ретрансляторы Массы",
+    "clusters": "Торговый коридор, Промежуточные системы нулевого элемента",
+    "desc": "Магистральный коридор сверхсветовых перелетов, соединяющий Внутреннее пространство Совета с секторами Альянса и внешними рубежами.",
+    "id": "transit",
+    "d": "M 279,404 L 283,436 L 298,480 L 296,484 L 293,482 L 289,497 L 307,521 L 307,526 L 295,537 L 301,543 L 304,541 L 308,550 L 312,548 L 313,540 L 325,544 L 317,551 L 322,552 L 325,558 L 330,554 L 336,560 L 336,564 L 329,568 L 342,579 L 347,579 L 349,584 L 345,591 L 364,588 L 393,600 L 415,604 L 447,589 L 447,561 L 421,559 L 423,539 L 437,540 L 447,528 L 463,526 L 465,540 L 518,523 L 509,509 L 505,510 L 507,505 L 502,504 L 501,492 L 514,482 L 497,461 L 471,475 L 440,477 L 427,474 L 415,505 L 380,487 L 364,472 L 345,439 L 347,434 L 365,427 L 374,414 L 373,404 L 323,404 L 315,408 L 316,414 L 313,412 L 305,416 L 301,412 L 302,420 L 307,421 L 306,427 L 313,426 L 307,430 L 316,444 L 321,444 L 319,448 L 329,456 L 329,462 L 334,463 L 332,468 L 337,472 L 330,480 L 325,475 L 316,477 L 314,471 L 322,469 L 323,472 L 325,465 L 321,467 L 311,458 L 312,465 L 308,466 L 307,457 L 295,443 L 296,440 L 302,443 L 299,436 L 302,429 L 299,425 L 296,429 L 288,428 L 293,413 L 291,409 L 298,404 Z",
+    "cx": 384,
+    "cy": 510
+  }
+];
+ME.relays = [
+  {
+    "id": "citadel",
+    "sector": "inner_council",
+    "name": "Цитадель // Туманность Змея",
+    "x": 370,
+    "y": 620,
+    "type": "primary",
+    "icon": "🏛️",
+    "lore": "Столица галактики, глубококосмическая станция протеанского происхождения, узел всех первичных ретрансляторов."
+  },
+  {
+    "id": "earth",
+    "sector": "alliance",
+    "name": "Земля // Местный Кластер",
+    "x": 600,
+    "y": 630,
+    "type": "primary",
+    "icon": "🌍",
+    "lore": "Колыбель человечества. Ретранслятор Харон соединяет Солнечную систему со штабом Арктур."
+  },
+  {
+    "id": "arcturus",
+    "sector": "alliance",
+    "name": "Станция Арктур // Поток Арктура",
+    "x": 650,
+    "y": 590,
+    "type": "primary",
+    "icon": "🛡️",
+    "lore": "Штаб-квартира Командования Альянса Систем и Парламент человечества."
+  },
+  {
+    "id": "thessia",
+    "sector": "inner_council",
+    "name": "Тессия // Туманность Афина",
+    "x": 320,
+    "y": 700,
+    "type": "primary",
+    "icon": "🌀",
+    "lore": "Родной мир Азари. Центр биотических исследований, древних архивов и культуры."
+  },
+  {
+    "id": "surkesh",
+    "sector": "inner_council",
+    "name": "Сур'Кеш // Внутренний бассейн",
+    "x": 420,
+    "y": 670,
+    "type": "primary",
+    "icon": "🦎",
+    "lore": "Родной тропический мир Саларианцев. Штаб-квартира Группы Особого Реагирования (STG)."
+  },
+  {
+    "id": "palaven",
+    "sector": "outer_council",
+    "name": "Палавен // Апийский Крест",
+    "x": 200,
+    "y": 520,
+    "type": "primary",
+    "icon": "🦅",
+    "lore": "Милитаризованная столица Турианской Иерархии. Базирование мощнейшего космического флота."
+  },
+  {
+    "id": "tuchanka",
+    "sector": "outer_council",
+    "name": "Тучанка // ДМЗ Кроганов",
+    "x": 150,
+    "y": 580,
+    "type": "secondary",
+    "icon": "🦴",
+    "lore": "Радиоактивная пустошь, разрушенная ядерной войной. Клановая территория кроганов."
+  },
+  {
+    "id": "omega",
+    "sector": "terminus",
+    "name": "Станция Омега // Туманность Омега",
+    "x": 470,
+    "y": 250,
+    "type": "primary",
+    "icon": "🍷",
+    "lore": "Добывающая станция на гигантском астероиде. Негласная столица Систем Терминала под властью Арии Т'Лоак."
+  },
+  {
+    "id": "illium",
+    "sector": "terminus",
+    "name": "Иллиум // Полумесяц Тасмин",
+    "x": 380,
+    "y": 300,
+    "type": "secondary",
+    "icon": "💎",
+    "lore": "Сверхразвитый торговый полис Азари на границе Терминала. Центр контрактов и свободной торговли."
+  },
+  {
+    "id": "rannoch",
+    "sector": "terminus",
+    "name": "Раннох // Вуаль Персея",
+    "x": 540,
+    "y": 130,
+    "type": "secondary",
+    "icon": "🤖",
+    "lore": "Занятая гетами родина изгнанных кварианцев за границей Вуали Персея."
+  },
+  {
+    "id": "eden_prime",
+    "sector": "attican",
+    "name": "Иден Прайм // Скопление Исход",
+    "x": 680,
+    "y": 480,
+    "type": "secondary",
+    "icon": "🌾",
+    "lore": "Плодородная аграрная жемчужина человечества в Аттическом Траверсе. Место раскопок маяка протеан."
+  },
+  {
+    "id": "omega4",
+    "sector": "core",
+    "name": "Ретранслятор Омега-4 // Ядро",
+    "x": 460,
+    "y": 385,
+    "type": "relay_core",
+    "icon": "⚡",
+    "lore": "Зашифрованный древний ретранслятор, ведущий за пределы черных дыр Ядра. Требует модуль свой-чужой Жнецов."
+  }
+];
+ME.mapState = {
+  zoom: 1.0,
+  cx: 450,
+  cy: 412.5,
+  activeSectorId: 'alliance'
+};
+
+function meRenderSidebarContent(s){
+  if(!s) return '<div style="color:#7da5c9;">Выберите сектор на карте для вывода тактической информации.</div>';
+  var threatClass = s.threat.indexOf('СМЕРТЕЛЬНАЯ') >= 0 ? '#ff5555' : (s.threat.indexOf('ВЫСОКАЯ') >= 0 ? '#ffaa33' : (s.threat.indexOf('УМЕРЕННАЯ') >= 0 ? '#ffd700' : '#22c55e'));
+  var clustersArr = s.clusters.split(',').map(function(c){ return c.trim(); });
+  
+  return '<div class="me-sidebar-header">' +
+    '<div class="me-sidebar-title">' + meEsc(s.nameRu) + '</div>' +
+    '<div class="me-sidebar-subtitle">' + meEsc(s.nameEn) + '</div>' +
+  '</div>' +
+  '<div style="margin:8px 0;">' +
+    '<span style="background:rgba(255,255,255,0.06);border:1px solid ' + threatClass + ';color:' + threatClass + ';font-size:11px;padding:2px 8px;border-radius:2px;font-family:monospace;font-weight:bold;">' +
+      'УГРОЗА: ' + meEsc(s.threat) +
+    '</span>' +
+  '</div>' +
+  '<div class="me-sidebar-prop"><strong>Контролирующая фракция:</strong><br>' + meEsc(s.faction) + '</div>' +
+  '<div class="me-sidebar-prop"><strong>Доминирующие виды:</strong><br>' + meEsc(s.species) + '</div>' +
+  '<div class="me-sidebar-prop"><strong>Главный узел / Столица:</strong><br>' + meEsc(s.capital) + '</div>' +
+  '<div class="me-sidebar-prop"><strong>Первичный ретранслятор:</strong><br><span style="color:#00d2ff;">' + meEsc(s.relay) + '</span></div>' +
+  '<div class="me-sidebar-prop">' +
+    '<strong>Звёздные скопления:</strong>' +
+    '<div class="me-clusters-badge-list">' + clustersArr.map(function(cl){
+      return '<span class="me-cluster-badge">' + meEsc(cl) + '</span>';
+    }).join('') + '</div>' +
+  '</div>' +
+  '<div class="rule" style="margin:10px 0;"></div>' +
+  '<div style="font-size:12.5px;color:#8bb1d6;line-height:1.55;">' + meEsc(s.desc) + '</div>' +
+  '<div style="margin-top:14px;">' +
+    '<button class="btn-primary" id="mePlotCourseBtn" data-sector-id="' + s.id + '" style="width:100%;padding:7px;font-size:12px;">' +
+      '🎯 Проложить курс в сектор (Контракт)' +
+    '</button>' +
+  '</div>';
+}
+
+function meMap(){
+  var activeId = ME.mapState.activeSectorId || 'alliance';
+  var activeSector = ME.galaxySectors.find(function(s){ return s.id === activeId; }) || ME.galaxySectors[0];
+
+  var filterChips = [
+    { id: 'all', label: '🌌 Вся Галактика' },
+    { id: 'alliance', label: '🎖️ Альянс' },
+    { id: 'inner_council', label: '🏛️ Совет (Ядро)' },
+    { id: 'outer_council', label: '🦅 Иерархия / ДМЗ' },
+    { id: 'terminus', label: '💀 Терминус' },
+    { id: 'attican', label: '🌾 Траверс' },
+    { id: 'core', label: '⚡ Ядро / Омега-4' }
+  ];
+
+  var filtersHtml = '<div class="me-map-filters">' + filterChips.map(function(fc){
+    var on = activeId === fc.id ? 'on' : '';
+    return '<button class="me-filter-btn ' + on + '" data-map-filter="' + fc.id + '">' + fc.label + '</button>';
+  }).join('') + '</div>';
+
+  var controlsHtml = '<div class="me-map-zoom-controls">' +
+    '<button class="me-zoom-btn" id="meZoomInBtn" title="Приблизить">+</button>' +
+    '<button class="me-zoom-btn" id="meZoomOutBtn" title="Отдалить">−</button>' +
+    '<button class="me-zoom-btn" id="meZoomResetBtn" title="Сброс вида" style="font-size:12px;">⛶</button>' +
+  '</div>';
+
+  // SVG Layers
+  var sectorsSvgHtml = ME.galaxySectors.map(function(s){
+    var isSel = s.id === activeId ? 'selected' : '';
+    return '<path class="me-sector-path ' + isSel + '" id="sector-' + s.id + '" data-sector-id="' + s.id + '" d="' + s.d + '" fill="' + s.color + '"></path>';
+  }).join('');
+
+  var relaysSvgHtml = ME.relays.map(function(r){
+    var col = r.type === 'relay_core' ? '#ff3333' : (r.type === 'primary' ? '#00d2ff' : '#ffd700');
+    return '<g class="me-relay-marker" data-relay-id="' + r.id + '" transform="translate(' + r.x + ',' + r.y + ')">' +
+      '<circle cx="0" cy="0" r="14" fill="transparent" stroke="none" style="cursor:pointer;"></circle>' +
+      '<circle class="pulse" cx="0" cy="0" r="5" fill="none" stroke="' + col + '" stroke-width="1.5" pointer-events="none"></circle>' +
+      '<polygon points="0,-6 6,0 0,6 -6,0" fill="' + col + '" stroke="#fff" stroke-width="0.8" pointer-events="none"></polygon>' +
+      '<text x="8" y="4" pointer-events="none">' + meEsc(r.name.split('//')[0].trim()) + '</text>' +
+    '</g>';
+  }).join('');
+
+  var polarGridHtml = '<g opacity="0.25" stroke="#00d2ff" stroke-width="1" stroke-dasharray="4 4" fill="none">' +
+    '<circle cx="450" cy="412.5" r="100"></circle>' +
+    '<circle cx="450" cy="412.5" r="200"></circle>' +
+    '<circle cx="450" cy="412.5" r="300"></circle>' +
+    '<circle cx="450" cy="412.5" r="400"></circle>' +
+    '<line x1="50" y1="412.5" x2="850" y2="412.5"></line>' +
+    '<line x1="450" y1="12.5" x2="450" y2="812.5"></line>' +
+  '</g>';
+
+  return meNavHeader('ГАЛАКТИЧЕСКАЯ КАРТА // СЕНСОРЫ IES', 'КАРТА РЕТРАНСЛЯТОРОВ') +
+    '<h1>ГАЛАКТИЧЕСКАЯ КАРТА</h1>' +
+    '<div class="subtitle">СЕТЬ РЕТРАНСЛЯТОРОВ МАССЫ • СЕКТОРА ВЛИЯНИЯ • ТАКТИЧЕСКИЙ АТЛАС МЛЕЧНОГО ПУТИ</div>' +
+    '<div class="me-map-container">' +
+      '<div class="me-map-toolbar">' +
+        filtersHtml +
+        controlsHtml +
+      '</div>' +
+      '<div class="me-map-layout">' +
+        '<div class="me-map-viewport" id="meGalaxyViewportBox">' +
+          '<div class="me-map-hud-overlay">' +
+            '<span class="me-map-hud-badge">IES STEALTH: NOMINAL</span>' +
+            '<span class="me-map-hud-badge" style="color:#ffaa33;border-color:rgba(255,170,51,0.3);">MASS RELAYS: ONLINE</span>' +
+          '</div>' +
+          '<svg id="meGalaxySvg" class="me-galaxy-svg" viewBox="0 0 900 825">' +
+            '<defs>' +
+              '<filter id="meSectorGlow" x="-20%" y="-20%" width="140%" height="140%">' +
+                '<feGaussianBlur stdDeviation="4" result="blur"></feGaussianBlur>' +
+                '<feComposite in="SourceGraphic" in2="blur" operator="over"></feComposite>' +
+              '</filter>' +
+            '</defs>' +
+            '<g id="meGalaxyStage">' +
+              '<image href="mass_effect_galaxy_map.jpg" x="0" y="0" width="900" height="825" preserveAspectRatio="xMidYMid meet"></image>' +
+              polarGridHtml +
+              '<g id="meSectorsGroup">' + sectorsSvgHtml + '</g>' +
+              '<g id="meRelaysGroup">' + relaysSvgHtml + '</g>' +
+            '</g>' +
+          '</svg>' +
+        '</div>' +
+        '<div class="me-map-sidebar" id="meMapSidebar">' +
+          meRenderSidebarContent(activeSector) +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+function wireMeMap(){
+  var vp = document.getElementById('meGalaxyViewportBox');
+  var svg = document.getElementById('meGalaxySvg');
+  var sidebar = document.getElementById('meMapSidebar');
+  if(!vp || !svg) return;
+
+  var state = ME.mapState;
+
+  function updateViewBox(){
+    var z = Math.min(4.0, Math.max(1.0, state.zoom));
+    var vbW = 900 / z;
+    var vbH = 825 / z;
+    var minX = state.cx - vbW / 2;
+    var minY = state.cy - vbH / 2;
+    minX = Math.max(-50, Math.min(950 - vbW, minX));
+    minY = Math.max(-50, Math.min(875 - vbH, minY));
+    svg.setAttribute('viewBox', minX.toFixed(2) + ' ' + minY.toFixed(2) + ' ' + vbW.toFixed(2) + ' ' + vbH.toFixed(2));
+  }
+  updateViewBox();
+
+  // Dragging
+  var isDragging = false;
+  var startX = 0, startY = 0;
+  var startCx = 450, startCy = 412.5;
+
+  vp.onmousedown = function(e){
+    if(e.button !== 0 && e.button !== 1) return;
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    startCx = state.cx;
+    startCy = state.cy;
+    vp.classList.add('grabbing');
+  };
+
+  window.addEventListener('mousemove', function(e){
+    if(!isDragging) return;
+    var dx = e.clientX - startX;
+    var dy = e.clientY - startY;
+    var rect = vp.getBoundingClientRect();
+    var vw = rect.width || 800;
+    var vh = rect.height || 540;
+    var scaleX = (900 / state.zoom) / vw;
+    var scaleY = (825 / state.zoom) / vh;
+    state.cx = startCx - dx * scaleX;
+    state.cy = startCy - dy * scaleY;
+    updateViewBox();
+  });
+
+  window.addEventListener('mouseup', function(){
+    if(isDragging){
+      isDragging = false;
+      vp.classList.remove('grabbing');
+    }
+  });
+
+  // Wheel zoom centered at cursor
+  vp.onwheel = function(e){
+    e.preventDefault();
+    var rect = vp.getBoundingClientRect();
+    var mouseX = e.clientX - rect.left;
+    var mouseY = e.clientY - rect.top;
+    var vw = rect.width || 800;
+    var vh = rect.height || 540;
+
+    var curW = 900 / state.zoom;
+    var curH = 825 / state.zoom;
+    var curMinX = state.cx - curW / 2;
+    var curMinY = state.cy - curH / 2;
+
+    var worldX = curMinX + (mouseX / vw) * curW;
+    var worldY = curMinY + (mouseY / vh) * curH;
+
+    var factor = e.deltaY < 0 ? 1.25 : 0.8;
+    var newZoom = Math.min(4.0, Math.max(1.0, state.zoom * factor));
+    if(newZoom === state.zoom) return;
+
+    state.zoom = newZoom;
+    state.cx = worldX - (mouseX / vw - 0.5) * (900 / newZoom);
+    state.cy = worldY - (mouseY / vh - 0.5) * (825 / newZoom);
+    updateViewBox();
+  };
+
+  // Zoom buttons
+  var zoomIn = document.getElementById('meZoomInBtn');
+  if(zoomIn) zoomIn.onclick = function(){
+    state.zoom = Math.min(4.0, state.zoom * 1.3);
+    updateViewBox();
+  };
+  var zoomOut = document.getElementById('meZoomOutBtn');
+  if(zoomOut) zoomOut.onclick = function(){
+    state.zoom = Math.max(1.0, state.zoom / 1.3);
+    if(state.zoom <= 1.05){ state.cx = 450; state.cy = 412.5; }
+    updateViewBox();
+  };
+  var zoomReset = document.getElementById('meZoomResetBtn');
+  if(zoomReset) zoomReset.onclick = function(){
+    state.zoom = 1.0;
+    state.cx = 450;
+    state.cy = 412.5;
+    updateViewBox();
+  };
+
+  // Sector selection and hover
+  function selectSector(sId, panTo){
+    state.activeSectorId = sId;
+    var sec = ME.galaxySectors.find(function(s){ return s.id === sId; });
+    if(!sec) return;
+
+    document.querySelectorAll('.me-sector-path').forEach(function(p){
+      p.classList.toggle('selected', p.getAttribute('data-sector-id') === sId);
+    });
+
+    document.querySelectorAll('.me-filter-btn').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-map-filter') === sId);
+    });
+
+    if(sidebar) sidebar.innerHTML = meRenderSidebarContent(sec);
+
+    if(panTo && sec.cx && sec.cy){
+      state.cx = sec.cx;
+      state.cy = sec.cy;
+      state.zoom = Math.max(1.6, state.zoom);
+      updateViewBox();
+    }
+    
+    // Bind plot course button
+    var plotBtn = document.getElementById('mePlotCourseBtn');
+    if(plotBtn){
+      plotBtn.onclick = function(){
+        if(sec.id === 'alliance') ME._activeMissionClient = 'Альянс Систем';
+        else if(sec.id === 'inner_council') ME._activeMissionClient = 'СБ Цитадели (C-Sec)';
+        else if(sec.id === 'outer_council') ME._activeMissionClient = 'STG (ГОР саларианцев)';
+        else if(sec.id === 'terminus') ME._activeMissionClient = 'Ария Т\'Лоак (Омега)';
+        else ME._activeMissionClient = 'all';
+
+        if(typeof ME.generateMission === 'function'){
+          var m = ME.generateMission();
+          m.location = sec.nameRu + ' // ' + (sec.clusters.split(',')[0] || 'Фронтир');
+          if(!ME._missionsList) ME._missionsList = [];
+          ME._missionsList.unshift(m);
+        }
+        navigate('meMissions');
+      };
+    }
+  }
+
+  // Sector paths
+  document.querySelectorAll('.me-sector-path').forEach(function(p){
+    p.onclick = function(e){
+      e.stopPropagation();
+      var id = p.getAttribute('data-sector-id');
+      selectSector(id, false);
+    };
+    p.onmouseenter = function(){
+      var id = p.getAttribute('data-sector-id');
+      var sec = ME.galaxySectors.find(function(s){ return s.id === id; });
+      if(sec && sidebar && !state.activeSectorId) sidebar.innerHTML = meRenderSidebarContent(sec);
+    };
+  });
+
+  // Filter buttons
+  document.querySelectorAll('.me-filter-btn').forEach(function(b){
+    b.onclick = function(){
+      var f = b.getAttribute('data-map-filter');
+      if(f === 'all'){
+        state.activeSectorId = null;
+        state.zoom = 1.0;
+        state.cx = 450;
+        state.cy = 412.5;
+        updateViewBox();
+        document.querySelectorAll('.me-sector-path').forEach(function(p){ p.classList.remove('selected'); });
+        document.querySelectorAll('.me-filter-btn').forEach(function(btn){ btn.classList.toggle('on', btn === b); });
+        if(sidebar) sidebar.innerHTML = '<div class="me-sidebar-header"><div class="me-sidebar-title">ГАЛАКТИКА МЛЕЧНЫЙ ПУТЬ</div><div class="me-sidebar-subtitle">ОБЗОР СЕКТОРОВ И РЕТРАНСЛЯТОРОВ</div></div><p style="color:#8bb1d6;font-size:13px;line-height:1.5;">Наведите курсор или выберите сектор на карте для детального тактического анализа, оценки угрозы и доступа к оперативным миссиям.</p>';
+      } else {
+        selectSector(f, true);
+      }
+    };
+  });
+
+  // Relay markers click
+  document.querySelectorAll('.me-relay-marker').forEach(function(rm){
+    rm.onclick = function(e){
+      e.stopPropagation();
+      var rId = rm.getAttribute('data-relay-id');
+      var r = ME.relays.find(function(item){ return item.id === rId; });
+      if(!r) return;
+      
+      var sec = ME.galaxySectors.find(function(s){ return s.id === r.sector; });
+      if(sec) selectSector(sec.id, false);
+
+      if(typeof meShowNotice === 'function'){
+        var overlay = document.createElement('div');
+        overlay.className = 'me-modal-overlay';
+        overlay.innerHTML = '<div class="me-modal-box">' +
+          '<div class="me-modal-header"><span class="me-tag-holo">[РЕТРАНСЛЯТОР МАССЫ]</span><span style="color:#00d2ff;font-family:monospace;font-size:11px;">КАНАЛ: АКТИВЕН</span></div>' +
+          '<h3 style="margin:10px 0 6px;color:#00d2ff;font-family:monospace;">' + r.icon + ' ' + meEsc(r.name) + '</h3>' +
+          '<p style="color:#8bb1d6;font-size:13px;line-height:1.55;margin-bottom:16px;">' + meEsc(r.lore) + '</p>' +
+          '<div style="text-align:right;"><button class="btn-primary" id="meCloseRelayModal" style="padding:5px 16px;">Закрыть</button></div>' +
+        '</div>';
+        document.body.appendChild(overlay);
+        document.getElementById('meCloseRelayModal').onclick = function(){ overlay.remove(); };
+        overlay.onclick = function(ev){ if(ev.target === overlay) overlay.remove(); };
+      }
+    };
+  });
+
+  // Initial plot course button bind
+  var initPlotBtn = document.getElementById('mePlotCourseBtn');
+  if(initPlotBtn){
+    initPlotBtn.onclick = function(){
+      var sId = initPlotBtn.getAttribute('data-sector-id');
+      var sec = ME.galaxySectors.find(function(s){ return s.id === sId; }) || ME.galaxySectors[0];
+      if(sec.id === 'alliance') ME._activeMissionClient = 'Альянс Систем';
+      else if(sec.id === 'inner_council') ME._activeMissionClient = 'СБ Цитадели (C-Sec)';
+      else if(sec.id === 'outer_council') ME._activeMissionClient = 'STG (ГОР саларианцев)';
+      else if(sec.id === 'terminus') ME._activeMissionClient = 'Ария Т\'Лоак (Омега)';
+      else ME._activeMissionClient = 'all';
+
+      if(typeof ME.generateMission === 'function'){
+        var m = ME.generateMission();
+        m.location = sec.nameRu + ' // ' + (sec.clusters.split(',')[0] || 'Фронтир');
+        if(!ME._missionsList) ME._missionsList = [];
+        ME._missionsList.unshift(m);
+      }
+      navigate('meMissions');
+    };
+  }
+}
+
+// 8. ДАННЫЕ СИСТЕМ
+function meData(){
+  var c = ME.getChar();
+  var pCount = ME.getPowers().length;
+  var aCount = ME.getArsenal().length;
+  var s = ME.getShip();
+  var cCount = (s.crew || []).length;
+
+  return meNavHeader('ДАННЫЕ СИСТЕМ // РЕЗЕРВНОЕ КОПИРОВАНИЕ', 'ХРАНИЛИЩЕ ПРОФИЛЯ') +
+    '<h1>ДАННЫЕ И СИСТЕМЫ</h1>' +
+    '<div class="subtitle">РЕЗЕРВНОЕ КОПИРОВАНИЕ • ПОЛНЫЙ ЭКСПОРТ/ИМПОРТ ДОСЬЕ, СИСТЕМ И ЭКИПАЖА</div>' +
+    '<div class="me-panel" style="margin-top:14px;">' +
+      '<div style="margin-bottom:14px;padding:10px 14px;background:rgba(0,210,255,0.08);border:1px solid rgba(0,210,255,0.25);border-radius:4px;font-size:12.5px;color:#8bb1d6;">' +
+        'Текущий статус базы данных: <strong>' + meEsc(c.name) + '</strong> | Способностей: <strong>' + pCount + '</strong> | Арсенал: <strong>' + aCount + '</strong> | Корабль: <strong>' + meEsc(s.name) + '</strong> (Экипаж: <strong>' + cCount + '</strong>)' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="me-card">' +
+          '<h3 style="color:#00d2ff;margin-top:0;">💾 Экспорт полного профиля</h3>' +
+          '<p style="font-size:13px;color:#8bb1d6;">Сохранение полного досье оперативника, древа способностей, оружия, модулей корабля и экипажа в JSON-файл.</p>' +
+          '<button class="btn-primary" id="meExportJsonBtn" style="margin-top:10px;">Экспортировать в JSON</button>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<h3 style="color:#ffaa33;margin-top:0;">📂 Импорт профиля из файла</h3>' +
+          '<p style="font-size:13px;color:#8bb1d6;">Загрузка досье, способностей, вооружения и корабля из внешнего файла резервной копии.</p>' +
+          '<input type="file" id="meImportFileInput" style="display:none;" accept=".json">' +
+          '<button class="btn-subtle" id="meImportFileBtn" style="margin-top:10px;">Выбрать JSON файл...</button>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<h3 style="color:#b266ff;margin-top:0;">📋 Карточка для AI DM</h3>' +
+          '<p style="font-size:13px;color:#8bb1d6;">Сформировать текстовую сводку досье и корабля для вставки в чат с ИИ-Мастером.</p>' +
+          '<button class="btn-subtle" id="meCopyDmCardBtn" style="margin-top:10px;">Скопировать бриф для DM</button>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<h3 style="color:#ff5555;margin-top:0;">↺ Сброс всех данных космоса</h3>' +
+          '<p style="font-size:13px;color:#8bb1d6;">Сброс досье, очистка пользовательских способностей, арсенала и сброс модулей корабля к начальному состоянию.</p>' +
+          '<button class="btn-subtle" id="meDataResetBtn" style="margin-top:10px;color:#ff5555;border-color:rgba(255,85,85,0.4);">Сбросить всё</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+// Привязка интерактивных событий всех экранов
+function wireMe(){
+  // Навигация по кнопкам с [data-nav] или [data-go]
+  document.querySelectorAll('[data-nav]').forEach(function(el){
+    if(el.__meNavBound) return;
+    el.__meNavBound = true;
+    el.addEventListener('click', function(){
+      var target = el.getAttribute('data-nav');
+      if(target) navigate(target);
+    });
+  });
+
+  document.querySelectorAll('[data-go]').forEach(function(el){
+    if(el.__meGoBound) return;
+    el.__meGoBound = true;
+    el.addEventListener('click', function(){
+      var target = el.getAttribute('data-go');
+      if(target) navigate(target);
+    });
+  });
+
+  // Экран: meChar
+  var editCharBtn = document.getElementById('meEditCharBtn');
+  if(editCharBtn){
+    editCharBtn.addEventListener('click', function(){
+      ME._editingChar = true;
+      render();
+    });
+  }
+  var cancelEditBtn = document.getElementById('meCancelEditBtn');
+  if(cancelEditBtn){
+    cancelEditBtn.addEventListener('click', function(){
+      ME._editingChar = false;
+      render();
+    });
+  }
+  var saveCharBtn = document.getElementById('meSaveCharBtn') || document.getElementById('meSaveCharBtn2');
+  if(saveCharBtn){
+    var doSave = function(){
+      var c = ME.getChar();
+      var nameInp = document.getElementById('meEditName'); if(nameInp) c.name = nameInp.value;
+      var csInp = document.getElementById('meEditCallsign'); if(csInp) c.callsign = csInp.value;
+      var raceInp = document.getElementById('meEditRace'); if(raceInp) c.race = raceInp.value;
+      var roleInp = document.getElementById('meEditRole'); if(roleInp) c.role = roleInp.value;
+      var origInp = document.getElementById('meEditOrigin'); if(origInp) c.origin = origInp.value;
+      var bioInp = document.getElementById('meEditBio'); if(bioInp) c.biochemistry = bioInp.value;
+      var lvlInp = document.getElementById('meEditLevel'); if(lvlInp) c.level = parseInt(lvlInp.value, 10) || 1;
+      var devInp = document.getElementById('meEditDevPoints'); if(devInp) c.devPoints = parseInt(devInp.value, 10) || 0;
+      var profInp = document.getElementById('meEditProf'); if(profInp) c.profBonus = parseInt(profInp.value, 10) || 2;
+      var spdInp = document.getElementById('meEditSpeed'); if(spdInp) c.speed = spdInp.value;
+      
+      var acInp = document.getElementById('meEditAc'); if(acInp) c.baseAc = parseInt(acInp.value, 10) || 10;
+      var shInp = document.getElementById('meEditShield'); if(shInp) c.baseShield = parseInt(shInp.value, 10) || 0;
+      var armInp = document.getElementById('meEditArmor'); if(armInp) c.baseArmorPoints = parseInt(armInp.value, 10) || 0;
+      var dtInp = document.getElementById('meEditDt'); if(dtInp) c.damageThreshold = parseInt(dtInp.value, 10) || 0;
+      var barInp = document.getElementById('meEditBarrier'); if(barInp) c.baseBarrier = parseInt(barInp.value, 10) || 0;
+      var hpInp = document.getElementById('meEditHp'); if(hpInp) c.maxHp = parseInt(hpInp.value, 10) || 10;
+
+      document.querySelectorAll('[data-stat]').forEach(function(sInp){
+        var statKey = sInp.getAttribute('data-stat');
+        if(statKey && c.stats) c.stats[statKey] = parseInt(sInp.value, 10) || 10;
+      });
+
+      var loadInp = document.getElementById('meEditLoadout'); if(loadInp) c.loadout = loadInp.value;
+      var omniInp = document.getElementById('meEditOmni'); if(omniInp) c.omniTool = omniInp.value;
+      var ampInp = document.getElementById('meEditBioAmp'); if(ampInp) c.bioAmp = ampInp.value;
+      var bgInp = document.getElementById('meEditBg'); if(bgInp) c.background = bgInp.value;
+
+      ME.saveChar(c);
+      ME._editingChar = false;
+      render();
+    };
+    if(document.getElementById('meSaveCharBtn')) document.getElementById('meSaveCharBtn').addEventListener('click', doSave);
+    if(document.getElementById('meSaveCharBtn2')) document.getElementById('meSaveCharBtn2').addEventListener('click', doSave);
+  }
+
+  var resetCharBtn = document.getElementById('meResetCharBtn');
+  if(resetCharBtn){
+    resetCharBtn.addEventListener('click', function(){
+      if(confirm('Сбросить досье оперативника к стандартному образцу Альянса?')){
+        ME.resetChar();
+        render();
+      }
+    });
+  }
+
+  var copyDmBriefBtn = document.getElementById('meCopyDmBriefBtn') || document.getElementById('meCopyDmCardBtn');
+  if(copyDmBriefBtn){
+    copyDmBriefBtn.addEventListener('click', function(){
+      var c = ME.getChar();
+      var s = ME.getShip();
+      var brief = 'ДОСЬЕ ОПЕРАТИВНИКА [' + c.name + ' // ' + c.callsign + ']' + String.fromCharCode(10) +
+        'Раса: ' + c.race + ' | Роль: ' + c.role + ' | Уровень: ' + c.level + ' | ОР: ' + c.devPoints + String.fromCharCode(10) +
+        'Слои защиты: AC ' + c.baseAc + ' | Барьер: ' + c.baseBarrier + ' | Щит: ' + c.baseShield + ' | Броня: ' + c.baseArmorPoints + ' (Порог DT ' + c.damageThreshold + ') | HP: ' + c.maxHp + String.fromCharCode(10) +
+        'Характеристики: СИЛ ' + c.stats.str + ' | ЛОВ ' + c.stats.dex + ' | ТЕЛ ' + c.stats.con + ' | ИНТ ' + c.stats.int + ' | МУД ' + c.stats.wis + ' | ХАР ' + c.stats.cha + String.fromCharCode(10) +
+        'Корабль: ' + s.name + ' (' + s.cls + ') | Статус: ' + s.status + String.fromCharCode(10) +
+        'Снаряжение: ' + c.loadout + String.fromCharCode(10) +
+        'Омни-тул: ' + c.omniTool + ' | Имплантат: ' + c.bioAmp;
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(brief).then(function(){ alert('Сводка досье скопирована в буфер обмена для AI DM!'); });
+      } else {
+        alert(brief);
+      }
+    });
+  }
+
+  // --- Экран: mePowers ---
+  document.querySelectorAll('[data-branch]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      ME._activeBranch = btn.getAttribute('data-branch');
+      render();
+    });
+  });
+
+  var powersSearch = document.getElementById('mePowersSearchInput');
+  if(powersSearch){
+    powersSearch.addEventListener('input', function(){
+      ME._powersSearch = powersSearch.value;
+      render();
+      var inputAgain = document.getElementById('mePowersSearchInput');
+      if(inputAgain){
+        inputAgain.focus();
+        inputAgain.selectionStart = inputAgain.selectionEnd = inputAgain.value.length;
+      }
+    });
+  }
+
+  var openPowerForm = function(editPower){
+    var p = editPower || { name: '', branch: 'Биотика', icon: '🌀', req: 'Узлы L-типа', cd: 3, cost: 1, desc: '', r1: '', r2: '', r3: '' };
+    var isNew = !editPower;
+    var htmlForm = '<div style="display:flex;flex-direction:column;gap:10px;">' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Название способности</label><input type="text" id="mPowName" class="me-input" style="width:100%;" value="' + meEsc(p.name) + '" placeholder="например: Сингулярность"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Ветвь / Категория</label>' +
+          '<select id="mPowBranch" class="me-input" style="width:100%;background:#040914;">' +
+            ['Биотика', 'Техника', 'Бой', 'Медицина', 'Производные', 'Кастомная'].map(function(b){
+              return '<option value="' + b + '" ' + (p.branch === b ? 'selected' : '') + '>' + b + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Иконка (эмодзи)</label><input type="text" id="mPowIcon" class="me-input" style="width:100%;" value="' + meEsc(p.icon || '⚡') + '"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Требование</label><input type="text" id="mPowReq" class="me-input" style="width:100%;" value="' + meEsc(p.req) + '" placeholder="Узлы L-типа / Омни-инструмент"></div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Кулдаун (раундов, 0 = без КД)</label><input type="number" id="mPowCd" class="me-input" style="width:100%;" value="' + (p.cd !== undefined ? p.cd : 3) + '"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Стоимость в ОР</label><input type="number" id="mPowCost" class="me-input" style="width:100%;" value="' + (p.cost || 1) + '"></div>' +
+      '</div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Описание и механика применения</label><textarea id="mPowDesc" class="me-input" style="width:100%;height:60px;" placeholder="Краткое описание действия способности...">' + meEsc(p.desc) + '</textarea></div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Ранг 1 (1 ОР)</label><input type="text" id="mPowR1" class="me-input" style="width:100%;" value="' + meEsc(p.r1) + '" placeholder="Эффект на 1 ранге..."></div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Ранг 2 (2 ОР)</label><input type="text" id="mPowR2" class="me-input" style="width:100%;" value="' + meEsc(p.r2) + '" placeholder="Эффект на 2 ранге..."></div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Ранг 3 (3 ОР)</label><input type="text" id="mPowR3" class="me-input" style="width:100%;" value="' + meEsc(p.r3) + '" placeholder="Эффект на 3 ранге..."></div>' +
+    '</div>';
+
+    meShowModal(isNew ? 'СОЗДАНИЕ СПОСОБНОСТИ A92' : 'РЕДАКТИРОВАНИЕ СПОСОБНОСТИ', 'ПРОТОКОЛ БОЕВОЙ СИСТЕМЫ', htmlForm, function(){
+      var name = (document.getElementById('mPowName').value || '').trim();
+      if(!name){ alert('Укажите название способности!'); return false; }
+      var updated = {
+        id: editPower ? editPower.id : ('pow_' + Date.now()),
+        name: name,
+        branch: document.getElementById('mPowBranch').value,
+        icon: document.getElementById('mPowIcon').value || '⚡',
+        req: document.getElementById('mPowReq').value || '—',
+        cd: parseInt(document.getElementById('mPowCd').value, 10) || 0,
+        cost: parseInt(document.getElementById('mPowCost').value, 10) || 1,
+        desc: document.getElementById('mPowDesc').value || '',
+        r1: document.getElementById('mPowR1').value || '',
+        r2: document.getElementById('mPowR2').value || '',
+        r3: document.getElementById('mPowR3').value || ''
+      };
+      if(isNew) ME.addPower(updated);
+      else ME.updatePower(updated);
+      render();
+      return true;
+    });
+  };
+
+  var addPowerBtn = document.getElementById('meAddPowerBtn') || document.getElementById('meAddPowerEmptyBtn');
+  if(addPowerBtn){
+    addPowerBtn.onclick = function(){ openPowerForm(null); };
+  }
+
+  var presetPowersBtn = document.getElementById('mePresetPowersBtn') || document.getElementById('mePresetPowerEmptyBtn');
+  if(presetPowersBtn){
+    presetPowersBtn.onclick = function(){
+      var listHtml = '<div style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">' +
+        ME_CANON_POWERS_PRESETS.map(function(cp, idx){
+          return '<div class="me-card" style="padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
+            '<div>' +
+              '<div style="font-weight:700;color:#fff;">' + cp.icon + ' ' + meEsc(cp.name) + ' <span class="me-tag-holo" style="font-size:10px;">' + cp.branch + '</span></div>' +
+              '<div style="font-size:11.5px;color:#8bb1d6;margin-top:2px;">' + meEsc(cp.desc) + '</div>' +
+            '</div>' +
+            '<button class="btn-primary me-add-preset-power-btn" data-idx="' + idx + '" style="font-size:11px;padding:3px 10px;white-space:nowrap;">+ Добавить</button>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+      meShowModal('ШАБЛОНЫ СПОСОБНОСТЕЙ ИЗ КОДЕКСА', 'ВЫБЕРИТЕ ПРОТОКОЛ ДЛЯ ДОБАВЛЕНИЯ В ВАШЕ ДРЕВО', listHtml, null);
+      document.querySelectorAll('.me-add-preset-power-btn').forEach(function(b){
+        b.onclick = function(){
+          var idx = parseInt(b.getAttribute('data-idx'), 10);
+          var template = ME_CANON_POWERS_PRESETS[idx];
+          if(template){
+            ME.addPower(JSON.parse(JSON.stringify(template)));
+            b.innerText = '✓ Добавлено';
+            b.disabled = true;
+            b.style.opacity = '0.6';
+            render();
+          }
+        };
+      });
+    };
+  }
+
+  document.querySelectorAll('.me-edit-power-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      var item = ME.getPowers().find(function(x){ return x.id === id; });
+      if(item) openPowerForm(item);
+    };
+  });
+
+  document.querySelectorAll('.me-del-power-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      if(confirm('Удалить эту способность из древа?')){
+        ME.deletePower(id);
+        render();
+      }
+    };
+  });
+
+  // --- Экран: meArsenal ---
+  document.querySelectorAll('[data-arsenal-cat]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      ME._activeArsenalCat = btn.getAttribute('data-arsenal-cat');
+      render();
+    });
+  });
+
+  var openWeaponForm = function(editWeapon){
+    var w = editWeapon || { name: '', cat: 'rifles', type: 'Штурмовая винтовка', dmg: '1d8+2 кин.', range: '60/180 фт', clip: 30, desc: '' };
+    var isNew = !editWeapon;
+    var htmlForm = '<div style="display:flex;flex-direction:column;gap:10px;">' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Название оружия</label><input type="text" id="mWpnName" class="me-input" style="width:100%;" value="' + meEsc(w.name) + '" placeholder="например: M-8 «Мститель»"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Категория арсенала</label>' +
+          '<select id="mWpnCat" class="me-input" style="width:100%;background:#040914;">' +
+            [
+              { id: 'rifles', name: 'Винтовки' },
+              { id: 'pistols', name: 'Пистолеты/ПП' },
+              { id: 'shotguns', name: 'Дробовики' },
+              { id: 'snipers', name: 'Снайперские' },
+              { id: 'heavy', name: 'Тяжелое' }
+            ].map(function(c){
+              return '<option value="' + c.id + '" ' + (w.cat === c.id ? 'selected' : '') + '>' + c.name + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Тип / Подтип</label><input type="text" id="mWpnType" class="me-input" style="width:100%;" value="' + meEsc(w.type) + '" placeholder="Штурмовая винтовка / Дробовик"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Кость урона</label><input type="text" id="mWpnDmg" class="me-input" style="width:100%;" value="' + meEsc(w.dmg) + '" placeholder="например: 1d8+2 кин."></div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Дистанция</label><input type="text" id="mWpnRange" class="me-input" style="width:100%;" value="' + meEsc(w.range) + '" placeholder="60/180 фт"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Магазин / Заряды</label><input type="text" id="mWpnClip" class="me-input" style="width:100%;" value="' + meEsc(w.clip) + '" placeholder="30"></div>' +
+      '</div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Описание и особенности</label><textarea id="mWpnDesc" class="me-input" style="width:100%;height:60px;" placeholder="Особенности стрельбы, модификации...">' + meEsc(w.desc) + '</textarea></div>' +
+    '</div>';
+
+    meShowModal(isNew ? 'ВПИСАТЬ ОРУЖИЕ В АРСЕНАЛ' : 'РЕДАКТИРОВАНИЕ ОРУЖИЯ', 'СКЛАД БОЕВОГО СНАРЯЖЕНИЯ', htmlForm, function(){
+      var name = (document.getElementById('mWpnName').value || '').trim();
+      if(!name){ alert('Укажите название оружия!'); return false; }
+      var updated = {
+        id: editWeapon ? editWeapon.id : ('wpn_' + Date.now()),
+        name: name,
+        cat: document.getElementById('mWpnCat').value,
+        type: document.getElementById('mWpnType').value || 'Огнестрел',
+        dmg: document.getElementById('mWpnDmg').value || '1d8',
+        range: document.getElementById('mWpnRange').value || '—',
+        clip: document.getElementById('mWpnClip').value || '—',
+        desc: document.getElementById('mWpnDesc').value || ''
+      };
+      if(isNew) ME.addWeapon(updated);
+      else ME.updateWeapon(updated);
+      render();
+      return true;
+    });
+  };
+
+  var addWeaponBtn = document.getElementById('meAddWeaponBtn') || document.getElementById('meAddWeaponEmptyBtn');
+  if(addWeaponBtn){
+    addWeaponBtn.onclick = function(){ openWeaponForm(null); };
+  }
+
+  var presetWeaponsBtn = document.getElementById('mePresetWeaponsBtn') || document.getElementById('mePresetWeaponEmptyBtn');
+  if(presetWeaponsBtn){
+    presetWeaponsBtn.onclick = function(){
+      var listHtml = '<div style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">' +
+        ME_CANON_WEAPONS_PRESETS.map(function(cw, idx){
+          return '<div class="me-card" style="padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
+            '<div>' +
+              '<div style="font-weight:700;color:#fff;">🔫 ' + meEsc(cw.name) + ' <span class="me-tag-holo" style="font-size:10px;">' + cw.dmg + '</span></div>' +
+              '<div style="font-size:11.5px;color:#8bb1d6;margin-top:2px;">' + meEsc(cw.desc) + '</div>' +
+            '</div>' +
+            '<button class="btn-primary me-add-preset-weapon-btn" data-idx="' + idx + '" style="font-size:11px;padding:3px 10px;white-space:nowrap;">+ Добавить</button>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+      meShowModal('КАТАЛОГ ВООРУЖЕНИЯ АЛЬЯНСА', 'ВЫБЕРИТЕ ОРУЖИЕ ДЛЯ ДОБАВЛЕНИЯ В ВАШ АРСЕНАЛ', listHtml, null);
+      document.querySelectorAll('.me-add-preset-weapon-btn').forEach(function(b){
+        b.onclick = function(){
+          var idx = parseInt(b.getAttribute('data-idx'), 10);
+          var template = ME_CANON_WEAPONS_PRESETS[idx];
+          if(template){
+            ME.addWeapon(JSON.parse(JSON.stringify(template)));
+            b.innerText = '✓ Добавлено';
+            b.disabled = true;
+            b.style.opacity = '0.6';
+            render();
+          }
+        };
+      });
+    };
+  }
+
+  document.querySelectorAll('.me-edit-weapon-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      var item = ME.getArsenal().find(function(x){ return x.id === id; });
+      if(item) openWeaponForm(item);
+    };
+  });
+
+  document.querySelectorAll('.me-del-weapon-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      if(confirm('Удалить это оружие из арсенала?')){
+        ME.deleteWeapon(id);
+        render();
+      }
+    };
+  });
+
+  document.querySelectorAll('.me-roll-weapon-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var wName = btn.getAttribute('data-weapon-name') || 'Оружие';
+      var wDmg = btn.getAttribute('data-dmg') || '';
+      diceState.labelCat = 'space';
+      diceState.label = '💥 ' + wName + (wDmg ? ' [' + wDmg + ']' : '');
+      navigate('dice');
+    });
+  });
+
+  // --- Экран: meShip ---
+  var editShipBtn = document.getElementById('meEditShipBtn');
+  if(editShipBtn){
+    editShipBtn.onclick = function(){
+      var s = ME.getShip();
+      var htmlForm = '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Название судна</label><input type="text" id="mShipName" class="me-input" style="width:100%;" value="' + meEsc(s.name) + '"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Класс корабля</label><input type="text" id="mShipCls" class="me-input" style="width:100%;" value="' + meEsc(s.cls) + '"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Статус готовности</label><input type="text" id="mShipStatus" class="me-input" style="width:100%;" value="' + meEsc(s.status) + '"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Заметки и назначение</label><textarea id="mShipNotes" class="me-input" style="width:100%;height:60px;">' + meEsc(s.notes || '') + '</textarea></div>' +
+      '</div>';
+      meShowModal('ПАРАМЕТРЫ КОРАБЛЯ', 'РЕГИСТРАЦИОННЫЕ ДАННЫЕ СУДНА', htmlForm, function(){
+        var name = (document.getElementById('mShipName').value || '').trim() || 'Без названия';
+        var cls = document.getElementById('mShipCls').value || 'Фрегат';
+        var status = document.getElementById('mShipStatus').value || 'В строю';
+        var notes = document.getElementById('mShipNotes').value || '';
+        ME.updateShipInfo(name, cls, status, notes);
+        render();
+        return true;
+      });
+    };
+  }
+
+  var presetShipBtn = document.getElementById('mePresetShipBtn');
+  if(presetShipBtn){
+    presetShipBtn.onclick = function(){
+      if(confirm('Загрузить конфигурацию фрегата «Нормандия SR-2» с полным комплектом модулей и экипажем?')){
+        ME.saveShip(JSON.parse(JSON.stringify(ME_CANON_NORMANDY_PRESET)));
+        render();
+      }
+    };
+  }
+
+  var resetShipBtn = document.getElementById('meResetShipBtn');
+  if(resetShipBtn){
+    resetShipBtn.onclick = function(){
+      if(confirm('Очистить все модули и список экипажа корабля?')){
+        ME.resetShip();
+        render();
+      }
+    };
+  }
+
+  document.querySelectorAll('.me-edit-module-btn').forEach(function(b){
+    b.onclick = function(){
+      var modId = b.getAttribute('data-mod-id');
+      var s = ME.getShip();
+      var m = s.modules.find(function(item){ return item.id === modId; });
+      if(!m) return;
+
+      var htmlForm = '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<div style="font-size:13px;font-weight:700;color:#00d2ff;margin-bottom:4px;">' + (m.icon || '🛰️') + ' Слот: ' + meEsc(m.slot) + '</div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Название установленного модуля</label><input type="text" id="mModName" class="me-input" style="width:100%;" value="' + (m.name === 'Слот пуст' ? '' : meEsc(m.name)) + '" placeholder="например: Танталовое ядро T-90"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Состояние / Характеристика</label><input type="text" id="mModStat" class="me-input" style="width:100%;" value="' + (m.stat === 'Не установлено' ? '' : meEsc(m.stat)) + '" placeholder="например: 100% Номинал / Активен"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Описание и свойства</label><textarea id="mModDesc" class="me-input" style="width:100%;height:60px;" placeholder="Технические характеристики модуля...">' + (m.name === 'Слот пуст' ? '' : meEsc(m.desc)) + '</textarea></div>' +
+        '<div style="text-align:left;margin-top:6px;">' +
+          '<button type="button" class="btn-subtle" id="mModClearBtn" style="font-size:11px;color:#ff5555;border-color:rgba(255,85,85,0.3);">Очистить этот слот</button>' +
+        '</div>' +
+      '</div>';
+
+      meShowModal('НАСТРОЙКА МОДУЛЯ', meEsc(m.slot), htmlForm, function(){
+        var modName = (document.getElementById('mModName').value || '').trim();
+        var modStat = (document.getElementById('mModStat').value || '').trim();
+        var modDesc = (document.getElementById('mModDesc').value || '').trim();
+        if(!modName){
+          modName = 'Слот пуст';
+          modStat = 'Не установлено';
+          modDesc = 'Место под ' + m.slot.toLowerCase() + '.';
+        } else {
+          if(!modStat) modStat = 'Установлен';
+          if(!modDesc) modDesc = 'Модуль смонтирован и функционирует штатно.';
+        }
+        ME.updateShipModule(modId, modName, modStat, modDesc);
+        render();
+        return true;
+      });
+
+      var clearBtn = document.getElementById('mModClearBtn');
+      if(clearBtn){
+        clearBtn.onclick = function(){
+          document.getElementById('mModName').value = '';
+          document.getElementById('mModStat').value = '';
+          document.getElementById('mModDesc').value = '';
+        };
+      }
+    };
+  });
+
+  var openCrewForm = function(editCrew){
+    var c = editCrew || { name: '', race: 'Человек', role: 'Специалист', loyalty: 'В отряде', note: '' };
+    var isNew = !editCrew;
+    var htmlForm = '<div style="display:flex;flex-direction:column;gap:10px;">' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Имя / Позывной</label><input type="text" id="mCrewName" class="me-input" style="width:100%;" value="' + meEsc(c.name) + '" placeholder="Имя соратника..."></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Раса</label><input type="text" id="mCrewRace" class="me-input" style="width:100%;" value="' + meEsc(c.race) + '" placeholder="Человек, Турианец, Азари..."></div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Роль / Должность</label><input type="text" id="mCrewRole" class="me-input" style="width:100%;" value="' + meEsc(c.role) + '" placeholder="Пилот, Старпом, Инженер..."></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Статус / Лояльность</label><input type="text" id="mCrewLoyalty" class="me-input" style="width:100%;" value="' + meEsc(c.loyalty) + '" placeholder="Предан, В отряде..."></div>' +
+      '</div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Заметки, навыки и биография</label><textarea id="mCrewNote" class="me-input" style="width:100%;height:60px;" placeholder="Особые черты, биография, специализация...">' + meEsc(c.note) + '</textarea></div>' +
+    '</div>';
+
+    meShowModal(isNew ? 'ДОБАВИТЬ ЧЛЕНА ЭКИПАЖА' : 'РЕДАКТИРОВАНИЕ ДАННЫХ СОРАТНИКА', 'СОСТАВ КОМАНДЫ СУДНА', htmlForm, function(){
+      var name = (document.getElementById('mCrewName').value || '').trim();
+      if(!name){ alert('Укажите имя члена экипажа!'); return false; }
+      var updated = {
+        id: editCrew ? editCrew.id : ('crew_' + Date.now()),
+        name: name,
+        race: document.getElementById('mCrewRace').value || 'Человек',
+        role: document.getElementById('mCrewRole').value || 'Специалист',
+        loyalty: document.getElementById('mCrewLoyalty').value || 'В отряде',
+        note: document.getElementById('mCrewNote').value || ''
+      };
+      if(isNew) ME.addCrewMember(updated);
+      else ME.updateCrewMember(updated);
+      render();
+      return true;
+    });
+  };
+
+  var addCrewBtn = document.getElementById('meAddCrewBtn') || document.getElementById('meAddCrewEmptyBtn');
+  if(addCrewBtn){
+    addCrewBtn.onclick = function(){ openCrewForm(null); };
+  }
+
+  document.querySelectorAll('.me-edit-crew-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      var item = ME.getShip().crew.find(function(x){ return x.id === id; });
+      if(item) openCrewForm(item);
+    };
+  });
+
+  document.querySelectorAll('.me-del-crew-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      if(confirm('Удалить этого соратника из состава экипажа?')){
+        ME.deleteCrewMember(id);
+        render();
+      }
+    };
+  });
+
+  // --- Экран: meCodex ---
+  document.querySelectorAll('[data-codex-tab]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      ME._activeCodexTab = btn.getAttribute('data-codex-tab');
+      render();
+    });
+  });
+
+  // --- Экран: meMissions ---
+  document.querySelectorAll('[data-mission-client]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      ME._activeMissionClient = btn.getAttribute('data-mission-client');
+      render();
+    });
+  });
+
+  var genMissionBtn = document.getElementById('meGenMissionBtn');
+  if(genMissionBtn){
+    genMissionBtn.addEventListener('click', function(){
+      if(!ME._missionsList) ME._missionsList = [];
+      ME._missionsList.unshift(ME.generateMission());
+      render();
+    });
+  }
+
+  document.querySelectorAll('.me-accept-mission-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var mId = btn.getAttribute('data-id');
+      var m = (ME._missionsList||[]).find(function(x){ return x.id === mId; });
+      if(m){ m.status = 'accepted'; render(); }
+    });
+  });
+
+  document.querySelectorAll('.me-complete-mission-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var mId = btn.getAttribute('data-id');
+      var m = (ME._missionsList||[]).find(function(x){ return x.id === mId; });
+      if(m){ m.status = 'completed'; render(); }
+    });
+  });
+
+  // --- Экран: meData ---
+  var exportJsonBtn = document.getElementById('meExportJsonBtn');
+  if(exportJsonBtn){
+    exportJsonBtn.addEventListener('click', function(){
+      var data = {
+        character: ME.getChar(),
+        powers: ME.getPowers(),
+        arsenal: ME.getArsenal(),
+        ship: ME.getShip(),
+        missions: ME._missionsList || []
+      };
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'mass_effect_dossier.json';
+      a.click();
+    });
+  }
+
+  var importFileBtn = document.getElementById('meImportFileBtn');
+  var importFileInput = document.getElementById('meImportFileInput');
+  if(importFileBtn && importFileInput){
+    importFileBtn.addEventListener('click', function(){ importFileInput.click(); });
+    importFileInput.addEventListener('change', function(){
+      if(importFileInput.files && importFileInput.files[0]){
+        var reader = new FileReader();
+        reader.onload = function(e){
+          try {
+            var parsed = JSON.parse(e.target.result);
+            if(parsed.character) ME.saveChar(parsed.character);
+            if(parsed.powers && Array.isArray(parsed.powers)) ME.savePowers(parsed.powers);
+            if(parsed.arsenal && Array.isArray(parsed.arsenal)) ME.saveArsenal(parsed.arsenal);
+            if(parsed.ship) ME.saveShip(parsed.ship);
+            if(parsed.missions && Array.isArray(parsed.missions)) ME._missionsList = parsed.missions;
+            alert('Полный профиль (досье, способности, арсенал и корабль) успешно загружен!');
+            render();
+          } catch(err){
+            alert('Ошибка чтения JSON: ' + err.message);
+          }
+        };
+        reader.readAsText(importFileInput.files[0]);
+      }
+    });
+  }
+
+  var dataResetBtn = document.getElementById('meDataResetBtn');
+  if(dataResetBtn){
+    dataResetBtn.addEventListener('click', function(){
+      if(confirm('Сбросить досье, очистить способности, арсенал и сбросить корабль к начальному состоянию?')){
+        ME.resetChar();
+        ME.savePowers([]);
+        ME.saveArsenal([]);
+        ME.resetShip();
+        ME._missionsList = [];
+        alert('Все данные космоса сброшены к начальным!');
+        render();
+      }
+    });
+  }
+  if(typeof wireMeMap === "function") wireMeMap();
+}
+
+window.meHome = meHome;
+window.meChar = meChar;
+window.mePowers = mePowers;
+window.meArsenal = meArsenal;
+window.meShip = meShip;
+window.meCodex = meCodex;
+window.meMissions = meMissions;
+window.meMap = meMap;
+window.wireMeMap = wireMeMap;
+window.meData = meData;
+window.wireMe = wireMe;
+window.ME_CANON_POWERS_PRESETS = ME_CANON_POWERS_PRESETS;
+window.ME_CANON_WEAPONS_PRESETS = ME_CANON_WEAPONS_PRESETS;
+window.ME_CANON_NORMANDY_PRESET = ME_CANON_NORMANDY_PRESET;
+window.meShowModal = meShowModal;
+
+/* ---------- третья и четвертая кнопки режима ---------- */
 function paintShBar(){
   var bar=document.getElementById('hbModeBar'); if(!bar) return;
   var seg=bar.querySelector('.hb-seg'); if(!seg) return;
+  
   if(!seg.querySelector('[data-hbmode="sh"]')){
     var b=document.createElement('button');
     b.className='hb-seg-btn'; b.setAttribute('data-hbmode','sh'); b.textContent='Шиноби';
     seg.appendChild(b);
   }
+  if(!seg.querySelector('[data-hbmode="me"]')){
+    var bMe=document.createElement('button');
+    bMe.className='hb-seg-btn'; bMe.setAttribute('data-hbmode','me'); bMe.textContent='Космос';
+    seg.appendChild(bMe);
+  }
+
   seg.querySelectorAll('.hb-seg-btn').forEach(function(b){
     b.classList.toggle('on', b.getAttribute('data-hbmode')===HB.mode);
   });
+
   var shBtn = seg.querySelector('[data-hbmode="sh"]');
   if(shBtn && !shBtn.__shBound){
     shBtn.__shBound = true;
@@ -38513,20 +41593,80 @@ function paintShBar(){
       view={screen:'shHome'}; SH.draft=null; render(); window.scrollTo(0,0);
     });
   }
+
+  var meBtn = seg.querySelector('[data-hbmode="me"]');
+  if(meBtn && !meBtn.__meBound){
+    meBtn.__meBound = true;
+    meBtn.addEventListener('click', function(){
+      HB.mode='me';
+      try{ localStorage.setItem('ttc_mode','me'); }catch(e){}
+      view={screen:'meHome'}; render(); window.scrollTo(0,0);
+    });
+  }
+
   document.body.classList.toggle('sh-theme', HB.mode==='sh');
-  if(HB.mode==='sh') document.body.classList.remove('hb-theme');
+  document.body.classList.toggle('me-theme', HB.mode==='me');
+  if(HB.mode==='sh' || HB.mode==='me') document.body.classList.remove('hb-theme');
+  if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
+
   var lab=bar.querySelector('.hb-bar-world');
   if(HB.mode==='sh'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
-    lab.textContent = SH.meta.name || 'Шиноби';
+    var charInfo = (SH.meta && SH.meta.charName) ? (' • ' + SH.meta.charName) : '';
+    lab.textContent = (SH.meta && SH.meta.name ? SH.meta.name : 'Шиноби') + charInfo;
+  } else if(HB.mode==='me'){
+    if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
+    lab.textContent = 'Космос • Mass Effect';
   }
 }
+SH.paintShBar = paintShBar;
+window.paintShBar = paintShBar;
+
 
 /* ---------- перехват ---------- */
 var _r=window.render, _n=window.navigate, _w=window.wireEvents;
 
 window.render=function(){
-  if(HB.mode!=='sh'){ _r(); paintShBar(); return; }
+  window.view = view;
+  if(HB.mode==='me'){
+    document.body.classList.remove('sh-theme');
+    document.body.classList.remove('hb-theme');
+    document.body.classList.add('me-theme');
+    var s=view.screen||'';
+    if(s==='dice'){
+      _r();
+      _w();
+      paintShBar();
+      return;
+    }
+    var app=document.getElementById('app');
+    app.classList.remove('wide');
+    app.classList.add('home-wide');
+    var html = '';
+    if(s==='meHome'||!s) html = meHome();
+    else if(s==='meChar') html = meChar();
+    else if(s==='mePowers') html = mePowers();
+    else if(s==='meArsenal') html = meArsenal();
+    else if(s==='meShip') html = meShip();
+    else if(s==='meCodex') html = meCodex();
+    else if(s==='meMissions') html = meMissions();
+    else if(s==='meMap') html = meMap();
+    else if(s==='meData') html = meData();
+    else html = meHome();
+    app.innerHTML = html;
+    _w();
+    if(typeof wireMe === 'function') wireMe();
+    paintShBar();
+    return;
+  }
+
+  if(HB.mode!=='sh'){
+    document.body.classList.remove('me-theme');
+    _r();
+    paintShBar();
+    return;
+  }
+
   _r();
   var s=view.screen||'';
   if(s.indexOf('sh')!==0){ paintShBar(); return; }
@@ -38556,11 +41696,32 @@ window.render=function(){
 
 window.navigate=function(val){
   var p=String(val||'').split(':');
+  if(HB.mode==='me'){
+    var meScreens = {
+      home: 'meHome',
+      meHome: 'meHome',
+      meChar: 'meChar',
+      mePowers: 'mePowers',
+      meArsenal: 'meArsenal',
+      meShip: 'meShip',
+      meCodex: 'meCodex',
+      meMissions: 'meMissions',
+      meMap: 'meMap',
+      meData: 'meData',
+      dice: 'dice'
+    };
+    if(meScreens[p[0]]){
+      window.view = view = { screen: meScreens[p[0]] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+  }
   if(HB.mode==='sh'){
     var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData'};
-    if(map[p[0]]){ view={screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
+    if(map[p[0]]){ window.view = view = {screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
     if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shMoveView'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
-      view={screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
+      window.view = view = {screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
     }
   }
   _n(val);
@@ -38570,12 +41731,16 @@ window.navigate=function(val){
 load();
 if(HB.mode==='sh'){
   document.body.classList.add('sh-theme');
-  if(!view.screen || String(view.screen).indexOf('sh')!==0) view={screen:'shHome'};
+  if(!view.screen || String(view.screen).indexOf('sh')!==0) window.view = view = {screen:'shHome'};
+} else if(HB.mode==='me'){
+  document.body.classList.add('me-theme');
+  if(!view.screen || view.screen!=='dice') window.view = view = {screen:'meHome'};
 }
+window.view = view;
 render();
-
 })();
 </script>
+
 
 </body>
 </html>

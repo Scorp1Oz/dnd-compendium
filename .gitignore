@@ -1,0 +1,11 @@
+# Windows system files
+desktop.ini
+Thumbs.db
+$RECYCLE.BIN/
+
+# Gemini / Scratch artifacts
+.gemini/antigravity/
+scratch/
+
+# Node / dependencies if any
+node_modules/
