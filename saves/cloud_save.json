@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "updatedAt": "2026-09-28T15:33:04.314Z",
+  "description": "Initial cloud sync save",
+  "shinobi": {
+    "status": "ready"
+  },
+  "mass_effect": {
+    "status": "ready"
+  }
+}
