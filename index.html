@@ -10540,7 +10540,7 @@ function shTechs(){
 
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники'}])+
     '<button class="back" data-nav="home">← Назад</button>'+
-    '<h1>Техники</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shTechEdit:new">Добавить технику</button><button class="btn-primary" style="background:#8e44ad; margin-left:10px;" data-nav="shJutsuGen">✨ AI Генератор Дзюцу</button></div>'+
+    '<h1>Техники</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shTechEdit:new">Добавить технику</button><button class="btn-ghost" style="color:#d29bfa;border-color:rgba(155,89,182,0.4); margin-left:10px;" data-nav="shJutsuGen">✨ AI Генератор Дзюцу</button></div>'+
     launcherWidget +
     catFilterBar +
     natFilterBar +
@@ -14193,7 +14193,7 @@ function shJutsuGen(){
         '</select>') +
       fld('Стихия / Природа', '<input type="text" id="jgNature" placeholder="Например: Огонь, Кровь, Дерево">') +
       '<div class="sheet-actions" style="margin-top:20px;">' +
-        '<button class="btn-primary" id="btnJutsuGen" style="width:100%; background:#8e44ad;">Сгенерировать технику</button>' +
+        '<button class="btn-ghost" id="btnJutsuGen" style="width:100%; color:#d29bfa; border-color:rgba(155,89,182,0.4); font-weight:700;">✨ Сгенерировать технику</button>' +
       '</div>'+
     '</div>'+
     
@@ -14488,12 +14488,21 @@ function shData(){
     '</div>'+
 
     (typeof GHSync !== 'undefined' ? GHSync.renderUI() : '') +
-'<div class="sheet-section" id="shGeminiApiSection">'+
-  '<div class="section-label">🤖 Интеграция с ИИ (Gemini)</div>'+
-  '<div class="desc">Используется для генерации техник и миссий. Ключ хранится локально в браузере.</div>'+
-  fld('API Ключ Gemini', '<input type="password" id="shDataGeminiKey" value="'+escA(getGeminiApiKey())+'" placeholder="Вставьте AIzaSy...">', 'Получить бесплатный ключ можно в <a href="https://aistudio.google.com/" target="_blank" style="color:#f6e58d;text-decoration:underline;">Google AI Studio</a>') +
-  '<div class="sheet-actions"><button class="btn-primary" id="shDataSaveGeminiKey">💾 Сохранить API Ключ</button></div>'+
-'</div>'+
+'<div class="gh-sync-card" id="shGeminiApiSection" style="margin-top:20px; margin-bottom:20px;">'+
+  '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">'+
+    '<span style="font-size:20px;">🤖</span>'+
+    '<div>'+
+      '<div style="font-weight:700;font-size:14px;color:var(--ink, #fff);">Google Gemini AI (Интеграция ИИ)</div>'+
+      '<div style="font-size:12px;color:var(--ink-dim, #8bb1d6);">Генерация уникальных миссий и дзюцу</div>'+
+    '</div>'+
+  '</div>'+
+  '<p style="font-size:12px;color:var(--ink-dim, #8bb1d6);margin:0 0 12px 0;">Ключ безопасно хранится <b style="color:var(--brass, #c5a059);">только в браузере этого устройства</b>. Получить бесплатный API-ключ можно за пару минут в <a href="https://aistudio.google.com/" target="_blank" style="color:#f6e58d;text-decoration:underline;">Google AI Studio</a>.</p>'+
+  '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">'+
+    '<input type="password" id="shDataGeminiKey" value="'+escA(getGeminiApiKey())+'" placeholder="Вставьте ключ AIzaSy..." style="flex:1; min-width:200px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:8px 12px; border-radius:4px; font-family:monospace; font-size:13px;">'+
+    '<button class="btn-primary" id="shDataSaveGeminiKey" style="background:linear-gradient(135deg, #c0392b, #8e44ad); border:none; padding:8px 16px; border-radius:4px; color:#fff; font-weight:bold; cursor:pointer;">💾 Сохранить API Ключ</button>'+
+  '</div>'+
+</div>'+
+  
 '<div class="sheet-section">'+
       '<div class="section-label">Экспорт и импорт</div>'+
       '<div class="desc">Единый файл на весь режим «Шиноби»: все профили, техники, приёмы, навыки и заметка мира. Импорт заменяет текущее содержимое.</div>'+
