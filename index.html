@@ -10540,7 +10540,7 @@ function shTechs(){
 
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники'}])+
     '<button class="back" data-nav="home">← Назад</button>'+
-    '<h1>Техники</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shTechEdit:new">Добавить технику</button></div>'+
+    '<h1>Техники</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shTechEdit:new">Добавить технику</button><button class="btn-primary" style="background:#8e44ad; margin-left:10px;" data-nav="shJutsuGen">✨ AI Генератор Дзюцу</button></div>'+
     launcherWidget +
     catFilterBar +
     natFilterBar +
@@ -14126,6 +14126,99 @@ function inpList(id,list,cur,ph){
 }
 function fld(l,inner,hint){
   return '<div class="field"><div class="section-label">'+esc(l)+'</div>'+inner+(hint?'<div class="desc">'+esc(hint)+'</div>':'')+'</div>';
+}
+
+
+function callGeminiJutsuGenerator(opts, apiKey, callback){
+  if(!apiKey){
+    callback("API ключ не указан", null);
+    return;
+  }
+  var prompt = "Ты Dungeon Master в сеттинге Naruto. Сгенерируй лорную технику (Дзюцу) для игрока. " +
+    "Тема: " + (opts.theme || "Случайная техника") + ". " +
+    "Ранг: " + (opts.rank || "Случайный") + ". " +
+    "Стихия: " + (opts.nature || "Случайная") + ". " +
+    "Ответь ИСКЛЮЧИТЕЛЬНО валидным JSON-объектом без markdown и комментариев, со следующими полями:\n" +
+    "{\n" +
+    '  "name": "Эпичное название техники",\n' +
+    '  "rank": "Ранг (E, D, C, B, A, S)",\n' +
+    '  "cat": "Ниндзюцу / Гендзюцу / Тайдзюцу / Фуиндзюцу",\n' +
+    '  "nature": "Стихия (Огонь, Вода, Ветер, Земля, Молния, Инь, Ян или пусто)",\n' +
+    '  "cost": "Стоимость чакры (число, например 3)",\n' +
+    '  "req": "Требования (если есть)",\n' +
+    '  "desc": "Печати: [Перечисление печатей, если требуются: Тигр, Змея...]. Подробное художественное и механическое описание.",\n' +
+    '  "dmgN": "Количество кубов урона (только число, например 2. Если урона нет, то 0)",\n' +
+    '  "dmgD": "Тип куба (d4, d6, d8, d10, d12. Если урона нет, то d0)",\n' +
+    '  "dmgMod": "Статичный бонус к урону (только число)"\n' +
+    "}";
+
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(apiKey);
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
+    })
+  }).then(function(res){
+    if(!res.ok) throw new Error('API status ' + res.status);
+    return res.json();
+  }).then(function(data){
+    try{
+      var rawTxt = data.candidates[0].content.parts[0].text;
+      var clean = rawTxt.replace(/^\s*```json\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+      var parsed = JSON.parse(clean);
+      callback(null, parsed);
+    }catch(err){
+      callback("Ошибка разбора JSON: " + err.message, null);
+    }
+  }).catch(function(err){
+    callback(err.message || err, null);
+  });
+}
+
+function shJutsuGen(){
+  var key = localStorage.getItem('gemini_api_key') || '';
+  
+  var html = crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники',nav:'shTechs'},{label:'AI Генератор Дзюцу'}])+
+    '<button class="back" data-nav="shTechs">← Назад</button>'+
+    '<h1>✨ AI Генератор Дзюцу</h1>'+
+    '<div class="sheet-section">'+
+      '<p>Введите пожелания к технике. AI создаст её механику и описание, правильно расставив печати.</p>'+
+      '<div class="field-row">'+
+        '<label>API Ключ Gemini</label>'+
+        '<input type="password" id="jgKey" value="'+escA(key)+'" placeholder="AI Studio Key">'+
+      '</div>'+
+      '<div class="field-row">'+
+        '<label>Тема / Идея (например: "Огненный дракон" или "Защита от гендзюцу")</label>'+
+        '<input type="text" id="jgTheme" placeholder="Что должна делать техника?">'+
+      '</div>'+
+      '<div class="field-row half">'+
+        '<label>Ранг</label>'+
+        '<select id="jgRank">'+
+          '<option value="">Авто (на усмотрение AI)</option>'+
+          '<option value="E">E (Студент)</option>'+
+          '<option value="D">D (Генин)</option>'+
+          '<option value="C">C (Чунин)</option>'+
+          '<option value="B">B (Джонин)</option>'+
+          '<option value="A">A (Элита)</option>'+
+          '<option value="S">S (Каге / Запретная)</option>'+
+        '</select>'+
+      '</div>'+
+      '<div class="field-row half">'+
+        '<label>Стихия / Природа</label>'+
+        '<input type="text" id="jgNature" placeholder="Например: Огонь, Кровь, Дерево">'+
+      '</div>'+
+      '<button class="btn-primary" id="btnJutsuGen" style="width:100%; margin-top:15px; background:#8e44ad;">Сгенерировать технику</button>'+
+    '</div>'+
+    
+    '<div id="jgResult" style="display:none; margin-top:20px;">'+
+      '<h2 style="border-bottom:1px solid #ddd; padding-bottom:10px;">Результат генерации</h2>'+
+      '<div id="jgPreview" style="background:var(--bg-light); padding:15px; border-radius:8px; margin-bottom:15px; font-family:var(--font-main);"></div>'+
+      '<button class="btn-primary" id="btnJutsuSave" style="width:100%; background:#27ae60;">Сохранить в Мои Техники</button>'+
+    '</div>';
+
+  return html;
 }
 
 function shTechEdit(){
@@ -19417,6 +19510,7 @@ window.render=function(){
   var html='';
   if(s==='shHome') html=shHome();
   else if(s==='shTechs') html=shTechs();
+  else if(s==='shJutsuGen') html=shJutsuGen();
   else if(s==='shTechEdit') html=shTechEdit();
   else if(s==='shTechView') html=shTechView();
   else if(s==='shMoves') html=shMoves();
@@ -19460,7 +19554,7 @@ window.navigate=function(val){
     }
   }
   if(HB.mode==='sh'){
-    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData'};
+    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shJutsuGen:'shJutsuGen',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData'};
     if(map[p[0]]){ window.view = view = {screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
     if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shMoveView'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
       window.view = view = {screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
