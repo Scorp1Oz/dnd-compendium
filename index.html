@@ -14508,7 +14508,15 @@ SH.shData = shData;
 
 /* ---------- обработчики ---------- */
 function wireSh(){
-  listen('click', '#btnJutsuGen', function(){
+  
+
+  if(HB.mode!=='sh') return;
+  if(typeof GHSync !== 'undefined' && GHSync.wireUI) GHSync.wireUI();
+  var g=function(id){ return document.getElementById(id); };
+  var v=function(id){ var e=g(id); return e?e.value:''; };
+
+  var btnJutsuGen = g('btnJutsuGen');
+  if(btnJutsuGen) btnJutsuGen.addEventListener('click', function(){
     var btn = this;
     var k = getGeminiApiKey();
     if(!k) {
@@ -14516,10 +14524,10 @@ function wireSh(){
       return;
     }
     
-    var theme = id('jgTheme').value.trim();
-    var cat = id('jgCat').value;
-    var rank = id('jgRank').value;
-    var nature = id('jgNature').value.trim();
+    var theme = v('jgTheme').trim();
+    var cat = v('jgCat');
+    var rank = v('jgRank');
+    var nature = v('jgNature').trim();
     
     btn.disabled = true;
     btn.textContent = 'Генерация (ожидайте)...';
@@ -14533,15 +14541,13 @@ function wireSh(){
         return;
       }
       
-      // Save result in window for the save button
       window._lastGenJutsu = result;
       
-      var resDiv = id('jgResult');
-      var preview = id('jgPreview');
-      resDiv.style.display = 'block';
+      var resDiv = g('jgResult');
+      var preview = g('jgPreview');
+      if(resDiv) resDiv.style.display = 'block';
       
-      // Render a simple preview
-      preview.innerHTML = 
+      if(preview) preview.innerHTML = 
         '<h3>' + esc(result.name) + ' <span style="font-size:14px; font-weight:normal; background:#444; color:#fff; padding:2px 6px; border-radius:4px;">Ранг ' + esc(result.rank) + '</span></h3>' +
         '<p><strong>Категория:</strong> ' + esc(result.cat) + (result.nature ? ' | <strong>Стихия:</strong> ' + esc(result.nature) : '') + '</p>' +
         '<p><strong>Стоимость:</strong> ' + esc(result.cost) + ' чакры</p>' +
@@ -14549,11 +14555,12 @@ function wireSh(){
         (result.dmgN && result.dmgN !== '0' ? '<p><strong>Урон:</strong> ' + esc(result.dmgN) + esc(result.dmgD) + (result.dmgMod ? '+' + esc(result.dmgMod) : '') + '</p>' : '') +
         '<p style="margin-top:10px; white-space:pre-wrap; line-height:1.5;">' + esc(result.desc) + '</p>';
         
-      resDiv.scrollIntoView({behavior: "smooth"});
+      if(resDiv) resDiv.scrollIntoView({behavior: "smooth"});
     });
   });
 
-  listen('click', '#btnJutsuSave', function(){
+  var btnJutsuSave = g('btnJutsuSave');
+  if(btnJutsuSave) btnJutsuSave.addEventListener('click', function(){
     var jutsu = window._lastGenJutsu;
     if(!jutsu) return;
     
@@ -14574,15 +14581,10 @@ function wireSh(){
     if(d.dmgMod === '0') d.dmgMod = '';
     
     SH.techs.unshift(d);
-    saveTechs(SH.techs);
+    saveT();
     alert('Техника "' + d.name + '" успешно добавлена в список!');
     window.render();
   });
-
-  if(HB.mode!=='sh') return;
-  if(typeof GHSync !== 'undefined' && GHSync.wireUI) GHSync.wireUI();
-  var g=function(id){ return document.getElementById(id); };
-  var v=function(id){ var e=g(id); return e?e.value:''; };
 
   var ef=g('shEff');
   if(ef){
