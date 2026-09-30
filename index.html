@@ -13778,19 +13778,7 @@ function renderMissionBoard(missionsList, activeFilter, originCid, showApiBox){
     }).join('') +
   '</div>';
 
-  var apiBoxHtml = ''; /* 
-    '<div class="sh-api-config-bar">' +
-      '<div style="flex:1;min-width:280px;">' +
-        '<div style="font-size:12px;font-weight:700;color:var(--brass,#c5a059);margin-bottom:3px;">🔑 Google Gemini API Key (для генерации авторских миссий)</div>' +
-        '<div style="font-size:11px;color:var(--ink-dim);margin-bottom:8px;">Ключ хранится локально в вашем браузере. Получить бесплатный ключ можно в <a href="https://aistudio.google.com/" target="_blank" style="color:#f6e58d;text-decoration:underline;">Google AI Studio</a>.</div>' +
-        '<div style="display:flex;gap:8px;">' +
-          '<input type="password" id="shGeminiApiKeyInput" class="sh-map-search-input" style="flex:1;font-size:13px;" placeholder="Вставьте AIzaSy..." value="' + escA(apiKey) + '">' +
-          '<button class="btn-primary" id="shBtnSaveApiKey" style="padding:5px 12px;font-size:12px;">💾 Сохранить</button>' +
-          (hasKey ? '<button class="sh-map-btn" id="shBtnClearApiKey" style="font-size:12px;color:#ff7675;">✕ Удалить</button>' : '') +
-        '</div>' +
-      '</div>' +
-    '</div>'
-  ) : '';
+  var apiBoxHtml = '';
 
   var missionsCardsHtml = '';
   if(!filtered.length){
