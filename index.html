@@ -14136,6 +14136,7 @@ function callGeminiJutsuGenerator(opts, apiKey, callback){
   }
   var prompt = "Ты Dungeon Master в сеттинге Naruto. Сгенерируй лорную технику (Дзюцу) для игрока. " +
     "Тема: " + (opts.theme || "Случайная техника") + ". " +
+    "Категория: " + (opts.cat || "Случайная") + ". " +
     "Ранг: " + (opts.rank || "Случайный") + ". " +
     "Стихия: " + (opts.nature || "Случайная") + ". " +
     "Ответь ИСКЛЮЧИТЕЛЬНО валидным JSON-объектом без markdown и комментариев, со следующими полями:\n" +
@@ -14185,8 +14186,14 @@ function shJutsuGen(){
     '<h1>✨ AI Генератор Дзюцу</h1>'+
     '<div class="sheet-section">'+
       '<p>Введите пожелания к технике. AI создаст её механику и описание, правильно расставив печати.</p>'+
-      fld('API Ключ Gemini', '<input type="password" id="jgKey" value="'+escA(key)+'" placeholder="AI Studio Key">') +
       fld('Тема / Идея (например: "Огненный дракон" или "Защита от гендзюцу")', '<input type="text" id="jgTheme" placeholder="Что должна делать техника?">') +
+      fld('Категория', '<select id="jgCat">'+
+          '<option value="">Авто (на усмотрение AI)</option>'+
+          '<option value="Ниндзюцу">Ниндзюцу</option>'+
+          '<option value="Гендзюцу">Гендзюцу</option>'+
+          '<option value="Тайдзюцу">Тайдзюцу</option>'+
+          '<option value="Фуиндзюцу">Фуиндзюцу</option>'+
+        '</select>') +
       fld('Ранг', '<select id="jgRank">'+
           '<option value="">Авто (на усмотрение AI)</option>'+
           '<option value="E">E (Студент)</option>'+
