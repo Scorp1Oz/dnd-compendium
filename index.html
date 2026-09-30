@@ -5428,8 +5428,7 @@ function dieShapeSvg(sides, uid, label){
     </svg>`;
   }
   if(!DICE_COLORS[sides]) return renderCustomFacetShape(sides, uid, label);
-  const isMeTheme = (typeof document !== 'undefined' && document.body && document.body.classList.contains('me-theme'));
-  const c = (isMeTheme && sides === 20) ? {light:'#00d2ff', dark:'#005080'} : DICE_COLORS[sides];
+  const c = DICE_COLORS[sides];
   const gid = 'grad_'+uid;
   let shape='';
   if(sides===4) shape = `<polygon points="50,6 96,90 4,90" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/>`;
@@ -5438,9 +5437,8 @@ function dieShapeSvg(sides, uid, label){
   else if(sides===10) shape = `<polygon points="50,4 93,42 50,96 7,42" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/><polyline points="7,42 50,58 93,42" fill="none" stroke="rgba(0,0,0,.14)"/><line x1="50" y1="58" x2="50" y2="96" stroke="rgba(0,0,0,.14)"/>`;
   else if(sides===12) shape = `<polygon points="50,4 95,38 78,94 22,94 5,38" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/>`;
   else {
-    const isMe = (typeof document !== 'undefined' && document.body && document.body.classList.contains('me-theme'));
-    const strokeColor = isMe ? 'rgba(0,210,255,0.55)' : 'rgba(0,0,0,0.28)';
-    const facetFill = isMe ? 'rgba(0,210,255,0.18)' : 'rgba(255,255,255,0.12)';
+    const strokeColor = 'rgba(0,0,0,0.28)';
+    const facetFill = 'rgba(255,255,255,0.12)';
     shape = `<polygon points="50,3 91,26 91,74 50,97 9,74 9,26" fill="url(#${gid})" stroke="${strokeColor}" stroke-width="1.6"/>
     <polygon points="50,24 75,63 25,63" fill="${facetFill}" stroke="${strokeColor}" stroke-width="1.2"/>
     <line x1="50" y1="24" x2="50" y2="3" stroke="${strokeColor}" stroke-width="1.2"/>
