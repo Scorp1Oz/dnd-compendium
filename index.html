@@ -14185,17 +14185,9 @@ function shJutsuGen(){
     '<h1>✨ AI Генератор Дзюцу</h1>'+
     '<div class="sheet-section">'+
       '<p>Введите пожелания к технике. AI создаст её механику и описание, правильно расставив печати.</p>'+
-      '<div class="field-row">'+
-        '<label>API Ключ Gemini</label>'+
-        '<input type="password" id="jgKey" value="'+escA(key)+'" placeholder="AI Studio Key">'+
-      '</div>'+
-      '<div class="field-row">'+
-        '<label>Тема / Идея (например: "Огненный дракон" или "Защита от гендзюцу")</label>'+
-        '<input type="text" id="jgTheme" placeholder="Что должна делать техника?">'+
-      '</div>'+
-      '<div class="field-row half">'+
-        '<label>Ранг</label>'+
-        '<select id="jgRank">'+
+      fld('API Ключ Gemini', '<input type="password" id="jgKey" value="'+escA(key)+'" placeholder="AI Studio Key">') +
+      fld('Тема / Идея (например: "Огненный дракон" или "Защита от гендзюцу")', '<input type="text" id="jgTheme" placeholder="Что должна делать техника?">') +
+      fld('Ранг', '<select id="jgRank">'+
           '<option value="">Авто (на усмотрение AI)</option>'+
           '<option value="E">E (Студент)</option>'+
           '<option value="D">D (Генин)</option>'+
@@ -14203,19 +14195,19 @@ function shJutsuGen(){
           '<option value="B">B (Джонин)</option>'+
           '<option value="A">A (Элита)</option>'+
           '<option value="S">S (Каге / Запретная)</option>'+
-        '</select>'+
+        '</select>') +
+      fld('Стихия / Природа', '<input type="text" id="jgNature" placeholder="Например: Огонь, Кровь, Дерево">') +
+      '<div class="sheet-actions" style="margin-top:20px;">' +
+        '<button class="btn-primary" id="btnJutsuGen" style="width:100%; background:#8e44ad;">Сгенерировать технику</button>' +
       '</div>'+
-      '<div class="field-row half">'+
-        '<label>Стихия / Природа</label>'+
-        '<input type="text" id="jgNature" placeholder="Например: Огонь, Кровь, Дерево">'+
-      '</div>'+
-      '<button class="btn-primary" id="btnJutsuGen" style="width:100%; margin-top:15px; background:#8e44ad;">Сгенерировать технику</button>'+
     '</div>'+
     
     '<div id="jgResult" style="display:none; margin-top:20px;">'+
       '<h2 style="border-bottom:1px solid #ddd; padding-bottom:10px;">Результат генерации</h2>'+
       '<div id="jgPreview" style="background:var(--bg-light); padding:15px; border-radius:8px; margin-bottom:15px; font-family:var(--font-main);"></div>'+
-      '<button class="btn-primary" id="btnJutsuSave" style="width:100%; background:#27ae60;">Сохранить в Мои Техники</button>'+
+      '<div class="sheet-actions">' +
+        '<button class="btn-primary" id="btnJutsuSave" style="width:100%; background:#27ae60;">Сохранить в Мои Техники</button>' +
+      '</div>' +
     '</div>';
 
   return html;
