@@ -13778,7 +13778,7 @@ function renderMissionBoard(missionsList, activeFilter, originCid, showApiBox){
     }).join('') +
   '</div>';
 
-  var apiBoxHtml = showApiBox ? (
+  var apiBoxHtml = ''; /* 
     '<div class="sh-api-config-bar">' +
       '<div style="flex:1;min-width:280px;">' +
         '<div style="font-size:12px;font-weight:700;color:var(--brass,#c5a059);margin-bottom:3px;">🔑 Google Gemini API Key (для генерации авторских миссий)</div>' +
@@ -14500,6 +14500,12 @@ function shData(){
     '</div>'+
 
     (typeof GHSync !== 'undefined' ? GHSync.renderUI() : '') +
+'<div class="sheet-section" id="shGeminiApiSection">'+
+  '<div class="section-label">🤖 Интеграция с ИИ (Gemini)</div>'+
+  '<div class="desc">Используется для генерации техник и миссий. Ключ хранится локально в браузере.</div>'+
+  fld('API Ключ Gemini', '<input type="password" id="shDataGeminiKey" value="'+escA(getGeminiApiKey())+'" placeholder="Вставьте AIzaSy...">', 'Получить бесплатный ключ можно в <a href="https://aistudio.google.com/" target="_blank" style="color:#f6e58d;text-decoration:underline;">Google AI Studio</a>') +
+  '<div class="sheet-actions"><button class="btn-primary" id="shDataSaveGeminiKey">💾 Сохранить API Ключ</button></div>'+
+'</div>'+
 '<div class="sheet-section">'+
       '<div class="section-label">Экспорт и импорт</div>'+
       '<div class="desc">Единый файл на весь режим «Шиноби»: все профили, техники, приёмы, навыки и заметка мира. Импорт заменяет текущее содержимое.</div>'+
@@ -14514,6 +14520,77 @@ SH.shData = shData;
 
 /* ---------- обработчики ---------- */
 function wireSh(){
+  listen('click', '#btnJutsuGen', function(){
+    var btn = this;
+    var k = getGeminiApiKey();
+    if(!k) {
+      alert("Пожалуйста, укажите Gemini API ключ на вкладке 'Данные'");
+      return;
+    }
+    
+    var theme = id('jgTheme').value.trim();
+    var cat = id('jgCat').value;
+    var rank = id('jgRank').value;
+    var nature = id('jgNature').value.trim();
+    
+    btn.disabled = true;
+    btn.textContent = 'Генерация (ожидайте)...';
+    
+    callGeminiJutsuGenerator({theme: theme, cat: cat, rank: rank, nature: nature}, k, function(err, result){
+      btn.disabled = false;
+      btn.textContent = 'Сгенерировать технику';
+      
+      if(err || !result){
+        alert('Ошибка генерации: ' + (err || 'Нет ответа от AI'));
+        return;
+      }
+      
+      // Save result in window for the save button
+      window._lastGenJutsu = result;
+      
+      var resDiv = id('jgResult');
+      var preview = id('jgPreview');
+      resDiv.style.display = 'block';
+      
+      // Render a simple preview
+      preview.innerHTML = 
+        '<h3>' + esc(result.name) + ' <span style="font-size:14px; font-weight:normal; background:#444; color:#fff; padding:2px 6px; border-radius:4px;">Ранг ' + esc(result.rank) + '</span></h3>' +
+        '<p><strong>Категория:</strong> ' + esc(result.cat) + (result.nature ? ' | <strong>Стихия:</strong> ' + esc(result.nature) : '') + '</p>' +
+        '<p><strong>Стоимость:</strong> ' + esc(result.cost) + ' чакры</p>' +
+        (result.req ? '<p><strong>Требования:</strong> ' + esc(result.req) + '</p>' : '') +
+        (result.dmgN && result.dmgN !== '0' ? '<p><strong>Урон:</strong> ' + esc(result.dmgN) + esc(result.dmgD) + (result.dmgMod ? '+' + esc(result.dmgMod) : '') + '</p>' : '') +
+        '<p style="margin-top:10px; white-space:pre-wrap; line-height:1.5;">' + esc(result.desc) + '</p>';
+        
+      resDiv.scrollIntoView({behavior: "smooth"});
+    });
+  });
+
+  listen('click', '#btnJutsuSave', function(){
+    var jutsu = window._lastGenJutsu;
+    if(!jutsu) return;
+    
+    var d = newTech();
+    d.id = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
+    d.name = jutsu.name || 'Новая AI Техника';
+    d.rank = jutsu.rank || 'D';
+    d.cat = jutsu.cat || 'Ниндзюцу';
+    d.nature = jutsu.nature || '';
+    d.cost = String(jutsu.cost || '');
+    d.req = jutsu.req || '';
+    d.desc = jutsu.desc || '';
+    d.dmgN = String(jutsu.dmgN || '0');
+    if(d.dmgN === '0') d.dmgN = '';
+    d.dmgD = jutsu.dmgD || 'd6';
+    if(d.dmgD === 'd0') d.dmgD = 'd6';
+    d.dmgMod = String(jutsu.dmgMod || '');
+    if(d.dmgMod === '0') d.dmgMod = '';
+    
+    SH.techs.unshift(d);
+    saveTechs(SH.techs);
+    alert('Техника "' + d.name + '" успешно добавлена в список!');
+    window.render();
+  });
+
   if(HB.mode!=='sh') return;
   if(typeof GHSync !== 'undefined' && GHSync.wireUI) GHSync.wireUI();
   var g=function(id){ return document.getElementById(id); };
