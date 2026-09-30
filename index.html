@@ -13710,7 +13710,7 @@ function callGeminiMissionGenerator(opts, apiKey, callback){
     '  "combat": "Кто оппонент партии и его главная тактическая уловка"\n' +
     "}";
 
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + encodeURIComponent(apiKey);
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(apiKey);
   fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
