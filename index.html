@@ -11034,7 +11034,7 @@ function shSkills(){
   }).join('') : '<div class="char-empty">Пусто. Сюда идёт всё, что персонаж умеет помимо боя: ремесло, быт, языки, счёт, готовка, уход за животными. Навык появляется от того, что персонаж этим занимался, а не от уровня.</div>';
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Навыки'}])+
     '<button class="back" data-nav="home">← Назад</button>'+
-    '<h1>Навыки и знания</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shSkillEdit:new">Добавить навык</button></div>'+body;
+    '<h1>Навыки и знания</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shSkillEdit:new">Добавить навык</button>'+'<button class="btn-ghost" style="color:#d29bfa;border-color:rgba(155,89,182,0.4); margin-left:10px;" data-nav="shSkillGen">✨ AI Генератор навыков</button></div>'+body;
 }
 
 function shSkillEdit(){
@@ -14689,6 +14689,74 @@ function shJutsuGen(){
   return html;
 }
 
+
+function callGeminiSkillGenerator(opts, apiKey, callback){
+  if(!apiKey){ callback("API ключ не указан", null); return; }
+  var prompt = "Ты Dungeon Master в сеттинге Naruto / DnD. Придумай небоевой навык, ремесло или знание. " +
+    "Идея: " + (opts.theme || "Случайный навык") + ". " +
+    "Категория: " + (opts.kind || "Случайная") + ". " +
+    "Отвечай строго JSON-объектом без markdown форматирования, с полями:\n" +
+    "{\n" +
+    '  "name": "Название навыка (например: Выживание в пустыне, Кузнечное дело, Знание истории)",\n' +
+    '  "kind": "Категория (строго одно из: Ремесло, Быт, Знание, Искусство, Выживание, Общение, Другое)",\n' +
+    '  "level": "Ступень мастерства (строго одно из: Начатки, Ученик, Подмастерье, Умелец, Мастер)",\n' +
+    '  "abil": "Связанная характеристика (Сила, Ловкость, Телосложение, Интеллект, Мудрость, Харизма)",\n' +
+    '  "src": "Где или как мог быть получен этот навык (например: Годы службы в АНБУ)",\n' +
+    '  "gives": "Сюжетно: что конкретно персонаж может делать благодаря навыку, чего не могут другие (без броска или с преимуществом)",\n' +
+    '  "desc": "Детали, нюансы и ограничения применения."\n' +
+    "}";
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(apiKey);
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.8, responseMimeType: "application/json" } })
+  }).then(function(r){ return r.json(); })
+    .then(function(data){
+       try { callback(null, JSON.parse(data.candidates[0].content.parts[0].text)); }
+       catch(e) { callback("Ошибка парсинга ответа от AI: " + e.message, null); }
+    }).catch(function(e){ callback(e.message, null); });
+}
+
+function shSkillGen(){
+  var key = localStorage.getItem('gemini_api_key') || '';
+  var html = crumbSh([{label:'Шиноби',nav:'home'},{label:'Навыки',nav:'shSkills'},{label:'AI Генератор'}])+
+    '<button class="back" data-nav="shSkills">← Назад</button>'+
+    '<h1>✨ AI Генератор Навыков</h1>'+
+    
+    '<div class="sheet-section" id="sgFormSection">'+
+      '<p>Создайте небоевой навык, ремесло или уникальное знание.</p>'+
+      fld('Идея / Название (например: "Знание запретных техник" или "Кузнец из страны Железа")', '<textarea id="sgTheme" rows="4" placeholder="Что должен уметь персонаж?"></textarea>') +
+      fld('Категория', '<select id="sgKind">'+
+          '<option value="">Любая (на усмотрение AI)</option>'+
+          '<option value="Ремесло">Ремесло (Ковка, шитье, готовка)</option>'+
+          '<option value="Быт">Быт (Охота, торговля, медицина)</option>'+
+          '<option value="Знание">Знание (История, печати, кланы)</option>'+
+          '<option value="Искусство">Искусство (Рисование, музыка)</option>'+
+          '<option value="Выживание">Выживание (Лес, пустыня, ориентирование)</option>'+
+          '<option value="Общение">Общение (Убеждение, допрос)</option>'+
+        '</select>') +
+      '<div class="sheet-actions" style="margin-top:20px;">' +
+        '<button class="btn-ghost" id="btnSkillGen" style="width:100%; color:#d29bfa; border-color:rgba(155,89,182,0.4); font-weight:700;">✨ Сгенерировать навык</button>' +
+      '</div>'+
+    '</div>'+
+    
+    '<div id="sgResult" style="display:none;">'+
+      '<div id="sgPreview" style="margin-bottom:15px;"></div>'+
+      '<div style="display:flex; flex-direction:column; gap:10px;">' +
+        '<button class="btn-primary" id="btnSkillSave" style="width:100%; background:#27ae60;">💾 Сохранить навык</button>' +
+        '<div style="display:flex; gap:10px;">' +
+          '<button class="btn-ghost" id="btnSkillRegen" style="flex:1;">🔄 Ещё раз (Те же настройки)</button>' +
+          '<button class="btn-ghost" id="btnSkillBack" style="flex:1;">✏️ Изменить настройки</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>'+
+    '<div id="sgHistoryWrap" style="margin-top:30px; border-top:1px solid var(--line); padding-top:15px; display:none;">'+
+      '<div class="section-label">📜 История генераций (локально)</div>'+
+      '<div id="sgHistoryList" style="display:flex; flex-direction:column; gap:8px;"></div>'+
+    '</div>';
+  return html;
+}
+
 function shTechEdit(){
   var isNew = view.shId==='new';
   var d = SH.draft || (SH.draft = isNew ? newTech() : JSON.parse(JSON.stringify(techById(view.shId)||newTech())));
@@ -15122,9 +15190,9 @@ function wireSh(){
       if(h.length === 0){ wrap.style.display='none'; return; }
       wrap.style.display='block';
       list.innerHTML = h.map(function(item, i){
-        return '<div class="card" style="cursor:pointer; margin-bottom:0;" onclick="window._loadJutsuHist('+i+')">'+
+        return '<div class="card" style="cursor:pointer; margin-bottom:0; display:flex; align-items:flex-start; justify-content:space-between;" onclick="window._loadJutsuHist('+i+')">'+
           '<div class="name" style="font-size:14px;"><span class="sh-cat-badge">'+esc(item.rank)+'</span> '+esc(item.name)+'</div>'+
-          '<div style="font-size:12px; color:var(--ink-dim); margin-top:4px;">'+esc(item.cat)+' | '+esc(item.nature)+'</div>'+
+          '<div style="font-size:12px; color:var(--ink-dim); margin-top:4px;">'+esc(item.cat)+' | '+esc(item.nature)+'</div></div>'+'<div style="padding:10px; margin:-10px; color:#f43f5e; font-size:16px;" onclick="event.stopPropagation(); window._delJutsuHist('+i+')">✖</div>'
         '</div>';
       }).join('');
     } catch(e){}
@@ -15276,9 +15344,9 @@ function wireSh(){
       if(h.length === 0){ wrap.style.display='none'; return; }
       wrap.style.display='block';
       list.innerHTML = h.map(function(item, i){
-        return '<div class="card" style="cursor:pointer; margin-bottom:0;" onclick="window._loadMoveHist('+i+')">'+
+        return '<div class="card" style="cursor:pointer; margin-bottom:0; display:flex; align-items:flex-start; justify-content:space-between;" onclick="window._loadMoveHist('+i+')">'+
           '<div class="name" style="font-size:14px;"><span class="sh-cat-badge">'+esc(item.kind)+'</span> '+esc(item.name)+'</div>'+
-          '<div style="font-size:12px; color:var(--ink-dim); margin-top:4px;">'+esc(item.mtype||'Урон')+' | '+esc(item.weapon||'Без оружия')+'</div>'+
+          '<div style="font-size:12px; color:var(--ink-dim); margin-top:4px;">'+esc(item.mtype||'Урон')+' | '+esc(item.weapon||'Без оружия')+'</div></div>'+'<div style="padding:10px; margin:-10px; color:#f43f5e; font-size:16px;" onclick="event.stopPropagation(); window._delMoveHist('+i+')">✖</div>'
         '</div>';
       }).join('');
     } catch(e){}
@@ -15320,6 +15388,143 @@ function wireSh(){
   };
 
   if(g('btnMoveGen')) renderMoveHistory();
+
+
+  // --- SKILLS AI ---
+  var btnSkillGen = g('btnSkillGen');
+  if(btnSkillGen) btnSkillGen.addEventListener('click', function(){
+    var btn = this;
+    var k = getGeminiApiKey();
+    if(!k) { alert("Сначала укажите Gemini API ключ в разделе 'Хоумбрю'"); return; }
+    var theme = v('sgTheme').trim();
+    var kind = v('sgKind');
+    btn.disabled = true; btn.textContent = 'Генерация (ждите)...';
+    callGeminiSkillGenerator({theme: theme, kind: kind}, k, function(err, result){
+      btn.disabled = false; btn.textContent = '✨ Сгенерировать навык';
+      if(err || !result){ alert('Ошибка генерации: ' + (err || 'Пустой ответ от AI')); return; }
+      window._lastGenSkill = result;
+      try {
+        var h = JSON.parse(localStorage.getItem('sh_ai_hist_skill')||'[]');
+        h.unshift(result);
+        if(h.length > 20) h.length = 20;
+        localStorage.setItem('sh_ai_hist_skill', JSON.stringify(h));
+      } catch(e){}
+      
+      var form = g('sgFormSection'), resDiv = g('sgResult'), preview = g('sgPreview');
+      if(form) form.style.display = 'none';
+      showFade(resDiv);
+      if(preview) {
+        var cardHtml = '<div class="card preview-card" style="pointer-events:none;">'+
+          '<div class="name" style="font-size:16px; margin-bottom:4px;"><span class="sh-cat-badge">' + esc(result.kind) + '</span> ' + esc(result.name||'Без названия')+' <span style="font-weight:normal; font-size:14px; color:var(--brass);">['+esc(result.level)+']</span></div>'+
+          '<div class="desc" style="margin-bottom:8px;">Связанная хар-ка: <b>'+esc(result.abil)+'</b></div>'+
+          '<div style="font-size:12px; color:var(--ink-dim); margin-bottom:8px; line-height:1.4;">' + 
+            (result.src ? '<b>Источник:</b> ' + esc(result.src) + '<br>' : '') +
+            (result.gives ? '<b>Сюжетно даёт:</b> ' + esc(result.gives) : '') +
+          '</div>' +
+          (result.desc ? '<div style="font-size:13px; color:var(--ink); line-height:1.4; border-top:1px solid var(--line); padding-top:6px; margin-top:6px;">' + esc(result.desc) + '</div>' : '') +
+          '</div>';
+        preview.innerHTML = cardHtml;
+      }
+      renderSkillHistory();
+      if(resDiv) resDiv.scrollIntoView({behavior: "smooth"});
+    });
+  });
+
+  var btnSkillBack = g('btnSkillBack');
+  if(btnSkillBack) btnSkillBack.addEventListener('click', function(){
+    if(g('sgFormSection')) showFade(g('sgFormSection'));
+    if(g('sgResult')) g('sgResult').style.display = 'none';
+  });
+
+  var btnSkillRegen = g('btnSkillRegen');
+  if(btnSkillRegen) btnSkillRegen.addEventListener('click', function(){
+    if(g('sgFormSection')) showFade(g('sgFormSection'));
+    if(g('sgResult')) g('sgResult').style.display = 'none';
+    if(g('btnSkillGen')) g('btnSkillGen').click();
+  });
+
+  var btnSkillSave = g('btnSkillSave');
+  if(btnSkillSave) btnSkillSave.addEventListener('click', function(){
+    var skill = window._lastGenSkill;
+    if(!skill) return;
+    var d = newSkill();
+    d.id = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
+    d.name = skill.name || '';
+    d.kind = skill.kind || 'Ремесло';
+    d.level = skill.level || 'Начатки';
+    d.abil = skill.abil || '';
+    d.src = skill.src || '';
+    d.gives = skill.gives || '';
+    d.desc = skill.desc || '';
+    
+    SH.skills = SH.skills || [];
+    SH.skills.push(d);
+    saveShinobi();
+    nav('shSkillView:'+d.id);
+  });
+
+  function renderSkillHistory(){
+    var wrap = g('sgHistoryWrap'), list = g('sgHistoryList');
+    if(!wrap || !list) return;
+    try {
+      var h = JSON.parse(localStorage.getItem('sh_ai_hist_skill')||'[]');
+      if(h.length === 0){ wrap.style.display='none'; return; }
+      wrap.style.display='block';
+      list.innerHTML = h.map(function(item, i){
+        return '<div class="card" style="cursor:pointer; margin-bottom:0; display:flex; align-items:flex-start; justify-content:space-between;" onclick="window._loadSkillHist('+i+')">'+
+          '<div><div class="name" style="font-size:14px;"><span class="sh-cat-badge">'+esc(item.kind)+'</span> '+esc(item.name)+'</div>'+
+          '<div style="font-size:12px; color:var(--ink-dim); margin-top:4px;">Уровень: '+esc(item.level)+'</div></div>'+
+          '<div style="padding:10px; margin:-10px; color:#f43f5e; font-size:16px;" onclick="event.stopPropagation(); window._delSkillHist('+i+')">✖</div>' +
+        '</div>';
+      }).join('');
+    } catch(e){}
+  }
+  
+  window._loadSkillHist = function(i){
+    try {
+      var h = JSON.parse(localStorage.getItem('sh_ai_hist_skill')||'[]');
+      var result = h[i];
+      if(!result) return;
+      window._lastGenSkill = result;
+      var form = g('sgFormSection'), resDiv = g('sgResult'), preview = g('sgPreview');
+      if(form) form.style.display = 'none';
+      showFade(resDiv);
+      if(preview) {
+        var cardHtml = '<div class="card preview-card" style="pointer-events:none;">'+
+          '<div class="name" style="font-size:16px; margin-bottom:4px;"><span class="sh-cat-badge">' + esc(result.kind) + '</span> ' + esc(result.name||'Без названия')+' <span style="font-weight:normal; font-size:14px; color:var(--brass);">['+esc(result.level)+']</span></div>'+
+          '<div class="desc" style="margin-bottom:8px;">Связанная хар-ка: <b>'+esc(result.abil)+'</b></div>'+
+          '<div style="font-size:12px; color:var(--ink-dim); margin-bottom:8px; line-height:1.4;">' + 
+            (result.src ? '<b>Источник:</b> ' + esc(result.src) + '<br>' : '') +
+            (result.gives ? '<b>Сюжетно даёт:</b> ' + esc(result.gives) : '') +
+          '</div>' +
+          (result.desc ? '<div style="font-size:13px; color:var(--ink); line-height:1.4; border-top:1px solid var(--line); padding-top:6px; margin-top:6px;">' + esc(result.desc) + '</div>' : '') +
+          '</div>';
+        preview.innerHTML = cardHtml;
+      }
+      window.scrollTo(0,0);
+    } catch(e){}
+  };
+
+  window._delJutsuHist = function(i){
+    var h = JSON.parse(localStorage.getItem('sh_ai_hist_jutsu')||'[]');
+    h.splice(i, 1);
+    localStorage.setItem('sh_ai_hist_jutsu', JSON.stringify(h));
+    renderJutsuHistory();
+  };
+  window._delMoveHist = function(i){
+    var h = JSON.parse(localStorage.getItem('sh_ai_hist_move')||'[]');
+    h.splice(i, 1);
+    localStorage.setItem('sh_ai_hist_move', JSON.stringify(h));
+    renderMoveHistory();
+  };
+  window._delSkillHist = function(i){
+    var h = JSON.parse(localStorage.getItem('sh_ai_hist_skill')||'[]');
+    h.splice(i, 1);
+    localStorage.setItem('sh_ai_hist_skill', JSON.stringify(h));
+    renderSkillHistory();
+  };
+
+  if(g('btnSkillGen')) renderSkillHistory();
 
   var ef=g('shEff');
   if(ef){
@@ -20314,6 +20519,7 @@ window.render=function(){
   else if(s==='shTechEdit') html=shTechEdit();
   else if(s==='shTechView') html=shTechView();
   else if(s==='shMoves') html=shMoves();
+  else if(s==='shSkillGen') html=shSkillGen();
   else if(s==='shMoveGen') html=shMoveGen();
   else if(s==='shMoveEdit') html=shMoveEdit();
   else if(s==='shMoveView') html=shMoveView();
@@ -20355,7 +20561,7 @@ window.navigate=function(val){
     }
   }
   if(HB.mode==='sh'){
-    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shJutsuGen:'shJutsuGen',shMoveGen:'shMoveGen',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData'};
+    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shJutsuGen:'shJutsuGen',shMoveGen:'shMoveGen',shMoves:'shMoves',shSkillGen:'shSkillGen',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData'};
     if(map[p[0]]){ window.view = view = {screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
     if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shMoveView'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
       window.view = view = {screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
