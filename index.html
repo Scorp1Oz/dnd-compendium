@@ -14980,6 +14980,15 @@ function wireSh(){
   var g=function(id){ return document.getElementById(id); };
   var v=function(id){ var e=g(id); return e?e.value:''; };
 
+  
+  function showFade(el){
+    if(!el) return;
+    el.style.display = 'block';
+    el.classList.remove('fade-zoom');
+    void el.offsetWidth; // trigger reflow
+    el.classList.add('fade-zoom');
+  }
+
   var btnJutsuGen = g('btnJutsuGen');
   if(btnJutsuGen) btnJutsuGen.addEventListener('click', function(){
     var btn = this;
@@ -15021,13 +15030,13 @@ function wireSh(){
       var preview = g('jgPreview');
       
       if(form) form.style.display = 'none';
-      if(resDiv) resDiv.style.display = 'block';
+      showFade(resDiv);
       
       if(preview) {
         var dummy = JSON.parse(JSON.stringify(result));
         dummy.id = 'dummy';
         if(dummy.cost && !dummy.cost.includes('ОД')) dummy.cost += ' Чакры';
-        var cardHtml = renderTechCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"');
+        var cardHtml = renderTechCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"').replace('class="card', 'class="card preview-card');
         preview.innerHTML = cardHtml;
       }
         
@@ -15040,8 +15049,8 @@ function wireSh(){
   if(btnJutsuBack) btnJutsuBack.addEventListener('click', function(){
     var form = g('jgFormSection');
     var resDiv = g('jgResult');
-    if(form) form.style.display = 'block';
     if(resDiv) resDiv.style.display = 'none';
+    showFade(form);
   });
 
   var btnJutsuRegen = g('btnJutsuRegen');
@@ -15049,8 +15058,8 @@ function wireSh(){
     var btnGen = g('btnJutsuGen');
     var form = g('jgFormSection');
     var resDiv = g('jgResult');
-    if(form) form.style.display = 'block';
     if(resDiv) resDiv.style.display = 'none';
+    showFade(form);
     if(btnGen) btnGen.click();
   });
 
@@ -15105,12 +15114,12 @@ function wireSh(){
       var resDiv = g('jgResult');
       var preview = g('jgPreview');
       if(form) form.style.display = 'none';
-      if(resDiv) resDiv.style.display = 'block';
+      showFade(resDiv);
       if(preview) {
         var dummy = JSON.parse(JSON.stringify(item));
         dummy.id = 'dummy';
         if(dummy.cost && !dummy.cost.includes('ОД')) dummy.cost += ' Чакры';
-        preview.innerHTML = renderTechCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"');
+        preview.innerHTML = renderTechCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"').replace('class="card', 'class="card preview-card');
       }
       window.scrollTo(0,0);
     } catch(e){}
@@ -15160,7 +15169,7 @@ function wireSh(){
       var preview = g('mgPreview');
       
       if(form) form.style.display = 'none';
-      if(resDiv) resDiv.style.display = 'block';
+      showFade(resDiv);
       
       if(preview) {
         var st = (result.mtype==='Состояние' && result.state && result.state!=='другое') ? ' • <span style="color:var(--brass);font-weight:600;">'+esc(result.state)+'</span>' : '';
@@ -15175,7 +15184,7 @@ function wireSh(){
         if(result.trigger) details.push('<b>Триггер:</b> ' + esc(result.trigger));
         if(result.reach) details.push('<b>Дистанция:</b> ' + esc(result.reach));
         
-        var cardHtml = '<div class="card" style="pointer-events:none;">'+
+        var cardHtml = '<div class="card preview-card" style="pointer-events:none;">'+
           '<div class="name" style="font-size:16px; margin-bottom:4px;"><span class="sh-cat-badge">' + esc(result.kind) + '</span> ' + esc(result.name||'Без названия')+st+'</div>'+
           '<div class="desc" style="margin-bottom:8px;">'+line+'</div>'+
           (details.length ? '<div style="font-size:12px; color:var(--ink-dim); margin-bottom:8px; line-height:1.4;">' + details.join('<br>') + '</div>' : '') +
@@ -15192,8 +15201,8 @@ function wireSh(){
   if(btnMoveBack) btnMoveBack.addEventListener('click', function(){
     var form = g('mgFormSection');
     var resDiv = g('mgResult');
-    if(form) form.style.display = 'block';
     if(resDiv) resDiv.style.display = 'none';
+    showFade(form);
   });
 
   var btnMoveRegen = g('btnMoveRegen');
@@ -15201,8 +15210,8 @@ function wireSh(){
     var btnGen = g('btnMoveGen');
     var form = g('mgFormSection');
     var resDiv = g('mgResult');
-    if(form) form.style.display = 'block';
     if(resDiv) resDiv.style.display = 'none';
+    showFade(form);
     if(btnGen) btnGen.click();
   });
 
@@ -15259,7 +15268,7 @@ function wireSh(){
       var resDiv = g('mgResult');
       var preview = g('mgPreview');
       if(form) form.style.display = 'none';
-      if(resDiv) resDiv.style.display = 'block';
+      showFade(resDiv);
       if(preview) {
         var st = (result.mtype==='Состояние' && result.state && result.state!=='другое') ? ' • <span style="color:var(--brass);font-weight:600;">'+esc(result.state)+'</span>' : '';
         var payStr = result.pay ? ('Цена: <b>'+esc(result.pay)+'</b>') : '';
@@ -15273,7 +15282,7 @@ function wireSh(){
         if(result.trigger) details.push('<b>Триггер:</b> ' + esc(result.trigger));
         if(result.reach) details.push('<b>Дистанция:</b> ' + esc(result.reach));
         
-        var cardHtml = '<div class="card" style="pointer-events:none;">'+
+        var cardHtml = '<div class="card preview-card" style="pointer-events:none;">'+
           '<div class="name" style="font-size:16px; margin-bottom:4px;"><span class="sh-cat-badge">' + esc(result.kind) + '</span> ' + esc(result.name||'Без названия')+st+'</div>'+
           '<div class="desc" style="margin-bottom:8px;">'+line+'</div>'+
           (details.length ? '<div style="font-size:12px; color:var(--ink-dim); margin-bottom:8px; line-height:1.4;">' + details.join('<br>') + '</div>' : '') +
