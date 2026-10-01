@@ -6527,9 +6527,7 @@ function renderCrumb(parts){
 function renderHome(){
   return `
     ${renderCrumb([{label:'Компендиум'}])}
-    <h1>Тактический компендиум</h1>
-    <p class="subtitle">Справочник боевых приёмов и техник по правилам 2024 года.</p>
-    <div class="rule"></div>
+    
     <div class="hero-dice" data-go="dice">
       <div class="hero-dice-icon">${dieShapeSvg(20,'heroDie',20)}</div>
       <div class="hero-dice-text">
@@ -8616,9 +8614,7 @@ function hbHome(){
   }).join('');
 
   return crumb([{label:'Хоумбрю'}])+
-    '<h1>'+esc(HB.world.name||'Хоумбрю')+'</h1>'+
-    '<p class="subtitle">Записные книжки мира. Ничего не предзаписано — всё создаёшь ты сам.</p>'+
-    '<div class="rule"></div>'+
+    
     '<div class="hero-dice" data-go="dice">'+
       '<div class="hero-dice-text"><div class="hero-dice-name">🎲 Бросок костей</div>'+
       '<div class="hero-dice-desc">Единственное, что общее для обоих режимов</div></div>'+
@@ -10695,8 +10691,7 @@ function shHome(){
     {nav:'shRef',   icon:'📚', t:'Справочник', d:'Колесо стихий, кнопки к1–к8, правила, чакра, окна'},
     {nav:'shData',  icon:'💾', t:'Данные',    d:'Экспорт и импорт всего мира одним файлом'}
   ];
-  return '<h1>Шиноби</h1>'+
-    '<div class="subtitle">'+esc(SH.meta.name||'Мир скрытых деревень')+'</div>'+
+  return ''+
     hudHtml +
     '<div class="rule"></div>'+ hero +
     '<div class="section-label">Свитки и разделы</div>'+
@@ -17621,8 +17616,7 @@ function meHome(){
     {nav:'meData',     icon:'💾', t:'Данные систем',          d:'Резервное копирование и управление профилем космоса'}
   ];
 
-  return '<h1>ТЕРМИНАЛ: КОСМОС</h1>'+
-    '<div class="subtitle">СЕТТИНГ MASS EFFECT • ПРОТОКОЛЫ 5E TACTICAL SCI-FI</div>'+
+  return ''+
     hudHtml +
     '<div class="rule"></div>'+ hero +
     '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // КОНСОЛЬ</div>'+
