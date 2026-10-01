@@ -11141,7 +11141,7 @@ function shCmds(){
   }).join('') + '</div>';
 
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Справочник',nav:'shRef'},{label:'Кнопки мастера'}])+
-    '<button class="back" data-nav="shRef">← Назад в Справочник</button>'+
+    '<button class="back" data-nav="'+((window._prevScreen === 'shHome') ? 'home' : 'shRef')+'">← '+((window._prevScreen === 'shHome') ? 'На главную' : 'Назад в Справочник')+'</button>'+
     '<h1>⌨️ Кнопки мастера</h1>'+
     '<div class="subtitle">Интерактивный пульт команд для ИИ-Мастера. Кликните по карточке любой кнопки, чтобы узнать её назначение, задать параметр и скопировать шаблон.</div>'+
     '<div id="shCmdInspectorWrap">' + inspectorHtml + '</div>'+
@@ -20608,6 +20608,7 @@ window.render=function(){
 
 window.navigate=function(val){
   var p=String(val||'').split(':');
+  if (window.view && window.view.screen !== p[0]) window._prevScreen = window.view.screen;
   if(HB.mode==='me'){
     var meScreens = {
       home: 'meHome',
