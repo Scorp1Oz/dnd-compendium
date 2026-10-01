@@ -5225,6 +5225,31 @@ body.sh-theme-dzanku .sh-dzanku-particles {
   75% { opacity: var(--p-op, 0.08); }
   100% { transform: translate(60px, -80px) rotate(20deg) scale(0.8); opacity: 0; }
 }
+
+/* AI Preview Card & Animations */
+.preview-card {
+  padding: 30px !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6) !important;
+  border-width: 2px !important;
+  border-color: rgba(229, 169, 60, 0.4) !important; /* amber glow hint */
+}
+.preview-card .name { font-size: 26px !important; margin-bottom: 16px !important; }
+.preview-card .desc { font-size: 16px !important; margin-bottom: 20px !important; }
+.preview-card div[style*="font-size:12px"], 
+.preview-card div[style*="font-size:13px"] {
+  font-size: 17px !important;
+  line-height: 1.7 !important;
+  margin-top: 14px !important;
+}
+
+@keyframes fadeZoom {
+  0% { opacity: 0; transform: translateY(25px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.fade-zoom {
+  animation: fadeZoom 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+}
+
 </style>
 
 
