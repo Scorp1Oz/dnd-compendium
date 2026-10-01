@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "savedAt": "2026-09-29T20:08:38.272Z",
-  "savedAtHuman": "29.09.2026, 22:08:38",
+  "savedAt": "2026-10-01T11:26:09.834Z",
+  "savedAtHuman": "01.10.2026, 13:26:09",
   "device": "Desktop",
   "activeMode": "sh",
   "shinobi": {
@@ -1442,23 +1442,40 @@
         ],
         "skills": [],
         "createdAt": "2026-09-20T18:13:34.340Z"
+      },
+      {
+        "id": "sh_prof_mupbdv86xv6k3",
+        "charName": "Тайра",
+        "clan": "Гоман",
+        "village": "Коноха",
+        "rank": "Академик",
+        "level": "1",
+        "nature": "Огонь",
+        "chakra": "18",
+        "hp": "12",
+        "ac": "12",
+        "notes": "",
+        "techs": [],
+        "moves": [],
+        "skills": [],
+        "createdAt": "2026-10-01T09:10:57.366Z"
       }
     ],
-    "activeProfileId": "sh_prof_mua4xb0jvt6fu",
+    "activeProfileId": "sh_prof_mupbdv86xv6k3",
     "userMarkers": null,
     "missions": null,
     "meta": {
       "name": "Шиноби",
       "note": "",
-      "charName": "Рэн",
-      "clan": "Учиха",
+      "charName": "Тайра",
+      "clan": "Гоман",
       "village": "Коноха",
-      "rank": "Джонин",
-      "level": "8",
+      "rank": "Академик",
+      "level": "1",
       "nature": "Огонь",
-      "chakra": "74",
-      "hp": "56",
-      "ac": "13",
+      "chakra": "18",
+      "hp": "12",
+      "ac": "12",
       "notes": ""
     }
   },
