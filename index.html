@@ -14695,6 +14695,7 @@ function callGeminiSkillGenerator(opts, apiKey, callback){
   var prompt = "Ты Dungeon Master в сеттинге Naruto / DnD. Придумай небоевой навык, ремесло или знание. " +
     "Идея: " + (opts.theme || "Случайный навык") + ". " +
     "Категория: " + (opts.kind || "Случайная") + ". " +
+    "Уровень мастерства: " + (opts.level || "Автоматически по контексту") + ". " +
     "Отвечай строго JSON-объектом без markdown форматирования, с полями:\n" +
     "{\n" +
     '  "name": "Название навыка (например: Выживание в пустыне, Кузнечное дело, Знание истории)",\n' +
@@ -14734,6 +14735,14 @@ function shSkillGen(){
           '<option value="Искусство">Искусство (Рисование, музыка)</option>'+
           '<option value="Выживание">Выживание (Лес, пустыня, ориентирование)</option>'+
           '<option value="Общение">Общение (Убеждение, допрос)</option>'+
+        '</select>') +
+      fld('Уровень мастерства', '<select id="sgLevel">'+
+          '<option value="">Авто (на усмотрение AI)</option>'+
+          '<option value="Начатки">Начатки (Базовые попытки, хобби)</option>'+
+          '<option value="Ученик">Ученик (Обученный новичок)</option>'+
+          '<option value="Подмастерье">Подмастерье (Опытный работяга)</option>'+
+          '<option value="Умелец">Умелец (Профи, делает без ошибок)</option>'+
+          '<option value="Мастер">Мастер (Лучший в своем деле, легенда)</option>'+
         '</select>') +
       '<div class="sheet-actions" style="margin-top:20px;">' +
         '<button class="btn-ghost" id="btnSkillGen" style="width:100%; color:#d29bfa; border-color:rgba(155,89,182,0.4); font-weight:700;">✨ Сгенерировать навык</button>' +
@@ -15404,8 +15413,9 @@ function wireSh(){
     if(!k) { alert("Сначала укажите Gemini API ключ в разделе 'Хоумбрю'"); return; }
     var theme = v('sgTheme').trim();
     var kind = v('sgKind');
+    var level = v('sgLevel');
     btn.disabled = true; btn.textContent = 'Генерация (ждите)...';
-    callGeminiSkillGenerator({theme: theme, kind: kind}, k, function(err, result){
+    callGeminiSkillGenerator({theme: theme, kind: kind, level: level}, k, function(err, result){
       btn.disabled = false; btn.textContent = '✨ Сгенерировать навык';
       if(err || !result){ alert('Ошибка генерации: ' + (err || 'Пустой ответ от AI')); return; }
       window._lastGenSkill = result;
