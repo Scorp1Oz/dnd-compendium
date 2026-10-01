@@ -9033,8 +9033,9 @@ window.render = function(){
   _render();
 };
 
-window.navigate = function(val){
-  var p = String(val||'').split(':');
+window.navigate=function(val){
+  var p=String(val||'').split(':');
+  if (window.view && window.view.screen !== p[0]) window._prevScreen = window.view.screen;
   if(HB.mode==='hb'){
     if(p[0]==='home'){ view={screen:'hbHome'}; HB.draft=null; render(); window.scrollTo(0,0); return; }
     if(p[0]==='hbList'){ view={screen:'hbList', hbType:p[1]}; HB.draft=null; render(); window.scrollTo(0,0); return; }
