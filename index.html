@@ -10985,7 +10985,7 @@ function shMoves(){
   var moveLauncherWidget = renderMoveLauncher();
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы'}])+
     '<button class="back" data-nav="home">← Назад</button>'+
-    '<h1>Приёмы</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shMoveEdit:new">Добавить приём</button></div>'+
+    '<h1>Приёмы</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shMoveEdit:new">Добавить приём</button>'+'<button class="btn-ghost" style="color:#d29bfa;border-color:rgba(155,89,182,0.4); margin-left:10px;" data-nav="shMoveGen">✨ AI Генератор</button></div>'+
     moveLauncherWidget +
     moveFilterBar +
     body;
@@ -14562,6 +14562,58 @@ function callGeminiJutsuGenerator(opts, apiKey, callback){
   });
 }
 
+
+function callGeminiMoveGenerator(opts, apiKey, callback){
+  if(!apiKey){
+    callback("API ключ не указан", null);
+    return;
+  }
+  var prompt = "Ты Dungeon Master в сеттинге Naruto / DnD. Придумай боевой приём (тайдзюцу, кендзюцу, маневр). " +
+    "Идея: " + (opts.theme || "Случайный приём") + ". " +
+    "Категория (вид): " + (opts.kind || "Случайный") + ". " +
+    "Тип механики: " + (opts.mtype || "Случайная") + ". " +
+    "Оружие: " + (opts.weapon || "Любое/Без оружия") + ". " +
+    "Отвечай строго JSON-объектом без markdown форматирования, с полями:\n" +
+    "{\n" +
+    '  "name": "Название приёма",\n' +
+    '  "kind": "Категория (строго одно из: Рукопашный, Оружейный, Смешанный, Передвижение)",\n' +
+    '  "mtype": "Тип (строго одно из: Урон, Состояние, Реакция, Манёвр, Защита)",\n' +
+    '  "weapon": "Используемое оружие (или пусто)",\n' +
+    '  "atk": "Модификатор атаки (строго одно из: Сила, Ловкость, Телосложение, Интеллект, Мудрость, Харизма) или пусто",\n' +
+    '  "dmg": "Формула урона (например 1d8+3 или 2d6) или пусто",\n' +
+    '  "def": "Спасбросок (Сила, Ловкость, Телосложение, Интеллект, Мудрость, Харизма) или пусто",\n' +
+    '  "state": "Состояние (СБИТ, ОБЕЗДВИЖЕН, ОСЛЕПЛЁН, КРОВОТЕЧЕНИЕ, другое) или пусто",\n' +
+    '  "dur": "Длительность (мгновенно, один ход, до конца боя) или пусто",\n' +
+    '  "trigger": "Условие активации (если Реакция, например \'при атаке врага\') или пусто",\n' +
+    '  "reach": "Дистанция (Ближний бой, 10 метров) или пусто",\n' +
+    '  "pay": "Цена (ОД, ОДД, Свободное, Реакция)",\n' +
+    '  "req": "Требования (например \'владение мечом\') или пусто",\n' +
+    '  "desc": "Художественное и механическое описание того, как выглядит и работает приём."\n' +
+    "}";
+
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(apiKey);
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
+    })
+  }).then(function(r){ return r.json(); })
+    .then(function(data){
+       try {
+         var txt = data.candidates[0].content.parts[0].text;
+         var obj = JSON.parse(txt);
+         callback(null, obj);
+       } catch(e) {
+         callback("Ошибка парсинга ответа от AI: " + e.message, null);
+       }
+    })
+    .catch(function(e){
+      callback(e.message, null);
+    });
+}
+
 function shJutsuGen(){
   var key = localStorage.getItem('gemini_api_key') || '';
   
@@ -14598,6 +14650,48 @@ function shJutsuGen(){
       '<div id="jgPreview" style="background:var(--bg-light); padding:15px; border-radius:8px; margin-bottom:15px; font-family:var(--font-main);"></div>'+
       '<div class="sheet-actions">' +
         '<button class="btn-primary" id="btnJutsuSave" style="width:100%; background:#27ae60;">Сохранить в Мои Техники</button>' +
+      '</div>' +
+    '</div>';
+
+  return html;
+}
+
+
+function shMoveGen(){
+  var key = localStorage.getItem('gemini_api_key') || '';
+  
+  var html = crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы',nav:'shMoves'},{label:'AI Генератор'}])+
+    '<button class="back" data-nav="shMoves">Назад</button>'+
+    '<h1>✨ AI Генератор Приёмов</h1>'+
+    '<div class="sheet-section">'+
+      '<p>Создайте новый боевой приём (тайдзюцу, кендзюцу, маневр). AI подберет эффекты, урон и условия.</p>'+
+      fld('Идея / Название (например: "Удар лотоса" или "Бросок с тенью")', '<input type="text" id="mgTheme" placeholder="Что должен делать приём?">') +
+      fld('Категория', '<select id="mgKind">'+
+          '<option value="">Любая (на усмотрение AI)</option>'+
+          '<option value="Рукопашный">Рукопашный</option>'+
+          '<option value="Оружейный">Оружейный</option>'+
+          '<option value="Смешанный">Смешанный</option>'+
+          '<option value="Передвижение">Передвижение</option>'+
+        '</select>') +
+      fld('Тип механики', '<select id="mgType">'+
+          '<option value="">Любая (на усмотрение AI)</option>'+
+          '<option value="Урон">Урон (Основная атака)</option>'+
+          '<option value="Состояние">Наложение состояния</option>'+
+          '<option value="Манёвр">Манёвр (Толчок, Бросок)</option>'+
+          '<option value="Реакция">Реакция / Парирование</option>'+
+          '<option value="Защита">Защита / Стойка</option>'+
+        '</select>') +
+      fld('Оружие (необязательно)', '<input type="text" id="mgWeapon" placeholder="Например: Катана, Кунаи, Тяжелый молот">') +
+      '<div class="sheet-actions" style="margin-top:20px;">' +
+        '<button class="btn-ghost" id="btnMoveGen" style="width:100%; color:#d29bfa; border-color:rgba(155,89,182,0.4); font-weight:700;">✨ Сгенерировать приём</button>' +
+      '</div>'+
+    '</div>'+
+    
+    '<div id="mgResult" style="display:none; margin-top:20px;">'+
+      '<h2 style="border-bottom:1px solid #ddd; padding-bottom:10px;">Результат генерации</h2>'+
+      '<div id="mgPreview" style="background:var(--bg-light); padding:15px; border-radius:8px; margin-bottom:15px; font-family:var(--font-main);"></div>'+
+      '<div class="sheet-actions">' +
+        '<button class="btn-primary" id="btnMoveSave" style="width:100%; background:#27ae60;">💾 Сохранить этот приём</button>' +
       '</div>' +
     '</div>';
 
@@ -14962,6 +15056,84 @@ function wireSh(){
         
       if(resDiv) resDiv.scrollIntoView({behavior: "smooth"});
     });
+  });
+
+  
+  var btnMoveGen = g('btnMoveGen');
+  if(btnMoveGen) btnMoveGen.addEventListener('click', function(){
+    var btn = this;
+    var k = getGeminiApiKey();
+    if(!k) {
+      alert("Сначала укажите Gemini API ключ в разделе 'Хоумбрю'");
+      return;
+    }
+    
+    var theme = v('mgTheme').trim();
+    var kind = v('mgKind');
+    var mtype = v('mgType');
+    var weapon = v('mgWeapon').trim();
+    
+    btn.disabled = true;
+    btn.textContent = 'Генерация (ждите)...';
+    
+    callGeminiMoveGenerator({theme: theme, kind: kind, mtype: mtype, weapon: weapon}, k, function(err, result){
+      btn.disabled = false;
+      btn.textContent = '✨ Сгенерировать приём';
+      
+      if(err || !result){
+        alert('Ошибка генерации: ' + (err || 'Пустой ответ от AI'));
+        return;
+      }
+      
+      window._lastGenMove = result;
+      
+      var resDiv = g('mgResult');
+      var preview = g('mgPreview');
+      if(resDiv) resDiv.style.display = 'block';
+      
+      if(preview) preview.innerHTML = 
+        '<h3>' + esc(result.name) + '</h3>' +
+        '<p><strong>Категория:</strong> ' + esc(result.kind) + ' | <strong>Тип:</strong> ' + esc(result.mtype) + '</p>' +
+        (result.weapon ? '<p><strong>Оружие:</strong> ' + esc(result.weapon) + '</p>' : '') +
+        '<p><strong>Цена:</strong> ' + esc(result.pay) + '</p>' +
+        (result.req ? '<p><strong>Требования:</strong> ' + esc(result.req) + '</p>' : '') +
+        (result.atk ? '<p><strong>Атака от:</strong> ' + esc(result.atk) + '</p>' : '') +
+        (result.dmg ? '<p><strong>Урон:</strong> ' + esc(result.dmg) + '</p>' : '') +
+        (result.def ? '<p><strong>Спасбросок:</strong> ' + esc(result.def) + '</p>' : '') +
+        (result.state ? '<p><strong>Состояние:</strong> ' + esc(result.state) + ' (' + esc(result.dur) + ')</p>' : '') +
+        (result.trigger ? '<p><strong>Триггер:</strong> ' + esc(result.trigger) + '</p>' : '') +
+        (result.reach ? '<p><strong>Дистанция:</strong> ' + esc(result.reach) + '</p>' : '') +
+        '<p style="margin-top:10px; white-space:pre-wrap; line-height:1.5;">' + esc(result.desc) + '</p>';
+        
+      if(resDiv) resDiv.scrollIntoView({behavior: "smooth"});
+    });
+  });
+
+  var btnMoveSave = g('btnMoveSave');
+  if(btnMoveSave) btnMoveSave.addEventListener('click', function(){
+    var move = window._lastGenMove;
+    if(!move) return;
+    
+    var d = newMove();
+    d.id = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
+    d.name = move.name || '';
+    d.kind = move.kind || 'Рукопашный';
+    d.mtype = move.mtype || 'Урон';
+    d.weapon = move.weapon || '';
+    d.atk = move.atk || '';
+    d.dmg = move.dmg || '';
+    d.def = move.def || '';
+    d.state = move.state || '';
+    d.dur = move.dur || '';
+    d.trigger = move.trigger || '';
+    d.reach = move.reach || '';
+    d.pay = move.pay || 'ОД';
+    d.req = move.req || '';
+    d.desc = move.desc || '';
+    
+    SH.moves.push(d);
+    saveShinobi();
+    nav('shMoveView:'+d.id);
   });
 
   var btnJutsuSave = g('btnJutsuSave');
