@@ -5091,7 +5091,122 @@ body.sh-theme-goman .sh-goman-particles {
   75% { opacity: var(--p-op, 0.08); }
   100% { transform: translate(80px, -80px) rotate(20deg) scale(0.5); opacity: 0; }
 }
+
+/* --- ТЕМА ДЗАНКУ (DZANKU / ЯНТАРНЫЙ ХРОНОМЕТР) --- */
+body.sh-theme.sh-theme-dzanku {
+  --ink: #f4f0e6;
+  --ink-dim: #9b9588;
+  --steel-0: #050608;
+  --steel-1: #0c0e13;
+  --steel-2: #151922;
+  --line: #242b38;
+  --brass: #e5a93c;
+  --brass-dim: #8a621d;
+  --brass-bright: #ffc459;
+  --crimson: #881337;
+  --crimson-bright: #f43f5e;
+  --die: #d99b26;
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(229, 169, 60, 0.12) 0%, transparent 60%),
+    radial-gradient(circle at 85% 25%, rgba(244, 240, 230, 0.05) 0%, transparent 40%),
+    repeating-linear-gradient(90deg, rgba(229,169,60,0.012) 0px, rgba(229,169,60,0.012) 1px, transparent 1px, transparent 24px),
+    linear-gradient(180deg, #0c0e13 0%, #050608 100%);
+}
+
+body.sh-theme.sh-theme-dzanku .hb-seg-btn.on {
+  background: linear-gradient(180deg, rgba(229, 169, 60, 0.15) 0%, transparent 100%);
+  border-bottom-color: #e5a93c;
+  color: #ffc459;
+  box-shadow: 0 -12px 20px -10px rgba(229, 169, 60, 0.35) inset;
+}
+
+body.sh-theme.sh-theme-dzanku .btn-primary {
+  background: linear-gradient(135deg, #e5a93c 0%, #8a621d 100%);
+  color: #050608;
+  border: none;
+  box-shadow: 0 0 14px rgba(229, 169, 60, 0.45);
+}
+
+body.sh-theme.sh-theme-dzanku .menu-item {
+  background: linear-gradient(135deg, rgba(12, 14, 19, 0.95) 0%, rgba(5, 6, 8, 0.95) 100%);
+  border-color: #242b38;
+  border-left-color: #8a621d;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(229, 169, 60, 0.05);
+}
+
+body.sh-theme.sh-theme-dzanku .menu-item:hover:not(.disabled) {
+  background: linear-gradient(135deg, rgba(21, 25, 34, 0.98) 0%, rgba(12, 14, 19, 0.98) 100%);
+  border-color: #e5a93c;
+  border-left-color: #f4f0e6;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 24px rgba(229, 169, 60, 0.22);
+}
+
+body.sh-theme.sh-theme-dzanku .card {
+  background: linear-gradient(145deg, rgba(12, 14, 19, 0.95) 0%, rgba(5, 6, 8, 0.95) 100%);
+  border-color: #242b38;
+  border-left-color: #8a621d;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55), 0 0 12px rgba(229, 169, 60, 0.05);
+}
+
+body.sh-theme.sh-theme-dzanku .card::before {
+  background: linear-gradient(90deg, #f4f0e6 0%, #e5a93c 40%, #151922 100%);
+}
+
+body.sh-theme.sh-theme-dzanku .card:hover {
+  background: linear-gradient(145deg, rgba(21, 25, 34, 0.98) 0%, rgba(12, 14, 19, 0.98) 100%);
+  border-color: #e5a93c;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 24px rgba(229, 169, 60, 0.22);
+}
+
+body.sh-theme.sh-theme-dzanku .sh-hud {
+  background: linear-gradient(135deg, rgba(12, 14, 19, 0.96) 0%, rgba(5, 6, 8, 0.96) 100%);
+  border-color: rgba(229, 169, 60, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(229, 169, 60, 0.15);
+}
+
+body.sh-theme.sh-theme-dzanku .sh-hud-stat-pill {
+  border-color: rgba(229, 169, 60, 0.35);
+  box-shadow: inset 0 0 8px rgba(229, 169, 60, 0.15), 0 0 10px rgba(229, 169, 60, 0.18);
+}
+
+/* Dzanku Particles Container */
+.sh-dzanku-particles {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  display: none;
+}
+body.sh-theme-dzanku .sh-dzanku-particles {
+  display: block;
+}
+
+/* Quantum Sparkles */
+.sh-dzanku-spark-particle {
+  position: absolute;
+  background: var(--spark-bg, #e5a93c);
+  border-radius: 1px;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px var(--spark-bg, #e5a93c));
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+/* Discrete teleporting movement with steps(1, end) */
+@keyframes dzankuQuantum {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+  10%  { transform: translate(5px, -15px) scale(1.2); opacity: var(--p-op, 0.5); }
+  30%  { transform: translate(25px, -40px) scale(0.8); opacity: var(--p-op, 0.3); }
+  50%  { transform: translate(10px, -70px) scale(1.4); opacity: var(--p-op, 0.6); }
+  70%  { transform: translate(35px, -100px) scale(0.9); opacity: var(--p-op, 0.4); }
+  90%  { transform: translate(20px, -130px) scale(1.1); opacity: var(--p-op, 0.2); }
+  100% { transform: translate(20px, -150px) scale(1); opacity: 0; }
+}
 </style>
+
 
 </head>
 <body>
@@ -9144,6 +9259,7 @@ function getShinobiClanTheme(prof){
   if(/(кураями|kurayami)/i.test(text)) return 'kurayami';
   if(/(учиха|uchiha)/i.test(text)) return 'uchiha';
   if(/(гоман|goman)/i.test(text)) return 'goman';
+  if(/(дзанку|занку|dzanku|zanku|хаято|hayato)/i.test(text)) return 'dzanku';
   return 'default';
 }
 
@@ -9269,26 +9385,74 @@ function initGomanParticles(){
   return cont;
 }
 
+
+function initDzankuParticles(){
+  if(typeof document === 'undefined' || !document.body) return null;
+  var cont = document.getElementById('shDzankuParticles');
+  if(!cont){
+    cont = document.createElement('div');
+    cont.id = 'shDzankuParticles';
+    cont.className = 'sh-dzanku-particles';
+    cont.setAttribute('aria-hidden', 'true');
+    document.body.insertBefore(cont, document.body.firstChild);
+  }
+  if(!cont.children || cont.children.length === 0){
+    // Quantum frames
+    for(var i = 0; i < 35; i++){
+      var p = document.createElement('div');
+      p.className = 'sh-dzanku-spark-particle';
+      // tiny geometric micro-frames 4-8px
+      var width = Math.floor(4 + Math.random() * 5); 
+      var height = Math.floor(4 + Math.random() * 5);
+      // Make some of them distinctly rectangular like film frames
+      if(Math.random() > 0.5) width = Math.floor(width * 1.5);
+      else height = Math.floor(height * 1.5);
+      
+      p.style.width = width + 'px';
+      p.style.height = height + 'px';
+      p.style.left = Math.floor(Math.random() * 100) + '%';
+      p.style.bottom = Math.floor(Math.random() * 20) + '%';
+      
+      var duration = (4 + Math.random() * 3).toFixed(1); // 4-7s
+      var delay = (-Math.random() * 10).toFixed(1);
+      var maxOp = (0.2 + Math.random() * 0.5).toFixed(2);
+      
+      // Sometimes ivory color instead of amber
+      if(Math.random() > 0.8) p.style.setProperty('--spark-bg', '#f4f0e6');
+      
+      p.style.setProperty('--p-op', maxOp);
+      p.style.animation = 'dzankuQuantum ' + duration + 's steps(1, end) ' + delay + 's infinite';
+      cont.appendChild(p);
+    }
+    // We hold off on Layer 2 (Dzanku crest) as requested by user.
+  }
+  return cont;
+}
+
 function updateShinobiTheme(){
   if(typeof document === 'undefined' || !document.body) return;
   if(typeof HB === 'undefined' || HB.mode !== 'sh'){
-    document.body.classList.remove('sh-theme-kurayami', 'sh-theme-uchiha', 'sh-theme-goman');
+    document.body.classList.remove('sh-theme-kurayami', 'sh-theme-uchiha', 'sh-theme-goman', 'sh-theme-dzanku');
     var pKur = document.getElementById('shKurayamiParticles');
     if(pKur) pKur.style.display = 'none';
     var pUch = document.getElementById('shUchihaParticles');
     if(pUch) pUch.style.display = 'none';
     var pGom = document.getElementById('shGomanParticles');
     if(pGom) pGom.style.display = 'none';
+    var pDza = document.getElementById('shDzankuParticles');
+    if(pDza) pDza.style.display = 'none';
     return;
   }
   var theme = getShinobiClanTheme();
   var isKurayami = (theme === 'kurayami');
   var isUchiha = (theme === 'uchiha');
   var isGoman = (theme === 'goman');
+  var isDzanku = (theme === 'dzanku');
   
   document.body.classList.toggle('sh-theme-kurayami', isKurayami);
   document.body.classList.toggle('sh-theme-uchiha', isUchiha);
   document.body.classList.toggle('sh-theme-goman', isGoman);
+  document.body.classList.toggle('sh-theme-dzanku', isDzanku);
 
   if(isKurayami){
     var pKur = initKurayamiParticles();
@@ -9312,6 +9476,14 @@ function updateShinobiTheme(){
   } else {
     var pGom = document.getElementById('shGomanParticles');
     if(pGom) pGom.style.display = 'none';
+  }
+
+  if(isDzanku){
+    var pDza = initDzankuParticles();
+    if(pDza) pDza.style.display = 'block';
+  } else {
+    var pDza = document.getElementById('shDzankuParticles');
+    if(pDza) pDza.style.display = 'none';
   }
 }
 
