@@ -15137,7 +15137,7 @@ function wireSh(){
       if(preview) {
         var dummy = JSON.parse(JSON.stringify(result));
         dummy.id = 'dummy';
-        if(dummy.cost && !dummy.cost.includes('ОД')) dummy.cost += ' Чакры';
+        if(dummy.cost && !String(dummy.cost).includes('ОД')) dummy.cost += ' Чакры';
         var cardHtml = renderTechCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"').replace('class="card', 'class="card preview-card');
         preview.innerHTML = cardHtml;
       }
@@ -15223,7 +15223,7 @@ function wireSh(){
       if(preview) {
         var dummy = JSON.parse(JSON.stringify(item));
         dummy.id = 'dummy';
-        if(dummy.cost && !dummy.cost.includes('ОД')) dummy.cost += ' Чакры';
+        if(dummy.cost && !String(dummy.cost).includes('ОД')) dummy.cost += ' Чакры';
         preview.innerHTML = renderTechCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"').replace('class="card', 'class="card preview-card');
       }
       window.scrollTo(0,0);
