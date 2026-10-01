@@ -10985,7 +10985,7 @@ function shMoves(){
   var moveLauncherWidget = renderMoveLauncher();
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы'}])+
     '<button class="back" data-nav="home">← Назад</button>'+
-    '<h1>Приёмы</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shMoveEdit:new">Добавить приём</button>'+'<button class="btn-ghost" style="color:#d29bfa;border-color:rgba(155,89,182,0.4); margin-left:10px;" data-nav="shMoveGen">✨ AI Генератор</button></div>'+
+    '<h1>Приёмы</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shMoveEdit:new">Добавить приём</button>'+'<button class="btn-ghost" style="color:#d29bfa;border-color:rgba(155,89,182,0.4); margin-left:10px;" data-nav="shMoveGen">✨ AI Генератор приёмов</button></div>'+
     moveLauncherWidget +
     moveFilterBar +
     body;
@@ -20156,6 +20156,7 @@ window.render=function(){
   else if(s==='shTechEdit') html=shTechEdit();
   else if(s==='shTechView') html=shTechView();
   else if(s==='shMoves') html=shMoves();
+  else if(s==='shMoveGen') html=shMoveGen();
   else if(s==='shMoveEdit') html=shMoveEdit();
   else if(s==='shMoveView') html=shMoveView();
   else if(s==='shSkills') html=shSkills();
@@ -20196,7 +20197,7 @@ window.navigate=function(val){
     }
   }
   if(HB.mode==='sh'){
-    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shJutsuGen:'shJutsuGen',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData'};
+    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shJutsuGen:'shJutsuGen',shMoveGen:'shMoveGen',shMoves:'shMoves',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData'};
     if(map[p[0]]){ window.view = view = {screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
     if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shMoveView'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
       window.view = view = {screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
