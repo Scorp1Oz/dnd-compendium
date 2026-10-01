@@ -14415,7 +14415,7 @@ function shMap(){
   var missionsCount = (SH.map.missions && SH.map.missions.length) || 0;
 
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Справочник',nav:'shRef'},{label:'Карта мира'}])+
-    '<button class="back" data-nav="shRef">← Назад в Справочник</button>'+
+    '<button class="back" data-nav="'+((window._prevScreen === 'shHome') ? 'home' : 'shRef')+'">← '+((window._prevScreen === 'shHome') ? 'На главную' : 'Назад в Справочник')+'</button>'+
     '<h1>🗺️ Карта мира шиноби</h1>'+
     '<div class="subtitle">Интерактивный тактический атлас 46 государств, калькулятор переходов, тактические метки и доска миссий (AI Studio)</div>'+
     '<div class="sh-map-container">'+
