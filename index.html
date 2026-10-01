@@ -5067,7 +5067,7 @@ body.sh-theme-goman .sh-goman-particles {
 /* Floating Lion Crest (Fuin) */
 .sh-goman-crest-particle {
   position: absolute;
-  background-image: url('symbols/clans/sun.png');
+
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -9252,6 +9252,7 @@ function initGomanParticles(){
     for(var j = 0; j < 5; j++){
       var c = document.createElement('div');
       c.className = 'sh-goman-crest-particle';
+      c.style.backgroundImage = "url('symbols/clans/" + (Math.random() > 0.5 ? 'sun.png' : 'sun2.webp') + "')";
       var csize = Math.floor(40 + Math.random() * 60); // 40-100px
       c.style.width = csize + 'px';
       c.style.height = csize + 'px';
