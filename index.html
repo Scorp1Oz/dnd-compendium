@@ -5205,7 +5205,28 @@ body.sh-theme-dzanku .sh-dzanku-particles {
   90%  { transform: translate(20px, -130px) scale(1.1); opacity: var(--p-op, 0.2); }
   100% { transform: translate(20px, -150px) scale(1); opacity: 0; }
 }
+
+.sh-dzanku-crest-particle {
+  position: absolute;
+  background-image: url('symbols/clans/Dzanku_Symbol.png');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  filter: brightness(1.1) drop-shadow(0 0 6px rgba(229, 169, 60, 0.3));
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+@keyframes dzankuDrift {
+  0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0; }
+  25% { opacity: var(--p-op, 0.1); }
+  50% { transform: translate(30px, -40px) rotate(10deg) scale(1.1); opacity: var(--p-op, 0.12); }
+  75% { opacity: var(--p-op, 0.08); }
+  100% { transform: translate(60px, -80px) rotate(20deg) scale(0.8); opacity: 0; }
+}
 </style>
+
 
 
 </head>
@@ -9424,7 +9445,22 @@ function initDzankuParticles(){
       p.style.animation = 'dzankuQuantum ' + duration + 's steps(1, end) ' + delay + 's infinite';
       cont.appendChild(p);
     }
-    // We hold off on Layer 2 (Dzanku crest) as requested by user.
+    // Layer 2: Dzanku crests
+    for(var j = 0; j < 18; j++){
+      var c = document.createElement('div');
+      c.className = 'sh-dzanku-crest-particle';
+      var csize = Math.floor(60 + Math.random() * 80); // 60-140px
+      c.style.width = csize + 'px';
+      c.style.height = csize + 'px';
+      c.style.left = Math.floor(Math.random() * 95) + '%';
+      c.style.top = Math.floor(Math.random() * 95) + '%';
+      var cdur = (20 + Math.random() * 25).toFixed(1);
+      var cdelay = (-Math.random() * 40).toFixed(1);
+      var cop = (0.06 + Math.random() * 0.06).toFixed(2);
+      c.style.setProperty('--p-op', cop);
+      c.style.animation = 'dzankuDrift ' + cdur + 's ease-in-out ' + cdelay + 's infinite';
+      cont.appendChild(c);
+    }
   }
   return cont;
 }
