@@ -15190,9 +15190,12 @@ function wireSh(){
       if(h.length === 0){ wrap.style.display='none'; return; }
       wrap.style.display='block';
       list.innerHTML = h.map(function(item, i){
-        return '<div class="card" style="cursor:pointer; margin-bottom:0; display:flex; align-items:flex-start; justify-content:space-between;" onclick="window._loadJutsuHist('+i+')">'+
-          '<div class="name" style="font-size:14px;"><span class="sh-cat-badge">'+esc(item.rank)+'</span> '+esc(item.name)+'</div>'+
-          '<div style="font-size:12px; color:var(--ink-dim); margin-top:4px;">'+esc(item.cat)+' | '+esc(item.nature)+'</div></div>'+'<div style="padding:10px; margin:-10px; color:#f43f5e; font-size:16px;" onclick="event.stopPropagation(); window._delJutsuHist('+i+')">✖</div>'
+        return '<div class="card" style="cursor:pointer; margin-bottom:0; display:flex; align-items:center; justify-content:space-between; padding:12px 16px;" onclick="window._loadJutsuHist('+i+')">'+
+          '<div style="flex:1;">'+
+            '<div class="name" style="font-size:15px; margin-bottom:2px;"><span class="sh-cat-badge">'+esc(item.rank)+'</span> '+esc(item.name)+'</div>'+
+            '<div style="font-size:12px; color:var(--ink-dim);">'+esc(item.cat)+' | '+esc(item.nature)+'</div>'+
+          '</div>'+
+          '<button class="btn-ghost" style="padding:6px 10px; color:var(--ink-dim); border-color:transparent; flex-shrink:0;" onclick="event.stopPropagation(); window._delJutsuHist('+i+')" title="Удалить">🗑️</button>'+
         '</div>';
       }).join('');
     } catch(e){}
@@ -15344,9 +15347,12 @@ function wireSh(){
       if(h.length === 0){ wrap.style.display='none'; return; }
       wrap.style.display='block';
       list.innerHTML = h.map(function(item, i){
-        return '<div class="card" style="cursor:pointer; margin-bottom:0; display:flex; align-items:flex-start; justify-content:space-between;" onclick="window._loadMoveHist('+i+')">'+
-          '<div class="name" style="font-size:14px;"><span class="sh-cat-badge">'+esc(item.kind)+'</span> '+esc(item.name)+'</div>'+
-          '<div style="font-size:12px; color:var(--ink-dim); margin-top:4px;">'+esc(item.mtype||'Урон')+' | '+esc(item.weapon||'Без оружия')+'</div></div>'+'<div style="padding:10px; margin:-10px; color:#f43f5e; font-size:16px;" onclick="event.stopPropagation(); window._delMoveHist('+i+')">✖</div>'
+        return '<div class="card" style="cursor:pointer; margin-bottom:0; display:flex; align-items:center; justify-content:space-between; padding:12px 16px;" onclick="window._loadMoveHist('+i+')">'+
+          '<div style="flex:1;">'+
+            '<div class="name" style="font-size:15px; margin-bottom:2px;"><span class="sh-cat-badge">'+esc(item.kind)+'</span> '+esc(item.name)+'</div>'+
+            '<div style="font-size:12px; color:var(--ink-dim);">'+esc(item.mtype||'Урон')+' | '+esc(item.weapon||'Без оружия')+'</div>'+
+          '</div>'+
+          '<button class="btn-ghost" style="padding:6px 10px; color:var(--ink-dim); border-color:transparent; flex-shrink:0;" onclick="event.stopPropagation(); window._delMoveHist('+i+')" title="Удалить">🗑️</button>'+
         '</div>';
       }).join('');
     } catch(e){}
@@ -15471,10 +15477,12 @@ function wireSh(){
       if(h.length === 0){ wrap.style.display='none'; return; }
       wrap.style.display='block';
       list.innerHTML = h.map(function(item, i){
-        return '<div class="card" style="cursor:pointer; margin-bottom:0; display:flex; align-items:flex-start; justify-content:space-between;" onclick="window._loadSkillHist('+i+')">'+
-          '<div><div class="name" style="font-size:14px;"><span class="sh-cat-badge">'+esc(item.kind)+'</span> '+esc(item.name)+'</div>'+
-          '<div style="font-size:12px; color:var(--ink-dim); margin-top:4px;">Уровень: '+esc(item.level)+'</div></div>'+
-          '<div style="padding:10px; margin:-10px; color:#f43f5e; font-size:16px;" onclick="event.stopPropagation(); window._delSkillHist('+i+')">✖</div>' +
+        return '<div class="card" style="cursor:pointer; margin-bottom:0; display:flex; align-items:center; justify-content:space-between; padding:12px 16px;" onclick="window._loadSkillHist('+i+')">'+
+          '<div style="flex:1;">'+
+            '<div class="name" style="font-size:15px; margin-bottom:2px;"><span class="sh-cat-badge">'+esc(item.kind)+'</span> '+esc(item.name)+'</div>'+
+            '<div style="font-size:12px; color:var(--ink-dim);">Уровень: '+esc(item.level)+'</div>'+
+          '</div>'+
+          '<button class="btn-ghost" style="padding:6px 10px; color:var(--ink-dim); border-color:transparent; flex-shrink:0;" onclick="event.stopPropagation(); window._delSkillHist('+i+')" title="Удалить">🗑️</button>'+
         '</div>';
       }).join('');
     } catch(e){}
