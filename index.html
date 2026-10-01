@@ -14617,10 +14617,11 @@ function callGeminiMoveGenerator(opts, apiKey, callback){
 function shJutsuGen(){
   var key = localStorage.getItem('gemini_api_key') || '';
   
-  var html = crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники',nav:'shTechs'},{label:'AI Генератор Дзюцу'}])+
+  var html = crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники',nav:'shTechs'},{label:'AI Генератор'}])+
     '<button class="back" data-nav="shTechs">← Назад</button>'+
     '<h1>✨ AI Генератор Дзюцу</h1>'+
-    '<div class="sheet-section">'+
+    
+    '<div class="sheet-section" id="jgFormSection">'+
       '<p>Введите пожелания к технике. AI создаст её механику и описание, правильно расставив печати.</p>'+
       fld('Тема / Идея (например: "Огненный дракон" или "Защита от гендзюцу")', '<textarea id="jgTheme" rows="4" placeholder="Что должна делать техника? Опиши идею подробно, вставь лор или механические пожелания..."></textarea>') +
       fld('Категория', '<select id="jgCat">'+
@@ -14628,16 +14629,16 @@ function shJutsuGen(){
           '<option value="Ниндзюцу">Ниндзюцу</option>'+
           '<option value="Гендзюцу">Гендзюцу</option>'+
           '<option value="Тайдзюцу">Тайдзюцу</option>'+
-          '<option value="Фуиндзюцу">Фуиндзюцу</option>'+
+          '<option value="ФУИНДЗЮЦУ">ФУИНДЗЮЦУ</option>'+
         '</select>') +
       fld('Ранг', '<select id="jgRank">'+
           '<option value="">Авто (на усмотрение AI)</option>'+
-          '<option value="E">E (Студент)</option>'+
+          '<option value="E">E (Академик)</option>'+
           '<option value="D">D (Генин)</option>'+
           '<option value="C">C (Чунин)</option>'+
           '<option value="B">B (Джонин)</option>'+
           '<option value="A">A (Элита)</option>'+
-          '<option value="S">S (Каге / Запретная)</option>'+
+          '<option value="S">S (Каге / Легенда)</option>'+
         '</select>') +
       fld('Стихия / Природа', '<input type="text" id="jgNature" placeholder="Например: Огонь, Кровь, Дерево">') +
       '<div class="sheet-actions" style="margin-top:20px;">' +
@@ -14645,54 +14646,19 @@ function shJutsuGen(){
       '</div>'+
     '</div>'+
     
-    '<div id="jgResult" style="display:none; margin-top:20px;">'+
-      '<h2 style="border-bottom:1px solid #ddd; padding-bottom:10px;">Результат генерации</h2>'+
-      '<div id="jgPreview" style="background:var(--bg-light); padding:15px; border-radius:8px; margin-bottom:15px; font-family:var(--font-main);"></div>'+
-      '<div class="sheet-actions">' +
-        '<button class="btn-primary" id="btnJutsuSave" style="width:100%; background:#27ae60;">Сохранить в Мои Техники</button>' +
+    '<div id="jgResult" style="display:none;">'+
+      '<div id="jgPreview" style="margin-bottom:15px;"></div>'+
+      '<div style="display:flex; flex-direction:column; gap:10px;">' +
+        '<button class="btn-primary" id="btnJutsuSave" style="width:100%; background:#27ae60;">💾 Сохранить в Мои Техники</button>' +
+        '<div style="display:flex; gap:10px;">' +
+          '<button class="btn-ghost" id="btnJutsuRegen" style="flex:1;">🔄 Ещё раз (Те же настройки)</button>' +
+          '<button class="btn-ghost" id="btnJutsuBack" style="flex:1;">✏️ Изменить настройки</button>' +
+        '</div>' +
       '</div>' +
-    '</div>';
-
-  return html;
-}
-
-
-function shMoveGen(){
-  var key = localStorage.getItem('gemini_api_key') || '';
-  
-  var html = crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы',nav:'shMoves'},{label:'AI Генератор'}])+
-    '<button class="back" data-nav="shMoves">Назад</button>'+
-    '<h1>✨ AI Генератор Приёмов</h1>'+
-    '<div class="sheet-section">'+
-      '<p>Создайте новый боевой приём (тайдзюцу, кендзюцу, маневр). AI подберет эффекты, урон и условия.</p>'+
-      fld('Идея / Название (например: "Удар лотоса" или "Бросок с тенью")', '<textarea id="mgTheme" rows="4" placeholder="Что должен делать приём? Опиши идею подробно, вставь лор или механические пожелания..."></textarea>') +
-      fld('Категория', '<select id="mgKind">'+
-          '<option value="">Любая (на усмотрение AI)</option>'+
-          '<option value="Рукопашный">Рукопашный</option>'+
-          '<option value="Оружейный">Оружейный</option>'+
-          '<option value="Смешанный">Смешанный</option>'+
-          '<option value="Передвижение">Передвижение</option>'+
-        '</select>') +
-      fld('Тип механики', '<select id="mgType">'+
-          '<option value="">Любая (на усмотрение AI)</option>'+
-          '<option value="Урон">Урон (Основная атака)</option>'+
-          '<option value="Состояние">Наложение состояния</option>'+
-          '<option value="Манёвр">Манёвр (Толчок, Бросок)</option>'+
-          '<option value="Реакция">Реакция / Парирование</option>'+
-          '<option value="Защита">Защита / Стойка</option>'+
-        '</select>') +
-      fld('Оружие (необязательно)', '<input type="text" id="mgWeapon" placeholder="Например: Катана, Кунаи, Тяжелый молот">') +
-      '<div class="sheet-actions" style="margin-top:20px;">' +
-        '<button class="btn-ghost" id="btnMoveGen" style="width:100%; color:#d29bfa; border-color:rgba(155,89,182,0.4); font-weight:700;">✨ Сгенерировать приём</button>' +
-      '</div>'+
-    '</div>'+
-    
-    '<div id="mgResult" style="display:none; margin-top:20px;">'+
-      '<h2 style="border-bottom:1px solid #ddd; padding-bottom:10px;">Результат генерации</h2>'+
-      '<div id="mgPreview" style="background:var(--bg-light); padding:15px; border-radius:8px; margin-bottom:15px; font-family:var(--font-main);"></div>'+
-      '<div class="sheet-actions">' +
-        '<button class="btn-primary" id="btnMoveSave" style="width:100%; background:#27ae60;">💾 Сохранить этот приём</button>' +
-      '</div>' +
+    '</div>' +
+    '<div id="jgHistoryWrap" style="margin-top:30px; border-top:1px solid var(--line); padding-top:15px; display:none;">'+
+      '<div class="section-label">📜 История генераций (локально)</div>'+
+      '<div id="jgHistoryList" style="display:flex; flex-direction:column; gap:8px;"></div>'+
     '</div>';
 
   return html;
@@ -15019,7 +14985,7 @@ function wireSh(){
     var btn = this;
     var k = getGeminiApiKey();
     if(!k) {
-      alert("Пожалуйста, укажите Gemini API ключ на вкладке 'Данные'");
+      alert("Сначала укажите Gemini API ключ в разделе 'Хоумбрю'");
       return;
     }
     
@@ -15029,36 +14995,130 @@ function wireSh(){
     var nature = v('jgNature').trim();
     
     btn.disabled = true;
-    btn.textContent = 'Генерация (ожидайте)...';
+    btn.textContent = 'Генерация (ждите)...';
     
     callGeminiJutsuGenerator({theme: theme, cat: cat, rank: rank, nature: nature}, k, function(err, result){
       btn.disabled = false;
-      btn.textContent = 'Сгенерировать технику';
+      btn.textContent = '✨ Сгенерировать технику';
       
       if(err || !result){
-        alert('Ошибка генерации: ' + (err || 'Нет ответа от AI'));
+        alert('Ошибка генерации: ' + (err || 'Пустой ответ от AI'));
         return;
       }
       
       window._lastGenJutsu = result;
       
+      // Save to local history
+      try {
+        var h = JSON.parse(localStorage.getItem('sh_ai_hist_jutsu')||'[]');
+        h.unshift(result);
+        if(h.length > 20) h.length = 20;
+        localStorage.setItem('sh_ai_hist_jutsu', JSON.stringify(h));
+      } catch(e){}
+      
+      var form = g('jgFormSection');
       var resDiv = g('jgResult');
       var preview = g('jgPreview');
+      
+      if(form) form.style.display = 'none';
       if(resDiv) resDiv.style.display = 'block';
       
-      if(preview) preview.innerHTML = 
-        '<h3>' + esc(result.name) + ' <span style="font-size:14px; font-weight:normal; background:#444; color:#fff; padding:2px 6px; border-radius:4px;">Ранг ' + esc(result.rank) + '</span></h3>' +
-        '<p><strong>Категория:</strong> ' + esc(result.cat) + (result.nature ? ' | <strong>Стихия:</strong> ' + esc(result.nature) : '') + '</p>' +
-        '<p><strong>Стоимость:</strong> ' + esc(result.cost) + ' чакры</p>' +
-        (result.req ? '<p><strong>Требования:</strong> ' + esc(result.req) + '</p>' : '') +
-        (result.dmgN && result.dmgN !== '0' ? '<p><strong>Урон:</strong> ' + esc(result.dmgN) + esc(result.dmgD) + (result.dmgMod ? '+' + esc(result.dmgMod) : '') + '</p>' : '') +
-        '<p style="margin-top:10px; white-space:pre-wrap; line-height:1.5;">' + esc(result.desc) + '</p>';
+      if(preview) {
+        var dummy = JSON.parse(JSON.stringify(result));
+        dummy.id = 'dummy';
+        if(dummy.cost && !dummy.cost.includes('ОД')) dummy.cost += ' Чакры';
+        var cardHtml = renderTechCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"');
+        preview.innerHTML = cardHtml;
+      }
         
+      renderJutsuHistory();
       if(resDiv) resDiv.scrollIntoView({behavior: "smooth"});
     });
   });
 
-  
+  var btnJutsuBack = g('btnJutsuBack');
+  if(btnJutsuBack) btnJutsuBack.addEventListener('click', function(){
+    var form = g('jgFormSection');
+    var resDiv = g('jgResult');
+    if(form) form.style.display = 'block';
+    if(resDiv) resDiv.style.display = 'none';
+  });
+
+  var btnJutsuRegen = g('btnJutsuRegen');
+  if(btnJutsuRegen) btnJutsuRegen.addEventListener('click', function(){
+    var btnGen = g('btnJutsuGen');
+    var form = g('jgFormSection');
+    var resDiv = g('jgResult');
+    if(form) form.style.display = 'block';
+    if(resDiv) resDiv.style.display = 'none';
+    if(btnGen) btnGen.click();
+  });
+
+  var btnJutsuSave = g('btnJutsuSave');
+  if(btnJutsuSave) btnJutsuSave.addEventListener('click', function(){
+    var jutsu = window._lastGenJutsu;
+    if(!jutsu) return;
+    var d = newTech();
+    d.id = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
+    d.name = jutsu.name || '';
+    d.rank = jutsu.rank || 'D';
+    d.cat = jutsu.cat || 'Ниндзюцу';
+    d.nature = jutsu.nature || '';
+    d.cost = String(jutsu.cost || '');
+    d.req = jutsu.req || '';
+    d.desc = jutsu.desc || '';
+    d.dmgN = String(jutsu.dmgN || '0');
+    if(d.dmgN === '0') d.dmgN = '';
+    d.dmgD = jutsu.dmgD || 'd6';
+    if(d.dmgD === 'd0') d.dmgD = 'd6';
+    d.dmgMod = String(jutsu.dmgMod || '');
+    if(d.dmgMod === '0') d.dmgMod = '';
+    
+    SH.techs.unshift(d);
+    saveShinobi();
+    nav('shTechView:'+d.id);
+  });
+
+  function renderJutsuHistory(){
+    var wrap = g('jgHistoryWrap');
+    var list = g('jgHistoryList');
+    if(!wrap || !list) return;
+    try {
+      var h = JSON.parse(localStorage.getItem('sh_ai_hist_jutsu')||'[]');
+      if(h.length === 0){ wrap.style.display='none'; return; }
+      wrap.style.display='block';
+      list.innerHTML = h.map(function(item, i){
+        return '<div class="card" style="cursor:pointer; margin-bottom:0;" onclick="window._loadJutsuHist('+i+')">'+
+          '<div class="name" style="font-size:14px;"><span class="sh-cat-badge">'+esc(item.rank)+'</span> '+esc(item.name)+'</div>'+
+          '<div style="font-size:12px; color:var(--ink-dim); margin-top:4px;">'+esc(item.cat)+' | '+esc(item.nature)+'</div>'+
+        '</div>';
+      }).join('');
+    } catch(e){}
+  }
+  window._loadJutsuHist = function(i){
+    try {
+      var h = JSON.parse(localStorage.getItem('sh_ai_hist_jutsu')||'[]');
+      var item = h[i];
+      if(!item) return;
+      window._lastGenJutsu = item;
+      var form = g('jgFormSection');
+      var resDiv = g('jgResult');
+      var preview = g('jgPreview');
+      if(form) form.style.display = 'none';
+      if(resDiv) resDiv.style.display = 'block';
+      if(preview) {
+        var dummy = JSON.parse(JSON.stringify(item));
+        dummy.id = 'dummy';
+        if(dummy.cost && !dummy.cost.includes('ОД')) dummy.cost += ' Чакры';
+        preview.innerHTML = renderTechCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"');
+      }
+      window.scrollTo(0,0);
+    } catch(e){}
+  };
+
+  if(g('btnJutsuGen')) renderJutsuHistory();
+
+
   var btnMoveGen = g('btnMoveGen');
   if(btnMoveGen) btnMoveGen.addEventListener('click', function(){
     var btn = this;
@@ -15087,26 +15147,63 @@ function wireSh(){
       
       window._lastGenMove = result;
       
+      // Save to local history
+      try {
+        var h = JSON.parse(localStorage.getItem('sh_ai_hist_move')||'[]');
+        h.unshift(result);
+        if(h.length > 20) h.length = 20;
+        localStorage.setItem('sh_ai_hist_move', JSON.stringify(h));
+      } catch(e){}
+      
+      var form = g('mgFormSection');
       var resDiv = g('mgResult');
       var preview = g('mgPreview');
+      
+      if(form) form.style.display = 'none';
       if(resDiv) resDiv.style.display = 'block';
       
-      if(preview) preview.innerHTML = 
-        '<h3>' + esc(result.name) + '</h3>' +
-        '<p><strong>Категория:</strong> ' + esc(result.kind) + ' | <strong>Тип:</strong> ' + esc(result.mtype) + '</p>' +
-        (result.weapon ? '<p><strong>Оружие:</strong> ' + esc(result.weapon) + '</p>' : '') +
-        '<p><strong>Цена:</strong> ' + esc(result.pay) + '</p>' +
-        (result.req ? '<p><strong>Требования:</strong> ' + esc(result.req) + '</p>' : '') +
-        (result.atk ? '<p><strong>Атака от:</strong> ' + esc(result.atk) + '</p>' : '') +
-        (result.dmg ? '<p><strong>Урон:</strong> ' + esc(result.dmg) + '</p>' : '') +
-        (result.def ? '<p><strong>Спасбросок:</strong> ' + esc(result.def) + '</p>' : '') +
-        (result.state ? '<p><strong>Состояние:</strong> ' + esc(result.state) + ' (' + esc(result.dur) + ')</p>' : '') +
-        (result.trigger ? '<p><strong>Триггер:</strong> ' + esc(result.trigger) + '</p>' : '') +
-        (result.reach ? '<p><strong>Дистанция:</strong> ' + esc(result.reach) + '</p>' : '') +
-        '<p style="margin-top:10px; white-space:pre-wrap; line-height:1.5;">' + esc(result.desc) + '</p>';
+      if(preview) {
+        var st = (result.mtype==='Состояние' && result.state && result.state!=='другое') ? ' • <span style="color:var(--brass);font-weight:600;">'+esc(result.state)+'</span>' : '';
+        var payStr = result.pay ? ('Цена: <b>'+esc(result.pay)+'</b>') : '';
+        var line = [ (result.mtype||'Урон'), (result.weapon||'Без оружия'), (result.atk||''), payStr ]
+                 .filter(function(x){return x;}).join(' • ');
+        var details = [];
+        if(result.req) details.push('<b>Требования:</b> ' + esc(result.req));
+        if(result.dmg) details.push('<b>Урон:</b> ' + esc(result.dmg));
+        if(result.def) details.push('<b>Спасбросок:</b> ' + esc(result.def));
+        if(result.state) details.push('<b>Эффект:</b> ' + esc(result.state) + (result.dur ? ' (' + esc(result.dur) + ')' : ''));
+        if(result.trigger) details.push('<b>Триггер:</b> ' + esc(result.trigger));
+        if(result.reach) details.push('<b>Дистанция:</b> ' + esc(result.reach));
         
+        var cardHtml = '<div class="card" style="pointer-events:none;">'+
+          '<div class="name" style="font-size:16px; margin-bottom:4px;"><span class="sh-cat-badge">' + esc(result.kind) + '</span> ' + esc(result.name||'Без названия')+st+'</div>'+
+          '<div class="desc" style="margin-bottom:8px;">'+line+'</div>'+
+          (details.length ? '<div style="font-size:12px; color:var(--ink-dim); margin-bottom:8px; line-height:1.4;">' + details.join('<br>') + '</div>' : '') +
+          (result.desc ? '<div style="font-size:13px; color:var(--ink); line-height:1.4; border-top:1px solid var(--line); padding-top:6px; margin-top:6px;">' + esc(result.desc) + '</div>' : '') +
+          '</div>';
+        preview.innerHTML = cardHtml;
+      }
+      renderMoveHistory();
       if(resDiv) resDiv.scrollIntoView({behavior: "smooth"});
     });
+  });
+
+  var btnMoveBack = g('btnMoveBack');
+  if(btnMoveBack) btnMoveBack.addEventListener('click', function(){
+    var form = g('mgFormSection');
+    var resDiv = g('mgResult');
+    if(form) form.style.display = 'block';
+    if(resDiv) resDiv.style.display = 'none';
+  });
+
+  var btnMoveRegen = g('btnMoveRegen');
+  if(btnMoveRegen) btnMoveRegen.addEventListener('click', function(){
+    var btnGen = g('btnMoveGen');
+    var form = g('mgFormSection');
+    var resDiv = g('mgResult');
+    if(form) form.style.display = 'block';
+    if(resDiv) resDiv.style.display = 'none';
+    if(btnGen) btnGen.click();
   });
 
   var btnMoveSave = g('btnMoveSave');
@@ -15136,32 +15233,59 @@ function wireSh(){
     nav('shMoveView:'+d.id);
   });
 
-  var btnJutsuSave = g('btnJutsuSave');
-  if(btnJutsuSave) btnJutsuSave.addEventListener('click', function(){
-    var jutsu = window._lastGenJutsu;
-    if(!jutsu) return;
-    
-    var d = newTech();
-    d.id = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
-    d.name = jutsu.name || 'Новая AI Техника';
-    d.rank = jutsu.rank || 'D';
-    d.cat = jutsu.cat || 'Ниндзюцу';
-    d.nature = jutsu.nature || '';
-    d.cost = String(jutsu.cost || '');
-    d.req = jutsu.req || '';
-    d.desc = jutsu.desc || '';
-    d.dmgN = String(jutsu.dmgN || '0');
-    if(d.dmgN === '0') d.dmgN = '';
-    d.dmgD = jutsu.dmgD || 'd6';
-    if(d.dmgD === 'd0') d.dmgD = 'd6';
-    d.dmgMod = String(jutsu.dmgMod || '');
-    if(d.dmgMod === '0') d.dmgMod = '';
-    
-    SH.techs.unshift(d);
-    saveT();
-    alert('Техника "' + d.name + '" успешно добавлена в список!');
-    window.render();
-  });
+  function renderMoveHistory(){
+    var wrap = g('mgHistoryWrap');
+    var list = g('mgHistoryList');
+    if(!wrap || !list) return;
+    try {
+      var h = JSON.parse(localStorage.getItem('sh_ai_hist_move')||'[]');
+      if(h.length === 0){ wrap.style.display='none'; return; }
+      wrap.style.display='block';
+      list.innerHTML = h.map(function(item, i){
+        return '<div class="card" style="cursor:pointer; margin-bottom:0;" onclick="window._loadMoveHist('+i+')">'+
+          '<div class="name" style="font-size:14px;"><span class="sh-cat-badge">'+esc(item.kind)+'</span> '+esc(item.name)+'</div>'+
+          '<div style="font-size:12px; color:var(--ink-dim); margin-top:4px;">'+esc(item.mtype||'Урон')+' | '+esc(item.weapon||'Без оружия')+'</div>'+
+        '</div>';
+      }).join('');
+    } catch(e){}
+  }
+  window._loadMoveHist = function(i){
+    try {
+      var h = JSON.parse(localStorage.getItem('sh_ai_hist_move')||'[]');
+      var result = h[i];
+      if(!result) return;
+      window._lastGenMove = result;
+      var form = g('mgFormSection');
+      var resDiv = g('mgResult');
+      var preview = g('mgPreview');
+      if(form) form.style.display = 'none';
+      if(resDiv) resDiv.style.display = 'block';
+      if(preview) {
+        var st = (result.mtype==='Состояние' && result.state && result.state!=='другое') ? ' • <span style="color:var(--brass);font-weight:600;">'+esc(result.state)+'</span>' : '';
+        var payStr = result.pay ? ('Цена: <b>'+esc(result.pay)+'</b>') : '';
+        var line = [ (result.mtype||'Урон'), (result.weapon||'Без оружия'), (result.atk||''), payStr ]
+                 .filter(function(x){return x;}).join(' • ');
+        var details = [];
+        if(result.req) details.push('<b>Требования:</b> ' + esc(result.req));
+        if(result.dmg) details.push('<b>Урон:</b> ' + esc(result.dmg));
+        if(result.def) details.push('<b>Спасбросок:</b> ' + esc(result.def));
+        if(result.state) details.push('<b>Эффект:</b> ' + esc(result.state) + (result.dur ? ' (' + esc(result.dur) + ')' : ''));
+        if(result.trigger) details.push('<b>Триггер:</b> ' + esc(result.trigger));
+        if(result.reach) details.push('<b>Дистанция:</b> ' + esc(result.reach));
+        
+        var cardHtml = '<div class="card" style="pointer-events:none;">'+
+          '<div class="name" style="font-size:16px; margin-bottom:4px;"><span class="sh-cat-badge">' + esc(result.kind) + '</span> ' + esc(result.name||'Без названия')+st+'</div>'+
+          '<div class="desc" style="margin-bottom:8px;">'+line+'</div>'+
+          (details.length ? '<div style="font-size:12px; color:var(--ink-dim); margin-bottom:8px; line-height:1.4;">' + details.join('<br>') + '</div>' : '') +
+          (result.desc ? '<div style="font-size:13px; color:var(--ink); line-height:1.4; border-top:1px solid var(--line); padding-top:6px; margin-top:6px;">' + esc(result.desc) + '</div>' : '') +
+          '</div>';
+        preview.innerHTML = cardHtml;
+      }
+      window.scrollTo(0,0);
+    } catch(e){}
+  };
+
+  if(g('btnMoveGen')) renderMoveHistory();
 
   var ef=g('shEff');
   if(ef){
