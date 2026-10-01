@@ -4960,7 +4960,138 @@ body.sh-theme .gh-sync-card {
   border: 1px solid #0284c7;
 }
 
+
+/* --- ТЕМА ГОМАН (GOMAN TEMPLE BASALT / ХРАМОВЫЙ БАЗАЛЬТ И БЕЛОЕ ЗОЛОТО) --- */
+body.sh-theme.sh-theme-goman {
+  --ink: #f8f4e6;
+  --ink-dim: #a39882;
+  --steel-0: #0c0a07;
+  --steel-1: #14110b;
+  --steel-2: #1d1811;
+  --line: #483c27;
+  --brass: #f3d37a;
+  --brass-dim: #6e5a38;
+  --brass-bright: #ffe89e;
+  --crimson: #d97706;
+  --crimson-bright: #fffbeb;
+  --die: #f3d37a;
+  background:
+    radial-gradient(ellipse at 50% -12%, rgba(243, 211, 122, 0.22) 0%, transparent 65%),
+    repeating-linear-gradient(90deg, rgba(243,211,122,0.015) 0px, rgba(243,211,122,0.015) 1px, transparent 1px, transparent 12px),
+    linear-gradient(180deg, #14110b 0%, #0c0a07 100%);
+}
+
+body.sh-theme.sh-theme-goman .hb-seg-btn.on {
+  background: linear-gradient(180deg, rgba(243, 211, 122, 0.15) 0%, rgba(243, 211, 122, 0.0) 100%);
+  border-bottom-color: #f3d37a;
+  color: #ffe89e;
+  box-shadow: 0 -12px 20px -10px rgba(243, 211, 122, 0.35) inset;
+}
+
+body.sh-theme.sh-theme-goman .btn-primary {
+  background: linear-gradient(135deg, #d97706 0%, #a85800 100%);
+  color: #fffbeb;
+  border: none;
+  box-shadow: 0 0 14px rgba(243, 211, 122, 0.45);
+}
+
+body.sh-theme.sh-theme-goman .menu-item {
+  background: linear-gradient(135deg, rgba(29, 24, 17, 0.95) 0%, rgba(20, 17, 11, 0.95) 100%);
+  border-color: #483c27;
+  border-left-color: #f3d37a;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(243, 211, 122, 0.08);
+}
+
+body.sh-theme.sh-theme-goman .menu-item:hover:not(.disabled) {
+  background: linear-gradient(135deg, rgba(38, 32, 24, 0.98) 0%, rgba(24, 20, 14, 0.98) 100%);
+  border-color: #6e5a38;
+  border-left-color: #ffe89e;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.75), 0 0 18px rgba(243, 211, 122, 0.25);
+}
+
+body.sh-theme.sh-theme-goman .card {
+  background: linear-gradient(145deg, rgba(29, 24, 17, 0.95) 0%, rgba(20, 17, 11, 0.95) 100%);
+  border-color: #483c27;
+  border-left-color: #f3d37a;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55), 0 0 12px rgba(243, 211, 122, 0.08);
+}
+
+body.sh-theme.sh-theme-goman .card::before {
+  background: linear-gradient(90deg, #d97706 0%, #ffffff 50%, #f3d37a 100%);
+}
+
+body.sh-theme.sh-theme-goman .card:hover {
+  background: linear-gradient(145deg, rgba(38, 32, 24, 0.98) 0%, rgba(24, 20, 14, 0.98) 100%);
+  border-color: #6e5a38;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 0 0 24px rgba(243, 211, 122, 0.35);
+}
+
+body.sh-theme.sh-theme-goman .sh-hud {
+  background: linear-gradient(135deg, rgba(29, 24, 17, 0.96) 0%, rgba(20, 17, 11, 0.96) 100%);
+  border-color: rgba(243, 211, 122, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(243, 211, 122, 0.15);
+}
+
+body.sh-theme.sh-theme-goman .sh-hud-stat-pill {
+  border-color: rgba(243, 211, 122, 0.35);
+  box-shadow: inset 0 0 8px rgba(243, 211, 122, 0.15), 0 0 10px rgba(243, 211, 122, 0.18);
+}
+
+/* Goman Particles Container */
+.sh-goman-particles {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  display: none;
+}
+body.sh-theme-goman .sh-goman-particles {
+  display: block;
+}
+
+/* Solar Embers (Sparkles) */
+.sh-goman-spark-particle {
+  position: absolute;
+  background: var(--spark-bg, #f3d37a);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px var(--spark-bg, #f3d37a));
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+/* Floating Lion Crest (Fuin) */
+.sh-goman-crest-particle {
+  position: absolute;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='%23f3d37a' stroke-width='4'/%3E%3Ccircle cx='50' cy='50' r='38' fill='none' stroke='%23f3d37a' stroke-width='1.5' stroke-dasharray='4 4'/%3E%3Cpath d='M35 35 L65 65 M35 65 L65 35 M50 20 L50 80 M20 50 L80 50' stroke='%23f3d37a' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='50' cy='50' r='10' fill='%23ffe89e'/%3E%3C/svg%3E");
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  filter: brightness(1.2) contrast(1.1) drop-shadow(0 0 6px rgba(243, 211, 122, 0.5));
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+@keyframes gomanRise {
+  0% { transform: translateY(0) scale(0.8); opacity: 0; }
+  20% { opacity: var(--p-op, 0.4); }
+  80% { opacity: var(--p-op, 0.2); }
+  100% { transform: translateY(calc(-100vh - 20px)) scale(1.2); opacity: 0; }
+}
+
+@keyframes gomanDrift {
+  0% { transform: translate(0, 0) rotate(0deg) scale(0.5); opacity: 0; }
+  25% { opacity: var(--p-op, 0.12); }
+  50% { transform: translate(40px, -40px) rotate(10deg) scale(1); opacity: var(--p-op, 0.12); }
+  75% { opacity: var(--p-op, 0.08); }
+  100% { transform: translate(80px, -80px) rotate(20deg) scale(0.5); opacity: 0; }
+}
 </style>
+
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -9011,6 +9142,7 @@ function getShinobiClanTheme(prof){
   var text = (name + ' ' + clan).trim();
   if(/(кураями|kurayami)/i.test(text)) return 'kurayami';
   if(/(учиха|uchiha)/i.test(text)) return 'uchiha';
+  if(/(гоман|goman)/i.test(text)) return 'goman';
   return 'default';
 }
 
@@ -9087,21 +9219,74 @@ function initKurayamiParticles(){
   return cont;
 }
 
+
+function initGomanParticles(){
+  if(typeof document === 'undefined' || !document.body) return null;
+  var cont = document.getElementById('shGomanParticles');
+  if(!cont){
+    cont = document.createElement('div');
+    cont.id = 'shGomanParticles';
+    cont.className = 'sh-goman-particles';
+    cont.setAttribute('aria-hidden', 'true');
+    document.body.insertBefore(cont, document.body.firstChild);
+  }
+  if(!cont.children || cont.children.length === 0){
+    // Solar embers
+    for(var i = 0; i < 45; i++){
+      var p = document.createElement('div');
+      p.className = 'sh-goman-spark-particle';
+      var size = Math.floor(Math.random() * 3 + 1); // 1-3px
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.left = Math.floor(Math.random() * 100) + '%';
+      p.style.bottom = '-10px';
+      var duration = (5 + Math.random() * 15).toFixed(1);
+      var delay = (-Math.random() * 20).toFixed(1);
+      var maxOp = (0.2 + Math.random() * 0.4).toFixed(2);
+      p.style.setProperty('--p-op', maxOp);
+      p.style.animation = 'gomanRise ' + duration + 's ease-in ' + delay + 's infinite';
+      cont.appendChild(p);
+    }
+    // Shishi crests
+    for(var j = 0; j < 5; j++){
+      var c = document.createElement('div');
+      c.className = 'sh-goman-crest-particle';
+      var csize = Math.floor(40 + Math.random() * 60); // 40-100px
+      c.style.width = csize + 'px';
+      c.style.height = csize + 'px';
+      c.style.left = Math.floor(Math.random() * 90) + '%';
+      c.style.top = Math.floor(Math.random() * 90) + '%';
+      var cdur = (20 + Math.random() * 20).toFixed(1);
+      var cdelay = (-Math.random() * 40).toFixed(1);
+      var cop = (0.08 + Math.random() * 0.04).toFixed(2);
+      c.style.setProperty('--p-op', cop);
+      c.style.animation = 'gomanDrift ' + cdur + 's ease-in-out ' + cdelay + 's infinite';
+      cont.appendChild(c);
+    }
+  }
+  return cont;
+}
+
 function updateShinobiTheme(){
   if(typeof document === 'undefined' || !document.body) return;
   if(typeof HB === 'undefined' || HB.mode !== 'sh'){
-    document.body.classList.remove('sh-theme-kurayami', 'sh-theme-uchiha');
+    document.body.classList.remove('sh-theme-kurayami', 'sh-theme-uchiha', 'sh-theme-goman');
     var pKur = document.getElementById('shKurayamiParticles');
     if(pKur) pKur.style.display = 'none';
     var pUch = document.getElementById('shUchihaParticles');
     if(pUch) pUch.style.display = 'none';
+    var pGom = document.getElementById('shGomanParticles');
+    if(pGom) pGom.style.display = 'none';
     return;
   }
   var theme = getShinobiClanTheme();
   var isKurayami = (theme === 'kurayami');
   var isUchiha = (theme === 'uchiha');
+  var isGoman = (theme === 'goman');
+  
   document.body.classList.toggle('sh-theme-kurayami', isKurayami);
   document.body.classList.toggle('sh-theme-uchiha', isUchiha);
+  document.body.classList.toggle('sh-theme-goman', isGoman);
 
   if(isKurayami){
     var pKur = initKurayamiParticles();
@@ -9117,6 +9302,14 @@ function updateShinobiTheme(){
   } else {
     var pUch = document.getElementById('shUchihaParticles');
     if(pUch) pUch.style.display = 'none';
+  }
+
+  if(isGoman){
+    var pGom = initGomanParticles();
+    if(pGom) pGom.style.display = 'block';
+  } else {
+    var pGom = document.getElementById('shGomanParticles');
+    if(pGom) pGom.style.display = 'none';
   }
 }
 
