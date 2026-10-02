@@ -5250,6 +5250,405 @@ body.sh-theme-dzanku .sh-dzanku-particles {
   animation: fadeZoom 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
 }
 
+
+
+/* ==========================================================================
+   MASS EFFECT 4-THEME SYSTEM & SCI-FI TACTICAL HUD
+   ========================================================================== */
+
+/* 1. CITADEL / ALLIANCE BLUE (DEFAULT) */
+body.me-theme.me-theme-citadel {
+  --ink: #e0f2fe;
+  --ink-dim: #7dd3fc;
+  --steel-0: #030712;
+  --steel-1: #071328;
+  --steel-2: #0e203f;
+  --line: #1e3a5f;
+  --brass: #00d2ff;
+  --brass-dim: #0284c7;
+  --brass-bright: #bae6fd;
+  --crimson: #0284c7;
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(0, 210, 255, 0.16) 0%, transparent 45%),
+    radial-gradient(ellipse at 15% 100%, rgba(0, 119, 204, 0.1) 0%, transparent 45%),
+    linear-gradient(rgba(0, 210, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 210, 255, 0.03) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 15%, #0b1a38 0%, #030712 75%);
+  background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px, 100% 100%;
+}
+
+/* 2. OMNI-TOOL AMBER */
+body.me-theme.me-theme-omni {
+  --ink: #fff7ed;
+  --ink-dim: #fdba74;
+  --steel-0: #0c0602;
+  --steel-1: #1a0d04;
+  --steel-2: #281406;
+  --line: #7c2d12;
+  --brass: #f97316;
+  --brass-dim: #c2410c;
+  --brass-bright: #ffedd5;
+  --crimson: #ea580c;
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(249, 115, 22, 0.18) 0%, transparent 45%),
+    radial-gradient(ellipse at 15% 100%, rgba(234, 88, 12, 0.12) 0%, transparent 45%),
+    linear-gradient(rgba(249, 115, 22, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(249, 115, 22, 0.035) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 15%, #241105 0%, #0c0602 75%);
+  background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px, 100% 100%;
+}
+body.me-theme.me-theme-omni .me-panel,
+body.me-theme.me-theme-omni .me-card,
+body.me-theme.me-theme-omni .me-dossier-card {
+  border-color: rgba(249, 115, 22, 0.3) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.7), 0 0 15px rgba(249, 115, 22, 0.08) !important;
+}
+body.me-theme.me-theme-omni .btn-primary {
+  background: linear-gradient(135deg, #f97316 0%, #c2410c 100%) !important;
+  color: #fff !important;
+  border-color: #f97316 !important;
+  box-shadow: 0 0 16px rgba(249, 115, 22, 0.5) !important;
+}
+
+/* 3. N7 CARBON BLACK */
+body.me-theme.me-theme-n7 {
+  --ink: #f8fafc;
+  --ink-dim: #94a3b8;
+  --steel-0: #08080a;
+  --steel-1: #101014;
+  --steel-2: #18181f;
+  --line: #333344;
+  --brass: #e11d48;
+  --brass-dim: #9f1239;
+  --brass-bright: #ffe4e6;
+  --crimson: #e11d48;
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(225, 29, 72, 0.15) 0%, transparent 45%),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0, rgba(255,255,255,0.015) 2px, transparent 0, transparent 6px),
+    linear-gradient(180deg, #101014 0%, #08080a 100%);
+}
+body.me-theme.me-theme-n7 .me-dossier-card,
+body.me-theme.me-theme-n7 .menu-item {
+  border-left: 3px solid #e11d48 !important;
+  border-color: rgba(225, 29, 72, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.8), 0 0 12px rgba(225, 29, 72, 0.1) !important;
+}
+body.me-theme.me-theme-n7 .btn-primary {
+  background: linear-gradient(135deg, #e11d48 0%, #881337 100%) !important;
+  color: #fff !important;
+  border-color: #e11d48 !important;
+  box-shadow: 0 0 16px rgba(225, 29, 72, 0.5) !important;
+}
+
+/* 4. CERBERUS OBSIDIAN & GOLD */
+body.me-theme.me-theme-cerberus {
+  --ink: #fefce8;
+  --ink-dim: #ca8a04;
+  --steel-0: #0a0905;
+  --steel-1: #15130b;
+  --steel-2: #211c0f;
+  --line: #524214;
+  --brass: #eab308;
+  --brass-dim: #a16207;
+  --brass-bright: #fef08a;
+  --crimson: #ca8a04;
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(234, 179, 8, 0.18) 0%, transparent 45%),
+    radial-gradient(ellipse at 15% 100%, rgba(161, 98, 7, 0.12) 0%, transparent 45%),
+    repeating-linear-gradient(90deg, rgba(234, 179, 8, 0.02) 0, rgba(234, 179, 8, 0.02) 1px, transparent 1px, transparent 20px),
+    linear-gradient(180deg, #15130b 0%, #0a0905 100%);
+}
+body.me-theme.me-theme-cerberus .me-panel,
+body.me-theme.me-theme-cerberus .me-card,
+body.me-theme.me-theme-cerberus .me-dossier-card {
+  border-color: rgba(234, 179, 8, 0.35) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.8), 0 0 14px rgba(234, 179, 8, 0.1) !important;
+}
+body.me-theme.me-theme-cerberus .btn-primary {
+  background: linear-gradient(135deg, #eab308 0%, #a16207 100%) !important;
+  color: #1a1505 !important;
+  border-color: #eab308 !important;
+  box-shadow: 0 0 16px rgba(234, 179, 8, 0.5) !important;
+  font-weight: 700 !important;
+}
+
+/* THEME PILLS */
+.me-theme-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.me-theme-pill {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.me-theme-pill:hover {
+  border-color: var(--brass);
+  color: var(--ink);
+}
+.me-theme-pill.active {
+  background: var(--brass);
+  color: #050b14;
+  border-color: var(--brass);
+  font-weight: 700;
+  box-shadow: 0 0 10px var(--brass);
+}
+
+/* DOSSIER CARD */
+.me-dossier-card {
+  background: linear-gradient(135deg, rgba(14, 32, 63, 0.8) 0%, rgba(6, 14, 28, 0.9) 100%);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.6);
+  position: relative;
+  overflow: hidden;
+}
+.me-dossier-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--brass), transparent);
+}
+.me-dossier-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.me-dossier-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--brass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.2);
+  flex-shrink: 0;
+}
+.me-avatar-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--brass);
+  letter-spacing: 0.05em;
+}
+.me-dossier-info {
+  flex: 1;
+}
+.me-dossier-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.me-dossier-name {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.03em;
+}
+.me-dossier-callsign {
+  font-size: 14px;
+  color: var(--brass);
+  font-family: 'JetBrains Mono', monospace;
+}
+.me-dossier-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.me-meta-tag {
+  font-size: 11px;
+  padding: 2px 7px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  border-radius: 2px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.me-meta-tag.class-tag {
+  border-color: rgba(0, 210, 255, 0.4);
+  color: var(--brass);
+}
+.me-meta-tag.cred-tag {
+  border-color: rgba(234, 179, 8, 0.4);
+  color: #facc15;
+}
+
+/* VITALS SECTION */
+.me-vitals-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.me-vital-card {
+  background: rgba(4, 9, 18, 0.6);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+.me-vital-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.me-vital-num {
+  color: var(--brass);
+  font-size: 13px;
+  font-weight: 700;
+}
+.me-vital-bar-wrap {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.me-vital-bar-fill {
+  height: 100%;
+  transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.shield-fill {
+  background: linear-gradient(90deg, #0284c7 0%, var(--brass) 100%);
+  box-shadow: 0 0 10px var(--brass);
+}
+.hp-fill {
+  background: linear-gradient(90deg, #dc2626 0%, #16a34a 100%);
+  box-shadow: 0 0 10px #16a34a;
+}
+.me-vital-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.me-btn-xs {
+  padding: 3px 8px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all 0.15s ease;
+}
+.me-btn-xs:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--brass);
+  color: var(--ink);
+}
+.me-btn-xs.full-btn {
+  border-color: rgba(0, 210, 255, 0.4);
+  color: var(--brass);
+}
+.me-btn-xs.medigel-btn {
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #4ade80;
+}
+.me-btn-mini {
+  padding: 1px 6px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.me-btn-mini:hover {
+  background: var(--brass);
+  color: #000;
+}
+
+/* SUPPLIES ROW */
+.me-supplies-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.me-supply-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.chip-label { color: var(--ink-dim); }
+.chip-val { color: var(--ink); font-weight: 700; }
+.chip-sub { color: var(--ink-dim); font-size: 10.5px; }
+
+/* STATS CHIPS */
+.me-dossier-stats-wrap {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+@media (max-width: 600px) {
+  .me-dossier-stats-wrap { grid-template-columns: repeat(3, 1fr); }
+}
+.me-stat-chip {
+  background: rgba(4, 9, 18, 0.7);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 6px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.me-stat-chip:hover {
+  border-color: var(--brass);
+  background: rgba(0, 210, 255, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.me-stat-chip .stat-name {
+  font-size: 10.5px;
+  color: var(--ink-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+.me-stat-chip .stat-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 1px 0;
+}
+.me-stat-chip .stat-mod {
+  font-size: 11px;
+  color: var(--brass);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
 </style>
 
 
@@ -18249,24 +18648,180 @@ function meNavHeader(title, tag){
   '</div>';
 }
 
+
+/* ==========================================================================
+   MASS EFFECT ENGINE & THEMES
+   ========================================================================== */
+window.getMeTheme = function(){
+  try { return localStorage.getItem('me_theme') || 'citadel'; } catch(e){ return 'citadel'; }
+};
+window.setMeTheme = function(t){
+  try { localStorage.setItem('me_theme', t); } catch(e){}
+  applyMeTheme();
+};
+window.applyMeTheme = function(){
+  var t = getMeTheme();
+  document.body.classList.remove('me-theme-citadel', 'me-theme-omni', 'me-theme-n7', 'me-theme-cerberus');
+  document.body.classList.add('me-theme-' + t);
+};
+
+function renderMeHudHtml(){
+  var t = getMeTheme();
+  return '<div class="me-hud" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+    '<div class="me-hud-status">' +
+      '<div class="me-hud-pulse"></div>' +
+      '<span>ТАКТИЧЕСКАЯ СЕТЬ АЛЬЯНСА // ТЕРМИНАЛ ОПЕРАТИВНИКА</span>' +
+    '</div>' +
+    '<div class="me-theme-pills">' +
+      '<button class="me-theme-pill ' + (t==='citadel'?'active':'') + '" data-me-theme="citadel">🔹 Цитадель</button>' +
+      '<button class="me-theme-pill ' + (t==='omni'?'active':'') + '" data-me-theme="omni">🔸 Омни-тул</button>' +
+      '<button class="me-theme-pill ' + (t==='n7'?'active':'') + '" data-me-theme="n7">🔴 N7</button>' +
+      '<button class="me-theme-pill ' + (t==='cerberus'?'active':'') + '" data-me-theme="cerberus">🟡 Цербер</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderMeCharWidget(c){
+  c = c || ME.getChar();
+  var curShield = (typeof c.currentShield === 'number') ? c.currentShield : (c.baseShield || 15);
+  var maxShield = c.baseShield || 15;
+  var shieldPct = Math.max(0, Math.min(100, Math.round((curShield / (maxShield || 1)) * 100)));
+
+  var curHp = (typeof c.currentHp === 'number') ? c.currentHp : (c.maxHp || 24);
+  var maxHp = c.maxHp || 24;
+  var hpPct = Math.max(0, Math.min(100, Math.round((curHp / (maxHp || 1)) * 100)));
+
+  var curArmor = (typeof c.currentArmor === 'number') ? c.currentArmor : (c.baseArmorPoints || 10);
+  var maxArmor = c.baseArmorPoints || 10;
+  var armorThreshold = c.damageThreshold || 1;
+
+  var medigel = (typeof c.medigel === 'number') ? c.medigel : 3;
+  var thermalClips = (typeof c.thermalClips === 'number') ? c.thermalClips : 6;
+  var credits = (typeof c.credits === 'number') ? c.credits : 15000;
+
+  function mod(v){
+    var m = Math.floor((v - 10) / 2);
+    return m >= 0 ? '+' + m : String(m);
+  }
+
+  var stats = [
+    { k: 'str', label: 'СИЛ', val: (c.stats && c.stats.str) || 10 },
+    { k: 'dex', label: 'ЛОВ', val: (c.stats && c.stats.dex) || 10 },
+    { k: 'con', label: 'ТЕЛ', val: (c.stats && c.stats.con) || 10 },
+    { k: 'int', label: 'ИНТ', val: (c.stats && c.stats.int) || 10 },
+    { k: 'wis', label: 'МУД', val: (c.stats && c.stats.wis) || 10 },
+    { k: 'cha', label: 'ХАР', val: (c.stats && c.stats.cha) || 10 }
+  ];
+
+  var statsHtml = stats.map(function(s){
+    var mStr = mod(s.val);
+    return '<div class="me-stat-chip" data-stat-key="' + s.k + '" data-stat-name="' + s.label + '" data-stat-val="' + s.val + '" data-stat-mod="' + mStr + '" title="Кликните для быстрой проверки ' + s.label + '">' +
+      '<div class="stat-name">' + s.label + '</div>' +
+      '<div class="stat-val">' + s.val + '</div>' +
+      '<div class="stat-mod">' + mStr + '</div>' +
+    '</div>';
+  }).join('');
+
+  return '<div class="me-dossier-card">' +
+    '<div class="me-dossier-head">' +
+      '<div class="me-dossier-avatar">' +
+        '<div class="me-avatar-badge">' + (c.callsign ? meEsc(c.callsign.substring(0,2).toUpperCase()) : 'N7') + '</div>' +
+      '</div>' +
+      '<div class="me-dossier-info">' +
+        '<div class="me-dossier-title-row">' +
+          '<span class="me-dossier-name">' + meEsc(c.name || 'Безымянный оперативник') + '</span>' +
+          (c.callsign ? ('<span class="me-dossier-callsign">«' + meEsc(c.callsign) + '»</span>') : '') +
+          '<button class="me-btn-xs" data-nav="meChar" style="margin-left:auto;">✏️ Досье</button>' +
+        '</div>' +
+        '<div class="me-dossier-meta">' +
+          '<span class="me-meta-tag">' + meEsc(c.race || 'Человек') + '</span>' +
+          '<span class="me-meta-tag class-tag">' + meEsc(c.role || 'Солдат') + '</span>' +
+          '<span class="me-meta-tag">Ур. ' + (c.level || 1) + '</span>' +
+          '<span class="me-meta-tag cred-tag">💳 ' + Number(credits).toLocaleString() + ' ₢</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Tactical Vitals
+    '<div class="me-vitals-container">' +
+      // Shields
+      '<div class="me-vital-card shield-card">' +
+        '<div class="me-vital-head">' +
+          '<span>🛡️ Кинетические Щиты</span>' +
+          '<span class="me-vital-num">' + curShield + ' / ' + maxShield + '</span>' +
+        '</div>' +
+        '<div class="me-vital-bar-wrap">' +
+          '<div class="me-vital-bar-fill shield-fill" style="width:' + shieldPct + '%;"></div>' +
+        '</div>' +
+        '<div class="me-vital-actions">' +
+          '<button class="me-btn-xs" data-vital-act="shield-sub-5">-5</button>' +
+          '<button class="me-btn-xs" data-vital-act="shield-sub-10">-10</button>' +
+          '<button class="me-btn-xs" data-vital-act="shield-add-5">+5</button>' +
+          '<button class="me-btn-xs full-btn" data-vital-act="shield-recharge" title="Полный заряд щитов">⚡ Заряд</button>' +
+        '</div>' +
+      '</div>' +
+
+      // Health
+      '<div class="me-vital-card hp-card">' +
+        '<div class="me-vital-head">' +
+          '<span>❤️ Жизненные показатели</span>' +
+          '<span class="me-vital-num">' + curHp + ' / ' + maxHp + '</span>' +
+        '</div>' +
+        '<div class="me-vital-bar-wrap">' +
+          '<div class="me-vital-bar-fill hp-fill" style="width:' + hpPct + '%;"></div>' +
+        '</div>' +
+        '<div class="me-vital-actions">' +
+          '<button class="me-btn-xs" data-vital-act="hp-sub-5">-5</button>' +
+          '<button class="me-btn-xs" data-vital-act="hp-sub-10">-10</button>' +
+          '<button class="me-btn-xs" data-vital-act="hp-add-5">+5</button>' +
+          '<button class="me-btn-xs medigel-btn" data-vital-act="hp-medigel" ' + (medigel <= 0 ? 'disabled' : '') + ' title="Использовать панацелин">+10 HP (💊 ' + medigel + ')</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Supplies & Armor
+    '<div class="me-supplies-row">' +
+      '<div class="me-supply-chip">' +
+        '<span class="chip-label">🛡️ Броня:</span>' +
+        '<span class="chip-val">' + curArmor + ' / ' + maxArmor + ' AP</span>' +
+        '<span class="chip-sub">(Порог: ' + armorThreshold + ')</span>' +
+      '</div>' +
+      '<div class="me-supply-chip">' +
+        '<span class="chip-label">💊 Панацелин:</span>' +
+        '<button class="me-btn-mini" data-vital-act="medigel-dec">-</button>' +
+        '<span class="chip-val">' + medigel + ' / 5</span>' +
+        '<button class="me-btn-mini" data-vital-act="medigel-inc">+</button>' +
+      '</div>' +
+      '<div class="me-supply-chip">' +
+        '<span class="chip-label">🔋 Термозаряды:</span>' +
+        '<button class="me-btn-mini" data-vital-act="clip-dec">-</button>' +
+        '<span class="chip-val">' + thermalClips + ' / 10</span>' +
+        '<button class="me-btn-mini" data-vital-act="clip-inc">+</button>' +
+      '</div>' +
+      '<div class="me-supply-chip" style="margin-left:auto;">' +
+        '<span class="chip-label">⚡ Омни-гель:</span>' +
+        '<span class="chip-val">' + (c.omnigel || 50) + ' ед.</span>' +
+      '</div>' +
+    '</div>' +
+
+    // Attributes
+    '<div class="me-dossier-stats-wrap">' +
+      statsHtml +
+    '</div>' +
+  '</div>';
+}
+
 function meHome(){
+  var c = ME.getChar();
+  var hudHtml = renderMeHudHtml();
+  var charWidget = renderMeCharWidget(c);
+
   var hero = '<div class="hero-dice" data-go="dice">'+
     '<div class="hero-dice-icon">'+(typeof dieShapeSvg==='function'? dieShapeSvg(20,'meHeroDie',20) : '🎲')+'</div>'+
     '<div class="hero-dice-text">'+
       '<div class="hero-dice-name">ТАКТИЧЕСКИЙ БРОСОК КОСТЕЙ</div>'+
       '<div class="hero-dice-desc">Кубики d4–d20, d100 критов и событий перелёта, монетка шанса W/L, модификаторы и подписи ME</div>'+
     '</div><div class="hero-dice-arrow">→</div></div>';
-
-  var hudHtml = '<div class="me-hud">'+
-    '<div class="me-hud-status">'+
-      '<div class="me-hud-pulse"></div>'+
-      '<span>ТАКТИЧЕСКАЯ СЕТЬ АЛЬЯНСА // ТЕРМИНАЛ ОПЕРАТИВНИКА</span>'+
-    '</div>'+
-    '<div style="display:flex;gap:6px;">'+
-      '<span class="me-tag-holo">EXTRANET ONLINE</span>'+
-      '<span class="me-tag-omni">ЭЛЕМЕНТ НОЛЬ: СТАБИЛЕН</span>'+
-    '</div>'+
-  '</div>';
 
   var items = [
     {nav:'meChar',     icon:'👤', t:'Досье оперативника',     d:'Расы Совета, роли Альянса, биохимия, барьеры, щиты и броня'},
@@ -18281,7 +18836,8 @@ function meHome(){
 
   return ''+
     hudHtml +
-    '<div class="rule"></div>'+ hero +
+    charWidget +
+    hero +
     '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // КОНСОЛЬ</div>'+
     '<div class="menu-list grid-2">'+items.map(function(i){
       return '<div class="menu-item" data-nav="'+i.nav+'">'+
@@ -19498,6 +20054,66 @@ function meData(){
 
 // Привязка интерактивных событий всех экранов
 function wireMe(){
+  // Обработчики тем Космоса
+  document.querySelectorAll('[data-me-theme]').forEach(function(btn){
+    btn.onclick = function(){
+      var th = btn.getAttribute('data-me-theme');
+      if(th){
+        setMeTheme(th);
+        render();
+      }
+    };
+  });
+
+  // Обработчики жизненных показателей (Щиты, HP, Панацелин, Патроны)
+  document.querySelectorAll('[data-vital-act]').forEach(function(btn){
+    btn.onclick = function(e){
+      e.stopPropagation();
+      var act = btn.getAttribute('data-vital-act');
+      var c = ME.getChar();
+      var curShield = (typeof c.currentShield === 'number') ? c.currentShield : (c.baseShield || 15);
+      var maxShield = c.baseShield || 15;
+      var curHp = (typeof c.currentHp === 'number') ? c.currentHp : (c.maxHp || 24);
+      var maxHp = c.maxHp || 24;
+      var medigel = (typeof c.medigel === 'number') ? c.medigel : 3;
+      var thermalClips = (typeof c.thermalClips === 'number') ? c.thermalClips : 6;
+
+      if(act === 'shield-sub-5') c.currentShield = Math.max(0, curShield - 5);
+      else if(act === 'shield-sub-10') c.currentShield = Math.max(0, curShield - 10);
+      else if(act === 'shield-add-5') c.currentShield = Math.min(maxShield, curShield + 5);
+      else if(act === 'shield-recharge') c.currentShield = maxShield;
+      else if(act === 'hp-sub-5') c.currentHp = Math.max(0, curHp - 5);
+      else if(act === 'hp-sub-10') c.currentHp = Math.max(0, curHp - 10);
+      else if(act === 'hp-add-5') c.currentHp = Math.min(maxHp, curHp + 5);
+      else if(act === 'hp-medigel'){
+        if(medigel > 0){
+          c.medigel = medigel - 1;
+          c.currentHp = Math.min(maxHp, curHp + 10);
+        }
+      }
+      else if(act === 'medigel-dec') c.medigel = Math.max(0, medigel - 1);
+      else if(act === 'medigel-inc') c.medigel = Math.min(5, medigel + 1);
+      else if(act === 'clip-dec') c.thermalClips = Math.max(0, thermalClips - 1);
+      else if(act === 'clip-inc') c.thermalClips = Math.min(10, thermalClips + 1);
+
+      ME.saveChar(c);
+      render();
+    };
+  });
+
+  // Быстрый тактический бросок при клике на характеристику
+  document.querySelectorAll('.me-stat-chip[data-stat-key]').forEach(function(chip){
+    chip.onclick = function(){
+      var sName = chip.getAttribute('data-stat-name') || 'Характеристика';
+      var sMod = parseInt(chip.getAttribute('data-stat-mod'), 10) || 0;
+      var d20 = 1 + Math.floor(Math.random() * 20);
+      var total = d20 + sMod;
+      var sign = sMod >= 0 ? '+' : '';
+      var critText = d20 === 20 ? ' 💥 КРИТИЧЕСКИЙ УСПЕХ (20)!' : (d20 === 1 ? ' 💀 КРИТИЧЕСКИЙ ПРОВАЛ (1)!' : '');
+      alert('🎲 Тактическая проверка [' + sName + ']:\n\nБросок d20: ' + d20 + '\nМодификатор: ' + sign + sMod + '\nИТОГ: ' + total + critText);
+    };
+  });
+
   // Навигация по кнопкам с [data-nav] или [data-go]
   document.querySelectorAll('[data-nav]').forEach(function(el){
     if(el.__meNavBound) return;
@@ -20585,7 +21201,10 @@ function paintShBar(){
     lab.textContent = (SH.meta && SH.meta.name ? SH.meta.name : 'Шиноби') + charInfo;
   } else if(HB.mode==='me'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
-    lab.textContent = 'Космос • Mass Effect';
+    var meC = (typeof ME !== 'undefined' && ME.getChar) ? ME.getChar() : null;
+    var meName = meC ? (' • ' + (meC.callsign ? ('[' + meC.callsign + '] ') : '') + meC.name) : '';
+    var meShieldHp = meC ? (' • 🛡️ ' + (meC.currentShield!=null?meC.currentShield:meC.baseShield) + ' | ❤️ ' + (meC.currentHp!=null?meC.currentHp:meC.maxHp)) : '';
+    lab.textContent = 'Космос' + meName + meShieldHp;
   }
 }
 SH.paintShBar = paintShBar;
@@ -20601,6 +21220,7 @@ window.render=function(){
     document.body.classList.remove('sh-theme');
     document.body.classList.remove('hb-theme');
     document.body.classList.add('me-theme');
+    if(typeof applyMeTheme === 'function') applyMeTheme();
     var s=view.screen||'';
     if(s==='dice'){
       _r();
