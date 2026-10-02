@@ -4392,17 +4392,17 @@ body.me-theme .me-filter-btn.on {
 }
 
 /* ============================================================
-   МАСС ЭФФЕКТ: СБАЛАНСИРОВАННЫЙ ГЛАВНЫЙ ЭКРАН (БЕЗ СКРОЛЛА, КАК В ШИНОБИ)
+   МАСС ЭФФЕКТ: ГЛАВНЫЙ ЭКРАН В МАСШТАБЕ ШИНОБИ (1:1)
    ============================================================ */
 
 body.me-theme {
   padding-bottom: calc(30px + env(safe-area-inset-bottom)) !important;
 }
 
-/* Сбалансированный HUD */
+/* Полноразмерный HUD как в Шиноби */
 body.me-theme #meHud {
-  padding: 12px 18px !important;
-  margin: 6px 0 12px !important;
+  padding: 14px 18px !important;
+  margin: 12px 0 16px !important;
 }
 body.me-theme #meHud .sh-hud-name {
   font-size: 18px !important;
@@ -4411,97 +4411,107 @@ body.me-theme #meHud .sh-hud-meta {
   font-size: 12.5px !important;
 }
 body.me-theme #meHud .sh-hud-stats {
-  margin-top: 8px !important;
+  margin-top: 10px !important;
   gap: 8px !important;
 }
 body.me-theme #meHud .sh-hud-stat-pill {
-  padding: 4px 12px !important;
-  font-size: 12.5px !important;
+  padding: 5px 12px !important;
+  font-size: 13px !important;
 }
 
 /* Разделитель */
 body.me-theme .rule {
-  margin: 8px 0 12px !important;
+  margin: 0 0 20px !important;
   background: linear-gradient(90deg, rgba(0, 210, 255, 0.4), transparent 75%) !important;
 }
 
-/* Плашка броска кубиков */
+/* Полноразмерная плашка броска кубиков как в Шиноби */
 body.me-theme .hero-dice {
-  padding: 14px 20px !important;
-  gap: 16px !important;
+  padding: 22px 26px !important;
+  gap: 20px !important;
   margin-bottom: 8px !important;
-  border-left-width: 3px !important;
+  border-left-width: 4px !important;
   border-radius: 4px !important;
 }
 body.me-theme .hero-dice-icon {
-  width: 44px !important;
-  height: 44px !important;
+  width: 60px !important;
+  height: 60px !important;
 }
 body.me-theme .hero-dice-name {
-  font-size: 17px !important;
-  margin-bottom: 3px !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  margin-bottom: 4px !important;
   letter-spacing: 0.03em !important;
 }
 body.me-theme .hero-dice-desc {
-  font-size: 12.5px !important;
+  font-size: 14.5px !important;
+  font-style: italic !important;
   color: #7da5c9 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
 }
 body.me-theme .hero-dice-arrow {
-  font-size: 18px !important;
+  font-size: 22px !important;
 }
 
 /* Заголовок разделов */
 body.me-theme .section-label {
-  margin: 12px 0 8px !important;
+  margin: 24px 0 12px !important;
   font-size: 11px !important;
-  letter-spacing: 0.12em !important;
+  letter-spacing: 0.15em !important;
 }
 
-/* Сетка и карточки системных разделов */
+/* Сетка и полноразмерные карточки системных разделов (как в Шиноби) */
 body.me-theme .menu-list.grid-2 {
-  gap: 10px !important;
+  gap: 12px !important;
 }
 
 body.me-theme .menu-item {
   background: rgba(6, 14, 28, 0.85) !important;
   border: 1px solid rgba(0, 210, 255, 0.22) !important;
-  border-left: 3px solid #00d2ff !important;
-  padding: 13px 18px !important;
+  border-left: 4px solid #00d2ff !important;
+  padding: 18px 22px !important;
   border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 body.me-theme .menu-item:hover {
   background: rgba(9, 22, 46, 0.95) !important;
   border-color: #00d2ff !important;
-  border-left-width: 4px !important;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 14px rgba(0, 210, 255, 0.22) !important;
+  border-left-color: #00d2ff !important;
+  border-left-width: 5px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 18px rgba(0, 210, 255, 0.3) !important;
   transform: translateY(-1px) !important;
 }
 
 body.me-theme .menu-item .name {
-  font-size: 15.5px !important;
+  font-size: 18px !important;
   font-weight: 700 !important;
   letter-spacing: 0.02em !important;
-  line-height: 1.3 !important;
+  white-space: nowrap !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
 }
 
 body.me-theme .menu-item .desc {
-  font-size: 12px !important;
-  margin-top: 3px !important;
+  font-size: 14px !important;
+  font-style: italic !important;
   color: #7da5c9 !important;
-  line-height: 1.3 !important;
+  margin: 0 14px !important;
+  text-align: right !important;
+  flex: 1 !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
 
 body.me-theme .menu-item .arrow {
-  font-size: 17px !important;
-  margin-left: 10px !important;
+  font-size: 19px !important;
+  color: #00d2ff !important;
+  flex-shrink: 0 !important;
 }
 
 /* Адаптация под 4 темы Mass Effect */
@@ -19325,8 +19335,8 @@ function meHome(){
   var profCount = (ME.getProfiles ? ME.getProfiles().length : 1);
 
   var items = [
-    {nav:'mePowers',   icon:'⚡', t:'Способности и Древо',    d:(powersCount ? powersCount + ' в арсенале сил' : 'Биотика, техника, бой и комбо')},
-    {nav:'meArsenal',  icon:'🔫', t:'Оружейный арсенал',      d:(weaponsCount ? weaponsCount + ' в арсенале' : 'Винтовки, тяжелое оружие, моды и урон')},
+    {nav:'mePowers',   icon:'⚡', t:'Способности и Древо',    d:(powersCount ? powersCount + ' в списке' : 'Биотика, техника, комбо')},
+    {nav:'meArsenal',  icon:'🔫', t:'Оружейный арсенал',      d:(weaponsCount ? weaponsCount + ' в списке' : 'Винтовки, моды и урон')},
     {nav:'meShip',     icon:'🚀', t:'Корабль и Экипаж',       d:((ship.name || 'Нормандия SR-2') + ' • ' + crewCount + ' в экипаже')},
     {nav:'meCodex',    icon:'📖', t:'Кодекс Галактики',       d:'12 статей: расы, фракции, матрица урона'},
     {nav:'meMap',      icon:'🗺️', t:'Галактическая карта',    d:'Сектора Цитадели, ретрансляторы и контракты'},
@@ -19339,10 +19349,8 @@ function meHome(){
     '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // КОНСОЛЬ</div>'+
     '<div class="menu-list grid-2">'+items.map(function(i){
       return '<div class="menu-item" data-nav="'+i.nav+'">'+
-        '<div style="min-width:0;flex:1;">'+
-          '<div class="name">'+i.icon+' '+meEsc(i.t)+'</div>'+
-          '<div class="desc">'+meEsc(i.d)+'</div>'+
-        '</div>'+
+        '<div class="name">'+i.icon+' '+meEsc(i.t)+'</div>'+
+        '<div class="desc">'+meEsc(i.d)+'</div>'+
         '<div class="arrow">›</div>'+
       '</div>';
     }).join('')+'</div>';
