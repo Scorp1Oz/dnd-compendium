@@ -19448,17 +19448,17 @@ function initCitadelParticles(){
     }
 
     // Летающие на фоне голографические логотипы Цитадели
-    for(var j = 0; j < 8; j++){
+    for(var j = 0; j < 12; j++){
       var c = document.createElement('div');
       c.className = 'me-citadel-crest-particle';
-      var csize = Math.floor(65 + Math.random() * 65); // 65px - 130px
+      var csize = Math.floor(32 + Math.random() * 32); // 32px - 64px
       c.style.width = csize + 'px';
       c.style.height = csize + 'px';
       c.style.left = Math.floor(4 + Math.random() * 88) + '%';
       c.style.top = Math.floor(4 + Math.random() * 88) + '%';
       var cdur = (22 + Math.random() * 18).toFixed(1); // 22s - 40s
       var cdelay = (-Math.random() * 35).toFixed(1);
-      var cop = (0.12 + Math.random() * 0.08).toFixed(2); // 0.12 - 0.20
+      var cop = (0.10 + Math.random() * 0.08).toFixed(2); // 0.10 - 0.18
       c.style.setProperty('--p-op', cop);
       var canim = (j % 2 === 0) ? 'citadelDrift1' : 'citadelDrift2';
       c.style.animation = canim + ' ' + cdur + 's ease-in-out ' + cdelay + 's infinite';
