@@ -20764,6 +20764,9 @@ function meData(){
     return '<option value="' + th.id + '" ' + (curTheme === th.id ? 'selected' : '') + '>' + th.name + '</option>';
   }).join('');
 
+  var isCollapsed = false;
+  try { isCollapsed = (localStorage.getItem('me_dossier_collapsed') === '1'); } catch(e){}
+
   var activeCharDisplay = (c.name || 'Оперативник Альянса') + (c.callsign ? (' [' + c.callsign + ']') : '');
 
   return meNavHeader('ДАННЫЕ И СИСТЕМЫ // ДОСЬЕ И РОСТЕР', 'КОНФИГУРАЦИЯ') +
@@ -20794,59 +20797,67 @@ function meData(){
         '</div>' +
       '</div>' +
 
-      // АНКЕТА ОПЕРАТИВНИКА
-      '<div style="background:rgba(4,9,20,0.7);border:1px solid rgba(0,210,255,0.25);border-radius:4px;padding:16px;margin-top:14px;">' +
-        '<div style="font-weight:700;margin-bottom:12px;color:var(--ink);font-family:\'JetBrains Mono\',monospace;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,210,255,0.2);padding-bottom:6px;">' +
-          '<span>ДОСЬЕ ОПЕРАТИВНИКА: <b style="color:#00d2ff;">' + esc(activeCharDisplay) + '</b></span>' +
-          '<span style="font-size:11px;color:var(--ink-dim);">' + esc(c.race || 'Человек') + ' // ' + esc(c.role || 'Солдат') + '</span>' +
-        '</div>' +
-
-        '<div class="grid-2" style="margin-top:10px;">' +
-          '<div>' +
-            '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Имя оперативника</div>' +
-            '<input type="text" class="me-input" id="meInpName" value="' + escA(c.name || '') + '" style="width:100%;">' +
+      // АНКЕТА ОПЕРАТИВНИКА (СВОРАЧИВАЕМАЯ)
+      '<div class="me-operative-card" style="background:rgba(4,9,20,0.7);border:1px solid rgba(0,210,255,0.25);border-radius:4px;padding:14px 16px;margin-top:14px;transition:all .2s ease;">' +
+        '<div id="meOperativeHeader" style="cursor:pointer;user-select:none;font-weight:700;color:var(--ink);font-family:\'JetBrains Mono\',monospace;font-size:13px;display:flex;justify-content:space-between;align-items:center;transition:all .2s ease;' + (isCollapsed ? '' : 'margin-bottom:12px;border-bottom:1px solid rgba(0,210,255,0.2);padding-bottom:8px;') + '">' +
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+            '<span id="meOperativeToggleIcon" style="font-size:11px;color:#00d2ff;display:inline-block;width:12px;text-align:center;">' + (isCollapsed ? '▶' : '▼') + '</span>' +
+            '<span>ДОСЬЕ ОПЕРАТИВНИКА: <b style="color:#00d2ff;">' + esc(activeCharDisplay) + '</b></span>' +
           '</div>' +
-          '<div>' +
-            '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Позывной / Звание</div>' +
-            '<input type="text" class="me-input" id="meInpCallsign" value="' + escA(c.callsign || '') + '" placeholder="Коммандер, Спектр..." style="width:100%;">' +
-          '</div>' +
-          '<div>' +
-            '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Раса / Вид</div>' +
-            '<select class="me-input" id="meSelRace" style="width:100%;">' + raceOpts + '</select>' +
-          '</div>' +
-          '<div>' +
-            '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Специализация / Класс (вписывается)</div>' +
-            '<input type="text" class="me-input" id="meInpRole" value="' + escA(c.role || '') + '" placeholder="Например: Солдат / Биотик / Разведчик..." style="width:100%;">' +
-          '</div>' +
-          '<div>' +
-            '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Уровень</div>' +
-            '<input type="number" class="me-input" id="meInpLevel" value="' + (c.level || 1) + '" min="1" max="20" style="width:100%;">' +
+          '<div style="display:flex;align-items:center;gap:10px;">' +
+            '<span style="font-size:11px;color:var(--ink-dim);">' + esc(c.race || 'Человек') + ' // ' + esc(c.role || 'Солдат') + '</span>' +
+            '<button class="btn-subtle" id="meOperativeToggleBtn" style="font-size:11px;padding:2px 8px;" title="Свернуть/развернуть анкету">' + (isCollapsed ? 'Развернуть' : 'Свернуть') + '</button>' +
           '</div>' +
         '</div>' +
 
-        // Базовые боевые статы (Щиты, ОЗ, КД)
-        '<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,210,255,0.2);">' +
-          '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:8px;">Базовые боевые параметры:</div>' +
-          '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));gap:10px;">' +
+        '<div id="meOperativeBody" style="' + (isCollapsed ? 'display:none;' : 'display:block;') + '">' +
+          '<div class="grid-2" style="margin-top:10px;">' +
             '<div>' +
-              '<div style="font-size:11px;color:var(--ink-dim);">🛡️ Щиты</div>' +
-              '<input type="number" class="me-input" id="meInpShield" value="' + (c.baseShield || 15) + '" style="width:100%;text-align:center;">' +
+              '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Имя оперативника</div>' +
+              '<input type="text" class="me-input" id="meInpName" value="' + escA(c.name || '') + '" style="width:100%;">' +
             '</div>' +
             '<div>' +
-              '<div style="font-size:11px;color:var(--ink-dim);">❤️ Макс. ОЗ</div>' +
-              '<input type="number" class="me-input" id="meInpHp" value="' + (c.maxHp || 24) + '" style="width:100%;text-align:center;">' +
+              '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Позывной / Звание</div>' +
+              '<input type="text" class="me-input" id="meInpCallsign" value="' + escA(c.callsign || '') + '" placeholder="Коммандер, Спектр..." style="width:100%;">' +
             '</div>' +
             '<div>' +
-              '<div style="font-size:11px;color:var(--ink-dim);">🔰 КД (Броня)</div>' +
-              '<input type="number" class="me-input" id="meInpAc" value="' + (c.baseAc || 15) + '" style="width:100%;text-align:center;">' +
+              '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Раса / Вид</div>' +
+              '<select class="me-input" id="meSelRace" style="width:100%;">' + raceOpts + '</select>' +
+            '</div>' +
+            '<div>' +
+              '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Специализация / Класс (вписывается)</div>' +
+              '<input type="text" class="me-input" id="meInpRole" value="' + escA(c.role || '') + '" placeholder="Например: Солдат / Биотик / Разведчик..." style="width:100%;">' +
+            '</div>' +
+            '<div>' +
+              '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Уровень</div>' +
+              '<input type="number" class="me-input" id="meInpLevel" value="' + (c.level || 1) + '" min="1" max="20" style="width:100%;">' +
             '</div>' +
           '</div>' +
-        '</div>' +
 
-        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px;">' +
-          '<button class="btn-primary" id="meSaveDossierBtn">✓ Сохранить досье</button>' +
-          '<button class="btn-subtle" id="meResetProfileBtn" title="Сбросить досье текущего оперативника">↺ Сбросить параметры</button>' +
-          '<button class="btn-subtle" id="meDelProfileBtn" style="color:#ff7777;border-color:rgba(255,85,85,0.4);margin-left:auto;" title="Удалить текущего оперативника">🗑️ Удалить оперативника</button>' +
+          // Базовые боевые статы (Щиты, ОЗ, КД)
+          '<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,210,255,0.2);">' +
+            '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:8px;">Базовые боевые параметры:</div>' +
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));gap:10px;">' +
+              '<div>' +
+                '<div style="font-size:11px;color:var(--ink-dim);">🛡️ Щиты</div>' +
+                '<input type="number" class="me-input" id="meInpShield" value="' + (c.baseShield || 15) + '" style="width:100%;text-align:center;">' +
+              '</div>' +
+              '<div>' +
+                '<div style="font-size:11px;color:var(--ink-dim);">❤️ Макс. ОЗ</div>' +
+                '<input type="number" class="me-input" id="meInpHp" value="' + (c.maxHp || 24) + '" style="width:100%;text-align:center;">' +
+              '</div>' +
+              '<div>' +
+                '<div style="font-size:11px;color:var(--ink-dim);">🔰 КД (Броня)</div>' +
+                '<input type="number" class="me-input" id="meInpAc" value="' + (c.baseAc || 15) + '" style="width:100%;text-align:center;">' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px;">' +
+            '<button class="btn-primary" id="meSaveDossierBtn">✓ Сохранить досье</button>' +
+            '<button class="btn-subtle" id="meResetProfileBtn" title="Сбросить досье текущего оперативника">↺ Сбросить параметры</button>' +
+            '<button class="btn-subtle" id="meDelProfileBtn" style="color:#ff7777;border-color:rgba(255,85,85,0.4);margin-left:auto;" title="Удалить текущего оперативника">🗑️ Удалить оперативника</button>' +
+          '</div>' +
         '</div>' +
       '</div>' +
     '</div>' +
@@ -20950,6 +20961,51 @@ function wireMe(){
       if(target) navigate(target);
     });
   });
+
+  // Сворачивание / разворачивание анкеты оперативника в meData
+  var opHeader = document.getElementById('meOperativeHeader');
+  var opToggleBtn = document.getElementById('meOperativeToggleBtn');
+  var opBody = document.getElementById('meOperativeBody');
+  var opIcon = document.getElementById('meOperativeToggleIcon');
+
+  function toggleOperativeWindow(){
+    if(!opBody) return;
+    var isHidden = (opBody.style.display === 'none');
+    if(isHidden){
+      opBody.style.display = 'block';
+      if(opIcon) opIcon.textContent = '▼';
+      if(opToggleBtn) opToggleBtn.textContent = 'Свернуть';
+      if(opHeader){
+        opHeader.style.marginBottom = '12px';
+        opHeader.style.borderBottom = '1px solid rgba(0,210,255,0.2)';
+        opHeader.style.paddingBottom = '8px';
+      }
+      try { localStorage.setItem('me_dossier_collapsed', '0'); } catch(err){}
+    } else {
+      opBody.style.display = 'none';
+      if(opIcon) opIcon.textContent = '▶';
+      if(opToggleBtn) opToggleBtn.textContent = 'Развернуть';
+      if(opHeader){
+        opHeader.style.marginBottom = '0';
+        opHeader.style.borderBottom = 'none';
+        opHeader.style.paddingBottom = '0';
+      }
+      try { localStorage.setItem('me_dossier_collapsed', '1'); } catch(err){}
+    }
+  }
+
+  if(opHeader){
+    opHeader.onclick = function(e){
+      if(e.target && e.target.closest('#meOperativeToggleBtn')) return;
+      toggleOperativeWindow();
+    };
+  }
+  if(opToggleBtn){
+    opToggleBtn.onclick = function(e){
+      e.stopPropagation();
+      toggleOperativeWindow();
+    };
+  }
 
   // Переключение активного оперативника
   var profSel = document.getElementById('meDataProfileSelect');
