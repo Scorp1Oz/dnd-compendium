@@ -15587,6 +15587,7 @@ function shData(){
       fld('Заметка мира','<textarea id="shWNote" rows="3">'+esc(SH.meta.note)+'</textarea>')+
       '<div class="sheet-actions"><button class="btn-primary" id="shWSave">Сохранить мир</button></div>'+
     '</div>'+
+    (typeof GHSync !== 'undefined' ? GHSync.renderUI() : '') +
 
     
 '<div class="gh-sync-card" id="shGeminiApiSection" style="margin-top:20px; margin-bottom:20px;">'+
