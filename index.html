@@ -12773,7 +12773,7 @@ function renderMapInspector(c){
     '</div>'+
     (c.lore ? '<div class="sh-map-lore-text">'+esc(c.lore)+'</div>' : '')+
     '<div class="sh-map-inspector-actions">'+
-      '<button class="btn-primary" id="shBtnCopyMapLore" data-country="'+escA(c.id)+'">📋 Скопировать лор в заявку AI Studio</button>'+
+      '<button class="btn-primary" id="shBtnCopyMapLore" data-country="'+escA(c.id)+'">📋 Скопировать лор в заявку AI Studio</button>'+'\n      <button class="sh-map-btn" id="shBtnCountryMissionBase" data-country="'+escA(c.id)+'" style="color:#d29bfa;border-color:rgba(155,89,182,0.4);" title="Открыть доску миссий для этого государства">📜 Миссии отсюда</button>'+
       (c.village ? '<button class="btn-ghost" id="shBtnFocusVillage2" data-focus-x="'+c.village.x+'" data-focus-y="'+c.village.y+'">🎯 Найти на карте</button>' : '')+
     '</div>'+
   '</div>';
@@ -14013,29 +14013,44 @@ function getVillagePoint(cid){
 }
 
 function pickMissionTargetCountry(rank, originCid){
-  originCid = originCid || 'fire';
+  originCid = optsOriginId(originCid);
   if(rank === 'D'){
     return originCid;
   }
-  var neighbors = {
-    fire: ['rivers', 'waves', 'tea', 'grass', 'rain', 'hot_water', 'waterfall'],
-    wind: ['rivers', 'rain', 'bird', 'red_desert', 'fire'],
-    earth: ['grass', 'rain', 'waterfall', 'frost', 'iron', 'mountains'],
-    lightning: ['hot_water', 'frost', 'sea_land', 'sound', 'iron'],
-    water: ['waves', 'sea_land', 'tea', 'fire']
-  };
+  var originPt = getVillagePoint(originCid);
+  var list = (typeof SH_MAP_DATA !== 'undefined' && Array.isArray(SH_MAP_DATA)) ? SH_MAP_DATA : [];
+  if(!list.length) return (originCid === 'fire' ? 'wind' : 'fire');
 
-  var pool = neighbors[originCid] || ['rivers', 'waves', 'grass', 'rain', 'sound'];
-  if(rank === 'B' || rank === 'A'){
-    pool = pool.concat(['sound', 'rain', 'iron', 'frost', 'waterfall', 'mount_koryu']);
+  var withDist = list.filter(function(c){ return c.id !== originCid; }).map(function(c){
+    var pt = (c.village && typeof c.village.x === 'number') ? c.village : (c.labelPoint || {x:512,y:341});
+    var d = Math.hypot(pt.x - originPt.x, pt.y - originPt.y);
+    return { id: c.id, dist: d, danger: c.danger || '', type: c.type };
+  }).sort(function(a,b){ return a.dist - b.dist; });
+
+  var candidates = [];
+  if(rank === 'C'){
+    candidates = withDist.slice(0, 7);
+  } else if(rank === 'B'){
+    candidates = withDist.slice(3, 16);
+  } else if(rank === 'A'){
+    var far = withDist.slice(8, 28);
+    var dangerous = withDist.filter(function(c){ return c.danger && (c.danger.indexOf('Высок') !== -1 || c.danger.indexOf('Критич') !== -1); });
+    candidates = far.concat(dangerous);
+  } else if(rank === 'S'){
+    var dangerousOrFar = withDist.filter(function(c){
+      return c.dist > 250 || (c.danger && (c.danger.indexOf('Критич') !== -1 || c.danger.indexOf('Высок') !== -1)) || c.id === 'myoboku' || c.id === 'mount_koryu' || c.id === 'sound' || c.id === 'rain' || c.id === 'terra_incognita';
+    });
+    candidates = dangerousOrFar.length ? dangerousOrFar : withDist.slice(15);
   }
-  if(rank === 'S'){
-    pool = ['myoboku', 'mount_koryu', 'sound', 'rain', 'sea_land', 'iron', 'water', 'red_desert'];
-  }
-  var nonLocal = pool.filter(function(id){ return id !== originCid; });
-  if(nonLocal.length) pool = nonLocal;
-  var chosen = pool[Math.floor(Math.random() * pool.length)];
-  return chosen || (originCid === 'fire' ? 'wind' : 'fire');
+  if(!candidates.length) candidates = withDist;
+  var chosen = candidates[Math.floor(Math.random() * candidates.length)];
+  return chosen ? chosen.id : (originCid === 'fire' ? 'wind' : 'fire');
+}
+
+function optsOriginId(optsOrCid){
+  if(!optsOrCid) return 'fire';
+  if(typeof optsOrCid === 'string') return optsOrCid;
+  return optsOrCid.originCountryId || optsOrCid.originCid || 'fire';
 }
 
 function generateProceduralMission(opts){
@@ -14044,8 +14059,11 @@ function generateProceduralMission(opts){
   var rank = (opts.rank && SH_MISSION_RANKS[opts.rank]) ? opts.rank : ranks[Math.floor(Math.random() * ranks.length)];
   var rConf = SH_MISSION_RANKS[rank];
 
-  var originCid = opts.originCountryId || 'fire';
+  var originCid = optsOriginId(opts);
   var originVillageObj = getVillagePoint(originCid);
+  var originCountry = mapCountryById(originCid);
+  var originName = originVillageObj.name || (originCountry ? originCountry.name : 'Резиденция');
+  var originCountryName = originCountry ? originCountry.name : '';
 
   var targetCid = pickMissionTargetCountry(rank, originCid);
   var targetC = mapCountryById(targetCid) || mapCountryById(originCid);
@@ -14074,16 +14092,31 @@ function generateProceduralMission(opts){
   var s2 = skills[Math.floor(Math.random() * skills.length)];
   if(s1 === s2) s2 = 'Контроль чакры';
 
-  var title = objTemplate.title + ' (' + targetC.name + ')';
-  var desc = 'Миссия ранга ' + rank + ' выдана в резиденции ' + originVillageObj.name + '. ' +
-    'Заказчик: ' + client.name + ' (' + client.title + '). ' +
-    'Партии необходимо выдвинуться в сектор [' + targetC.name + '] и обеспечить выполнение директивы шиноби.';
+  var title = '';
+  var desc = '';
+  var objectives = [];
 
-  var objectives = [
-    'Переход в ' + targetC.name + ' и разведка ориентиров на месте',
-    'DC ' + checkDc1 + ' ' + s1 + ': обнаружение зацепок или уклонение от засады',
-    'Завершение директивы и доклад в резиденцию'
-  ];
+  if(rank === 'D'){
+    title = objTemplate.title + ' (' + originName + ')';
+    desc = 'Внутренний контракт ранга D выдан в селении ' + originName + ' (' + originCountryName + '). ' +
+      'Заказчик: ' + client.name + ' (' + client.title + '). ' +
+      'Партии поручено локальное задание без выезда за пределы границ.';
+    objectives = [
+      'Выполнение поручения в черте ' + originName,
+      'DC ' + checkDc1 + ' ' + s1 + ': проверка навыков и внимательности',
+      'Сдача отчёта заказчику в ' + originName
+    ];
+  } else {
+    title = objTemplate.title + ' (' + targetC.name + ')';
+    desc = 'Миссия ранга ' + rank + ' выдана в резиденции ' + originName + ' (' + originCountryName + '). ' +
+      'Заказчик: ' + client.name + ' (' + client.title + '). ' +
+      'Партии необходимо выдвинуться из ' + originName + ' в сектор [' + targetC.name + '] и обеспечить выполнение директивы шиноби.';
+    objectives = [
+      'Переход из ' + originName + ' в ' + targetC.name + ' и разведка ориентиров на месте',
+      'DC ' + checkDc1 + ' ' + s1 + ': обнаружение зацепок или уклонение от засады',
+      'Завершение директивы и доклад в резиденцию (' + originName + ')'
+    ];
+  }
 
   return {
     id: 'mis_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
@@ -14091,7 +14124,7 @@ function generateProceduralMission(opts){
     title: title,
     client: client,
     originCountryId: originCid,
-    originVillage: originVillageObj.name,
+    originVillage: originName,
     targetCountryId: targetC.id,
     targetName: (targetC.village ? targetC.village.name : targetC.name) + ' (' + targetC.name + ')',
     targetCoords: { x: targetPointObj.x, y: targetPointObj.y },
@@ -14108,27 +14141,40 @@ function generateProceduralMission(opts){
 }
 
 function callGeminiMissionGenerator(opts, apiKey, callback){
+  opts = opts || {};
+  var originCid = optsOriginId(opts);
   var fallback = generateProceduralMission(opts);
   if(!apiKey){
     callback(null, fallback);
     return;
   }
 
-  var originObj = getVillagePoint(opts.originCountryId || 'fire');
+  var originObj = getVillagePoint(originCid);
+  var originCountry = mapCountryById(originCid);
+  var originName = originObj.name || (originCountry ? originCountry.name : 'Резиденция');
+  var originCountryName = originCountry ? originCountry.name : '';
+  var targetC = mapCountryById(fallback.targetCountryId) || originCountry || { name: 'Земли шиноби' };
+  var targetName = targetC.village ? (targetC.village.name + ' [' + targetC.name + ']') : targetC.name;
+
   var rank = opts.rank || 'C';
-  var prompt = "Ты профессиональный Dungeon Master по настольной ролевой игре D&D 2024 в сеттинге Naruto / Мир шиноби. " +
-    "Сгенерируй авторскую миссию ранга " + rank + " для отряда шиноби из деревни " + originObj.name + ". " +
+  var prompt = "Ты профессиональный Dungeon Master по настольной ролевой игре D&D 2024 в сеттинге Naruto / Мир шиноби.\n" +
+    "Сгенерируй авторскую миссию ранга " + rank + " для отряда шиноби.\n" +
+    "- Точка старта / резиденция найма: " + originName + " (" + originCountryName + "). Заказчик находится именно здесь.\n" +
+    (rank === 'D' 
+      ? "- Место действия: Локально в пределах " + originName + " (" + originCountryName + "). Это небоевое бытовое или патрульное поручение.\n" 
+      : "- Целевой регион назначения: " + targetName + ". Партия должна отправиться в путь из " + originName + ".\n") +
+    "- Специфика задания, личность заказчика, атмосфера и опасности должны строго соответствовать культуре, климату и геополитике " + originCountryName + " и маршруту.\n" +
     "Ответь ИСКЛЮЧИТЕЛЬНО валидным JSON-объектом без каких-либо вводных слов или markdown обрамления, со следующими полями:\n" +
     "{\n" +
     '  "title": "Краткое эпичное название миссии",\n' +
     '  "clientName": "Имя заказчика",\n' +
     '  "clientTitle": "Титул/профессия заказчика",\n' +
-    '  "desc": "Художественное описание ситуации (2-3 предложения)",\n' +
+    '  "desc": "Художественное описание ситуации и вводной задачи (2-3 предложения)",\n' +
     '  "objectives": ["Пункт 1", "Пункт 2", "Пункт 3"],\n' +
     '  "checks": ["DC 13 Внимательность", "DC 14 Контроль чакры"],\n' +
-    '  "rewardRyo": 50000,\n' +
+    '  "rewardRyo": ' + fallback.rewardRyo + ',\n' +
     '  "twist": "Неожиданный поворот событий и скрытый секрет для Мастера",\n' +
-    '  "dialogue": "Короткая прямая речь заказчика при выдаче миссии",\n' +
+    '  "dialogue": "Короткая прямая речь заказчика при выдаче миссии в резиденции ' + originName + '",\n' +
     '  "combat": "Кто оппонент партии и его главная тактическая уловка"\n' +
     "}";
 
@@ -14146,7 +14192,7 @@ function callGeminiMissionGenerator(opts, apiKey, callback){
   }).then(function(data){
     try{
       var rawTxt = data.candidates[0].content.parts[0].text;
-      var clean = rawTxt.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+      var clean = rawTxt.replace(/^[```]+json\s*/i, '').replace(/\s*[```]+$/i, '').trim();
       var parsed = JSON.parse(clean);
 
       fallback.title = parsed.title || fallback.title;
@@ -14277,22 +14323,23 @@ function renderMissionBoard(missionsList, activeFilter, originCid, showApiBox){
     }).join('');
   }
 
-  var villages = [
-    { id: 'fire', name: 'Конохагакуре (Страна Огня)' },
-    { id: 'wind', name: 'Сунагакуре (Страна Ветра)' },
-    { id: 'water', name: 'Киригакуре (Страна Воды)' },
-    { id: 'lightning', name: 'Кумогакуре (Страна Молнии)' },
-    { id: 'earth', name: 'Ивагакуре (Страна Земли)' },
-    { id: 'rain', name: 'Амегакуре (Страна Дождя)' },
-    { id: 'sound', name: 'Отогакуре (Страна Звука)' },
-    { id: 'grass', name: 'Кусагакуре (Страна Травы)' },
-    { id: 'waterfall', name: 'Такигакуре (Страна Водопада)' },
-    { id: 'iron', name: 'Самураи Страны Железа' }
-  ];
+  var originOptions = '';
+  if(typeof SH_MAP_DATA !== 'undefined' && Array.isArray(SH_MAP_DATA)){
+    var great = SH_MAP_DATA.filter(function(c){ return c.type === 'great'; });
+    var buffer = SH_MAP_DATA.filter(function(c){ return c.type === 'buffer'; });
+    var islands = SH_MAP_DATA.filter(function(c){ return c.type === 'island'; });
+    var east = SH_MAP_DATA.filter(function(c){ return c.type === 'east'; });
 
-  var originOptions = villages.map(function(v){
-    return '<option value="' + escA(v.id) + '" ' + (v.id === originCid ? 'selected' : '') + '>' + esc(v.name) + '</option>';
-  }).join('');
+    var formatOpt = function(c){
+      var vName = c.village ? c.village.name : c.name;
+      return '<option value="' + escA(c.id) + '" ' + (c.id === originCid ? 'selected' : '') + '>' + esc(vName + ' (' + c.name + ')') + '</option>';
+    };
+
+    originOptions = '<optgroup label="Великие Скрытые Селения">' + great.map(formatOpt).join('') + '</optgroup>' +
+      '<optgroup label="Малые Страны и Селения">' + buffer.map(formatOpt).join('') + '</optgroup>' +
+      '<optgroup label="Островные Государства">' + islands.map(formatOpt).join('') + '</optgroup>' +
+      '<optgroup label="Восточные Земли и Особые">' + east.map(formatOpt).join('') + '</optgroup>';
+  }
 
   return '<div class="sh-map-inspector" id="shMapInspector">' +
     '<div class="sh-map-inspector-head" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap;">' +
@@ -16858,6 +16905,18 @@ function wireSh(){
     };
 
     var wireMapInspector = function(){
+      var btnMissionsFromHere = g('shBtnCountryMissionBase');
+      if(btnMissionsFromHere){
+        btnMissionsFromHere.onclick = function(){
+          var cid = btnMissionsFromHere.getAttribute('data-country');
+          if(cid){
+            SH.map.missionOrigin = cid;
+            SH.map.mode = 'missions';
+            if(typeof render === 'function') render();
+            else refreshMapAndInspector();
+          }
+        };
+      }
       var btnCopy = g('shBtnCopyMapLore');
       if(btnCopy){
         btnCopy.onclick = function(){
