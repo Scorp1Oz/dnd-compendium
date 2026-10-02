@@ -4490,11 +4490,12 @@ body.me-theme .menu-list.grid-2 {
 body.me-theme .menu-item {
   width: 100% !important;
   min-width: 0 !important;
+  min-height: 88px !important;
   box-sizing: border-box !important;
   background: rgba(6, 14, 28, 0.85) !important;
   border: 1px solid rgba(0, 210, 255, 0.22) !important;
   border-left: 4px solid #00d2ff !important;
-  padding: 21px 24px !important;
+  padding: 20px 24px !important;
   border-radius: 4px !important;
   display: flex !important;
   align-items: center !important;
@@ -4524,7 +4525,7 @@ body.me-theme .menu-item .name {
 }
 
 body.me-theme .menu-item .desc {
-  font-size: 14.5px !important;
+  font-size: 15px !important;
   font-style: italic !important;
   color: #7da5c9 !important;
   margin: 0 14px !important;
@@ -4537,7 +4538,7 @@ body.me-theme .menu-item .desc {
 }
 
 body.me-theme .menu-item .arrow {
-  font-size: 21px !important;
+  font-size: 22px !important;
   color: #00d2ff !important;
   flex-shrink: 0 !important;
 }
@@ -19250,7 +19251,7 @@ var ME_CANON_WEAPONS_PRESETS = [
 
 // Каноничный пресет судна «Нормандия SR-2»
 var ME_CANON_NORMANDY_PRESET = {
-  name: 'Нормандия SR-2',
+  name: 'Нормандия',
   cls: 'Стелс-фрегат глубокой разведки Альянса',
   status: '100% НОМИНАЛ // ГОТОВ К ВЫЛЕТУ',
   notes: 'Флагман тактической разведки Альянса. Оснащен передовой маскировкой IES и орудием Таникс.',
@@ -19400,12 +19401,12 @@ function meHome(){
   var shipDesc = shipName + ' • ' + crewCount + ' в экипаже';
 
   var items = [
-    {nav:'mePowers',   icon:'⚡', t:'Способности и Древо',    d:(powersCount ? powersCount + ' в списке' : 'Биотика, техника, комбо')},
+    {nav:'mePowers',   icon:'⚡', t:'Способности и Древо',    d:(powersCount ? powersCount + ' в списке' : 'Биотика, техника, силы')},
     {nav:'meArsenal',  icon:'🔫', t:'Оружейный арсенал',      d:(weaponsCount ? weaponsCount + ' в списке' : 'Винтовки, моды и урон')},
     {nav:'meShip',     icon:'🚀', t:'Корабль и Экипаж',       d:shipDesc},
     {nav:'meCodex',    icon:'📖', t:'Кодекс Галактики',       d:'Расы, фракции, урон'},
     {nav:'meMap',      icon:'🗺️', t:'Галактическая карта',    d:'Сектора и контракты'},
-    {nav:'meData',     icon:'💾', t:'Данные систем',          d:profCount + ' в отряде, темы, Cloud Sync и ИИ'}
+    {nav:'meData',     icon:'💾', t:'Данные систем',          d:profCount + ' в отряде, темы и ИИ'}
   ];
 
   return ''+
