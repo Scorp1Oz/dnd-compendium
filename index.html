@@ -4596,13 +4596,11 @@ body.me-theme.me-theme-citadel .me-citadel-particles {
   display: block;
 }
 
-/* Синие неоновые мелкие частички, летящие вверх */
-.me-citadel-spark-particle {
+/* Синие неоновые полосы трафика, летящие строго вверх (как поток данных Цитадели) */
+.me-citadel-traffic-streak {
   position: absolute;
-  background: var(--spark-bg, #00d2ff);
-  border-radius: 50%;
   pointer-events: none;
-  box-shadow: 0 0 6px #00d2ff, 0 0 12px rgba(0, 210, 255, 0.8);
+  border-radius: 2px;
   will-change: transform, opacity;
   opacity: 0;
 }
@@ -4610,7 +4608,7 @@ body.me-theme.me-theme-citadel .me-citadel-particles {
 /* Летающий на фоне голографический логотип Цитадели */
 .me-citadel-crest-particle {
   position: absolute;
-  background-image: url('symbols/Mass Effect/Citadel.webp');
+  background-image: url("symbols/Mass Effect/Citadel.webp");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -4620,20 +4618,21 @@ body.me-theme.me-theme-citadel .me-citadel-particles {
   opacity: 0;
 }
 
-@keyframes citadelRise1 {
-  0% { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
-  15% { opacity: var(--p-op, 0.6); }
-  50% { transform: translateY(calc(-50vh)) translateX(18px) scale(1.1); opacity: var(--p-op, 0.8); }
-  85% { opacity: var(--p-op, 0.5); }
-  100% { transform: translateY(calc(-100vh - 30px)) translateX(-12px) scale(0.9); opacity: 0; }
-}
-
-@keyframes citadelRise2 {
-  0% { transform: translateY(0) translateX(0) scale(0.7); opacity: 0; }
-  20% { opacity: var(--p-op, 0.5); }
-  50% { transform: translateY(calc(-50vh)) translateX(-22px) scale(1.2); opacity: var(--p-op, 0.7); }
-  80% { opacity: var(--p-op, 0.4); }
-  100% { transform: translateY(calc(-100vh - 30px)) translateX(15px) scale(0.8); opacity: 0; }
+@keyframes citadelTrafficStream {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: var(--p-op, 0.7);
+  }
+  85% {
+    opacity: var(--p-op, 0.7);
+  }
+  100% {
+    transform: translateY(calc(-100vh - 120px));
+    opacity: 0;
+  }
 }
 
 @keyframes citadelDrift1 {
@@ -19426,24 +19425,30 @@ function initCitadelParticles(){
     document.body.insertBefore(cont, document.body.firstChild);
   }
   if(!cont.children || cont.children.length === 0){
-    // Синие неоновые мелкие частички, летящие вверх
-    var sparkColors = ['#00d2ff', '#38bdf8', '#67e8f9', '#7dd3fc', '#0284c7'];
-    for(var i = 0; i < 50; i++){
-      var p = document.createElement('div');
-      p.className = 'me-citadel-spark-particle';
-      var size = Math.floor(Math.random() * 3 + 1.5); // 1.5px - 4.5px
-      p.style.width = size + 'px';
-      p.style.height = size + 'px';
-      p.style.left = Math.floor(Math.random() * 100) + '%';
-      p.style.bottom = '-15px';
-      var duration = (7 + Math.random() * 14).toFixed(1); // 7s to 21s
-      var delay = (-Math.random() * 20).toFixed(1);
-      var maxOp = (0.35 + Math.random() * 0.45).toFixed(2);
-      var col = sparkColors[i % sparkColors.length];
-      p.style.setProperty('--spark-bg', col);
-      p.style.setProperty('--p-op', maxOp);
-      var animName = (i % 2 === 0) ? 'citadelRise1' : 'citadelRise2';
-      p.style.animation = animName + ' ' + duration + 's ease-in-out ' + delay + 's infinite';
+        // Синие неоновые вертикальные полоски трафика, летящие строго вверх (поток данных)
+    var trafficColors = [
+      "linear-gradient(to top, rgba(0, 210, 255, 0) 0%, rgba(0, 210, 255, 0.6) 40%, #00d2ff 85%, #ffffff 100%)",
+      "linear-gradient(to top, rgba(56, 189, 248, 0) 0%, rgba(56, 189, 248, 0.6) 40%, #38bdf8 85%, #e0f2fe 100%)",
+      "linear-gradient(to top, rgba(6, 182, 212, 0) 0%, rgba(6, 182, 212, 0.5) 40%, #06b6d4 85%, #cffafe 100%)",
+      "linear-gradient(to top, rgba(14, 165, 233, 0) 0%, rgba(14, 165, 233, 0.5) 40%, #0ea5e9 85%, #ffffff 100%)"
+    ];
+    for(var i = 0; i < 55; i++){
+      var p = document.createElement("div");
+      p.className = "me-citadel-traffic-streak";
+      var w = (1.5 + Math.random() * 1.5).toFixed(1); // 1.5px - 3.0px width
+      var h = Math.floor(20 + Math.random() * 45); // 20px - 65px length (vertical stick/streak)
+      p.style.width = w + "px";
+      p.style.height = h + "px";
+      p.style.left = (Math.random() * 100).toFixed(2) + "%";
+      p.style.bottom = "-80px";
+      var duration = (3.5 + Math.random() * 5.5).toFixed(2); // 3.5s to 9s (traffic flow speed)
+      var delay = (-Math.random() * 10).toFixed(2);
+      var maxOp = (0.40 + Math.random() * 0.45).toFixed(2);
+      var grad = trafficColors[i % trafficColors.length];
+      p.style.background = grad;
+      p.style.boxShadow = "0 0 6px #00d2ff, 0 0 14px rgba(0, 210, 255, 0.5)";
+      p.style.setProperty("--p-op", maxOp);
+      p.style.animation = "citadelTrafficStream " + duration + "s linear " + delay + "s infinite";
       cont.appendChild(p);
     }
 
