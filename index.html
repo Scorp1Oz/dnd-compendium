@@ -14319,17 +14319,25 @@ var SH_MISSION_TWISTS = [
 
 function getGeminiApiKey(){
   try{
-    return localStorage.getItem(SH_GEMINI_API_KEY_STORAGE) || '';
+    return localStorage.getItem('ttc_gemini_api_key') || localStorage.getItem('gemini_api_key') || '';
   }catch(e){}
   return '';
 }
+window.getGeminiApiKey = getGeminiApiKey;
 
 function saveGeminiApiKey(key){
   try{
-    if(key) localStorage.setItem(SH_GEMINI_API_KEY_STORAGE, key.trim());
-    else localStorage.removeItem(SH_GEMINI_API_KEY_STORAGE);
+    var trimmed = (key || '').trim();
+    if(trimmed){
+      localStorage.setItem('ttc_gemini_api_key', trimmed);
+      localStorage.setItem('gemini_api_key', trimmed);
+    } else {
+      localStorage.removeItem('ttc_gemini_api_key');
+      localStorage.removeItem('gemini_api_key');
+    }
   }catch(e){}
 }
+window.saveGeminiApiKey = saveGeminiApiKey;
 
 function loadMissions(){
   try{
@@ -15125,7 +15133,7 @@ function callGeminiMoveGenerator(opts, apiKey, callback){
 }
 
 function shJutsuGen(){
-  var key = localStorage.getItem('gemini_api_key') || '';
+  var key = getGeminiApiKey();
   
   var html = crumbSh([{label:'Шиноби',nav:'home'},{label:'Техники',nav:'shTechs'},{label:'AI Генератор'}])+
     '<button class="back" data-nav="shTechs">← Назад</button>'+
@@ -15177,7 +15185,7 @@ function shJutsuGen(){
 
 
 function shMoveGen(){
-  var key = localStorage.getItem('gemini_api_key') || '';
+  var key = getGeminiApiKey();
   
   var html = crumbSh([{label:'Шиноби',nav:'home'},{label:'Приёмы',nav:'shMoves'},{label:'AI Генератор'}])+
     '<button class="back" data-nav="shMoves">← Назад</button>'+
@@ -15254,7 +15262,7 @@ function callGeminiSkillGenerator(opts, apiKey, callback){
 }
 
 function shSkillGen(){
-  var key = localStorage.getItem('gemini_api_key') || '';
+  var key = getGeminiApiKey();
   var html = crumbSh([{label:'Шиноби',nav:'home'},{label:'Навыки',nav:'shSkills'},{label:'AI Генератор'}])+
     '<button class="back" data-nav="shSkills">← Назад</button>'+
     '<h1>✨ AI Генератор Навыков</h1>'+
@@ -15580,7 +15588,7 @@ function shData(){
       '<div class="sheet-actions"><button class="btn-primary" id="shWSave">Сохранить мир</button></div>'+
     '</div>'+
 
-    (typeof GHSync !== 'undefined' ? GHSync.renderUI() : '') +
+    
 '<div class="gh-sync-card" id="shGeminiApiSection" style="margin-top:20px; margin-bottom:20px;">'+
   '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">'+
     '<span style="font-size:20px;">🤖</span>'+
@@ -17097,6 +17105,17 @@ function wireSh(){
 
   var ws=g('shWSave');
   if(ws) ws.addEventListener('click', function(){ SH.meta.name=v('shWName'); SH.meta.note=v('shWNote'); saveMeta(); paintShBar(); navigate('home'); });
+
+  var saveGeminiBtn = g('shDataSaveGeminiKey');
+  if(saveGeminiBtn && !saveGeminiBtn.__wired){
+    saveGeminiBtn.__wired = true;
+    saveGeminiBtn.addEventListener('click', function(){
+      var inp = g('shDataGeminiKey');
+      var k = inp ? inp.value.trim() : '';
+      saveGeminiApiKey(k);
+      alert(k ? '✓ API-ключ Gemini успешно сохранён!' : 'API-ключ удалён.');
+    });
+  }
 
   var ex=g('shExport');
   if(ex) ex.addEventListener('click', function(){
@@ -18986,7 +19005,6 @@ function mePowers(){
   return meNavHeader('ДРЕВО СПОСОБНОСТЕЙ // ПРОТОКОЛЫ A92', 'АКТИВНЫХ: ' + allPowers.length) +
     '<h1>СПОСОБНОСТИ И ДРЕВО НАВЫКОВ</h1>' +
     '<div class="subtitle">СИСТЕМА РОСТА A92 • КОРНИ, РАНГИ И ПРОИЗВОДНЫЕ ЗА ОЧКИ РАЗВИТИЯ (ОР)</div>' +
-    (typeof GHSync !== 'undefined' ? GHSync.renderUI() : '') +
 '<div class="me-panel" style="margin-top:14px;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
@@ -19173,101 +19191,482 @@ function meShip(){
     '</div>';
 }
 
-// 5. КОДЕКС ГАЛАКТИКИ
-function meCodex(){
-  var activeTab = ME._activeCodexTab || 'matrix';
-  var tabs = [
-    { id: 'matrix', name: 'Матрица урона' },
-    { id: 'combos', name: 'Комбо-детонации' },
-    { id: 'races', name: '12 Рас Галактики' },
-    { id: 'factions', name: 'Фракции' },
-    { id: 'rules', name: 'Тактика боя 5e' }
-  ];
 
-  var tabsHtml = '<div class="me-tabs">' + tabs.map(function(t){
-    var on = activeTab === t.id ? 'on' : '';
-    return '<button class="me-tab-btn ' + on + '" data-codex-tab="' + t.id + '">' + t.name + '</button>';
-  }).join('') + '</div>';
+// ============================================================
+// КОДЕКС ГАЛАКТИКИ (АРХИВЫ ЦИТАДЕЛИ) — ПОЛНАЯ БАЗА ЗНАНИЙ
+// ============================================================
 
-  var contentHtml = '';
-  if(activeTab === 'matrix'){
-    contentHtml = '<div class="me-card" style="line-height:1.6;">' +
-      '<h3 style="color:#00d2ff;margin-top:0;">МАТРИЦА ЭФФЕКТИВНОСТИ УРОНА ПРОТИВ СЛОЕВ ЗАЩИТЫ</h3>' +
-      '<p style="color:#8bb1d6;font-size:13px;">В сеттинге Mass Effect каждая цель может обладать несколькими слоями защиты: <strong>Кинетический щит</strong>, <strong>Биотический барьер</strong>, <strong>Броня (с порогом DT)</strong> и <strong>Здоровье (HP)</strong>.</p>' +
-      '<table class="me-table" style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px;">' +
-        '<thead><tr style="border-bottom:1px solid rgba(0,210,255,0.4);text-align:left;color:#00d2ff;"><th>Тип урона</th><th>Щиты (Shields)</th><th>Броня (Armor)</th><th>Барьеры (Barriers)</th><th>Здоровье (Health)</th></tr></thead>' +
-        '<tbody>' +
-          '<tr style="border-bottom:1px solid rgba(0,210,255,0.1);"><td style="font-weight:bold;color:#fff;">Оружие / Кинетика</td><td style="color:#00d2ff;">100%</td><td style="color:#ffaa33;">− Порог брони (DT)</td><td style="color:#b266ff;">50%</td><td style="color:#ff5555;">100%</td></tr>' +
-          '<tr style="border-bottom:1px solid rgba(0,210,255,0.1);"><td style="font-weight:bold;color:#00d2ff;">Электро / Перегрузка</td><td style="color:#00d2ff;font-weight:bold;">200% (×2)</td><td style="color:#ffaa33;">50%</td><td style="color:#b266ff;">100%</td><td style="color:#ff5555;">100% (синтетики ×2)</td></tr>' +
-          '<tr style="border-bottom:1px solid rgba(0,210,255,0.1);"><td style="font-weight:bold;color:#b266ff;">Биотика / Деформация</td><td style="color:#00d2ff;">50%</td><td style="color:#ffaa33;font-weight:bold;">200% (порог −1)</td><td style="color:#b266ff;font-weight:bold;">200% (×2)</td><td style="color:#ff5555;">100%</td></tr>' +
-          '<tr style="border-bottom:1px solid rgba(0,210,255,0.1);"><td style="font-weight:bold;color:#ffaa33;">Огонь / Поджог</td><td style="color:#00d2ff;">50%</td><td style="color:#ffaa33;font-weight:bold;">200% (горение)</td><td style="color:#b266ff;">50%</td><td style="color:#ff5555;font-weight:bold;">200% (органика)</td></tr>' +
-          '<tr><td style="font-weight:bold;color:#70dbdb;">Крио / Заморозка</td><td style="color:#00d2ff;">50%</td><td style="color:#ffaa33;">Хрупкость (порог −2)</td><td style="color:#b266ff;">50%</td><td style="color:#ff5555;">Заморозка/Обездвиж.</td></tr>' +
-        '</tbody>' +
-      '</table>' +
-    '</div>';
-  } else if(activeTab === 'combos'){
-    contentHtml = '<div class="grid-2">' +
-      '<div class="me-card"><h3 style="color:#b266ff;margin-top:0;">💥 БИОТИЧЕСКИЙ ВЗРЫВ</h3><p style="font-size:13px;color:#8bb1d6;"><strong>Маркер:</strong> Деформация, Притяжение или Сингулярность.<br><strong>Детонатор:</strong> Отталкивание, Биотический рывок или Новая.<br><strong>Эффект:</strong> Сокрушительная гравитационная детонация в радиусе 15 фт, наносящая огромный биотический урон и сбивающая цели с ног.</p></div>' +
-      '<div class="me-card"><h3 style="color:#00d2ff;margin-top:0;">⚡ ТЕХНИЧЕСКИЙ ВЗРЫВ</h3><p style="font-size:13px;color:#8bb1d6;"><strong>Маркер:</strong> Перегрузка.<br><strong>Детонатор:</strong> Поджог, Заморозка или Боевой дрон.<br><strong>Эффект:</strong> Цепная вспышка статического электричества, парализующая синтетиков и наносящая урон щитам всей группы противников.</p></div>' +
-      '<div class="me-card"><h3 style="color:#ffaa33;margin-top:0;">🔥 ОГНЕННЫЙ ВЗРЫВ</h3><p style="font-size:13px;color:#8bb1d6;"><strong>Маркер:</strong> Поджог или Зажигательные патроны.<br><strong>Детонатор:</strong> Перегрузка, Отталкивание или Биотический рывок.<br><strong>Эффект:</strong> Огненная волна в радиусе 15 фт, поджигающая всех врагов и размягчающая тяжелую броню.</p></div>' +
-      '<div class="me-card"><h3 style="color:#70dbdb;margin-top:0;">❄️ КРИО-ВЗРЫВ</h3><p style="font-size:13px;color:#8bb1d6;"><strong>Маркер:</strong> Заморозка или Крио-патроны.<br><strong>Детонатор:</strong> Любая наносящая урон способность.<br><strong>Эффект:</strong> Разрыв ледяной корки на осколки, замедляющий врагов и наносящий колющий крио-урон в области.</p></div>' +
-    '</div>';
-  } else if(activeTab === 'races'){
-    var races = [
-      { name: 'Человек', bio: 'Левоамино', desc: 'Универсальность, адаптивность, амбиции. Родина: Земля.' },
-      { name: 'Азари', bio: 'Левоамино', desc: 'Природная биотика, дипломатия, долголетие (до 1000 лет). Родина: Тессия.' },
-      { name: 'Турианец', bio: 'Декстроамино', desc: 'Жесткая воинская дисциплина, честь, хитиновый панцирь. Родина: Палавен.' },
-      { name: 'Саларианец', bio: 'Левоамино', desc: 'Стремительный метаболизм, гениальный интеллект, шпионаж STG. Родина: Сур\'Кеш.' },
-      { name: 'Кроган', bio: 'Левоамино', desc: 'Дублирующие органы, регенерация, колоссальная сила. Родина: Тучанка.' },
-      { name: 'Кварианец', bio: 'Декстроамино', desc: 'Мастера техники и кибернетики, герметичные скафандры. Родина: Раннох.' },
-      { name: 'Дрелл', bio: 'Левоамино', desc: 'Эйдетическая память, скрытность, боевые монахи. Родина: Рахана.' },
-      { name: 'Батарианец', bio: 'Левоамино', desc: 'Четыре глаза, военная кастовая культура, пираты и наёмники. Родина: Хар\'шан.' },
-      { name: 'Волус', bio: 'Аммиачная', desc: 'Мастера торговли и финансов, высокое давление скафандров. Родина: Ирун.' },
-      { name: 'Элкор', bio: 'Левоамино', desc: 'Гигантские неторопливые колоссы, ходячие танки с пушками. Родина: Декууна.' },
-      { name: 'Ханар', bio: 'Водная', desc: 'Медузообразные вежливые глубоководники, почитатели Протеан. Родина: Кахье.' },
-      { name: 'Ворча', bio: 'Левоамино', desc: 'Мгновенная клеточная регенерация, примитивная ярость, огнеметы. Родина: Хешшок.' }
-    ];
-    contentHtml = '<div class="grid-2">' + races.map(function(r){
-      return '<div class="me-card">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-          '<div style="font-size:15px;font-weight:700;color:#00d2ff;">' + r.name + '</div>' +
-          '<span class="me-tag-holo">' + r.bio + '</span>' +
+ME.codexCategories = [
+  {
+    group: '⚔️ Боевая система и механики',
+    color: '#00d2ff',
+    items: [
+      { id: 'matrix', icon: '🛡️', title: 'Матрица урона и слои защиты', tag: 'Щиты / Барьеры / DT', desc: 'Кинетические щиты, биотические барьеры, броня с порогом DT и здоровье: матрица сопротивлений и уязвимостей.' },
+      { id: 'combos', icon: '💥', title: 'Технические и биотические комбо', tag: 'Маркер + Детонатор', desc: 'Механика связок: Биотический взрыв, Огненная волна, Технический разряд и Крио-раскол.' },
+      { id: 'tactics', icon: '🎯', title: 'Тактика боя 5e и укрытия', tag: 'Позиционка 5e', desc: 'Правила укрытий (+2/+5 AC), дистанции перестрелок, термозаряды и активные реакции защиты.' }
+    ]
+  },
+  {
+    group: '🌌 Расы Млечного Пути',
+    color: '#b266ff',
+    items: [
+      { id: 'races_citadel', icon: '🏛️', title: 'Расы Пространства Цитадели', tag: 'Совет Цитадели', desc: 'Азари, Турианцы, Саларианцы и Человечество: происхождение, биология, культура и базовые особенности 5e.' },
+      { id: 'races_outer', icon: '💀', title: 'Расы Внешних Систем и Терминала', tag: 'Фронтир и ДМЗ', desc: 'Кроганы, Кварианцы, Дреллы, Батарианцы и Ворча: физиология выживания, генофаг и изгнание.' },
+      { id: 'races_ancient', icon: '🔮', title: 'Уникальные и древние формы жизни', tag: 'Синтетики и Реликты', desc: 'Волусы, Элкоры, Ханары, Геты и исчезнувшие Протеане: дипломатия, синтетический консенсус и артефакты.' }
+    ]
+  },
+  {
+    group: '🏛️ Фракции и Политика',
+    color: '#ffaa33',
+    items: [
+      { id: 'factions_council', icon: '⚖️', title: 'Совет Цитадели и СПЕКТРы', tag: 'Высшая власть', desc: 'Структура Совета, элитный институт СПЕКТР с неограниченными полномочиями и служба СБ Цитадели (C-Sec).' },
+      { id: 'factions_alliance', icon: '🎖️', title: 'Альянс Систем и Войска Земли', tag: 'Флот Человечества', desc: 'Парламент Арктура, программа спецподразделений N7, доктрина авианосцев и 5-й космический флот.' },
+      { id: 'factions_syndicates', icon: '☣️', title: 'Синдикаты Терминала и «Цербер»', tag: 'Омега и Теневые сети', desc: 'Ария Т\'Лоак, Омега, триада наёмников (Синие Светила, Затмение, Кровавая Стая) и секретная сеть Призрака.' }
+    ]
+  },
+  {
+    group: '🚀 Звездоплавание и Технологии',
+    color: '#22c55e',
+    items: [
+      { id: 'tech_eezo', icon: '🌀', title: 'Элемент Ноль и Ретрансляторы массы', tag: 'Физика Темной Энергии', desc: 'Принцип работы поля темной энергии, физика FTL-сверхсвета, первичные и вторичные ретрансляторы.' },
+      { id: 'tech_omnitool', icon: '🔶', title: 'Омни-инструменты и Уни-гель', tag: 'Голо-интерфейс', desc: 'Микрофабрикаторы омни-инструментов, тактические омни-лезвия, применение меди-геля и полевой ремонт.' },
+      { id: 'tech_normandy', icon: '🛸', title: 'Фрегат «Нормандия» SR-2 и системы IES', tag: 'Стелс-прототипы', desc: 'Стелс-маскировка IES, колоссальное ядро Тантала, отсеки фрегата и тактические сенсоры дальнего сканирования.' }
+    ]
+  }
+];
+
+ME.codexArticles = {
+  matrix: {
+    title: 'Матрица урона и слои защиты',
+    subtitle: 'Взаимодействие типов урона со слоями кинетической, биотической и биологической защиты',
+    tag: 'МЕХАНИКА 5E',
+    icon: '🛡️',
+    contentHtml:
+      '<div style="background:rgba(0,210,255,0.06);border-left:3px solid #00d2ff;padding:12px 14px;border-radius:3px;margin-bottom:14px;">' +
+        '<strong style="color:#00d2ff;">Архитектура защиты в Mass Effect 5e:</strong> Каждое живое существо или боевой мех обладает слоями обороны. Урон наносится строго последовательно: снаружи внутрь (Щиты / Барьеры ➔ Броня ➔ Здоровье).' +
+      '</div>' +
+      '<div style="overflow-x:auto;margin-bottom:16px;">' +
+        '<table class="me-table" style="width:100%;border-collapse:collapse;font-size:12.5px;">' +
+          '<thead>' +
+            '<tr style="border-bottom:1px solid rgba(0,210,255,0.4);color:#00d2ff;text-align:left;">' +
+              '<th style="padding:8px;">Тип урона</th>' +
+              '<th style="padding:8px;color:#00d2ff;">Щиты (Shields)</th>' +
+              '<th style="padding:8px;color:#b266ff;">Барьеры (Barriers)</th>' +
+              '<th style="padding:8px;color:#ffaa33;">Броня (Armor)</th>' +
+              '<th style="padding:8px;color:#ff5555;">Здоровье (HP)</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            '<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">' +
+              '<td style="padding:8px;font-weight:bold;color:#fff;">Оружие / Кинетика</td>' +
+              '<td style="padding:8px;color:#00d2ff;">100%</td>' +
+              '<td style="padding:8px;color:#b266ff;">50%</td>' +
+              '<td style="padding:8px;color:#ffaa33;">− Порог DT</td>' +
+              '<td style="padding:8px;color:#ff5555;">100%</td>' +
+            '</tr>' +
+            '<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">' +
+              '<td style="padding:8px;font-weight:bold;color:#00d2ff;">Электро / Перегрузка</td>' +
+              '<td style="padding:8px;color:#00d2ff;font-weight:bold;">200% (×2)</td>' +
+              '<td style="padding:8px;color:#b266ff;">100%</td>' +
+              '<td style="padding:8px;color:#ffaa33;">50%</td>' +
+              '<td style="padding:8px;color:#ff5555;">100% (синтетики ×2)</td>' +
+            '</tr>' +
+            '<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">' +
+              '<td style="padding:8px;font-weight:bold;color:#b266ff;">Биотика / Деформация</td>' +
+              '<td style="padding:8px;color:#00d2ff;">50%</td>' +
+              '<td style="padding:8px;color:#b266ff;font-weight:bold;">200% (×2)</td>' +
+              '<td style="padding:8px;color:#ffaa33;font-weight:bold;">200% (порог DT −2)</td>' +
+              '<td style="padding:8px;color:#ff5555;">100%</td>' +
+            '</tr>' +
+            '<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">' +
+              '<td style="padding:8px;font-weight:bold;color:#ffaa33;">Огонь / Поджог</td>' +
+              '<td style="padding:8px;color:#00d2ff;">50%</td>' +
+              '<td style="padding:8px;color:#b266ff;">50%</td>' +
+              '<td style="padding:8px;color:#ffaa33;font-weight:bold;">200% (горение)</td>' +
+              '<td style="padding:8px;color:#ff5555;font-weight:bold;">200% (органика)</td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td style="padding:8px;font-weight:bold;color:#70dbdb;">Крио / Заморозка</td>' +
+              '<td style="padding:8px;color:#00d2ff;">50%</td>' +
+              '<td style="padding:8px;color:#b266ff;">50%</td>' +
+              '<td style="padding:8px;color:#ffaa33;">Хрупкость (порог −2)</td>' +
+              '<td style="padding:8px;color:#ff5555;">Заморозка / Оцепенение</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="me-card">' +
+          '<h4 style="color:#ffaa33;margin-top:0;">🛡️ Порог брони (Damage Threshold — DT)</h4>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Каждая единица тяжелой брони имеет значение DT (обычно 2–6). Значение DT вычитается из <em>каждого отдельного попадания или пули в очереди</em>. Из-за этого скорострельные пистолеты-пулемёты (SMG) почти бессильны против брони шагоходов и кроганов, тогда как тяжелые крупнокалиберные снайперские винтовки («Вдова») пробивают DT одним сокрушительным залпом.</p>' +
         '</div>' +
-        '<div style="font-size:12.5px;color:#8bb1d6;margin-top:6px;line-height:1.5;">' + r.desc + '</div>' +
-      '</div>';
-    }).join('') + '</div>';
-  } else if(activeTab === 'factions'){
-    var factions = [
-      { name: 'Альянс Систем', desc: 'Официальное объединенное правительство человечества, 5-й космический флот.' },
-      { name: 'Совет Цитадели и СПЕКТРы', desc: 'Высший руководящий орган пространства Цитадели. СПЕКТРы имеют неограниченные полномочия.' },
-      { name: 'СБ Цитадели (C-Sec)', desc: 'Многовидовая служба правопорядка гигантской станции Цитадель.' },
-      { name: 'STG (Группа Особого Реагирования)', desc: 'Элитная военная разведка и оперативники Саларианского Союза.' },
-      { name: 'Цербер', desc: 'Радикальная военизированная организация за превосходство человечества.' },
-      { name: 'Синие Светила, Затмение, Кровавая Стая', desc: 'Тройка крупнейших наёмных армий и преступных картелей систем Терминала.' },
-      { name: 'Геты', desc: 'Сетевой синтетический разум, созданный кварианцами и восставший за автономию.' }
-    ];
-    contentHtml = '<div class="grid-2">' + factions.map(function(f){
-      return '<div class="me-card">' +
-        '<div style="font-size:15px;font-weight:700;color:#ffaa33;">' + f.name + '</div>' +
-        '<div style="font-size:12.5px;color:#8bb1d6;margin-top:6px;line-height:1.5;">' + f.desc + '</div>' +
-      '</div>';
-    }).join('') + '</div>';
-  } else if(activeTab === 'rules'){
-    contentHtml = '<div class="me-card" style="line-height:1.6;font-size:13px;color:#8bb1d6;">' +
-      '<h3 style="color:#00d2ff;margin-top:0;">ТАКТИЧЕСКИЕ ПРАВИЛА БОЯ 5E MASS EFFECT</h3>' +
-      '<p><strong>Дистанции:</strong> Ближняя (до 30 фт), Средняя (30–90 фт), Дальняя (90+ фт).</p>' +
-      '<p><strong>Система укрытий:</strong><br>• Половинное укрытие: +2 к AC и спасброскам ЛОВ.<br>• Полное укрытие: +5 к AC или полная защита от прямой линии огня.</p>' +
-      '<p><strong>Активная защита:</strong> Реакция на попадание — бросок ЛОВ (перекат) или ТЕЛ (упорство) для снижения полученного урона.</p>' +
-      '<p><strong>Термозаряды:</strong> Оружие перегревается при непрерывном огне; быстрая замена картриджа действием или бонусным действием возвращает боеспособность.</p>' +
+        '<div class="me-card">' +
+          '<h4 style="color:#00d2ff;margin-top:0;">⚡ Регенерация кинетических щитов</h4>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Если персонаж находится в полном укрытии и не получает урона в течение 1 полного раунда (6 секунд), его кинетический щит начинает мгновенно перезаряжаться со скоростью <strong>5 + Бонус Мастерства</strong> хитов в начале каждого хода.</p>' +
+        '</div>' +
+      '</div>'
+  },
+
+  combos: {
+    title: 'Технические и биотические комбо',
+    subtitle: 'Двухфазная боевая система: маркеры (Primers) и детонаторы (Detonators)',
+    tag: 'КОМБО-СИСТЕМА',
+    icon: '💥',
+    contentHtml:
+      '<div style="background:rgba(178,102,255,0.06);border-left:3px solid #b266ff;padding:12px 14px;border-radius:3px;margin-bottom:14px;">' +
+        '<strong style="color:#b266ff;">Правило связки:</strong> Первая способность накладывает на цель статус <em>Маркера (Primer)</em> на 1 минуту. Любая последующая способность с дескриптором <em>Детонатор (Detonator)</em> снимает статус и производит сокрушительный взрыв в радиусе 15 фт.' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="me-card" style="border-left:3px solid #b266ff;">' +
+          '<h3 style="color:#b266ff;margin-top:0;">💥 БИОТИЧЕСКИЙ ВЗРЫВ</h3>' +
+          '<div style="font-size:12.5px;color:#8bb1d6;margin-bottom:8px;"><strong>Маркеры:</strong> Деформация, Притяжение, Сингулярность, Стазис.</div>' +
+          '<div style="font-size:12.5px;color:#8bb1d6;margin-bottom:8px;"><strong>Детонаторы:</strong> Биотический рывок, Отталкивание, Новая, Ударная волна.</div>' +
+          '<div style="font-size:12px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:8px;border-radius:3px;">Эффект: Мощнейший гравитационный коллапс в радиусе 15 фт. Наносит 3d8 + Уровень игрока силового биотического урона и сбивает все цели с ног (спасбросок СИЛ отменяет падение).</div>' +
+        '</div>' +
+        '<div class="me-card" style="border-left:3px solid #00d2ff;">' +
+          '<h3 style="color:#00d2ff;margin-top:0;">⚡ ТЕХНИЧЕСКИЙ РАЗРЯД</h3>' +
+          '<div style="font-size:12.5px;color:#8bb1d6;margin-bottom:8px;"><strong>Маркеры:</strong> Перегрузка, Поглощение энергии.</div>' +
+          '<div style="font-size:12.5px;color:#8bb1d6;margin-bottom:8px;"><strong>Детонаторы:</strong> Поджог, Заморозка, Омни-луч, Выстрел дрона.</div>' +
+          '<div style="font-size:12px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:8px;border-radius:3px;">Эффект: Цепная статическая дуга на 20 фт. Наносит 2d10 урона электричеством, снимает щиты по площади и оглушает синтетиков на 1 раунд (спасбросок ТЕЛ).</div>' +
+        '</div>' +
+        '<div class="me-card" style="border-left:3px solid #ffaa33;">' +
+          '<h3 style="color:#ffaa33;margin-top:0;">🔥 ОГНЕННЫЙ ВЗРЫВ</h3>' +
+          '<div style="font-size:12.5px;color:#8bb1d6;margin-bottom:8px;"><strong>Маркеры:</strong> Поджог, Зажигательные патроны.</div>' +
+          '<div style="font-size:12.5px;color:#8bb1d6;margin-bottom:8px;"><strong>Детонаторы:</strong> Перегрузка, Деформация, Биотический рывок.</div>' +
+          '<div style="font-size:12px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:8px;border-radius:3px;">Эффект: Вспышка белого напалма 15 фт. Наносит 2d8 урона огнем, поджигает цели на 1d6 каждый раунд и снижает показатель брони DT на 2 до конца боя.</div>' +
+        '</div>' +
+        '<div class="me-card" style="border-left:3px solid #70dbdb;">' +
+          '<h3 style="color:#70dbdb;margin-top:0;">❄️ КРИО-РАСКОЛ</h3>' +
+          '<div style="font-size:12.5px;color:#8bb1d6;margin-bottom:8px;"><strong>Маркеры:</strong> Заморозка, Крио-патроны.</div>' +
+          '<div style="font-size:12.5px;color:#8bb1d6;margin-bottom:8px;"><strong>Детонаторы:</strong> Любой критический урон или прямая атака.</div>' +
+          '<div style="font-size:12px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:8px;border-radius:3px;">Эффект: Разрыв ледяной корки. Осколки наносят 2d6 колющего крио-урона и уменьшают скорость передвижения всех врагов в радиусе вдвое на 2 хода.</div>' +
+        '</div>' +
+      '</div>'
+  },
+
+  tactics: {
+    title: 'Тактика боя 5e и укрытия',
+    subtitle: 'Позиционные перестрелки, баллистические дистанции и экономика термозарядов',
+    tag: 'ТАКТИЧЕСКИЙ БОЙ',
+    icon: '🎯',
+    contentHtml:
+      '<div class="me-card" style="margin-bottom:14px;">' +
+        '<h4 style="color:#00d2ff;margin-top:0;">🧱 Система укрытий (Cover System)</h4>' +
+        '<ul style="font-size:13px;color:#8bb1d6;line-height:1.7;margin:0;padding-left:20px;">' +
+          '<li><strong>Половинное укрытие (Half Cover):</strong> низкие бетонные блоки, консоли, ящики. Дает <strong style="color:#fff;">+2 к КБ (AC)</strong> и спасброскам Ловкости.</li>' +
+          '<li><strong>Укрытие на три четверти (Three-Quarters Cover):</strong> дверные проемы, углы коридоров космических станций. Дает <strong style="color:#fff;">+5 к КБ (AC)</strong>.</li>' +
+          '<li><strong>Полное укрытие (Full Cover):</strong> герметичные переборки, монолитные стены. Субъект не может быть выбран прямой целью для выстрелов и направленной биотики.</li>' +
+        '</ul>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="me-card">' +
+          '<h4 style="color:#ffaa33;margin-top:0;">🔄 Охлаждение и термозаряды</h4>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Современное стрелковое оружие Млечного Пути использует одноразовые радиаторные картриджи — <strong>термозаряды</strong>. Замена отработанного блока требует <em>Бонусного действия</em> (для подготовленных бойцов N7) или <em>Основного действия</em>. В полевых условиях запас термозарядов ограничен ячейками боекомплекта брони.</p>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<h4 style="color:#22c55e;margin-top:0;">⚡ Активная реакция: Перекат в укрытие</h4>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Когда по персонажу совершается успешная дальнобойная атака, он может потратить свою <em>Реакцию</em> на тактический перекат к ближайшему укрытию (в пределах 10 фт), совершив проверку Ловкости (Акробатика) против броска атаки врага.</p>' +
+        '</div>' +
+      '</div>'
+  },
+
+  races_citadel: {
+    title: 'Расы Пространства Цитадели',
+    subtitle: 'Азари, Турианцы, Саларианцы и Человечество — архитекторы галактического мира',
+    tag: 'СОВЕТ ЦИТАДЕЛИ',
+    icon: '🏛️',
+    contentHtml:
+      '<div class="grid-2">' +
+        '<div class="me-card">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;"><h3 style="color:#b266ff;margin:0;">Азари (Asari)</h3><span class="me-tag-holo">Тессия • Левоамино</span></div>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;margin-top:8px;">Однополая биотическая раса непревзойденных дипломатов и философов, живущая до 1000 лет. Их нервная система пронизана природным элементом ноль, что делает каждую азари потенциальным биотиком.</p>' +
+          '<div style="font-size:11.5px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:6px 10px;border-radius:3px;">Бонусы 5e: +2 Харизма, +1 Мудрость. Врожденный заговор биотики, способность к слиянию сознаний (Мельд).</div>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;"><h3 style="color:#00d2ff;margin:0;">Турианцы (Turians)</h3><span class="me-tag-holo">Палавен • Декстроамино</span></div>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;margin-top:8px;">Милитаризованная культура строжайшей чести и дисциплины. Хитиновый панцирь защищает от жесткой радиации родного светила. Составляют основу миротворческого флота Совета.</p>' +
+          '<div style="font-size:11.5px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:6px 10px;border-radius:3px;">Бонусы 5e: +2 Ловкость, +1 Телосложение. +1 к базовому КБ за счет панциря, владение всеми видами оружия.</div>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;"><h3 style="color:#ffaa33;margin:0;">Саларианцы (Salarians)</h3><span class="me-tag-holo">Сур\'Кеш • Левоамино</span></div>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;margin-top:8px;">Амфибии с молниеносным метаболизмом: спят по 1 часу в сутки, мыслят и говорят с невероятной скоростью. Мастера шпионажа (ГОР / STG), генетики и технической разведки.</p>' +
+          '<div style="font-size:11.5px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:6px 10px;border-radius:3px;">Бонусы 5e: +2 Интеллект, +1 Ловкость. Преимущество на проверки Инициативы и взлома систем (Анализ).</div>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;"><h3 style="color:#22c55e;margin:0;">Человечество (Humans)</h3><span class="me-tag-holo">Земля • Левоамино</span></div>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;margin-top:8px;">Новички на галактической арене (вышли в космос менее 30 лет назад), но поразили Совет своей адаптивностью, военной инициативой Альянса и безграничными амбициями.</p>' +
+          '<div style="font-size:11.5px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:6px 10px;border-radius:3px;">Бонусы 5e: +1 к двум характеристикам, одна бесплатная черта (Feat) или навык на выбор.</div>' +
+        '</div>' +
+      '</div>'
+  },
+
+  races_outer: {
+    title: 'Расы Внешних Систем и Терминала',
+    subtitle: 'Кроганы, Кварианцы, Дреллы, Батарианцы, Ворча — обитатели опасного фронтира',
+    tag: 'ФРОНТИР И ДМЗ',
+    icon: '💀',
+    contentHtml:
+      '<div class="grid-2">' +
+        '<div class="me-card">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;"><h3 style="color:#ff5555;margin:0;">Кроганы (Krogans)</h3><span class="me-tag-holo">Тучанка • Левоамино</span></div>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;margin-top:8px;">Невероятно живучие гиганты с дублированными внутренними органами и горбом-накопителем. Пережили ядерную зиму Тучанки, восстание и генофаг саларианцев.</p>' +
+          '<div style="font-size:11.5px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:6px 10px;border-radius:3px;">Бонусы 5e: +2 Сила, +2 Телосложение. Кровавая ярость (Blood Rage) при падении ниже половины HP (+2 к урону в ближнем бою).</div>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;"><h3 style="color:#b266ff;margin:0;">Кварианцы (Quarians)</h3><span class="me-tag-holo">Раннох • Декстроамино</span></div>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;margin-top:8px;">Скитальцы Мигрирующего Флота из 50 000 кораблей. Создали гетов и потеряли родной мир. Из-за стерильной среды флота вынуждены постоянно носить гермокостюмы.</p>' +
+          '<div style="font-size:11.5px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:6px 10px;border-radius:3px;">Бонусы 5e: +2 Интеллект, +1 Ловкость. Экспертиза в ремонте техники, робототехнике и перепрограммировании синтетиков.</div>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;"><h3 style="color:#22c55e;margin:0;">Дреллы (Drell)</h3><span class="me-tag-holo">Рахана • Левоамино</span></div>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;margin-top:8px;">Рептилоидные гуманоиды с эйдетической памятью: способны переживать прошлое в мельчайших деталях. Спасены ханарами от гибели родного мира Рахана, служат разведчиками и ассасинами.</p>' +
+          '<div style="font-size:11.5px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:6px 10px;border-radius:3px;">Бонусы 5e: +2 Ловкость, +1 Мудрость. Фотографическая память, мастерство рукопашного боя и скрытности.</div>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;"><h3 style="color:#ffaa33;margin:0;">Батарианцы (Batarians)</h3><span class="me-tag-holo">Хар\'шан • Левоамино</span></div>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;margin-top:8px;">Четырехглазые милитаристы с жесткой кастовой системой. Порвали отношения с Советом Цитадели из-за экспансии людей в Скиллианском Пределе; контролируют пиратство Терминала.</p>' +
+          '<div style="font-size:11.5px;color:#c8e1f5;background:rgba(0,0,0,0.3);padding:6px 10px;border-radius:3px;">Бонусы 5e: +2 Телосложение, +1 Сила. Четыре глаза дают преимущество на проверки Внимания от засад.</div>' +
+        '</div>' +
+      '</div>'
+  },
+
+  races_ancient: {
+    title: 'Уникальные и древние формы жизни',
+    subtitle: 'Волусы, Элкоры, Ханары, Геты и загадочные Протеане',
+    tag: 'СИНТЕТИКИ И ДРЕВНИЕ',
+    icon: '🔮',
+    contentHtml:
+      '<div class="grid-2">' +
+        '<div class="me-card">' +
+          '<h3 style="color:#ffaa33;margin-top:0;">💰 Волусы (Volus)</h3>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Родом с аммиачной планеты Ирун с высоким давлением. Архитекторы «Акта об универсальной банковской системе Цитадели» и создатели кредита. Постоянно находятся в защитных скафандрах под давлением.</p>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<h3 style="color:#00d2ff;margin-top:0;">🐘 Элкоры (Elcor)</h3>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Массивные четвероногие великаны с высокой гравитацией родного мира Декууна. Говорят медленно и монотонно, предварительно озвучивая эмоцию («С искренним любопытством: как дела?»). В бою несут тяжелые пушки на спине.</p>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<h3 style="color:#b266ff;margin-top:0;">🪼 Ханары (Hanar)</h3>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Глубоководные полупрозрачные медузы планеты Кахье. Исключительно вежливы, о себе говорят в третьем лице («Этот скромно просит извинить»). Поклоняются Протеанам как «Вдохновителям».</p>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<h3 style="color:#70dbdb;margin-top:0;">🤖 Геты (Geth)</h3>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Сетевой синтетический разум. Отдельная программа гета не умнее мыши, но в кластере из сотен программ мобильная платформа обретает сверхразум. Ищут самоопределение и будущее своего народа.</p>' +
+        '</div>' +
+      '</div>'
+  },
+
+  factions_council: {
+    title: 'Совет Цитадели и СПЕКТРы',
+    subtitle: 'Высшая законодательная и арбитражная власть Пространства Цитадели',
+    tag: 'ВЫСШАЯ ВЛАСТЬ',
+    icon: '⚖️',
+    contentHtml:
+      '<div class="me-card" style="margin-bottom:14px;">' +
+        '<h3 style="color:#00d2ff;margin-top:0;">🏛️ Совет Цитадели (The Council)</h3>' +
+        '<p style="font-size:12.5px;color:#8bb1d6;line-height:1.6;">Триумвират послов Азари, Саларианцев и Турианцев (позже расширенный представителем Человечества). Совет разрешает межзвездные споры, регулирует применение флотских дредноутов (Фаросская конвенция) и курирует сеть ретрансляторов массы.</p>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="me-card" style="border-left:3px solid #b266ff;">' +
+          '<h3 style="color:#b266ff;margin-top:0;">🗡️ Институт СПЕКТР (Spectres)</h3>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;"><strong>Специальный Корпус Тактической Разведки.</strong> Элитные оперативники, наделенные Советом чрезвычайными правами. Спектр стоит выше любых местных законов, имеет доступ к секретным арсеналам и отчитывается <em>исключительно перед Советом Цитадели</em>. Девиз: «Цель оправдывает любые средства».</p>' +
+        '</div>' +
+        '<div class="me-card" style="border-left:3px solid #00d2ff;">' +
+          '<h3 style="color:#00d2ff;margin-top:0;">👮 Служба Безопасности Цитадели (C-Sec)</h3>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Огромная 200-тысячная многовидовая полиция, патрулирующая Кольцо Президиума и жилые Закоулки гигантской космической станции Цитадель. Возглавляется исполнительным директором (палавенский турианский офицер).</p>' +
+        '</div>' +
+      '</div>'
+  },
+
+  factions_alliance: {
+    title: 'Альянс Систем и Вооруженные силы',
+    subtitle: 'Объединенное правительство человечества, Станция Арктур и доктрина N7',
+    tag: 'АЛЬЯНС СИСТЕМ',
+    icon: '🎖️',
+    contentHtml:
+      '<div class="me-card" style="margin-bottom:14px;">' +
+        '<h3 style="color:#00d2ff;margin-top:0;">🌍 Альянс Систем (Systems Alliance)</h3>' +
+        '<p style="font-size:12.5px;color:#8bb1d6;line-height:1.6;">Создан после раскопок на Марсе в 2148 году и обнаружения ретранслятора Харона. Представляет интересы всего человечества в Галактике со штаб-квартирой на Станции Арктур. Обладает крупным современным авианосным флотом во главе с флагманом «Эверест».</p>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="me-card" style="border-left:3px solid #ff5555;">' +
+          '<h3 style="color:#ff5555;margin-top:0;">🎖️ Программа N7 (Special Forces)</h3>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Высший знак отличия спецназа ВКС Альянса. Буква <strong>N</strong> обозначает Специальные силы, цифра <strong>7</strong> — высший уровень прохождения жесточайших боевых симуляций на полигоне Вилла Рома (Рио-де-Жанейро) и в открытом космосе. Оперативники N7 обучаются действовать в абсолютном меньшинстве.</p>' +
+        '</div>' +
+        '<div class="me-card" style="border-left:3px solid #00d2ff;">' +
+          '<h3 style="color:#00d2ff;margin-top:0;">🚀 5-й Флот Альянса</h3>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Командующий: адмирал Стивен Хакетт. Быстроходные крейсеры и фрегаты, применяющие тактику прикрытия звеньев истребителей перехватчиками. Флот показал высочайшую эффективность при защите Цитадели.</p>' +
+        '</div>' +
+      '</div>'
+  },
+
+  factions_syndicates: {
+    title: 'Синдикаты Терминала и «Цербер»',
+    subtitle: 'Ария Т\'Лоак, криминальная теневая экономика и сеть Призрака',
+    tag: 'ТЕНЕВОЙ СЕКТОР',
+    icon: '☣️',
+    contentHtml:
+      '<div class="me-card" style="margin-bottom:14px;">' +
+        '<h3 style="color:#b266ff;margin-top:0;">🍸 Ария Т\'Лоак и Станция Омега</h3>' +
+        '<p style="font-size:12.5px;color:#8bb1d6;line-height:1.6;">«На Омеге есть только одно правило: не переходи дорогу Арии». Заброшенная шахтерская станция в поясе астероидов стала некоронованной столицей Систем Терминала, черным рынком наркотиков, оружия и контрабандного нулевого элемента.</p>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="me-card" style="border-left:3px solid #ffaa33;">' +
+          '<h3 style="color:#ffaa33;margin-top:0;">🏴 Наёмные армии Терминала</h3>' +
+          '<ul style="font-size:12px;color:#8bb1d6;padding-left:16px;margin:0;line-height:1.7;">' +
+            '<li><strong>Синие Светила (Blue Suns):</strong> ЧВК людей и батарианцев с бронетехникой и тяжелой артиллерией.</li>' +
+            '<li><strong>Затмение (Eclipse):</strong> наёмники-азари и саларианцы, мастера диверсий, биотики и боевых мехов ИМИР.</li>' +
+            '<li><strong>Кровавая Стая (Blood Pack):</strong> штурмовые банды кроганов и ворча с тяжелыми огнеметами.</li>' +
+          '</ul>' +
+        '</div>' +
+        '<div class="me-card" style="border-left:3px solid #ff5555;">' +
+          '<h3 style="color:#ff5555;margin-top:0;">🧬 Организация «Цербер» (Cerberus)</h3>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Военизированный подпольный синдикат, созданный загадочным лидером по прозвищу «Призрак» (Illusive Man). Цель — выживание и абсолютное превосходство человечества в Галактике любой ценой. Имеет неограниченный бюджет, собственные верфи и генетические лаборатории.</p>' +
+        '</div>' +
+      '</div>'
+  },
+
+  tech_eezo: {
+    title: 'Элемент Ноль и Ретрансляторы массы',
+    subtitle: 'Физика эффекта массы, сверхсветовые полеты и галактическая сеть ретрансляторов',
+    tag: 'ФИЗИКА И СВЕРХСВЕТ',
+    icon: '🌀',
+    contentHtml:
+      '<div class="me-card" style="margin-bottom:14px;">' +
+        '<h3 style="color:#00d2ff;margin-top:0;">⚛️ Нулевой элемент (Element Zero / Eezo)</h3>' +
+        '<p style="font-size:12.5px;color:#8bb1d6;line-height:1.6;">Редчайший минерал, образующийся при взрывах сверхновых звезд в ядрах планет. При пропускании постоянного электрического тока определенной полярности темная энергия сжимает или расширяет метрику пространства, увеличивая или уменьшая массу объектов в поле действия эффекта массы до нуля.</p>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="me-card">' +
+          '<h4 style="color:#b266ff;margin-top:0;">🛰️ Ретрансляторы массы (Mass Relays)</h4>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Гигантские 15-километровые монолиты в глубоком вакууме. Создают безинерционный туннель между звездами. <strong>Первичные ретрансляторы</strong> способны мгновенно перебрасывать корабли через тысячи световых лет в другие сектора. <strong>Вторичные</strong> связывают соседние скопления на сотни световых лет.</p>' +
+        '</div>' +
+        '<div class="me-card">' +
+          '<h4 style="color:#ffaa33;margin-top:0;">⚡ Сброс статического заряда FTL</h4>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Любой корабль, летящий со сверхсветовой скоростью (FTL), накапливает в корпусе колоссальный статический заряд. Каждые 50 часов полета корабль <em>обязан войти в магнитное поле газового гиганта или планеты</em> для разрядки, иначе ядро взорвется от перегрева.</p>' +
+        '</div>' +
+      '</div>'
+  },
+
+  tech_omnitool: {
+    title: 'Омни-инструменты и Уни-гель',
+    subtitle: 'Голографический интерфейс, 3D-микрофабрикаторы, омни-лезвия и нано-медицина',
+    tag: 'ЭКИПИРОВКА И СОФТ',
+    icon: '🔶',
+    contentHtml:
+      '<div class="me-card" style="margin-bottom:14px;">' +
+        '<h3 style="color:#ffaa33;margin-top:0;">📱 Омни-инструмент (Omni-Tool)</h3>' +
+        '<p style="font-size:12.5px;color:#8bb1d6;line-height:1.6;">Миниатюрный квантовый компьютер, закрепляемый на предплечье. Проецирует оранжевый сенсорный голографический дисплей и содержит встроенный 3D-микрофабрикатор, способный на молекулярном уровне за секунды печатать детали, сканеры, дешифраторы и боевые лезвия.</p>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="me-card" style="border-left:3px solid #ffaa33;">' +
+          '<h4 style="color:#ffaa33;margin-top:0;">🗡️ Омни-клинок (Omni-Blade)</h4>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Голографический раскаленный клинок из алмазоподобного полимера, синтезируемый за долю секунды. Наносит 1d8 + Модификатор ЛОВ/СИЛ колющего урона, игнорируя базовый порог брони (DT) цели за счет сверхвысокой температуры лезвия.</p>' +
+        '</div>' +
+        '<div class="me-card" style="border-left:3px solid #22c55e;">' +
+          '<h4 style="color:#22c55e;margin-top:0;">🧪 Меди-гель (Medi-Gel)</h4>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Универсальный фармакологический гель. Содержит анестетики, свертывающие наномашины и генные стимуляторы. В бою применение меди-геля в качестве <em>Бонусного действия</em> восстанавливает <strong>2d4 + 2 HP</strong> и стабилизирует умирающего оперативника.</p>' +
+        '</div>' +
+      '</div>'
+  },
+
+  tech_normandy: {
+    title: 'Фрегат «Нормандия» SR-2 и системы IES',
+    subtitle: 'Скрытные поглотители выбросов IES, ядро Тантала и тактическое превосходство',
+    tag: 'ФЛАГМАН И СТЕЛС',
+    icon: '🛸',
+    contentHtml:
+      '<div class="me-card" style="margin-bottom:14px;">' +
+        '<h3 style="color:#00d2ff;margin-top:0;">🛸 Фрегат «Нормандия» SR-2</h3>' +
+        '<p style="font-size:12.5px;color:#8bb1d6;line-height:1.6;">Вершина космического кораблестроения Млечного Пути. Вдвое крупнее предшественницы SR-1, оснащена передовым боевым информационным центром (CIC), каютами экипажа, арсеналом и ангаром для шаттла «Кадьяк».</p>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="me-card" style="border-left:3px solid #00d2ff;">' +
+          '<h4 style="color:#00d2ff;margin-top:0;">🔇 Стелс-маскировка IES</h4>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;"><strong>Internal Emissions Sink (IES).</strong> Обычные корабли выдают себя тепловым излучением в холодный космос. «Нормандия» временно запирает всё тепло двигателей во внутренних криогенных радиаторах. До 3 часов корабль абсолютно невидим для дальних сенсоров вражеских флотов.</p>' +
+        '</div>' +
+        '<div class="me-card" style="border-left:3px solid #b266ff;">' +
+          '<h4 style="color:#b266ff;margin-top:0;">⚡ Ядро эффекта массы «Тантал»</h4>' +
+          '<p style="font-size:12.5px;color:#8bb1d6;">Непропорционально гигантское ядро нулевого элемента, генерирующее концентрации гравитации перед носом корабля. Фрегат фактически «падает» вперед без задействования плазменных реактивных сопел, что дает максимальную скрытность и маневренность.</p>' +
+        '</div>' +
+      '</div>'
+  }
+};
+
+// 5. ГЛАВНЫЙ ЭКРАН КОДЕКСА ГАЛАКТИКИ (КАТАЛОГ С ПОИСКОМ)
+function meCodex(){
+  var searchVal = (typeof ME !== 'undefined' && ME.codexSearch) ? ME.codexSearch.toLowerCase().trim() : '';
+
+  var html = meNavHeader('АРХИВЫ ЦИТАДЕЛИ // БАЗА ЗНАНИЙ', 'СТАТЕЙ В АРХИВЕ: 12') +
+    '<h1 style="margin-bottom:6px;">📚 КОДЕКС ГАЛАКТИКИ</h1>' +
+    '<div class="subtitle">ТАКТИЧЕСКИЙ АТЛАС МЛЕЧНОГО ПУТИ • БОЕВЫЕ МЕХАНИКИ • РАСЫ • ФРАКЦИИ • ТЕХНОЛОГИИ</div>' +
+    
+    '<div class="sh-ref-search-wrap" style="margin:16px 0;">' +
+      '<span class="sh-ref-search-icon">🔍</span>' +
+      '<input type="text" id="meCodexSearchInput" class="sh-ref-search-input me-input" placeholder="Быстрый поиск по Кодексу (щиты, комбо, азари, кроганы, N7, омни-клинок, Нормандия)..." value="' + meEsc(searchVal) + '" style="width:100%;font-size:13px;padding-left:36px;">' +
     '</div>';
+
+  var totalFound = 0;
+
+  ME.codexCategories.forEach(function(sec){
+    var filteredItems = sec.items.filter(function(it){
+      if(!searchVal) return true;
+      var haystack = (it.title + ' ' + it.desc + ' ' + (it.tag || '')).toLowerCase();
+      return haystack.indexOf(searchVal) !== -1;
+    });
+
+    if(filteredItems.length === 0) return;
+    totalFound += filteredItems.length;
+
+    html += '<div class="sh-ref-group-block" style="margin-bottom:20px;">' +
+      '<div class="sh-ref-group-title" style="border-left:3px solid ' + sec.color + ';display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:rgba(255,255,255,0.03);margin-bottom:10px;">' +
+        '<span style="font-size:14px;font-weight:700;color:#fff;">' + sec.group + '</span>' +
+        '<span class="sh-ref-group-count" style="font-size:11px;background:rgba(0,210,255,0.15);color:#00d2ff;padding:2px 8px;border-radius:10px;font-family:monospace;">' + filteredItems.length + '</span>' +
+      '</div>' +
+      '<div class="menu-list grid-2">' +
+        filteredItems.map(function(it){
+          return '<div class="menu-item me-card" data-nav="meCodexView:' + it.id + '" style="position:relative;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;">' +
+            '<div style="flex:1;">' +
+              '<div class="name" style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#00d2ff;">' +
+                it.icon + ' ' + meEsc(it.title) +
+                (it.tag ? '<span class="me-tag-holo" style="font-size:10px;">' + meEsc(it.tag) + '</span>' : '') +
+              '</div>' +
+              '<div class="desc" style="font-size:12px;color:#8bb1d6;margin-top:6px;line-height:1.5;">' + meEsc(it.desc) + '</div>' +
+            '</div>' +
+            '<div class="arrow" style="color:#00d2ff;font-size:18px;">›</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  });
+
+  if(totalFound === 0 && searchVal){
+    html += '<div class="char-empty" style="margin-top:24px;text-align:center;color:#7da5c9;padding:30px;background:rgba(0,0,0,0.3);border:1px solid rgba(0,210,255,0.2);border-radius:4px;">По запросу «' + meEsc(searchVal) + '» записей в архиве Совета Цитадели не найдено. Попробуйте другой термин.</div>';
   }
 
-  return meNavHeader('КОДЕКС ГАЛАКТИКИ // АРХИВЫ ЦИТАДЕЛИ', 'БАЗА ДАННЫХ СОВЕТА') +
-    '<h1>КОДЕКС ГАЛАКТИКИ</h1>' +
-    '<div class="subtitle">МАТРИЦА УРОНА • РАСЫ • ФРАКЦИИ • КОМБО-ДЕТОНАЦИИ • ПРАВИЛА БОЯ</div>' +
-    '<div class="me-panel" style="margin-top:14px;">' +
-      '<div style="margin-bottom:14px;">' + tabsHtml + '</div>' +
-      contentHtml +
+  return html;
+}
+
+// 5b. ПРОСМОТР СТАТЬИ КОДЕКСА
+function meCodexView(){
+  var key = (window.view && window.view.codexKey) ? window.view.codexKey : 'matrix';
+  var art = ME.codexArticles[key];
+  if(!art) return meCodex();
+
+  return meNavHeader('КОДЕКС ГАЛАКТИКИ // АРХИВЫ ЦИТАДЕЛИ', art.tag || 'АРХИВ') +
+    '<div style="margin-bottom:12px;">' +
+      '<button class="btn-subtle" data-nav="meCodex" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;cursor:pointer;">' +
+        '← Назад в Кодекс' +
+      '</button>' +
+    '</div>' +
+    '<h1>' + art.icon + ' ' + meEsc(art.title) + '</h1>' +
+    '<div class="subtitle">' + meEsc(art.subtitle || art.tag) + '</div>' +
+    '<div class="me-panel" style="margin-top:14px;line-height:1.65;font-size:13px;color:#c8e1f5;">' +
+      art.contentHtml +
+    '</div>' +
+    '<div style="margin-top:20px;padding-top:14px;border-top:1px solid rgba(0,210,255,0.15);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+      '<button class="btn-subtle" data-nav="meCodex" style="cursor:pointer;">← Вернуться ко всем статьям Кодекса</button>' +
+      '<div style="font-size:11px;color:#7da5c9;">БАЗА ДАННЫХ ЦИТАДЕЛИ • РАЗДЕЛ ' + meEsc(art.tag || 'LORE') + '</div>' +
     '</div>';
 }
 
@@ -20015,7 +20414,7 @@ function meData(){
       '<div class="section-label">✨ ИНТЕГРАЦИЯ С GOOGLE GEMINI AI</div>' +
       '<div style="font-size:12.5px;color:var(--ink-dim);margin:6px 0 10px;">API-ключ используется для работы с ИИ:</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-        '<input type="password" class="me-input" id="meGeminiKeyInput" placeholder="AIzaSy..." value="' + escA(localStorage.getItem('gemini_api_key') || '') + '" style="flex:1;min-width:240px;">' +
+        '<input type="password" class="me-input" id="meGeminiKeyInput" placeholder="AIzaSy..." value="' + escA(getGeminiApiKey()) + '" style="flex:1;min-width:240px;">' +
         '<button class="btn-primary" id="meSaveGeminiKeyBtn">Сохранить ключ</button>' +
       '</div>' +
       '<div style="font-size:11px;color:var(--ink-dim);margin-top:6px;">Ключ хранится исключительно локально в браузере.</div>' +
@@ -20046,6 +20445,36 @@ function meData(){
 
 // Привязка интерактивных событий всех экранов
 function wireMe(){
+  // Поиск по Кодексу Галактики
+  var codexSearchInput = document.getElementById('meCodexSearchInput');
+  if(codexSearchInput && !codexSearchInput.__wired){
+    codexSearchInput.__wired = true;
+    codexSearchInput.addEventListener('input', function(){
+      ME.codexSearch = this.value;
+      var curVal = this.value.toLowerCase().trim();
+      var blocks = document.querySelectorAll('.sh-ref-group-block');
+      var anyFound = false;
+
+      blocks.forEach(function(b){
+        var items = b.querySelectorAll('.menu-item');
+        var groupFound = false;
+        items.forEach(function(it){
+          var text = (it.innerText || '').toLowerCase();
+          var match = !curVal || text.indexOf(curVal) !== -1;
+          it.style.display = match ? 'flex' : 'none';
+          if(match) groupFound = true;
+        });
+        b.style.display = groupFound ? 'block' : 'none';
+        if(groupFound) anyFound = true;
+      });
+
+      var emptyMsg = document.querySelector('.char-empty');
+      if(emptyMsg){
+        emptyMsg.style.display = anyFound ? 'none' : 'block';
+      }
+    });
+  }
+
   // Навигация по кнопкам с [data-nav] или [data-go]
   document.querySelectorAll('[data-nav]').forEach(function(el){
     if(el.__meNavBound) return;
@@ -20129,7 +20558,7 @@ function wireMe(){
       var inp = document.getElementById('meGeminiKeyInput');
       if(inp){
         var key = inp.value.trim();
-        localStorage.setItem('gemini_api_key', key);
+        saveGeminiApiKey(key);
         alert(key ? '✓ Ключ Gemini API успешно сохранен!' : 'Ключ удален');
       }
     };
@@ -20642,6 +21071,7 @@ window.mePowers = mePowers;
 window.meArsenal = meArsenal;
 window.meShip = meShip;
 window.meCodex = meCodex;
+window.meCodexView = meCodexView;
 window.meMap = meMap;
 window.wireMeMap = wireMeMap;
 window.meData = meData;
@@ -20744,6 +21174,7 @@ window.render=function(){
     else if(s==='meArsenal') html = meArsenal();
     else if(s==='meShip') html = meShip();
     else if(s==='meCodex') html = meCodex();
+    else if(s==='meCodexView') html = meCodexView();
     else if(s==='meMissions' || s==='meMap') html = meMap();
     else if(s==='meMap') html = meMap();
     else if(s==='meData') html = meData();
@@ -20811,6 +21242,12 @@ window.navigate=function(val){
     };
     if(meScreens[p[0]]){
       window.view = view = { screen: meScreens[p[0]] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'meCodexView'){
+      window.view = view = { screen: 'meCodexView', codexKey: p[1] };
       render();
       window.scrollTo(0,0);
       return;
