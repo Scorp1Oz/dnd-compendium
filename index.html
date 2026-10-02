@@ -4391,20 +4391,117 @@ body.me-theme .me-filter-btn.on {
   font-weight: 700 !important;
 }
 
-/* Карточки в Кодексе и меню */
+/* ============================================================
+   МАСС ЭФФЕКТ: КОМПАКТНЫЙ ГЛАВНЫЙ ЭКРАН ТЕРМИНАЛА (БЕЗ СКРОЛЛА)
+   ============================================================ */
+
+body.me-theme {
+  padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Компактный HUD */
+body.me-theme #meHud {
+  padding: 8px 14px !important;
+  margin-bottom: 6px !important;
+}
+body.me-theme #meHud .sh-hud-name {
+  font-size: 15px !important;
+}
+body.me-theme #meHud .sh-hud-meta {
+  font-size: 11.5px !important;
+}
+body.me-theme #meHud .sh-hud-stats {
+  margin-top: 6px !important;
+  gap: 6px !important;
+}
+body.me-theme #meHud .sh-hud-stat-pill {
+  padding: 3px 9px !important;
+  font-size: 11.5px !important;
+}
+
+/* Компактный разделитель */
+body.me-theme .rule {
+  margin: 6px 0 8px !important;
+  background: linear-gradient(90deg, rgba(0, 210, 255, 0.4), transparent 75%) !important;
+}
+
+/* Компактная плашка броска кубиков */
+body.me-theme .hero-dice {
+  padding: 10px 16px !important;
+  gap: 12px !important;
+  margin-bottom: 6px !important;
+  border-left-width: 3px !important;
+  border-radius: 4px !important;
+}
+body.me-theme .hero-dice-icon {
+  width: 36px !important;
+  height: 36px !important;
+}
+body.me-theme .hero-dice-name {
+  font-size: 15px !important;
+  margin-bottom: 2px !important;
+  letter-spacing: 0.04em !important;
+}
+body.me-theme .hero-dice-desc {
+  font-size: 11.5px !important;
+  color: #7da5c9 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+body.me-theme .hero-dice-arrow {
+  font-size: 16px !important;
+}
+
+/* Компактный заголовок разделов */
+body.me-theme .section-label {
+  margin: 8px 0 6px !important;
+  font-size: 10px !important;
+  letter-spacing: 0.12em !important;
+}
+
+/* Компактная сетка и карточки системных разделов */
+body.me-theme .menu-list.grid-2 {
+  gap: 8px !important;
+}
+
 body.me-theme .menu-item {
   background: rgba(6, 14, 28, 0.85) !important;
   border: 1px solid rgba(0, 210, 255, 0.22) !important;
   border-left: 3px solid #00d2ff !important;
+  padding: 9px 14px !important;
+  border-radius: 3px !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 body.me-theme .menu-item:hover {
   background: rgba(9, 22, 46, 0.95) !important;
   border-color: #00d2ff !important;
-  border-left-width: 5px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 18px rgba(0, 210, 255, 0.25) !important;
-  transform: translateY(-2px) !important;
+  border-left-width: 4px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 14px rgba(0, 210, 255, 0.22) !important;
+  transform: translateY(-1px) !important;
+}
+
+body.me-theme .menu-item .name {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.25 !important;
+}
+
+body.me-theme .menu-item .desc {
+  font-size: 11px !important;
+  margin-top: 2px !important;
+  color: #7da5c9 !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body.me-theme .menu-item .arrow {
+  font-size: 15px !important;
+  margin-left: 8px !important;
 }
 
 /* Адаптация под 4 темы Mass Effect */
@@ -19218,16 +19315,22 @@ function meHome(){
     '<div class="hero-dice-icon">'+(typeof dieShapeSvg==='function'? dieShapeSvg(20,'meHeroDie',20) : '🎲')+'</div>'+
     '<div class="hero-dice-text">'+
       '<div class="hero-dice-name">ТАКТИЧЕСКИЙ БРОСОК КОСТЕЙ</div>'+
-      '<div class="hero-dice-desc">Кубики d4–d20, d100 критов и событий перелёта, монетка шанса W/L, модификаторы и подписи ME</div>'+
+      '<div class="hero-dice-desc">Кубики d4–d20, d100 критов, монетка шанса W/L и модификаторы ME</div>'+
     '</div><div class="hero-dice-arrow">→</div></div>';
 
+  var powersCount = (ME.getPowers ? ME.getPowers().length : 0);
+  var weaponsCount = (ME.getArsenal ? ME.getArsenal().length : 0);
+  var ship = (ME.getShip ? ME.getShip() : {});
+  var crewCount = (ship.crew || []).length;
+  var profCount = (ME.getProfiles ? ME.getProfiles().length : 1);
+
   var items = [
-    {nav:'mePowers',   icon:'⚡', t:'Способности и Древо',    d:'Биотика, Техника, Бой, Медицина: корни, ранги и комбинации'},
-    {nav:'meArsenal',  icon:'🔫', t:'Оружейный арсенал',      d:'Классификация оружия, типы урона, модификации, заряды'},
-    {nav:'meShip',     icon:'🚀', t:'Корабль и Экипаж',       d:'Системы судна, ядро масс-эффекта, СЖО, отряд и лояльность'},
-    {nav:'meCodex',    icon:'📖', t:'Кодекс Галактики',       d:'Виды, фракции, матрица урона против слоев защиты, правила боя'},
-    {nav:'meMap',      icon:'🗺️', t:'Галактическая карта',    d:'Сектора Цитадели, ретрансляторы массы, контракты систем'},
-    {nav:'meData',     icon:'💾', t:'Данные систем',          d:'Досье оперативника, темы оформления, GitHub Sync и Gemini AI'}
+    {nav:'mePowers',   icon:'⚡', t:'Способности и Древо',    d:(powersCount ? powersCount + ' в арсенале сил' : 'Биотика, техника, бой и комбо')},
+    {nav:'meArsenal',  icon:'🔫', t:'Оружейный арсенал',      d:(weaponsCount ? weaponsCount + ' в арсенале' : 'Винтовки, тяжелое оружие, моды и урон')},
+    {nav:'meShip',     icon:'🚀', t:'Корабль и Экипаж',       d:((ship.name || 'Нормандия SR-2') + ' • ' + crewCount + ' в экипаже')},
+    {nav:'meCodex',    icon:'📖', t:'Кодекс Галактики',       d:'12 статей: расы, фракции, матрица урона'},
+    {nav:'meMap',      icon:'🗺️', t:'Галактическая карта',    d:'Сектора Цитадели, ретрансляторы и контракты'},
+    {nav:'meData',     icon:'💾', t:'Данные систем',          d:(profCount + ' в отряде, темы, Cloud Sync и ИИ')}
   ];
 
   return ''+
@@ -19236,8 +19339,10 @@ function meHome(){
     '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // КОНСОЛЬ</div>'+
     '<div class="menu-list grid-2">'+items.map(function(i){
       return '<div class="menu-item" data-nav="'+i.nav+'">'+
-        '<div class="name">'+i.icon+' '+meEsc(i.t)+'</div>'+
-        '<div class="desc">'+meEsc(i.d)+'</div>'+
+        '<div style="min-width:0;flex:1;">'+
+          '<div class="name">'+i.icon+' '+meEsc(i.t)+'</div>'+
+          '<div class="desc">'+meEsc(i.d)+'</div>'+
+        '</div>'+
         '<div class="arrow">›</div>'+
       '</div>';
     }).join('')+'</div>';
