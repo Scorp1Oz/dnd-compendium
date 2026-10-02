@@ -4654,6 +4654,154 @@ body.me-theme.me-theme-citadel .me-citadel-particles {
 }
 
 
+/* Проекции темы Omni-tool (Оранжевый голографический интерфейс) */
+.me-omni-projections {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  display: none;
+}
+body.me-theme.me-theme-omni .me-omni-projections {
+  display: block;
+}
+
+.omni-scan-beam {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 136, 0, 0.15) 20%, rgba(255, 170, 50, 0.5) 50%, rgba(255, 136, 0, 0.15) 80%, transparent 100%);
+  box-shadow: 0 0 15px rgba(255, 136, 0, 0.4);
+  animation: omniScanSweep 14s linear infinite;
+  opacity: 0.5;
+}
+
+.omni-radar-widget {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 440px;
+  height: 440px;
+  opacity: 0.22;
+  filter: drop-shadow(0 0 10px rgba(255, 120, 0, 0.5));
+}
+
+.omni-spin-cw {
+  animation: omniSpin 60s linear infinite;
+  transform-origin: center;
+}
+
+.omni-spin-ccw {
+  animation: omniSpinRev 42s linear infinite;
+  transform-origin: center;
+}
+
+.omni-hex-matrix {
+  position: absolute;
+  left: 2%;
+  top: 22%;
+  width: 250px;
+  height: 250px;
+  opacity: 0.20;
+  filter: drop-shadow(0 0 8px rgba(255, 120, 0, 0.5));
+  animation: omniFloat1 18s ease-in-out infinite alternate;
+}
+
+.omni-wave-widget {
+  position: absolute;
+  left: 3%;
+  bottom: 40px;
+  width: 270px;
+  height: 85px;
+  opacity: 0.22;
+  filter: drop-shadow(0 0 6px rgba(255, 120, 0, 0.45));
+  animation: omniPulseWave 5s ease-in-out infinite;
+}
+
+.omni-target-widget {
+  position: absolute;
+  right: 4%;
+  bottom: 50px;
+  width: 240px;
+  height: 170px;
+  opacity: 0.22;
+  filter: drop-shadow(0 0 8px rgba(255, 120, 0, 0.5));
+  animation: omniFloat2 16s ease-in-out infinite alternate;
+}
+
+.omni-blade-widget {
+  position: absolute;
+  right: 2.5%;
+  top: 35%;
+  width: 150px;
+  height: 270px;
+  opacity: 0.20;
+  filter: drop-shadow(0 0 10px rgba(255, 120, 0, 0.5));
+  animation: omniBladePulse 8s ease-in-out infinite;
+}
+
+.omni-spark {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #ffaa33;
+  box-shadow: 0 0 6px #ff8800, 0 0 10px rgba(255, 136, 0, 0.6);
+  opacity: 0;
+  animation: omniSparkRise 12s ease-in-out infinite;
+}
+
+@keyframes omniSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes omniSpinRev {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes omniFloat1 {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(1.5deg); }
+  100% { transform: translateY(8px) rotate(-1deg); }
+}
+
+@keyframes omniFloat2 {
+  0% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(10px) translateX(-6px); }
+  100% { transform: translateY(-8px) translateX(5px); }
+}
+
+@keyframes omniPulseWave {
+  0%, 100% { opacity: 0.18; transform: scaleY(0.96); }
+  50% { opacity: 0.28; transform: scaleY(1.04); }
+}
+
+@keyframes omniBladePulse {
+  0%, 100% { opacity: 0.16; transform: translateY(0) scale(0.98); }
+  50% { opacity: 0.26; transform: translateY(-8px) scale(1.02); }
+}
+
+@keyframes omniScanSweep {
+  0% { top: -20px; opacity: 0; }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.5; }
+  100% { top: 105vh; opacity: 0; }
+}
+
+@keyframes omniSparkRise {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  20% { opacity: var(--sp-op, 0.6); }
+  80% { opacity: var(--sp-op, 0.6); }
+  100% { transform: translateY(-200px) scale(1); opacity: 0; }
+}
+
 /* Адаптация под 4 темы Mass Effect */
 body.me-theme.me-theme-omni .btn-primary {
   background: linear-gradient(135deg, #ff7700 0%, #aa4400 100%) !important;
@@ -19466,25 +19614,159 @@ function initCitadelParticles(){
   return cont;
 }
 
+function initOmniProjections(){
+  if(typeof document === "undefined" || !document.body) return null;
+  var cont = document.getElementById("meOmniProjections");
+  if(!cont){
+    cont = document.createElement("div");
+    cont.id = "meOmniProjections";
+    cont.className = "me-omni-projections";
+    cont.setAttribute("aria-hidden", "true");
+    document.body.insertBefore(cont, document.body.firstChild);
+  }
+  if(!cont.children || cont.children.length === 0){
+    // 1. Сканирующий луч
+    var beam = document.createElement("div");
+    beam.className = "omni-scan-beam";
+    cont.appendChild(beam);
+
+    // 2. Вращающийся радар-диск
+    var radar = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    radar.setAttribute("class", "omni-radar-widget");
+    radar.setAttribute("viewBox", "0 0 400 400");
+    radar.setAttribute("fill", "none");
+    radar.setAttribute("stroke", "#ff8800");
+    radar.innerHTML = '<g class="omni-spin-cw">' +
+      '<circle cx="200" cy="200" r="180" stroke-width="1.5" stroke-dasharray="16 8 4 8" />' +
+      '<circle cx="200" cy="200" r="160" stroke-width="1" stroke-opacity="0.4" />' +
+      '<path d="M 200,10 L 200,30 M 200,370 L 200,390 M 10,200 L 30,200 M 370,200 L 390,200" stroke-width="2" />' +
+      '</g>' +
+      '<g class="omni-spin-ccw">' +
+      '<path d="M 200,60 A 140 140 0 0 1 340,200" stroke-width="3" stroke-linecap="round" />' +
+      '<path d="M 200,340 A 140 140 0 0 1 60,200" stroke-width="2" stroke-dasharray="8 6" />' +
+      '<circle cx="200" cy="200" r="100" stroke-width="1.5" stroke-dasharray="30 15" stroke-opacity="0.6" />' +
+      '</g>' +
+      '<circle cx="200" cy="200" r="40" stroke-width="1" stroke-dasharray="4 4" />' +
+      '<path d="M 180,200 L 220,200 M 200,180 L 200,220" stroke-width="1.5" />' +
+      '<text x="200" y="250" text-anchor="middle" fill="#ffaa33" stroke="none" font-size="10" letter-spacing="2" font-family="monospace">OMNI // RADAR</text>';
+    cont.appendChild(radar);
+
+    // 3. Гексагональная сетка синтеза / щита слева
+    var hex = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    hex.setAttribute("class", "omni-hex-matrix");
+    hex.setAttribute("viewBox", "0 0 240 240");
+    hex.setAttribute("fill", "none");
+    hex.setAttribute("stroke", "#ff8800");
+    hex.setAttribute("stroke-width", "1.2");
+    hex.innerHTML = '<polygon points="60,20 100,20 120,55 100,90 60,90 40,55" fill="rgba(255,136,0,0.06)" />' +
+      '<polygon points="120,55 160,55 180,90 160,125 120,125 100,90" fill="rgba(255,136,0,0.12)" />' +
+      '<polygon points="60,90 100,90 120,125 100,160 60,160 40,125" fill="rgba(255,136,0,0.04)" />' +
+      '<polygon points="120,125 160,125 180,160 160,195 120,195 100,160" fill="rgba(255,136,0,0.08)" />' +
+      '<polygon points="180,90 220,90 240,125 220,160 180,160 160,125" />' +
+      '<polygon points="0,90 40,90 60,125 40,160 0,160 -20,125" stroke-dasharray="4 4" />' +
+      '<circle cx="100" cy="90" r="2.5" fill="#ffaa33" stroke="none" />' +
+      '<circle cx="120" cy="125" r="3" fill="#ffedd5" stroke="none" />' +
+      '<circle cx="160" cy="125" r="2.5" fill="#ffaa33" stroke="none" />' +
+      '<text x="50" y="215" fill="#ffaa33" stroke="none" font-size="9" letter-spacing="1.5" font-family="monospace">[ FABRICATOR MATRIX ]</text>';
+    cont.appendChild(hex);
+
+    // 4. Волновой спектрограф слева внизу
+    var wave = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    wave.setAttribute("class", "omni-wave-widget");
+    wave.setAttribute("viewBox", "0 0 280 90");
+    wave.setAttribute("fill", "none");
+    wave.setAttribute("stroke", "#ff8800");
+    wave.innerHTML = '<rect x="0" y="0" width="280" height="90" stroke-width="1" stroke-dasharray="4 6" stroke-opacity="0.3" rx="4" />' +
+      '<path d="M 0,45 L 40,45 L 55,25 L 70,65 L 85,35 L 100,55 L 115,15 L 130,75 L 145,45 L 175,45 L 190,30 L 205,60 L 220,45 L 280,45" stroke-width="1.8" />' +
+      '<line x1="0" y1="45" x2="280" y2="45" stroke-width="0.8" stroke-dasharray="2 4" stroke-opacity="0.4" />' +
+      '<text x="12" y="20" fill="#ffaa33" stroke="none" font-size="9" letter-spacing="1" font-family="monospace">SIG.ANALYSIS // 142.8 MHz</text>' +
+      '<text x="12" y="80" fill="#f97316" stroke="none" font-size="8" letter-spacing="1" font-family="monospace">STATUS: CARRIER ACQUIRED</text>' +
+      '<rect x="230" y="12" width="38" height="6" fill="#ff8800" fill-opacity="0.3" stroke="none" />' +
+      '<rect x="230" y="12" width="26" height="6" fill="#ffaa33" stroke="none" />';
+    cont.appendChild(wave);
+
+    // 5. Тактическая рамка справа внизу
+    var target = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    target.setAttribute("class", "omni-target-widget");
+    target.setAttribute("viewBox", "0 0 240 180");
+    target.setAttribute("fill", "none");
+    target.setAttribute("stroke", "#ff8800");
+    target.innerHTML = '<path d="M 20,40 L 20,20 L 40,20" stroke-width="2" />' +
+      '<path d="M 220,40 L 220,20 L 200,20" stroke-width="2" />' +
+      '<path d="M 20,140 L 20,160 L 40,160" stroke-width="2" />' +
+      '<path d="M 220,140 L 220,160 L 200,160" stroke-width="2" />' +
+      '<circle cx="120" cy="90" r="45" stroke-width="1.2" stroke-dasharray="12 6" />' +
+      '<circle cx="120" cy="90" r="15" stroke-width="1" />' +
+      '<path d="M 120,35 L 120,45 M 120,135 L 120,145 M 65,90 L 75,90 M 165,90 L 175,90" stroke-width="1.5" />' +
+      '<text x="45" y="30" fill="#ffaa33" stroke="none" font-size="9" letter-spacing="1.5" font-family="monospace">SYS.OMNI // V.4.12</text>' +
+      '<text x="45" y="155" fill="#f97316" stroke="none" font-size="8" letter-spacing="1" font-family="monospace">COORD: 47.902 // +12.44</text>';
+    cont.appendChild(target);
+
+    // 6. Голографический Омни-клинок справа
+    var blade = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    blade.setAttribute("class", "omni-blade-widget");
+    blade.setAttribute("viewBox", "0 0 150 270");
+    blade.setAttribute("fill", "none");
+    blade.setAttribute("stroke", "#ff8800");
+    blade.innerHTML = '<path d="M 40,250 L 75,20 L 110,250 Z" stroke-width="1.8" fill="rgba(255,136,0,0.06)" />' +
+      '<path d="M 75,20 L 75,250" stroke-width="1.5" stroke-dasharray="6 4" />' +
+      '<line x1="68" y1="60" x2="82" y2="60" stroke-width="1.5" />' +
+      '<line x1="62" y1="100" x2="88" y2="100" stroke-width="1.5" />' +
+      '<line x1="56" y1="140" x2="94" y2="140" stroke-width="1.5" />' +
+      '<line x1="50" y1="180" x2="100" y2="180" stroke-width="1.5" />' +
+      '<line x1="44" y1="220" x2="106" y2="220" stroke-width="1.5" />' +
+      '<rect x="25" y="248" width="100" height="14" rx="2" stroke-width="1.2" fill="rgba(255,136,0,0.12)" />' +
+      '<circle cx="75" cy="20" r="3" fill="#ffedd5" stroke="none" />' +
+      '<text x="75" y="260" text-anchor="middle" fill="#ffedd5" stroke="none" font-size="7.5" letter-spacing="1" font-family="monospace">[ OMNI-BLADE ]</text>';
+    cont.appendChild(blade);
+
+    // 7. Летающие искры-частицы омнитула
+    for(var i = 0; i < 14; i++){
+      var sp = document.createElement("div");
+      sp.className = "omni-spark";
+      sp.style.left = (Math.random() * 100).toFixed(1) + "%";
+      sp.style.bottom = (Math.random() * 80).toFixed(1) + "%";
+      var dur = (9 + Math.random() * 8).toFixed(1);
+      var del = (-Math.random() * 12).toFixed(1);
+      var op = (0.30 + Math.random() * 0.40).toFixed(2);
+      sp.style.setProperty("--sp-op", op);
+      sp.style.animation = "omniSparkRise " + dur + "s ease-in-out " + del + "s infinite";
+      cont.appendChild(sp);
+    }
+  }
+  return cont;
+}
+
 window.applyMeTheme = function(){
-  if(typeof document === 'undefined' || !document.body) return;
-  if(typeof HB === 'undefined' || HB.mode !== 'me'){
-    document.body.classList.remove('me-theme-citadel', 'me-theme-omni', 'me-theme-n7', 'me-theme-cerberus');
-    var pCit = document.getElementById('meCitadelParticles');
-    if(pCit) pCit.style.display = 'none';
+  if(typeof document === "undefined" || !document.body) return;
+  if(typeof HB === "undefined" || HB.mode !== "me"){
+    document.body.classList.remove("me-theme-citadel", "me-theme-omni", "me-theme-n7", "me-theme-cerberus");
+    var pCit = document.getElementById("meCitadelParticles");
+    if(pCit) pCit.style.display = "none";
+    var pOmni = document.getElementById("meOmniProjections");
+    if(pOmni) pOmni.style.display = "none";
     return;
   }
   var t = getMeTheme();
-  document.body.classList.remove('me-theme-citadel', 'me-theme-omni', 'me-theme-n7', 'me-theme-cerberus');
-  document.body.classList.add('me-theme-' + t);
+  document.body.classList.remove("me-theme-citadel", "me-theme-omni", "me-theme-n7", "me-theme-cerberus");
+  document.body.classList.add("me-theme-" + t);
 
-  if(t === 'citadel'){
+  var pCit = document.getElementById("meCitadelParticles");
+  if(t === "citadel"){
     initCitadelParticles();
-    var pCit = document.getElementById('meCitadelParticles');
-    if(pCit) pCit.style.display = 'block';
+    pCit = document.getElementById("meCitadelParticles");
+    if(pCit) pCit.style.display = "block";
   } else {
-    var pCit = document.getElementById('meCitadelParticles');
-    if(pCit) pCit.style.display = 'none';
+    if(pCit) pCit.style.display = "none";
+  }
+
+  var pOmni = document.getElementById("meOmniProjections");
+  if(t === "omni"){
+    initOmniProjections();
+    pOmni = document.getElementById("meOmniProjections");
+    if(pOmni) pOmni.style.display = "block";
+  } else {
+    if(pOmni) pOmni.style.display = "none";
   }
 };
 
