@@ -535,13 +535,14 @@
     padding:11px 26px;border-radius:2px;cursor:pointer;transition:all .15s;
   }
   .btn-primary:hover:not(:disabled){background:var(--crimson-bright);}
-  .btn-ghost{
+  .btn-ghost, .btn-subtle{
     font-family:'JetBrains Mono',monospace;font-size:13px;
     background:var(--steel-1);border:1px solid var(--line);color:var(--ink-dim);
-    padding:11px 20px;border-radius:2px;cursor:pointer;transition:all .15s;
+    padding:9px 18px;border-radius:2px;cursor:pointer;transition:all .15s;
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;
   }
-  .btn-ghost:hover:not(:disabled){border-color:var(--brass-dim);color:var(--ink);}
-  .btn-primary:disabled,.btn-ghost:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-ghost:hover:not(:disabled), .btn-subtle:hover:not(:disabled){border-color:var(--brass-dim);color:var(--ink);}
+  .btn-primary:disabled,.btn-ghost:disabled,.btn-subtle:disabled{opacity:.4;cursor:not-allowed;}
 
   .map-frame-wrap{
     position:relative;
@@ -4160,29 +4161,313 @@ body.me-theme .die-coin-btn:hover {
   box-shadow: 0 0 18px rgba(255, 136, 0, 0.5);
 }
 
+/* ============================================================
+   MASS EFFECT BUTTONS & SCI-FI UI CONTROLS
+   ============================================================ */
+
+body.me-theme button {
+  font-family: 'JetBrains Mono', monospace;
+  box-sizing: border-box;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Primary Button: неоновый акцент с заливкой */
 body.me-theme .btn-primary {
-  background: linear-gradient(135deg, #00d2ff 0%, #0066aa 100%);
-  color: #030814;
-  border: 1px solid #00d2ff;
-  box-shadow: 0 0 16px rgba(0, 210, 255, 0.4);
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, rgba(0, 210, 255, 0.9) 0%, rgba(0, 119, 204, 0.95) 100%) !important;
+  color: #030814 !important;
+  border: 1px solid #00d2ff !important;
+  box-shadow: 0 0 14px rgba(0, 210, 255, 0.45) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  padding: 8px 18px !important;
+  border-radius: 3px !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  text-shadow: none !important;
 }
 
-body.me-theme .btn-primary:hover {
-  box-shadow: 0 0 24px rgba(0, 210, 255, 0.65);
-  transform: translateY(-1px);
+body.me-theme .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #33dcff 0%, #0088e0 100%) !important;
+  box-shadow: 0 0 22px rgba(0, 210, 255, 0.75), 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+  transform: translateY(-1px) !important;
+  color: #02060f !important;
 }
 
-body.me-theme .btn-ghost {
-  border-color: rgba(0, 210, 255, 0.3);
-  color: #7da5c9;
+body.me-theme .btn-primary:active:not(:disabled) {
+  transform: translateY(1px) !important;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.5) !important;
 }
 
-body.me-theme .btn-ghost:hover {
-  border-color: #00d2ff;
-  color: #00d2ff;
-  box-shadow: 0 0 12px rgba(0, 210, 255, 0.25);
+/* Subtle / Ghost Button: тёмное стекло с неоновой рамкой */
+body.me-theme .btn-ghost,
+body.me-theme .btn-subtle,
+body.me-theme .btn {
+  background: rgba(6, 15, 30, 0.75) !important;
+  border: 1px solid rgba(0, 210, 255, 0.35) !important;
+  color: #7da5c9 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12.5px !important;
+  padding: 7px 15px !important;
+  border-radius: 3px !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  letter-spacing: 0.03em !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 0 8px rgba(0, 210, 255, 0.03) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+body.me-theme .btn-ghost:hover:not(:disabled),
+body.me-theme .btn-subtle:hover:not(:disabled),
+body.me-theme .btn:hover:not(:disabled) {
+  background: rgba(0, 210, 255, 0.14) !important;
+  border-color: #00d2ff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 14px rgba(0, 210, 255, 0.4), inset 0 0 10px rgba(0, 210, 255, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+body.me-theme .btn-ghost:active:not(:disabled),
+body.me-theme .btn-subtle:active:not(:disabled),
+body.me-theme .btn:active:not(:disabled) {
+  transform: translateY(1px) !important;
+  box-shadow: 0 0 8px rgba(0, 210, 255, 0.3) !important;
+}
+
+/* Кнопка "← В ТЕРМИНАЛ" в HUD шапке */
+body.me-theme .me-hud .btn-subtle,
+body.me-theme .me-hud button {
+  background: rgba(4, 9, 20, 0.95) !important;
+  border: 1px solid rgba(0, 210, 255, 0.45) !important;
+  color: #00d2ff !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  padding: 5px 14px !important;
+  border-radius: 3px !important;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.18) inset !important;
+  letter-spacing: 0.06em !important;
+}
+
+body.me-theme .me-hud .btn-subtle:hover:not(:disabled),
+body.me-theme .me-hud button:hover:not(:disabled) {
+  background: rgba(0, 210, 255, 0.22) !important;
+  border-color: #00d2ff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(0, 210, 255, 0.55), inset 0 0 10px rgba(0, 210, 255, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Кнопки пресетов и золотые акценты (Нормандия, Шаблоны и т.д.) */
+body.me-theme .btn-subtle[style*="#ffd700"],
+body.me-theme .btn-subtle[style*="255, 215, 0"],
+body.me-theme .btn-subtle[style*="255,215,0"],
+body.me-theme #mePresetShipBtn,
+body.me-theme #mePresetPowersBtn,
+body.me-theme #mePresetPowerEmptyBtn,
+body.me-theme #mePresetWeaponsBtn,
+body.me-theme #mePresetWeaponEmptyBtn {
+  background: rgba(255, 170, 51, 0.08) !important;
+  border: 1px solid rgba(255, 170, 51, 0.45) !important;
+  color: #ffaa33 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 0 8px rgba(255, 170, 51, 0.05) !important;
+}
+
+body.me-theme .btn-subtle[style*="#ffd700"]:hover,
+body.me-theme .btn-subtle[style*="255, 215, 0"]:hover,
+body.me-theme .btn-subtle[style*="255,215,0"]:hover,
+body.me-theme #mePresetShipBtn:hover,
+body.me-theme #mePresetPowersBtn:hover,
+body.me-theme #mePresetPowerEmptyBtn:hover,
+body.me-theme #mePresetWeaponsBtn:hover,
+body.me-theme #mePresetWeaponEmptyBtn:hover {
+  background: rgba(255, 170, 51, 0.2) !important;
+  border-color: #ffaa33 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(255, 170, 51, 0.5), inset 0 0 10px rgba(255, 170, 51, 0.2) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Опасные / Деструктивные кнопки (Удалить, Очистить всё, Сброс) */
+body.me-theme .btn-subtle[style*="#ff5555"],
+body.me-theme .btn-subtle[style*="255, 85, 85"],
+body.me-theme .btn-subtle[style*="255,85,85"],
+body.me-theme .btn-subtle[style*="#ff7777"],
+body.me-theme .btn-ghost[style*="#f87171"],
+body.me-theme #meResetShipBtn,
+body.me-theme #meResetCharBtn,
+body.me-theme #meDataResetBtn,
+body.me-theme .me-del-power-btn,
+body.me-theme .me-del-weapon-btn,
+body.me-theme .me-del-crew-btn {
+  background: rgba(255, 85, 85, 0.08) !important;
+  border: 1px solid rgba(255, 85, 85, 0.4) !important;
+  color: #ff6666 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 0 8px rgba(255, 85, 85, 0.05) !important;
+}
+
+body.me-theme .btn-subtle[style*="#ff5555"]:hover,
+body.me-theme .btn-subtle[style*="255, 85, 85"]:hover,
+body.me-theme .btn-subtle[style*="255,85,85"]:hover,
+body.me-theme .btn-subtle[style*="#ff7777"]:hover,
+body.me-theme .btn-ghost[style*="#f87171"]:hover,
+body.me-theme #meResetShipBtn:hover,
+body.me-theme #meResetCharBtn:hover,
+body.me-theme #meDataResetBtn:hover,
+body.me-theme .me-del-power-btn:hover,
+body.me-theme .me-del-weapon-btn:hover,
+body.me-theme .me-del-crew-btn:hover {
+  background: rgba(255, 85, 85, 0.22) !important;
+  border-color: #ff5555 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(255, 85, 85, 0.55), inset 0 0 10px rgba(255, 85, 85, 0.2) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Кнопка Досье в HUD шапке */
+body.me-theme .sh-hud-edit-btn {
+  background: rgba(4, 9, 20, 0.85) !important;
+  border: 1px solid rgba(0, 210, 255, 0.35) !important;
+  color: #7da5c9 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  border-radius: 3px !important;
+  transition: all 0.2s ease !important;
+}
+body.me-theme .sh-hud-edit-btn:hover {
+  background: rgba(0, 210, 255, 0.16) !important;
+  border-color: #00d2ff !important;
+  color: #00d2ff !important;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.35) !important;
+}
+
+/* Кнопки бросков кубиков оружия */
+body.me-theme .me-roll-weapon-btn {
+  background: rgba(0, 210, 255, 0.12) !important;
+  border: 1px solid #00d2ff !important;
+  color: #00d2ff !important;
+  font-weight: 700 !important;
+}
+body.me-theme .me-roll-weapon-btn:hover {
+  background: #00d2ff !important;
+  color: #040812 !important;
+  box-shadow: 0 0 16px rgba(0, 210, 255, 0.6) !important;
+}
+
+/* Табы в Mass Effect (.me-tab-btn, .me-filter-btn) */
+body.me-theme .me-tab-btn,
+body.me-theme .me-filter-btn {
+  background: rgba(6, 14, 28, 0.8) !important;
+  border: 1px solid rgba(0, 210, 255, 0.25) !important;
+  color: #7da5c9 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12px !important;
+  padding: 6px 14px !important;
+  border-radius: 3px !important;
+  transition: all 0.15s ease !important;
+  letter-spacing: 0.04em !important;
+}
+
+body.me-theme .me-tab-btn:hover,
+body.me-theme .me-filter-btn:hover {
+  border-color: #00d2ff !important;
+  color: #ffffff !important;
+  background: rgba(0, 210, 255, 0.1) !important;
+}
+
+body.me-theme .me-tab-btn.on,
+body.me-theme .me-filter-btn.on {
+  background: linear-gradient(135deg, rgba(0, 210, 255, 0.25) 0%, rgba(0, 119, 204, 0.3) 100%) !important;
+  border-color: #00d2ff !important;
+  color: #00d2ff !important;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.35), inset 0 0 8px rgba(0, 210, 255, 0.2) !important;
+  font-weight: 700 !important;
+}
+
+/* Карточки в Кодексе и меню */
+body.me-theme .menu-item {
+  background: rgba(6, 14, 28, 0.85) !important;
+  border: 1px solid rgba(0, 210, 255, 0.22) !important;
+  border-left: 3px solid #00d2ff !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+body.me-theme .menu-item:hover {
+  background: rgba(9, 22, 46, 0.95) !important;
+  border-color: #00d2ff !important;
+  border-left-width: 5px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 18px rgba(0, 210, 255, 0.25) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Адаптация под 4 темы Mass Effect */
+body.me-theme.me-theme-omni .btn-primary {
+  background: linear-gradient(135deg, #ff7700 0%, #aa4400 100%) !important;
+  border-color: #ffaa33 !important;
+  box-shadow: 0 0 16px rgba(255, 120, 0, 0.45) !important;
+}
+body.me-theme.me-theme-omni .btn-ghost,
+body.me-theme.me-theme-omni .btn-subtle {
+  border-color: rgba(255, 140, 0, 0.35) !important;
+  color: #ffaa33 !important;
+}
+body.me-theme.me-theme-omni .btn-ghost:hover,
+body.me-theme.me-theme-omni .btn-subtle:hover {
+  background: rgba(255, 120, 0, 0.18) !important;
+  border-color: #ffaa33 !important;
+  box-shadow: 0 0 16px rgba(255, 120, 0, 0.45) !important;
+}
+body.me-theme.me-theme-omni .me-hud .btn-subtle {
+  border-color: #ffaa33 !important;
+  color: #ffaa33 !important;
+}
+
+body.me-theme.me-theme-n7 .btn-primary {
+  background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%) !important;
+  border-color: #f43f5e !important;
+  box-shadow: 0 0 16px rgba(225, 29, 72, 0.45) !important;
+}
+body.me-theme.me-theme-n7 .btn-ghost,
+body.me-theme.me-theme-n7 .btn-subtle {
+  border-color: rgba(225, 29, 72, 0.35) !important;
+  color: #fda4af !important;
+}
+body.me-theme.me-theme-n7 .btn-ghost:hover,
+body.me-theme.me-theme-n7 .btn-subtle:hover {
+  background: rgba(225, 29, 72, 0.18) !important;
+  border-color: #f43f5e !important;
+  box-shadow: 0 0 16px rgba(225, 29, 72, 0.45) !important;
+}
+body.me-theme.me-theme-n7 .me-hud .btn-subtle {
+  border-color: #f43f5e !important;
+  color: #fda4af !important;
+}
+
+body.me-theme.me-theme-cerberus .btn-primary {
+  background: linear-gradient(135deg, #d97706 0%, #92400e 100%) !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.45) !important;
+}
+body.me-theme.me-theme-cerberus .btn-ghost,
+body.me-theme.me-theme-cerberus .btn-subtle {
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  color: #fcd34d !important;
+}
+body.me-theme.me-theme-cerberus .btn-ghost:hover,
+body.me-theme.me-theme-cerberus .btn-subtle:hover {
+  background: rgba(245, 158, 11, 0.18) !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.45) !important;
+}
+body.me-theme.me-theme-cerberus .me-hud .btn-subtle {
+  border-color: #f59e0b !important;
+  color: #fcd34d !important;
 }
 
 body.me-theme .back {
