@@ -8988,26 +8988,64 @@ function mountBar(){
   document.body.appendChild(bar);
   paintBar();
 }
+window.paintBar = paintBar;
 function paintBar(){
   var bar = document.getElementById('hbModeBar');
   if(!bar) return;
-  var hb = HB.mode==='hb';
-  document.body.classList.toggle('hb-theme', hb);
+  var curMode = HB.mode || 'faerun';
+  document.body.classList.toggle('hb-theme', curMode === 'hb');
+  document.body.classList.toggle('sh-theme', curMode === 'sh');
+  document.body.classList.toggle('me-theme', curMode === 'me');
+
+  var worldLabel = '';
+  if(curMode === 'hb'){
+    worldLabel = esc(HB.world && HB.world.name ? HB.world.name : 'Хоумбрю');
+  } else if(curMode === 'sh'){
+    var charInfo = (typeof SH !== 'undefined' && SH.meta && SH.meta.charName) ? (' • ' + SH.meta.charName) : '';
+    worldLabel = (typeof SH !== 'undefined' && SH.meta && SH.meta.name ? esc(SH.meta.name) : 'Шиноби') + charInfo;
+  } else if(curMode === 'me'){
+    var meC = (typeof ME !== 'undefined' && ME.getChar) ? ME.getChar() : null;
+    var meName = meC ? (' • ' + (meC.callsign ? ('[' + meC.callsign + '] ') : '') + meC.name) : '';
+    var meShieldHp = meC ? (' • 🛡️ ' + (meC.currentShield!=null?meC.currentShield:meC.baseShield) + ' | ❤️ ' + (meC.currentHp!=null?meC.currentHp:meC.maxHp)) : '';
+    worldLabel = 'Космос' + meName + meShieldHp;
+  }
+
   bar.innerHTML =
     '<div class="hb-bar-inner">'+
       '<div class="hb-seg">'+
-        '<button class="hb-seg-btn '+(!hb?'on':'')+'" data-hbmode="faerun">Фаэрун</button>'+
-        '<button class="hb-seg-btn '+(hb?'on':'')+'" data-hbmode="hb">Хоумбрю</button>'+
+        '<button class="hb-seg-btn ' + (curMode==='faerun'?'on':'') + '" data-hbmode="faerun">Фаэрун</button>'+
+        '<button class="hb-seg-btn ' + (curMode==='hb'?'on':'') + '" data-hbmode="hb">Хоумбрю</button>'+
+        '<button class="hb-seg-btn ' + (curMode==='sh'?'on':'') + '" data-hbmode="sh">Шиноби</button>'+
+        '<button class="hb-seg-btn ' + (curMode==='me'?'on':'') + '" data-hbmode="me">Космос</button>'+
       '</div>'+
-      (hb ? '<div class="hb-bar-world">'+esc(HB.world.name||'Хоумбрю')+'</div>' : '')+
+      (worldLabel ? '<div class="hb-bar-world">' + worldLabel + '</div>' : '')+
     '</div>';
+
   bar.querySelectorAll('[data-hbmode]').forEach(function(b){
     b.addEventListener('click', function(){
-      HB.mode = b.getAttribute('data-hbmode'); saveMode(); paintBar();
-      view = (HB.mode==='hb') ? {screen:'hbHome'} : {screen:'home'};
-      render(); window.scrollTo(0,0);
+      var m = b.getAttribute('data-hbmode');
+      HB.mode = m;
+      saveMode();
+      if(m === 'sh'){
+        if(typeof window.navigate === 'function') window.navigate('shHome');
+        else { view = {screen:'shHome'}; if(typeof SH !== 'undefined') SH.draft=null; render(); }
+      } else if(m === 'me'){
+        if(typeof window.navigate === 'function') window.navigate('meHome');
+        else { view = {screen:'meHome'}; render(); }
+      } else if(m === 'hb'){
+        view = {screen:'hbHome'};
+        render();
+      } else {
+        view = {screen:'home'};
+        render();
+      }
+      paintBar();
+      if(typeof paintShBar === 'function') paintShBar();
+      window.scrollTo(0,0);
     });
   });
+  if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
+  if(typeof applyMeTheme === 'function') applyMeTheme();
 }
 
 /* ---------- экраны ---------- */
@@ -19745,8 +19783,17 @@ function wireMeMap(){
           m.location = sec.nameRu + ' // ' + (sec.clusters.split(',')[0] || 'Фронтир');
           if(!ME._missionsList) ME._missionsList = [];
           ME._missionsList.unshift(m);
+
+          var modalBody = '<div style="font-size:13px;line-height:1.6;color:#c8e1f5;">' +
+            '<div style="margin-bottom:10px;"><strong style="color:#00d2ff;">ЗАКАЗЧИК:</strong> ' + meEsc(m.client) + '</div>' +
+            '<div style="margin-bottom:10px;"><strong style="color:#00d2ff;">ЛОКАЦИЯ:</strong> ' + meEsc(m.location) + '</div>' +
+            '<div style="margin-bottom:10px;"><strong style="color:#ffaa33;">ОПИСАНИЕ ОПЕРАЦИИ:</strong><br>' + meEsc(m.title) + '</div>' +
+            '<div style="margin-bottom:10px;"><strong style="color:#ff5555;">ПРОТИВНИК:</strong> ' + meEsc(m.enemy) + ' (' + meEsc(m.difficulty) + ')</div>' +
+            '<div style="margin-bottom:10px;"><strong style="color:#22c55e;">НАГРАДА:</strong> ' + meEsc(m.reward) + '</div>' +
+            '<div style="font-size:11px;color:#7da5c9;margin-top:10px;">Контракт добавлен в тактический журнал миссий сектора.</div>' +
+            '</div>';
+          meShowModal('ТАКТИЧЕСКИЙ КОНТРАКТ // ' + m.type, 'СЕКТОР: ' + sec.nameRu, modalBody);
         }
-        navigate('meMissions');
       };
     }
   }
@@ -19828,8 +19875,17 @@ function wireMeMap(){
         m.location = sec.nameRu + ' // ' + (sec.clusters.split(',')[0] || 'Фронтир');
         if(!ME._missionsList) ME._missionsList = [];
         ME._missionsList.unshift(m);
+
+        var modalBody = '<div style="font-size:13px;line-height:1.6;color:#c8e1f5;">' +
+          '<div style="margin-bottom:10px;"><strong style="color:#00d2ff;">ЗАКАЗЧИК:</strong> ' + meEsc(m.client) + '</div>' +
+          '<div style="margin-bottom:10px;"><strong style="color:#00d2ff;">ЛОКАЦИЯ:</strong> ' + meEsc(m.location) + '</div>' +
+          '<div style="margin-bottom:10px;"><strong style="color:#ffaa33;">ОПИСАНИЕ ОПЕРАЦИИ:</strong><br>' + meEsc(m.title) + '</div>' +
+          '<div style="margin-bottom:10px;"><strong style="color:#ff5555;">ПРОТИВНИК:</strong> ' + meEsc(m.enemy) + ' (' + meEsc(m.difficulty) + ')</div>' +
+          '<div style="margin-bottom:10px;"><strong style="color:#22c55e;">НАГРАДА:</strong> ' + meEsc(m.reward) + '</div>' +
+          '<div style="font-size:11px;color:#7da5c9;margin-top:10px;">Контракт добавлен в тактический журнал миссий сектора.</div>' +
+          '</div>';
+        meShowModal('ТАКТИЧЕСКИЙ КОНТРАКТ // ' + m.type, 'СЕКТОР: ' + sec.nameRu, modalBody);
       }
-      navigate('meMissions');
     };
   }
 }
@@ -20586,7 +20642,6 @@ window.mePowers = mePowers;
 window.meArsenal = meArsenal;
 window.meShip = meShip;
 window.meCodex = meCodex;
-window.meMissions = meMissions;
 window.meMap = meMap;
 window.wireMeMap = wireMeMap;
 window.meData = meData;
@@ -20652,6 +20707,11 @@ function paintShBar(){
     var meName = meC ? (' • ' + (meC.callsign ? ('[' + meC.callsign + '] ') : '') + meC.name) : '';
     var meShieldHp = meC ? (' • 🛡️ ' + (meC.currentShield!=null?meC.currentShield:meC.baseShield) + ' | ❤️ ' + (meC.currentHp!=null?meC.currentHp:meC.maxHp)) : '';
     lab.textContent = 'Космос' + meName + meShieldHp;
+  } else if(HB.mode==='hb'){
+    if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
+    lab.textContent = (HB.world && HB.world.name ? HB.world.name : 'Хоумбрю');
+  } else {
+    if(lab && lab.parentNode) lab.parentNode.removeChild(lab);
   }
 }
 SH.paintShBar = paintShBar;
@@ -20679,12 +20739,12 @@ window.render=function(){
     app.classList.add('home-wide');
     var html = '';
     if(s==='meHome'||!s) html = meHome();
-    else if(s==='meChar') html = meChar();
+    else if(s==='meChar') html = meData();
     else if(s==='mePowers') html = mePowers();
     else if(s==='meArsenal') html = meArsenal();
     else if(s==='meShip') html = meShip();
     else if(s==='meCodex') html = meCodex();
-    else if(s==='meMissions') html = meMissions();
+    else if(s==='meMissions' || s==='meMap') html = meMap();
     else if(s==='meMap') html = meMap();
     else if(s==='meData') html = meData();
     else html = meHome();
