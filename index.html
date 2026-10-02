@@ -4304,6 +4304,7 @@ body.me-theme .btn-ghost[style*="#f87171"],
 body.me-theme #meResetShipBtn,
 body.me-theme #meResetCharBtn,
 body.me-theme #meDataResetBtn,
+body.me-theme #meDelProfileBtn,
 body.me-theme .me-del-power-btn,
 body.me-theme .me-del-weapon-btn,
 body.me-theme .me-del-crew-btn {
@@ -18605,56 +18606,228 @@ var ME = window.ME = {
     background: 'Герой Скиллианского блица. Отличная огневая подготовка, лидерские качества.'
   },
 
-  char: null,
+  // --- РОСТЕР И МУЛЬТИ-ПРОФИЛИ ОПЕРАТИВНИКОВ (ПО АНАЛОГИИ С ШИНОБИ) ---
+  profiles: null,
+  activeProfileId: null,
 
-  getChar: function(){
-    if(ME.char) return ME.char;
+  loadProfiles: function(){
     try {
-      var saved = localStorage.getItem('me_character');
-      if(saved) {
-        ME.char = JSON.parse(saved);
-        return ME.char;
+      var raw = localStorage.getItem('me_profiles');
+      if(raw){
+        var arr = JSON.parse(raw);
+        if(Array.isArray(arr) && arr.length){
+          ME.profiles = arr;
+          return arr;
+        }
       }
     } catch(e){}
-    ME.char = JSON.parse(JSON.stringify(ME.defaultChar));
-    return ME.char;
+
+    // Миграция существующих данных персонажа
+    var initChar = null;
+    try {
+      var sc = localStorage.getItem('me_character');
+      if(sc) initChar = JSON.parse(sc);
+    } catch(e){}
+    if(!initChar) initChar = JSON.parse(JSON.stringify(ME.defaultChar));
+
+    var initPowers = [];
+    try {
+      var sp = localStorage.getItem('me_powers');
+      if(sp) initPowers = JSON.parse(sp);
+    } catch(e){}
+
+    var initArsenal = [];
+    try {
+      var sa = localStorage.getItem('me_arsenal');
+      if(sa) initArsenal = JSON.parse(sa);
+    } catch(e){}
+
+    var firstProf = {
+      id: 'me_prof_default',
+      name: initChar.name || 'Джон Шепард',
+      callsign: initChar.callsign || 'Коммандер',
+      race: initChar.race || 'Человек',
+      role: initChar.role || 'Солдат',
+      level: parseInt(initChar.level, 10) || 1,
+      baseShield: parseInt(initChar.baseShield, 10) || 15,
+      maxHp: parseInt(initChar.maxHp, 10) || 24,
+      baseAc: parseInt(initChar.baseAc, 10) || 15,
+      powers: Array.isArray(initPowers) ? initPowers : [],
+      arsenal: Array.isArray(initArsenal) ? initArsenal : []
+    };
+
+    var list = [firstProf];
+    ME.profiles = list;
+    ME.activeProfileId = firstProf.id;
+    try {
+      localStorage.setItem('me_profiles', JSON.stringify(list));
+      localStorage.setItem('me_active_profile_id', firstProf.id);
+    } catch(e){}
+    return list;
+  },
+
+  getProfiles: function(){
+    if(!Array.isArray(ME.profiles) || !ME.profiles.length){
+      return ME.loadProfiles();
+    }
+    return ME.profiles;
+  },
+
+  saveProfilesList: function(list){
+    ME.profiles = list;
+    try {
+      localStorage.setItem('me_profiles', JSON.stringify(list));
+    } catch(e){}
+  },
+
+  getActiveProfile: function(){
+    var list = ME.getProfiles();
+    if(!ME.activeProfileId){
+      try { ME.activeProfileId = localStorage.getItem('me_active_profile_id'); } catch(e){}
+    }
+    var act = null;
+    if(ME.activeProfileId){
+      act = list.find(function(p){ return p.id === ME.activeProfileId; });
+    }
+    if(!act){
+      act = list[0] || ME.createProfile({ name: 'Джон Шепард' });
+      ME.activeProfileId = act.id;
+      try { localStorage.setItem('me_active_profile_id', act.id); } catch(e){}
+    }
+    return act;
+  },
+
+  switchProfile: function(newId){
+    if(!newId) return;
+    var list = ME.getProfiles();
+    var target = list.find(function(p){ return p.id === newId; });
+    if(!target) return;
+    ME.activeProfileId = target.id;
+    try { localStorage.setItem('me_active_profile_id', target.id); } catch(e){}
+    try {
+      localStorage.setItem('me_character', JSON.stringify(target));
+      localStorage.setItem('me_powers', JSON.stringify(target.powers || []));
+      localStorage.setItem('me_arsenal', JSON.stringify(target.arsenal || []));
+    } catch(e){}
+    if(typeof render === 'function') render();
+  },
+
+  createProfile: function(opts){
+    var list = ME.getProfiles();
+    var p = {
+      id: 'me_prof_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+      name: (opts && opts.name) || 'Новый оперативник',
+      callsign: (opts && opts.callsign) || '',
+      race: (opts && opts.race) || 'Человек',
+      role: (opts && opts.role) || 'Солдат',
+      level: 1,
+      baseShield: 15,
+      maxHp: 24,
+      baseAc: 15,
+      powers: [],
+      arsenal: []
+    };
+    list.push(p);
+    ME.saveProfilesList(list);
+    ME.switchProfile(p.id);
+    return p;
+  },
+
+  cloneProfile: function(id){
+    id = id || ME.activeProfileId;
+    var list = ME.getProfiles();
+    var src = list.find(function(p){ return p.id === id; }) || ME.getActiveProfile();
+    if(!src) return null;
+    var copy = JSON.parse(JSON.stringify(src));
+    copy.id = 'me_prof_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    copy.name = (copy.name || 'Оперативник') + ' (Копия)';
+    list.push(copy);
+    ME.saveProfilesList(list);
+    ME.switchProfile(copy.id);
+    return copy;
+  },
+
+  resetProfile: function(id){
+    id = id || ME.activeProfileId;
+    var list = ME.getProfiles();
+    var p = list.find(function(item){ return item.id === id; });
+    if(!p) return;
+    p.name = 'Новый оперативник';
+    p.callsign = '';
+    p.race = 'Человек';
+    p.role = 'Солдат';
+    p.level = 1;
+    p.baseShield = 15;
+    p.maxHp = 24;
+    p.baseAc = 15;
+    p.powers = [];
+    p.arsenal = [];
+    ME.saveProfilesList(list);
+    if(ME.activeProfileId === id){
+      try {
+        localStorage.setItem('me_character', JSON.stringify(p));
+        localStorage.setItem('me_powers', JSON.stringify([]));
+        localStorage.setItem('me_arsenal', JSON.stringify([]));
+      } catch(e){}
+    }
+    if(typeof render === 'function') render();
+  },
+
+  deleteProfile: function(id){
+    id = id || ME.activeProfileId;
+    var list = ME.getProfiles();
+    if(list.length <= 1){
+      ME.resetProfile(id);
+      return;
+    }
+    var idx = list.findIndex(function(p){ return p.id === id; });
+    if(idx === -1) return;
+    list.splice(idx, 1);
+    ME.saveProfilesList(list);
+    if(ME.activeProfileId === id){
+      var next = list[Math.max(0, idx - 1)] || list[0];
+      ME.switchProfile(next.id);
+    } else {
+      if(typeof render === 'function') render();
+    }
+  },
+
+  getChar: function(){
+    return ME.getActiveProfile();
   },
 
   saveChar: function(c){
-    ME.char = c;
-    try {
-      localStorage.setItem('me_character', JSON.stringify(c));
-    } catch(e){}
+    var act = ME.getActiveProfile();
+    if(act && c){
+      act.name = c.name || 'Оперативник';
+      act.callsign = c.callsign || '';
+      act.race = c.race || 'Человек';
+      act.role = c.role || 'Солдат';
+      act.level = parseInt(c.level, 10) || 1;
+      act.baseShield = parseInt(c.baseShield, 10) || 15;
+      act.maxHp = parseInt(c.maxHp, 10) || 24;
+      act.baseAc = parseInt(c.baseAc, 10) || 15;
+      ME.saveProfilesList(ME.profiles);
+      try { localStorage.setItem('me_character', JSON.stringify(act)); } catch(e){}
+    }
   },
 
   resetChar: function(){
-    ME.char = JSON.parse(JSON.stringify(ME.defaultChar));
-    try {
-      localStorage.setItem('me_character', JSON.stringify(ME.char));
-    } catch(e){}
-    return ME.char;
+    return ME.resetProfile(ME.activeProfileId);
   },
 
-  // --- СПОСОБНОСТИ (A92 PROTOCOLS: ВПИСЫВАЮТСЯ И НАСТРАИВАЮТСЯ ИГРОКОМ) ---
-  powersList: null,
+  // --- СПОСОБНОСТИ ОПЕРАТИВНИКА ---
   getPowers: function(){
-    if(ME.powersList) return ME.powersList;
-    try {
-      var saved = localStorage.getItem('me_powers');
-      if(saved) {
-        ME.powersList = JSON.parse(saved);
-        return ME.powersList;
-      }
-    } catch(e){}
-    ME.powersList = [];
-    return ME.powersList;
+    var act = ME.getActiveProfile();
+    if(!Array.isArray(act.powers)) act.powers = [];
+    return act.powers;
   },
 
   savePowers: function(list){
-    ME.powersList = list;
-    try {
-      localStorage.setItem('me_powers', JSON.stringify(list));
-    } catch(e){}
+    var act = ME.getActiveProfile();
+    act.powers = list;
+    ME.saveProfilesList(ME.profiles);
+    try { localStorage.setItem('me_powers', JSON.stringify(list)); } catch(e){}
   },
 
   addPower: function(p){
@@ -18679,26 +18852,18 @@ var ME = window.ME = {
     ME.savePowers(list);
   },
 
-  // --- ОРУЖЕЙНЫЙ АРСЕНАЛ (ВПИСЫВАЕТСЯ И НАСТРАИВАЕТСЯ ИГРОКОМ) ---
-  arsenalList: null,
+  // --- ОРУЖЕЙНЫЙ АРСЕНАЛ ОПЕРАТИВНИКА ---
   getArsenal: function(){
-    if(ME.arsenalList) return ME.arsenalList;
-    try {
-      var saved = localStorage.getItem('me_arsenal');
-      if(saved) {
-        ME.arsenalList = JSON.parse(saved);
-        return ME.arsenalList;
-      }
-    } catch(e){}
-    ME.arsenalList = [];
-    return ME.arsenalList;
+    var act = ME.getActiveProfile();
+    if(!Array.isArray(act.arsenal)) act.arsenal = [];
+    return act.arsenal;
   },
 
   saveArsenal: function(list){
-    ME.arsenalList = list;
-    try {
-      localStorage.setItem('me_arsenal', JSON.stringify(list));
-    } catch(e){}
+    var act = ME.getActiveProfile();
+    act.arsenal = list;
+    ME.saveProfilesList(ME.profiles);
+    try { localStorage.setItem('me_arsenal', JSON.stringify(list)); } catch(e){}
   },
 
   addWeapon: function(w){
@@ -19040,11 +19205,6 @@ function renderMeHudHtml(c){
         '<span class="stat-icon">🔰</span>' +
         '<span class="stat-label">КД</span>' +
         '<span class="stat-val">' + (c.baseAc || 15) + '</span>' +
-      '</div>' +
-      '<div class="sh-hud-stat-pill">' +
-        '<span class="stat-icon">💳</span>' +
-        '<span class="stat-label">Кредиты</span>' +
-        '<span class="stat-val">' + Number(c.credits || 15000).toLocaleString() + ' ₢</span>' +
       '</div>' +
     '</div>' +
   '</div>';
@@ -20578,7 +20738,13 @@ function wireMeMap(){
 // 8. ДАННЫЕ СИСТЕМ
 function meData(){
   var c = ME.getChar();
-  var curTheme = (typeof getMeTheme === 'function') ? getMeTheme() : 'citadel';
+  var profList = (typeof ME.getProfiles === 'function') ? ME.getProfiles() : [];
+  var actId = ME.activeProfileId || (c && c.id);
+
+  var profOptions = profList.map(function(p){
+    var pTitle = (p.name || 'Оперативник') + (p.callsign ? ' [' + p.callsign + ']' : '') + ' • ' + (p.role || 'Солдат') + ' (Ур. ' + (p.level || 1) + ')';
+    return '<option value="' + escA(p.id) + '" ' + (p.id === actId ? 'selected' : '') + '>' + esc(pTitle) + '</option>';
+  }).join('');
 
   var races = ['Человек', 'Турианец', 'Азари', 'Салариан', 'Кроган', 'Квариан', 'Дрелл', 'Батарианец', 'Ворча'];
   var raceOpts = races.map(function(r){
@@ -20588,16 +20754,7 @@ function meData(){
     raceOpts = '<option value="' + escA(c.race) + '" selected>' + esc(c.race) + '</option>' + raceOpts;
   }
 
-  var roles = ['Солдат', 'Адепт', 'Инженер', 'Штурмовик', 'Страж', 'Разведчик'];
-  var roleOpts = roles.map(function(r){
-    return '<option value="' + escA(r) + '" ' + (c.role === r ? 'selected' : '') + '>' + esc(r) + '</option>';
-  }).join('');
-  if(roles.indexOf(c.role) === -1 && c.role){
-    roleOpts = '<option value="' + escA(c.role) + '" selected>' + esc(c.role) + '</option>' + roleOpts;
-  }
-
-  var stats = (c.stats || {str:14, dex:14, con:15, int:10, wis:12, cha:10});
-
+  var curTheme = (typeof getMeTheme === 'function') ? getMeTheme() : 'citadel';
   var themeOpts = [
     { id: 'citadel', name: '🔹 Цитадель (Альянс Систем / Неоновый циан)' },
     { id: 'omni', name: '🔸 Инструментрон (Omni-Tool / Теплый янтарь)' },
@@ -20607,77 +20764,91 @@ function meData(){
     return '<option value="' + th.id + '" ' + (curTheme === th.id ? 'selected' : '') + '>' + th.name + '</option>';
   }).join('');
 
-  return meNavHeader('ДАННЫЕ И СИСТЕМЫ // ДОСЬЕ И ОБЛАКО', 'КОНФИГУРАЦИЯ') +
+  var activeCharDisplay = (c.name || 'Оперативник Альянса') + (c.callsign ? (' [' + c.callsign + ']') : '');
+
+  return meNavHeader('ДАННЫЕ И СИСТЕМЫ // ДОСЬЕ И РОСТЕР', 'КОНФИГУРАЦИЯ') +
     '<button class="back" data-go="meHome">← Назад</button>' +
     '<h1>ДАННЫЕ И СИСТЕМЫ</h1>' +
-    '<div class="subtitle">Управление досье оперативника, темами оформления, облачной синхронизацией и ИИ</div>' +
+    '<div class="subtitle">Управление ростером оперативников, темами оформления, облачной синхронизацией и ИИ</div>' +
 
-    // 1. ДОСЬЕ ОПЕРАТИВНИКА (ЛАКОНИЧНО)
+    // 1. РОСТЕР И ВЫБОР ОПЕРАТИВНИКОВ
     '<div class="me-panel" style="margin-top:14px;">' +
-      '<div class="section-label" style="display:flex;justify-content:space-between;align-items:center;">' +
-        '<span>👤 ДОСЬЕ ОПЕРАТИВНИКА</span>' +
-        '<span style="font-size:11px;color:var(--ink-dim);font-weight:normal;">Отображается на главной карточке</span>' +
+      '<div class="section-label" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+        '<span>👥 ВЫБОР И УПРАВЛЕНИЕ ОПЕРАТИВНИКАМИ</span>' +
+        '<span style="font-size:11px;color:var(--ink-dim);font-weight:normal;">Всего в отряде: ' + profList.length + '</span>' +
       '</div>' +
-      '<div class="grid-2" style="margin-top:10px;">' +
-        '<div>' +
-          '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Имя оперативника</div>' +
-          '<input type="text" class="me-input" id="meInpName" value="' + escA(c.name || '') + '" style="width:100%;">' +
+      '<div style="font-size:12px;color:var(--ink-dim);margin:6px 0 10px;">' +
+        'Выберите активного оперативника для боевых миссий или зарегистрируйте нового в терминале Альянса. Способности, боевые щиты и арсенал оружия изолированы и сохраняются индивидуально для каждого бойца.' +
+      '</div>' +
+
+      '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:14px 0 12px 0;">' +
+        '<div style="flex:1;min-width:240px;">' +
+          '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">Активный оперативник (переключение на лету):</label>' +
+          '<select id="meDataProfileSelect" class="me-input" style="width:100%;font-size:13px;padding:9px 12px;">' +
+            profOptions +
+          '</select>' +
         '</div>' +
-        '<div>' +
-          '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Позывной / Звание</div>' +
-          '<input type="text" class="me-input" id="meInpCallsign" value="' + escA(c.callsign || '') + '" placeholder="Коммандер, Спектр..." style="width:100%;">' +
-        '</div>' +
-        '<div>' +
-          '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Раса / Вид</div>' +
-          '<select class="me-input" id="meSelRace" style="width:100%;">' + raceOpts + '</select>' +
-        '</div>' +
-        '<div>' +
-          '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Специализация / Класс</div>' +
-          '<select class="me-input" id="meSelRole" style="width:100%;">' + roleOpts + '</select>' +
-        '</div>' +
-        '<div>' +
-          '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Уровень</div>' +
-          '<input type="number" class="me-input" id="meInpLevel" value="' + (c.level || 1) + '" min="1" max="20" style="width:100%;">' +
-        '</div>' +
-        '<div>' +
-          '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Баланс кредитов (₢)</div>' +
-          '<input type="number" class="me-input" id="meInpCredits" value="' + (c.credits || 15000) + '" style="width:100%;">' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button class="btn-primary" id="meDataNewProfileBtn" title="Зарегистрировать нового оперативника">➕ Новый оперативник</button>' +
+          '<button class="btn-subtle" id="meDataCloneProfileBtn" title="Клонировать активного оперативника со способностями и оружием">📋 Дублировать</button>' +
         '</div>' +
       '</div>' +
 
-      // Базовые боевые статы
-      '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);">' +
-        '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:8px;">Базовые боевые параметры:</div>' +
-        '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(100px, 1fr));gap:10px;">' +
+      // АНКЕТА ОПЕРАТИВНИКА
+      '<div style="background:rgba(4,9,20,0.7);border:1px solid rgba(0,210,255,0.25);border-radius:4px;padding:16px;margin-top:14px;">' +
+        '<div style="font-weight:700;margin-bottom:12px;color:var(--ink);font-family:\'JetBrains Mono\',monospace;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,210,255,0.2);padding-bottom:6px;">' +
+          '<span>ДОСЬЕ ОПЕРАТИВНИКА: <b style="color:#00d2ff;">' + esc(activeCharDisplay) + '</b></span>' +
+          '<span style="font-size:11px;color:var(--ink-dim);">' + esc(c.race || 'Человек') + ' // ' + esc(c.role || 'Солдат') + '</span>' +
+        '</div>' +
+
+        '<div class="grid-2" style="margin-top:10px;">' +
           '<div>' +
-            '<div style="font-size:11px;color:var(--ink-dim);">🛡️ Щиты</div>' +
-            '<input type="number" class="me-input" id="meInpShield" value="' + (c.baseShield || 15) + '" style="width:100%;text-align:center;">' +
+            '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Имя оперативника</div>' +
+            '<input type="text" class="me-input" id="meInpName" value="' + escA(c.name || '') + '" style="width:100%;">' +
           '</div>' +
           '<div>' +
-            '<div style="font-size:11px;color:var(--ink-dim);">❤️ Макс. ОЗ</div>' +
-            '<input type="number" class="me-input" id="meInpHp" value="' + (c.maxHp || 24) + '" style="width:100%;text-align:center;">' +
+            '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Позывной / Звание</div>' +
+            '<input type="text" class="me-input" id="meInpCallsign" value="' + escA(c.callsign || '') + '" placeholder="Коммандер, Спектр..." style="width:100%;">' +
           '</div>' +
           '<div>' +
-            '<div style="font-size:11px;color:var(--ink-dim);">🔰 КД (Броня)</div>' +
-            '<input type="number" class="me-input" id="meInpAc" value="' + (c.baseAc || 15) + '" style="width:100%;text-align:center;">' +
+            '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Раса / Вид</div>' +
+            '<select class="me-input" id="meSelRace" style="width:100%;">' + raceOpts + '</select>' +
+          '</div>' +
+          '<div>' +
+            '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Специализация / Класс (вписывается)</div>' +
+            '<input type="text" class="me-input" id="meInpRole" value="' + escA(c.role || '') + '" placeholder="Например: Солдат / Биотик / Разведчик..." style="width:100%;">' +
+          '</div>' +
+          '<div>' +
+            '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:4px;">Уровень</div>' +
+            '<input type="number" class="me-input" id="meInpLevel" value="' + (c.level || 1) + '" min="1" max="20" style="width:100%;">' +
           '</div>' +
         '</div>' +
-      '</div>' +
 
-      // 6 характеристик в 1 компактную строку
-      '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);">' +
-        '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:8px;">Характеристики D&D 2024 / ME:</div>' +
-        '<div style="display:grid;grid-template-columns:repeat(6, 1fr);gap:8px;">' +
-          '<div><div style="font-size:10.5px;color:var(--ink-dim);text-align:center;">СИЛ</div><input type="number" class="me-input" id="meInpStr" value="' + (stats.str||10) + '" style="width:100%;text-align:center;"></div>' +
-          '<div><div style="font-size:10.5px;color:var(--ink-dim);text-align:center;">ЛОВ</div><input type="number" class="me-input" id="meInpDex" value="' + (stats.dex||10) + '" style="width:100%;text-align:center;"></div>' +
-          '<div><div style="font-size:10.5px;color:var(--ink-dim);text-align:center;">ТЕЛ</div><input type="number" class="me-input" id="meInpCon" value="' + (stats.con||10) + '" style="width:100%;text-align:center;"></div>' +
-          '<div><div style="font-size:10.5px;color:var(--ink-dim);text-align:center;">ИНТ</div><input type="number" class="me-input" id="meInpInt" value="' + (stats.int||10) + '" style="width:100%;text-align:center;"></div>' +
-          '<div><div style="font-size:10.5px;color:var(--ink-dim);text-align:center;">МУД</div><input type="number" class="me-input" id="meInpWis" value="' + (stats.wis||10) + '" style="width:100%;text-align:center;"></div>' +
-          '<div><div style="font-size:10.5px;color:var(--ink-dim);text-align:center;">ХАР</div><input type="number" class="me-input" id="meInpCha" value="' + (stats.cha||10) + '" style="width:100%;text-align:center;"></div>' +
+        // Базовые боевые статы (Щиты, ОЗ, КД)
+        '<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,210,255,0.2);">' +
+          '<div style="font-size:12px;color:var(--ink-dim);margin-bottom:8px;">Базовые боевые параметры:</div>' +
+          '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));gap:10px;">' +
+            '<div>' +
+              '<div style="font-size:11px;color:var(--ink-dim);">🛡️ Щиты</div>' +
+              '<input type="number" class="me-input" id="meInpShield" value="' + (c.baseShield || 15) + '" style="width:100%;text-align:center;">' +
+            '</div>' +
+            '<div>' +
+              '<div style="font-size:11px;color:var(--ink-dim);">❤️ Макс. ОЗ</div>' +
+              '<input type="number" class="me-input" id="meInpHp" value="' + (c.maxHp || 24) + '" style="width:100%;text-align:center;">' +
+            '</div>' +
+            '<div>' +
+              '<div style="font-size:11px;color:var(--ink-dim);">🔰 КД (Броня)</div>' +
+              '<input type="number" class="me-input" id="meInpAc" value="' + (c.baseAc || 15) + '" style="width:100%;text-align:center;">' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px;">' +
+          '<button class="btn-primary" id="meSaveDossierBtn">✓ Сохранить досье</button>' +
+          '<button class="btn-subtle" id="meResetProfileBtn" title="Сбросить досье текущего оперативника">↺ Сбросить параметры</button>' +
+          '<button class="btn-subtle" id="meDelProfileBtn" style="color:#ff7777;border-color:rgba(255,85,85,0.4);margin-left:auto;" title="Удалить текущего оперативника">🗑️ Удалить оперативника</button>' +
         '</div>' +
       '</div>' +
-
-      '<button class="btn-primary" id="meSaveDossierBtn" style="margin-top:16px;width:100%;">💾 Сохранить досье</button>' +
     '</div>' +
 
     // 2. ОФОРМЛЕНИЕ И ТЕМЫ
@@ -20780,6 +20951,56 @@ function wireMe(){
     });
   });
 
+  // Переключение активного оперативника
+  var profSel = document.getElementById('meDataProfileSelect');
+  if(profSel){
+    profSel.onchange = function(){
+      if(this.value && this.value !== ME.activeProfileId){
+        ME.switchProfile(this.value);
+      }
+    };
+  }
+
+  // Создание нового оперативника
+  var newProfBtn = document.getElementById('meDataNewProfileBtn');
+  if(newProfBtn){
+    newProfBtn.onclick = function(){
+      var name = prompt('Введите имя нового оперативника:', 'Новый оперативник');
+      if(!name) return;
+      ME.createProfile({ name: name.trim() });
+    };
+  }
+
+  // Клонирование активного оперативника
+  var cloneProfBtn = document.getElementById('meDataCloneProfileBtn');
+  if(cloneProfBtn){
+    cloneProfBtn.onclick = function(){
+      ME.cloneProfile(ME.activeProfileId);
+    };
+  }
+
+  // Сброс параметров текущего оперативника
+  var resetProfBtn = document.getElementById('meResetProfileBtn');
+  if(resetProfBtn){
+    resetProfBtn.onclick = function(){
+      if(confirm('Сбросить параметры текущего оперативника к начальным значениям?')){
+        ME.resetProfile(ME.activeProfileId);
+      }
+    };
+  }
+
+  // Удаление текущего оперативника
+  var delProfBtn = document.getElementById('meDelProfileBtn');
+  if(delProfBtn){
+    delProfBtn.onclick = function(){
+      var act = ME.getActiveProfile();
+      var pName = act ? (act.name || 'оперативника') : 'оперативника';
+      if(confirm('Удалить досье «' + pName + '» из отряда?')){
+        ME.deleteProfile(ME.activeProfileId);
+      }
+    };
+  }
+
   // Сохранение Досье Оперативника в meData
   var saveDossierBtn = document.getElementById('meSaveDossierBtn');
   if(saveDossierBtn){
@@ -20788,9 +21009,8 @@ function wireMe(){
       var inpName = document.getElementById('meInpName');
       var inpCallsign = document.getElementById('meInpCallsign');
       var selRace = document.getElementById('meSelRace');
-      var selRole = document.getElementById('meSelRole');
+      var inpRole = document.getElementById('meInpRole');
       var inpLevel = document.getElementById('meInpLevel');
-      var inpCredits = document.getElementById('meInpCredits');
       var inpShield = document.getElementById('meInpShield');
       var inpHp = document.getElementById('meInpHp');
       var inpAc = document.getElementById('meInpAc');
@@ -20798,27 +21018,11 @@ function wireMe(){
       if(inpName) c.name = inpName.value.trim() || 'Оперативник';
       if(inpCallsign) c.callsign = inpCallsign.value.trim();
       if(selRace) c.race = selRace.value;
-      if(selRole) c.role = selRole.value;
+      if(inpRole) c.role = inpRole.value.trim() || 'Оперативник';
       if(inpLevel) c.level = parseInt(inpLevel.value, 10) || 1;
-      if(inpCredits) c.credits = parseInt(inpCredits.value, 10) || 0;
       if(inpShield) c.baseShield = parseInt(inpShield.value, 10) || 15;
       if(inpHp) c.maxHp = parseInt(inpHp.value, 10) || 24;
       if(inpAc) c.baseAc = parseInt(inpAc.value, 10) || 15;
-
-      var sStr = document.getElementById('meInpStr');
-      var sDex = document.getElementById('meInpDex');
-      var sCon = document.getElementById('meInpCon');
-      var sInt = document.getElementById('meInpInt');
-      var sWis = document.getElementById('meInpWis');
-      var sCha = document.getElementById('meInpCha');
-
-      if(!c.stats) c.stats = {};
-      if(sStr) c.stats.str = parseInt(sStr.value, 10) || 10;
-      if(sDex) c.stats.dex = parseInt(sDex.value, 10) || 10;
-      if(sCon) c.stats.con = parseInt(sCon.value, 10) || 10;
-      if(sInt) c.stats.int = parseInt(sInt.value, 10) || 10;
-      if(sWis) c.stats.wis = parseInt(sWis.value, 10) || 10;
-      if(sCha) c.stats.cha = parseInt(sCha.value, 10) || 10;
 
       ME.saveChar(c);
       alert('✓ Досье оперативника успешно сохранено!');
@@ -20858,6 +21062,8 @@ function wireMe(){
   if(expBtn){
     expBtn.onclick = function(){
       var data = {
+        profiles: ME.getProfiles(),
+        activeProfileId: ME.activeProfileId,
         char: ME.getChar(),
         powers: ME.getPowers(),
         arsenal: ME.getArsenal(),
@@ -20869,7 +21075,7 @@ function wireMe(){
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = 'mass_effect_dossier_' + Date.now() + '.json';
+      a.download = 'mass_effect_roster_' + Date.now() + '.json';
       a.click();
       URL.revokeObjectURL(url);
     };
@@ -20886,7 +21092,12 @@ function wireMe(){
       r.onload = function(evt){
         try {
           var d = JSON.parse(evt.target.result);
-          if(d.char) ME.saveChar(d.char);
+          if(d.profiles && Array.isArray(d.profiles)){
+            ME.saveProfilesList(d.profiles);
+            if(d.activeProfileId) ME.switchProfile(d.activeProfileId);
+          } else if(d.char){
+            ME.saveChar(d.char);
+          }
           if(d.powers) ME.savePowers(d.powers);
           if(d.arsenal) ME.saveArsenal(d.arsenal);
           if(d.ship) ME.saveShip(d.ship);
@@ -20903,8 +21114,8 @@ function wireMe(){
   var resetBtn = document.getElementById('meDataResetBtn');
   if(resetBtn){
     resetBtn.onclick = function(){
-      if(confirm('Сбросить данные оперативника и корабля к начальным заводским настройкам?')){
-        ME.resetChar();
+      if(confirm('Сбросить данные всех оперативников и корабля к начальным заводским настройкам?')){
+        ME.resetProfile(ME.activeProfileId);
         ME.resetShip();
         alert('Данные сброшены!');
         render();
@@ -20920,9 +21131,7 @@ function wireMe(){
       var text = '=== ДОСЬЕ ОПЕРАТИВНИКА (MASS EFFECT) ===\n' +
         'Имя: ' + c.name + (c.callsign ? ' [' + c.callsign + ']' : '') + '\n' +
         'Раса: ' + c.race + ' | Специализация: ' + c.role + ' (Ур. ' + c.level + ')\n' +
-        'Баланс: ' + (c.credits || 0) + ' ₢\n' +
         'Защита: Щиты ' + c.baseShield + ' | ОЗ ' + c.maxHp + ' | КД ' + c.baseAc + '\n' +
-        'Характеристики: СИЛ ' + c.stats.str + ', ЛОВ ' + c.stats.dex + ', ТЕЛ ' + c.stats.con + ', ИНТ ' + c.stats.int + ', МУД ' + c.stats.wis + ', ХАР ' + c.stats.cha + '\n' +
         'Судно: ' + s.name + ' (' + s.model + ')\n' +
         'Капитан: ' + s.captain + ' | Экипаж: ' + (s.crew || []).length + ' чел.';
       copyText(text);
@@ -21017,6 +21226,8 @@ var GHSync = window.GHSync = {
         meta: (typeof SH !== 'undefined' && SH.meta) ? SH.meta : {}
       },
       massEffect: {
+        profiles: (typeof ME !== 'undefined' && ME.getProfiles) ? ME.getProfiles() : [],
+        activeProfileId: (typeof ME !== 'undefined' && ME.activeProfileId) ? ME.activeProfileId : localStorage.getItem('me_active_profile_id'),
         powers: (typeof ME !== 'undefined' && ME.getPowers) ? ME.getPowers() : [],
         arsenal: (typeof ME !== 'undefined' && ME.getArsenal) ? ME.getArsenal() : [],
         ship: (typeof ME !== 'undefined' && ME.getShip) ? ME.getShip() : {},
@@ -21056,6 +21267,12 @@ var GHSync = window.GHSync = {
       }
 
       if(bundle.massEffect && typeof ME !== 'undefined'){
+        if(bundle.massEffect.profiles && Array.isArray(bundle.massEffect.profiles)){
+          ME.saveProfilesList(bundle.massEffect.profiles);
+        }
+        if(bundle.massEffect.activeProfileId){
+          ME.switchProfile(bundle.massEffect.activeProfileId);
+        }
         if(bundle.massEffect.powers) ME.savePowers(bundle.massEffect.powers);
         if(bundle.massEffect.arsenal) ME.saveArsenal(bundle.massEffect.arsenal);
         if(bundle.massEffect.ship) ME.saveShip(bundle.massEffect.ship);
