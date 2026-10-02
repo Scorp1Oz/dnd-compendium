@@ -4988,19 +4988,7 @@ body.me-theme.me-theme-cerberus .me-cerberus-background {
   100% { transform: translateY(-180px) scale(1); opacity: 0; }
 }
 
-/* Оверлей эффекта ЭЛТ-монитора поверх экрана (pointer-events: none) */
-.cerberus-crt-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  display: none;
-  overflow: hidden;
-}
-body.me-theme.me-theme-cerberus .cerberus-crt-overlay {
-  display: block;
-}
-
+/* Элементы эффекта ЭЛТ-монитора на фоне (строго под кнопками и интерфейсом, z-index: 0) */
 /* 1. Горизонтальные строки развертки кинескопа (Scanlines) */
 .cerberus-crt-scanlines {
   position: absolute;
@@ -20130,26 +20118,45 @@ function initCerberusBackground(){
       p.style.animationDuration = dur + "s";
       cont.appendChild(p);
     }
+
+    // 5. Эффекты ЭЛТ-монитора на фоне (строго ниже интерфейса и кнопок, z-index: 0)
+    var scanlines = document.createElement("div");
+    scanlines.className = "cerberus-crt-scanlines";
+    cont.appendChild(scanlines);
+
+    var roll = document.createElement("div");
+    roll.className = "cerberus-crt-roll";
+    cont.appendChild(roll);
+
+    var vignette = document.createElement("div");
+    vignette.className = "cerberus-crt-vignette";
+    cont.appendChild(vignette);
+
+    var flicker = document.createElement("div");
+    flicker.className = "cerberus-crt-flicker";
+    cont.appendChild(flicker);
+
+    var bTl = document.createElement("div");
+    bTl.className = "cerberus-crt-bracket tl";
+    cont.appendChild(bTl);
+
+    var bBl = document.createElement("div");
+    bBl.className = "cerberus-crt-bracket bl";
+    cont.appendChild(bBl);
+
+    var bBr = document.createElement("div");
+    bBr.className = "cerberus-crt-bracket br";
+    cont.appendChild(bBr);
+
+    var status = document.createElement("div");
+    status.className = "cerberus-crt-status";
+    status.textContent = "CRONOS // CRT-TERMINAL // CH-01 [QEC ACTIVE]";
+    cont.appendChild(status);
   }
 
-  // Оверлей эффекта ЭЛТ-монитора поверх экрана (pointer-events: none)
-  var crt = document.getElementById("meCerberusCrtOverlay");
-  if(!crt){
-    crt = document.createElement("div");
-    crt.id = "meCerberusCrtOverlay";
-    crt.className = "cerberus-crt-overlay";
-    crt.setAttribute("aria-hidden", "true");
-    crt.innerHTML = '<div class="cerberus-crt-scanlines"></div>' +
-      '<div class="cerberus-crt-roll"></div>' +
-      '<div class="cerberus-crt-vignette"></div>' +
-      '<div class="cerberus-crt-flicker"></div>' +
-      '<div class="cerberus-crt-bracket tl"></div>' +
-      '<div class="cerberus-crt-bracket tr"></div>' +
-      '<div class="cerberus-crt-bracket bl"></div>' +
-      '<div class="cerberus-crt-bracket br"></div>' +
-      '<div class="cerberus-crt-status">CRONOS // CRT-TERMINAL // CH-01 [QEC ACTIVE]</div>';
-    document.body.appendChild(crt);
-  }
+  // Очистка старого оверлея если остался
+  var oldCrt = document.getElementById("meCerberusCrtOverlay");
+  if(oldCrt && oldCrt.parentNode) oldCrt.parentNode.removeChild(oldCrt);
 
   return cont;
 }
@@ -20166,8 +20173,8 @@ window.applyMeTheme = function(){
     if(pN7) pN7.style.display = "none";
     var pCerb = document.getElementById("meCerberusBackground");
     if(pCerb) pCerb.style.display = "none";
-    var pCrt = document.getElementById("meCerberusCrtOverlay");
-    if(pCrt) pCrt.style.display = "none";
+    var oldCrt = document.getElementById("meCerberusCrtOverlay");
+    if(oldCrt && oldCrt.parentNode) oldCrt.parentNode.removeChild(oldCrt);
     return;
   }
   var t = getMeTheme();
@@ -20202,16 +20209,12 @@ window.applyMeTheme = function(){
   }
 
   var pCerb = document.getElementById("meCerberusBackground");
-  var pCrt = document.getElementById("meCerberusCrtOverlay");
   if(t === "cerberus"){
     initCerberusBackground();
     pCerb = document.getElementById("meCerberusBackground");
     if(pCerb) pCerb.style.display = "block";
-    pCrt = document.getElementById("meCerberusCrtOverlay");
-    if(pCrt) pCrt.style.display = "block";
   } else {
     if(pCerb) pCerb.style.display = "none";
-    if(pCrt) pCrt.style.display = "none";
   }
 };
 
