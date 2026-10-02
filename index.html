@@ -4904,6 +4904,150 @@ body.me-theme.me-theme-n7 .me-n7-background {
   }
 }
 
+/* Фон темы Cerberus (Звезда Кроноса, шевроны брони, герб и золотая плазма) */
+.me-cerberus-background {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  display: none;
+}
+body.me-theme.me-theme-cerberus .me-cerberus-background {
+  display: block;
+}
+
+.cerberus-sun {
+  position: absolute;
+  top: -120px;
+  left: -120px;
+  width: 550px;
+  height: 550px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 45% 45%,
+    rgba(254, 240, 138, 0.45) 0%,
+    rgba(234, 179, 8, 0.28) 25%,
+    rgba(180, 83, 9, 0.15) 55%,
+    rgba(120, 53, 15, 0.05) 75%,
+    transparent 100%);
+  filter: blur(20px);
+  opacity: 0.75;
+  animation: cerberusSunBreath 12s ease-in-out infinite alternate;
+}
+
+.cerberus-sun-corona {
+  position: absolute;
+  top: -80px;
+  left: -80px;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  border: 1px dashed rgba(234, 179, 8, 0.2);
+  animation: cerberusCoronaSpin 80s linear infinite;
+}
+
+.cerberus-hazard-stripes {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 220px;
+  height: 220px;
+  overflow: hidden;
+  opacity: 0.75;
+}
+
+.cerberus-stripe-line {
+  position: absolute;
+  transform: rotate(45deg);
+  transform-origin: top right;
+}
+
+.cerberus-stripe-gold {
+  top: -40px;
+  right: 50px;
+  width: 16px;
+  height: 380px;
+  background: #eab308;
+  box-shadow: 0 0 15px rgba(234, 179, 8, 0.5);
+}
+
+.cerberus-stripe-white {
+  top: -40px;
+  right: 74px;
+  width: 8px;
+  height: 380px;
+  background: #f8fafc;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+.cerberus-emblem-widget {
+  position: absolute;
+  right: 3%;
+  top: 30%;
+  width: 180px;
+  height: 180px;
+  opacity: 0.25;
+  filter: drop-shadow(0 0 12px rgba(234, 179, 8, 0.4));
+  animation: cerberusFloat 16s ease-in-out infinite alternate;
+}
+
+.cerberus-dossier-stamp {
+  position: absolute;
+  left: 4%;
+  bottom: 50px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: #ca8a04;
+  letter-spacing: 1.5px;
+  opacity: 0.45;
+  line-height: 1.6;
+}
+.cerberus-dossier-stamp .badge {
+  display: inline-block;
+  background: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  color: #fef08a;
+  padding: 2px 6px;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.cerberus-plasma-spark {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: #fde047;
+  box-shadow: 0 0 6px #eab308, 0 0 12px rgba(234, 179, 8, 0.7);
+  will-change: transform, opacity;
+  opacity: 0;
+  animation: cerberusSparkRise 14s ease-in-out infinite;
+}
+
+@keyframes cerberusSunBreath {
+  0% { transform: scale(0.96); opacity: 0.65; }
+  100% { transform: scale(1.06); opacity: 0.85; }
+}
+
+@keyframes cerberusCoronaSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes cerberusFloat {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+  100% { transform: translateY(8px) rotate(-1deg); }
+}
+
+@keyframes cerberusSparkRise {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  20% { opacity: var(--sp-op, 0.6); }
+  80% { opacity: var(--sp-op, 0.6); }
+  100% { transform: translateY(-180px) scale(1); opacity: 0; }
+}
+
 /* Адаптация под 4 темы Mass Effect */
 body.me-theme.me-theme-omni .btn-primary {
   background: linear-gradient(135deg, #ff7700 0%, #aa4400 100%) !important;
@@ -19894,6 +20038,72 @@ function initN7Background(){
   return cont;
 }
 
+function initCerberusBackground(){
+  if(typeof document === "undefined" || !document.body) return null;
+  var cont = document.getElementById("meCerberusBackground");
+  if(!cont){
+    cont = document.createElement("div");
+    cont.id = "meCerberusBackground";
+    cont.className = "me-cerberus-background";
+    cont.setAttribute("aria-hidden", "true");
+    document.body.insertBefore(cont, document.body.firstChild);
+  }
+  if(!cont.children || cont.children.length === 0){
+    // 1. Звезда Кроноса
+    var sun = document.createElement("div");
+    sun.className = "cerberus-sun";
+    cont.appendChild(sun);
+    var corona = document.createElement("div");
+    corona.className = "cerberus-sun-corona";
+    cont.appendChild(corona);
+
+    // 2. Шевроны брони в углу
+    var stripes = document.createElement("div");
+    stripes.className = "cerberus-hazard-stripes";
+    stripes.innerHTML = '<div class="cerberus-stripe-line cerberus-stripe-gold"></div><div class="cerberus-stripe-line cerberus-stripe-white"></div>';
+    cont.appendChild(stripes);
+
+    // 3. Векторный герб Цербера
+    var emblem = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    emblem.setAttribute("class", "cerberus-emblem-widget");
+    emblem.setAttribute("viewBox", "0 0 200 200");
+    emblem.setAttribute("fill", "none");
+    emblem.innerHTML = '<polygon points="100,25 125,75 100,120 75,75" fill="rgba(234, 179, 8, 0.15)" stroke="#eab308" stroke-width="2" />' +
+      '<line x1="100" y1="25" x2="100" y2="120" stroke="#fef08a" stroke-width="1.5" />' +
+      '<polygon points="50,65 72,75 58,125 32,100" fill="rgba(234, 179, 8, 0.12)" stroke="#eab308" stroke-width="1.8" />' +
+      '<polygon points="150,65 168,100 142,125 128,75" fill="rgba(234, 179, 8, 0.12)" stroke="#eab308" stroke-width="1.8" />' +
+      '<polygon points="100,128 120,158 100,178 80,158" fill="rgba(248, 250, 252, 0.1)" stroke="#f8fafc" stroke-width="1.5" />' +
+      '<circle cx="100" cy="100" r="88" stroke="#eab308" stroke-width="1" stroke-dasharray="6 8" opacity="0.4" />' +
+      '<text x="100" y="195" text-anchor="middle" fill="#ca8a04" font-size="7.5" letter-spacing="1.5" font-family="monospace">CERBERUS COMMAND</text>';
+    cont.appendChild(emblem);
+
+    // 4. Засекреченная директива Лазаря
+    var stamp = document.createElement("div");
+    stamp.className = "cerberus-dossier-stamp";
+    stamp.innerHTML = '<div class="badge">CLASSIFIED // EYES ONLY</div><br>OPERATIONAL BASE: CRONOS STATION<br>DIRECTIVE: LAZARUS PROTOCOL<br>RELAY: QEC SECURE NODE 0x09';
+    cont.appendChild(stamp);
+
+    // 5. Плавающие частички золотой плазмы
+    for(var i = 0; i < 24; i++){
+      var p = document.createElement("div");
+      p.className = "cerberus-plasma-spark";
+      var size = (1.8 + Math.random() * 2.2).toFixed(1);
+      p.style.width = size + "px";
+      p.style.height = size + "px";
+      p.style.left = (Math.random() * 100).toFixed(2) + "%";
+      p.style.bottom = (Math.random() * 80).toFixed(2) + "%";
+      var dur = (10 + Math.random() * 10).toFixed(1);
+      var del = (-Math.random() * 14).toFixed(1);
+      var op = (0.35 + Math.random() * 0.40).toFixed(2);
+      p.style.setProperty("--sp-op", op);
+      p.style.animationDelay = del + "s";
+      p.style.animationDuration = dur + "s";
+      cont.appendChild(p);
+    }
+  }
+  return cont;
+}
+
 window.applyMeTheme = function(){
   if(typeof document === "undefined" || !document.body) return;
   if(typeof HB === "undefined" || HB.mode !== "me"){
@@ -19904,6 +20114,8 @@ window.applyMeTheme = function(){
     if(pOmni) pOmni.style.display = "none";
     var pN7 = document.getElementById("meN7Background");
     if(pN7) pN7.style.display = "none";
+    var pCerb = document.getElementById("meCerberusBackground");
+    if(pCerb) pCerb.style.display = "none";
     return;
   }
   var t = getMeTheme();
@@ -19935,6 +20147,15 @@ window.applyMeTheme = function(){
     if(pN7) pN7.style.display = "block";
   } else {
     if(pN7) pN7.style.display = "none";
+  }
+
+  var pCerb = document.getElementById("meCerberusBackground");
+  if(t === "cerberus"){
+    initCerberusBackground();
+    pCerb = document.getElementById("meCerberusBackground");
+    if(pCerb) pCerb.style.display = "block";
+  } else {
+    if(pCerb) pCerb.style.display = "none";
   }
 };
 
