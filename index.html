@@ -4392,17 +4392,23 @@ body.me-theme .me-filter-btn.on {
 }
 
 /* ============================================================
-   МАСС ЭФФЕКТ: ГЛАВНЫЙ ЭКРАН В МАСШТАБЕ ШИНОБИ (1:1)
+   МАСС ЭФФЕКТ: ГЛАВНЫЙ ЭКРАН В МАСШТАБЕ ШИНОБИ (1:1 И РАВНАЯ ДЛИНА КНОПОК)
    ============================================================ */
 
 body.me-theme {
   padding-bottom: calc(30px + env(safe-area-inset-bottom)) !important;
 }
 
-/* Полноразмерный HUD как в Шиноби */
+/* Полноразмерный HUD в стиле Mass Effect (выровнен 1:1 по ширине с сеткой) */
 body.me-theme #meHud {
+  background: rgba(6, 14, 28, 0.9) !important;
+  border: 1px solid rgba(0, 210, 255, 0.22) !important;
+  border-left: 4px solid #00d2ff !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
   padding: 14px 18px !important;
   margin: 12px 0 16px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 body.me-theme #meHud .sh-hud-name {
   font-size: 18px !important;
@@ -4423,15 +4429,22 @@ body.me-theme #meHud .sh-hud-stat-pill {
 body.me-theme .rule {
   margin: 0 0 20px !important;
   background: linear-gradient(90deg, rgba(0, 210, 255, 0.4), transparent 75%) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
-/* Полноразмерная плашка броска кубиков как в Шиноби */
+/* Полноразмерная плашка броска кубиков (выровнена 1:1 по ширине) */
 body.me-theme .hero-dice {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background: rgba(6, 14, 28, 0.85) !important;
+  border: 1px solid rgba(0, 210, 255, 0.22) !important;
+  border-left: 4px solid #00d2ff !important;
   padding: 22px 26px !important;
   gap: 20px !important;
   margin-bottom: 8px !important;
-  border-left-width: 4px !important;
   border-radius: 4px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
 }
 body.me-theme .hero-dice-icon {
   width: 60px !important;
@@ -4459,12 +4472,25 @@ body.me-theme .section-label {
   letter-spacing: 0.15em !important;
 }
 
-/* Сетка и полноразмерные карточки системных разделов (как в Шиноби) */
+/* Сетка и полноразмерные карточки системных разделов (строго равная длина 50/50 и полное совпадение ширины с кубиком) */
 body.me-theme .menu-list.grid-2 {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 640px) {
+  body.me-theme .menu-list.grid-2 {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 body.me-theme .menu-item {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
   background: rgba(6, 14, 28, 0.85) !important;
   border: 1px solid rgba(0, 210, 255, 0.22) !important;
   border-left: 4px solid #00d2ff !important;
@@ -4494,6 +4520,7 @@ body.me-theme .menu-item .name {
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
+  flex-shrink: 0 !important;
 }
 
 body.me-theme .menu-item .desc {
@@ -4502,7 +4529,8 @@ body.me-theme .menu-item .desc {
   color: #7da5c9 !important;
   margin: 0 14px !important;
   text-align: right !important;
-  flex: 1 !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
@@ -4512,6 +4540,40 @@ body.me-theme .menu-item .arrow {
   font-size: 19px !important;
   color: #00d2ff !important;
   flex-shrink: 0 !important;
+}
+
+/* Адаптация под 4 темы Mass Effect для HUD, Hero Dice и кнопок меню */
+body.me-theme.me-theme-omni #meHud,
+body.me-theme.me-theme-omni .hero-dice,
+body.me-theme.me-theme-omni .menu-item {
+  border-left-color: #ffaa33 !important;
+  border-color: rgba(255, 170, 51, 0.25) !important;
+}
+body.me-theme.me-theme-omni .hero-dice-arrow,
+body.me-theme.me-theme-omni .menu-item .arrow {
+  color: #ffaa33 !important;
+}
+
+body.me-theme.me-theme-n7 #meHud,
+body.me-theme.me-theme-n7 .hero-dice,
+body.me-theme.me-theme-n7 .menu-item {
+  border-left-color: #e11d48 !important;
+  border-color: rgba(225, 29, 72, 0.25) !important;
+}
+body.me-theme.me-theme-n7 .hero-dice-arrow,
+body.me-theme.me-theme-n7 .menu-item .arrow {
+  color: #f43f5e !important;
+}
+
+body.me-theme.me-theme-cerberus #meHud,
+body.me-theme.me-theme-cerberus .hero-dice,
+body.me-theme.me-theme-cerberus .menu-item {
+  border-left-color: #f59e0b !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+body.me-theme.me-theme-cerberus .hero-dice-arrow,
+body.me-theme.me-theme-cerberus .menu-item .arrow {
+  color: #f59e0b !important;
 }
 
 /* Адаптация под 4 темы Mass Effect */
@@ -19334,13 +19396,16 @@ function meHome(){
   var crewCount = (ship.crew || []).length;
   var profCount = (ME.getProfiles ? ME.getProfiles().length : 1);
 
+  var shipName = (ship.name && ship.name !== 'Не зарегистрировано') ? ship.name : 'Нормандия SR-2';
+  var shipDesc = shipName + ' • ' + crewCount + ' в экипаже';
+
   var items = [
     {nav:'mePowers',   icon:'⚡', t:'Способности и Древо',    d:(powersCount ? powersCount + ' в списке' : 'Биотика, техника, комбо')},
     {nav:'meArsenal',  icon:'🔫', t:'Оружейный арсенал',      d:(weaponsCount ? weaponsCount + ' в списке' : 'Винтовки, моды и урон')},
-    {nav:'meShip',     icon:'🚀', t:'Корабль и Экипаж',       d:((ship.name || 'Нормандия SR-2') + ' • ' + crewCount + ' в экипаже')},
-    {nav:'meCodex',    icon:'📖', t:'Кодекс Галактики',       d:'12 статей: расы, фракции, матрица урона'},
-    {nav:'meMap',      icon:'🗺️', t:'Галактическая карта',    d:'Сектора Цитадели, ретрансляторы и контракты'},
-    {nav:'meData',     icon:'💾', t:'Данные систем',          d:(profCount + ' в отряде, темы, Cloud Sync и ИИ')}
+    {nav:'meShip',     icon:'🚀', t:'Корабль и Экипаж',       d:shipDesc},
+    {nav:'meCodex',    icon:'📖', t:'Кодекс Галактики',       d:'12 статей: расы, фракции, урон'},
+    {nav:'meMap',      icon:'🗺️', t:'Галактическая карта',    d:'Сектора Цитадели, контракты'},
+    {nav:'meData',     icon:'💾', t:'Данные систем',          d:profCount + ' в отряде, темы, Cloud Sync и ИИ'}
   ];
 
   return ''+
