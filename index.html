@@ -4602,7 +4602,7 @@ body.me-theme.me-theme-citadel .me-citadel-particles {
   pointer-events: none;
   border-radius: 1px;
   background: #00d2ff;
-  box-shadow: 0 0 5px rgba(0, 210, 255, 0.7);
+  box-shadow: 0 0 4px #00d2ff, 0 0 10px rgba(0, 210, 255, 0.6);
   will-change: transform, opacity;
   opacity: 0;
 }
@@ -19427,7 +19427,7 @@ function initCitadelParticles(){
     document.body.insertBefore(cont, document.body.firstChild);
   }
   if(!cont.children || cont.children.length === 0){
-            // Простые синие вертикальные полоски (меньшее количество, спокойная низкая скорость)
+                // Простые синие вертикальные полоски с неоновым свечением
     for(var i = 0; i < 22; i++){
       var p = document.createElement("div");
       p.className = "me-citadel-traffic-streak";
@@ -19437,9 +19437,9 @@ function initCitadelParticles(){
       p.style.height = h + "px";
       p.style.left = (Math.random() * 100).toFixed(2) + "%";
       p.style.bottom = "-60px";
-      var duration = (12 + Math.random() * 10).toFixed(2); // 12s - 22s (низкая плавная скорость)
+      var duration = (12 + Math.random() * 10).toFixed(2); // 12s - 22s
       var delay = (-Math.random() * 22).toFixed(2);
-      var maxOp = (0.35 + Math.random() * 0.35).toFixed(2);
+      var maxOp = (0.55 + Math.random() * 0.30).toFixed(2); // 0.55 - 0.85 (выразительное неоновое свечение)
       p.style.setProperty("--p-op", maxOp);
       p.style.animation = "citadelTrafficStream " + duration + "s linear " + delay + "s infinite";
       cont.appendChild(p);
