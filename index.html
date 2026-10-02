@@ -61,7 +61,7 @@
     padding-bottom:calc(90px + env(safe-area-inset-bottom));
     -webkit-tap-highlight-color:transparent;
   }
-  .app{width:100%;max-width:920px;}
+  .app{width:100%;max-width:920px;position:relative;z-index:1;}
   .app.wide{max-width:1400px;}
   .app.home-wide{max-width:1060px;}
 
@@ -5061,7 +5061,8 @@ body.me-theme .label-preview {
 
 /* ME Sci-Fi UI панели, карточки, таблицы и вкладки */
 .me-panel {
-  background: rgba(6, 14, 28, 0.85);
+  position: relative;
+  background: rgba(6, 14, 28, 0.92);
   border: 1px solid rgba(0, 210, 255, 0.25);
   border-radius: 6px;
   padding: 18px;
