@@ -4802,6 +4802,108 @@ body.me-theme.me-theme-omni .me-omni-projections {
   100% { transform: translateY(-200px) scale(1); opacity: 0; }
 }
 
+/* Фон темы N7 (Статический логотип, красно-белая полоса брони и частицы огня) */
+.me-n7-background {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  display: none;
+}
+body.me-theme.me-theme-n7 .me-n7-background {
+  display: block;
+}
+
+.n7-armor-stripe {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: clamp(15px, 4vw, 60px);
+  width: 22px;
+  display: flex;
+  opacity: 0.85;
+  pointer-events: none;
+  box-shadow: 0 0 25px rgba(225, 29, 72, 0.35);
+}
+.n7-stripe-white {
+  width: 6px;
+  background: #f8fafc;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+.n7-stripe-red {
+  width: 16px;
+  background: linear-gradient(180deg, #e11d48 0%, #be123c 50%, #e11d48 100%);
+  box-shadow: 0 0 14px rgba(225, 29, 72, 0.6);
+}
+
+.n7-static-logo {
+  position: absolute;
+  top: 90px;
+  right: calc(clamp(15px, 4vw, 60px) + 32px);
+  width: 160px;
+  height: 62px;
+  background-image: url("symbols/Mass Effect/N7_light.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: right center;
+  opacity: 0.70;
+  filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.6));
+  pointer-events: none;
+}
+
+.n7-fire-ember {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+@keyframes n7EmberFloat1 {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    opacity: var(--e-op, 0.8);
+  }
+  40% {
+    transform: translateY(-35vh) translateX(18px) scale(1.1);
+  }
+  70% {
+    transform: translateY(-70vh) translateX(-14px) scale(0.9);
+    opacity: var(--e-op, 0.8);
+  }
+  100% {
+    transform: translateY(calc(-100vh - 40px)) translateX(22px) scale(0.6);
+    opacity: 0;
+  }
+}
+
+@keyframes n7EmberFloat2 {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.7);
+    opacity: 0;
+  }
+  20% {
+    opacity: var(--e-op, 0.7);
+  }
+  50% {
+    transform: translateY(-50vh) translateX(-22px) scale(1.15);
+  }
+  80% {
+    transform: translateY(-80vh) translateX(12px) scale(0.85);
+    opacity: var(--e-op, 0.6);
+  }
+  100% {
+    transform: translateY(calc(-100vh - 40px)) translateX(-18px) scale(0.5);
+    opacity: 0;
+  }
+}
+
 /* Адаптация под 4 темы Mass Effect */
 body.me-theme.me-theme-omni .btn-primary {
   background: linear-gradient(135deg, #ff7700 0%, #aa4400 100%) !important;
@@ -19737,6 +19839,60 @@ function initOmniProjections(){
   return cont;
 }
 
+function initN7Background(){
+  if(typeof document === "undefined" || !document.body) return null;
+  var cont = document.getElementById("meN7Background");
+  if(!cont){
+    cont = document.createElement("div");
+    cont.id = "meN7Background";
+    cont.className = "me-n7-background";
+    cont.setAttribute("aria-hidden", "true");
+    document.body.insertBefore(cont, document.body.firstChild);
+  }
+  if(!cont.children || cont.children.length === 0){
+    // 1. Полоса брони N7
+    var stripe = document.createElement("div");
+    stripe.className = "n7-armor-stripe";
+    stripe.innerHTML = '<div class="n7-stripe-white"></div><div class="n7-stripe-red"></div>';
+    cont.appendChild(stripe);
+
+    // 2. Статический логотип N7
+    var logo = document.createElement("div");
+    logo.className = "n7-static-logo";
+    cont.appendChild(logo);
+
+    // 3. Частички огня (искры/угольки)
+    var fireColors = [
+      { bg: "#ff3b00", shadow: "0 0 6px #ff3b00, 0 0 12px rgba(255, 59, 0, 0.8)" },
+      { bg: "#ff6200", shadow: "0 0 5px #ff6200, 0 0 10px rgba(255, 98, 0, 0.8)" },
+      { bg: "#ff8800", shadow: "0 0 6px #ff8800, 0 0 12px rgba(255, 136, 0, 0.8)" },
+      { bg: "#ff2200", shadow: "0 0 5px #ff2200, 0 0 14px rgba(255, 34, 0, 0.8)" },
+      { bg: "#ffaa33", shadow: "0 0 6px #ffaa33, 0 0 10px rgba(255, 170, 51, 0.7)" }
+    ];
+
+    for(var i = 0; i < 35; i++){
+      var p = document.createElement("div");
+      p.className = "n7-fire-ember";
+      var size = (2 + Math.random() * 2.5).toFixed(1); // 2px - 4.5px
+      p.style.width = size + "px";
+      p.style.height = (size * (1 + Math.random() * 0.5)).toFixed(1) + "px";
+      p.style.left = (Math.random() * 100).toFixed(2) + "%";
+      p.style.bottom = "-30px";
+      var col = fireColors[i % fireColors.length];
+      p.style.background = col.bg;
+      p.style.boxShadow = col.shadow;
+      var dur = (7 + Math.random() * 9).toFixed(1); // 7s - 16s
+      var del = (-Math.random() * 16).toFixed(1);
+      var op = (0.45 + Math.random() * 0.45).toFixed(2);
+      p.style.setProperty("--e-op", op);
+      var anim = (i % 2 === 0) ? "n7EmberFloat1" : "n7EmberFloat2";
+      p.style.animation = anim + " " + dur + "s ease-in-out " + del + "s infinite";
+      cont.appendChild(p);
+    }
+  }
+  return cont;
+}
+
 window.applyMeTheme = function(){
   if(typeof document === "undefined" || !document.body) return;
   if(typeof HB === "undefined" || HB.mode !== "me"){
@@ -19745,6 +19901,8 @@ window.applyMeTheme = function(){
     if(pCit) pCit.style.display = "none";
     var pOmni = document.getElementById("meOmniProjections");
     if(pOmni) pOmni.style.display = "none";
+    var pN7 = document.getElementById("meN7Background");
+    if(pN7) pN7.style.display = "none";
     return;
   }
   var t = getMeTheme();
@@ -19767,6 +19925,15 @@ window.applyMeTheme = function(){
     if(pOmni) pOmni.style.display = "block";
   } else {
     if(pOmni) pOmni.style.display = "none";
+  }
+
+  var pN7 = document.getElementById("meN7Background");
+  if(t === "n7"){
+    initN7Background();
+    pN7 = document.getElementById("meN7Background");
+    if(pN7) pN7.style.display = "block";
+  } else {
+    if(pN7) pN7.style.display = "none";
   }
 };
 
