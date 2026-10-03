@@ -42,10 +42,15 @@
     --shadow: 0 10px 30px rgba(0,0,0,.45);
   }
   *{box-sizing:border-box;}
+  html{
+    background-color:#050608 !important;
+    background:#050608 !important;
+  }
   html,body{margin:0;padding:0;}
   body{
     min-height:100vh;
     min-height:100dvh;
+    background-color:#0e1013;
     background:
       repeating-linear-gradient(135deg, rgba(255,255,255,.015) 0px, rgba(255,255,255,.015) 1px, transparent 1px, transparent 26px),
       radial-gradient(ellipse at 20% -10%, #23262c 0%, var(--steel-0) 55%);
@@ -6724,10 +6729,10 @@ body.el-theme {
                radial-gradient(ellipse at 85% 90%, rgba(5, 150, 105, 0.08) 0%, transparent 50%),
                radial-gradient(ellipse at 15% 90%, rgba(20, 83, 45, 0.08) 0%, transparent 50%);
 
-  background-color: var(--el-bg-color);
+  background-color: var(--el-bg-color, #070e0a);
   background-image: var(--el-bg-img);
   color: #e2e8f0;
-  transition: background-color 0.25s ease, background-image 0.25s ease;
+  transition: none;
 }
 
 /* Тема: Земля (Earth) - Нефрит и Камень */
