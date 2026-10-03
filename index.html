@@ -24440,6 +24440,28 @@ function elKindClass(kind){
 window._elTechSearch = window._elTechSearch || '';
 window._elTechElemFilter = window._elTechElemFilter || 'all';
 
+function renderElTechCard(t){
+  var elemIcon = t.element === 'Огонь' ? '🔥' : t.element === 'Вода' ? '🌊' : t.element === 'Земля' ? '⛰️' : t.element === 'Тьма' ? '🌑' : '🌪️';
+  var benefitText = t.benefit === 'cheap' ? '✦ Снижение стоимости (-1 МВН)' : '✦ Преимущество на бросок атаки';
+  var winBadge = (t.reqWindow && t.reqWindow !== 'нет')
+    ? '<span class="el-mini-tag tag-win">🎯 Окно: ' + elEsc(t.reqWindow) + '</span>'
+    : '';
+
+  return '<div class="el-tech-card ' + elElemClass(t.element) + '" data-nav="elTechView:' + elEscA(t.id) + '">' +
+    '<div class="el-item-badges">' +
+      '<span class="el-mini-tag" style="color:var(--el-accent);">' + elemIcon + ' ' + elEsc(t.element) + ' · ' + elEsc(t.subArt || 'Базовое') + '</span>' +
+      '<span class="el-mini-tag tag-cost">⚡ ' + elEsc(t.cost || '1 МВН') + '</span>' +
+      '<span class="el-mini-tag tag-benefit">' + benefitText + '</span>' +
+      winBadge +
+      '<span style="margin-left:auto;">' + elScaleStars(t.scale) + '</span>' +
+    '</div>' +
+    '<div class="el-item-name">' + elEsc(t.name) + '</div>' +
+    '<div class="el-item-line">Дистанция: <b style="color:#fff;">' + elEsc(t.range || 'Ближний бой') + '</b> · Эффект/Урон: <b style="color:var(--el-accent);">' + elEsc(t.damage || '—') + '</b></div>' +
+    '<div class="el-item-desc">' + elEsc(t.desc || '') + '</div>' +
+  '</div>';
+}
+window.renderElTechCard = renderElTechCard;
+
 function elTechs(){
   var allTechs = EL.getTechs();
   var elemCounts = { 'Огонь': 0, 'Вода': 0, 'Земля': 0, 'Воздух': 0, 'Тьма': 0 };
@@ -24484,26 +24506,7 @@ function elTechs(){
     '</button>'
   ].join('');
 
-  var cardsHtml = filtered.length ? filtered.map(function(t){
-    var elemIcon = t.element === 'Огонь' ? '🔥' : t.element === 'Вода' ? '🌊' : t.element === 'Земля' ? '⛰️' : t.element === 'Тьма' ? '🌑' : '🌪️';
-    var benefitText = t.benefit === 'cheap' ? '✦ Снижение стоимости (-1 МВН)' : '✦ Преимущество на бросок атаки';
-    var winBadge = (t.reqWindow && t.reqWindow !== 'нет')
-      ? '<span class="el-mini-tag tag-win">🎯 Окно: ' + elEsc(t.reqWindow) + '</span>'
-      : '';
-
-    return '<div class="el-tech-card ' + elElemClass(t.element) + '" data-nav="elTechView:' + elEscA(t.id) + '">' +
-      '<div class="el-item-badges">' +
-        '<span class="el-mini-tag" style="color:var(--el-accent);">' + elemIcon + ' ' + elEsc(t.element) + ' · ' + elEsc(t.subArt || 'Базовое') + '</span>' +
-        '<span class="el-mini-tag tag-cost">⚡ ' + elEsc(t.cost || '1 МВН') + '</span>' +
-        '<span class="el-mini-tag tag-benefit">' + benefitText + '</span>' +
-        winBadge +
-        '<span style="margin-left:auto;">' + elScaleStars(t.scale) + '</span>' +
-      '</div>' +
-      '<div class="el-item-name">' + elEsc(t.name) + '</div>' +
-      '<div class="el-item-line">Дистанция: <b style="color:#fff;">' + elEsc(t.range || 'Ближний бой') + '</b> · Эффект/Урон: <b style="color:var(--el-accent);">' + elEsc(t.damage || '—') + '</b></div>' +
-      '<div class="el-item-desc">' + elEsc(t.desc || '') + '</div>' +
-    '</div>';
-  }).join('') : (allTechs.length === 0 ? '<div class="char-empty" style="padding:50px 20px;text-align:center;color:#94a3b8;background:rgba(0,0,0,0.25);border:1px dashed var(--el-accent-border);border-radius:8px;margin-top:16px;"><div style="font-size:36px;margin-bottom:10px;">✨</div><div style="font-size:16px;color:#f5f6fa;font-weight:700;margin-bottom:6px;font-family:Cinzel,serif;">Список форм стихий пуст</div><div style="font-size:13px;color:#94a3b8;max-width:500px;margin:0 auto 18px;line-height:1.5;">Стихийная магия вселенной Аватара рождается из вашего воображения и тактики. Нажмите кнопку <b>«+ Изучить новую форму»</b>, чтобы создать свою уникальную форму, технику или высшее искусство!</div><button class="btn-primary" data-nav="elTechEdit:new">+ Изучить новую форму</button></div>' : '<div class="char-empty" style="padding:40px 20px;text-align:center;color:#94a3b8;font-style:italic;">В выбранной категории нет форм стихий.</div>');
+  var cardsHtml = filtered.length ? filtered.map(renderElTechCard).join('') : (allTechs.length === 0 ? '<div class="char-empty" style="padding:50px 20px;text-align:center;color:#94a3b8;background:rgba(0,0,0,0.25);border:1px dashed var(--el-accent-border);border-radius:8px;margin-top:16px;"><div style="font-size:36px;margin-bottom:10px;">✨</div><div style="font-size:16px;color:#f5f6fa;font-weight:700;margin-bottom:6px;font-family:Cinzel,serif;">Список форм стихий пуст</div><div style="font-size:13px;color:#94a3b8;max-width:500px;margin:0 auto 18px;line-height:1.5;">Стихийная магия вселенной Аватара рождается из вашего воображения и тактики. Нажмите кнопку <b>«+ Изучить новую форму»</b> или сгенерируйте форму через <b>AI Генератор</b>!</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"><button class="btn-primary" data-nav="elTechEdit:new">+ Изучить новую форму</button><button class="btn-ghost" style="color:var(--el-accent);border-color:var(--el-accent-border);" data-nav="elTechGen">✨ AI Генератор форм</button></div></div>' : '<div class="char-empty" style="padding:40px 20px;text-align:center;color:#94a3b8;font-style:italic;">В выбранной категории нет форм стихий.</div>');
 
   return crumbEl([{label:'Стихия', nav:'home'}, {label:'Формы стихий'}]) +
     '<button class="back" data-nav="home">← Назад в меню</button>' +
@@ -24511,6 +24514,7 @@ function elTechs(){
     '<div class="subtitle">ИЗУЧЕННЫЕ МАГИЧЕСКИЕ ПРИМЕНЕНИЯ • ВЫСШИЕ ИСКУССТВА • ШКАЛА СИЛЫ 0–5 • ВЫНОСЛИВОСТЬ МВН</div>' +
     '<div class="sheet-actions" style="margin:14px 0 16px;display:flex;gap:10px;flex-wrap:wrap;">' +
       '<button class="btn-primary" data-nav="elTechEdit:new">+ Изучить новую форму</button>' +
+      '<button class="btn-ghost" style="color:var(--el-accent);border-color:var(--el-accent-border);" data-nav="elTechGen">✨ AI Генератор форм</button>' +
     '</div>' +
     '<div class="el-ref-search-wrap" style="margin-bottom:12px;">' +
       '<span class="el-ref-search-icon">🔍</span>' +
@@ -24744,12 +24748,355 @@ function wireElTechEdit(){
   }
 }
 
+function elShowFade(el){
+  if(!el) return;
+  el.style.display = 'block';
+  el.classList.remove('fade-zoom');
+  void el.offsetWidth;
+  el.classList.add('fade-zoom');
+}
+
+function callGeminiAvatarTechGenerator(opts, apiKey, callback){
+  if(!apiKey){
+    callback("API ключ не указан", null);
+    return;
+  }
+  var prompt = "Ты профессиональный ведущий (Dungeon Master) и глубокий знаток вселенной Avatar: The Last Airbender и The Legend of Korra (Мир четырёх стихий: Огонь, Вода, Земля, Воздух, и подстихии). " +
+    "Придумай и сбалансируй лорную форму стихии (Bending Form / Высшее искусство) для настольной ролевой игры. " +
+    "КРИТИЧЕСКИ ВАЖНО: Это вселенная Аватара (магия стихий, восточные единоборства, концентрация Ци, дыхание, свитки мастеров), а НЕ Наруто! Категорически запрещено использовать: печати рук, чакру, ниндзюцу, гендзюцу, додзюцу, кланы шиноби, каге, кунаи и т.д.!\n" +
+    "Пожелания игрока:\n" +
+    "- Идея / Тема: " + (opts.theme || "Случайная каноничная форма стихий") + "\n" +
+    "- Стихия: " + (opts.element || "Любая на усмотрение AI (Огонь, Вода, Земля, Воздух или Тьма)") + "\n" +
+    "- Высшее искусство / Направление: " + (opts.subArt || "Авто (Базовое, Молния, Сейсмочувствительность, Металл, Лава, Кровь, Лёд, Исцеление, Полёт, Духовная магия)") + "\n" +
+    "- Шкала мастерства (0–5): " + (opts.scale !== '' && opts.scale !== undefined ? opts.scale : "Авто") + "\n" +
+    "- Бонус выученной формы: " + (opts.benefit || "Авто") + "\n\n" +
+    "Ответь ИСКЛЮЧИТЕЛЬНО валидным JSON-объектом без лишних символов и markdown-разметки, со следующими полями:\n" +
+    "{\n" +
+    '  "name": "Атмосферное и каноничное название формы в стиле Аватара",\n' +
+    '  "element": "Огонь / Вода / Земля / Воздух / Тьма",\n' +
+    '  "subArt": "Базовое / Молния / Металл / Лава / Кровь / Лёд / Исцеление / Полёт / Сейсмика",\n' +
+    '  "scale": 1,\n' +
+    '  "cost": "1 МВН",\n' +
+    '  "benefit": "advantage",\n' +
+    '  "reqWindow": "нет",\n' +
+    '  "range": "Дистанция (например: Ближний бой, 30 фт, 60 фт, Конус 20 фт)",\n' +
+    '  "damage": "Урон или исцеление (например: 2d6 огненный, 3d8 дробящий, 1d10 режущий, Исцеление 2d6+3, Контроль зоны)",\n' +
+    '  "desc": "Детальное боевое описание: восточный стиль единоборств (Северный Шаолинь для Огня, Тайцзицюань для Воды, Хунгар для Земли, Багуачжан для Воздуха), стойка, движение тела, концентрация Ци и визуальный эффект стихии."\n' +
+    "}";
+
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(apiKey);
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
+    })
+  }).then(function(res){
+    if(!res.ok) throw new Error('API status ' + res.status);
+    return res.json();
+  }).then(function(data){
+    try{
+      var rawTxt = data.candidates[0].content.parts[0].text;
+      var clean = rawTxt.replace(/^\s*```json\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+      var parsed = JSON.parse(clean);
+      callback(null, parsed);
+    }catch(err){
+      callback("Ошибка разбора JSON: " + err.message, null);
+    }
+  }).catch(function(err){
+    callback(err.message || err, null);
+  });
+}
+window.callGeminiAvatarTechGenerator = callGeminiAvatarTechGenerator;
+
+function elTechGen(){
+  var key = getGeminiApiKey();
+  var html = crumbEl([{label:'Стихия', nav:'home'}, {label:'Формы стихий', nav:'elTechs'}, {label:'AI Генератор'}]) +
+    '<button class="back" data-nav="elTechs">← Назад к формам</button>' +
+    '<h1>✨ AI Генератор форм стихий</h1>' +
+    '<div class="subtitle">ГЕНЕРАЦИЯ КАНОНИЧНЫХ МАГИЧЕСКИХ ФОРМ И ВЫСШИХ ИСКУССТВ МИРА АВАТАРА</div>' +
+    
+    '<div class="el-form-card" id="elTechGenFormSection" style="margin-top:16px;">' +
+      '<p style="color:#94a3b8;font-size:13.5px;line-height:1.5;margin-bottom:14px;">' +
+        'Опишите вашу идею формы, стихию или высшее искусство. Нейросеть сгенерирует боевую стойку, траекторию движений тела (Северный Шаолинь, Тайцзи, Хунгар, Багуа), механику урона и требуемые Окна возможностей (A94).' +
+      '</p>' +
+      '<div class="el-field-group">' +
+        '<label class="el-field-label">Идея / Название / Эффект формы:</label>' +
+        '<textarea id="elTgTheme" class="el-textarea" rows="4" placeholder="Что должна делать форма? Например: «Драконий танец с огненными дугами», «Щит из спрессованного льда», «Сейсмический толчок для опрокидывания», «Лезвие сжатого воздуха», «Управление металлом»..."></textarea>' +
+      '</div>' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Стихия:</label>' +
+          '<select id="elTgElement" class="el-select">' +
+            '<option value="">Авто (на усмотрение AI)</option>' +
+            '<option value="Огонь">🔥 Огонь</option>' +
+            '<option value="Вода">🌊 Вода</option>' +
+            '<option value="Земля">⛰️ Земля</option>' +
+            '<option value="Воздух">🌪️ Воздух</option>' +
+            '<option value="Тьма">🌑 Тьма</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Шкала мастерства (0–5):</label>' +
+          '<select id="elTgScale" class="el-select">' +
+            '<option value="">Авто (на усмотрение AI)</option>' +
+            '<option value="0">0 (Базовый трюк / Быт)</option>' +
+            '<option value="1">1 (Базовая форма)</option>' +
+            '<option value="2">2 (Продвинутая форма)</option>' +
+            '<option value="3">3 (Мастерская форма)</option>' +
+            '<option value="4">4 (Гроссмейстер)</option>' +
+            '<option value="5">5 (Стихийный катаклизм)</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Высшее искусство / Подкатегория:</label>' +
+          '<input type="text" id="elTgSubArt" class="el-input" placeholder="Авто (Базовое, Молния, Металл, Лава, Лед, Кровь, Полет...)">' +
+        '</div>' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Бонус выученной формы:</label>' +
+          '<select id="elTgBenefit" class="el-select">' +
+            '<option value="">Авто (на выбор AI)</option>' +
+            '<option value="cheap">✦ Снижение стоимости (-1 МВН)</option>' +
+            '<option value="advantage">✦ Преимущество на бросок атаки</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sheet-actions" style="margin-top:20px;">' +
+        '<button class="btn-ghost" id="btnElTechGen" style="width:100%;color:var(--el-accent);border-color:var(--el-accent-border);font-weight:700;font-size:15px;padding:12px 18px;">✨ Сгенерировать форму стихий</button>' +
+      '</div>' +
+    '</div>' +
+    
+    '<div id="elTechGenResult" style="display:none;margin-top:16px;">' +
+      '<div id="elTechGenPreview" style="margin-bottom:16px;"></div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<button class="btn-primary" id="btnElTechSave" style="width:100%;padding:12px;font-size:15px;">💾 Сохранить в Мои Формы</button>' +
+        '<div style="display:flex;gap:10px;">' +
+          '<button class="btn-ghost" id="btnElTechRegen" style="flex:1;">🔄 Ещё раз (те же настройки)</button>' +
+          '<button class="btn-ghost" id="btnElTechBack" style="flex:1;">✏️ Изменить параметры</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div id="elTechGenHistoryWrap" style="margin-top:30px;border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;display:none;">' +
+      '<div class="section-label" style="font-size:12px;letter-spacing:0.12em;color:var(--el-accent);font-weight:700;margin-bottom:10px;font-family:\'JetBrains Mono\',monospace;">📜 ИСТОРИЯ ГЕНЕРАЦИЙ (ЛОКАЛЬНО)</div>' +
+      '<div id="elTechGenHistoryList" style="display:flex;flex-direction:column;gap:10px;"></div>' +
+    '</div>';
+
+  return html;
+}
+window.elTechGen = elTechGen;
+
+function wireElTechGen(){
+  function renderHistory(){
+    var wrap = document.getElementById('elTechGenHistoryWrap');
+    var list = document.getElementById('elTechGenHistoryList');
+    if(!wrap || !list) return;
+    try {
+      var h = JSON.parse(localStorage.getItem('el_ai_hist_techs') || '[]');
+      if(h.length === 0){ wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+      list.innerHTML = h.map(function(item, i){
+        var elemIcon = item.element === 'Огонь' ? '🔥' : item.element === 'Вода' ? '🌊' : item.element === 'Земля' ? '⛰️' : item.element === 'Тьма' ? '🌑' : '🌪️';
+        return '<div class="el-card" style="cursor:pointer;margin-bottom:0;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;" onclick="window._loadAvatarTechHist(' + i + ')">' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:15px;font-weight:700;color:#fff;font-family:\'Cinzel\',serif;margin-bottom:3px;">' +
+              elemIcon + ' ' + elEsc(item.name || 'Безымянная форма') + ' ' + elScaleStars(item.scale) +
+            '</div>' +
+            '<div style="font-size:12px;color:#94a3b8;font-family:\'JetBrains Mono\',monospace;">' +
+              elEsc(item.element) + ' · ' + elEsc(item.subArt || 'Базовое') + ' · ⚡ ' + elEsc(item.cost || '1 МВН') +
+            '</div>' +
+          '</div>' +
+          '<button class="btn-ghost" style="padding:6px 10px;color:#fca5a5;border-color:transparent;flex-shrink:0;font-size:14px;" onclick="event.stopPropagation(); window._delAvatarTechHist(' + i + ')" title="Удалить из истории">🗑️</button>' +
+        '</div>';
+      }).join('');
+    } catch(e){}
+  }
+
+  window._loadAvatarTechHist = function(i){
+    try {
+      var h = JSON.parse(localStorage.getItem('el_ai_hist_techs') || '[]');
+      var item = h[i];
+      if(!item) return;
+      window._lastGenAvatarTech = item;
+      var form = document.getElementById('elTechGenFormSection');
+      var resDiv = document.getElementById('elTechGenResult');
+      var preview = document.getElementById('elTechGenPreview');
+      if(form) form.style.display = 'none';
+      elShowFade(resDiv);
+      if(preview){
+        var dummy = JSON.parse(JSON.stringify(item));
+        dummy.id = 'dummy';
+        preview.innerHTML = renderElTechCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"');
+      }
+      window.scrollTo(0, 0);
+    } catch(e){}
+  };
+
+  window._delAvatarTechHist = function(i){
+    try {
+      var h = JSON.parse(localStorage.getItem('el_ai_hist_techs') || '[]');
+      h.splice(i, 1);
+      localStorage.setItem('el_ai_hist_techs', JSON.stringify(h));
+      renderHistory();
+    } catch(e){}
+  };
+
+  renderHistory();
+
+  var btnGen = document.getElementById('btnElTechGen');
+  if(btnGen){
+    btnGen.onclick = function(){
+      var k = getGeminiApiKey();
+      if(!k){
+        var keyInput = prompt('Введите ваш Google Gemini API ключ для генерации:');
+        if(keyInput && keyInput.trim()){
+          k = keyInput.trim();
+          saveGeminiApiKey(k);
+        } else {
+          return;
+        }
+      }
+
+      var theme = (document.getElementById('elTgTheme').value || '').trim();
+      var element = document.getElementById('elTgElement').value;
+      var scale = document.getElementById('elTgScale').value;
+      var subArt = (document.getElementById('elTgSubArt').value || '').trim();
+      var benefit = document.getElementById('elTgBenefit').value;
+
+      btnGen.disabled = true;
+      btnGen.textContent = 'Генерация формы (ждите)...';
+
+      callGeminiAvatarTechGenerator({
+        theme: theme,
+        element: element,
+        scale: scale,
+        subArt: subArt,
+        benefit: benefit
+      }, k, function(err, result){
+        btnGen.disabled = false;
+        btnGen.textContent = '✨ Сгенерировать форму стихий';
+
+        if(err || !result){
+          alert('Ошибка генерации: ' + (err || 'Пустой ответ от AI'));
+          return;
+        }
+
+        result.name = result.name || 'Стихийная форма';
+        var validElems = ['Огонь', 'Вода', 'Земля', 'Воздух', 'Тьма'];
+        if(validElems.indexOf(result.element) === -1) result.element = element || 'Огонь';
+        result.subArt = result.subArt || subArt || 'Базовое';
+        result.scale = Math.max(0, Math.min(5, parseInt(result.scale, 10) || 0));
+        result.cost = String(result.cost || '1 МВН');
+        if(!result.cost.includes('МВН')) result.cost += ' МВН';
+        result.benefit = (result.benefit === 'cheap' ? 'cheap' : 'advantage');
+        result.reqWindow = result.reqWindow || 'нет';
+        result.range = result.range || '30 фт';
+        result.damage = result.damage || '';
+        result.desc = result.desc || '';
+
+        window._lastGenAvatarTech = result;
+
+        try {
+          var h = JSON.parse(localStorage.getItem('el_ai_hist_techs') || '[]');
+          h.unshift(result);
+          if(h.length > 20) h.length = 20;
+          localStorage.setItem('el_ai_hist_techs', JSON.stringify(h));
+        } catch(e){}
+
+        var form = document.getElementById('elTechGenFormSection');
+        var resDiv = document.getElementById('elTechGenResult');
+        var preview = document.getElementById('elTechGenPreview');
+
+        if(form) form.style.display = 'none';
+        elShowFade(resDiv);
+
+        if(preview){
+          var dummy = JSON.parse(JSON.stringify(result));
+          dummy.id = 'dummy';
+          preview.innerHTML = renderElTechCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"');
+        }
+
+        renderHistory();
+        if(resDiv) resDiv.scrollIntoView({behavior: 'smooth'});
+      });
+    };
+  }
+
+  var btnBack = document.getElementById('btnElTechBack');
+  if(btnBack){
+    btnBack.onclick = function(){
+      var form = document.getElementById('elTechGenFormSection');
+      var resDiv = document.getElementById('elTechGenResult');
+      if(resDiv) resDiv.style.display = 'none';
+      elShowFade(form);
+    };
+  }
+
+  var btnRegen = document.getElementById('btnElTechRegen');
+  if(btnRegen){
+    btnRegen.onclick = function(){
+      var form = document.getElementById('elTechGenFormSection');
+      var resDiv = document.getElementById('elTechGenResult');
+      if(resDiv) resDiv.style.display = 'none';
+      elShowFade(form);
+      if(btnGen) btnGen.click();
+    };
+  }
+
+  var btnSave = document.getElementById('btnElTechSave');
+  if(btnSave){
+    btnSave.onclick = function(){
+      var tech = window._lastGenAvatarTech;
+      if(!tech) return;
+
+      var targetId = 'tech_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+      var record = {
+        id: targetId,
+        name: tech.name,
+        element: tech.element,
+        subArt: tech.subArt,
+        scale: tech.scale,
+        cost: tech.cost,
+        benefit: tech.benefit,
+        reqWindow: tech.reqWindow,
+        range: tech.range,
+        damage: tech.damage,
+        desc: tech.desc
+      };
+
+      var list = EL.getTechs();
+      list.unshift(record);
+      EL.saveTechs(list);
+      window.navigate('elTechView:' + targetId);
+    };
+  }
+}
+window.wireElTechGen = wireElTechGen;
+
 /* ============================================================
    3. БОЕВЫЕ ПРИЁМЫ И ЧИ-БЛОКИНГ (EL-MOVES)
    ============================================================ */
 
 window._elMoveSearch = window._elMoveSearch || '';
 window._elMoveKindFilter = window._elMoveKindFilter || 'all';
+
+function renderElMoveCard(m){
+  return '<div class="el-move-card ' + elKindClass(m.kind) + '" data-nav="elMoveView:' + elEscA(m.id) + '">' +
+    '<div class="el-item-badges">' +
+      '<span class="el-mini-tag" style="color:var(--el-accent);">' + elEsc(m.kind) + '</span>' +
+      '<span class="el-mini-tag tag-cost">⚡ ' + elEsc(m.cost || '1 ФВН') + '</span>' +
+      '<span class="el-mini-tag tag-win">🎯 Открывает окно: ' + elEsc(m.opensWindow || 'СБИТ') + '</span>' +
+    '</div>' +
+    '<div class="el-item-name">' + elEsc(m.name) + '</div>' +
+    '<div class="el-item-line">Условие/Стойка: <b style="color:#fff;">' + elEsc(m.trigger || 'Ближний бой') + '</b></div>' +
+    '<div class="el-item-desc" style="color:#fde68a;font-style:normal;margin-bottom:4px;"><b>Эффект:</b> ' + elEsc(m.effect || '—') + '</div>' +
+    '<div class="el-item-desc">' + elEsc(m.desc || '') + '</div>' +
+  '</div>';
+}
+window.renderElMoveCard = renderElMoveCard;
 
 function elMoves(){
   var allMoves = EL.getMoves();
@@ -24792,19 +25139,7 @@ function elMoves(){
     '</button>'
   ].join('');
 
-  var cardsHtml = filtered.length ? filtered.map(function(m){
-    return '<div class="el-move-card ' + elKindClass(m.kind) + '" data-nav="elMoveView:' + elEscA(m.id) + '">' +
-      '<div class="el-item-badges">' +
-        '<span class="el-mini-tag" style="color:var(--el-accent);">' + elEsc(m.kind) + '</span>' +
-        '<span class="el-mini-tag tag-cost">⚡ ' + elEsc(m.cost || '1 ФВН') + '</span>' +
-        '<span class="el-mini-tag tag-win">🎯 Открывает окно: ' + elEsc(m.opensWindow || 'СБИТ') + '</span>' +
-      '</div>' +
-      '<div class="el-item-name">' + elEsc(m.name) + '</div>' +
-      '<div class="el-item-line">Условие/Стойка: <b style="color:#fff;">' + elEsc(m.trigger || 'Ближний бой') + '</b></div>' +
-      '<div class="el-item-desc" style="color:#fde68a;font-style:normal;margin-bottom:4px;"><b>Эффект:</b> ' + elEsc(m.effect || '—') + '</div>' +
-      '<div class="el-item-desc">' + elEsc(m.desc || '') + '</div>' +
-    '</div>';
-  }).join('') : (allMoves.length === 0 ? '<div class="char-empty" style="padding:50px 20px;text-align:center;color:#94a3b8;background:rgba(0,0,0,0.25);border:1px dashed var(--el-accent-border);border-radius:8px;margin-top:16px;"><div style="font-size:36px;margin-bottom:10px;">🥋</div><div style="font-size:16px;color:#f5f6fa;font-weight:700;margin-bottom:6px;font-family:Cinzel,serif;">Список боевых приёмов пуст</div><div style="font-size:13px;color:#94a3b8;max-width:500px;margin:0 auto 18px;line-height:1.5;">Создавайте собственные тактические приёмы, чи-блокинг и манёвры ближнего боя. Нажмите <b>«+ Добавить приём»</b>, чтобы задать действие, стоимость в ФВН и открываемое окно возможностей (A94/A95).</div><button class="btn-primary" data-nav="elMoveEdit:new">+ Добавить приём</button></div>' : '<div class="char-empty" style="padding:40px 20px;text-align:center;color:#94a3b8;font-style:italic;">В выбранной категории нет приёмов.</div>');
+  var cardsHtml = filtered.length ? filtered.map(renderElMoveCard).join('') : (allMoves.length === 0 ? '<div class="char-empty" style="padding:50px 20px;text-align:center;color:#94a3b8;background:rgba(0,0,0,0.25);border:1px dashed var(--el-accent-border);border-radius:8px;margin-top:16px;"><div style="font-size:36px;margin-bottom:10px;">🥋</div><div style="font-size:16px;color:#f5f6fa;font-weight:700;margin-bottom:6px;font-family:Cinzel,serif;">Список боевых приёмов пуст</div><div style="font-size:13px;color:#94a3b8;max-width:500px;margin:0 auto 18px;line-height:1.5;">Создавайте собственные тактические приёмы, чи-блокинг и манёвры ближнего боя. Нажмите <b>«+ Добавить приём»</b> или сгенерируйте приём через <b>AI Генератор</b>!</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"><button class="btn-primary" data-nav="elMoveEdit:new">+ Добавить приём</button><button class="btn-ghost" style="color:var(--el-accent);border-color:var(--el-accent-border);" data-nav="elMoveGen">✨ AI Генератор приёмов</button></div></div>' : '<div class="char-empty" style="padding:40px 20px;text-align:center;color:#94a3b8;font-style:italic;">В выбранной категории нет приёмов.</div>');
 
   return crumbEl([{label:'Стихия', nav:'home'}, {label:'Боевые приёмы'}]) +
     '<button class="back" data-nav="home">← Назад в меню</button>' +
@@ -24812,6 +25147,7 @@ function elMoves(){
     '<div class="subtitle">ТАКТИЧЕСКИЕ ДЕЙСТВИЯ • ОТКРЫТИЕ ОКОН ВОЗМОЖНОСТЕЙ (A94/A95) • ЧИ-БЛОКИНГ • БОЙ БЕЗ МАГИИ</div>' +
     '<div class="sheet-actions" style="margin:14px 0 16px;display:flex;gap:10px;flex-wrap:wrap;">' +
       '<button class="btn-primary" data-nav="elMoveEdit:new">+ Добавить приём</button>' +
+      '<button class="btn-ghost" style="color:var(--el-accent);border-color:var(--el-accent-border);" data-nav="elMoveGen">✨ AI Генератор приёмов</button>' +
     '</div>' +
     '<div class="el-ref-search-wrap" style="margin-bottom:12px;">' +
       '<span class="el-ref-search-icon">🔍</span>' +
@@ -25001,6 +25337,303 @@ function wireElMoveEdit(){
     };
   }
 }
+
+function callGeminiAvatarMoveGenerator(opts, apiKey, callback){
+  if(!apiKey){
+    callback("API ключ не указан", null);
+    return;
+  }
+  var prompt = "Ты профессиональный ведущий (Dungeon Master) и глубокий знаток боевых искусств вселенной Avatar: The Last Airbender и The Legend of Korra. " +
+    "Придумай и сбалансируй тактический боевой приём, манёвр без магии, технику чи-блокинга или фехтования для настольной ролевой игры. " +
+    "КРИТИЧЕСКИ ВАЖНО: Это вселенная Аватара (воины Киоши с веерами и катанами, чи-блокеры Тай Ли и Уравнители Амона, мастера мечей Сокка и Пиандао, костяные топоры и бумеранги Воды), а НЕ Наруто! Никаких печатей рук, чакры, ниндзюцу, гендзюцу, кланов шиноби, кунаев и т.д.!\n" +
+    "Пожелания игрока:\n" +
+    "- Идея / Название: " + (opts.theme || "Случайный тактический приём") + "\n" +
+    "- Направление: " + (opts.kind || "Любая на усмотрение AI (Рукопашный, Чи-блокинг, Оружейный, Тактический)") + "\n" +
+    "- Оружие / Стиль: " + (opts.weapon || "Любое / Без оружия") + "\n" +
+    "- Навязываемое Окно возможностей (A94): " + (opts.opensWindow || "Авто (СБИТ, ОБЕЗДВИЖЕН, ОСЛЕПЛЁН, СВЯЗАН, СПИНА, ИСТОЩЁН, ЧИ-БЛОК)") + "\n\n" +
+    "Ответь ИСКЛЮЧИТЕЛЬНО валидным JSON-объектом без лишних символов и markdown-разметки, со следующими полями:\n" +
+    "{\n" +
+    '  "name": "Название приёма (например: Блокировка меридиана плеча, Подсечка веером Киоши, Разоружающий залом, Бросок песка в глаза, Удар эфесом)",\n' +
+    '  "kind": "Рукопашный / Чи-блокинг / Оружейный / Тактический",\n' +
+    '  "cost": "1 ФВН",\n' +
+    '  "opensWindow": "СБИТ",\n' +
+    '  "trigger": "Условие или дистанция (например: Ближний бой, Свободное действие при уклонении, Реакция на промах атакующего)",\n' +
+    '  "effect": "Тактический эффект (например: Цель проходит спасбросок Ловкости СЛ 14 или падает ничком; для Чи-блока: цель не может использовать магию стихий до конца следующего хода)",\n' +
+    '  "desc": "Художественное описание: механика движения, точки давления, акробатический маневр, использование инерции противника или финт оружием."\n' +
+    "}";
+
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(apiKey);
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
+    })
+  }).then(function(res){
+    if(!res.ok) throw new Error('API status ' + res.status);
+    return res.json();
+  }).then(function(data){
+    try{
+      var rawTxt = data.candidates[0].content.parts[0].text;
+      var clean = rawTxt.replace(/^\s*```json\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+      var parsed = JSON.parse(clean);
+      callback(null, parsed);
+    }catch(err){
+      callback("Ошибка разбора JSON: " + err.message, null);
+    }
+  }).catch(function(err){
+    callback(err.message || err, null);
+  });
+}
+window.callGeminiAvatarMoveGenerator = callGeminiAvatarMoveGenerator;
+
+function elMoveGen(){
+  var key = getGeminiApiKey();
+  var html = crumbEl([{label:'Стихия', nav:'home'}, {label:'Боевые приёмы', nav:'elMoves'}, {label:'AI Генератор'}]) +
+    '<button class="back" data-nav="elMoves">← Назад к приёмам</button>' +
+    '<h1>✨ AI Генератор боевых приёмов</h1>' +
+    '<div class="subtitle">ГЕНЕРАЦИЯ ТАКТИЧЕСКИХ ДЕЙСТВИЙ, ЧИ-БЛОКИНГА И БОЯ ОРУЖИЕМ В СТИЛЕ АВАТАРА</div>' +
+    
+    '<div class="el-form-card" id="elMoveGenFormSection" style="margin-top:16px;">' +
+      '<p style="color:#94a3b8;font-size:13.5px;line-height:1.5;margin-bottom:14px;">' +
+        'Создайте новый тактический маневр, атаку оружием или чи-блокинг (в стиле воинов Киоши, Тай Ли или бойцов Уравнителей). AI подберёт эффект, спасбросок, открываемое Окно возможностей (A94) и стоимость в ФВН.' +
+      '</p>' +
+      '<div class="el-field-group">' +
+        '<label class="el-field-label">Идея / Название приёма:</label>' +
+        '<textarea id="elMgTheme" class="el-textarea" rows="4" placeholder="Что должен делать приём? Например: «Точечный удар в нервный узел руки», «Подсечка шестом с разворота», «Ослепление веером и уход за спину», «Захват оружия плащом»..."></textarea>' +
+      '</div>' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Направление приёма:</label>' +
+          '<select id="elMgKind" class="el-select">' +
+            '<option value="">Любая (на усмотрение AI)</option>' +
+            '<option value="Рукопашный">🥋 Рукопашный</option>' +
+            '<option value="Чи-блокинг">🖐️ Чи-блокинг</option>' +
+            '<option value="Оружейный">⚔️ Оружейный</option>' +
+            '<option value="Тактический">♟️ Тактический</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Навязываемое Окно возможностей (A94):</label>' +
+          '<select id="elMgWindow" class="el-select">' +
+            '<option value="">Авто (на усмотрение AI)</option>' +
+            '<option value="СБИТ">СБИТ (сбит с ног)</option>' +
+            '<option value="ЧИ-БЛОК">ЧИ-БЛОК (блокировка магии стихий)</option>' +
+            '<option value="ОБЕЗДВИЖЕН">ОБЕЗДВИЖЕН (скован на месте)</option>' +
+            '<option value="ОСЛЕПЛЁН">ОСЛЕПЛЁН (потеря ориентации)</option>' +
+            '<option value="СВЯЗАН">СВЯЗАН (захват / сковывание)</option>' +
+            '<option value="СПИНА">СПИНА (открытая спина врага)</option>' +
+            '<option value="ИСТОЩЁН">ИСТОЩЁН (тяжёлая одышка)</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="el-field-group">' +
+        '<label class="el-field-label">Используемое оружие / Стиль (необязательно):</label>' +
+        '<input type="text" id="elMgWeapon" class="el-input" placeholder="Например: Без оружия, Веера Киоши, Парные мечи дао, Бамбуковый шест, Меч из метеорита...">' +
+      '</div>' +
+      '<div class="sheet-actions" style="margin-top:20px;">' +
+        '<button class="btn-ghost" id="btnElMoveGen" style="width:100%;color:var(--el-accent);border-color:var(--el-accent-border);font-weight:700;font-size:15px;padding:12px 18px;">✨ Сгенерировать боевой приём</button>' +
+      '</div>' +
+    '</div>' +
+    
+    '<div id="elMoveGenResult" style="display:none;margin-top:16px;">' +
+      '<div id="elMoveGenPreview" style="margin-bottom:16px;"></div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<button class="btn-primary" id="btnElMoveSave" style="width:100%;padding:12px;font-size:15px;">💾 Сохранить этот приём</button>' +
+        '<div style="display:flex;gap:10px;">' +
+          '<button class="btn-ghost" id="btnElMoveRegen" style="flex:1;">🔄 Ещё раз (те же настройки)</button>' +
+          '<button class="btn-ghost" id="btnElMoveBack" style="flex:1;">✏️ Изменить параметры</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div id="elMoveGenHistoryWrap" style="margin-top:30px;border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;display:none;">' +
+      '<div class="section-label" style="font-size:12px;letter-spacing:0.12em;color:var(--el-accent);font-weight:700;margin-bottom:10px;font-family:\'JetBrains Mono\',monospace;">📜 ИСТОРИЯ ГЕНЕРАЦИЙ (ЛОКАЛЬНО)</div>' +
+      '<div id="elMoveGenHistoryList" style="display:flex;flex-direction:column;gap:10px;"></div>' +
+    '</div>';
+
+  return html;
+}
+window.elMoveGen = elMoveGen;
+
+function wireElMoveGen(){
+  function renderHistory(){
+    var wrap = document.getElementById('elMoveGenHistoryWrap');
+    var list = document.getElementById('elMoveGenHistoryList');
+    if(!wrap || !list) return;
+    try {
+      var h = JSON.parse(localStorage.getItem('el_ai_hist_moves') || '[]');
+      if(h.length === 0){ wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+      list.innerHTML = h.map(function(item, i){
+        return '<div class="el-card" style="cursor:pointer;margin-bottom:0;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;" onclick="window._loadAvatarMoveHist(' + i + ')">' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:15px;font-weight:700;color:#fff;font-family:\'Cinzel\',serif;margin-bottom:3px;">' +
+              '🥋 ' + elEsc(item.name || 'Безымянный приём') +
+            '</div>' +
+            '<div style="font-size:12px;color:#94a3b8;font-family:\'JetBrains Mono\',monospace;">' +
+              elEsc(item.kind) + ' · ⚡ ' + elEsc(item.cost || '1 ФВН') + ' · 🎯 ' + elEsc(item.opensWindow || 'СБИТ') +
+            '</div>' +
+          '</div>' +
+          '<button class="btn-ghost" style="padding:6px 10px;color:#fca5a5;border-color:transparent;flex-shrink:0;font-size:14px;" onclick="event.stopPropagation(); window._delAvatarMoveHist(' + i + ')" title="Удалить из истории">🗑️</button>' +
+        '</div>';
+      }).join('');
+    } catch(e){}
+  }
+
+  window._loadAvatarMoveHist = function(i){
+    try {
+      var h = JSON.parse(localStorage.getItem('el_ai_hist_moves') || '[]');
+      var item = h[i];
+      if(!item) return;
+      window._lastGenAvatarMove = item;
+      var form = document.getElementById('elMoveGenFormSection');
+      var resDiv = document.getElementById('elMoveGenResult');
+      var preview = document.getElementById('elMoveGenPreview');
+      if(form) form.style.display = 'none';
+      elShowFade(resDiv);
+      if(preview){
+        var dummy = JSON.parse(JSON.stringify(item));
+        dummy.id = 'dummy';
+        preview.innerHTML = renderElMoveCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"');
+      }
+      window.scrollTo(0, 0);
+    } catch(e){}
+  };
+
+  window._delAvatarMoveHist = function(i){
+    try {
+      var h = JSON.parse(localStorage.getItem('el_ai_hist_moves') || '[]');
+      h.splice(i, 1);
+      localStorage.setItem('el_ai_hist_moves', JSON.stringify(h));
+      renderHistory();
+    } catch(e){}
+  };
+
+  renderHistory();
+
+  var btnGen = document.getElementById('btnElMoveGen');
+  if(btnGen){
+    btnGen.onclick = function(){
+      var k = getGeminiApiKey();
+      if(!k){
+        var keyInput = prompt('Введите ваш Google Gemini API ключ для генерации:');
+        if(keyInput && keyInput.trim()){
+          k = keyInput.trim();
+          saveGeminiApiKey(k);
+        } else {
+          return;
+        }
+      }
+
+      var theme = (document.getElementById('elMgTheme').value || '').trim();
+      var kind = document.getElementById('elMgKind').value;
+      var opensWindow = document.getElementById('elMgWindow').value;
+      var weapon = (document.getElementById('elMgWeapon').value || '').trim();
+
+      btnGen.disabled = true;
+      btnGen.textContent = 'Генерация приёма (ждите)...';
+
+      callGeminiAvatarMoveGenerator({
+        theme: theme,
+        kind: kind,
+        opensWindow: opensWindow,
+        weapon: weapon
+      }, k, function(err, result){
+        btnGen.disabled = false;
+        btnGen.textContent = '✨ Сгенерировать боевой приём';
+
+        if(err || !result){
+          alert('Ошибка генерации: ' + (err || 'Пустой ответ от AI'));
+          return;
+        }
+
+        result.name = result.name || 'Боевой приём';
+        var validKinds = ['Рукопашный', 'Чи-блокинг', 'Оружейный', 'Тактический'];
+        if(validKinds.indexOf(result.kind) === -1) result.kind = kind || 'Рукопашный';
+        result.cost = String(result.cost || '1 ФВН');
+        if(!result.cost.includes('ФВН')) result.cost += ' ФВН';
+        result.opensWindow = result.opensWindow || opensWindow || 'СБИТ';
+        result.trigger = result.trigger || 'Ближний бой';
+        result.effect = result.effect || '';
+        result.desc = result.desc || '';
+
+        window._lastGenAvatarMove = result;
+
+        try {
+          var h = JSON.parse(localStorage.getItem('el_ai_hist_moves') || '[]');
+          h.unshift(result);
+          if(h.length > 20) h.length = 20;
+          localStorage.setItem('el_ai_hist_moves', JSON.stringify(h));
+        } catch(e){}
+
+        var form = document.getElementById('elMoveGenFormSection');
+        var resDiv = document.getElementById('elMoveGenResult');
+        var preview = document.getElementById('elMoveGenPreview');
+
+        if(form) form.style.display = 'none';
+        elShowFade(resDiv);
+
+        if(preview){
+          var dummy = JSON.parse(JSON.stringify(result));
+          dummy.id = 'dummy';
+          preview.innerHTML = renderElMoveCard(dummy).replace(/data-nav="[^"]+"/, 'style="pointer-events:none;"');
+        }
+
+        renderHistory();
+        if(resDiv) resDiv.scrollIntoView({behavior: 'smooth'});
+      });
+    };
+  }
+
+  var btnBack = document.getElementById('btnElMoveBack');
+  if(btnBack){
+    btnBack.onclick = function(){
+      var form = document.getElementById('elMoveGenFormSection');
+      var resDiv = document.getElementById('elMoveGenResult');
+      if(resDiv) resDiv.style.display = 'none';
+      elShowFade(form);
+    };
+  }
+
+  var btnRegen = document.getElementById('btnElMoveRegen');
+  if(btnRegen){
+    btnRegen.onclick = function(){
+      var form = document.getElementById('elMoveGenFormSection');
+      var resDiv = document.getElementById('elMoveGenResult');
+      if(resDiv) resDiv.style.display = 'none';
+      elShowFade(form);
+      if(btnGen) btnGen.click();
+    };
+  }
+
+  var btnSave = document.getElementById('btnElMoveSave');
+  if(btnSave){
+    btnSave.onclick = function(){
+      var move = window._lastGenAvatarMove;
+      if(!move) return;
+
+      var targetId = 'move_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+      var record = {
+        id: targetId,
+        name: move.name,
+        kind: move.kind,
+        cost: move.cost,
+        opensWindow: move.opensWindow,
+        trigger: move.trigger,
+        effect: move.effect,
+        desc: move.desc
+      };
+
+      var list = EL.getMoves();
+      list.unshift(record);
+      EL.saveMoves(list);
+      window.navigate('elMoveView:' + targetId);
+    };
+  }
+}
+window.wireElMoveGen = wireElMoveGen;
 
 
 /* ============================================================
@@ -28194,6 +28827,16 @@ window.render=function(){
       paintShBar();
       return;
     }
+    if(s === 'elTechGen'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      app.innerHTML = elTechGen();
+      _w();
+      if(typeof wireElTechGen === 'function') wireElTechGen();
+      paintShBar();
+      return;
+    }
     if(s === 'elTechView'){
       var app = document.getElementById('app');
       app.classList.remove('wide');
@@ -28221,6 +28864,16 @@ window.render=function(){
       app.innerHTML = elMoves();
       _w();
       if(typeof wireElMoves === 'function') wireElMoves();
+      paintShBar();
+      return;
+    }
+    if(s === 'elMoveGen'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      app.innerHTML = elMoveGen();
+      _w();
+      if(typeof wireElMoveGen === 'function') wireElMoveGen();
       paintShBar();
       return;
     }
@@ -28373,7 +29026,9 @@ window.navigate=function(val){
       elData: 'elData',
       elRef: 'elRef',
       elTechs: 'elTechs',
+      elTechGen: 'elTechGen',
       elMoves: 'elMoves',
+      elMoveGen: 'elMoveGen',
       elMap: 'elMap',
       dice: 'dice'
     };
