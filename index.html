@@ -6814,6 +6814,244 @@ body.el-theme.el-theme-fire {
                radial-gradient(ellipse at 15% 90%, rgba(185, 28, 28, 0.08) 0%, transparent 50%);
 }
 
+/* ============================================================
+   СТИХИЯ: АНИМИРОВАННЫЕ ЭФФЕКТЫ ФОНА (ELEMENTAL BACKGROUND FX)
+   ============================================================ */
+.el-theme-fx {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  display: none;
+}
+body.el-theme .el-theme-fx {
+  display: block;
+}
+
+/* --- ВЕТЕР (WIND): Золотистый вихрь, парящие листья духа и воздушные порывы --- */
+.el-wind-leaf {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 2px 14px 2px 14px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.9) 0%, rgba(245, 158, 11, 0.6) 50%, rgba(217, 119, 6, 0.3) 100%);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
+  will-change: transform, opacity;
+}
+.el-wind-gust {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(253, 230, 138, 0.22) 0%, rgba(245, 158, 11, 0.08) 55%, transparent 80%);
+  filter: blur(14px);
+  will-change: transform, opacity;
+}
+.el-wind-mote {
+  position: absolute;
+  border-radius: 50%;
+  background: #fde68a;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.9), 0 0 16px rgba(245, 158, 11, 0.5);
+  will-change: transform, opacity;
+}
+@keyframes elWindDrift {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.75);
+    opacity: 0;
+  }
+  15% {
+    opacity: var(--w-op, 0.7);
+  }
+  50% {
+    transform: translate3d(var(--w-drift-x, 180px), var(--w-drift-y, 280px), 0) rotate(180deg) scale(1.05);
+    opacity: var(--w-op, 0.7);
+  }
+  85% {
+    opacity: calc(var(--w-op, 0.7) * 0.85);
+  }
+  100% {
+    transform: translate3d(calc(var(--w-drift-x, 180px) * 2), calc(var(--w-drift-y, 280px) * 2), 0) rotate(360deg) scale(0.7);
+    opacity: 0;
+  }
+}
+@keyframes elWindGustWave {
+  0% {
+    transform: translate3d(-30vw, 15vh, 0) scaleX(0.6) scaleY(0.4) rotate(-18deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.45;
+  }
+  75% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate3d(120vw, -35vh, 0) scaleX(1.5) scaleY(0.8) rotate(-10deg);
+    opacity: 0;
+  }
+}
+
+/* --- ВОДА (WATER): Океанические пузыри, каустические лучи и капли росы --- */
+.el-water-bubble {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 32%, rgba(255, 255, 255, 0.9) 0%, rgba(56, 189, 248, 0.5) 30%, rgba(14, 165, 233, 0.15) 70%, rgba(2, 132, 199, 0.05) 100%);
+  border: 1px solid rgba(125, 211, 252, 0.4);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.45), inset 0 0 6px rgba(255, 255, 255, 0.35);
+  will-change: transform, opacity;
+}
+.el-water-caustic {
+  position: absolute;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.16) 0%, rgba(14, 165, 233, 0.06) 65%, transparent 100%);
+  filter: blur(18px);
+  will-change: transform, opacity;
+}
+.el-water-droplet {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: #7dd3fc;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.9), 0 0 18px rgba(14, 165, 233, 0.6);
+  will-change: transform, opacity;
+}
+@keyframes elWaterFloatUp {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    opacity: var(--wb-op, 0.7);
+  }
+  50% {
+    transform: translate3d(var(--wb-sway, 25px), calc(var(--wb-dist, -600px) * 0.5), 0) scale(1.08);
+    opacity: var(--wb-op, 0.7);
+  }
+  85% {
+    opacity: var(--wb-op, 0.7);
+  }
+  100% {
+    transform: translate3d(calc(var(--wb-sway, 25px) * -0.5), var(--wb-dist, -600px), 0) scale(0.85);
+    opacity: 0;
+  }
+}
+@keyframes elWaterCausticSway {
+  0%, 100% {
+    transform: translateX(0) scaleX(1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translateX(45px) scaleX(1.3);
+    opacity: 0.35;
+  }
+}
+
+/* --- ОГОНЬ (FIRE): Восходящие раскаленные искры, угли и жар кальдеры --- */
+.el-fire-ember {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, #ffffff 0%, #fef08a 25%, #f97316 65%, #dc2626 100%);
+  box-shadow: 0 0 8px #f59e0b, 0 0 16px #ef4444, 0 0 28px rgba(239, 68, 68, 0.65);
+  will-change: transform, opacity;
+}
+.el-fire-ash {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: #78350f;
+  box-shadow: 0 0 5px rgba(249, 115, 22, 0.45);
+  will-change: transform, opacity;
+}
+.el-fire-glow-spot {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.28) 0%, rgba(249, 115, 22, 0.12) 50%, transparent 75%);
+  filter: blur(32px);
+  will-change: transform, opacity;
+}
+@keyframes elFireEmberRise {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--fe-op, 0.95);
+  }
+  40% {
+    transform: translate3d(var(--fe-drift, 30px), calc(var(--fe-h, -500px) * 0.4), 0) scale(1.2);
+    opacity: var(--fe-op, 0.95);
+  }
+  75% {
+    transform: translate3d(calc(var(--fe-drift, 30px) * -0.6), calc(var(--fe-h, -500px) * 0.75), 0) scale(0.85);
+    opacity: calc(var(--fe-op, 0.95) * 0.65);
+  }
+  100% {
+    transform: translate3d(calc(var(--fe-drift, 30px) * 0.8), var(--fe-h, -500px), 0) scale(0.35);
+    opacity: 0;
+  }
+}
+@keyframes elFireCalderaPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.75;
+  }
+}
+
+/* --- ЗЕМЛЯ (EARTH): Парящие кристаллы нефрита, резонанс и геомантическая пыльца --- */
+.el-earth-crystal {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 2px;
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.5) 0%, rgba(16, 185, 129, 0.25) 55%, rgba(5, 150, 105, 0.12) 100%);
+  border: 1px solid rgba(110, 231, 183, 0.45);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.45), inset 0 0 8px rgba(110, 231, 183, 0.35);
+  will-change: transform, opacity;
+}
+.el-earth-mote {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: #6ee7b7;
+  box-shadow: 0 0 8px #10b981, 0 0 16px rgba(16, 185, 129, 0.6);
+  will-change: transform, opacity;
+}
+.el-earth-resonance {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, rgba(5, 150, 105, 0.08) 50%, transparent 75%);
+  filter: blur(28px);
+  will-change: transform, opacity;
+}
+@keyframes elEarthLevitate {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(45deg) scale(0.9);
+    opacity: var(--ec-op, 0.65);
+  }
+  50% {
+    transform: translate3d(var(--ec-drift-x, 18px), var(--ec-drift-y, -38px), 0) rotate(70deg) scale(1.1);
+    opacity: calc(var(--ec-op, 0.65) * 1.35);
+  }
+}
+@keyframes elEarthPulse {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.65;
+  }
+}
+
 body.el-theme .hb-seg-btn.on {
   background: var(--el-gradient) !important;
   color: #ffffff !important;
@@ -21617,13 +21855,257 @@ var EL = window.EL = window.EL || {
   },
   applyTheme: function(){
     if(typeof document === 'undefined' || !document.body) return;
+    var fx = document.getElementById('elThemeFx');
     if(typeof HB === 'undefined' || HB.mode !== 'el'){
-      document.body.classList.remove('el-theme-wind', 'el-theme-water', 'el-theme-fire', 'el-theme-earth');
+      document.body.classList.remove('el-theme', 'el-theme-wind', 'el-theme-water', 'el-theme-fire', 'el-theme-earth');
+      if(fx) fx.style.display = 'none';
       return;
     }
     var t = EL.getTheme();
     document.body.classList.remove('el-theme-wind', 'el-theme-water', 'el-theme-fire', 'el-theme-earth');
     document.body.classList.add('el-theme-' + t);
+    EL.updateThemeFx(t);
+  },
+  updateThemeFx: function(theme){
+    if(typeof document === 'undefined' || !document.body) return;
+    var cont = document.getElementById('elThemeFx');
+    if(!cont){
+      cont = document.createElement('div');
+      cont.id = 'elThemeFx';
+      cont.className = 'el-theme-fx';
+      cont.setAttribute('aria-hidden', 'true');
+      document.body.insertBefore(cont, document.body.firstChild);
+    }
+    cont.style.display = 'block';
+    if(cont.getAttribute('data-theme') === theme && cont.children.length > 0) return;
+    cont.setAttribute('data-theme', theme);
+    cont.innerHTML = '';
+    EL.buildThemeFx(cont, theme);
+  },
+  buildThemeFx: function(cont, theme){
+    if(theme === 'wind'){
+      // 3 плавных ветровых потока / воздушных порыва
+      for(var g = 0; g < 3; g++){
+        var gust = document.createElement('div');
+        gust.className = 'el-wind-gust';
+        var gw = Math.floor(400 + Math.random() * 250);
+        var gh = Math.floor(130 + Math.random() * 90);
+        gust.style.width = gw + 'px';
+        gust.style.height = gh + 'px';
+        gust.style.top = (15 + g * 28 + (Math.random() * 10 - 5)) + '%';
+        gust.style.left = (-25 + Math.random() * 15) + 'vw';
+        var gdur = (16 + Math.random() * 8).toFixed(1);
+        var gdel = (-Math.random() * 20).toFixed(1);
+        gust.style.animation = 'elWindGustWave ' + gdur + 's cubic-bezier(0.4, 0, 0.2, 1) ' + gdel + 's infinite';
+        cont.appendChild(gust);
+      }
+      // 22 парящих золотых/янтарных листа духа
+      for(var i = 0; i < 22; i++){
+        var leaf = document.createElement('div');
+        leaf.className = 'el-wind-leaf';
+        var lw = Math.floor(12 + Math.random() * 14);
+        var lh = Math.floor(7 + Math.random() * 8);
+        leaf.style.width = lw + 'px';
+        leaf.style.height = lh + 'px';
+        leaf.style.left = (Math.random() * 110 - 10).toFixed(2) + '%';
+        leaf.style.top = (Math.random() * 110 - 10).toFixed(2) + '%';
+        var driftX = Math.floor(180 + Math.random() * 240);
+        var driftY = Math.floor(240 + Math.random() * 320);
+        var ldur = (10 + Math.random() * 9).toFixed(1);
+        var ldel = (-Math.random() * 20).toFixed(1);
+        var lop = (0.55 + Math.random() * 0.40).toFixed(2);
+        leaf.style.setProperty('--w-drift-x', driftX + 'px');
+        leaf.style.setProperty('--w-drift-y', driftY + 'px');
+        leaf.style.setProperty('--w-op', lop);
+        leaf.style.animation = 'elWindDrift ' + ldur + 's ease-in-out ' + ldel + 's infinite';
+        cont.appendChild(leaf);
+      }
+      // 16 золотых воздушных пылинок
+      for(var m = 0; m < 16; m++){
+        var mote = document.createElement('div');
+        mote.className = 'el-wind-mote';
+        var msize = Math.floor(2 + Math.random() * 4);
+        mote.style.width = msize + 'px';
+        mote.style.height = msize + 'px';
+        mote.style.left = (Math.random() * 100).toFixed(2) + '%';
+        mote.style.top = (Math.random() * 100).toFixed(2) + '%';
+        var mdriftX = Math.floor(220 + Math.random() * 280);
+        var mdriftY = Math.floor(150 + Math.random() * 220);
+        var mdur = (7 + Math.random() * 8).toFixed(1);
+        var mdel = (-Math.random() * 15).toFixed(1);
+        var mop = (0.60 + Math.random() * 0.35).toFixed(2);
+        mote.style.setProperty('--w-drift-x', mdriftX + 'px');
+        mote.style.setProperty('--w-drift-y', mdriftY + 'px');
+        mote.style.setProperty('--w-op', mop);
+        mote.style.animation = 'elWindDrift ' + mdur + 's ease-in-out ' + mdel + 's infinite';
+        cont.appendChild(mote);
+      }
+    } else if(theme === 'water'){
+      // 3 каустических подводных световых луча
+      for(var c = 0; c < 3; c++){
+        var cBeam = document.createElement('div');
+        cBeam.className = 'el-water-caustic';
+        var cw = Math.floor(220 + Math.random() * 180);
+        cBeam.style.width = cw + 'px';
+        cBeam.style.height = '100vh';
+        cBeam.style.top = '0';
+        cBeam.style.left = (12 + c * 34 + (Math.random() * 8 - 4)) + '%';
+        var cdur = (14 + Math.random() * 10).toFixed(1);
+        var cdel = (-Math.random() * 20).toFixed(1);
+        cBeam.style.animation = 'elWaterCausticSway ' + cdur + 's ease-in-out ' + cdel + 's infinite';
+        cont.appendChild(cBeam);
+      }
+      // 24 светящихся лазурных пузырька
+      for(var b = 0; b < 24; b++){
+        var bub = document.createElement('div');
+        bub.className = 'el-water-bubble';
+        var bsize = Math.floor(8 + Math.random() * 18);
+        bub.style.width = bsize + 'px';
+        bub.style.height = bsize + 'px';
+        bub.style.left = (Math.random() * 96 + 2).toFixed(2) + '%';
+        bub.style.bottom = '-40px';
+        var bdist = -Math.floor(750 + Math.random() * 550);
+        var bsway = Math.floor((Math.random() * 60) - 30);
+        var bdur = (13 + Math.random() * 13).toFixed(1);
+        var bdel = (-Math.random() * 26).toFixed(1);
+        var bop = (0.55 + Math.random() * 0.40).toFixed(2);
+        bub.style.setProperty('--wb-dist', bdist + 'px');
+        bub.style.setProperty('--wb-sway', bsway + 'px');
+        bub.style.setProperty('--wb-op', bop);
+        bub.style.animation = 'elWaterFloatUp ' + bdur + 's ease-in-out ' + bdel + 's infinite';
+        cont.appendChild(bub);
+      }
+      // 14 мерцающих водяных капель
+      for(var d = 0; d < 14; d++){
+        var drop = document.createElement('div');
+        drop.className = 'el-water-droplet';
+        var dsize = Math.floor(2 + Math.random() * 4);
+        drop.style.width = dsize + 'px';
+        drop.style.height = dsize + 'px';
+        drop.style.left = (Math.random() * 96 + 2).toFixed(2) + '%';
+        drop.style.bottom = '-30px';
+        var ddist = -Math.floor(650 + Math.random() * 500);
+        var dsway = Math.floor((Math.random() * 40) - 20);
+        var ddur = (9 + Math.random() * 9).toFixed(1);
+        var ddel = (-Math.random() * 18).toFixed(1);
+        var dop = (0.65 + Math.random() * 0.35).toFixed(2);
+        drop.style.setProperty('--wb-dist', ddist + 'px');
+        drop.style.setProperty('--wb-sway', dsway + 'px');
+        drop.style.setProperty('--wb-op', dop);
+        drop.style.animation = 'elWaterFloatUp ' + ddur + 's ease-in-out ' + ddel + 's infinite';
+        cont.appendChild(drop);
+      }
+    } else if(theme === 'fire'){
+      // 2 пульсирующих пятна жара кальдеры
+      for(var fg = 0; fg < 2; fg++){
+        var glow = document.createElement('div');
+        glow.className = 'el-fire-glow-spot';
+        var gw = Math.floor(400 + Math.random() * 220);
+        var gh = Math.floor(280 + Math.random() * 140);
+        glow.style.width = gw + 'px';
+        glow.style.height = gh + 'px';
+        glow.style.bottom = '-90px';
+        glow.style.left = (fg === 0 ? '10%' : '58%');
+        var fdur = (7 + Math.random() * 5).toFixed(1);
+        glow.style.animation = 'elFireCalderaPulse ' + fdur + 's ease-in-out infinite alternate';
+        cont.appendChild(glow);
+      }
+      // 34 раскаленные восходящие искры
+      for(var e = 0; e < 34; e++){
+        var ember = document.createElement('div');
+        ember.className = 'el-fire-ember';
+        var esize = Math.floor(3 + Math.random() * 5);
+        ember.style.width = esize + 'px';
+        ember.style.height = esize + 'px';
+        ember.style.left = (Math.random() * 98 + 1).toFixed(2) + '%';
+        ember.style.bottom = '-20px';
+        var eh = -Math.floor(550 + Math.random() * 650);
+        var edrift = Math.floor((Math.random() * 90) - 45);
+        var edur = (5 + Math.random() * 8).toFixed(1);
+        var edel = (-Math.random() * 14).toFixed(1);
+        var eop = (0.70 + Math.random() * 0.30).toFixed(2);
+        ember.style.setProperty('--fe-h', eh + 'px');
+        ember.style.setProperty('--fe-drift', edrift + 'px');
+        ember.style.setProperty('--fe-op', eop);
+        ember.style.animation = 'elFireEmberRise ' + edur + 's cubic-bezier(0.25, 0.46, 0.45, 0.94) ' + edel + 's infinite';
+        cont.appendChild(ember);
+      }
+      // 12 темных пепельных хлопьев
+      for(var a = 0; a < 12; a++){
+        var ash = document.createElement('div');
+        ash.className = 'el-fire-ash';
+        var asize = Math.floor(2 + Math.random() * 4);
+        ash.style.width = asize + 'px';
+        ash.style.height = asize + 'px';
+        ash.style.left = (Math.random() * 98 + 1).toFixed(2) + '%';
+        ash.style.bottom = '-20px';
+        var ah = -Math.floor(400 + Math.random() * 550);
+        var adrift = Math.floor((Math.random() * 120) - 60);
+        var adur = (8 + Math.random() * 9).toFixed(1);
+        var adel = (-Math.random() * 17).toFixed(1);
+        ash.style.setProperty('--fe-h', ah + 'px');
+        ash.style.setProperty('--fe-drift', adrift + 'px');
+        ash.style.setProperty('--fe-op', '0.45');
+        ash.style.animation = 'elFireEmberRise ' + adur + 's ease-in-out ' + adel + 's infinite';
+        cont.appendChild(ash);
+      }
+    } else {
+      // Earth (Земля - default/fallback)
+      // 2 изумрудных резонансных свечения
+      for(var eg = 0; eg < 2; eg++){
+        var eglow = document.createElement('div');
+        eglow.className = 'el-earth-resonance';
+        var ew = Math.floor(450 + Math.random() * 200);
+        var eh2 = Math.floor(320 + Math.random() * 150);
+        eglow.style.width = ew + 'px';
+        eglow.style.height = eh2 + 'px';
+        eglow.style.top = (eg === 0 ? '15%' : '60%');
+        eglow.style.left = (eg === 0 ? '-10%' : '65%');
+        var edur2 = (9 + Math.random() * 6).toFixed(1);
+        eglow.style.animation = 'elEarthPulse ' + edur2 + 's ease-in-out infinite alternate';
+        cont.appendChild(eglow);
+      }
+      // 20 парящих кристаллов нефрита в левитации
+      for(var k = 0; k < 20; k++){
+        var cryst = document.createElement('div');
+        cryst.className = 'el-earth-crystal';
+        var csize = Math.floor(9 + Math.random() * 15);
+        cryst.style.width = csize + 'px';
+        cryst.style.height = csize + 'px';
+        cryst.style.left = (Math.random() * 92 + 4).toFixed(2) + '%';
+        cryst.style.top = (Math.random() * 88 + 6).toFixed(2) + '%';
+        var cdriftX = Math.floor((Math.random() * 50) - 25);
+        var cdriftY = Math.floor((Math.random() * 70) - 35);
+        var cdurt = (8 + Math.random() * 10).toFixed(1);
+        var cdelt = (-Math.random() * 18).toFixed(1);
+        var cop2 = (0.50 + Math.random() * 0.40).toFixed(2);
+        cryst.style.setProperty('--ec-drift-x', cdriftX + 'px');
+        cryst.style.setProperty('--ec-drift-y', cdriftY + 'px');
+        cryst.style.setProperty('--ec-op', cop2);
+        cryst.style.animation = 'elEarthLevitate ' + cdurt + 's ease-in-out ' + cdelt + 's infinite';
+        cont.appendChild(cryst);
+      }
+      // 16 светящихся нефритовых песчинок
+      for(var m2 = 0; m2 < 16; m2++){
+        var emote = document.createElement('div');
+        emote.className = 'el-earth-mote';
+        var emsize = Math.floor(2 + Math.random() * 4);
+        emote.style.width = emsize + 'px';
+        emote.style.height = emsize + 'px';
+        emote.style.left = (Math.random() * 94 + 3).toFixed(2) + '%';
+        emote.style.top = (Math.random() * 90 + 5).toFixed(2) + '%';
+        var edriftX2 = Math.floor((Math.random() * 40) - 20);
+        var edriftY2 = Math.floor((Math.random() * 60) - 30);
+        var edur3 = (6 + Math.random() * 8).toFixed(1);
+        var edel2 = (-Math.random() * 14).toFixed(1);
+        var eop2 = (0.60 + Math.random() * 0.35).toFixed(2);
+        emote.style.setProperty('--ec-drift-x', edriftX2 + 'px');
+        emote.style.setProperty('--ec-drift-y', edriftY2 + 'px');
+        emote.style.setProperty('--ec-op', eop2);
+        emote.style.animation = 'elEarthLevitate ' + edur3 + 's ease-in-out ' + edel2 + 's infinite';
+        cont.appendChild(emote);
+      }
+    }
   }
 };
 
