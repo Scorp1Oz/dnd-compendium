@@ -7870,6 +7870,285 @@ body.el-theme .el-calc-result-box {
   margin-top: 14px;
 }
 
+/* ============================================================
+   КАСТОМНЫЕ СТИЛИЗОВАННЫЕ ВЫПАДАЮЩИЕ СПИСКИ (CUSTOM THEMED SELECTS)
+   ============================================================ */
+:root, html, body, select, option, optgroup {
+  color-scheme: dark !important;
+}
+
+select {
+  color-scheme: dark !important;
+  background-color: var(--steel-0, #0e1013);
+  color: var(--ink, #e2e8f0);
+}
+
+select option, select optgroup {
+  background-color: #0e1218 !important;
+  color: #f1f5f9 !important;
+  padding: 8px 12px;
+}
+
+.ttc-select-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.ttc-select-native {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.ttc-select-btn {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--steel-0, #0e1013);
+  border: 1px solid var(--line, #3a3f46);
+  border-left: 3px solid var(--brass, #c9a45c);
+  border-radius: 4px;
+  color: var(--ink, #f1f5f9);
+  padding: 9px 36px 9px 13px;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+}
+
+/* Шиноби */
+body.sh-theme .ttc-select-btn {
+  background: linear-gradient(135deg, rgba(22, 18, 14, 0.98) 0%, rgba(14, 11, 8, 0.98) 100%);
+  border-color: rgba(201, 164, 92, 0.3);
+  border-left: 3px solid #c9a45c;
+  color: #f5eedb;
+}
+body.sh-theme .ttc-select-btn:hover,
+body.sh-theme .ttc-select-btn.open {
+  border-color: #c9a45c;
+  box-shadow: 0 0 14px rgba(201, 164, 92, 0.35);
+}
+
+/* Космос */
+body.me-theme .ttc-select-btn {
+  background: rgba(10, 16, 26, 0.96);
+  border-color: rgba(56, 189, 248, 0.3);
+  border-left: 3px solid #38bdf8;
+  color: #e0f2fe;
+}
+body.me-theme .ttc-select-btn:hover,
+body.me-theme .ttc-select-btn.open {
+  border-color: #38bdf8;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+}
+
+/* Стихия */
+body.el-theme .ttc-select-btn {
+  background: var(--el-card-bg, rgba(10, 18, 14, 0.92));
+  border-color: var(--el-accent-border, rgba(16, 185, 129, 0.25));
+  border-left: 3px solid var(--el-accent, #10b981);
+  color: var(--el-title-color, #f0fdf4);
+}
+body.el-theme .ttc-select-btn:hover,
+body.el-theme .ttc-select-btn.open {
+  border-color: var(--el-accent, #10b981);
+  box-shadow: 0 0 14px var(--el-accent-glow, rgba(16, 185, 129, 0.35));
+}
+
+.ttc-select-btn:hover {
+  border-color: var(--brass, #c9a45c);
+  box-shadow: 0 0 12px rgba(201, 164, 92, 0.25);
+}
+.ttc-select-btn.open {
+  border-color: var(--brass, #c9a45c);
+  box-shadow: 0 0 16px rgba(201, 164, 92, 0.35);
+}
+
+.ttc-select-val {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ttc-select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--line, #94a3b8);
+  pointer-events: none;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.15s ease;
+}
+.ttc-select-btn:hover .ttc-select-arrow,
+.ttc-select-btn.open .ttc-select-arrow {
+  color: var(--brass, #c9a45c);
+}
+body.sh-theme .ttc-select-arrow { color: #c9a45c; }
+body.me-theme .ttc-select-arrow { color: #38bdf8; }
+body.el-theme .ttc-select-arrow { color: var(--el-accent, #10b981); }
+
+.ttc-select-btn.open .ttc-select-arrow {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.ttc-select-menu {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  min-width: 240px;
+  max-height: 285px;
+  overflow-y: auto;
+  background: rgba(14, 18, 24, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9), 0 0 25px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  padding: 6px 0;
+  margin: 4px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+  animation: ttcMenuFadeIn 0.15s ease-out;
+}
+@keyframes ttcMenuFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ttc-select-menu.flip-up {
+  bottom: calc(100% + 4px);
+  top: auto;
+  animation: ttcMenuFadeInUp 0.15s ease-out;
+}
+@keyframes ttcMenuFadeInUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body.sh-theme .ttc-select-menu {
+  background: rgba(18, 14, 11, 0.98);
+  border-color: rgba(201, 164, 92, 0.4);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.95), 0 0 25px rgba(201, 164, 92, 0.2);
+  scrollbar-color: rgba(201, 164, 92, 0.3) transparent;
+}
+body.me-theme .ttc-select-menu {
+  background: rgba(9, 14, 22, 0.98);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.95), 0 0 25px rgba(56, 189, 248, 0.2);
+  scrollbar-color: rgba(56, 189, 248, 0.3) transparent;
+}
+body.el-theme .ttc-select-menu {
+  background: var(--el-tray-bg, rgba(8, 14, 11, 0.98));
+  border-color: var(--el-accent-border, rgba(16, 185, 129, 0.4));
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.95), 0 0 25px var(--el-accent-glow, rgba(16, 185, 129, 0.25));
+  scrollbar-color: var(--el-accent-border, rgba(16, 185, 129, 0.3)) transparent;
+}
+
+.ttc-select-menu::-webkit-scrollbar {
+  width: 6px;
+}
+.ttc-select-menu::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+.ttc-select-menu::-webkit-scrollbar-thumb:hover {
+  background: var(--brass, #c9a45c);
+}
+body.el-theme .ttc-select-menu::-webkit-scrollbar-thumb:hover {
+  background: var(--el-accent, #10b981);
+}
+body.me-theme .ttc-select-menu::-webkit-scrollbar-thumb:hover {
+  background: #38bdf8;
+}
+
+.ttc-select-item {
+  padding: 10px 16px;
+  font-size: 14.5px;
+  color: #cbd5e1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  user-select: none;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.ttc-select-item:hover,
+.ttc-select-item.focused {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+body.sh-theme .ttc-select-item:hover,
+body.sh-theme .ttc-select-item.focused {
+  background: rgba(201, 164, 92, 0.18);
+  color: #ffffff;
+}
+body.me-theme .ttc-select-item:hover,
+body.me-theme .ttc-select-item.focused {
+  background: rgba(56, 189, 248, 0.18);
+  color: #ffffff;
+}
+body.el-theme .ttc-select-item:hover,
+body.el-theme .ttc-select-item.focused {
+  background: var(--el-accent-dim, rgba(16, 185, 129, 0.2));
+  color: #ffffff;
+}
+
+.ttc-select-item.selected {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-weight: 600;
+}
+body.sh-theme .ttc-select-item.selected {
+  background: rgba(201, 164, 92, 0.25);
+  color: #f3d37a;
+}
+body.me-theme .ttc-select-item.selected {
+  background: rgba(56, 189, 248, 0.25);
+  color: #7dd3fc;
+}
+body.el-theme .ttc-select-item.selected {
+  background: var(--el-accent-dim, rgba(16, 185, 129, 0.28));
+  color: var(--el-highlight, #6ee7b7);
+}
+
+.ttc-select-check {
+  font-size: 13px;
+  font-weight: 800;
+  color: #94a3b8;
+  opacity: 0;
+  transition: opacity 0.12s;
+  flex-shrink: 0;
+}
+.ttc-select-item.selected .ttc-select-check {
+  opacity: 1;
+}
+body.sh-theme .ttc-select-check { color: #c9a45c; }
+body.me-theme .ttc-select-check { color: #38bdf8; }
+body.el-theme .ttc-select-check { color: var(--el-accent, #10b981); }
+
 </style>
 </head>
 <body>
@@ -10490,6 +10769,183 @@ function escapeHtml(s){
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+/* ---------- Кастомные стилизованные селекты (Custom Themed Selects) ---------- */
+function enhanceCustomSelect(sel){
+  if(!sel || sel.__cSelectEnhanced || sel.classList.contains('no-custom-select')) return;
+  sel.__cSelectEnhanced = true;
+
+  var wrap = document.createElement('div');
+  wrap.className = 'ttc-select-wrap';
+  if(sel.id) wrap.id = sel.id + '_wrap';
+  if(sel.className) {
+    if(sel.classList.contains('el-select')) wrap.classList.add('el-select-wrap');
+    if(sel.classList.contains('me-input')) wrap.classList.add('me-select-wrap');
+    if(sel.classList.contains('sh-route-preset-sel')) wrap.classList.add('sh-route-preset-wrap');
+  }
+
+  sel.classList.add('ttc-select-native');
+
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'ttc-select-btn';
+  var valSpan = document.createElement('span');
+  valSpan.className = 'ttc-select-val';
+  var arrowSpan = document.createElement('span');
+  arrowSpan.className = 'ttc-select-arrow';
+  arrowSpan.textContent = '▼';
+  btn.appendChild(valSpan);
+  btn.appendChild(arrowSpan);
+
+  var menu = document.createElement('div');
+  menu.className = 'ttc-select-menu';
+  menu.style.display = 'none';
+
+  function syncTrigger(){
+    var opt = sel.options && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
+    valSpan.textContent = opt ? opt.textContent : (sel.getAttribute('placeholder') || '— выберите —');
+  }
+  sel._syncCustomSelect = syncTrigger;
+
+  function rebuildMenu(){
+    menu.innerHTML = '';
+    var opts = Array.from(sel.options || []);
+    if(opts.length === 0){
+      var empty = document.createElement('div');
+      empty.className = 'ttc-select-item';
+      empty.style.color = '#64748b';
+      empty.style.fontStyle = 'italic';
+      empty.textContent = '— нет вариантов —';
+      menu.appendChild(empty);
+      return;
+    }
+    opts.forEach(function(opt, idx){
+      var item = document.createElement('div');
+      item.className = 'ttc-select-item' + (opt.selected ? ' selected' : '');
+      item.setAttribute('data-val', opt.value);
+      
+      var textSpan = document.createElement('span');
+      textSpan.textContent = opt.textContent;
+      
+      var checkSpan = document.createElement('span');
+      checkSpan.className = 'ttc-select-check';
+      checkSpan.textContent = '✓';
+
+      item.appendChild(textSpan);
+      item.appendChild(checkSpan);
+
+      item.addEventListener('click', function(e){
+        e.stopPropagation();
+        sel.selectedIndex = idx;
+        sel.value = opt.value;
+        syncTrigger();
+        closeMenu();
+        if(typeof sel.onchange === 'function') {
+          try { sel.onchange.call(sel, new Event('change')); } catch(err){}
+        }
+        sel.dispatchEvent(new Event('input', { bubbles: true }));
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      menu.appendChild(item);
+    });
+  }
+  sel._rebuildCustomMenu = rebuildMenu;
+
+  function openMenu(){
+    document.querySelectorAll('.ttc-select-menu.open').forEach(function(m){
+      m.classList.remove('open');
+      m.style.display = 'none';
+    });
+    document.querySelectorAll('.ttc-select-btn.open').forEach(function(b){
+      b.classList.remove('open');
+    });
+
+    var rect = btn.getBoundingClientRect();
+    var spaceBelow = window.innerHeight - rect.bottom;
+    var spaceAbove = rect.top;
+    var estHeight = Math.min(285, (sel.options ? sel.options.length : 1) * 42 + 16);
+    
+    if(spaceBelow < estHeight && spaceAbove > spaceBelow){
+      menu.classList.add('flip-up');
+    } else {
+      menu.classList.remove('flip-up');
+    }
+
+    rebuildMenu();
+    btn.classList.add('open');
+    menu.classList.add('open');
+    menu.style.display = 'block';
+
+    var curSelected = menu.querySelector('.ttc-select-item.selected');
+    if(curSelected){
+      curSelected.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  function closeMenu(){
+    btn.classList.remove('open');
+    menu.classList.remove('open');
+    menu.style.display = 'none';
+  }
+
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(menu.classList.contains('open')){
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  var observer = new MutationObserver(function(){
+    syncTrigger();
+    if(menu.classList.contains('open')){
+      rebuildMenu();
+    }
+  });
+  observer.observe(sel, { childList: true, subtree: true, attributes: true });
+
+  sel.addEventListener('change', syncTrigger);
+  syncTrigger();
+
+  if(sel.parentNode){
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(btn);
+    wrap.appendChild(menu);
+    wrap.appendChild(sel);
+  }
+}
+
+function enhanceAllCustomSelects(){
+  document.querySelectorAll('select:not(.no-custom-select)').forEach(enhanceCustomSelect);
+}
+window.enhanceAllCustomSelects = enhanceAllCustomSelects;
+
+if(typeof window !== 'undefined' && !window.__ttcSelectGlobalBound){
+  window.__ttcSelectGlobalBound = true;
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('.ttc-select-wrap')){
+      document.querySelectorAll('.ttc-select-menu.open').forEach(function(m){
+        m.classList.remove('open');
+        m.style.display = 'none';
+      });
+      document.querySelectorAll('.ttc-select-btn.open').forEach(function(b){
+        b.classList.remove('open');
+      });
+    }
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      document.querySelectorAll('.ttc-select-menu.open').forEach(function(m){
+        m.classList.remove('open');
+        m.style.display = 'none';
+      });
+      document.querySelectorAll('.ttc-select-btn.open').forEach(function(b){
+        b.classList.remove('open');
+      });
+    }
+  });
+}
+
 function wireEvents(){
   document.querySelectorAll('[data-go]').forEach(el=>{
     el.addEventListener('click', ()=>{
@@ -10991,6 +11447,7 @@ function wireEvents(){
       render();
     });
   });
+  enhanceAllCustomSelects();
 }
 
 function navigate(val){
