@@ -7482,6 +7482,305 @@ body.el-theme .el-ref-copy-btn:hover {
   border-color: var(--el-accent);
   box-shadow: 0 0 12px var(--el-accent-glow);
 }
+
+
+/* ============================================================
+   СТИХИЯ: ФОРМЫ (TECHS), ПРИЁМЫ (MOVES), КАРТА МИРА (MAP)
+   ============================================================ */
+body.el-theme .el-filter-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 10px;
+  margin-bottom: 12px;
+  scrollbar-width: thin;
+}
+body.el-theme .el-filter-bar::-webkit-scrollbar {
+  height: 4px;
+}
+body.el-theme .el-filter-bar::-webkit-scrollbar-thumb {
+  background: var(--el-accent-border);
+  border-radius: 2px;
+}
+body.el-theme .el-filter-pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--el-accent-border);
+  color: #cbd5e1;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+body.el-theme .el-filter-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--el-accent);
+  color: #fff;
+  transform: translateY(-1px);
+}
+body.el-theme .el-filter-pill.active {
+  background: var(--el-accent);
+  border-color: var(--el-accent);
+  color: #fff;
+  box-shadow: 0 0 12px var(--el-accent-glow);
+}
+body.el-theme .el-filter-pill .pill-cnt {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  opacity: 0.85;
+}
+body.el-theme .el-filter-pill.active .pill-cnt {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Карточки форм и приёмов */
+body.el-theme .el-tech-card,
+body.el-theme .el-move-card {
+  background: var(--el-card-bg);
+  border: 1px solid var(--el-accent-border);
+  border-radius: 6px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+body.el-theme .el-tech-card:hover,
+body.el-theme .el-move-card:hover {
+  border-color: var(--el-accent);
+  box-shadow: 0 6px 20px var(--el-accent-glow);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.04);
+}
+body.el-theme .el-tech-card.elem-fire { border-left: 4px solid #ef4444; }
+body.el-theme .el-tech-card.elem-water { border-left: 4px solid #38bdf8; }
+body.el-theme .el-tech-card.elem-earth { border-left: 4px solid #34d399; }
+body.el-theme .el-tech-card.elem-wind  { border-left: 4px solid #fbbf24; }
+
+body.el-theme .el-move-card.kind-melee    { border-left: 4px solid #f97316; }
+body.el-theme .el-move-card.kind-weapon   { border-left: 4px solid #94a3b8; }
+body.el-theme .el-move-card.kind-chi      { border-left: 4px solid #a855f7; }
+body.el-theme .el-move-card.kind-tactical { border-left: 4px solid #38bdf8; }
+
+body.el-theme .el-item-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 8px;
+}
+body.el-theme .el-mini-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+}
+body.el-theme .el-mini-tag.tag-cost {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+body.el-theme .el-mini-tag.tag-win {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+}
+body.el-theme .el-mini-tag.tag-benefit {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #7dd3fc;
+}
+
+body.el-theme .el-item-name {
+  font-size: 17.5px;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+}
+body.el-theme .el-item-line {
+  font-size: 12.5px;
+  color: #94a3b8;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 6px;
+}
+body.el-theme .el-item-desc {
+  font-size: 13.5px;
+  color: #cbd5e1;
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+/* Формы редактирования */
+body.el-theme .el-form-card {
+  background: var(--el-card-bg);
+  border: 1px solid var(--el-accent-border);
+  border-left: 4px solid var(--el-accent);
+  border-radius: 6px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+body.el-theme .el-field-group {
+  margin-bottom: 14px;
+}
+body.el-theme .el-field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--el-tag-text);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+}
+body.el-theme .el-field-hint {
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin-top: 4px;
+  font-style: italic;
+}
+body.el-theme .el-input,
+body.el-theme .el-select,
+body.el-theme .el-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--el-accent-border);
+  color: #fff;
+  padding: 9px 12px;
+  border-radius: 4px;
+  font-size: 13.5px;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+body.el-theme .el-input:focus,
+body.el-theme .el-select:focus,
+body.el-theme .el-textarea:focus {
+  outline: none;
+  border-color: var(--el-accent);
+  box-shadow: 0 0 10px var(--el-accent-glow);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* КАРТА МИРА (EL-MAP) */
+body.el-theme .el-map-outer {
+  background: #070c14;
+  border: 1px solid var(--el-accent-border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7);
+  margin-bottom: 20px;
+  position: relative;
+}
+body.el-theme .el-map-header {
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid var(--el-accent-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+body.el-theme .el-map-legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #94a3b8;
+}
+body.el-theme .el-map-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+body.el-theme .el-map-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+body.el-theme .el-map-canvas-wrap {
+  width: 100%;
+  position: relative;
+  background: radial-gradient(circle at 50% 50%, #111b2b 0%, #070d18 100%);
+  overflow: hidden;
+}
+body.el-theme .el-map-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  user-select: none;
+}
+
+/* Анимация пульса активного пина на карте */
+@keyframes elPinPulseAnim {
+  0% { r: 9; opacity: 0.9; stroke-width: 2; }
+  50% { r: 18; opacity: 0.4; stroke-width: 1.5; }
+  100% { r: 26; opacity: 0; stroke-width: 0.5; }
+}
+body.el-theme .el-pin-pulse {
+  animation: elPinPulseAnim 1.8s infinite ease-out;
+  transform-origin: center;
+  pointer-events: none;
+}
+body.el-theme .el-map-pin {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+body.el-theme .el-map-pin:hover {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+}
+body.el-theme .el-map-pin text {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  text-shadow: 0 1px 4px #000, 0 0 6px #000;
+  pointer-events: none;
+}
+
+/* Досье локации и калькулятор */
+body.el-theme .el-loc-dossier {
+  background: var(--el-card-bg);
+  border: 1px solid var(--el-accent-border);
+  border-radius: 6px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+body.el-theme .el-calc-card {
+  background: var(--el-card-bg);
+  border: 1px solid var(--el-accent-border);
+  border-radius: 6px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+}
+body.el-theme .el-calc-result-box {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--el-accent-border);
+  border-left: 4px solid var(--el-accent);
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+
 </style>
 </head>
 <body>
@@ -22331,8 +22630,11 @@ function elHome(){
   '</div>';
 
   var items = [
-    { nav: 'elRef',  icon: '📚', t: 'Справочник', d: 'Полный свод правил, боевой механики, магии четырёх стихий и законов мира' },
-    { nav: 'elData', icon: '💾', t: 'Данные', d: 'Профиль персонажа, стихия, экспорт и параметры' }
+    { nav: 'elTechs', icon: '⚡', t: 'Формы стихий', d: 'Изученные магические формы четырёх стихий, высшие искусства, шкала 0–5 и затраты МВН' },
+    { nav: 'elMoves', icon: '🥋', t: 'Боевые приёмы', d: 'Тактические действия, навязывание Окон возможностей (A94/A95), чи-блокинг и атаки оружием' },
+    { nav: 'elMap',   icon: '🗺️', t: 'Карта мира', d: 'Интерактивная карта четырёх народов, ключевые локации, калькулятор путешествий и досье' },
+    { nav: 'elRef',   icon: '📚', t: 'Справочник', d: 'Полный свод правил, боевой механики, магии четырёх стихий и законов мира' },
+    { nav: 'elData',  icon: '💾', t: 'Данные', d: 'Профиль персонажа, стихия, экспорт и параметры' }
   ];
 
   return '<div class="el-hud">' +
@@ -23408,6 +23710,1660 @@ function wireElRefView(){
   }
 }
 window.wireElRefView = wireElRefView;
+
+
+/* ============================================================
+   СТИХИЯ: КОРНЕВЫЕ ДАННЫЕ И МЕТОДЫ ХРАНИЛИЩА
+   ============================================================ */
+
+var EL_DEFAULT_TECHS = [
+  // --- ОГОНЬ ---
+  {
+    id: 'tech_fire_daggers',
+    name: 'Огненные кинжалы',
+    element: 'Огонь',
+    subArt: 'Базовое',
+    scale: 0,
+    cost: '1 МВН',
+    benefit: 'advantage',
+    reqWindow: 'нет',
+    damage: '1d6 огненный',
+    range: 'Ближний бой',
+    desc: 'Высекание коротких концентрированных лезвий пламени прямо из кулаков. Позволяет фехтовать чистым огнем, парировать легкие клинки и резать канаты.'
+  },
+  {
+    id: 'tech_fire_sweep',
+    name: 'Огненный серп ногой',
+    element: 'Огонь',
+    subArt: 'Базовое',
+    scale: 1,
+    cost: '1 МВН',
+    benefit: 'advantage',
+    reqWindow: 'нет',
+    damage: '1d6 огненный + сбивание',
+    range: '10 фт',
+    desc: 'Низкий подсекающий дуговой взмах ногой, пускающий серповидную волну пламени по земле. При попадании противник делает спасбросок Ловкости СЛ 13 или падает (Окно: СБИТ).'
+  },
+  {
+    id: 'tech_fire_stream',
+    name: 'Сфокусированная струя пламени',
+    element: 'Огонь',
+    subArt: 'Базовое',
+    scale: 2,
+    cost: '2 МВН',
+    benefit: 'cheap',
+    reqWindow: 'нет',
+    damage: '2d6 огненный',
+    range: '30 фт',
+    desc: 'Непрерывный поток раскалённого огня из обеих ладоней. Прожигает деревянные преграды, заставляет противника закрываться щитом и отступать.'
+  },
+  {
+    id: 'tech_fire_lightning',
+    name: 'Молниевый разряд',
+    element: 'Огонь',
+    subArt: 'Молния',
+    scale: 3,
+    cost: '3 МВН',
+    benefit: 'advantage',
+    reqWindow: 'СВЯЗАН или ИСТОЩЁН',
+    damage: '3d10 электрический',
+    range: '60 фт',
+    desc: 'Холодное разделение положительной и отрицательной энергий в кончиках пальцев с последующим высвобождением смертоносной дуги. Игнорирует металлическую броню. Дневной лимит (A93-БИС)!'
+  },
+
+  // --- ВОДА ---
+  {
+    id: 'tech_water_whip',
+    name: 'Водяной кнут',
+    element: 'Вода',
+    subArt: 'Базовое',
+    scale: 1,
+    cost: '1 МВН',
+    benefit: 'advantage',
+    reqWindow: 'нет',
+    damage: '1d6 дробящий / захват',
+    range: '20 фт',
+    desc: 'Гибкая хлещущая плеть из воды, вытягиваемая из бурдюка или водоёма. Позволяет наносить удары под любым углом, сдергивать противников с возвышений или выбивать оружие.'
+  },
+  {
+    id: 'tech_water_spikes',
+    name: 'Ледяные шипы',
+    element: 'Вода',
+    subArt: 'Лёд',
+    scale: 1,
+    cost: '1 МВН',
+    benefit: 'cheap',
+    reqWindow: 'нет',
+    damage: '1d8 колющий + замедление',
+    range: '30 фт',
+    desc: 'Мгновенная кристаллизация воды в серию острых ледяных кольев, запускаемых во врага. При попадании цель замедляется на 10 фт до конца своего хода.'
+  },
+  {
+    id: 'tech_water_heal',
+    name: 'Целительное сияние',
+    element: 'Вода',
+    subArt: 'Исцеление',
+    scale: 1,
+    cost: '2 МВН',
+    benefit: 'advantage',
+    reqWindow: 'нет',
+    damage: 'Восстановление 2d4 + МУД HP',
+    range: 'Касание',
+    desc: 'Направление потока чистой воды через энергетические меридианы тела. Очищает раны, снимает усталость и останавливает кровотечение.'
+  },
+  {
+    id: 'tech_blood_puppet',
+    name: 'Марионетка крови',
+    element: 'Вода',
+    subArt: 'Магия крови',
+    scale: 4,
+    cost: '4 МВН',
+    benefit: 'advantage',
+    reqWindow: 'ОБЕЗДВИЖЕН или ИСТОЩЁН',
+    damage: 'Полное подчинение тела цели',
+    range: '30 фт',
+    desc: 'Запретное искусство управления жидкостями внутри живого организма. Требует колоссальной концентрации или полнолуния. Цель теряет контроль над собственными движениями.'
+  },
+
+  // --- ЗЕМЛЯ ---
+  {
+    id: 'tech_earth_shield',
+    name: 'Каменная плита',
+    element: 'Земля',
+    subArt: 'Базовое',
+    scale: 1,
+    cost: '1 МВН',
+    benefit: 'cheap',
+    reqWindow: 'нет',
+    damage: '+3 к КБ (Реакция)',
+    range: 'На себя / 5 фт',
+    desc: 'Резкий удар ногой в грунт, поднимающий вертикальную плиту песчаника или гранита перед собой. Поглощает входящий выстрел или удар.'
+  },
+  {
+    id: 'tech_earth_launch',
+    name: 'Катапультирующий пик',
+    element: 'Земля',
+    subArt: 'Базовое',
+    scale: 2,
+    cost: '2 МВН',
+    benefit: 'advantage',
+    reqWindow: 'нет',
+    damage: '2d8 дробящий + подбрасывание',
+    range: '30 фт',
+    desc: 'Резкое выталкивание каменного клина прямо из-под ног противника. При успехе цель взлетает на 15 фт в воздух и при падении получает Окно: СБИТ.'
+  },
+  {
+    id: 'tech_metal_cables',
+    name: 'Захват металлическими тросами',
+    element: 'Земля',
+    subArt: 'Металл',
+    scale: 2,
+    cost: '2 МВН',
+    benefit: 'advantage',
+    reqWindow: 'нет',
+    damage: '1d6 дробящий + Окно: СВЯЗАН',
+    range: '40 фт',
+    desc: 'Стрельба катушечными тросами из наручей с последующим оплетением рук и оружия цели. Классическая тактика полиции Металлического клана и Республиканского города.'
+  },
+  {
+    id: 'tech_lava_river',
+    name: 'Раскалённый лавовый поток',
+    element: 'Земля',
+    subArt: 'Лава',
+    scale: 3,
+    cost: '3 МВН',
+    benefit: 'advantage',
+    reqWindow: 'СБИТ или ОБЕЗДВИЖЕН',
+    damage: '3d8 огненный + зона жара',
+    range: '30 фт (полоса)',
+    desc: 'Разжижение каменной породы фазовым переходом давления в кипящую магму. Создает зону непроходимого жидкого огня, отрезающую пути отхода.'
+  },
+
+  // --- ВОЗДУХ ---
+  {
+    id: 'tech_air_blast',
+    name: 'Порыв вихря',
+    element: 'Воздух',
+    subArt: 'Базовое',
+    scale: 1,
+    cost: '1 МВН',
+    benefit: 'advantage',
+    reqWindow: 'нет',
+    damage: '1d6 дробящий + отброс на 15 фт',
+    range: '30 фт',
+    desc: 'Хлёсткий удар обеими ладонями, посылающий плотный сжатый воздушный снаряд. Отбрасывает противника и сбивает его прицел.'
+  },
+  {
+    id: 'tech_air_scooter',
+    name: 'Воздушный самокат',
+    element: 'Воздух',
+    subArt: 'Базовое',
+    scale: 1,
+    cost: '1 МВН',
+    benefit: 'cheap',
+    reqWindow: 'нет',
+    damage: 'Скорость 60 фт / Верховая езда',
+    range: 'На себя',
+    desc: 'Знаменитое изобретение юного Аанга: быстро вращающаяся сфера сжатого воздуха под ногами. Позволяет мчаться по пересечённой местности и даже взбираться по вертикальным стенам.'
+  },
+  {
+    id: 'tech_air_suction',
+    name: 'Вакуумная тяга',
+    element: 'Воздух',
+    subArt: 'Базовое',
+    scale: 2,
+    cost: '2 МВН',
+    benefit: 'advantage',
+    reqWindow: 'нет',
+    damage: 'Притягивание на 20 фт + дезориентация',
+    range: '40 фт',
+    desc: 'Резкое круговое всасывание воздуха назад, создающее зону разрежения позади цели. Стягивает противника прямо под рукопашный удар или захват соратника.'
+  },
+  {
+    id: 'tech_air_flight',
+    name: 'Абсолютный полёт без веса',
+    element: 'Воздух',
+    subArt: 'Полёт',
+    scale: 5,
+    cost: '4 МВН',
+    benefit: 'cheap',
+    reqWindow: 'Отрешение от земных уз',
+    damage: 'Свободный полёт со скоростью 90 фт',
+    range: 'На себя',
+    desc: 'Древнейшее утраченное искусство гуру Лахимы и Захира. «Отпусти свои земные узы. Войди в пустоту. Стань ветром». Полная левитация без глайдера и усилий.'
+  }
+];
+
+var EL_DEFAULT_MOVES = [
+  {
+    id: 'move_dust',
+    name: 'Бросок пыли / песка в глаза',
+    kind: 'Тактический',
+    cost: '0 ФВН',
+    opensWindow: 'ОСЛЕПЛЁН',
+    trigger: 'Быстрое свободное действие в ближнем бою',
+    effect: 'Швыряет горсть пыли, пепла или песка в лицо врагу. Цель ослеплена на 1 раунд (помеха на атаки, открывает Окно: ОСЛЕПЛЁН).',
+    desc: 'Грязный, но безотказный прием уличных бойцов и разбойников-даофэй.'
+  },
+  {
+    id: 'move_sweep',
+    name: 'Низкая подсечка ногой или посохом',
+    kind: 'Рукопашный',
+    cost: '1 ФВН',
+    opensWindow: 'СБИТ',
+    trigger: 'Ближний бой при ударе снизу',
+    effect: 'Цель проходит спасбросок Ловкости СЛ 14 или падает плашмя на землю, получая статус Окно: СБИТ.',
+    desc: 'Классическая техника шаолиньского шеста и северного стиля кунг-фу.'
+  },
+  {
+    id: 'move_joint_lock',
+    name: 'Болевой залом сустава / Кисть',
+    kind: 'Рукопашный',
+    cost: '1 ФВН',
+    opensWindow: 'СВЯЗАН',
+    trigger: 'После успешного парирования или захвата',
+    effect: 'Фиксирует сустав руки врага. Цель не может колдовать этой рукой и получает Окно: СВЯЗАН.',
+    desc: 'Рычаг циньна. Оружие в захваченной руке выпадает.'
+  },
+  {
+    id: 'move_flank',
+    name: 'Тактический заход за спину',
+    kind: 'Тактический',
+    cost: '1 ФВН',
+    opensWindow: 'СПИНА',
+    trigger: 'Маневр перемещения вокруг связанного боем противника',
+    effect: 'Смещение в слепую зону врага. Следующая атака против цели получает преимущество и открывает Окно: СПИНА.',
+    desc: 'Быстрое круговое скольжение шагом Багуачжан.'
+  },
+  {
+    id: 'move_stamina_drain',
+    name: 'Изматывающий прессинг',
+    kind: 'Тактический',
+    cost: '1 ФВН',
+    opensWindow: 'ИСТОЩЁН',
+    trigger: 'Серия непрерывных ложных выпадов',
+    effect: 'Цель вынуждена потратить 1 ФВН на защиту либо немедленно получает Окно: ИСТОЩЁН.',
+    desc: 'Тактика постоянного давления, не оставляющая времени перевести дыхание.'
+  },
+  {
+    id: 'move_chi_arm',
+    name: 'Блокировка меридиана руки (Чи-блок)',
+    kind: 'Чи-блокинг',
+    cost: '1 ФВН',
+    opensWindow: 'ОБЕЗДВИЖЕН / ЧИ-БЛОК',
+    trigger: 'Точный тычок двумя пальцами в плечевой узел',
+    effect: 'Рука противника повисает плетью на 1 раунд. Невозможно держать оружие и направлять стихию этой рукой.',
+    desc: 'Смертоносная методика Тай Ли и Уравнителей против магов.'
+  },
+  {
+    id: 'move_chi_knee',
+    name: 'Удар по подколенному узлу',
+    kind: 'Чи-блокинг',
+    cost: '1 ФВН',
+    opensWindow: 'СБИТ / ОБЕЗДВИЖЕН',
+    trigger: 'Точечный удар пальцами или носком сапога под колено',
+    effect: 'Нога цели подкашивается. Цель падает ничком, а её скорость передвижения снижается вдвое.',
+    desc: 'Разрушение циркуляции энергии в нижних меридианах.'
+  },
+  {
+    id: 'move_chi_full',
+    name: 'Полное гашение ци (Каскад ударов)',
+    kind: 'Чи-блокинг',
+    cost: '2 ФВН',
+    opensWindow: 'ИСТОЩЁН + ЧИ-БЛОК',
+    trigger: 'Успешная серия из четырёх быстрых ударов по корпусу',
+    effect: 'Полный паралич магических каналов цели на 1 минуту. Маг не может использовать формы шкалы 1+.',
+    desc: 'Вершина искусства чи-блокинга, повергающая даже опытных мастеров магии.'
+  },
+  {
+    id: 'move_hook_disarm',
+    name: 'Зацеп парными мечами-крюками',
+    kind: 'Оружейный',
+    cost: '1 ФВН',
+    opensWindow: 'ОБЕЗДВИЖЕН',
+    trigger: 'Атака оружием Шуангоу',
+    effect: 'Крюк цепляет клинок или ногу противника. Цель разоружена либо теряет равновесие.',
+    desc: 'Смертоносная тактика разбойников из банды Джета.'
+  },
+  {
+    id: 'move_fan_deflect',
+    name: 'Отвод атаки боевым веером Киоши',
+    kind: 'Оружейный',
+    cost: '1 ФВН',
+    opensWindow: 'СПИНА',
+    trigger: 'Реакция на входящую атаку ближнего или дальнего боя',
+    effect: '+3 к КБ против этой атаки. При промахе атакующий теряет равновесие и подставляет спину.',
+    desc: 'Древнее искусство воительниц Киоши: использование силы врага против него самого.'
+  }
+];
+
+var EL_MAP_LOCATIONS = [
+  // --- НАРОД ОГНЯ ---
+  {
+    id: 'fire_capital',
+    name: 'Столица Народа Огня (Кальдера)',
+    nation: 'Народ Огня',
+    nationIcon: '🔥',
+    x: 215, y: 310,
+    danger: 'Высокая (Цитадель)',
+    climate: 'Вулканический, тропический',
+    ruler: 'Лорд Огня (Зуко / Озай / Созин)',
+    desc: 'Величественная столица, расположенная внутри кратера потухшего вулкана. Королевский дворец защищён отвесными базальтовыми стенами и береговой артиллерией. Индустриальное сердце архипелага с верфями и заводами.'
+  },
+  {
+    id: 'boiling_rock',
+    name: 'Кипящая Скала',
+    nation: 'Народ Огня',
+    nationIcon: '🔥',
+    x: 275, y: 265,
+    danger: 'Максимальная (Тюрьма строгого режима)',
+    climate: 'Кипящее озеро вулканической лавы и серы',
+    ruler: 'Начальник тюрьмы Народа Огня',
+    desc: 'Самая охраняемая тюрьма мира, выстроенная посреди кипящего озера в кратере вулкана. Любой побег вплавь невозможен из-за обжигающей воды. Единственная связь — канатная дорога.'
+  },
+  {
+    id: 'ember_island',
+    name: 'Угольный Остров (Эмбер Айленд)',
+    nation: 'Народ Огня',
+    nationIcon: '🔥',
+    x: 325, y: 355,
+    danger: 'Низкая (Курорт знати)',
+    climate: 'Тропические пляжи, пальмы, морской бриз',
+    ruler: 'Знать и министры Народа Огня',
+    desc: 'Роскошный курортный остров для высшей элиты Народа Огня. Знаменит пляжами, виллами чиновников и драматическим театром Угольного острова.'
+  },
+  {
+    id: 'sun_warrior_city',
+    name: 'Древний город Воинов Солнца',
+    nation: 'Народ Огня',
+    nationIcon: '🔥',
+    x: 185, y: 400,
+    danger: 'Скрытые испытания (Драконы)',
+    climate: 'Влажные джунгли, древние ступенчатые пирамиды',
+    ruler: 'Вождь Воинов Солнца / Драконы Ран и Шао',
+    desc: 'Колыбель первозданной магии огня. Считавшийся вымершим народ бережно хранит Вечное Пламя и тайну настоящей природы огня как энергии жизни, а не разрушения.'
+  },
+  {
+    id: 'crescent_island',
+    name: 'Остров Полумесяца (Храм Року)',
+    nation: 'Народ Огня',
+    nationIcon: '🔥',
+    x: 355, y: 295,
+    danger: 'Средняя (Жрецы Огня)',
+    climate: 'Скалистый остров в форме полумесяца',
+    ruler: 'Верховные Мудрецы Огня',
+    desc: 'Священный остров с многоярусным храмом Аватара Року. В день зимнего солнцестояния здесь открывается прямой портал в Мир Духов к предыдущему воплощению Аватара.'
+  },
+
+  // --- ЦАРСТВО ЗЕМЛИ ---
+  {
+    id: 'ba_sing_se',
+    name: 'Ба Синг Се (Неприступная столица)',
+    nation: 'Царство Земли',
+    nationIcon: '⛰️',
+    x: 690, y: 220,
+    danger: 'Средняя (Тайная полиция Дай Ли)',
+    climate: 'Умеренный, обширные долины и поля',
+    ruler: 'Царь Земли / Агентство Дай Ли',
+    desc: 'Колоссальный мегаполис, окружённый Внешней и Внутренней Великими Стенами. Внутри города есть собственные поля, озеро Лаогай, железная дорога и три кольца: Нижнее, Среднее и Верхнее.'
+  },
+  {
+    id: 'omashu',
+    name: 'Омашу (Горная твердыня)',
+    nation: 'Царство Земли',
+    nationIcon: '⛰️',
+    x: 480, y: 405,
+    danger: 'Средняя (Оборона)',
+    climate: 'Горный, сухой, ущелья',
+    ruler: 'Царь Буми',
+    desc: 'Древний город, возведённый на вершине отвесной скалы посреди глубокого каньона. Славится уникальной гравитационной системой почтовых и грузовых желобов магов земли.'
+  },
+  {
+    id: 'zaofu',
+    name: 'Заофу (Город Металла)',
+    nation: 'Царство Земли',
+    nationIcon: '⛰️',
+    x: 430, y: 345,
+    danger: 'Низкая (Безопаснейший город мира)',
+    climate: 'Степной, чистый, технологичный',
+    ruler: 'Суинь Бейфонг (Клан Металла)',
+    desc: 'Самый прогрессивный и безопасный город в мире, целиком выстроенный из платины и металла. Состоит из подвижных куполов-лотосов, закрывающихся на ночь.'
+  },
+  {
+    id: 'foggy_swamp',
+    name: 'Великое Туманное Болото',
+    nation: 'Царство Земли',
+    nationIcon: '🌊',
+    x: 525, y: 460,
+    danger: 'Высокая (Иллюзии духов и топи)',
+    climate: 'Тропические топи, вечный туман',
+    ruler: 'Хранитель Хью / Племя Болота',
+    desc: 'Колоссальное древнее болото, представляющее собой единый живой организм — гигантское Древо Баньян, чьи корни оплетают весь континент и связывают мир духовно.'
+  },
+  {
+    id: 'si_wong_desert',
+    name: 'Пустыня Ши Вонг (Библиотека)',
+    nation: 'Царство Земли',
+    nationIcon: '⛰️',
+    x: 640, y: 360,
+    danger: 'Экстремальная (Песчаные бури и жуки)',
+    climate: 'Знойная пустыня, зыбучие пески',
+    ruler: 'Дух познания Ван Ши Тонг / Маги песка',
+    desc: 'Бескрайнее море зыбучих песков. Здесь скрыта погребенная Библиотека Духа Ван Ши Тонга, хранящая все тайны и свитки вселенной.'
+  },
+  {
+    id: 'kyoshi_island',
+    name: 'Остров Киоши',
+    nation: 'Царство Земли',
+    nationIcon: '⛰️',
+    x: 420, y: 495,
+    danger: 'Низкая (Охраняется воительницами)',
+    climate: 'Морской умеренный, прибрежные холмы',
+    ruler: 'Старейшина Ояджи / Воительницы Киоши',
+    desc: 'Остров, оторванный Аватаром Киоши от материка ради спасения от Чин Завоевателя. Родина Воительниц Киоши, вооруженных боевыми веерами и щитами.'
+  },
+  {
+    id: 'gaoling',
+    name: 'Гаолинь',
+    nation: 'Царство Земли',
+    nationIcon: '⛰️',
+    x: 565, y: 395,
+    danger: 'Средняя (Подпольные арены)',
+    climate: 'Холмистый, цветущие сады',
+    ruler: 'Клан Бейфонг / Академия мастеров',
+    desc: 'Богатый торговый город на юге Царства Земли. Известен как вотчина благородного дома Бейфонг и родина подпольного турнира «Грохочущая Земля VI».'
+  },
+
+  // --- ПЛЕМЕНА ВОДЫ ---
+  {
+    id: 'north_water_tribe',
+    name: 'Северное племя Воды (Агна Кель-а)',
+    nation: 'Племена Воды',
+    nationIcon: '🌊',
+    x: 520, y: 65,
+    danger: 'Низкая (Цитадель во льдах)',
+    climate: 'Полярная тундра, арктический лед',
+    ruler: 'Вождь Арнук / Вожди Севера',
+    desc: 'Величественная ледяная цитадель, высеченная магами воды среди северных ледников. В глубине города скрыт священный Оазис Духов с вечно цветущей травой и прудом, где плавают духи Луны и Океана — Туи и Ла.'
+  },
+  {
+    id: 'south_water_tribe',
+    name: 'Деревня Южного племени Воды',
+    nation: 'Племена Воды',
+    nationIcon: '🌊',
+    x: 500, y: 535,
+    danger: 'Средняя (Холод и рейды)',
+    climate: 'Вечная мерзлота, метели',
+    ruler: 'Вождь Хакода / Тоняк',
+    desc: 'Родина Катары и Сокки. Пережила опустошительные рейды магов огня и была заново отстроена после войны в крупный процветающий южный полярный порт.'
+  },
+  {
+    id: 'foggy_swamp_tribe',
+    name: 'Болотное племя Воды (Деревня Хью)',
+    nation: 'Племена Воды',
+    nationIcon: '🌊',
+    x: 540, y: 475,
+    danger: 'Средняя (Топи и дикая природа)',
+    climate: 'Тропические мангровые заросли, влажные топи',
+    ruler: 'Совет старейшин Болота',
+    desc: 'Обособленная ветвь магов воды, переселившаяся с Южного полюса тысячи лет назад. Носят набедренные повязки из водорослей, управляют лодками с помощью гидрокинеза и почитают священное Древо Баньян.'
+  },
+
+  // --- ВОЗДУШНЫЕ КОЧЕВНИКИ ---
+  {
+    id: 'southern_air_temple',
+    name: 'Южный Храм Воздуха',
+    nation: 'Воздушные Кочевники',
+    nationIcon: '🌪️',
+    x: 360, y: 470,
+    danger: 'Древние руины',
+    climate: 'Высокогорный, чистейший воздух',
+    ruler: 'Монах Гияцо (в прошлом) / Наставники',
+    desc: 'Родной храм Аватара Аанга на вершине неприступной скалы. Известен Залом статуй прошлых воплощений Аватара и ареной для состязаний в воздушном поло.'
+  },
+  {
+    id: 'northern_air_temple',
+    name: 'Северный Храм Воздуха',
+    nation: 'Воздушные Кочевники',
+    nationIcon: '🌪️',
+    x: 600, y: 110,
+    danger: 'Средняя (Горные обвалы)',
+    climate: 'Снежные горные пики',
+    ruler: 'Изобретатель и беженцы Земли',
+    desc: 'Горный храм, где беженцы Царства Земли во главе с Изобретателем построили планеры, геотермальные лифты и первые боевые воздушные шары.'
+  },
+  {
+    id: 'western_air_temple',
+    name: 'Западный Храм Воздуха',
+    nation: 'Воздушные Кочевники',
+    nationIcon: '🌪️',
+    x: 340, y: 220,
+    danger: 'Головокружительная высота',
+    climate: 'Скалистый каньон',
+    ruler: 'Монахини Воздуха',
+    desc: 'Шедевр архитектуры: храм высечен прямо под нависающими сводами глубокого каньона «вверх ногами». Невидим для воздушных судов сверху.'
+  },
+  {
+    id: 'eastern_air_temple',
+    name: 'Восточный Храм Воздуха',
+    nation: 'Воздушные Кочевники',
+    nationIcon: '🌪️',
+    x: 820, y: 350,
+    danger: 'Низкая (Святилище)',
+    climate: 'Зеленые горы, туманы',
+    ruler: 'Гуру Патик / Монахини Воздуха',
+    desc: 'Храм на трёх зеленых пиках, где традиционно воспитывали детёнышей летающих бизонов. Место духовного уединения гуру Патика.'
+  },
+
+  // --- ОБЪЕДИНЁННАЯ РЕСПУБЛИКА ---
+  {
+    id: 'republic_city',
+    name: 'Республиканский город',
+    nation: 'Объединённая Республика',
+    nationIcon: '🏙️',
+    x: 440, y: 280,
+    danger: 'Уличные банды / Уравнители',
+    climate: 'Морской порт, залив Юи',
+    ruler: 'Президент Райко / Совет Наций',
+    desc: 'Огромный мегаполис эпохи ар-деко в заливе Юи. Символ мира между четырьмя народами. Включает Остров Храма Воздуха, Арену Про-бендинга, башню Future Industries и центральный портал духов.'
+  }
+];
+
+// Управление хранилищем стихийных техник
+EL.getTechs = function(){
+  try {
+    var raw = localStorage.getItem('el_techs');
+    if(raw) return JSON.parse(raw);
+  } catch(e){}
+  return EL_DEFAULT_TECHS.slice();
+};
+
+EL.saveTechs = function(techs){
+  try {
+    localStorage.setItem('el_techs', JSON.stringify(techs));
+  } catch(e){}
+};
+
+// Управление хранилищем приёмов
+EL.getMoves = function(){
+  try {
+    var raw = localStorage.getItem('el_moves');
+    if(raw) return JSON.parse(raw);
+  } catch(e){}
+  return EL_DEFAULT_MOVES.slice();
+};
+
+EL.saveMoves = function(moves){
+  try {
+    localStorage.setItem('el_moves', JSON.stringify(moves));
+  } catch(e){}
+};
+
+// Состояние карты мира
+EL.getMapState = function(){
+  try {
+    var raw = localStorage.getItem('el_map_state');
+    if(raw) return JSON.parse(raw);
+  } catch(e){}
+  return {
+    selectedId: 'republic_city',
+    filter: 'all',
+    routeFrom: 'republic_city',
+    routeTo: 'ba_sing_se',
+    transport: 'bison'
+  };
+};
+
+EL.saveMapState = function(st){
+  try {
+    localStorage.setItem('el_map_state', JSON.stringify(st));
+  } catch(e){}
+};
+
+// Вспомогательные функции экранирования
+function elEsc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+function elEscA(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function elScaleStars(sc){
+  var n = Math.max(0, Math.min(5, parseInt(sc, 10) || 0));
+  var stars = '';
+  for(var i=1; i<=5; i++){
+    stars += (i <= n) ? '★' : '☆';
+  }
+  return '<span style="color:#f59e0b;letter-spacing:1px;font-weight:700;" title="Шкала ' + n + ' из 5">' + stars + '</span>' +
+         '<span style="font-size:11px;color:#94a3b8;margin-left:4px;">(Шкала ' + n + ')</span>';
+}
+
+function elElemClass(elem){
+  if(elem === 'Огонь') return 'elem-fire';
+  if(elem === 'Вода') return 'elem-water';
+  if(elem === 'Земля') return 'elem-earth';
+  return 'elem-wind';
+}
+
+function elKindClass(kind){
+  if(kind === 'Чи-блокинг') return 'kind-chi';
+  if(kind === 'Оружейный') return 'kind-weapon';
+  if(kind === 'Тактический') return 'kind-tactical';
+  return 'kind-melee';
+}
+
+/* ============================================================
+   1. ФОРМЫ СТИХИЙ (EL-TECHS)
+   ============================================================ */
+
+window._elTechSearch = window._elTechSearch || '';
+window._elTechElemFilter = window._elTechElemFilter || 'all';
+
+function elTechs(){
+  var allTechs = EL.getTechs();
+  var elemCounts = { 'Огонь': 0, 'Вода': 0, 'Земля': 0, 'Воздух': 0 };
+  allTechs.forEach(function(t){
+    if(elemCounts[t.element] !== undefined) elemCounts[t.element]++;
+  });
+
+  var curFilter = window._elTechElemFilter || 'all';
+  var curSearch = (window._elTechSearch || '').toLowerCase().trim();
+
+  var filtered = allTechs.filter(function(t){
+    if(curFilter !== 'all' && t.element !== curFilter) return false;
+    if(curSearch){
+      var match = (t.name || '').toLowerCase().indexOf(curSearch) >= 0 ||
+                  (t.subArt || '').toLowerCase().indexOf(curSearch) >= 0 ||
+                  (t.desc || '').toLowerCase().indexOf(curSearch) >= 0 ||
+                  (t.damage || '').toLowerCase().indexOf(curSearch) >= 0 ||
+                  (t.reqWindow || '').toLowerCase().indexOf(curSearch) >= 0;
+      if(!match) return false;
+    }
+    return true;
+  });
+
+  var filterPills = [
+    '<button class="el-filter-pill ' + (curFilter==='all'?'active':'') + '" data-el-filter="all">' +
+      'Все стихии <span class="pill-cnt">' + allTechs.length + '</span>' +
+    '</button>',
+    '<button class="el-filter-pill ' + (curFilter==='Огонь'?'active':'') + '" data-el-filter="Огонь">' +
+      '🔥 Огонь <span class="pill-cnt">' + elemCounts['Огонь'] + '</span>' +
+    '</button>',
+    '<button class="el-filter-pill ' + (curFilter==='Вода'?'active':'') + '" data-el-filter="Вода">' +
+      '🌊 Вода <span class="pill-cnt">' + elemCounts['Вода'] + '</span>' +
+    '</button>',
+    '<button class="el-filter-pill ' + (curFilter==='Земля'?'active':'') + '" data-el-filter="Земля">' +
+      '⛰️ Земля <span class="pill-cnt">' + elemCounts['Земля'] + '</span>' +
+    '</button>',
+    '<button class="el-filter-pill ' + (curFilter==='Воздух'?'active':'') + '" data-el-filter="Воздух">' +
+      '🌪️ Воздух <span class="pill-cnt">' + elemCounts['Воздух'] + '</span>' +
+    '</button>'
+  ].join('');
+
+  var cardsHtml = filtered.length ? filtered.map(function(t){
+    var elemIcon = t.element === 'Огонь' ? '🔥' : t.element === 'Вода' ? '🌊' : t.element === 'Земля' ? '⛰️' : '🌪️';
+    var benefitText = t.benefit === 'cheap' ? '✦ Снижение стоимости (-1 МВН)' : '✦ Преимущество на бросок атаки';
+    var winBadge = (t.reqWindow && t.reqWindow !== 'нет')
+      ? '<span class="el-mini-tag tag-win">🎯 Окно: ' + elEsc(t.reqWindow) + '</span>'
+      : '';
+
+    return '<div class="el-tech-card ' + elElemClass(t.element) + '" data-nav="elTechView:' + elEscA(t.id) + '">' +
+      '<div class="el-item-badges">' +
+        '<span class="el-mini-tag" style="color:var(--el-accent);">' + elemIcon + ' ' + elEsc(t.element) + ' · ' + elEsc(t.subArt || 'Базовое') + '</span>' +
+        '<span class="el-mini-tag tag-cost">⚡ ' + elEsc(t.cost || '1 МВН') + '</span>' +
+        '<span class="el-mini-tag tag-benefit">' + benefitText + '</span>' +
+        winBadge +
+        '<span style="margin-left:auto;">' + elScaleStars(t.scale) + '</span>' +
+      '</div>' +
+      '<div class="el-item-name">' + elEsc(t.name) + '</div>' +
+      '<div class="el-item-line">Дистанция: <b style="color:#fff;">' + elEsc(t.range || 'Ближний бой') + '</b> · Эффект/Урон: <b style="color:var(--el-accent);">' + elEsc(t.damage || '—') + '</b></div>' +
+      '<div class="el-item-desc">' + elEsc(t.desc || '') + '</div>' +
+    '</div>';
+  }).join('') : '<div class="char-empty" style="padding:40px 20px;text-align:center;color:#94a3b8;font-style:italic;">В этой выборке нет форм стихий. Создайте новую форму или сбросьте фильтры.</div>';
+
+  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Формы стихий'}]) +
+    '<button class="back" data-nav="home">← Назад в меню</button>' +
+    '<h1>⚡ ФОРМЫ СТИХИЙ</h1>' +
+    '<div class="subtitle">ИЗУЧЕННЫЕ МАГИЧЕСКИЕ ПРИМЕНЕНИЯ • ВЫСШИЕ ИСКУССТВА • ШКАЛА СИЛЫ 0–5 • ВЫНОСЛИВОСТЬ МВН</div>' +
+    '<div class="sheet-actions" style="margin:14px 0 16px;display:flex;gap:10px;flex-wrap:wrap;">' +
+      '<button class="btn-primary" data-nav="elTechEdit:new">+ Изучить новую форму</button>' +
+      '<button class="btn-ghost" id="elTechResetDefaults" style="color:#fca5a5;border-color:rgba(239,68,68,0.35);">Сброс к канону (16 форм)</button>' +
+    '</div>' +
+    '<div class="el-ref-search-wrap" style="margin-bottom:12px;">' +
+      '<span class="el-ref-search-icon">🔍</span>' +
+      '<input type="text" id="elTechSearchInput" class="el-ref-search-input" placeholder="Поиск формы (молния, хлыст, полет, исцеление, лава, кинжалы)..." value="' + elEscA(window._elTechSearch || '') + '">' +
+    '</div>' +
+    '<div class="el-filter-bar">' + filterPills + '</div>' +
+    cardsHtml;
+}
+
+function wireElTechs(){
+  var searchInput = document.getElementById('elTechSearchInput');
+  if(searchInput){
+    searchInput.oninput = function(){
+      window._elTechSearch = this.value;
+      var app = document.getElementById('app');
+      app.innerHTML = elTechs();
+      _w();
+      wireElTechs();
+      var ni = document.getElementById('elTechSearchInput');
+      if(ni){ ni.focus(); ni.setSelectionRange(ni.value.length, ni.value.length); }
+    };
+  }
+
+  var pills = document.querySelectorAll('[data-el-filter]');
+  pills.forEach(function(p){
+    p.onclick = function(){
+      window._elTechElemFilter = this.getAttribute('data-el-filter');
+      var app = document.getElementById('app');
+      app.innerHTML = elTechs();
+      _w();
+      wireElTechs();
+    };
+  });
+
+  var resetBtn = document.getElementById('elTechResetDefaults');
+  if(resetBtn){
+    resetBtn.onclick = function(){
+      if(confirm('Сбросить список форм к 16 каноничным формам четырёх стихий? Все пользовательские правки будут заменены.')){
+        EL.saveTechs(EL_DEFAULT_TECHS);
+        var app = document.getElementById('app');
+        app.innerHTML = elTechs();
+        _w();
+        wireElTechs();
+      }
+    };
+  }
+}
+
+/* ============================================================
+   2. ДОСЬЕ И ПРАВКА ФОРМЫ (EL-TECH-VIEW & EL-TECH-EDIT)
+   ============================================================ */
+
+function elTechView(id){
+  var techs = EL.getTechs();
+  var t = techs.filter(function(x){ return x.id === id; })[0];
+  if(!t) return elTechs();
+
+  var elemIcon = t.element === 'Огонь' ? '🔥' : t.element === 'Вода' ? '🌊' : t.element === 'Земля' ? '⛰️' : '🌪️';
+  var benefitText = t.benefit === 'cheap' ? 'Снижение стоимости (-1 МВН)' : 'Преимущество на бросок атаки';
+
+  var rows = [
+    { k: 'Стихия', v: elemIcon + ' ' + t.element },
+    { k: 'Высшее искусство', v: t.subArt || 'Базовое применение' },
+    { k: 'Шкала мастерства (0–5)', v: elScaleStars(t.scale), raw: true },
+    { k: 'Стоимость применения', v: '<b style="color:#fca5a5;">' + elEsc(t.cost) + '</b>', raw: true },
+    { k: 'Бонус выученной формы', v: '<b style="color:#7dd3fc;">' + benefitText + '</b>', raw: true },
+    { k: 'Требуемое окно (A94)', v: (t.reqWindow && t.reqWindow !== 'нет') ? '<span class="el-mini-tag tag-win">🎯 ' + elEsc(t.reqWindow) + '</span>' : 'Не требуется (любая ситуация)', raw: true },
+    { k: 'Дистанция / Зона', v: elEsc(t.range || 'Ближний бой') },
+    { k: 'Урон / Эффект', v: '<b style="color:var(--el-accent);">' + elEsc(t.damage || '—') + '</b>', raw: true },
+    { k: 'Описание и пластика', v: elEsc(t.desc || '—') }
+  ];
+
+  var tableHtml = rows.map(function(r){
+    return '<div class="hb-row" style="display:flex;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.06);align-items:flex-start;">' +
+      '<div class="hb-row-k" style="width:200px;flex-shrink:0;font-size:12px;color:#94a3b8;font-family:JetBrains Mono,monospace;font-weight:700;">' + elEsc(r.k) + '</div>' +
+      '<div class="hb-row-v" style="flex:1;font-size:13.5px;color:#e2e8f0;">' + (r.raw ? r.v : elEsc(r.v)) + '</div>' +
+    '</div>';
+  }).join('');
+
+  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Формы', nav:'elTechs'}, {label: t.name}]) +
+    '<button class="back" data-nav="elTechs">← К списку форм</button>' +
+    '<h1>' + elemIcon + ' ' + elEsc(t.name) + '</h1>' +
+    '<div class="subtitle">' + elEsc(t.element) + ' • ШКАЛА ' + (t.scale || 0) + ' • ' + elEsc(t.subArt || 'Базовое') + '</div>' +
+    '<div class="el-loc-dossier" style="margin-top:16px;padding:0;overflow:hidden;">' +
+      tableHtml +
+    '</div>' +
+    '<div class="el-ref-callout" style="margin-top:14px;background:rgba(0,0,0,0.35);border:1px solid var(--el-accent-border);border-left:4px solid var(--el-accent);padding:12px 16px;border-radius:4px;font-size:13px;color:#cbd5e1;line-height:1.5;">' +
+      'ℹ️ <b>Механика форм стихий (W4-БИС // A93)</b>: В мире Аватара формы не расходуют слоты заклинаний. Выученная форма даёт выбор перед броском: совершить атаку с <b>Преимуществом</b> либо снизить затраты на <b>-1 МВН</b> (минимум 1). Для применения разрушительных форм шкалы 3+ необходимо предварительно открыть у противника Окно возможностей (A94)!' +
+    '</div>' +
+    '<div class="sheet-actions" style="margin-top:18px;display:flex;gap:10px;">' +
+      '<button class="btn-primary" data-nav="elTechEdit:' + elEscA(t.id) + '">✏️ Редактировать форму</button>' +
+      '<button class="btn-ghost" id="elTechDeleteBtn" style="color:#fca5a5;border-color:rgba(239,68,68,0.35);">🗑️ Забыть форму</button>' +
+    '</div>';
+}
+
+function wireElTechView(){
+  var delBtn = document.getElementById('elTechDeleteBtn');
+  if(delBtn){
+    delBtn.onclick = function(){
+      if(confirm('Удалить эту форму из вашего списка изученных?')){
+        var techs = EL.getTechs().filter(function(x){ return x.id !== view.shId; });
+        EL.saveTechs(techs);
+        window.navigate('elTechs');
+      }
+    };
+  }
+}
+
+function elTechEdit(id){
+  var isNew = id === 'new';
+  var t = isNew ? {
+    id: 'tech_' + Date.now(),
+    name: '',
+    element: 'Огонь',
+    subArt: 'Базовое',
+    scale: 1,
+    cost: '1 МВН',
+    benefit: 'advantage',
+    reqWindow: 'нет',
+    range: '30 фт',
+    damage: '1d8',
+    desc: ''
+  } : (EL.getTechs().filter(function(x){ return x.id === id; })[0] || {});
+
+  var elemOptions = ['Огонь', 'Вода', 'Земля', 'Воздух'].map(function(e){
+    return '<option value="' + e + '" ' + (t.element === e ? 'selected' : '') + '>' + e + '</option>';
+  }).join('');
+
+  var benefitOptions = [
+    { val: 'advantage', label: 'Преимущество на бросок атаки' },
+    { val: 'cheap', label: 'Снижение стоимости (-1 МВН)' }
+  ].map(function(b){
+    return '<option value="' + b.val + '" ' + (t.benefit === b.val ? 'selected' : '') + '>' + b.label + '</option>';
+  }).join('');
+
+  var scaleOptions = [0, 1, 2, 3, 4, 5].map(function(s){
+    var label = s === 0 ? '0 (Базовый трюк)' : s === 1 ? '1 (Базовая форма)' : s === 2 ? '2 (Продвинутая)' : s === 3 ? '3 (Мастерская)' : s === 4 ? '4 (Гроссмейстер)' : '5 (Стихийный катаклизм)';
+    return '<option value="' + s + '" ' + (t.scale === s ? 'selected' : '') + '>' + label + '</option>';
+  }).join('');
+
+  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Формы', nav:'elTechs'}, {label: isNew ? 'Новая форма' : 'Редактирование'}]) +
+    '<button class="back" data-nav="elTechs">← Отмена</button>' +
+    '<h1>' + (isNew ? '✨ Изучение новой формы' : '✏️ Редактирование: ' + elEsc(t.name)) + '</h1>' +
+    '<div class="subtitle">НАСТРОЙКА ПАРАМЕТРОВ СТИХИЙНОЙ ФОРМЫ, ЗАТРАТ МВН И ЭФФЕКТОВ</div>' +
+    '<div class="el-form-card" style="margin-top:16px;">' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Название формы:</label>' +
+          '<input type="text" id="elTechEditName" class="el-input" value="' + elEscA(t.name) + '" placeholder="Например: Огненные кинжалы">' +
+        '</div>' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Стихия:</label>' +
+          '<select id="elTechEditElem" class="el-select">' + elemOptions + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Высшее искусство / Подкатегория:</label>' +
+          '<input type="text" id="elTechEditSub" class="el-input" value="' + elEscA(t.subArt || 'Базовое') + '" placeholder="Базовое, Молния, Лёд, Металл, Полёт...">' +
+        '</div>' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Шкала мастерства (0–5):</label>' +
+          '<select id="elTechEditScale" class="el-select">' + scaleOptions + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Стоимость (МВН):</label>' +
+          '<input type="text" id="elTechEditCost" class="el-input" value="' + elEscA(t.cost || '1 МВН') + '" placeholder="1 МВН, 2 МВН...">' +
+        '</div>' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Бонус выученной формы:</label>' +
+          '<select id="elTechEditBenefit" class="el-select">' + benefitOptions + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Требуемое окно возможностей (A94):</label>' +
+          '<input type="text" id="elTechEditWindow" class="el-input" value="' + elEscA(t.reqWindow || 'нет') + '" placeholder="нет, СВЯЗАН, ОБЕЗДВИЖЕН, ОСЛЕПЛЁН, СБИТ...">' +
+        '</div>' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Дистанция / Зона:</label>' +
+          '<input type="text" id="elTechEditRange" class="el-input" value="' + elEscA(t.range || '30 фт') + '" placeholder="Ближний бой, 30 фт, 60 фт...">' +
+        '</div>' +
+      '</div>' +
+      '<div class="el-field-group">' +
+        '<label class="el-field-label">Урон / Исцеление / Эффект:</label>' +
+        '<input type="text" id="elTechEditDmg" class="el-input" value="' + elEscA(t.damage || '') + '" placeholder="2d6 огненный, 1d8 дробящий + подбрасывание...">' +
+      '</div>' +
+      '<div class="el-field-group">' +
+        '<label class="el-field-label">Описание, пластика движений и правила:</label>' +
+        '<textarea id="elTechEditDesc" class="el-textarea" rows="4" placeholder="Опишите стойку, траекторию движений тела и тактические тонкости...">' + elEsc(t.desc || '') + '</textarea>' +
+      '</div>' +
+      '<div class="sheet-actions" style="margin-top:16px;display:flex;gap:10px;">' +
+        '<button class="btn-primary" id="elTechSaveBtn">Сохранить форму</button>' +
+        '<button class="btn-ghost" data-nav="elTechs">Отмена</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function wireElTechEdit(){
+  var saveBtn = document.getElementById('elTechSaveBtn');
+  if(saveBtn){
+    saveBtn.onclick = function(){
+      var name = document.getElementById('elTechEditName').value.trim();
+      if(!name){ alert('Введите название формы'); return; }
+      var elem = document.getElementById('elTechEditElem').value;
+      var sub = document.getElementById('elTechEditSub').value.trim() || 'Базовое';
+      var scale = parseInt(document.getElementById('elTechEditScale').value, 10) || 0;
+      var cost = document.getElementById('elTechEditCost').value.trim() || '1 МВН';
+      var benefit = document.getElementById('elTechEditBenefit').value;
+      var win = document.getElementById('elTechEditWindow').value.trim() || 'нет';
+      var range = document.getElementById('elTechEditRange').value.trim() || 'Ближний бой';
+      var dmg = document.getElementById('elTechEditDmg').value.trim();
+      var desc = document.getElementById('elTechEditDesc').value.trim();
+
+      var techs = EL.getTechs();
+      var isNew = view.shId === 'new';
+      var targetId = isNew ? ('tech_' + Date.now()) : view.shId;
+
+      var record = {
+        id: targetId,
+        name: name,
+        element: elem,
+        subArt: sub,
+        scale: scale,
+        cost: cost,
+        benefit: benefit,
+        reqWindow: win,
+        range: range,
+        damage: dmg,
+        desc: desc
+      };
+
+      if(isNew){
+        techs.push(record);
+      } else {
+        techs = techs.map(function(x){ return x.id === targetId ? record : x; });
+      }
+
+      EL.saveTechs(techs);
+      window.navigate('elTechView:' + targetId);
+    };
+  }
+}
+
+/* ============================================================
+   3. БОЕВЫЕ ПРИЁМЫ И ЧИ-БЛОКИНГ (EL-MOVES)
+   ============================================================ */
+
+window._elMoveSearch = window._elMoveSearch || '';
+window._elMoveKindFilter = window._elMoveKindFilter || 'all';
+
+function elMoves(){
+  var allMoves = EL.getMoves();
+  var kindCounts = { 'Рукопашный': 0, 'Оружейный': 0, 'Чи-блокинг': 0, 'Тактический': 0 };
+  allMoves.forEach(function(m){
+    if(kindCounts[m.kind] !== undefined) kindCounts[m.kind]++;
+  });
+
+  var curFilter = window._elMoveKindFilter || 'all';
+  var curSearch = (window._elMoveSearch || '').toLowerCase().trim();
+
+  var filtered = allMoves.filter(function(m){
+    if(curFilter !== 'all' && m.kind !== curFilter) return false;
+    if(curSearch){
+      var match = (m.name || '').toLowerCase().indexOf(curSearch) >= 0 ||
+                  (m.kind || '').toLowerCase().indexOf(curSearch) >= 0 ||
+                  (m.opensWindow || '').toLowerCase().indexOf(curSearch) >= 0 ||
+                  (m.effect || '').toLowerCase().indexOf(curSearch) >= 0 ||
+                  (m.desc || '').toLowerCase().indexOf(curSearch) >= 0;
+      if(!match) return false;
+    }
+    return true;
+  });
+
+  var filterPills = [
+    '<button class="el-filter-pill ' + (curFilter==='all'?'active':'') + '" data-el-mfilter="all">' +
+      'Все приёмы <span class="pill-cnt">' + allMoves.length + '</span>' +
+    '</button>',
+    '<button class="el-filter-pill ' + (curFilter==='Рукопашный'?'active':'') + '" data-el-mfilter="Рукопашный">' +
+      '🥋 Рукопашный <span class="pill-cnt">' + kindCounts['Рукопашный'] + '</span>' +
+    '</button>',
+    '<button class="el-filter-pill ' + (curFilter==='Чи-блокинг'?'active':'') + '" data-el-mfilter="Чи-блокинг">' +
+      '🖐️ Чи-блокинг <span class="pill-cnt">' + kindCounts['Чи-блокинг'] + '</span>' +
+    '</button>',
+    '<button class="el-filter-pill ' + (curFilter==='Оружейный'?'active':'') + '" data-el-mfilter="Оружейный">' +
+      '⚔️ Оружейный <span class="pill-cnt">' + kindCounts['Оружейный'] + '</span>' +
+    '</button>',
+    '<button class="el-filter-pill ' + (curFilter==='Тактический'?'active':'') + '" data-el-mfilter="Тактический">' +
+      '♟️ Тактический <span class="pill-cnt">' + kindCounts['Тактический'] + '</span>' +
+    '</button>'
+  ].join('');
+
+  var cardsHtml = filtered.length ? filtered.map(function(m){
+    return '<div class="el-move-card ' + elKindClass(m.kind) + '" data-nav="elMoveView:' + elEscA(m.id) + '">' +
+      '<div class="el-item-badges">' +
+        '<span class="el-mini-tag" style="color:var(--el-accent);">' + elEsc(m.kind) + '</span>' +
+        '<span class="el-mini-tag tag-cost">⚡ ' + elEsc(m.cost || '1 ФВН') + '</span>' +
+        '<span class="el-mini-tag tag-win">🎯 Открывает окно: ' + elEsc(m.opensWindow || 'СБИТ') + '</span>' +
+      '</div>' +
+      '<div class="el-item-name">' + elEsc(m.name) + '</div>' +
+      '<div class="el-item-line">Условие/Стойка: <b style="color:#fff;">' + elEsc(m.trigger || 'Ближний бой') + '</b></div>' +
+      '<div class="el-item-desc" style="color:#fde68a;font-style:normal;margin-bottom:4px;"><b>Эффект:</b> ' + elEsc(m.effect || '—') + '</div>' +
+      '<div class="el-item-desc">' + elEsc(m.desc || '') + '</div>' +
+    '</div>';
+  }).join('') : '<div class="char-empty" style="padding:40px 20px;text-align:center;color:#94a3b8;font-style:italic;">В этой выборке нет боевых приёмов. Создайте новый приём или сбросьте фильтры.</div>';
+
+  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Боевые приёмы'}]) +
+    '<button class="back" data-nav="home">← Назад в меню</button>' +
+    '<h1>🥋 БОЕВЫЕ ПРИЁМЫ</h1>' +
+    '<div class="subtitle">ТАКТИЧЕСКИЕ ДЕЙСТВИЯ • ОТКРЫТИЕ ОКОН ВОЗМОЖНОСТЕЙ (A94/A95) • ЧИ-БЛОКИНГ • БОЙ БЕЗ МАГИИ</div>' +
+    '<div class="sheet-actions" style="margin:14px 0 16px;display:flex;gap:10px;flex-wrap:wrap;">' +
+      '<button class="btn-primary" data-nav="elMoveEdit:new">+ Добавить приём</button>' +
+      '<button class="btn-ghost" id="elMoveResetDefaults" style="color:#fca5a5;border-color:rgba(239,68,68,0.35);">Сброс к канону (10 приёмов)</button>' +
+    '</div>' +
+    '<div class="el-ref-search-wrap" style="margin-bottom:12px;">' +
+      '<span class="el-ref-search-icon">🔍</span>' +
+      '<input type="text" id="elMoveSearchInput" class="el-ref-search-input" placeholder="Поиск приёма (чи-блок, подсечка, веер Киоши, песок в глаза, залом)..." value="' + elEscA(window._elMoveSearch || '') + '">' +
+    '</div>' +
+    '<div class="el-filter-bar">' + filterPills + '</div>' +
+    cardsHtml;
+}
+
+function wireElMoves(){
+  var searchInput = document.getElementById('elMoveSearchInput');
+  if(searchInput){
+    searchInput.oninput = function(){
+      window._elMoveSearch = this.value;
+      var app = document.getElementById('app');
+      app.innerHTML = elMoves();
+      _w();
+      wireElMoves();
+      var ni = document.getElementById('elMoveSearchInput');
+      if(ni){ ni.focus(); ni.setSelectionRange(ni.value.length, ni.value.length); }
+    };
+  }
+
+  var pills = document.querySelectorAll('[data-el-mfilter]');
+  pills.forEach(function(p){
+    p.onclick = function(){
+      window._elMoveKindFilter = this.getAttribute('data-el-mfilter');
+      var app = document.getElementById('app');
+      app.innerHTML = elMoves();
+      _w();
+      wireElMoves();
+    };
+  });
+
+  var resetBtn = document.getElementById('elMoveResetDefaults');
+  if(resetBtn){
+    resetBtn.onclick = function(){
+      if(confirm('Сбросить список приёмов к 10 каноничным боевым техникам и чи-блокингу?')){
+        EL.saveMoves(EL_DEFAULT_MOVES);
+        var app = document.getElementById('app');
+        app.innerHTML = elMoves();
+        _w();
+        wireElMoves();
+      }
+    };
+  }
+}
+
+/* ============================================================
+   4. ДОСЬЕ И ПРАВКА ПРИЁМА (EL-MOVE-VIEW & EL-MOVE-EDIT)
+   ============================================================ */
+
+function elMoveView(id){
+  var moves = EL.getMoves();
+  var m = moves.filter(function(x){ return x.id === id; })[0];
+  if(!m) return elMoves();
+
+  var rows = [
+    { k: 'Направление', v: elEsc(m.kind) },
+    { k: 'Затраты выносливости', v: '<b style="color:#fca5a5;">' + elEsc(m.cost || '1 ФВН') + '</b>', raw: true },
+    { k: 'Открываемое окно (A94)', v: '<span class="el-mini-tag tag-win">🎯 ' + elEsc(m.opensWindow || '—') + '</span>', raw: true },
+    { k: 'Условие / Требуемое действие', v: elEsc(m.trigger || 'Ближний бой') },
+    { k: 'Тактический эффект', v: '<b style="color:var(--el-accent);">' + elEsc(m.effect || '—') + '</b>', raw: true },
+    { k: 'Боевое описание и лор', v: elEsc(m.desc || '—') }
+  ];
+
+  var tableHtml = rows.map(function(r){
+    return '<div class="hb-row" style="display:flex;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.06);align-items:flex-start;">' +
+      '<div class="hb-row-k" style="width:200px;flex-shrink:0;font-size:12px;color:#94a3b8;font-family:JetBrains Mono,monospace;font-weight:700;">' + elEsc(r.k) + '</div>' +
+      '<div class="hb-row-v" style="flex:1;font-size:13.5px;color:#e2e8f0;">' + (r.raw ? r.v : elEsc(r.v)) + '</div>' +
+    '</div>';
+  }).join('');
+
+  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Приёмы', nav:'elMoves'}, {label: m.name}]) +
+    '<button class="back" data-nav="elMoves">← К списку приёмов</button>' +
+    '<h1>🥋 ' + elEsc(m.name) + '</h1>' +
+    '<div class="subtitle">' + elEsc(m.kind) + ' • ОТКРЫТИЕ ОКНА: ' + elEsc(m.opensWindow || 'СБИТ') + ' • ' + elEsc(m.cost || '1 ФВН') + '</div>' +
+    '<div class="el-loc-dossier" style="margin-top:16px;padding:0;overflow:hidden;">' +
+      tableHtml +
+    '</div>' +
+    '<div class="el-ref-callout" style="margin-top:14px;background:rgba(0,0,0,0.35);border:1px solid var(--el-accent-border);border-left:4px solid var(--el-accent);padding:12px 16px;border-radius:4px;font-size:13px;color:#cbd5e1;line-height:1.5;">' +
+      'ℹ️ <b>Окна возможностей (A94/A95)</b>: Боевые приёмы и чи-блокинг не требуют магии и доступны любому бойцу. Успешный приём навязывает противнику Окно (СБИТ, ОБЕЗДВИЖЕН, ОСЛЕПЛЁН, СПИНА, СВЯЗАН, ИСТОЩЁН). Это открывает коридор для разрушительных стихийных форм шкалы 3+ ваших магов либо для критических ударов воинов!' +
+    '</div>' +
+    '<div class="sheet-actions" style="margin-top:18px;display:flex;gap:10px;">' +
+      '<button class="btn-primary" data-nav="elMoveEdit:' + elEscA(m.id) + '">✏️ Редактировать приём</button>' +
+      '<button class="btn-ghost" id="elMoveDeleteBtn" style="color:#fca5a5;border-color:rgba(239,68,68,0.35);">🗑️ Удалить приём</button>' +
+    '</div>';
+}
+
+function wireElMoveView(){
+  var delBtn = document.getElementById('elMoveDeleteBtn');
+  if(delBtn){
+    delBtn.onclick = function(){
+      if(confirm('Удалить этот приём из списка?')){
+        var moves = EL.getMoves().filter(function(x){ return x.id !== view.shId; });
+        EL.saveMoves(moves);
+        window.navigate('elMoves');
+      }
+    };
+  }
+}
+
+function elMoveEdit(id){
+  var isNew = id === 'new';
+  var m = isNew ? {
+    id: 'move_' + Date.now(),
+    name: '',
+    kind: 'Рукопашный',
+    cost: '1 ФВН',
+    opensWindow: 'СБИТ',
+    trigger: 'Ближний бой',
+    effect: '',
+    desc: ''
+  } : (EL.getMoves().filter(function(x){ return x.id === id; })[0] || {});
+
+  var kindOptions = ['Рукопашный', 'Чи-блокинг', 'Оружейный', 'Тактический'].map(function(k){
+    return '<option value="' + k + '" ' + (m.kind === k ? 'selected' : '') + '>' + k + '</option>';
+  }).join('');
+
+  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Приёмы', nav:'elMoves'}, {label: isNew ? 'Новый приём' : 'Редактирование'}]) +
+    '<button class="back" data-nav="elMoves">← Отмена</button>' +
+    '<h1>' + (isNew ? '✨ Новый боевой приём' : '✏️ Редактирование: ' + elEsc(m.name)) + '</h1>' +
+    '<div class="subtitle">НАСТРОЙКА ТАКТИЧЕСКОГО ДЕЙСТВИЯ, ЗАТРАТ ФВН И ОКНА ВОЗМОЖНОСТЕЙ</div>' +
+    '<div class="el-form-card" style="margin-top:16px;">' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Название приёма:</label>' +
+          '<input type="text" id="elMoveEditName" class="el-input" value="' + elEscA(m.name) + '" placeholder="Например: Блокировка меридиана руки">' +
+        '</div>' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Направление:</label>' +
+          '<select id="elMoveEditKind" class="el-select">' + kindOptions + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Стоимость (ФВН):</label>' +
+          '<input type="text" id="elMoveEditCost" class="el-input" value="' + elEscA(m.cost || '1 ФВН') + '" placeholder="0 ФВН, 1 ФВН, 2 ФВН...">' +
+        '</div>' +
+        '<div class="el-field-group">' +
+          '<label class="el-field-label">Навязываемое Окно возможностей (A94):</label>' +
+          '<input type="text" id="elMoveEditWin" class="el-input" value="' + elEscA(m.opensWindow || 'СБИТ') + '" placeholder="СБИТ, ОБЕЗДВИЖЕН, ОСЛЕПЛЁН, СВЯЗАН, СПИНА, ИСТОЩЁН, ЧИ-БЛОК">' +
+        '</div>' +
+      '</div>' +
+      '<div class="el-field-group">' +
+        '<label class="el-field-label">Условие применения / Оружие / Действие:</label>' +
+        '<input type="text" id="elMoveEditTrigger" class="el-input" value="' + elEscA(m.trigger || '') + '" placeholder="Ближний бой, после парирования, свободное действие...">' +
+      '</div>' +
+      '<div class="el-field-group">' +
+        '<label class="el-field-label">Тактический эффект приёма:</label>' +
+        '<input type="text" id="elMoveEditEffect" class="el-input" value="' + elEscA(m.effect || '') + '" placeholder="Цель проходит спасбросок Ловкости СЛ 14 или падает ничком...">' +
+      '</div>' +
+      '<div class="el-field-group">' +
+        '<label class="el-field-label">Боевое описание и лор:</label>' +
+        '<textarea id="elMoveEditDesc" class="el-textarea" rows="4" placeholder="Опишите механику выполнения приёма, воздействие на сухожилия или точки ци...">' + elEsc(m.desc || '') + '</textarea>' +
+      '</div>' +
+      '<div class="sheet-actions" style="margin-top:16px;display:flex;gap:10px;">' +
+        '<button class="btn-primary" id="elMoveSaveBtn">Сохранить приём</button>' +
+        '<button class="btn-ghost" data-nav="elMoves">Отмена</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function wireElMoveEdit(){
+  var saveBtn = document.getElementById('elMoveSaveBtn');
+  if(saveBtn){
+    saveBtn.onclick = function(){
+      var name = document.getElementById('elMoveEditName').value.trim();
+      if(!name){ alert('Введите название приёма'); return; }
+      var kind = document.getElementById('elMoveEditKind').value;
+      var cost = document.getElementById('elMoveEditCost').value.trim() || '1 ФВН';
+      var win = document.getElementById('elMoveEditWin').value.trim() || 'СБИТ';
+      var trigger = document.getElementById('elMoveEditTrigger').value.trim() || 'Ближний бой';
+      var effect = document.getElementById('elMoveEditEffect').value.trim();
+      var desc = document.getElementById('elMoveEditDesc').value.trim();
+
+      var moves = EL.getMoves();
+      var isNew = view.shId === 'new';
+      var targetId = isNew ? ('move_' + Date.now()) : view.shId;
+
+      var record = {
+        id: targetId,
+        name: name,
+        kind: kind,
+        cost: cost,
+        opensWindow: win,
+        trigger: trigger,
+        effect: effect,
+        desc: desc
+      };
+
+      if(isNew){
+        moves.push(record);
+      } else {
+        moves = moves.map(function(x){ return x.id === targetId ? record : x; });
+      }
+
+      EL.saveMoves(moves);
+      window.navigate('elMoveView:' + targetId);
+    };
+  }
+}
+
+/* ============================================================
+   5. КАРТА МИРА (EL-MAP) И КАЛЬКУЛЯТОР ПУТЕШЕСТВИЙ
+   ============================================================ */
+
+function elMap(){
+  var st = EL.getMapState();
+  var locations = EL_MAP_LOCATIONS;
+  var selLoc = locations.filter(function(l){ return l.id === st.selectedId; })[0] || locations[0];
+  var fromLoc = locations.filter(function(l){ return l.id === st.routeFrom; })[0] || locations[0];
+  var toLoc = locations.filter(function(l){ return l.id === st.routeTo; })[0] || locations[1];
+
+  var filterNation = st.filter || 'all';
+
+  var nationChips = [
+    { id: 'all', label: 'Все земли (' + locations.length + ')' },
+    { id: 'Царство Земли', label: '⛰️ Царство Земли' },
+    { id: 'Народ Огня', label: '🔥 Народ Огня' },
+    { id: 'Племена Воды', label: '🌊 Племена Воды' },
+    { id: 'Воздушные Кочевники', label: '🌪️ Воздушные Кочевники' },
+    { id: 'Объединённая Республика', label: '🏙️ Объединённая Республика' }
+  ].map(function(c){
+    return '<button class="el-filter-pill ' + (filterNation === c.id ? 'active' : '') + '" data-map-nation="' + elEscA(c.id) + '">' +
+      c.label +
+    '</button>';
+  }).join('');
+
+  // Расчет дистанции по координатам
+  var dx = toLoc.x - fromLoc.x;
+  var dy = toLoc.y - fromLoc.y;
+  var pixelDist = Math.sqrt(dx*dx + dy*dy);
+  // Масштаб: 1 пиксель карты ≈ 3.5 ли (1.75 км).
+  var distanceLi = Math.round(pixelDist * 3.5);
+  var distanceKm = Math.round(distanceLi * 0.5);
+
+  var transport = st.transport || 'bison';
+  var speedData = {
+    bison: { name: '🦬 Летающий бизон', speed: 220, type: 'air', desc: 'Прямой полёт над горами и морями. Не обращает внимания на рельеф местности.' },
+    ship:  { name: '🚢 Паровой крейсер Народа Огня', speed: 130, type: 'sea', desc: 'Движение по морским и речным путям. Требует наличия открытой воды.' },
+    train: { name: '🚂 Монорельс / Бронепоезд Ба Синг Се', speed: 260, type: 'rail', desc: 'Высокоскоростная железная дорога. Доступна только в пределах Царства Земли.' },
+    cart:  { name: '🦨 Страусовая лошадь / Караван', speed: 35, type: 'land', desc: 'Сухопутные караванные пути. Опасность нападений даофэй и песчаных бурь.' },
+    walk:  { name: '👣 Пеший переход', speed: 20, type: 'foot', desc: 'Тяжелый марш. Каждые 3 дня требуется отдых или тратится 1 ФВН на преодоление истощения.' }
+  };
+  var curTr = speedData[transport] || speedData.bison;
+  var daysTravel = (distanceLi / curTr.speed).toFixed(1);
+  var hoursTravel = Math.round(daysTravel * 24);
+
+  // SVG-линия маршрута между fromLoc и toLoc
+  var routeLineSvg = '';
+  if(fromLoc.id !== toLoc.id){
+    var mx = (fromLoc.x + toLoc.x) / 2;
+    var my = (fromLoc.y + toLoc.y) / 2 - 25; // дуга вверх
+    routeLineSvg = '<path d="M ' + fromLoc.x + ' ' + fromLoc.y + ' Q ' + mx + ' ' + my + ' ' + toLoc.x + ' ' + toLoc.y + '" ' +
+      'fill="none" stroke="var(--el-accent)" stroke-width="2.5" stroke-dasharray="6,5" stroke-linecap="round" opacity="0.85"/>';
+  }
+
+  // Генерация пинов локаций
+  var pinsSvg = locations.map(function(l){
+    var isVis = (filterNation === 'all' || l.nation === filterNation);
+    var isSel = (l.id === selLoc.id);
+    var isFrom = (l.id === fromLoc.id);
+    var isTo = (l.id === toLoc.id);
+
+    var pinColor = '#34d399';
+    if(l.nation === 'Народ Огня') pinColor = '#ef4444';
+    else if(l.nation === 'Племена Воды') pinColor = '#38bdf8';
+    else if(l.nation === 'Воздушные Кочевники') pinColor = '#fbbf24';
+    else if(l.nation === 'Объединённая Республика') pinColor = '#c084fc';
+
+    var pulseSvg = isSel ? '<circle cx="' + l.x + '" cy="' + l.y + '" r="14" fill="none" stroke="' + pinColor + '" class="el-pin-pulse"/>' : '';
+
+    var outerBorder = isSel ? '#ffffff' : 'rgba(0,0,0,0.6)';
+    var outerR = isSel ? 7 : 5;
+
+    var badgeText = isFrom ? ' [СТАРТ]' : isTo ? ' [ЦЕЛЬ]' : '';
+
+    return '<g class="el-map-pin" data-pin-id="' + elEscA(l.id) + '" opacity="' + (isVis ? '1' : '0.25') + '">' +
+      pulseSvg +
+      '<circle cx="' + l.x + '" cy="' + l.y + '" r="' + (outerR + 2) + '" fill="rgba(0,0,0,0.7)"/>' +
+      '<circle cx="' + l.x + '" cy="' + l.y + '" r="' + outerR + '" fill="' + pinColor + '" stroke="' + outerBorder + '" stroke-width="1.8"/>' +
+      '<text x="' + (l.x + 9) + '" y="' + (l.y + 4) + '" fill="' + (isSel ? '#ffffff' : '#cbd5e1') + '" font-size="' + (isSel ? '12.5' : '10.5') + '" font-weight="' + (isSel ? '800' : '600') + '">' +
+        elEsc(l.name.split(' (')[0]) + badgeText +
+      '</text>' +
+    '</g>';
+  }).join('');
+
+  var fromOpts = locations.map(function(l){
+    return '<option value="' + elEscA(l.id) + '" ' + (l.id === fromLoc.id ? 'selected' : '') + '>' + l.nationIcon + ' ' + elEsc(l.name) + '</option>';
+  }).join('');
+
+  var toOpts = locations.map(function(l){
+    return '<option value="' + elEscA(l.id) + '" ' + (l.id === toLoc.id ? 'selected' : '') + '>' + l.nationIcon + ' ' + elEsc(l.name) + '</option>';
+  }).join('');
+
+  var transportPills = Object.keys(speedData).map(function(k){
+    var item = speedData[k];
+    return '<button class="el-filter-pill ' + (transport === k ? 'active' : '') + '" data-tr-key="' + k + '">' +
+      item.name +
+    '</button>';
+  }).join('');
+
+  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Карта мира'}]) +
+    '<button class="back" data-nav="home">← Назад в меню</button>' +
+    '<h1>🗺️ КАРТА МИРА ЧЕТЫРЁХ НАРОДОВ</h1>' +
+    '<div class="subtitle">ИНТЕРАКТИВНЫЙ АТЛАС ЗЕМЕЛЬ, ОКЕАНОВ И СТОЛИЦ • ДОСЬЕ ЛОКАЦИЙ • РАСЧЁТ ВРЕМЕНИ В ПУТИ</div>' +
+    
+    // Фильтр наций
+    '<div class="el-filter-bar" style="margin-top:14px;">' + nationChips + '</div>' +
+
+    // Контейнер карты SVG
+    '<div class="el-map-outer">' +
+      '<div class="el-map-header">' +
+        '<div style="font-size:13px;font-weight:700;color:#fff;font-family:Cinzel,serif;display:flex;align-items:center;gap:8px;">' +
+          '<span>🧭 КАРТОГРАФИЧЕСКИЙ АТЛАС МИРА АВАТАРА</span>' +
+          '<span style="font-size:11px;color:var(--el-accent);background:var(--el-accent-dim);padding:2px 8px;border-radius:4px;font-family:JetBrains Mono,monospace;">1000 × 620 ЛИ</span>' +
+        '</div>' +
+        '<div class="el-map-legend">' +
+          '<div class="el-map-legend-item"><span class="el-map-legend-dot" style="background:#ef4444;"></span> Народ Огня</div>' +
+          '<div class="el-map-legend-item"><span class="el-map-legend-dot" style="background:#38bdf8;"></span> Племена Воды</div>' +
+          '<div class="el-map-legend-item"><span class="el-map-legend-dot" style="background:#34d399;"></span> Царство Земли</div>' +
+          '<div class="el-map-legend-item"><span class="el-map-legend-dot" style="background:#fbbf24;"></span> Воздушные Храмы</div>' +
+          '<div class="el-map-legend-item"><span class="el-map-legend-dot" style="background:#c084fc;"></span> Республика</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="el-map-canvas-wrap">' +
+        '<svg class="el-map-svg" viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg">' +
+          '<defs>' +
+            '<radialGradient id="oceanBg" cx="50%" cy="50%" r="60%">' +
+              '<stop offset="0%" stop-color="#121e33"/>' +
+              '<stop offset="100%" stop-color="#080e18"/>' +
+            '</radialGradient>' +
+            '<linearGradient id="earthGrad" x1="0%" y1="0%" x2="100%" y2="100%">' +
+              '<stop offset="0%" stop-color="#1c3426"/>' +
+              '<stop offset="50%" stop-color="#14261c"/>' +
+              '<stop offset="100%" stop-color="#0e1a13"/>' +
+            '</linearGradient>' +
+            '<linearGradient id="fireGrad" x1="0%" y1="0%" x2="100%" y2="100%">' +
+              '<stop offset="0%" stop-color="#3d1b1b"/>' +
+              '<stop offset="100%" stop-color="#241010"/>' +
+            '</linearGradient>' +
+            '<linearGradient id="waterIceGrad" x1="0%" y1="0%" x2="100%" y2="100%">' +
+              '<stop offset="0%" stop-color="#1c3b52"/>' +
+              '<stop offset="100%" stop-color="#0c2030"/>' +
+            '</linearGradient>' +
+          '</defs>' +
+          
+          // Фоновый океан
+          '<rect width="1000" height="620" fill="url(#oceanBg)"/>' +
+
+          // Сетка координат (широты и долготы)
+          '<line x1="0" y1="120" x2="1000" y2="120" stroke="rgba(255,255,255,0.04)" stroke-dasharray="4,8"/>' +
+          '<line x1="0" y1="310" x2="1000" y2="310" stroke="rgba(255,255,255,0.08)" stroke-width="1.2"/>' +
+          '<line x1="0" y1="500" x2="1000" y2="500" stroke="rgba(255,255,255,0.04)" stroke-dasharray="4,8"/>' +
+          '<line x1="250" y1="0" x2="250" y2="620" stroke="rgba(255,255,255,0.04)" stroke-dasharray="4,8"/>' +
+          '<line x1="500" y1="0" x2="500" y2="620" stroke="rgba(255,255,255,0.08)" stroke-width="1.2"/>' +
+          '<line x1="750" y1="0" x2="750" y2="620" stroke="rgba(255,255,255,0.04)" stroke-dasharray="4,8"/>' +
+
+          // 1. СЕВЕРНЫЙ ПОЛЮС (ПЛЕМЯ ВОДЫ)
+          '<path d="M 320 20 Q 520 10 720 20 L 740 75 Q 630 105 520 95 Q 410 105 300 75 Z" fill="url(#waterIceGrad)" stroke="#38bdf8" stroke-width="1.5" opacity="0.9"/>' +
+          '<path d="M 460 50 Q 520 35 580 50 L 570 75 Q 520 65 470 75 Z" fill="#224c6d" opacity="0.6"/>' +
+
+          // 2. ЮЖНЫЙ ПОЛЮС (ПЛЕМЯ ВОДЫ)
+          '<path d="M 280 550 Q 500 525 720 550 L 750 615 Q 500 625 250 615 Z" fill="url(#waterIceGrad)" stroke="#38bdf8" stroke-width="1.5" opacity="0.9"/>' +
+          '<path d="M 440 545 Q 500 535 560 545 L 555 580 Q 500 570 445 580 Z" fill="#224c6d" opacity="0.6"/>' +
+
+          // 3. НАРОД ОГНЯ (ЗАПАДНЫЙ АРХИПЕЛАГ)
+          // Главный остров Кальдеры
+          '<path d="M 160 270 Q 230 240 265 285 Q 275 340 215 365 Q 150 335 160 270 Z" fill="url(#fireGrad)" stroke="#ef4444" stroke-width="1.5"/>' +
+          '<circle cx="215" cy="310" r="10" fill="#4d1616" stroke="#f87171" stroke-width="1"/>' + // Кратер Кальдеры
+          // Остров Полумесяца
+          '<path d="M 345 280 Q 370 295 355 315 Q 335 300 345 280 Z" fill="url(#fireGrad)" stroke="#ef4444" stroke-width="1.2"/>' +
+          // Кипящая скала
+          '<path d="M 265 250 Q 285 255 280 275 Q 260 270 265 250 Z" fill="url(#fireGrad)" stroke="#ef4444" stroke-width="1"/>' +
+          // Угольный остров
+          '<path d="M 315 345 Q 340 345 330 370 Q 310 365 315 345 Z" fill="url(#fireGrad)" stroke="#ef4444" stroke-width="1"/>' +
+          // Остров Воинов Солнца (Юг)
+          '<path d="M 170 385 Q 205 385 195 415 Q 165 410 170 385 Z" fill="url(#fireGrad)" stroke="#ef4444" stroke-width="1"/>' +
+          // Мелкие островки архипелага
+          '<path d="M 125 240 Q 145 235 140 255 Z" fill="url(#fireGrad)" stroke="#ef4444" stroke-width="0.8"/>' +
+          '<path d="M 135 310 Q 150 315 145 330 Z" fill="url(#fireGrad)" stroke="#ef4444" stroke-width="0.8"/>' +
+
+          // 4. ЦАРСТВО ЗЕМЛИ (ВЕЛИКИЙ КОНТИНЕНТ)
+          '<path d="M 380 170 Q 520 120 700 135 Q 860 155 935 240 Q 960 340 910 430 Q 800 480 670 495 Q 540 515 440 475 Q 375 410 415 335 Q 365 270 395 205 Z" fill="url(#earthGrad)" stroke="#34d399" stroke-width="2"/>' +
+          
+          // Пустыня Ши Вонг (Песчаное плато внутри Царства Земли)
+          '<ellipse cx="640" cy="360" rx="90" ry="48" fill="#383018" stroke="#ca8a04" stroke-width="1.2" stroke-dasharray="3,3" opacity="0.85"/>' +
+          '<text x="605" y="340" fill="#ca8a04" font-size="10" font-weight="700" letter-spacing="2" opacity="0.35">ПУСТЫНЯ ШИ ВОНГ</text>' +
+
+          // Великое Туманное Болото
+          '<ellipse cx="525" cy="460" rx="42" ry="24" fill="#143026" stroke="#10b981" stroke-width="1" stroke-dasharray="2,2"/>' +
+          '<text x="495" y="445" fill="#34d399" font-size="8" font-style="italic" opacity="0.35">Туманное Болото</text>' +
+
+          // Великие стены Ба Синг Се
+          '<circle cx="690" cy="220" r="54" fill="none" stroke="#34d399" stroke-width="1.8" stroke-dasharray="4,3"/>' +
+          '<circle cx="690" cy="220" r="28" fill="#10291a" stroke="#10b981" stroke-width="1.5"/>' +
+          '<text x="655" y="195" fill="#a7f3d0" font-size="9" font-weight="800" opacity="0.35">БА СИНГ СЕ</text>' +
+
+          // Озеро Лаогай
+          '<ellipse cx="740" cy="250" rx="14" ry="7" fill="#16384c" stroke="#38bdf8" stroke-width="0.8"/>' +
+
+          // Остров Киоши
+          '<path d="M 405 485 Q 435 480 430 505 Q 410 510 405 485 Z" fill="url(#earthGrad)" stroke="#34d399" stroke-width="1.2"/>' +
+
+          // Залив Юи (Республиканский город)
+          '<path d="M 410 270 Q 435 260 455 285 Q 440 305 410 290 Z" fill="#0d1b2d" opacity="0.7"/>' +
+
+          // Роза ветров (Компас в левом нижнем углу)
+          '<g transform="translate(70, 530)">' +
+            '<circle cx="0" cy="0" r="32" fill="rgba(0,0,0,0.5)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>' +
+            '<path d="M 0 -28 L 6 0 L 0 28 L -6 0 Z" fill="#ef4444"/>' +
+            '<path d="M -28 0 L 0 6 L 28 0 L 0 -6 Z" fill="#cbd5e1"/>' +
+            '<circle cx="0" cy="0" r="4" fill="#fff"/>' +
+            '<text x="-4" y="-32" fill="#fff" font-size="10" font-weight="800">С</text>' +
+            '<text x="-4" y="42" fill="#94a3b8" font-size="10" font-weight="700">Ю</text>' +
+            '<text x="34" y="4" fill="#94a3b8" font-size="10" font-weight="700">В</text>' +
+            '<text x="-44" y="4" fill="#94a3b8" font-size="10" font-weight="700">З</text>' +
+          '</g>' +
+
+          // Линия маршрута
+          routeLineSvg +
+
+          // Пины локаций
+          pinsSvg +
+
+        '</svg>' +
+      '</div>' +
+    '</div>' +
+
+    // ДОСЬЕ ВЫБРАННОЙ ЛОКАЦИИ
+    '<div class="el-loc-dossier">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:12px;">' +
+        '<div>' +
+          '<div style="font-size:22px;font-weight:800;color:#fff;font-family:Cinzel,serif;">' +
+            selLoc.nationIcon + ' ' + elEsc(selLoc.name) +
+          '</div>' +
+          '<div style="font-size:12px;color:var(--el-accent);font-family:JetBrains Mono,monospace;margin-top:2px;">' +
+            'ПРИНАДЛЕЖНОСТЬ: ' + elEsc(selLoc.nation).toUpperCase() + ' // КООРДИНАТЫ [' + selLoc.x + ', ' + selLoc.y + ']' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button class="btn-primary" id="elSetRouteFrom" style="font-size:12px;padding:6px 12px;">📍 Отсюда (Старт)</button>' +
+          '<button class="btn-primary" id="elSetRouteTo" style="font-size:12px;padding:6px 12px;background:var(--el-accent-dim);border:1px solid var(--el-accent-border);color:var(--el-tag-text);">🎯 Сюда (Цель)</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px;background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:4px;border:1px solid rgba(255,255,255,0.06);">' +
+        '<div><span style="font-size:11px;color:#94a3b8;font-family:JetBrains Mono,monospace;">ПРАВИТЕЛЬ / ВЛАСТЬ:</span><br><b style="font-size:13px;color:#fff;">' + elEsc(selLoc.ruler) + '</b></div>' +
+        '<div><span style="font-size:11px;color:#94a3b8;font-family:JetBrains Mono,monospace;">КЛИМАТ И МЕСТНОСТЬ:</span><br><b style="font-size:13px;color:#fff;">' + elEsc(selLoc.climate) + '</b></div>' +
+        '<div><span style="font-size:11px;color:#94a3b8;font-family:JetBrains Mono,monospace;">ОПАСНОСТЬ:</span><br><b style="font-size:13px;color:#fca5a5;">' + elEsc(selLoc.danger) + '</b></div>' +
+        '<div><span style="font-size:11px;color:#94a3b8;font-family:JetBrains Mono,monospace;">СТАТУС:</span><br><b style="font-size:13px;color:#7dd3fc;">Каноничная локация Вселенной</b></div>' +
+      '</div>' +
+      '<div style="font-size:13.5px;color:#cbd5e1;line-height:1.55;font-family:EB Garamond,serif;font-style:italic;">' +
+        elEsc(selLoc.desc) +
+      '</div>' +
+    '</div>' +
+
+    // КАЛЬКУЛЯТОР ПУТЕШЕСТВИЙ
+    '<div class="el-calc-card">' +
+      '<div style="font-size:16px;font-weight:700;color:#fff;font-family:Cinzel,serif;margin-bottom:12px;display:flex;align-items:center;gap:8px;">' +
+        '<span>⏱️ КАЛЬКУЛЯТОР ПУТЕШЕСТВИЙ И РАСЧЁТ МАРШРУТА</span>' +
+      '</div>' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px;">' +
+        '<div>' +
+          '<label class="el-field-label">Точка отправления (Откуда):</label>' +
+          '<select id="elRouteFromSel" class="el-select">' + fromOpts + '</select>' +
+        '</div>' +
+        '<div>' +
+          '<label class="el-field-label">Пункт назначения (Куда):</label>' +
+          '<select id="elRouteToSel" class="el-select">' + toOpts + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<label class="el-field-label">Способ перемещения:</label>' +
+        '<div class="el-filter-bar" style="margin-bottom:10px;">' + transportPills + '</div>' +
+      '</div>' +
+
+      // Результат расчёта
+      '<div class="el-calc-result-box">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:8px;">' +
+          '<div>' +
+            '<div style="font-size:12px;color:#94a3b8;font-family:JetBrains Mono,monospace;">МАРШРУТ: ' + elEsc(fromLoc.name) + ' → ' + elEsc(toLoc.name) + '</div>' +
+            '<div style="font-size:20px;font-weight:800;color:var(--el-accent);font-family:Cinzel,serif;margin-top:2px;">' +
+              'Расстояние: ' + distanceLi + ' ли (~' + distanceKm + ' км)' +
+            '</div>' +
+          '</div>' +
+          '<div style="text-align:right;">' +
+            '<div style="font-size:12px;color:#94a3b8;font-family:JetBrains Mono,monospace;">РАСЧЁТНОЕ ВРЕМЯ В ПУТИ:</div>' +
+            '<div style="font-size:22px;font-weight:800;color:#fff;font-family:Cinzel,serif;">' +
+              daysTravel + ' дней <span style="font-size:14px;color:#94a3b8;font-weight:normal;">(~' + hoursTravel + ' ч)</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#cbd5e1;line-height:1.45;border-top:1px solid rgba(255,255,255,0.08);padding-top:8px;margin-top:6px;">' +
+          '<b>Особенности транспорта:</b> ' + curTr.desc + ' ' +
+          (curTr.type === 'sea' && (fromLoc.climate.indexOf('пустыня') >= 0 || toLoc.climate.indexOf('пустыня') >= 0) ? '<br><span style="color:#fca5a5;">⚠️ Внимание: в пункте назначения отсутствует выход к морю! Потребуется комбинированный сухопутный переход.</span>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+function wireElMap(){
+  var st = EL.getMapState();
+
+  // Клик по фильтрам наций
+  var nationPills = document.querySelectorAll('[data-map-nation]');
+  nationPills.forEach(function(p){
+    p.onclick = function(){
+      st.filter = this.getAttribute('data-map-nation');
+      EL.saveMapState(st);
+      var app = document.getElementById('app');
+      app.innerHTML = elMap();
+      _w();
+      wireElMap();
+    };
+  });
+
+  // Клик по пинам на карте
+  var pins = document.querySelectorAll('[data-pin-id]');
+  pins.forEach(function(pin){
+    pin.onclick = function(){
+      var id = this.getAttribute('data-pin-id');
+      st.selectedId = id;
+      EL.saveMapState(st);
+      var app = document.getElementById('app');
+      app.innerHTML = elMap();
+      _w();
+      wireElMap();
+    };
+  });
+
+  // Кнопки установки Старта и Цели из досье
+  var setFromBtn = document.getElementById('elSetRouteFrom');
+  if(setFromBtn){
+    setFromBtn.onclick = function(){
+      st.routeFrom = st.selectedId;
+      EL.saveMapState(st);
+      var app = document.getElementById('app');
+      app.innerHTML = elMap();
+      _w();
+      wireElMap();
+    };
+  }
+
+  var setToBtn = document.getElementById('elSetRouteTo');
+  if(setToBtn){
+    setToBtn.onclick = function(){
+      st.routeTo = st.selectedId;
+      EL.saveMapState(st);
+      var app = document.getElementById('app');
+      app.innerHTML = elMap();
+      _w();
+      wireElMap();
+    };
+  }
+
+  // Селекторы Откуда / Куда
+  var fromSel = document.getElementById('elRouteFromSel');
+  if(fromSel){
+    fromSel.onchange = function(){
+      st.routeFrom = this.value;
+      EL.saveMapState(st);
+      var app = document.getElementById('app');
+      app.innerHTML = elMap();
+      _w();
+      wireElMap();
+    };
+  }
+
+  var toSel = document.getElementById('elRouteToSel');
+  if(toSel){
+    toSel.onchange = function(){
+      st.routeTo = this.value;
+      EL.saveMapState(st);
+      var app = document.getElementById('app');
+      app.innerHTML = elMap();
+      _w();
+      wireElMap();
+    };
+  }
+
+  // Транспортные кнопки
+  var trPills = document.querySelectorAll('[data-tr-key]');
+  trPills.forEach(function(b){
+    b.onclick = function(){
+      st.transport = this.getAttribute('data-tr-key');
+      EL.saveMapState(st);
+      var app = document.getElementById('app');
+      app.innerHTML = elMap();
+      _w();
+      wireElMap();
+    };
+  });
+}
+
+// Экспорт функций на window
+window.elTechs = elTechs;
+window.wireElTechs = wireElTechs;
+window.elTechView = elTechView;
+window.wireElTechView = wireElTechView;
+window.elTechEdit = elTechEdit;
+window.wireElTechEdit = wireElTechEdit;
+
+window.elMoves = elMoves;
+window.wireElMoves = wireElMoves;
+window.elMoveView = elMoveView;
+window.wireElMoveView = wireElMoveView;
+window.elMoveEdit = elMoveEdit;
+window.wireElMoveEdit = wireElMoveEdit;
+
+window.elMap = elMap;
+window.wireElMap = wireElMap;
+
+
+
 
 
 // 5. ГЛАВНЫЙ ЭКРАН КОДЕКСА ГАЛАКТИКИ (КАТАЛОГ С ПОИСКОМ)
@@ -25147,6 +27103,76 @@ window.render=function(){
       paintShBar();
       return;
     }
+    if(s === 'elTechs'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      app.innerHTML = elTechs();
+      _w();
+      if(typeof wireElTechs === 'function') wireElTechs();
+      paintShBar();
+      return;
+    }
+    if(s === 'elTechView'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      app.innerHTML = elTechView(view.shId || view.techId);
+      _w();
+      if(typeof wireElTechView === 'function') wireElTechView();
+      paintShBar();
+      return;
+    }
+    if(s === 'elTechEdit'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      app.innerHTML = elTechEdit(view.shId || view.techId);
+      _w();
+      if(typeof wireElTechEdit === 'function') wireElTechEdit();
+      paintShBar();
+      return;
+    }
+    if(s === 'elMoves'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      app.innerHTML = elMoves();
+      _w();
+      if(typeof wireElMoves === 'function') wireElMoves();
+      paintShBar();
+      return;
+    }
+    if(s === 'elMoveView'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      app.innerHTML = elMoveView(view.shId || view.moveId);
+      _w();
+      if(typeof wireElMoveView === 'function') wireElMoveView();
+      paintShBar();
+      return;
+    }
+    if(s === 'elMoveEdit'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      app.innerHTML = elMoveEdit(view.shId || view.moveId);
+      _w();
+      if(typeof wireElMoveEdit === 'function') wireElMoveEdit();
+      paintShBar();
+      return;
+    }
+    if(s === 'elMap'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      app.innerHTML = elMap();
+      _w();
+      if(typeof wireElMap === 'function') wireElMap();
+      paintShBar();
+      return;
+    }
     var app = document.getElementById('app');
     app.classList.remove('wide');
     app.classList.add('home-wide');
@@ -25265,6 +27291,9 @@ window.navigate=function(val){
       elHome: 'elHome',
       elData: 'elData',
       elRef: 'elRef',
+      elTechs: 'elTechs',
+      elMoves: 'elMoves',
+      elMap: 'elMap',
       dice: 'dice'
     };
     if(elScreens[p[0]]){
@@ -25275,6 +27304,12 @@ window.navigate=function(val){
     }
     if(p[0] === 'elRefView'){
       window.view = view = { screen: 'elRefView', refKey: p[1] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'elTechView' || p[0] === 'elTechEdit' || p[0] === 'elMoveView' || p[0] === 'elMoveEdit'){
+      window.view = view = { screen: p[0], shId: p[1], techId: p[1], moveId: p[1] };
       render();
       window.scrollTo(0,0);
       return;
