@@ -918,7 +918,7 @@
 }
 .hb-seg-btn{
   background:transparent; border:0; color:var(--ink-dim);
-  padding:5px 14px; font-size:12.5px; cursor:pointer; font-family:inherit; letter-spacing:.02em;
+  padding:5px 14px; font-size:13.5px !important; cursor:pointer; font-family:'EB Garamond', serif !important; letter-spacing:.02em !important;
 }
 .hb-seg-btn.on{ background:var(--brass); color:#101216; font-weight:600; }
 .hb-bar-world{
@@ -4165,7 +4165,7 @@ body.me-theme .die-coin-btn:hover {
    MASS EFFECT BUTTONS & SCI-FI UI CONTROLS
    ============================================================ */
 
-body.me-theme button {
+body.me-theme button:not(.hb-seg-btn) {
   font-family: 'JetBrains Mono', monospace;
   box-sizing: border-box;
   outline: none;
@@ -4451,12 +4451,14 @@ body.me-theme .hero-dice-icon {
   height: 60px !important;
 }
 body.me-theme .hero-dice-name {
+  font-family: 'Cinzel', serif !important;
   font-size: 24px !important;
   font-weight: 700 !important;
   margin-bottom: 4px !important;
   letter-spacing: 0.03em !important;
 }
 body.me-theme .hero-dice-desc {
+  font-family: 'EB Garamond', serif !important;
   font-size: 14.5px !important;
   font-style: italic !important;
   color: #7da5c9 !important;
@@ -4514,6 +4516,7 @@ body.me-theme .menu-item:hover {
 }
 
 body.me-theme .menu-item .name {
+  font-family: 'Cinzel', serif !important;
   font-size: 20px !important;
   font-weight: 700 !important;
   letter-spacing: 0.02em !important;
@@ -4525,6 +4528,7 @@ body.me-theme .menu-item .name {
 }
 
 body.me-theme .menu-item .desc {
+  font-family: 'EB Garamond', serif !important;
   font-size: 15px !important;
   font-style: italic !important;
   color: #7da5c9 !important;
@@ -6775,6 +6779,151 @@ body.el-theme .el-rule {
   background: linear-gradient(90deg, rgba(16, 185, 129, 0.6), transparent 75%);
   width: 100%;
 }
+
+/* Элементальный экран костей для Стихии */
+body.el-theme .dice-tray {
+  background: rgba(6, 18, 14, 0.92);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-left: 4px solid #10b981;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.12) inset, 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+body.el-theme .dice-total-row .sum {
+  color: #10b981;
+  font-family: 'JetBrains Mono', monospace;
+  text-shadow: 0 0 20px rgba(16, 185, 129, 0.65);
+}
+
+body.el-theme .dice-total-row .cap {
+  color: #6ee7b7;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+body.el-theme .dice-notation {
+  color: #a7f3d0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+body.el-theme .die-btn {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 2px;
+}
+
+body.el-theme .die-btn:hover {
+  border: none !important;
+  box-shadow: none !important;
+  transform: translateY(-2px);
+}
+
+body.el-theme .die-coin-btn {
+  border-color: rgba(16, 185, 129, 0.45);
+}
+
+body.el-theme .die-coin-btn:hover {
+  border-color: #10b981;
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.5);
+}
+
+body.el-theme .mod-ctrl {
+  background: rgba(8, 20, 16, 0.85);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+body.el-theme .mod-btn {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+  color: #34d399 !important;
+}
+
+body.el-theme .mod-btn:hover {
+  background: rgba(16, 185, 129, 0.3) !important;
+  border-color: #10b981 !important;
+  color: #fff !important;
+}
+
+body.el-theme .mod-val {
+  color: #10b981;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+body.el-theme .custom-die-box {
+  background: rgba(8, 20, 16, 0.9);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-left: 4px solid #10b981;
+}
+
+body.el-theme .custom-die-title {
+  color: #e2e8f0;
+}
+
+body.el-theme .custom-highlight {
+  color: #34d399;
+  font-weight: 700;
+}
+
+body.el-theme .custom-input {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #e2e8f0;
+}
+
+body.el-theme .custom-pill {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #94a3b8;
+}
+
+body.el-theme .custom-pill.active {
+  background: #10b981;
+  color: #070b0e;
+  font-weight: 700;
+}
+
+body.el-theme .custom-add-btn {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border: 1px solid rgba(16, 185, 129, 0.45) !important;
+  color: #34d399 !important;
+}
+
+body.el-theme .custom-add-btn:hover {
+  background: #10b981 !important;
+  color: #070b0e !important;
+}
+
+body.el-theme .label-picker {
+  background: rgba(8, 20, 16, 0.85);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+body.el-theme .label-picker select,
+body.el-theme .label-picker input {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #e2e8f0;
+}
+
+body.el-theme .back {
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+body.el-theme .back:hover {
+  border-color: #10b981;
+  color: #10b981;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+}
+
+body.el-theme .rule {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.6), transparent 75%);
+}
+
+body.el-theme h1 {
+  color: #f0fdf4;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+}
 </style>
 </head>
 <body>
@@ -7598,6 +7747,16 @@ function handleGenerateClick(btn){
 }
 
 const DICE_LABEL_CATEGORIES = window.DICE_LABEL_CATEGORIES = [
+  {key:'elements', icon:'🌀', ru:'Стихия', items:[
+    {icon:'🔥', ru:'Огненный выброс / Воспламенение', std:20},
+    {icon:'💧', ru:'Водный поток / Крио-удержание', std:20},
+    {icon:'⛰️', ru:'Земляной барьер / Сейсмический толчок', std:20},
+    {icon:'🌪️', ru:'Вихревой порыв / Удар молнии', std:20},
+    {icon:'💥', ru:'Стихийный резонанс (комбо)', std:null},
+    {icon:'🛡️', ru:'Стихийное поглощение / Щит', std:20},
+    {icon:'🎯', ru:'Сфокусированная атака стихией', std:20},
+    {icon:'🪙', ru:'Монетка баланса первоэлементов (50/50)', std:'coin'}
+  ]},
   {key:'space', icon:'🪐', ru:'Космос (Mass Effect)', items:[
     {icon:'🎯', ru:'Атака стрелковым оружием (по AC)', std:20},
     {icon:'🛡️', ru:'Активная защита (перекат / укрытие)', std:20},
@@ -7683,29 +7842,26 @@ function renderDice(){
 
   return `
     ${(function(){
-      if(HB.mode==='el'){
-    var elScreens = {
-      home: 'elHome',
-      elHome: 'elHome',
-      dice: 'dice'
-    };
-    if(elScreens[p[0]]){
-      window.view = view = { screen: elScreens[p[0]] };
-      render();
-      window.scrollTo(0,0);
-      return;
-    }
-  }
-  if(HB.mode==='me'){
-        return renderCrumb([{label:'Космос', nav:'meHome'},{label:'Тактический симулятор костей'}]) +
+      if(HB.mode==='me'){
+        return renderCrumb([{label:'Космос', nav:'meHome'},{label:'Бросок костей'}]) +
           '<button class="back" data-go="meHome">← Назад в Терминал</button>' +
-          '<h1>ТАКТИЧЕСКИЙ БРОСОК КОСТЕЙ</h1>' +
-          '<p class="subtitle">СИСТЕМЫ АЛЬЯНСА // ТАКТИЧЕСКИЙ СИМУЛЯТОР БРОСКОВ MASS EFFECT</p>';
+          '<h1>Бросок костей</h1>' +
+          '<p class="subtitle">СИСТЕМЫ АЛЬЯНСА // СИМУЛЯТОР БРОСКОВ MASS EFFECT</p>';
       } else if(HB.mode==='el'){
-        return renderCrumb([{label:'Стихия', nav:'elHome'},{label:'Стихийный бросок костей'}]) +
+        return renderCrumb([{label:'Стихия', nav:'elHome'},{label:'Бросок костей'}]) +
           '<button class="back" data-go="elHome">← Назад в Стихию</button>' +
-          '<h1>СТИХИЙНЫЙ БРОСОК КОСТЕЙ</h1>' +
+          '<h1>Бросок костей</h1>' +
           '<p class="subtitle">ЭНЕРГИЯ СТИХИЙ // БРОСКИ И МОДИФИКАТОРЫ</p>';
+      } else if(HB.mode==='sh'){
+        return renderCrumb([{label:'Шиноби', nav:'shHome'},{label:'Бросок костей'}]) +
+          '<button class="back" data-go="shHome">← Назад в Свитки</button>' +
+          '<h1>Бросок костей</h1>' +
+          '<p class="subtitle">Кости судьбы шиноби — чакра, техники и проверки характеристик.</p>';
+      } else if(HB.mode==='hb'){
+        return renderCrumb([{label:'Технологии', nav:'hbHome'},{label:'Бросок костей'}]) +
+          '<button class="back" data-go="hbHome">← Назад</button>' +
+          '<h1>Бросок костей</h1>' +
+          '<p class="subtitle">Виртуальные кости — как за столом, только d4 не теряется под диваном.</p>';
       }
       return renderCrumb([{label:'Компендиум', nav:'home'},{label:'Бросок костей'}]) +
         '<button class="back" data-go="home">← Назад</button>' +
@@ -20447,7 +20603,7 @@ function meHome(){
   var hero = '<div class="hero-dice" data-go="dice">'+
     '<div class="hero-dice-icon">'+(typeof dieShapeSvg==='function'? dieShapeSvg(20,'meHeroDie',20) : '🎲')+'</div>'+
     '<div class="hero-dice-text">'+
-      '<div class="hero-dice-name">ТАКТИЧЕСКИЙ БРОСОК КОСТЕЙ</div>'+
+      '<div class="hero-dice-name">Бросок костей</div>'+
       '<div class="hero-dice-desc">Кубики d4–d20, d100 критов, монетка шанса W/L и модификаторы ME</div>'+
     '</div><div class="hero-dice-arrow">→</div></div>';
 
@@ -21286,50 +21442,39 @@ function elHome(){
   var hero = '<div class="el-hero-dice" data-go="dice">' +
     '<div style="font-size:42px;line-height:1;">🎲</div>' +
     '<div style="flex:1;">' +
-      '<div style="font-size:22px;font-weight:700;letter-spacing:0.03em;color:#fff;margin-bottom:4px;">СТИХИЙНЫЙ БРОСОК КОСТЕЙ</div>' +
-      '<div style="font-size:14px;color:#94a3b8;">Кубики d4–d20, стихийные резонансы, модификаторы и проверки</div>' +
+      '<div class="hero-name" style="font-size:22px;font-weight:700;letter-spacing:0.03em;color:#fff;margin-bottom:4px;font-family:\'Cinzel\',serif;">Бросок костей</div>' +
+      '<div class="hero-desc" style="font-size:14px;color:#94a3b8;font-style:italic;font-family:\'EB Garamond\',serif;">Кубики d4–d20, стихийные резонансы, модификаторы и проверки</div>' +
     '</div>' +
     '<div style="font-size:24px;color:#10b981;font-weight:700;">→</div>' +
   '</div>';
 
   var items = [
-    { icon: '🔥', t: 'Стихия Огня и Пламени', d: 'Взрывы, ярость, воспламенение и разрушительная мощь' },
-    { icon: '💧', t: 'Стихия Воды и Льда',   d: 'Исцеление, крио-контроль, гибкость и поглощение урона' },
-    { icon: '⛰️', t: 'Стихия Земли и Металла', d: 'Сейсмические толчки, прочность, барьеры и монолит' },
-    { icon: '🌪️', t: 'Стихия Воздуха и Бури', d: 'Порывы ветра, молнии, скорость и вихревые потоки' },
-    { icon: '📜', t: 'Свитки и Древо Способностей', d: 'Стихийные техники, комбо-резонансы и таланты' },
     { icon: '⚙️', t: 'Хроники и Настройки', d: 'Управление профилем мастера стихий и параметры' }
   ];
 
   return '<div class="el-hud">' +
     '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
       '<div>' +
-        '<div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:0.02em;">Повелитель Стихий</div>' +
-        '<div style="font-size:13px;color:#10b981;margin-top:2px;">🌀 ХРОНИКИ СТИХИЙ // ТАКТИЧЕСКИЙ ТЕРМИНАЛ</div>' +
+        '<div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:0.02em;font-family:\'Cinzel\',serif;">Повелитель Стихий</div>' +
+        '<div style="font-size:13px;color:#10b981;margin-top:2px;font-family:\'JetBrains Mono\',monospace;">🌀 ХРОНИКИ СТИХИЙ // ТАКТИЧЕСКИЙ ТЕРМИНАЛ</div>' +
       '</div>' +
       '<div style="display:flex;gap:8px;">' +
-        '<span style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;">Ур. 1</span>' +
-        '<span style="background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:999px;font-size:12px;">Мастер 4 стихий</span>' +
+        '<span style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;font-family:\'JetBrains Mono\',monospace;">Ур. 1</span>' +
+        '<span style="background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:999px;font-size:12px;font-family:\'JetBrains Mono\',monospace;">Мастер 4 стихий</span>' +
       '</div>' +
-    '</div>' +
-    '<div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;">' +
-      '<div style="background:rgba(0,0,0,0.3);border:1px solid rgba(16,185,129,0.2);border-radius:4px;padding:6px 12px;font-size:13px;">🔥 Огонь: <b>10</b></div>' +
-      '<div style="background:rgba(0,0,0,0.3);border:1px solid rgba(16,185,129,0.2);border-radius:4px;padding:6px 12px;font-size:13px;">💧 Вода: <b>10</b></div>' +
-      '<div style="background:rgba(0,0,0,0.3);border:1px solid rgba(16,185,129,0.2);border-radius:4px;padding:6px 12px;font-size:13px;">⛰️ Земля: <b>10</b></div>' +
-      '<div style="background:rgba(0,0,0,0.3);border:1px solid rgba(16,185,129,0.2);border-radius:4px;padding:6px 12px;font-size:13px;">🌪️ Воздух: <b>10</b></div>' +
     '</div>' +
   '</div>' +
   '<div class="el-rule"></div>' +
   hero +
-  '<div class="section-label" style="font-size:11px;letter-spacing:0.1em;color:#10b981;font-weight:700;margin:18px 0 10px;">СТИХИЙНЫЕ ДИСЦИПЛИНЫ // СИСТЕМЫ</div>' +
+  '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:#10b981;font-weight:700;margin:18px 0 10px;font-family:\'JetBrains Mono\',monospace;">СИСТЕМНЫЕ РАЗДЕЛЫ // СТИХИЯ</div>' +
   '<div class="menu-list grid-2">' +
     items.map(function(it){
       return '<div class="el-card">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div style="font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
+          '<div style="font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;margin-bottom:4px;font-family:\'Cinzel\',serif;">' +
             it.icon + ' ' + it.t +
           '</div>' +
-          '<div style="font-size:12.5px;color:#94a3b8;line-height:1.45;">' + it.d + '</div>' +
+          '<div style="font-size:12.5px;color:#94a3b8;line-height:1.45;font-style:italic;font-family:\'EB Garamond\',serif;">' + it.d + '</div>' +
         '</div>' +
         '<div style="color:#10b981;font-size:22px;flex-shrink:0;margin-left:8px;">›</div>' +
       '</div>';
@@ -23145,6 +23290,19 @@ window.navigate=function(val){
     }
     if(p[0] === 'meCodexView'){
       window.view = view = { screen: 'meCodexView', codexKey: p[1] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+  }
+  if(HB.mode==='el'){
+    var elScreens = {
+      home: 'elHome',
+      elHome: 'elHome',
+      dice: 'dice'
+    };
+    if(elScreens[p[0]]){
+      window.view = view = { screen: elScreens[p[0]] };
       render();
       window.scrollTo(0,0);
       return;
