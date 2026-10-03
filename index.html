@@ -6815,6 +6815,90 @@ body.el-theme.el-theme-fire {
 }
 
 /* ============================================================
+   ТЕМА: ТЬМА (DARK / KURAYAMI VOID) — НА ОСНОВЕ ТЕМЫ КУРАЯМИ
+   ============================================================ */
+body.el-theme.el-theme-dark {
+  --el-accent: #94a3b8;
+  --el-accent-hover: #cbd5e1;
+  --el-accent-glow: rgba(148, 163, 184, 0.45);
+  --el-accent-dim: rgba(148, 163, 184, 0.14);
+  --el-accent-border: rgba(148, 163, 184, 0.28);
+  --el-accent-border-hover: rgba(203, 213, 225, 0.55);
+  --el-gradient: linear-gradient(135deg, #475569 0%, #1e293b 100%);
+  --el-card-bg: rgba(12, 14, 18, 0.94);
+  --el-hero-bg: rgba(10, 12, 16, 0.94);
+  --el-tray-bg: rgba(8, 10, 14, 0.96);
+  --el-tag-text: #e2e8f0;
+  --el-highlight: #ffffff;
+  --el-title-color: #f8fafc;
+  --el-bg-color: #050608;
+  --el-bg-img: radial-gradient(ellipse at 50% -10%, rgba(255, 255, 255, 0.05) 0%, transparent 60%),
+               radial-gradient(circle at 10% 40%, rgba(30, 30, 30, 0.4) 0%, transparent 45%),
+               radial-gradient(circle at 90% 70%, rgba(18, 18, 18, 0.5) 0%, transparent 50%),
+               repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.008) 0px, rgba(255, 255, 255, 0.008) 1px, transparent 1px, transparent 32px),
+               linear-gradient(180deg, #08090c 0%, #020304 100%);
+}
+
+body.el-theme.el-theme-dark .hb-seg-btn.on {
+  background: linear-gradient(135deg, #3d3d3d 0%, #171717 100%);
+  color: #ffffff;
+  border: 1px solid #555555;
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.85), 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+body.el-theme.el-theme-dark .el-card {
+  border-left: 4px solid #64748b;
+  background: linear-gradient(145deg, rgba(16, 18, 22, 0.96) 0%, rgba(8, 10, 14, 0.96) 100%);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+body.el-theme.el-theme-dark .el-card:hover {
+  border-left-color: #cbd5e1;
+  border-color: #64748b;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.95), 0 0 14px rgba(255, 255, 255, 0.1);
+}
+
+body.el-theme.el-theme-dark .el-hud {
+  background: linear-gradient(135deg, rgba(14, 16, 20, 0.98) 0%, rgba(6, 8, 10, 0.98) 100%);
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 0 16px rgba(0, 0, 0, 0.8);
+}
+
+body.el-theme.el-theme-dark .el-hero-dice {
+  border-left: 4px solid #94a3b8;
+  background: linear-gradient(135deg, rgba(16, 18, 24, 0.96) 0%, rgba(8, 10, 14, 0.96) 100%);
+}
+body.el-theme.el-theme-dark .el-hero-dice:hover {
+  border-left-color: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.95), 0 0 16px rgba(255, 255, 255, 0.12);
+}
+
+body.el-theme.el-theme-dark .dice-tray {
+  background: rgba(10, 12, 16, 0.95);
+  border-color: rgba(148, 163, 184, 0.25);
+}
+
+body.el-theme .el-tech-card.elem-dark {
+  border-left: 4px solid #94a3b8;
+}
+
+.el-dark-shadow-mote {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: #cbd5e1;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.4), 0 0 12px rgba(148, 163, 184, 0.3);
+  will-change: transform, opacity;
+}
+@keyframes elDarkMoteDrift {
+  0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+  30% { opacity: var(--dk-op, 0.6); transform: translate(calc(var(--dk-drift-x) * 0.4), calc(var(--dk-drift-y) * 0.4)) scale(1.1); }
+  70% { opacity: calc(var(--dk-op, 0.6) * 0.85); transform: translate(calc(var(--dk-drift-x) * 0.8), calc(var(--dk-drift-y) * 0.8)) scale(1); }
+  100% { transform: translate(var(--dk-drift-x), var(--dk-drift-y)) scale(0.7); opacity: 0; }
+}
+
+
+
+/* ============================================================
    СТИХИЯ: АНИМИРОВАННЫЕ ЭФФЕКТЫ ФОНА (ELEMENTAL BACKGROUND FX)
    ============================================================ */
 .el-theme-fx {
@@ -22340,6 +22424,7 @@ var EL = window.EL = window.EL || {
     if(elem === 'Вода') return 'water';
     if(elem === 'Огонь') return 'fire';
     if(elem === 'Земля') return 'earth';
+    if(elem === 'Тьма') return 'dark';
     // Аватар и Без стихии: темы пока не делаем -> используем базовую earth
     return 'earth';
   },
@@ -22355,12 +22440,12 @@ var EL = window.EL = window.EL || {
     if(typeof document === 'undefined' || !document.body) return;
     var fx = document.getElementById('elThemeFx');
     if(typeof HB === 'undefined' || HB.mode !== 'el'){
-      document.body.classList.remove('el-theme', 'el-theme-wind', 'el-theme-water', 'el-theme-fire', 'el-theme-earth');
+      document.body.classList.remove('el-theme', 'el-theme-wind', 'el-theme-water', 'el-theme-fire', 'el-theme-earth', 'el-theme-dark');
       if(fx) fx.style.display = 'none';
       return;
     }
     var t = EL.getTheme();
-    document.body.classList.remove('el-theme-wind', 'el-theme-water', 'el-theme-fire', 'el-theme-earth');
+    document.body.classList.remove('el-theme-wind', 'el-theme-water', 'el-theme-fire', 'el-theme-earth', 'el-theme-dark');
     document.body.classList.add('el-theme-' + t);
     EL.updateThemeFx(t);
   },
@@ -22547,6 +22632,53 @@ var EL = window.EL = window.EL || {
         ash.style.animation = 'elFireEmberRise ' + adur + 's ease-in-out ' + adel + 's infinite';
         cont.appendChild(ash);
       }
+    } else if(theme === 'dark'){
+      // ТЬМА (DARK / KURAYAMI VOID) — На основе темы Кураями из раздела Шиноби
+      // 28 левитирующих частиц-плюсиков Тьмы
+      var particleCount = 28;
+      var colors = ['#cfcfcf', '#9e9e9e', '#b8b8b8', '#787878', '#e5e5e5'];
+      for(var i = 0; i < particleCount; i++){
+        var p = document.createElement('div');
+        p.className = 'sh-kurayami-plus-particle';
+        var size = Math.floor(7 + ((i * 5 + 3) % 9));
+        var left = Math.floor((i * 13 + (i % 5) * 7) % 94 + 2);
+        var top = Math.floor((i * 19 + (i % 4) * 8) % 92 + 3);
+        var duration = (9 + ((i * 3 + 2) % 11)).toFixed(1);
+        var delay = (-1 * ((i * 2.9 + 1.1) % 16)).toFixed(1);
+        var animIndex = (i % 5) + 1;
+        var maxOp = (0.16 + ((i % 5) * 0.04)).toFixed(2);
+        var col = colors[i % colors.length];
+        var thickness = (size > 11 ? '1.5px' : '1.2px');
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left = left + '%';
+        p.style.top = top + '%';
+        p.style.setProperty('--p-op', maxOp);
+        p.style.setProperty('--p-col', col);
+        p.style.setProperty('--p-th', thickness);
+        p.style.animation = 'kurayamiDrift' + animIndex + ' ' + duration + 's ease-in-out ' + delay + 's infinite';
+        cont.appendChild(p);
+      }
+      // 14 медленно дрейфующих графитовых дымных искр
+      for(var dk = 0; dk < 14; dk++){
+        var dmote = document.createElement('div');
+        dmote.className = 'el-dark-shadow-mote';
+        var dsize = Math.floor(2 + Math.random() * 5);
+        dmote.style.width = dsize + 'px';
+        dmote.style.height = dsize + 'px';
+        dmote.style.left = (Math.random() * 96 + 2).toFixed(2) + '%';
+        dmote.style.top = (Math.random() * 94 + 2).toFixed(2) + '%';
+        var ddriftX = Math.floor((Math.random() * 60) - 30);
+        var ddriftY = Math.floor((Math.random() * 80) - 40);
+        var ddur = (7 + Math.random() * 9).toFixed(1);
+        var ddel = (-Math.random() * 15).toFixed(1);
+        var dop = (0.45 + Math.random() * 0.35).toFixed(2);
+        dmote.style.setProperty('--dk-drift-x', ddriftX + 'px');
+        dmote.style.setProperty('--dk-drift-y', ddriftY + 'px');
+        dmote.style.setProperty('--dk-op', dop);
+        dmote.style.animation = 'elDarkMoteDrift ' + ddur + 's ease-in-out ' + ddel + 's infinite';
+        cont.appendChild(dmote);
+      }
     } else {
       // Earth (Земля - default/fallback)
       // 2 изумрудных резонансных свечения
@@ -22615,6 +22747,7 @@ function elHome(){
     'Вода': '🌊',
     'Огонь': '🔥',
     'Земля': '⛰️',
+    'Тьма': '🌑',
     'Аватар': '☸️',
     'Без стихии': '⚔️'
   };
@@ -22677,6 +22810,7 @@ function elData(){
     { val: 'Вода', label: '🌊 Вода' },
     { val: 'Огонь', label: '🔥 Огонь' },
     { val: 'Земля', label: '⛰️ Земля' },
+    { val: 'Тьма', label: '🌑 Тьма (Кураями)' },
     { val: 'Аватар', label: '☸️ Аватар' },
     { val: 'Без стихии', label: '⚔️ Без стихии' }
   ];
@@ -23931,7 +24065,34 @@ var EL_DEFAULT_TECHS = [
     damage: 'Свободный полёт со скоростью 90 фт',
     range: 'На себя',
     desc: 'Древнейшее утраченное искусство гуру Лахимы и Захира. «Отпусти свои земные узы. Войди в пустоту. Стань ветром». Полная левитация без глайдера и усилий.'
-  }
+  },
+  // --- ТЬМА (КУРАЯМИ) ---
+  {
+    id: 'tech_dark_shadow_step',
+    name: 'Теневой шаг (Кураями)',
+    element: 'Тьма',
+    subArt: 'Теневое растворение',
+    scale: 1,
+    cost: '1 МВН',
+    benefit: 'cheap',
+    reqWindow: 'нет',
+    damage: 'Перемещение на 30 фт сквозь тени',
+    range: 'На себя / 30 фт',
+    desc: 'Мгновенное растворение физического тела в густой тени с последующим бесшумным проявлением за спиной врага или за укрытием. Дарует скрытность до начала следующего хода.'
+  },
+  {
+    id: 'tech_dark_void_grasp',
+    name: 'Захват первозданной тьмы',
+    element: 'Тьма',
+    subArt: 'Поглощение бездны',
+    scale: 3,
+    cost: '3 МВН',
+    benefit: 'advantage',
+    reqWindow: 'СВЯЗАН или ОБЕЗДВИЖЕН',
+    damage: '3d8 некротический + слепота',
+    range: '30 фт',
+    desc: 'Материализация щупалец абсолютной тьмы из сущности Кураями. Сжимает грудную клетку цели, гасит зрение и леденит кровь, вытягивая жизненную энергию.'
+  },
 ];
 
 var EL_DEFAULT_MOVES = [
@@ -24273,7 +24434,18 @@ var EL_MAP_LOCATIONS = [
 EL.getTechs = function(){
   try {
     var raw = localStorage.getItem('el_techs');
-    if(raw) return JSON.parse(raw);
+    if(raw){
+      var list = JSON.parse(raw);
+      // Auto-merge new canonical dark forms if missing
+      var hasDark = list.some(function(t){ return t.element === 'Тьма'; });
+      if(!hasDark){
+        EL_DEFAULT_TECHS.filter(function(t){ return t.element === 'Тьма'; }).forEach(function(dt){
+          list.push(dt);
+        });
+        localStorage.setItem('el_techs', JSON.stringify(list));
+      }
+      return list;
+    }
   } catch(e){}
   return EL_DEFAULT_TECHS.slice();
 };
@@ -24348,6 +24520,7 @@ function elElemClass(elem){
   if(elem === 'Огонь') return 'elem-fire';
   if(elem === 'Вода') return 'elem-water';
   if(elem === 'Земля') return 'elem-earth';
+  if(elem === 'Тьма') return 'elem-dark';
   return 'elem-wind';
 }
 
@@ -24367,7 +24540,7 @@ window._elTechElemFilter = window._elTechElemFilter || 'all';
 
 function elTechs(){
   var allTechs = EL.getTechs();
-  var elemCounts = { 'Огонь': 0, 'Вода': 0, 'Земля': 0, 'Воздух': 0 };
+  var elemCounts = { 'Огонь': 0, 'Вода': 0, 'Земля': 0, 'Воздух': 0, 'Тьма': 0 };
   allTechs.forEach(function(t){
     if(elemCounts[t.element] !== undefined) elemCounts[t.element]++;
   });
@@ -24403,11 +24576,14 @@ function elTechs(){
     '</button>',
     '<button class="el-filter-pill ' + (curFilter==='Воздух'?'active':'') + '" data-el-filter="Воздух">' +
       '🌪️ Воздух <span class="pill-cnt">' + elemCounts['Воздух'] + '</span>' +
+    '</button>',
+    '<button class="el-filter-pill ' + (curFilter==='Тьма'?'active':'') + '" data-el-filter="Тьма">' +
+      '🌑 Тьма <span class="pill-cnt">' + (elemCounts['Тьма'] || 0) + '</span>' +
     '</button>'
   ].join('');
 
   var cardsHtml = filtered.length ? filtered.map(function(t){
-    var elemIcon = t.element === 'Огонь' ? '🔥' : t.element === 'Вода' ? '🌊' : t.element === 'Земля' ? '⛰️' : '🌪️';
+    var elemIcon = t.element === 'Огонь' ? '🔥' : t.element === 'Вода' ? '🌊' : t.element === 'Земля' ? '⛰️' : t.element === 'Тьма' ? '🌑' : '🌪️';
     var benefitText = t.benefit === 'cheap' ? '✦ Снижение стоимости (-1 МВН)' : '✦ Преимущество на бросок атаки';
     var winBadge = (t.reqWindow && t.reqWindow !== 'нет')
       ? '<span class="el-mini-tag tag-win">🎯 Окно: ' + elEsc(t.reqWindow) + '</span>'
@@ -24491,7 +24667,7 @@ function elTechView(id){
   var t = techs.filter(function(x){ return x.id === id; })[0];
   if(!t) return elTechs();
 
-  var elemIcon = t.element === 'Огонь' ? '🔥' : t.element === 'Вода' ? '🌊' : t.element === 'Земля' ? '⛰️' : '🌪️';
+  var elemIcon = t.element === 'Огонь' ? '🔥' : t.element === 'Вода' ? '🌊' : t.element === 'Земля' ? '⛰️' : t.element === 'Тьма' ? '🌑' : '🌪️';
   var benefitText = t.benefit === 'cheap' ? 'Снижение стоимости (-1 МВН)' : 'Преимущество на бросок атаки';
 
   var rows = [
@@ -24558,7 +24734,7 @@ function elTechEdit(id){
     desc: ''
   } : (EL.getTechs().filter(function(x){ return x.id === id; })[0] || {});
 
-  var elemOptions = ['Огонь', 'Вода', 'Земля', 'Воздух'].map(function(e){
+  var elemOptions = ['Огонь', 'Вода', 'Земля', 'Воздух', 'Тьма'].map(function(e){
     return '<option value="' + e + '" ' + (t.element === e ? 'selected' : '') + '>' + e + '</option>';
   }).join('');
 
