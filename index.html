@@ -10382,9 +10382,13 @@ function hbHome(){
   return crumb([{label:'Технологии'}])+
     
     '<div class="hero-dice" data-go="dice">'+
-      '<div class="hero-dice-text"><div class="hero-dice-name">🎲 Бросок костей</div>'+
-      '<div class="hero-dice-desc">Единственное, что общее для обоих режимов</div></div>'+
-      '<div class="hero-dice-arrow">→</div></div>'+
+      '<div class="hero-dice-icon">'+(typeof dieShapeSvg==='function'? dieShapeSvg(20,'hbHeroDie',20) : '🎲')+'</div>'+
+      '<div class="hero-dice-text">'+
+        '<div class="hero-dice-name">Бросок костей</div>'+
+        '<div class="hero-dice-desc">Виртуальные кости: d4–d20, d100, подсчёт суммы, модификаторы, история бросков</div>'+
+      '</div>'+
+      '<div class="hero-dice-arrow">→</div>'+
+    '</div>'+
     '<div class="section-label">Активный персонаж</div>'+
     '<div class="hb-active-box">'+sel+
       (ac?'<button class="btn-ghost" data-go="hbView:'+ac.id+'">Открыть карточку</button>':'')+
@@ -21440,12 +21444,12 @@ ME.codexArticles = {
 // ============================================================
 function elHome(){
   var hero = '<div class="el-hero-dice" data-go="dice">' +
-    '<div style="font-size:42px;line-height:1;">🎲</div>' +
-    '<div style="flex:1;">' +
-      '<div class="hero-name" style="font-size:22px;font-weight:700;letter-spacing:0.03em;color:#fff;margin-bottom:4px;font-family:\'Cinzel\',serif;">Бросок костей</div>' +
-      '<div class="hero-desc" style="font-size:14px;color:#94a3b8;font-style:italic;font-family:\'EB Garamond\',serif;">Кубики d4–d20, стихийные резонансы, модификаторы и проверки</div>' +
+    '<div class="hero-dice-icon">' + (typeof dieShapeSvg === 'function' ? dieShapeSvg(20, 'elHeroDie', 20) : '🎲') + '</div>' +
+    '<div class="hero-dice-text" style="flex:1;min-width:0;">' +
+      '<div class="hero-dice-name" style="font-size:24px;font-weight:700;letter-spacing:0.03em;color:#fff;margin-bottom:4px;font-family:\'Cinzel\',serif;">Бросок костей</div>' +
+      '<div class="hero-dice-desc" style="font-size:14.5px;color:#94a3b8;font-style:italic;font-family:\'EB Garamond\',serif;">Кубики d4–d20, стихийные резонансы, модификаторы и проверки</div>' +
     '</div>' +
-    '<div style="font-size:24px;color:#10b981;font-weight:700;">→</div>' +
+    '<div class="hero-dice-arrow" style="font-size:22px;color:#10b981;font-weight:700;flex-shrink:0;">→</div>' +
   '</div>';
 
   var items = [
