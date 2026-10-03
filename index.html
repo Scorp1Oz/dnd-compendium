@@ -20626,7 +20626,7 @@ function meHome(){
     {nav:'meShip',     icon:'🚀', t:'Корабль и Экипаж',       d:shipDesc},
     {nav:'meCodex',    icon:'📖', t:'Кодекс Галактики',       d:'Расы, фракции, урон'},
     {nav:'meMap',      icon:'🗺️', t:'Галактическая карта',    d:'Сектора и контракты'},
-    {nav:'meData',     icon:'💾', t:'Данные систем',          d:profCount + ' в отряде, темы и ИИ'}
+    {nav:'meData',     icon:'💾', t:'Данные',                 d:profCount + ' в отряде, темы и ИИ'}
   ];
 
   return ''+
@@ -21442,7 +21442,23 @@ ME.codexArticles = {
 // ============================================================
 // РАЗДЕЛ СТИХИЯ (ELEMENTS MODE)
 // ============================================================
+var EL = window.EL = window.EL || {
+  getProfile: function(){
+    try {
+      var raw = localStorage.getItem('el_profile');
+      if(raw) return JSON.parse(raw);
+    } catch(e){}
+    return { name: 'Повелитель Стихий', title: 'Мастер 4 стихий', level: 1, note: '' };
+  },
+  saveProfile: function(p){
+    try {
+      localStorage.setItem('el_profile', JSON.stringify(p));
+    } catch(e){}
+  }
+};
+
 function elHome(){
+  var p = EL.getProfile();
   var hero = '<div class="el-hero-dice" data-go="dice">' +
     '<div class="hero-dice-icon">' + (typeof dieShapeSvg === 'function' ? dieShapeSvg(20, 'elHeroDie', 20) : '🎲') + '</div>' +
     '<div class="hero-dice-text" style="flex:1;min-width:0;">' +
@@ -21453,18 +21469,18 @@ function elHome(){
   '</div>';
 
   var items = [
-    { icon: '⚙️', t: 'Хроники и Настройки', d: 'Управление профилем мастера стихий и параметры' }
+    { nav: 'elData', icon: '💾', t: 'Данные', d: 'Профиль повелителя стихий, экспорт и параметры' }
   ];
 
   return '<div class="el-hud">' +
     '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
       '<div>' +
-        '<div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:0.02em;font-family:\'Cinzel\',serif;">Повелитель Стихий</div>' +
+        '<div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:0.02em;font-family:\'Cinzel\',serif;">' + escapeHtml(p.name || 'Повелитель Стихий') + '</div>' +
         '<div style="font-size:13px;color:#10b981;margin-top:2px;font-family:\'JetBrains Mono\',monospace;">🌀 ХРОНИКИ СТИХИЙ // ТАКТИЧЕСКИЙ ТЕРМИНАЛ</div>' +
       '</div>' +
       '<div style="display:flex;gap:8px;">' +
-        '<span style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;font-family:\'JetBrains Mono\',monospace;">Ур. 1</span>' +
-        '<span style="background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:999px;font-size:12px;font-family:\'JetBrains Mono\',monospace;">Мастер 4 стихий</span>' +
+        '<span style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;font-family:\'JetBrains Mono\',monospace;">Ур. ' + (p.level || 1) + '</span>' +
+        '<span style="background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:999px;font-size:12px;font-family:\'JetBrains Mono\',monospace;">' + escapeHtml(p.title || 'Мастер 4 стихий') + '</span>' +
       '</div>' +
     '</div>' +
   '</div>' +
@@ -21473,7 +21489,7 @@ function elHome(){
   '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:#10b981;font-weight:700;margin:18px 0 10px;font-family:\'JetBrains Mono\',monospace;">СИСТЕМНЫЕ РАЗДЕЛЫ // СТИХИЯ</div>' +
   '<div class="menu-list grid-2">' +
     items.map(function(it){
-      return '<div class="el-card">' +
+      return '<div class="el-card" data-nav="' + it.nav + '">' +
         '<div style="flex:1;min-width:0;">' +
           '<div style="font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;margin-bottom:4px;font-family:\'Cinzel\',serif;">' +
             it.icon + ' ' + it.t +
@@ -21486,6 +21502,89 @@ function elHome(){
   '</div>';
 }
 window.elHome = elHome;
+
+function elData(){
+  var prof = EL.getProfile();
+  return renderCrumb([{label:'Стихия', nav:'elHome'},{label:'Данные'}]) +
+    '<button class="back" data-go="elHome">← Назад в Стихию</button>' +
+    '<h1>Данные</h1>' +
+    '<div class="subtitle">Управление профилем мастера стихий, параметры мира, резервные копии и синхронизация</div>' +
+    '<div class="rule"></div>' +
+
+    // Профиль повелителя стихий
+    '<div class="sheet-section" style="background:rgba(10,18,16,0.85);border:1px solid rgba(16,185,129,0.25);border-left:4px solid #10b981;border-radius:4px;padding:16px 20px;margin-bottom:20px;">' +
+      '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:#10b981;font-weight:700;margin-bottom:12px;font-family:\'JetBrains Mono\',monospace;">👤 ПРОФИЛЬ ПОВЕЛИТЕЛЯ СТИХИЙ</div>' +
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px;">' +
+        '<div>' +
+          '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">Имя или статус:</label>' +
+          '<input type="text" id="elProfName" value="' + escapeAttr(prof.name || 'Повелитель Стихий') + '" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.4);border:1px solid rgba(16,185,129,0.3);color:#fff;padding:8px 12px;border-radius:4px;font-size:14px;">' +
+        '</div>' +
+        '<div>' +
+          '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">Титул / Ранг:</label>' +
+          '<input type="text" id="elProfTitle" value="' + escapeAttr(prof.title || 'Мастер 4 стихий') + '" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.4);border:1px solid rgba(16,185,129,0.3);color:#fff;padding:8px 12px;border-radius:4px;font-size:14px;">' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-bottom:14px;">' +
+        '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">Уровень мастерства (1–20):</label>' +
+        '<input type="number" min="1" max="20" id="elProfLevel" value="' + (prof.level || 1) + '" style="width:120px;box-sizing:border-box;background:rgba(0,0,0,0.4);border:1px solid rgba(16,185,129,0.3);color:#fff;padding:8px 12px;border-radius:4px;font-size:14px;">' +
+      '</div>' +
+      '<div style="margin-bottom:14px;">' +
+        '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">Хроники и заметки стихийника:</label>' +
+        '<textarea id="elProfNote" rows="3" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.4);border:1px solid rgba(16,185,129,0.3);color:#fff;padding:8px 12px;border-radius:4px;font-size:13px;resize:vertical;">' + escapeHtml(prof.note || '') + '</textarea>' +
+      '</div>' +
+      '<button class="btn btn-primary" id="elSaveProfBtn" style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);border:none;color:#fff;padding:8px 18px;border-radius:4px;font-weight:700;cursor:pointer;">✓ Сохранить профиль</button>' +
+    '</div>' +
+
+    // Облако GHSync
+    (typeof GHSync !== 'undefined' ? GHSync.renderUI() : '') +
+
+    // Gemini API
+    '<div class="gh-sync-card" id="elGeminiApiSection" style="margin-top:20px; margin-bottom:20px;background:rgba(10,18,16,0.85);border:1px solid rgba(16,185,129,0.25);border-radius:4px;padding:16px 20px;">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">' +
+        '<span style="font-size:20px;">✨</span>' +
+        '<div>' +
+          '<div style="font-weight:700;font-size:14px;color:#fff;font-family:\'Cinzel\',serif;">Google Gemini AI (Интеграция ИИ)</div>' +
+          '<div style="font-size:12px;color:#94a3b8;">Генерация стихийных явлений, испытаний и свитков</div>' +
+        '</div>' +
+      '</div>' +
+      '<p style="font-size:12px;color:#94a3b8;margin:0 0 12px 0;">Ключ хранится локально на этом устройстве. Получить бесплатный API-ключ можно в <a href="https://aistudio.google.com/" target="_blank" style="color:#34d399;text-decoration:underline;">Google AI Studio</a>.</p>' +
+      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">' +
+        '<input type="password" id="elDataGeminiKey" value="' + escapeAttr(typeof getGeminiApiKey === 'function' ? getGeminiApiKey() : '') + '" placeholder="Вставьте ключ AIzaSy..." style="flex:1; min-width:200px; box-sizing:border-box; background:rgba(0,0,0,0.4); border:1px solid rgba(16,185,129,0.3); color:#fff; padding:8px 12px; border-radius:4px; font-family:monospace; font-size:13px;">' +
+        '<button class="btn btn-primary" id="elDataSaveGeminiKey" style="background:linear-gradient(135deg,#10b981 0%,#059669 100%); border:none; padding:8px 16px; border-radius:4px; color:#fff; font-weight:bold; cursor:pointer;">💾 Сохранить API Ключ</button>' +
+      '</div>' +
+    '</div>';
+}
+window.elData = elData;
+
+function wireElData(){
+  var saveBtn = document.getElementById('elSaveProfBtn');
+  if(saveBtn){
+    saveBtn.onclick = function(){
+      var name = (document.getElementById('elProfName').value || '').trim() || 'Повелитель Стихий';
+      var title = (document.getElementById('elProfTitle').value || '').trim() || 'Мастер 4 стихий';
+      var level = parseInt(document.getElementById('elProfLevel').value, 10) || 1;
+      var note = (document.getElementById('elProfNote').value || '').trim();
+      EL.saveProfile({ name: name, title: title, level: level, note: note });
+      saveBtn.textContent = 'Сохранено ✓';
+      setTimeout(function(){ saveBtn.textContent = '✓ Сохранить профиль'; }, 1200);
+      paintShBar();
+    };
+  }
+  var saveKeyBtn = document.getElementById('elDataSaveGeminiKey');
+  if(saveKeyBtn){
+    saveKeyBtn.onclick = function(){
+      var key = (document.getElementById('elDataGeminiKey').value || '').trim();
+      if(typeof saveGeminiApiKey === 'function'){
+        saveGeminiApiKey(key);
+      } else {
+        try { localStorage.setItem('gemini_api_key', key); } catch(e){}
+      }
+      saveKeyBtn.textContent = 'Сохранено ✓';
+      setTimeout(function(){ saveKeyBtn.textContent = '💾 Сохранить API Ключ'; }, 1200);
+    };
+  }
+}
+window.wireElData = wireElData;
 
 // 5. ГЛАВНЫЙ ЭКРАН КОДЕКСА ГАЛАКТИКИ (КАТАЛОГ С ПОИСКОМ)
 function meCodex(){
@@ -22217,9 +22316,9 @@ function meData(){
 
   var activeCharDisplay = (c.name || 'Оперативник Альянса') + (c.callsign ? (' [' + c.callsign + ']') : '');
 
-  return meNavHeader('ДАННЫЕ И СИСТЕМЫ // ДОСЬЕ И РОСТЕР', 'КОНФИГУРАЦИЯ') +
+  return meNavHeader('ДАННЫЕ // ДОСЬЕ И РОСТЕР', 'КОНФИГУРАЦИЯ') +
     '<button class="back" data-go="meHome">← Назад</button>' +
-    '<h1>ДАННЫЕ И СИСТЕМЫ</h1>' +
+    '<h1>ДАННЫЕ</h1>' +
     '<div class="subtitle">Управление ростером оперативников, темами оформления, облачной синхронизацией и ИИ</div>' +
 
     // 1. РОСТЕР И ВЫБОР ОПЕРАТИВНИКОВ
@@ -23189,6 +23288,16 @@ window.render=function(){
       paintShBar();
       return;
     }
+    if(s === 'elData'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      app.innerHTML = elData();
+      _w();
+      if(typeof wireElData === 'function') wireElData();
+      paintShBar();
+      return;
+    }
     var app = document.getElementById('app');
     app.classList.remove('wide');
     app.classList.add('home-wide');
@@ -23303,6 +23412,7 @@ window.navigate=function(val){
     var elScreens = {
       home: 'elHome',
       elHome: 'elHome',
+      elData: 'elData',
       dice: 'dice'
     };
     if(elScreens[p[0]]){
@@ -23329,10 +23439,10 @@ if(HB.mode==='sh'){
   if(!view.screen || String(view.screen).indexOf('sh')!==0) view={screen:'shHome'};
 } else if(HB.mode==='me'){
   document.body.classList.add('me-theme');
-  if(!view.screen || view.screen!=='dice') view={screen:'meHome'};
+  if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('me')!==0)) view={screen:'meHome'};
 } else if(HB.mode==='el'){
   document.body.classList.add('el-theme');
-  if(!view.screen || view.screen!=='dice') view={screen:'elHome'};
+  if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('el')!==0)) view={screen:'elHome'};
 }
 render();
   if(typeof GHSync !== "undefined") GHSync.checkStartupSync();
