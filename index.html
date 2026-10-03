@@ -8742,7 +8742,8 @@ function updateDiceControls(){
 function currentLabelEmojiFor(sides){
   if(!diceState.labelCat) return '';
   if(diceState.labelCat==='custom') return (diceState.customLabel||'').trim() ? '✎' : '';
-  const cat = DICE_LABEL_CATEGORIES.find(c=>c.key===diceState.labelCat);
+  const cats = (typeof getAvailableDiceCategories === 'function') ? getAvailableDiceCategories() : (typeof DICE_LABEL_CATEGORIES !== 'undefined' ? DICE_LABEL_CATEGORIES : []);
+  const cat = cats.find(c=>c.key===diceState.labelCat);
   if(!cat) return '';
   const item = cat.items.find(i=>i.ru===diceState.label);
   if(!item) return '';
@@ -8972,17 +8973,17 @@ function handleGenerateClick(btn){
 }
 
 const DICE_LABEL_CATEGORIES = window.DICE_LABEL_CATEGORIES = [
-  {key:'elements', icon:'🌀', ru:'Стихия', items:[
-    {icon:'🔥', ru:'Огненный выброс / Воспламенение', std:20},
-    {icon:'💧', ru:'Водный поток / Крио-удержание', std:20},
-    {icon:'⛰️', ru:'Земляной барьер / Сейсмический толчок', std:20},
-    {icon:'🌪️', ru:'Вихревой порыв / Удар молнии', std:20},
-    {icon:'💥', ru:'Стихийный резонанс (комбо)', std:null},
-    {icon:'🛡️', ru:'Стихийное поглощение / Щит', std:20},
-    {icon:'🎯', ru:'Сфокусированная атака стихией', std:20},
-    {icon:'🪙', ru:'Монетка баланса первоэлементов (50/50)', std:'coin'}
+  {key:'shinobi', mode:'sh', icon:'🌀', ru:'Шиноби', items:[
+    {icon:'🌀', ru:'Контроль чакры', std:20},
+    {icon:'🛡️', ru:'Активная защита', std:20},
+    {icon:'🎯', ru:'Атака ниндзюцу', std:20},
+    {icon:'👊', ru:'Приём тайдзюцу', std:20},
+    {icon:'👁️', ru:'Развеять гендзюцу (Кай)', std:20},
+    {icon:'🥷', ru:'Скрытность шиноби', std:20},
+    {icon:'📡', ru:'Сенсорика и поиск', std:20},
+    {icon:'💥', ru:'Урон техники / приёма', std:null}
   ]},
-  {key:'space', icon:'🪐', ru:'Космос (Mass Effect)', items:[
+  {key:'space', mode:'me', icon:'🪐', ru:'Космос (Mass Effect)', items:[
     {icon:'🎯', ru:'Атака стрелковым оружием (по AC)', std:20},
     {icon:'🛡️', ru:'Активная защита (перекат / укрытие)', std:20},
     {icon:'💥', ru:'Урон оружия / боеприпаса', std:null},
@@ -8995,16 +8996,6 @@ const DICE_LABEL_CATEGORIES = window.DICE_LABEL_CATEGORIES = [
     {icon:'🎲', ru:'d100: Таблица крит. попадания', std:100},
     {icon:'🌌', ru:'d100: Событие космического перелёта', std:100},
     {icon:'⚠️', ru:'d100: Осложнение взлома терминала', std:100}
-  ]},
-  {key:'shinobi', icon:'🌀', ru:'Шиноби', items:[
-    {icon:'🌀', ru:'Контроль чакры', std:20},
-    {icon:'🛡️', ru:'Активная защита', std:20},
-    {icon:'🎯', ru:'Атака ниндзюцу', std:20},
-    {icon:'👊', ru:'Приём тайдзюцу', std:20},
-    {icon:'👁️', ru:'Развеять гендзюцу (Кай)', std:20},
-    {icon:'🥷', ru:'Скрытность шиноби', std:20},
-    {icon:'📡', ru:'Сенсорика и поиск', std:20},
-    {icon:'💥', ru:'Урон техники / приёма', std:null}
   ]},
   {key:'core', icon:'⚔️', ru:'Основное', items:[
     {icon:'🎯', ru:'Попадание', std:20},
@@ -9028,23 +9019,41 @@ const DICE_LABEL_CATEGORIES = window.DICE_LABEL_CATEGORIES = [
   {key:'custom', icon:'✎', ru:'Своя подпись', items:[]}
 ];
 
+function getAvailableDiceCategories(){
+  const curMode = (typeof HB !== 'undefined' && HB.mode) ? HB.mode : 'core';
+  return DICE_LABEL_CATEGORIES.filter(c => {
+    if(c.mode){
+      return c.mode === curMode;
+    }
+    return true;
+  });
+}
+window.getAvailableDiceCategories = getAvailableDiceCategories;
+
 function currentLabelStd(){
   if(diceState.labelCat==='custom' || !diceState.labelCat) return null;
-  const cat = DICE_LABEL_CATEGORIES.find(c=>c.key===diceState.labelCat);
+  const cats = (typeof getAvailableDiceCategories === 'function') ? getAvailableDiceCategories() : DICE_LABEL_CATEGORIES;
+  const cat = cats.find(c=>c.key===diceState.labelCat);
   if(!cat) return null;
   const item = cat.items.find(i=>i.ru===diceState.label);
   return item ? item.std : null;
 }
 
 function diceCategoryOptionsHtml(){
+  const cats = getAvailableDiceCategories();
+  if(diceState.labelCat && diceState.labelCat !== 'custom' && !cats.some(c=>c.key===diceState.labelCat)){
+    diceState.labelCat = '';
+    diceState.label = '';
+  }
   const cur = diceState.labelCat || '';
   const opt = (val, text)=>`<option value="${escapeAttr(val)}" ${cur===val?'selected':''}>${escapeHtml(text)}</option>`;
   return opt('', '— без подписи —') +
-    DICE_LABEL_CATEGORIES.map(c=>opt(c.key, c.icon+'  '+c.ru)).join('');
+    cats.map(c=>opt(c.key, c.icon+'  '+c.ru)).join('');
 }
 
 function diceItemOptionsHtml(){
-  const cat = DICE_LABEL_CATEGORIES.find(c=>c.key===diceState.labelCat);
+  const cats = getAvailableDiceCategories();
+  const cat = cats.find(c=>c.key===diceState.labelCat);
   if(!cat || !cat.items.length) return '';
   const cur = diceState.label || '';
   return `<option value="">— выберите —</option>` +
@@ -29052,7 +29061,7 @@ window.navigate=function(val){
     }
   }
   if(HB.mode==='sh'){
-    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shJutsuGen:'shJutsuGen',shMoveGen:'shMoveGen',shMoves:'shMoves',shSkillGen:'shSkillGen',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData'};
+    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shJutsuGen:'shJutsuGen',shMoveGen:'shMoveGen',shMoves:'shMoves',shSkillGen:'shSkillGen',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData',dice:'dice'};
     if(map[p[0]]){ window.view = view = {screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
     if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shMoveView'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
       window.view = view = {screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
@@ -29065,7 +29074,7 @@ window.navigate=function(val){
 load();
 if(HB.mode==='sh'){
   document.body.classList.add('sh-theme');
-  if(!view.screen || String(view.screen).indexOf('sh')!==0) view={screen:'shHome'};
+  if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('sh')!==0)) view={screen:'shHome'};
 } else if(HB.mode==='me'){
   document.body.classList.add('me-theme');
   if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('me')!==0)) view={screen:'meHome'};
