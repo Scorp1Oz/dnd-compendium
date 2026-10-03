@@ -4543,6 +4543,84 @@ body.me-theme .menu-item .arrow {
   flex-shrink: 0 !important;
 }
 
+/* Карточки статей Кодекса Галактики (meCodex) */
+body.me-theme .me-codex-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  padding: 14px 16px !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+body.me-theme .me-codex-item .me-codex-content {
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+body.me-theme .me-codex-item .me-codex-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0.02em !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  flex-wrap: wrap !important;
+  color: #00d2ff !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+body.me-theme .me-codex-item .me-codex-title .me-tag-holo {
+  font-size: 10px !important;
+  padding: 2px 7px !important;
+  white-space: nowrap !important;
+}
+
+body.me-theme .me-codex-item .me-codex-desc {
+  font-size: 12.5px !important;
+  line-height: 1.5 !important;
+  color: #8bb1d6 !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  text-align: left !important;
+  margin: 0 !important;
+  font-style: normal !important;
+}
+
+body.me-theme .me-codex-item .me-codex-arrow {
+  font-size: 22px !important;
+  color: #00d2ff !important;
+  flex-shrink: 0 !important;
+  margin-left: 4px !important;
+}
+
+/* Цветовая адаптация заголовков и стрелок Кодекса под темы */
+body.me-theme.me-theme-omni .me-codex-item .me-codex-title,
+body.me-theme.me-theme-omni .me-codex-item .me-codex-arrow {
+  color: #ffaa33 !important;
+}
+body.me-theme.me-theme-n7 .me-codex-item .me-codex-title,
+body.me-theme.me-theme-n7 .me-codex-item .me-codex-arrow {
+  color: #f43f5e !important;
+}
+body.me-theme.me-theme-cerberus .me-codex-item .me-codex-title,
+body.me-theme.me-theme-cerberus .me-codex-item .me-codex-arrow {
+  color: #f59e0b !important;
+}
+
 /* Адаптация под 4 темы Mass Effect для HUD, Hero Dice и кнопок меню */
 body.me-theme.me-theme-omni #meHud,
 body.me-theme.me-theme-omni .hero-dice,
@@ -21134,15 +21212,15 @@ function meCodex(){
       '</div>' +
       '<div class="menu-list grid-2">' +
         filteredItems.map(function(it){
-          return '<div class="menu-item me-card" data-nav="meCodexView:' + it.id + '" style="position:relative;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;">' +
-            '<div style="flex:1;">' +
-              '<div class="name" style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#00d2ff;">' +
-                it.icon + ' ' + meEsc(it.title) +
-                (it.tag ? '<span class="me-tag-holo" style="font-size:10px;">' + meEsc(it.tag) + '</span>' : '') +
+          return '<div class="menu-item me-card me-codex-item" data-nav="meCodexView:' + it.id + '">' +
+            '<div class="me-codex-content">' +
+              '<div class="me-codex-title">' +
+                '<span>' + it.icon + ' ' + meEsc(it.title) + '</span>' +
+                (it.tag ? '<span class="me-tag-holo">' + meEsc(it.tag) + '</span>' : '') +
               '</div>' +
-              '<div class="desc" style="font-size:12px;color:#8bb1d6;margin-top:6px;line-height:1.5;">' + meEsc(it.desc) + '</div>' +
+              '<div class="me-codex-desc">' + meEsc(it.desc) + '</div>' +
             '</div>' +
-            '<div class="arrow" style="color:#00d2ff;font-size:18px;">›</div>' +
+            '<div class="me-codex-arrow">›</div>' +
           '</div>';
         }).join('') +
       '</div>' +
