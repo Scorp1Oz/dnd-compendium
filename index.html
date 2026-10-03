@@ -21608,12 +21608,6 @@ var EL = window.EL = window.EL || {
     return 'earth';
   },
   getTheme: function(){
-    try {
-      var saved = localStorage.getItem('el_theme');
-      if(saved && (saved === 'wind' || saved === 'water' || saved === 'fire' || saved === 'earth')) {
-        return saved;
-      }
-    } catch(e){}
     var p = EL.getProfile();
     return EL.elementToTheme(p.element);
   },
@@ -21656,7 +21650,7 @@ function elHome(){
   '</div>';
 
   var items = [
-    { nav: 'elData', icon: '💾', t: 'Данные', d: 'Профиль персонажа, темы стихий, экспорт и параметры' }
+    { nav: 'elData', icon: '💾', t: 'Данные', d: 'Профиль персонажа, стихия, экспорт и параметры' }
   ];
 
   return '<div class="el-hud">' +
@@ -21693,14 +21687,6 @@ window.elHome = elHome;
 
 function elData(){
   var prof = EL.getProfile();
-  var curTheme = EL.getTheme();
-
-  var themes = [
-    { id: 'wind', name: 'Ветер', icon: '🌪️', desc: 'Воздушный янтарь и шафран', color: '#f59e0b' },
-    { id: 'water', name: 'Вода', icon: '🌊', desc: 'Океаническая лазурь и лёд', color: '#0ea5e9' },
-    { id: 'fire', name: 'Огонь', icon: '🔥', desc: 'Алое пламя и пепел', color: '#ef4444' },
-    { id: 'earth', name: 'Земля', icon: '⛰️', desc: 'Изумрудный нефрит и сланец', color: '#10b981' }
-  ];
 
   var elements = [
     { val: 'Ветер', label: '🌪️ Ветер' },
@@ -21715,36 +21701,13 @@ function elData(){
     return '<option value="' + escapeAttr(el.val) + '" ' + (prof.element === el.val ? 'selected' : '') + '>' + el.label + '</option>';
   }).join('');
 
-  var themeCards = themes.map(function(th){
-    var isActive = (curTheme === th.id);
-    return '<div class="theme-card-btn ' + (isActive ? 'active' : '') + '" data-set-theme="' + th.id + '" style="border-left:4px solid ' + th.color + ';cursor:pointer;">' +
-      '<div style="font-size:24px;">' + th.icon + '</div>' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div style="font-weight:700;font-size:14px;color:#fff;display:flex;align-items:center;justify-content:space-between;">' +
-          '<span>' + th.name + '</span>' +
-          (isActive ? '<span style="font-size:10.5px;color:' + th.color + ';font-weight:bold;font-family:\'JetBrains Mono\',monospace;">АКТИВНА</span>' : '') +
-        '</div>' +
-        '<div style="font-size:11.5px;color:#94a3b8;font-style:italic;">' + th.desc + '</div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-
   return renderCrumb([{label:'Стихия', nav:'elHome'},{label:'Данные'}]) +
     '<button class="back" data-go="elHome">← Назад в Стихию</button>' +
     '<h1>Данные</h1>' +
-    '<div class="subtitle">Управление профилем персонажа, стихиями, темами оформления, резервными копиями и синхронизацией</div>' +
+    '<div class="subtitle">Управление профилем персонажа, стихией, резервными копиями и синхронизацией</div>' +
     '<div class="rule"></div>' +
 
-    // 1. ТЕМЫ ОФОРМЛЕНИЯ
-    '<div class="sheet-section" style="background:var(--el-card-bg);border:1px solid var(--el-accent-border);border-left:4px solid var(--el-accent);border-radius:4px;padding:16px 20px;margin-bottom:20px;">' +
-      '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:var(--el-accent);font-weight:700;margin-bottom:6px;font-family:\'JetBrains Mono\',monospace;">🎨 ТЕМА ОФОРМЛЕНИЯ</div>' +
-      '<div style="font-size:12.5px;color:#94a3b8;margin-bottom:12px;">Тема автоматически привязана к выбранной стихии персонажа (Ветер, Вода, Огонь, Земля). Также можно переключить тему вручную кликом:</div>' +
-      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">' +
-        themeCards +
-      '</div>' +
-    '</div>' +
-
-    // 2. ПРОФИЛЬ ПЕРСОНАЖА
+    // ПРОФИЛЬ ПЕРСОНАЖА
     '<div class="sheet-section" style="background:var(--el-card-bg);border:1px solid var(--el-accent-border);border-left:4px solid var(--el-accent);border-radius:4px;padding:16px 20px;margin-bottom:20px;">' +
       '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:var(--el-accent);font-weight:700;margin-bottom:12px;font-family:\'JetBrains Mono\',monospace;">👤 ПРОФИЛЬ ПЕРСОНАЖА</div>' +
       
@@ -21821,41 +21784,11 @@ function wireElData(){
   if(elemSel){
     elemSel.onchange = function(){
       var elem = this.value;
-      if(elem === 'Ветер' || elem === 'Вода' || elem === 'Огонь' || elem === 'Земля'){
-        var th = EL.elementToTheme(elem);
-        EL.setTheme(th);
-        var curScreen = (window.view && window.view.screen) || '';
-        if(curScreen === 'elData'){
-          var app = document.getElementById('app');
-          if(app){
-            app.innerHTML = elData();
-            _w();
-            wireElData();
-            paintShBar();
-          }
-        }
-      }
+      var th = EL.elementToTheme(elem);
+      EL.setTheme(th);
+      paintShBar();
     };
   }
-
-  document.querySelectorAll('.theme-card-btn').forEach(function(btn){
-    btn.onclick = function(){
-      var th = btn.getAttribute('data-set-theme');
-      if(th){
-        EL.setTheme(th);
-        var curScreen = (window.view && window.view.screen) || '';
-        if(curScreen === 'elData'){
-          var app = document.getElementById('app');
-          if(app){
-            app.innerHTML = elData();
-            _w();
-            wireElData();
-            paintShBar();
-          }
-        }
-      }
-    };
-  });
 
   var saveBtn = document.getElementById('elSaveProfBtn');
   if(saveBtn){
@@ -21879,10 +21812,7 @@ function wireElData(){
       };
 
       EL.saveProfile(prof);
-
-      if(element === 'Ветер' || element === 'Вода' || element === 'Огонь' || element === 'Земля'){
-        EL.setTheme(EL.elementToTheme(element));
-      }
+      EL.setTheme(EL.elementToTheme(element));
 
       saveBtn.textContent = 'Сохранено ✓';
       setTimeout(function(){ saveBtn.textContent = '✓ Сохранить профиль'; }, 1200);
