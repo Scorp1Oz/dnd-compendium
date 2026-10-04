@@ -6938,22 +6938,9 @@ body.el-theme .el-theme-fx {
   background-size: contain;
   pointer-events: none;
   z-index: 0;
-  will-change: transform, opacity;
-  transform-origin: bottom right;
-  animation: elCrestBreath 8s ease-in-out infinite alternate;
+  opacity: 0.18;
   -webkit-mask-image: radial-gradient(circle at 75% 75%, #000 65%, transparent 100%);
   mask-image: radial-gradient(circle at 75% 75%, #000 65%, transparent 100%);
-}
-
-@keyframes elCrestBreath {
-  0% {
-    opacity: 0.14;
-    transform: scale(0.96);
-  }
-  100% {
-    opacity: 0.22;
-    transform: scale(1.03);
-  }
 }
 
 .el-crest-earth {
