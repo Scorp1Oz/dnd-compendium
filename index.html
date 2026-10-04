@@ -3494,12 +3494,72 @@ body.sh-theme-uchiha .sh-uchiha-particles {
   align-items:center;
   justify-content:center;
 }
-#shMapSvg{
+#shMapSvg, #elMapSvg, .sh-map-svg{
   width:100%;
   height:100%;
   display:block;
   user-select:none;
   -webkit-user-select:none;
+}
+#elMapViewport{
+  height:clamp(560px, 75vh, 860px);
+  aspect-ratio:16 / 12;
+  max-width:100%;
+  margin:10px auto 14px;
+  background:#060e18;
+  border-color:var(--el-accent, #38bdf8);
+  box-shadow:0 0 24px rgba(56, 189, 248, 0.28), inset 0 0 45px rgba(0,0,0,0.95);
+}
+@media (max-width: 768px){
+  #elMapViewport{
+    height:460px;
+    aspect-ratio:auto;
+  }
+}
+.el-territory{
+  cursor:pointer;
+  pointer-events:auto;
+  transition:fill-opacity 0.25s, stroke-width 0.25s, filter 0.25s;
+}
+.el-territory:hover{
+  fill-opacity:0.38 !important;
+  stroke-width:4.5px !important;
+  filter:drop-shadow(0 0 12px currentColor);
+}
+.el-territory.active{
+  fill-opacity:0.35 !important;
+  stroke-width:4px !important;
+  filter:drop-shadow(0 0 10px currentColor);
+}
+.el-territory-label{
+  pointer-events:none;
+  user-select:none;
+  letter-spacing:0.6px;
+  transition:opacity 0.25s;
+}
+.el-map-quicknav{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:4px 14px 10px;
+}
+.el-quick-jump{
+  font-size:11.5px;
+  padding:3px 10px;
+  border-radius:6px;
+  border:1px solid var(--border, rgba(255,255,255,0.12));
+  background:rgba(14, 18, 24, 0.85);
+  color:var(--ink-dim, #cbd5e1);
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.el-quick-jump:hover{
+  color:#ffffff;
+  border-color:var(--el-accent, #38bdf8);
+  background:rgba(56, 189, 248, 0.15);
+  box-shadow:0 0 10px rgba(56, 189, 248, 0.3);
 }
 .sh-neutral-poly{
   pointer-events:none;
@@ -26008,7 +26068,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Столица Народа Огня (Кальдера)',
     nation: 'Народ Огня',
     nationIcon: '🔥',
-    x: 155, y: 470,
+    x: 272, y: 575,
     type: 'capital',
     ruler: 'Лорд Огня (Зуко / Озай / Созин)',
     climate: 'Вулканический кратер, тропический',
@@ -26020,7 +26080,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Город Воинов Солнца',
     nation: 'Народ Огня',
     nationIcon: '🔥',
-    x: 98, y: 360,
+    x: 115, y: 430,
     type: 'city',
     ruler: 'Вождь Воинов / Драконы Ран и Шао',
     climate: 'Тропические джунгли, пирамиды',
@@ -26032,7 +26092,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Кипящая Скала',
     nation: 'Народ Огня',
     nationIcon: '🔥',
-    x: 212, y: 388,
+    x: 265, y: 430,
     type: 'city',
     ruler: 'Начальник тюрьмы Народа Огня',
     climate: 'Кипящее серное озеро в жерле вулкана',
@@ -26044,7 +26104,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Угольный Остров (Эмбер Айленд)',
     nation: 'Народ Огня',
     nationIcon: '🔥',
-    x: 393, y: 441,
+    x: 460, y: 530,
     type: 'city',
     ruler: 'Аристократия Народа Огня',
     climate: 'Песчаные пляжи, морской бриз',
@@ -26056,7 +26116,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Чёрные Скалы',
     nation: 'Народ Огня',
     nationIcon: '🔥',
-    x: 308, y: 492,
+    x: 450, y: 590,
     type: 'city',
     ruler: 'Береговая охрана империи',
     climate: 'Базальтовые отвесные утесы',
@@ -26068,7 +26128,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Город Огненного Фонтана',
     nation: 'Народ Огня',
     nationIcon: '🔥',
-    x: 462, y: 502,
+    x: 545, y: 645,
     type: 'city',
     ruler: 'Имперский наместник',
     climate: 'Промышленный портовый город',
@@ -26080,7 +26140,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Остров Полумесяца (Храм Року)',
     nation: 'Народ Огня',
     nationIcon: '🔥',
-    x: 660, y: 432,
+    x: 770, y: 540,
     type: 'city',
     ruler: 'Верховные Мудрецы Огня',
     climate: 'Остров в виде полумесяца',
@@ -26092,7 +26152,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Шу Цзин (Поместье Пиандао)',
     nation: 'Народ Огня',
     nationIcon: '🔥',
-    x: 577, y: 412,
+    x: 695, y: 515,
     type: 'city',
     ruler: 'Мастер меча Пиандао',
     climate: 'Горная долина, водопады',
@@ -26104,7 +26164,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Деревня Джанг Хуэй',
     nation: 'Народ Огня',
     nationIcon: '🔥',
-    x: 618, y: 412,
+    x: 740, y: 515,
     type: 'city',
     ruler: 'Старейшины / Раскрашенная Леди',
     climate: 'Речной поселок на сваях',
@@ -26116,7 +26176,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Деревня Хамы',
     nation: 'Народ Огня',
     nationIcon: '🔥',
-    x: 360, y: 470,
+    x: 490, y: 550,
     type: 'city',
     ruler: 'Местный совет',
     climate: 'Тихая лесная долина',
@@ -26142,7 +26202,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Северное Полярное Море',
     nation: 'Племена Воды',
     nationIcon: '🌊',
-    x: 620, y: 150,
+    x: 600, y: 175,
     type: 'city',
     ruler: 'Патрули магов воды',
     climate: 'Дрейфующие айсберги, мороз',
@@ -26154,7 +26214,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Южное Племя Воды (Гавань Волка)',
     nation: 'Племена Воды',
     nationIcon: '🌊',
-    x: 615, y: 860,
+    x: 615, y: 1005,
     type: 'capital',
     ruler: 'Вождь Хакода / Тоняк',
     climate: 'Вечная мерзлота, ледники',
@@ -26166,7 +26226,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Бухта Волка (Wolf Cove)',
     nation: 'Племена Воды',
     nationIcon: '🌊',
-    x: 630, y: 890,
+    x: 670, y: 1035,
     type: 'city',
     ruler: 'Воины Южного Племени',
     climate: 'Заснеженный фьорд',
@@ -26178,7 +26238,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Пролив Китового Хвоста',
     nation: 'Племена Воды',
     nationIcon: '🌊',
-    x: 785, y: 640,
+    x: 780, y: 710,
     type: 'city',
     ruler: 'Морские охотники',
     climate: 'Холодный океанский пролив',
@@ -26192,7 +26252,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Северный Храм Воздуха',
     nation: 'Воздушные Кочевники',
     nationIcon: '🌪️',
-    x: 936, y: 150,
+    x: 936, y: 175,
     type: 'capital',
     ruler: 'Изобретатель и беженцы',
     climate: 'Высокогорные заснеженные пики',
@@ -26204,7 +26264,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Пик Гуру Лахимы',
     nation: 'Воздушные Кочевники',
     nationIcon: '🌪️',
-    x: 975, y: 170,
+    x: 990, y: 205,
     type: 'city',
     ruler: 'Древнее святилище',
     climate: 'Заоблачная высота, разреженный воздух',
@@ -26216,7 +26276,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Западный Храм Воздуха',
     nation: 'Воздушные Кочевники',
     nationIcon: '🌪️',
-    x: 360, y: 235,
+    x: 485, y: 255,
     type: 'capital',
     ruler: 'Монахини Воздуха',
     climate: 'Глубокий каньон, эхо ветров',
@@ -26228,7 +26288,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Южный Храм Воздуха',
     nation: 'Воздушные Кочевники',
     nationIcon: '🌪️',
-    x: 590, y: 705,
+    x: 585, y: 845,
     type: 'capital',
     ruler: 'Монах Гияцо (в прошлом)',
     climate: 'Изолированные скальные пики',
@@ -26240,7 +26300,7 @@ var EL_AVATAR_LOCATIONS = [
     name: 'Горы Патола',
     nation: 'Воздушные Кочевники',
     nationIcon: '🌪️',
-    x: 630, y: 750,
+    x: 630, y: 890,
     type: 'city',
     ruler: 'Стада диких летающих бизонов',
     climate: 'Крутые альпийские склоны',
@@ -26372,17 +26432,129 @@ function renderAvatarMapSvg(){
   var filterNation = st.filter || 'all';
   var search = (st.search || '').toLowerCase().trim();
 
-  // 1. Интерактивные полупрозрачные контуры территорий
-  var territoriesSvg = [
-    // Царство Земли
-    '<path class="el-territory" data-nation="Царство Земли" d="M 420 180 Q 750 120 1150 140 Q 1550 190 1560 480 Q 1460 760 1180 770 Q 880 740 760 620 Q 560 520 480 360 Q 420 280 420 180 Z" fill="rgba(46, 204, 113, ' + (st.selectedId==='earth_kingdom'?'0.18':'0.04') + ')" stroke="#2ecc71" stroke-width="' + (st.selectedId==='earth_kingdom'?'3.5':'2') + '" stroke-dasharray="6,4" opacity="0.6"/>',
-    // Народ Огня
-    '<path class="el-territory" data-nation="Народ Огня" d="M 30 380 Q 180 290 420 380 Q 480 540 260 620 Q 40 580 30 380 Z" fill="rgba(231, 76, 60, ' + (st.selectedId==='fire_nation'?'0.22':'0.04') + ')" stroke="#e74c3c" stroke-width="' + (st.selectedId==='fire_nation'?'3.5':'2') + '" stroke-dasharray="6,4" opacity="0.6"/>',
-    // Северное Племя Воды
-    '<path class="el-territory" data-nation="Племена Воды" d="M 480 30 Q 750 15 1020 30 L 1050 160 Q 750 200 460 160 Z" fill="rgba(52, 152, 219, ' + (st.selectedId==='water_north'?'0.22':'0.04') + ')" stroke="#3498db" stroke-width="2" stroke-dasharray="6,4" opacity="0.6"/>',
-    // Южное Племя Воды
-    '<path class="el-territory" data-nation="Племена Воды" d="M 420 780 Q 640 750 960 780 L 1020 980 Q 640 1020 380 980 Z" fill="rgba(52, 152, 219, ' + (st.selectedId==='water_south'?'0.22':'0.04') + ')" stroke="#3498db" stroke-width="2" stroke-dasharray="6,4" opacity="0.6"/>'
-  ].join('');
+  // 1. Интерактивные контуры территорий Четырёх Народов
+  var territoriesList = [
+    {
+      id: 'water_north',
+      locId: 'north_water_capital',
+      name: 'Северное Племя Воды',
+      nation: 'Племена Воды',
+      icon: '🌊',
+      color: '#38bdf8',
+      fillAlpha: 0.18,
+      labelX: 760, labelY: 52,
+      labelText: '🌊 СЕВЕРНОЕ ПЛЕМЯ ВОДЫ',
+      d: 'M 550 70 L 580 35 L 640 20 L 720 15 L 820 15 L 900 25 L 960 45 L 970 70 L 950 95 L 900 85 L 850 105 L 810 120 L 770 120 L 745 140 L 690 145 L 640 130 L 610 135 L 565 120 L 535 90 L 550 70 Z M 985 75 L 1015 68 L 1030 82 L 1010 95 L 985 90 Z M 1025 88 L 1060 85 L 1070 98 L 1040 105 L 1025 95 Z'
+    },
+    {
+      id: 'water_south',
+      locId: 'south_water_capital',
+      name: 'Южное Племя Воды',
+      nation: 'Племена Воды',
+      icon: '🌊',
+      color: '#38bdf8',
+      fillAlpha: 0.18,
+      labelX: 760, labelY: 1145,
+      labelText: '🌊 ЮЖНОЕ ПЛЕМЯ ВОДЫ',
+      d: 'M 520 1060 L 540 1020 L 580 980 L 630 965 L 700 965 L 780 975 L 850 990 L 910 1010 L 960 1030 L 1000 1065 L 1005 1100 L 965 1135 L 890 1165 L 800 1175 L 710 1170 L 620 1150 L 550 1115 L 520 1060 Z M 890 990 L 925 985 L 935 1000 L 910 1010 Z M 930 1000 L 970 995 L 980 1018 L 945 1022 Z M 975 1025 L 1010 1020 L 1015 1045 L 985 1050 Z'
+    },
+    {
+      id: 'fire_nation',
+      locId: 'fire_capital',
+      name: 'Народ Огня',
+      nation: 'Народ Огня',
+      icon: '🔥',
+      color: '#ef4444',
+      fillAlpha: 0.18,
+      labelX: 200, labelY: 615,
+      labelText: '🔥 НАРОД ОГНЯ',
+      d: 'M 25 540 L 40 500 L 75 490 L 130 460 L 170 450 L 210 480 L 260 460 L 310 490 L 360 505 L 410 545 L 400 590 L 365 600 L 350 650 L 305 680 L 280 700 L 260 740 L 200 750 L 150 690 L 100 660 L 60 620 L 25 540 Z M 390 540 L 435 520 L 480 545 L 470 575 L 425 575 L 390 540 Z M 490 565 L 545 540 L 590 570 L 580 620 L 520 630 L 490 590 L 490 565 Z M 605 540 L 650 530 L 660 580 L 615 585 L 605 540 Z M 670 520 L 720 500 L 780 515 L 810 540 L 795 565 L 740 560 L 690 550 L 670 520 Z M 80 410 L 130 390 L 145 420 L 115 440 L 80 410 Z M 250 425 L 275 415 L 285 435 L 260 445 L 250 425 Z'
+    },
+    {
+      id: 'air_west',
+      locId: 'western_air_temple',
+      name: 'Западный Храм Воздуха',
+      nation: 'Воздушные Кочевники',
+      icon: '🌪️',
+      color: '#f59e0b',
+      fillAlpha: 0.22,
+      labelX: 330, labelY: 240,
+      labelText: '🌪️ ЗАПАДНЫЙ ХРАМ',
+      d: 'M 160 330 L 175 270 L 210 220 L 260 160 L 320 175 L 380 195 L 450 225 L 510 240 L 550 275 L 520 320 L 460 290 L 405 260 L 360 280 L 310 340 L 240 360 L 190 375 L 160 330 Z M 240 380 L 290 370 L 300 420 L 250 430 L 240 380 Z'
+    },
+    {
+      id: 'air_north',
+      locId: 'northern_air_temple',
+      name: 'Северный Храм Воздуха',
+      nation: 'Воздушные Кочевники',
+      icon: '🌪️',
+      color: '#f59e0b',
+      fillAlpha: 0.22,
+      labelX: 965, labelY: 215,
+      labelText: '🌪️ СЕВЕРНЫЙ ХРАМ',
+      d: 'M 870 200 L 910 165 L 970 160 L 1040 185 L 1055 220 L 1010 250 L 950 255 L 890 235 L 870 200 Z'
+    },
+    {
+      id: 'air_south',
+      locId: 'southern_air_temple',
+      name: 'Южный Храм Воздуха',
+      nation: 'Воздушные Кочевники',
+      icon: '🌪️',
+      color: '#f59e0b',
+      fillAlpha: 0.22,
+      labelX: 630, labelY: 895,
+      labelText: '🌪️ ЮЖНЫЙ ХРАМ',
+      d: 'M 370 915 L 410 850 L 460 820 L 510 830 L 525 875 L 490 920 L 440 925 L 370 915 Z M 520 870 L 570 825 L 640 815 L 710 835 L 720 885 L 670 955 L 590 965 L 530 940 L 520 870 Z M 715 840 L 770 805 L 840 810 L 890 840 L 880 890 L 830 910 L 760 915 L 720 880 L 715 840 Z'
+    },
+    {
+      id: 'air_east',
+      locId: 'eastern_air_temple',
+      name: 'Восточный Храм Воздуха',
+      nation: 'Воздушные Кочевники',
+      icon: '🌪️',
+      color: '#f59e0b',
+      fillAlpha: 0.22,
+      labelX: 1460, labelY: 680,
+      labelText: '🌪️ ВОСТОЧНЫЙ ХРАМ',
+      d: 'M 1470 530 L 1510 560 L 1560 600 L 1570 650 L 1540 710 L 1490 760 L 1440 750 L 1390 700 L 1410 620 L 1450 560 L 1470 530 Z'
+    },
+    {
+      id: 'earth_kingdom',
+      locId: 'ba_sing_se',
+      name: 'Царство Земли',
+      nation: 'Царство Земли',
+      icon: '⛰️',
+      color: '#22c55e',
+      fillAlpha: 0.16,
+      labelX: 1160, labelY: 490,
+      labelText: '⛰️ ЦАРСТВО ЗЕМЛИ',
+      d: 'M 440 260 L 515 230 L 570 260 L 580 335 L 640 310 L 710 320 L 750 280 L 730 210 L 650 180 L 750 160 L 860 180 L 870 255 L 1060 255 L 1140 185 L 1250 195 L 1360 220 L 1460 260 L 1530 310 L 1575 370 L 1580 450 L 1540 490 L 1460 480 L 1380 470 L 1320 500 L 1360 550 L 1420 560 L 1390 610 L 1300 615 L 1240 600 L 1160 630 L 1080 640 L 990 630 L 920 645 L 850 640 L 810 620 L 760 590 L 740 520 L 700 480 L 640 475 L 600 420 L 550 440 L 490 410 L 445 360 L 420 300 L 440 260 Z M 860 675 L 905 660 L 940 675 L 930 705 L 885 710 L 860 685 Z M 940 745 L 1060 735 L 1190 735 L 1320 740 L 1370 760 L 1300 785 L 1140 785 L 990 775 L 940 755 Z'
+    }
+  ];
+
+  var territoriesSvg = '';
+  if(st.showTerritories !== false){
+    territoriesSvg = territoriesList.map(function(t){
+      var isNationMatch = (filterNation === 'all' || t.nation === filterNation);
+      var isSel = (st.selectedId === t.locId || st.selectedTerritoryId === t.id);
+      var strokeW = isSel ? '3.8' : (isNationMatch ? '2.4' : '1.4');
+      var fillOp = isSel ? (t.fillAlpha + 0.16) : (isNationMatch ? t.fillAlpha : '0.04');
+      var op = isNationMatch ? '0.88' : '0.25';
+      var dash = isSel ? 'none' : '7,4';
+
+      var labelHtml = '';
+      if(st.showLabels !== false && isNationMatch){
+        labelHtml = '<text class="el-territory-label" x="' + t.labelX + '" y="' + t.labelY + '" text-anchor="middle" fill="' + t.color + '" font-size="' + (isSel ? '15' : '13') + '" font-weight="900" font-family="Cinzel,serif" style="text-shadow: 0 0 10px #000, 0 1px 4px #000, 0 0 16px ' + t.color + ';" opacity="' + (isSel ? '1' : '0.88') + '">' +
+          t.labelText +
+        '</text>';
+      }
+
+      return '<g class="el-territory-group" data-territory-id="' + t.id + '">' +
+        '<path class="el-territory ' + (isSel ? 'active' : '') + '" data-territory-id="' + t.id + '" data-territory-loc="' + t.locId + '" data-nation="' + elEscA(t.nation) + '" d="' + t.d + '" fill="' + t.color + '" fill-opacity="' + fillOp + '" stroke="' + t.color + '" stroke-width="' + strokeW + '" stroke-dasharray="' + dash + '" opacity="' + op + '"/>' +
+        labelHtml +
+      '</g>';
+    }).join('');
+  }
 
   // 2. Линия маршрута
   var routeSvg = '';
@@ -26463,22 +26635,22 @@ function renderAvatarMapSvg(){
         '<circle cx="0" cy="0" r="14" fill="rgba(18, 16, 22, 0.95)" stroke="' + (isMSelected ? '#f1c40f' : 'var(--el-accent, #38bdf8)') + '" stroke-width="2"/>' +
         '<text x="0" y="5" text-anchor="middle" font-size="14">' + icon + '</text>' +
         '<text x="18" y="4" fill="' + (isMSelected ? '#f1c40f' : '#ffffff') + '" font-size="11.5" font-weight="700" font-family="JetBrains Mono,monospace" style="text-shadow: 0 1px 4px #000, 0 0 8px #000;">' +
-          elEsc(um.title || 'Метка') +
+        elEsc(um.title || 'Метка') +
         '</text>' +
       '</g>';
     }).join('');
   }
 
-  // 6. Сетка координат и декоративные элементы
-  return '<svg id="elMapSvg" class="sh-map-svg" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">' +
+  // 6. Сетка координат и декоративные элементы (preserveAspectRatio="xMidYMid meet" гарантирует 100% видимость полюсов)
+  return '<svg id="elMapSvg" class="sh-map-svg" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">' +
     '<defs>' +
       '<filter id="elGlow" x="-20%" y="-20%" width="140%" height="140%">' +
-        '<feGaussianBlur stdDeviation="3" result="blur" />' +
+        '<feGaussianBlur stdDeviation="3.5" result="blur" />' +
         '<feComposite in="SourceGraphic" in2="blur" operator="over" />' +
       '</filter>' +
     '</defs>' +
-    // Высококачественная каноничная растровая карта Аватара
-    '<image href="v4-1600px-Avatar-the-Last-Airbender-Map-Summary-Version-2.jpg.webp" x="0" y="0" width="1600" height="1200" preserveAspectRatio="xMidYMid slice"/>' +
+    // Высококачественная каноничная растровая карта Аватара 1600x1200
+    '<image href="v4-1600px-Avatar-the-Last-Airbender-Map-Summary-Version-2.jpg.webp" x="0" y="0" width="1600" height="1200" preserveAspectRatio="xMidYMid meet"/>' +
     // Территории 4 Народов
     '<g id="elMapTerritories">' + territoriesSvg + '</g>' +
     // Маршруты
@@ -26771,6 +26943,7 @@ function elMap(){
           )) +
         '</div>' +
         '<div class="sh-map-controls">' +
+          '<label class="sh-map-chk"><input type="checkbox" id="elMapToggleTerritories" ' + (EL.map.showTerritories!==false?'checked':'') + '> Границы</label>' +
           '<label class="sh-map-chk"><input type="checkbox" id="elMapTogglePins" ' + (EL.map.showVillages!==false?'checked':'') + '> Локации</label>' +
           '<label class="sh-map-chk"><input type="checkbox" id="elMapToggleLabels" ' + (EL.map.showLabels!==false?'checked':'') + '> Названия</label>' +
           '<label class="sh-map-chk"><input type="checkbox" id="elMapToggleUserMarkers" ' + (EL.map.showUserMarkers!==false?'checked':'') + '> Метки (' + markersCount + ')</label>' +
@@ -26778,6 +26951,15 @@ function elMap(){
           '<button class="sh-map-btn" id="elMapZoomOut" title="Отдалить внутри бокса">➖</button>' +
           '<button class="sh-map-btn" id="elMapZoomReset" title="Сбросить масштаб">⟲ 100%</button>' +
         '</div>' +
+      '</div>' +
+      '<div class="el-map-quicknav">' +
+        '<span style="font-size:11px;color:var(--ink-muted,#94a3b8);margin-right:4px;font-weight:600;">Быстрый фокус:</span>' +
+        '<button class="el-quick-jump" data-jump="north">🌊 Северный полюс</button>' +
+        '<button class="el-quick-jump" data-jump="south">🌊 Южный полюс</button>' +
+        '<button class="el-quick-jump" data-jump="fire">🔥 Народ Огня</button>' +
+        '<button class="el-quick-jump" data-jump="earth">⛰️ Царство Земли</button>' +
+        '<button class="el-quick-jump" data-jump="air">🌪️ Храмы Воздуха</button>' +
+        '<button class="el-quick-jump" data-jump="world">🗺️ Вся карта</button>' +
       '</div>' +
       '<div class="sh-map-viewport" id="elMapViewport" title="Зажмите левую кнопку мыши для перемещения карты внутри бокса, колесико для зума">' +
         '<div class="sh-map-corner sh-map-corner-tl"></div>' +
@@ -26962,6 +27144,9 @@ function wireElMap(){
   };
 
   // Переключатели слоев
+  var chkTerritories = document.getElementById('elMapToggleTerritories');
+  if(chkTerritories) chkTerritories.onchange = function(){ EL.map.showTerritories = this.checked; refreshElMapSvgOnly(); };
+
   var chkPins = document.getElementById('elMapTogglePins');
   if(chkPins) chkPins.onchange = function(){ EL.map.showVillages = this.checked; refreshElMapSvgOnly(); };
 
@@ -26970,6 +27155,28 @@ function wireElMap(){
 
   var chkUserMarkers = document.getElementById('elMapToggleUserMarkers');
   if(chkUserMarkers) chkUserMarkers.onchange = function(){ EL.map.showUserMarkers = this.checked; refreshElMapSvgOnly(); };
+
+  // Быстрый переход по ключевым регионам
+  var jumpBtns = document.querySelectorAll('[data-jump]');
+  jumpBtns.forEach(function(btn){
+    btn.onclick = function(){
+      var target = this.getAttribute('data-jump');
+      if(target === 'north'){
+        EL.map.zoom = 2.2; EL.map.cx = 760; EL.map.cy = 120;
+      } else if(target === 'south'){
+        EL.map.zoom = 2.2; EL.map.cx = 760; EL.map.cy = 1060;
+      } else if(target === 'fire'){
+        EL.map.zoom = 1.8; EL.map.cx = 320; EL.map.cy = 580;
+      } else if(target === 'earth'){
+        EL.map.zoom = 1.4; EL.map.cx = 1100; EL.map.cy = 440;
+      } else if(target === 'air'){
+        EL.map.zoom = 1.6; EL.map.cx = 630; EL.map.cy = 880;
+      } else { // world
+        EL.map.zoom = 1.0; EL.map.cx = 800; EL.map.cy = 600;
+      }
+      updateViewBox();
+    };
+  });
 
   // Поиск локаций в режиме Атлас
   var searchInput = document.getElementById('elMapSearch');
@@ -26989,11 +27196,27 @@ function wireElMap(){
     };
   });
 
+  // Клик по контурам территорий Четырёх Народов
+  var territoryPaths = document.querySelectorAll('.el-territory');
+  territoryPaths.forEach(function(poly){
+    poly.onclick = function(e){
+      if(hasMoved) return;
+      var locId = this.getAttribute('data-territory-loc');
+      var tid = this.getAttribute('data-territory-id');
+      if(locId){
+        EL.map.selectedId = locId;
+        EL.map.selectedTerritoryId = tid;
+        refreshElMap();
+      }
+    };
+  });
+
   // Клик по локациям на карте
   var locPins = document.querySelectorAll('[data-loc-id]');
   locPins.forEach(function(pin){
     pin.onclick = function(e){
       if(hasMoved) return;
+      e.stopPropagation();
       var id = this.getAttribute('data-loc-id');
       var loc = elMapLocById(id);
       if(!loc) return;
