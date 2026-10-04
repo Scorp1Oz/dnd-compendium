@@ -6751,6 +6751,7 @@ body.el-theme.el-theme-earth {
   --el-highlight: #6ee7b7;
   --el-title-color: #f0fdf4;
   --el-bg-color: #070e0a;
+  --el-symbol-img: url("symbols/Avatar/earth.png");
   --el-bg-img: radial-gradient(ellipse at 50% -10%, rgba(16, 185, 129, 0.14) 0%, transparent 60%),
                radial-gradient(ellipse at 85% 90%, rgba(5, 150, 105, 0.08) 0%, transparent 50%),
                radial-gradient(ellipse at 15% 90%, rgba(20, 83, 45, 0.08) 0%, transparent 50%);
@@ -6772,6 +6773,7 @@ body.el-theme.el-theme-wind {
   --el-highlight: #fde68a;
   --el-title-color: #fffbeb;
   --el-bg-color: #0e0d08;
+  --el-symbol-img: url("symbols/Avatar/air.png");
   --el-bg-img: radial-gradient(ellipse at 50% -10%, rgba(245, 158, 11, 0.14) 0%, transparent 60%),
                radial-gradient(ellipse at 85% 90%, rgba(217, 119, 6, 0.08) 0%, transparent 50%),
                radial-gradient(ellipse at 15% 90%, rgba(56, 189, 248, 0.08) 0%, transparent 50%);
@@ -6793,6 +6795,7 @@ body.el-theme.el-theme-water {
   --el-highlight: #7dd3fc;
   --el-title-color: #f0f9ff;
   --el-bg-color: #060b12;
+  --el-symbol-img: url("symbols/Avatar/water.png");
   --el-bg-img: radial-gradient(ellipse at 50% -10%, rgba(14, 165, 233, 0.15) 0%, transparent 60%),
                radial-gradient(ellipse at 85% 90%, rgba(2, 132, 199, 0.09) 0%, transparent 50%),
                radial-gradient(ellipse at 15% 90%, rgba(99, 102, 241, 0.07) 0%, transparent 50%);
@@ -6814,6 +6817,7 @@ body.el-theme.el-theme-fire {
   --el-highlight: #fca5a5;
   --el-title-color: #fef2f2;
   --el-bg-color: #120707;
+  --el-symbol-img: url("symbols/Avatar/fire.png");
   --el-bg-img: radial-gradient(ellipse at 50% -10%, rgba(239, 68, 68, 0.15) 0%, transparent 60%),
                radial-gradient(ellipse at 85% 90%, rgba(249, 115, 22, 0.10) 0%, transparent 50%),
                radial-gradient(ellipse at 15% 90%, rgba(185, 28, 28, 0.08) 0%, transparent 50%);
@@ -6918,6 +6922,56 @@ body.el-theme .el-tech-card.elem-dark {
 }
 body.el-theme .el-theme-fx {
   display: block;
+}
+
+/* --- СТИХИЯ: СВЯЩЕННЫЕ СИМВОЛЫ СТИХИЙ НА ФОНЕ (ELEMENTAL CRESTS) --- */
+.el-theme-crest {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(80vw, 560px);
+  height: min(80vw, 560px);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform, opacity;
+  animation: elCrestBreath 8s ease-in-out infinite alternate;
+  -webkit-mask-image: radial-gradient(circle at center, #000 60%, transparent 96%);
+  mask-image: radial-gradient(circle at center, #000 60%, transparent 96%);
+}
+
+@keyframes elCrestBreath {
+  0% {
+    opacity: 0.12;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+  100% {
+    opacity: 0.20;
+    transform: translate(-50%, -50%) scale(1.03);
+  }
+}
+
+.el-crest-earth {
+  background-image: url("symbols/Avatar/earth.png");
+  filter: invert(1) sepia(1) saturate(800%) hue-rotate(90deg) brightness(0.9) drop-shadow(0 0 25px rgba(16, 185, 129, 0.8));
+}
+
+.el-crest-fire {
+  background-image: url("symbols/Avatar/fire.png");
+  filter: invert(1) sepia(1) saturate(900%) hue-rotate(325deg) brightness(0.95) drop-shadow(0 0 25px rgba(239, 68, 68, 0.8));
+}
+
+.el-crest-water {
+  background-image: url("symbols/Avatar/water.png");
+  filter: invert(1) sepia(1) saturate(900%) hue-rotate(160deg) brightness(0.9) drop-shadow(0 0 25px rgba(14, 165, 233, 0.8));
+}
+
+.el-crest-wind {
+  background-image: url("symbols/Avatar/air.png");
+  filter: invert(1) sepia(1) saturate(800%) hue-rotate(5deg) brightness(1.05) drop-shadow(0 0 25px rgba(245, 158, 11, 0.8));
 }
 
 /* --- ВЕТЕР (WIND): Золотистый вихрь, парящие листья духа и воздушные порывы --- */
@@ -22980,6 +23034,13 @@ var EL = window.EL = window.EL || {
     EL.buildThemeFx(cont, theme);
   },
   buildThemeFx: function(cont, theme){
+    // Священный знак стихии на фоне темы
+    if(theme === 'wind' || theme === 'water' || theme === 'fire' || theme === 'earth'){
+      var crest = document.createElement('div');
+      crest.className = 'el-theme-crest el-crest-' + theme;
+      crest.setAttribute('aria-hidden', 'true');
+      cont.appendChild(crest);
+    }
     if(theme === 'wind'){
       // 3 плавных ветровых потока / воздушных порыва
       for(var g = 0; g < 3; g++){

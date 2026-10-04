@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v8';
+const CACHE_NAME = 'compendium-cache-v9';
 const APP_SHELL = [
   './',
   './index.html',
@@ -6,7 +6,11 @@ const APP_SHELL = [
   './icon-192.png',
   './icon-512.png',
   './apple-touch-icon.png',
-  './favicon-32.png'
+  './favicon-32.png',
+  './symbols/Avatar/air.png',
+  './symbols/Avatar/earth.png',
+  './symbols/Avatar/water.png',
+  './symbols/Avatar/fire.png'
 ];
 
 self.addEventListener('install', (event) => {
