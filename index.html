@@ -17059,6 +17059,79 @@ function saveGeminiApiKey(key){
 }
 window.saveGeminiApiKey = saveGeminiApiKey;
 
+function requestGeminiGenerateContent(prompt, apiKey, callback){
+  if(!apiKey){
+    callback(new Error("API ключ не указан"), null);
+    return;
+  }
+  var models = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+  var preferred = null;
+  try{
+    preferred = localStorage.getItem('gemini_preferred_model');
+  }catch(e){}
+  if(preferred && models.indexOf(preferred) !== -1){
+    models = [preferred].concat(models.filter(function(m){ return m !== preferred; }));
+  }
+
+  function tryModel(idx){
+    if(idx >= models.length){
+      callback(new Error('API status 404: Модель не найдена для данного API-ключа (проверены: ' + models.join(', ') + ')'), null);
+      return;
+    }
+    var model = models[idx];
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey);
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
+      })
+    }).then(function(res){
+      if(res.status === 404){
+        tryModel(idx + 1);
+        return;
+      }
+      if(!res.ok){
+        throw new Error('API status ' + res.status);
+      }
+      return res.json().then(function(data){
+        try{
+          localStorage.setItem('gemini_preferred_model', model);
+        }catch(e){}
+        callback(null, data);
+      });
+    }).catch(function(err){
+      callback(err, null);
+    });
+  }
+
+  tryModel(0);
+}
+window.requestGeminiGenerateContent = requestGeminiGenerateContent;
+
+function extractJsonFromAi(data){
+  if(!data) throw new Error("Пустой ответ от AI");
+  var rawTxt = '';
+  if(data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]){
+    rawTxt = data.candidates[0].content.parts[0].text || '';
+  } else if(typeof data === 'string'){
+    rawTxt = data;
+  }
+  var clean = rawTxt.replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  try{
+    return JSON.parse(clean);
+  }catch(e){
+    var firstOpen = clean.indexOf('{');
+    var lastClose = clean.lastIndexOf('}');
+    if(firstOpen !== -1 && lastClose > firstOpen){
+      return JSON.parse(clean.substring(firstOpen, lastClose + 1));
+    }
+    throw e;
+  }
+}
+window.extractJsonFromAi = extractJsonFromAi;
+
 function loadMissions(){
   try{
     var raw = localStorage.getItem(SH_MISSIONS_STORAGE_KEY);
@@ -17343,23 +17416,13 @@ function callGeminiMissionGenerator(opts, apiKey, callback){
     '  "combat": "Кто оппонент партии и его главная тактическая уловка"\n' +
     "}";
 
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(apiKey);
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
-    })
-  }).then(function(res){
-    if(!res.ok) throw new Error('API status ' + res.status);
-    return res.json();
-  }).then(function(data){
+  requestGeminiGenerateContent(prompt, apiKey, function(err, data){
+    if(err || !data){
+      callback(err, fallback);
+      return;
+    }
     try{
-      var rawTxt = data.candidates[0].content.parts[0].text;
-      var clean = rawTxt.replace(/^[```]+json\s*/i, '').replace(/\s*[```]+$/i, '').trim();
-      var parsed = JSON.parse(clean);
-
+      var parsed = extractJsonFromAi(data);
       fallback.title = parsed.title || fallback.title;
       if(parsed.clientName) fallback.client = { name: parsed.clientName, title: parsed.clientTitle || 'Заказчик' };
       if(parsed.desc) fallback.desc = parsed.desc;
@@ -17371,11 +17434,9 @@ function callGeminiMissionGenerator(opts, apiKey, callback){
       if(parsed.combat) fallback.aiCombat = parsed.combat;
       fallback.aiGenerated = true;
       callback(null, fallback);
-    }catch(err){
+    }catch(err2){
       callback(null, fallback);
     }
-  }).catch(function(err){
-    callback(err, fallback);
   });
 }
 
@@ -17775,28 +17836,17 @@ function callGeminiJutsuGenerator(opts, apiKey, callback){
     '  "dmgMod": "Статичный бонус к урону (только число)"\n' +
     "}";
 
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(apiKey);
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
-    })
-  }).then(function(res){
-    if(!res.ok) throw new Error('API status ' + res.status);
-    return res.json();
-  }).then(function(data){
-    try{
-      var rawTxt = data.candidates[0].content.parts[0].text;
-      var clean = rawTxt.replace(/^\s*```json\s*/i, '').replace(/\s*```\s*$/i, '').trim();
-      var parsed = JSON.parse(clean);
-      callback(null, parsed);
-    }catch(err){
-      callback("Ошибка разбора JSON: " + err.message, null);
+  requestGeminiGenerateContent(prompt, apiKey, function(err, data){
+    if(err || !data){
+      callback(err ? (err.message || String(err)) : "Пустой ответ от AI", null);
+      return;
     }
-  }).catch(function(err){
-    callback(err.message || err, null);
+    try{
+      var parsed = extractJsonFromAi(data);
+      callback(null, parsed);
+    }catch(err2){
+      callback("Ошибка разбора JSON: " + err2.message, null);
+    }
   });
 }
 
@@ -17829,27 +17879,18 @@ function callGeminiMoveGenerator(opts, apiKey, callback){
     '  "desc": "Художественное и механическое описание того, как выглядит и работает приём."\n' +
     "}";
 
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(apiKey);
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
-    })
-  }).then(function(r){ return r.json(); })
-    .then(function(data){
-       try {
-         var txt = data.candidates[0].content.parts[0].text;
-         var obj = JSON.parse(txt);
-         callback(null, obj);
-       } catch(e) {
-         callback("Ошибка парсинга ответа от AI: " + e.message, null);
-       }
-    })
-    .catch(function(e){
-      callback(e.message, null);
-    });
+  requestGeminiGenerateContent(prompt, apiKey, function(err, data){
+    if(err || !data){
+      callback(err ? (err.message || String(err)) : "Пустой ответ от AI", null);
+      return;
+    }
+    try{
+      var parsed = extractJsonFromAi(data);
+      callback(null, parsed);
+    }catch(err2){
+      callback("Ошибка разбора JSON: " + err2.message, null);
+    }
+  });
 }
 
 function shJutsuGen(){
@@ -17969,16 +18010,18 @@ function callGeminiSkillGenerator(opts, apiKey, callback){
     '  "gives": "Сюжетно: что конкретно персонаж может делать благодаря навыку, чего не могут другие (без броска или с преимуществом)",\n' +
     '  "desc": "Детали, нюансы и ограничения применения."\n' +
     "}";
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(apiKey);
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.8, responseMimeType: "application/json" } })
-  }).then(function(r){ return r.json(); })
-    .then(function(data){
-       try { callback(null, JSON.parse(data.candidates[0].content.parts[0].text)); }
-       catch(e) { callback("Ошибка парсинга ответа от AI: " + e.message, null); }
-    }).catch(function(e){ callback(e.message, null); });
+  requestGeminiGenerateContent(prompt, apiKey, function(err, data){
+    if(err || !data){
+      callback(err ? (err.message || String(err)) : "Пустой ответ от AI", null);
+      return;
+    }
+    try{
+      var parsed = extractJsonFromAi(data);
+      callback(null, parsed);
+    }catch(err2){
+      callback("Ошибка разбора JSON: " + err2.message, null);
+    }
+  });
 }
 
 function shSkillGen(){
@@ -24793,28 +24836,17 @@ function callGeminiAvatarTechGenerator(opts, apiKey, callback){
     '  "desc": "Детальное боевое описание: восточный стиль единоборств (Северный Шаолинь для Огня, Тайцзицюань для Воды, Хунгар для Земли, Багуачжан для Воздуха), стойка, движение тела, концентрация Ци и визуальный эффект стихии."\n' +
     "}";
 
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(apiKey);
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
-    })
-  }).then(function(res){
-    if(!res.ok) throw new Error('API status ' + res.status);
-    return res.json();
-  }).then(function(data){
-    try{
-      var rawTxt = data.candidates[0].content.parts[0].text;
-      var clean = rawTxt.replace(/^\s*```json\s*/i, '').replace(/\s*```\s*$/i, '').trim();
-      var parsed = JSON.parse(clean);
-      callback(null, parsed);
-    }catch(err){
-      callback("Ошибка разбора JSON: " + err.message, null);
+  requestGeminiGenerateContent(prompt, apiKey, function(err, data){
+    if(err || !data){
+      callback(err ? (err.message || String(err)) : "Пустой ответ от AI", null);
+      return;
     }
-  }).catch(function(err){
-    callback(err.message || err, null);
+    try{
+      var parsed = extractJsonFromAi(data);
+      callback(null, parsed);
+    }catch(err2){
+      callback("Ошибка разбора JSON: " + err2.message, null);
+    }
   });
 }
 window.callGeminiAvatarTechGenerator = callGeminiAvatarTechGenerator;
@@ -24827,6 +24859,12 @@ function elTechGen(){
     '<div class="subtitle">ГЕНЕРАЦИЯ КАНОНИЧНЫХ МАГИЧЕСКИХ ФОРМ И ВЫСШИХ ИСКУССТВ МИРА АВАТАРА</div>' +
     
     '<div class="el-form-card" id="elTechGenFormSection" style="margin-top:16px;">' +
+      '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--el-accent-border);border-radius:4px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
+        '<div style="font-size:12.5px;color:#94a3b8;display:flex;align-items:center;gap:6px;">' +
+          '<span>🔑 Gemini API:</span> ' + (key ? '<span style="color:#4ade80;font-weight:600;">✓ Подключен (' + escapeHtml(key.slice(0,6)) + '...' + escapeHtml(key.slice(-4)) + ')</span>' : '<span style="color:#f87171;font-weight:600;">Не указан</span>') +
+        '</div>' +
+        '<button type="button" class="btn btn-ghost" id="elTechGenChangeKeyBtn" style="padding:4px 10px;font-size:11.5px;border-color:var(--el-accent-border);color:var(--el-tag-text);cursor:pointer;">' + (key ? 'Изменить ключ' : 'Указать ключ') + '</button>' +
+      '</div>' +
       '<p style="color:#94a3b8;font-size:13.5px;line-height:1.5;margin-bottom:14px;">' +
         'Опишите вашу идею формы, стихию или высшее искусство. Нейросеть сгенерирует боевую стойку, траекторию движений тела (Северный Шаолинь, Тайцзи, Хунгар, Багуа), механику урона и требуемые Окна возможностей (A94).' +
       '</p>' +
@@ -24955,6 +24993,18 @@ function wireElTechGen(){
 
   renderHistory();
 
+  var btnTechChangeKey = document.getElementById('elTechGenChangeKeyBtn');
+  if(btnTechChangeKey){
+    btnTechChangeKey.onclick = function(){
+      var curKey = getGeminiApiKey();
+      var keyInput = prompt('Введите ваш Google Gemini API ключ (из Google AI Studio):', curKey || '');
+      if(keyInput !== null){
+        saveGeminiApiKey(keyInput.trim());
+        if(typeof render === 'function') render();
+      }
+    };
+  }
+
   var btnGen = document.getElementById('btnElTechGen');
   if(btnGen){
     btnGen.onclick = function(){
@@ -24964,6 +25014,7 @@ function wireElTechGen(){
         if(keyInput && keyInput.trim()){
           k = keyInput.trim();
           saveGeminiApiKey(k);
+          if(typeof render === 'function') render();
         } else {
           return;
         }
@@ -24989,7 +25040,11 @@ function wireElTechGen(){
         btnGen.textContent = '✨ Сгенерировать форму стихий';
 
         if(err || !result){
-          alert('Ошибка генерации: ' + (err || 'Пустой ответ от AI'));
+          var errMsg = (err && err.message) ? err.message : (err || 'Пустой ответ от AI');
+          if(String(errMsg).indexOf('400') !== -1 || String(errMsg).indexOf('403') !== -1){
+            errMsg += '\n\nПроверьте правильность API-ключа в Google AI Studio (aistudio.google.com).';
+          }
+          alert('Ошибка генерации: ' + errMsg);
           return;
         }
 
@@ -25371,28 +25426,17 @@ function callGeminiAvatarMoveGenerator(opts, apiKey, callback){
     '  "desc": "Художественное описание: механика движения, точки давления, акробатический маневр, использование инерции противника или финт оружием."\n' +
     "}";
 
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(apiKey);
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
-    })
-  }).then(function(res){
-    if(!res.ok) throw new Error('API status ' + res.status);
-    return res.json();
-  }).then(function(data){
-    try{
-      var rawTxt = data.candidates[0].content.parts[0].text;
-      var clean = rawTxt.replace(/^\s*```json\s*/i, '').replace(/\s*```\s*$/i, '').trim();
-      var parsed = JSON.parse(clean);
-      callback(null, parsed);
-    }catch(err){
-      callback("Ошибка разбора JSON: " + err.message, null);
+  requestGeminiGenerateContent(prompt, apiKey, function(err, data){
+    if(err || !data){
+      callback(err ? (err.message || String(err)) : "Пустой ответ от AI", null);
+      return;
     }
-  }).catch(function(err){
-    callback(err.message || err, null);
+    try{
+      var parsed = extractJsonFromAi(data);
+      callback(null, parsed);
+    }catch(err2){
+      callback("Ошибка разбора JSON: " + err2.message, null);
+    }
   });
 }
 window.callGeminiAvatarMoveGenerator = callGeminiAvatarMoveGenerator;
@@ -25405,6 +25449,12 @@ function elMoveGen(){
     '<div class="subtitle">ГЕНЕРАЦИЯ ТАКТИЧЕСКИХ ДЕЙСТВИЙ, ЧИ-БЛОКИНГА И БОЯ ОРУЖИЕМ В СТИЛЕ АВАТАРА</div>' +
     
     '<div class="el-form-card" id="elMoveGenFormSection" style="margin-top:16px;">' +
+      '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--el-accent-border);border-radius:4px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
+        '<div style="font-size:12.5px;color:#94a3b8;display:flex;align-items:center;gap:6px;">' +
+          '<span>🔑 Gemini API:</span> ' + (key ? '<span style="color:#4ade80;font-weight:600;">✓ Подключен (' + escapeHtml(key.slice(0,6)) + '...' + escapeHtml(key.slice(-4)) + ')</span>' : '<span style="color:#f87171;font-weight:600;">Не указан</span>') +
+        '</div>' +
+        '<button type="button" class="btn btn-ghost" id="elMoveGenChangeKeyBtn" style="padding:4px 10px;font-size:11.5px;border-color:var(--el-accent-border);color:var(--el-tag-text);cursor:pointer;">' + (key ? 'Изменить ключ' : 'Указать ключ') + '</button>' +
+      '</div>' +
       '<p style="color:#94a3b8;font-size:13.5px;line-height:1.5;margin-bottom:14px;">' +
         'Создайте новый тактический маневр, атаку оружием или чи-блокинг (в стиле воинов Киоши, Тай Ли или бойцов Уравнителей). AI подберёт эффект, спасбросок, открываемое Окно возможностей (A94) и стоимость в ФВН.' +
       '</p>' +
@@ -25520,7 +25570,17 @@ function wireElMoveGen(){
     } catch(e){}
   };
 
-  renderHistory();
+  var btnMoveChangeKey = document.getElementById('elMoveGenChangeKeyBtn');
+  if(btnMoveChangeKey){
+    btnMoveChangeKey.onclick = function(){
+      var curKey = getGeminiApiKey();
+      var keyInput = prompt('Введите ваш Google Gemini API ключ (из Google AI Studio):', curKey || '');
+      if(keyInput !== null){
+        saveGeminiApiKey(keyInput.trim());
+        if(typeof render === 'function') render();
+      }
+    };
+  }
 
   var btnGen = document.getElementById('btnElMoveGen');
   if(btnGen){
@@ -25531,6 +25591,7 @@ function wireElMoveGen(){
         if(keyInput && keyInput.trim()){
           k = keyInput.trim();
           saveGeminiApiKey(k);
+          if(typeof render === 'function') render();
         } else {
           return;
         }
@@ -25554,7 +25615,11 @@ function wireElMoveGen(){
         btnGen.textContent = '✨ Сгенерировать боевой приём';
 
         if(err || !result){
-          alert('Ошибка генерации: ' + (err || 'Пустой ответ от AI'));
+          var errMsg = (err && err.message) ? err.message : (err || 'Пустой ответ от AI');
+          if(String(errMsg).indexOf('400') !== -1 || String(errMsg).indexOf('403') !== -1){
+            errMsg += '\n\nПроверьте правильность API-ключа в Google AI Studio (aistudio.google.com).';
+          }
+          alert('Ошибка генерации: ' + errMsg);
           return;
         }
 
