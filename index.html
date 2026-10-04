@@ -6927,11 +6927,13 @@ body.el-theme .el-theme-fx {
 /* --- СТИХИЯ: СВЯЩЕННЫЕ СИМВОЛЫ СТИХИЙ НА ФОНЕ (ELEMENTAL CRESTS) --- */
 .el-theme-crest {
   position: absolute;
-  bottom: clamp(20px, 5vh, 70px);
-  right: clamp(15px, 4vw, 70px);
-  width: clamp(230px, 30vw, 420px);
-  height: clamp(230px, 30vw, 420px);
-  background-position: center;
+  bottom: clamp(0px, 2vh, 40px);
+  right: clamp(0px, 2vw, 40px);
+  width: clamp(300px, 50vw, 680px);
+  height: clamp(300px, 50vw, 680px);
+  max-width: 80vw;
+  max-height: 80vh;
+  background-position: bottom right;
   background-repeat: no-repeat;
   background-size: contain;
   pointer-events: none;
@@ -6939,18 +6941,18 @@ body.el-theme .el-theme-fx {
   will-change: transform, opacity;
   transform-origin: bottom right;
   animation: elCrestBreath 8s ease-in-out infinite alternate;
-  -webkit-mask-image: radial-gradient(circle at center, #000 60%, transparent 96%);
-  mask-image: radial-gradient(circle at center, #000 60%, transparent 96%);
+  -webkit-mask-image: radial-gradient(circle at 75% 75%, #000 65%, transparent 100%);
+  mask-image: radial-gradient(circle at 75% 75%, #000 65%, transparent 100%);
 }
 
 @keyframes elCrestBreath {
   0% {
-    opacity: 0.16;
+    opacity: 0.14;
     transform: scale(0.96);
   }
   100% {
-    opacity: 0.26;
-    transform: scale(1.04);
+    opacity: 0.22;
+    transform: scale(1.03);
   }
 }
 
