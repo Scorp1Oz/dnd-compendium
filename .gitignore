@@ -9,3 +9,10 @@ scratch/
 
 # Node / dependencies if any
 node_modules/
+
+# Backups and temporary scraps
+_backup_pre_refactor/
+*.bak
+*.tmp
+old_*
+scratch.txt
