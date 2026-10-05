@@ -25126,6 +25126,13 @@ function finalizeElTechLaunch(mode, t, autoCopy){
   var vals = EL.launcher.rolledValues || {};
   var mods = EL.launcher.mods || {exp:0, atk:0, dmg:0};
   
+  var formatRoll = function(label, diceStr, rollSum, mod) {
+      var base = '*[Результат броска ' + label + ': ' + diceStr + ' = ' + rollSum + ']*';
+      if(mod > 0) return base + ' + ' + mod;
+      if(mod < 0) return base + ' - ' + Math.abs(mod);
+      return base;
+  };
+  
   if(mode === 'claim' || mode === 'all'){
     var scale = t.scale !== undefined && t.scale !== null && t.scale !== '' ? t.scale : '1';
     var cost = t.cost || '1 МВН';
@@ -25133,29 +25140,21 @@ function finalizeElTechLaunch(mode, t, autoCopy){
   }
   
   if((mode === 'all' || mode === 'exp') && isExp){
-    var r = vals.exp || 10;
-    var res = r + mods.exp;
-    out.push('*[Результат броска Исполнение: 1d20' + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + r + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + res + ']*');
+    out.push(formatRoll('Исполнение', '1d20', vals.exp || 10, mods.exp));
   }
   
   if(mode === 'all' || mode === 'atk'){
-    var r = vals.atk || 10;
-    var res = r + mods.atk;
-    out.push('*[Результат броска Попадание: 1d20' + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + r + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + res + ']*');
+    out.push(formatRoll('Попадание', '1d20', vals.atk || 10, mods.atk));
   }
   
   var pDmg = typeof parseMoveDmg === 'function' ? parseMoveDmg(t.damage) : null;
   if((mode === 'all' || mode === 'dmg') && pDmg){
     var sum = 0;
-    var rolls = [];
     for(var i=0; i<pDmg.n; i++){
-      var v = (vals.dmgRolls && vals.dmgRolls[i]) ? vals.dmgRolls[i] : Math.ceil(pDmg.sides/2);
-      sum += v;
-      rolls.push(v);
+      sum += (vals.dmgRolls && vals.dmgRolls[i]) ? vals.dmgRolls[i] : Math.ceil(pDmg.sides/2);
     }
     var totalMod = mods.dmg + pDmg.mod;
-    sum += totalMod;
-    out.push('*[Результат броска Урон: '+pDmg.n+'d'+pDmg.sides+' ('+rolls.join(', ')+')' + (totalMod>=0?'+'+totalMod:totalMod) + ' = ' + sum + ']*');
+    out.push(formatRoll('Урон', pDmg.n + 'd' + pDmg.sides, sum, totalMod));
   }
   
   var output = out.join('\n').trim();
@@ -25245,35 +25244,34 @@ function finalizeElMoveLaunch(mode, m, autoCopy){
   var vals = EL.moveLauncher.rolledValues || {};
   var mods = EL.moveLauncher.mods || {atk:0, dmg:0, exp:0};
   
+  var formatRoll = function(label, diceStr, rollSum, mod) {
+      var base = '*[Результат броска ' + label + ': ' + diceStr + ' = ' + rollSum + ']*';
+      if(mod > 0) return base + ' + ' + mod;
+      if(mod < 0) return base + ' - ' + Math.abs(mod);
+      return base;
+  };
+  
   if(mode === 'claim' || mode === 'all'){
     var cost = m.cost || '1 ФВН';
     out.push('*[Боевой приём: ' + m.name + ' | Тип: ' + m.kind + ' | Затраты: ' + cost + ']*');
   }
   
   if((mode === 'all' || mode === 'exp') && isExp){
-    var r = vals.exp || 10;
-    var res = r + mods.exp;
-    out.push('*[Результат броска Защита: 1d20' + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + r + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + res + ']*');
+    out.push(formatRoll('Защита', '1d20', vals.exp || 10, mods.exp));
   }
 
   if(mode === 'all' || mode === 'atk'){
-    var r = vals.atk || 10;
-    var res = r + mods.atk;
-    out.push('*[Результат броска Попадание: 1d20' + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + r + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + res + ']*');
+    out.push(formatRoll('Попадание', '1d20', vals.atk || 10, mods.atk));
   }
   
   var pDmg = typeof parseMoveDmg === 'function' ? parseMoveDmg(m.effect) : null;
   if((mode === 'all' || mode === 'dmg') && pDmg){
     var sum = 0;
-    var rolls = [];
     for(var i=0; i<pDmg.n; i++){
-      var v = (vals.dmgRolls && vals.dmgRolls[i]) ? vals.dmgRolls[i] : Math.ceil(pDmg.sides/2);
-      sum += v;
-      rolls.push(v);
+      sum += (vals.dmgRolls && vals.dmgRolls[i]) ? vals.dmgRolls[i] : Math.ceil(pDmg.sides/2);
     }
     var totalMod = mods.dmg + pDmg.mod;
-    sum += totalMod;
-    out.push('*[Результат броска Урон/Эффект: '+pDmg.n+'d'+pDmg.sides+' ('+rolls.join(', ')+')' + (totalMod>=0?'+'+totalMod:totalMod) + ' = ' + sum + ']*');
+    out.push(formatRoll('Урон/Эффект', pDmg.n + 'd' + pDmg.sides, sum, totalMod));
   }
   
   var output = out.join('\n').trim();
