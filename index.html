@@ -29493,60 +29493,6 @@ function wireMe(){
   });
 
 
-  // Вкладки и кнопки в Способностях
-  document.querySelectorAll('.me-tab-btn[data-branch]').forEach(function(btn){
-    btn.onclick = function(){
-      ME._activeBranch = this.getAttribute('data-branch');
-      render();
-    };
-  });
-  var powSearch = document.getElementById('mePowersSearchInput');
-  if(powSearch) powSearch.oninput = function(){
-    ME._powersSearch = this.value;
-    // debounce render
-    clearTimeout(powSearch._t);
-    powSearch._t = setTimeout(render, 300);
-  };
-  var addPow = document.getElementById('meAddPowerEmptyBtn') || document.getElementById('meAddPowerBtn');
-  if(addPow) addPow.onclick = function(){ window.navigate('mePowerEdit:new'); };
-  
-  document.querySelectorAll('.me-edit-power-btn').forEach(function(btn){
-    btn.onclick = function(){ window.navigate('mePowerEdit:' + this.getAttribute('data-id')); };
-  });
-  document.querySelectorAll('.me-del-power-btn').forEach(function(btn){
-    btn.onclick = function(){
-      if(confirm('Удалить протокол?')){
-        var id = this.getAttribute('data-id');
-        var list = ME.getPowers().filter(function(x){ return x.id !== id; });
-        ME.savePowers(list);
-        render();
-      }
-    };
-  });
-
-  // Вкладки и кнопки в Арсенале
-  document.querySelectorAll('.me-tab-btn[data-arsenal-cat]').forEach(function(btn){
-    btn.onclick = function(){
-      ME._activeArsenalCat = this.getAttribute('data-arsenal-cat');
-      render();
-    };
-  });
-  var addWeap = document.getElementById('meAddWeapEmptyBtn') || document.getElementById('meAddWeapBtn');
-  if(addWeap) addWeap.onclick = function(){ window.navigate('meArsenalEdit:new'); };
-  
-  document.querySelectorAll('.me-edit-weap-btn').forEach(function(btn){
-    btn.onclick = function(){ window.navigate('meArsenalEdit:' + this.getAttribute('data-id')); };
-  });
-  document.querySelectorAll('.me-del-weap-btn').forEach(function(btn){
-    btn.onclick = function(){
-      if(confirm('Списать оружие со склада?')){
-        var id = this.getAttribute('data-id');
-        var list = ME.getArsenal().filter(function(x){ return x.id !== id; });
-        ME.saveArsenal(list);
-        render();
-      }
-    };
-  });
 
   document.querySelectorAll('[data-go]').forEach(function(el){
     if(el.__meGoBound) return;
@@ -29793,61 +29739,484 @@ function wireMe(){
   // Проводка экрана галактической карты
   if(typeof wireMeMap === 'function') wireMeMap();
 
-  // Вкладки и кнопки в Способностях
-  document.querySelectorAll('.me-tab-btn[data-branch]').forEach(function(btn){
-    btn.onclick = function(){
-      ME._activeBranch = this.getAttribute('data-branch');
+  // ===== Восстановлено из 019422a: проводка Досье / Способностей / Арсенала / Корабля =====
+  var editCharBtn = document.getElementById('meEditCharBtn');
+  if(editCharBtn){
+    editCharBtn.addEventListener('click', function(){
+      ME._editingChar = true;
+      render();
+    });
+  }
+  var cancelEditBtn = document.getElementById('meCancelEditBtn');
+  if(cancelEditBtn){
+    cancelEditBtn.addEventListener('click', function(){
+      ME._editingChar = false;
+      render();
+    });
+  }
+  var saveCharBtn = document.getElementById('meSaveCharBtn') || document.getElementById('meSaveCharBtn2');
+  if(saveCharBtn){
+    var doSave = function(){
+      var c = ME.getChar();
+      var nameInp = document.getElementById('meEditName'); if(nameInp) c.name = nameInp.value;
+      var csInp = document.getElementById('meEditCallsign'); if(csInp) c.callsign = csInp.value;
+      var raceInp = document.getElementById('meEditRace'); if(raceInp) c.race = raceInp.value;
+      var roleInp = document.getElementById('meEditRole'); if(roleInp) c.role = roleInp.value;
+      var origInp = document.getElementById('meEditOrigin'); if(origInp) c.origin = origInp.value;
+      var bioInp = document.getElementById('meEditBio'); if(bioInp) c.biochemistry = bioInp.value;
+      var lvlInp = document.getElementById('meEditLevel'); if(lvlInp) c.level = parseInt(lvlInp.value, 10) || 1;
+      var devInp = document.getElementById('meEditDevPoints'); if(devInp) c.devPoints = parseInt(devInp.value, 10) || 0;
+      var profInp = document.getElementById('meEditProf'); if(profInp) c.profBonus = parseInt(profInp.value, 10) || 2;
+      var spdInp = document.getElementById('meEditSpeed'); if(spdInp) c.speed = spdInp.value;
+      
+      var acInp = document.getElementById('meEditAc'); if(acInp) c.baseAc = parseInt(acInp.value, 10) || 10;
+      var shInp = document.getElementById('meEditShield'); if(shInp) c.baseShield = parseInt(shInp.value, 10) || 0;
+      var armInp = document.getElementById('meEditArmor'); if(armInp) c.baseArmorPoints = parseInt(armInp.value, 10) || 0;
+      var dtInp = document.getElementById('meEditDt'); if(dtInp) c.damageThreshold = parseInt(dtInp.value, 10) || 0;
+      var barInp = document.getElementById('meEditBarrier'); if(barInp) c.baseBarrier = parseInt(barInp.value, 10) || 0;
+      var hpInp = document.getElementById('meEditHp'); if(hpInp) c.maxHp = parseInt(hpInp.value, 10) || 10;
+
+      document.querySelectorAll('[data-stat]').forEach(function(sInp){
+        var statKey = sInp.getAttribute('data-stat');
+        if(statKey && c.stats) c.stats[statKey] = parseInt(sInp.value, 10) || 10;
+      });
+
+      var loadInp = document.getElementById('meEditLoadout'); if(loadInp) c.loadout = loadInp.value;
+      var omniInp = document.getElementById('meEditOmni'); if(omniInp) c.omniTool = omniInp.value;
+      var ampInp = document.getElementById('meEditBioAmp'); if(ampInp) c.bioAmp = ampInp.value;
+      var bgInp = document.getElementById('meEditBg'); if(bgInp) c.background = bgInp.value;
+
+      ME.saveChar(c);
+      ME._editingChar = false;
       render();
     };
+    if(document.getElementById('meSaveCharBtn')) document.getElementById('meSaveCharBtn').addEventListener('click', doSave);
+    if(document.getElementById('meSaveCharBtn2')) document.getElementById('meSaveCharBtn2').addEventListener('click', doSave);
+  }
+
+  var resetCharBtn = document.getElementById('meResetCharBtn');
+  if(resetCharBtn){
+    resetCharBtn.addEventListener('click', function(){
+      if(confirm('Сбросить досье оперативника к стандартному образцу Альянса?')){
+        ME.resetChar();
+        render();
+      }
+    });
+  }
+
+  var copyDmBriefBtn = document.getElementById('meCopyDmBriefBtn') || document.getElementById('meCopyDmCardBtn');
+  if(copyDmBriefBtn){
+    copyDmBriefBtn.addEventListener('click', function(){
+      var c = ME.getChar();
+      var s = ME.getShip();
+      var brief = 'ДОСЬЕ ОПЕРАТИВНИКА [' + c.name + ' // ' + c.callsign + ']' + String.fromCharCode(10) +
+        'Раса: ' + c.race + ' | Роль: ' + c.role + ' | Уровень: ' + c.level + ' | ОР: ' + c.devPoints + String.fromCharCode(10) +
+        'Слои защиты: AC ' + c.baseAc + ' | Барьер: ' + c.baseBarrier + ' | Щит: ' + c.baseShield + ' | Броня: ' + c.baseArmorPoints + ' (Порог DT ' + c.damageThreshold + ') | HP: ' + c.maxHp + String.fromCharCode(10) +
+        'Характеристики: СИЛ ' + c.stats.str + ' | ЛОВ ' + c.stats.dex + ' | ТЕЛ ' + c.stats.con + ' | ИНТ ' + c.stats.int + ' | МУД ' + c.stats.wis + ' | ХАР ' + c.stats.cha + String.fromCharCode(10) +
+        'Корабль: ' + s.name + ' (' + s.cls + ') | Статус: ' + s.status + String.fromCharCode(10) +
+        'Снаряжение: ' + c.loadout + String.fromCharCode(10) +
+        'Омни-тул: ' + c.omniTool + ' | Имплантат: ' + c.bioAmp;
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(brief).then(function(){ alert('Сводка досье скопирована в буфер обмена для AI DM!'); });
+      } else {
+        alert(brief);
+      }
+    });
+  }
+
+  // --- Экран: mePowers ---
+  document.querySelectorAll('[data-branch]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      ME._activeBranch = btn.getAttribute('data-branch');
+      render();
+    });
   });
-  var powSearch = document.getElementById('mePowersSearchInput');
-  if(powSearch) powSearch.oninput = function(){
-    ME._powersSearch = this.value;
-    clearTimeout(powSearch._t);
-    powSearch._t = setTimeout(render, 300);
+
+  var powersSearch = document.getElementById('mePowersSearchInput');
+  if(powersSearch){
+    powersSearch.addEventListener('input', function(){
+      ME._powersSearch = powersSearch.value;
+      render();
+      var inputAgain = document.getElementById('mePowersSearchInput');
+      if(inputAgain){
+        inputAgain.focus();
+        inputAgain.selectionStart = inputAgain.selectionEnd = inputAgain.value.length;
+      }
+    });
+  }
+
+  var openPowerForm = function(editPower){
+    var p = editPower || { name: '', branch: 'Биотика', icon: '🌀', req: 'Узлы L-типа', cd: 3, cost: 1, desc: '', r1: '', r2: '', r3: '' };
+    var isNew = !editPower;
+    var htmlForm = '<div style="display:flex;flex-direction:column;gap:10px;">' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Название способности</label><input type="text" id="mPowName" class="me-input" style="width:100%;" value="' + meEsc(p.name) + '" placeholder="например: Сингулярность"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Ветвь / Категория</label>' +
+          '<select id="mPowBranch" class="me-input" style="width:100%;background:#040914;">' +
+            ['Биотика', 'Техника', 'Бой', 'Медицина', 'Производные', 'Кастомная'].map(function(b){
+              return '<option value="' + b + '" ' + (p.branch === b ? 'selected' : '') + '>' + b + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Иконка (эмодзи)</label><input type="text" id="mPowIcon" class="me-input" style="width:100%;" value="' + meEsc(p.icon || '⚡') + '"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Требование</label><input type="text" id="mPowReq" class="me-input" style="width:100%;" value="' + meEsc(p.req) + '" placeholder="Узлы L-типа / Омни-инструмент"></div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Кулдаун (раундов, 0 = без КД)</label><input type="number" id="mPowCd" class="me-input" style="width:100%;" value="' + (p.cd !== undefined ? p.cd : 3) + '"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Стоимость в ОР</label><input type="number" id="mPowCost" class="me-input" style="width:100%;" value="' + (p.cost || 1) + '"></div>' +
+      '</div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Описание и механика применения</label><textarea id="mPowDesc" class="me-input" style="width:100%;height:60px;" placeholder="Краткое описание действия способности...">' + meEsc(p.desc) + '</textarea></div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Ранг 1 (1 ОР)</label><input type="text" id="mPowR1" class="me-input" style="width:100%;" value="' + meEsc(p.r1) + '" placeholder="Эффект на 1 ранге..."></div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Ранг 2 (2 ОР)</label><input type="text" id="mPowR2" class="me-input" style="width:100%;" value="' + meEsc(p.r2) + '" placeholder="Эффект на 2 ранге..."></div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Ранг 3 (3 ОР)</label><input type="text" id="mPowR3" class="me-input" style="width:100%;" value="' + meEsc(p.r3) + '" placeholder="Эффект на 3 ранге..."></div>' +
+    '</div>';
+
+    meShowModal(isNew ? 'СОЗДАНИЕ СПОСОБНОСТИ A92' : 'РЕДАКТИРОВАНИЕ СПОСОБНОСТИ', 'ПРОТОКОЛ БОЕВОЙ СИСТЕМЫ', htmlForm, function(){
+      var name = (document.getElementById('mPowName').value || '').trim();
+      if(!name){ alert('Укажите название способности!'); return false; }
+      var updated = {
+        id: editPower ? editPower.id : ('pow_' + Date.now()),
+        name: name,
+        branch: document.getElementById('mPowBranch').value,
+        icon: document.getElementById('mPowIcon').value || '⚡',
+        req: document.getElementById('mPowReq').value || '—',
+        cd: parseInt(document.getElementById('mPowCd').value, 10) || 0,
+        cost: parseInt(document.getElementById('mPowCost').value, 10) || 1,
+        desc: document.getElementById('mPowDesc').value || '',
+        r1: document.getElementById('mPowR1').value || '',
+        r2: document.getElementById('mPowR2').value || '',
+        r3: document.getElementById('mPowR3').value || ''
+      };
+      if(isNew) ME.addPower(updated);
+      else ME.updatePower(updated);
+      render();
+      return true;
+    });
   };
-  var addPow = document.getElementById('meAddPowerEmptyBtn');
-  if(!addPow) addPow = document.getElementById('meAddPowerBtn');
-  if(addPow) addPow.onclick = function(){ window.navigate('mePowerEdit:new'); };
-  
-  document.querySelectorAll('.me-edit-power-btn').forEach(function(btn){
-    btn.onclick = function(){ window.navigate('mePowerEdit:' + this.getAttribute('data-id')); };
+
+  var addPowerBtn = document.getElementById('meAddPowerBtn') || document.getElementById('meAddPowerEmptyBtn');
+  if(addPowerBtn){
+    addPowerBtn.onclick = function(){ openPowerForm(null); };
+  }
+
+  var presetPowersBtn = document.getElementById('mePresetPowersBtn') || document.getElementById('mePresetPowerEmptyBtn');
+  if(presetPowersBtn){
+    presetPowersBtn.onclick = function(){
+      var listHtml = '<div style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">' +
+        ME_CANON_POWERS_PRESETS.map(function(cp, idx){
+          return '<div class="me-card" style="padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
+            '<div>' +
+              '<div style="font-weight:700;color:#fff;">' + cp.icon + ' ' + meEsc(cp.name) + ' <span class="me-tag-holo" style="font-size:10px;">' + cp.branch + '</span></div>' +
+              '<div style="font-size:11.5px;color:#8bb1d6;margin-top:2px;">' + meEsc(cp.desc) + '</div>' +
+            '</div>' +
+            '<button class="btn-primary me-add-preset-power-btn" data-idx="' + idx + '" style="font-size:11px;padding:3px 10px;white-space:nowrap;">+ Добавить</button>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+      meShowModal('ШАБЛОНЫ СПОСОБНОСТЕЙ ИЗ КОДЕКСА', 'ВЫБЕРИТЕ ПРОТОКОЛ ДЛЯ ДОБАВЛЕНИЯ В ВАШЕ ДРЕВО', listHtml, null);
+      document.querySelectorAll('.me-add-preset-power-btn').forEach(function(b){
+        b.onclick = function(){
+          var idx = parseInt(b.getAttribute('data-idx'), 10);
+          var template = ME_CANON_POWERS_PRESETS[idx];
+          if(template){
+            ME.addPower(JSON.parse(JSON.stringify(template)));
+            b.innerText = '✓ Добавлено';
+            b.disabled = true;
+            b.style.opacity = '0.6';
+            render();
+          }
+        };
+      });
+    };
+  }
+
+  document.querySelectorAll('.me-edit-power-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      var item = ME.getPowers().find(function(x){ return x.id === id; });
+      if(item) openPowerForm(item);
+    };
   });
-  document.querySelectorAll('.me-del-power-btn').forEach(function(btn){
-    btn.onclick = function(){
-      if(confirm('Удалить протокол?')){
-        var id = this.getAttribute('data-id');
-        var list = ME.getPowers().filter(function(x){ return x.id !== id; });
-        ME.savePowers(list);
+
+  document.querySelectorAll('.me-del-power-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      if(confirm('Удалить эту способность из древа?')){
+        ME.deletePower(id);
         render();
       }
     };
   });
 
-  // Вкладки и кнопки в Арсенале
-  document.querySelectorAll('.me-tab-btn[data-arsenal-cat]').forEach(function(btn){
-    btn.onclick = function(){
-      ME._activeArsenalCat = this.getAttribute('data-arsenal-cat');
+  // --- Экран: meArsenal ---
+  document.querySelectorAll('[data-arsenal-cat]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      ME._activeArsenalCat = btn.getAttribute('data-arsenal-cat');
       render();
+    });
+  });
+
+  var openWeaponForm = function(editWeapon){
+    var w = editWeapon || { name: '', cat: 'rifles', type: 'Штурмовая винтовка', dmg: '1d8+2 кин.', range: '60/180 фт', clip: 30, desc: '' };
+    var isNew = !editWeapon;
+    var htmlForm = '<div style="display:flex;flex-direction:column;gap:10px;">' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Название оружия</label><input type="text" id="mWpnName" class="me-input" style="width:100%;" value="' + meEsc(w.name) + '" placeholder="например: M-8 «Мститель»"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Категория арсенала</label>' +
+          '<select id="mWpnCat" class="me-input" style="width:100%;background:#040914;">' +
+            [
+              { id: 'rifles', name: 'Винтовки' },
+              { id: 'pistols', name: 'Пистолеты/ПП' },
+              { id: 'shotguns', name: 'Дробовики' },
+              { id: 'snipers', name: 'Снайперские' },
+              { id: 'heavy', name: 'Тяжелое' }
+            ].map(function(c){
+              return '<option value="' + c.id + '" ' + (w.cat === c.id ? 'selected' : '') + '>' + c.name + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Тип / Подтип</label><input type="text" id="mWpnType" class="me-input" style="width:100%;" value="' + meEsc(w.type) + '" placeholder="Штурмовая винтовка / Дробовик"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Кость урона</label><input type="text" id="mWpnDmg" class="me-input" style="width:100%;" value="' + meEsc(w.dmg) + '" placeholder="например: 1d8+2 кин."></div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Дистанция</label><input type="text" id="mWpnRange" class="me-input" style="width:100%;" value="' + meEsc(w.range) + '" placeholder="60/180 фт"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Магазин / Заряды</label><input type="text" id="mWpnClip" class="me-input" style="width:100%;" value="' + meEsc(w.clip) + '" placeholder="30"></div>' +
+      '</div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Описание и особенности</label><textarea id="mWpnDesc" class="me-input" style="width:100%;height:60px;" placeholder="Особенности стрельбы, модификации...">' + meEsc(w.desc) + '</textarea></div>' +
+    '</div>';
+
+    meShowModal(isNew ? 'ВПИСАТЬ ОРУЖИЕ В АРСЕНАЛ' : 'РЕДАКТИРОВАНИЕ ОРУЖИЯ', 'СКЛАД БОЕВОГО СНАРЯЖЕНИЯ', htmlForm, function(){
+      var name = (document.getElementById('mWpnName').value || '').trim();
+      if(!name){ alert('Укажите название оружия!'); return false; }
+      var updated = {
+        id: editWeapon ? editWeapon.id : ('wpn_' + Date.now()),
+        name: name,
+        cat: document.getElementById('mWpnCat').value,
+        type: document.getElementById('mWpnType').value || 'Огнестрел',
+        dmg: document.getElementById('mWpnDmg').value || '1d8',
+        range: document.getElementById('mWpnRange').value || '—',
+        clip: document.getElementById('mWpnClip').value || '—',
+        desc: document.getElementById('mWpnDesc').value || ''
+      };
+      if(isNew) ME.addWeapon(updated);
+      else ME.updateWeapon(updated);
+      render();
+      return true;
+    });
+  };
+
+  var addWeaponBtn = document.getElementById('meAddWeaponBtn') || document.getElementById('meAddWeaponEmptyBtn');
+  if(addWeaponBtn){
+    addWeaponBtn.onclick = function(){ openWeaponForm(null); };
+  }
+
+  var presetWeaponsBtn = document.getElementById('mePresetWeaponsBtn') || document.getElementById('mePresetWeaponEmptyBtn');
+  if(presetWeaponsBtn){
+    presetWeaponsBtn.onclick = function(){
+      var listHtml = '<div style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">' +
+        ME_CANON_WEAPONS_PRESETS.map(function(cw, idx){
+          return '<div class="me-card" style="padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
+            '<div>' +
+              '<div style="font-weight:700;color:#fff;">🔫 ' + meEsc(cw.name) + ' <span class="me-tag-holo" style="font-size:10px;">' + cw.dmg + '</span></div>' +
+              '<div style="font-size:11.5px;color:#8bb1d6;margin-top:2px;">' + meEsc(cw.desc) + '</div>' +
+            '</div>' +
+            '<button class="btn-primary me-add-preset-weapon-btn" data-idx="' + idx + '" style="font-size:11px;padding:3px 10px;white-space:nowrap;">+ Добавить</button>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+      meShowModal('КАТАЛОГ ВООРУЖЕНИЯ АЛЬЯНСА', 'ВЫБЕРИТЕ ОРУЖИЕ ДЛЯ ДОБАВЛЕНИЯ В ВАШ АРСЕНАЛ', listHtml, null);
+      document.querySelectorAll('.me-add-preset-weapon-btn').forEach(function(b){
+        b.onclick = function(){
+          var idx = parseInt(b.getAttribute('data-idx'), 10);
+          var template = ME_CANON_WEAPONS_PRESETS[idx];
+          if(template){
+            ME.addWeapon(JSON.parse(JSON.stringify(template)));
+            b.innerText = '✓ Добавлено';
+            b.disabled = true;
+            b.style.opacity = '0.6';
+            render();
+          }
+        };
+      });
+    };
+  }
+
+  document.querySelectorAll('.me-edit-weapon-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      var item = ME.getArsenal().find(function(x){ return x.id === id; });
+      if(item) openWeaponForm(item);
     };
   });
-  var addWeap = document.getElementById('meAddWeapEmptyBtn');
-  if(!addWeap) addWeap = document.getElementById('meAddWeapBtn');
-  if(addWeap) addWeap.onclick = function(){ window.navigate('meArsenalEdit:new'); };
-  
-  document.querySelectorAll('.me-edit-weap-btn').forEach(function(btn){
-    btn.onclick = function(){ window.navigate('meArsenalEdit:' + this.getAttribute('data-id')); };
-  });
-  document.querySelectorAll('.me-del-weap-btn').forEach(function(btn){
-    btn.onclick = function(){
-      if(confirm('Списать оружие со склада?')){
-        var id = this.getAttribute('data-id');
-        var list = ME.getArsenal().filter(function(x){ return x.id !== id; });
-        ME.saveArsenal(list);
+
+  document.querySelectorAll('.me-del-weapon-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      if(confirm('Удалить это оружие из арсенала?')){
+        ME.deleteWeapon(id);
         render();
       }
     };
   });
+
+  document.querySelectorAll('.me-roll-weapon-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var wName = btn.getAttribute('data-weapon-name') || 'Оружие';
+      var wDmg = btn.getAttribute('data-dmg') || '';
+      diceState.labelCat = 'space';
+      diceState.label = '💥 ' + wName + (wDmg ? ' [' + wDmg + ']' : '');
+      navigate('dice');
+    });
+  });
+
+  // --- Экран: meShip ---
+  var editShipBtn = document.getElementById('meEditShipBtn');
+  if(editShipBtn){
+    editShipBtn.onclick = function(){
+      var s = ME.getShip();
+      var htmlForm = '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Название судна</label><input type="text" id="mShipName" class="me-input" style="width:100%;" value="' + meEsc(s.name) + '"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Класс корабля</label><input type="text" id="mShipCls" class="me-input" style="width:100%;" value="' + meEsc(s.cls) + '"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Статус готовности</label><input type="text" id="mShipStatus" class="me-input" style="width:100%;" value="' + meEsc(s.status) + '"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Заметки и назначение</label><textarea id="mShipNotes" class="me-input" style="width:100%;height:60px;">' + meEsc(s.notes || '') + '</textarea></div>' +
+      '</div>';
+      meShowModal('ПАРАМЕТРЫ КОРАБЛЯ', 'РЕГИСТРАЦИОННЫЕ ДАННЫЕ СУДНА', htmlForm, function(){
+        var name = (document.getElementById('mShipName').value || '').trim() || 'Без названия';
+        var cls = document.getElementById('mShipCls').value || 'Фрегат';
+        var status = document.getElementById('mShipStatus').value || 'В строю';
+        var notes = document.getElementById('mShipNotes').value || '';
+        ME.updateShipInfo(name, cls, status, notes);
+        render();
+        return true;
+      });
+    };
+  }
+
+  var presetShipBtn = document.getElementById('mePresetShipBtn');
+  if(presetShipBtn){
+    presetShipBtn.onclick = function(){
+      if(confirm('Загрузить конфигурацию фрегата «Нормандия SR-2» с полным комплектом модулей и экипажем?')){
+        ME.saveShip(JSON.parse(JSON.stringify(ME_CANON_NORMANDY_PRESET)));
+        render();
+      }
+    };
+  }
+
+  var resetShipBtn = document.getElementById('meResetShipBtn');
+  if(resetShipBtn){
+    resetShipBtn.onclick = function(){
+      if(confirm('Очистить все модули и список экипажа корабля?')){
+        ME.resetShip();
+        render();
+      }
+    };
+  }
+
+  document.querySelectorAll('.me-edit-module-btn').forEach(function(b){
+    b.onclick = function(){
+      var modId = b.getAttribute('data-mod-id');
+      var s = ME.getShip();
+      var m = s.modules.find(function(item){ return item.id === modId; });
+      if(!m) return;
+
+      var htmlForm = '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<div style="font-size:13px;font-weight:700;color:#00d2ff;margin-bottom:4px;">' + (m.icon || '🛰️') + ' Слот: ' + meEsc(m.slot) + '</div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Название установленного модуля</label><input type="text" id="mModName" class="me-input" style="width:100%;" value="' + (m.name === 'Слот пуст' ? '' : meEsc(m.name)) + '" placeholder="например: Танталовое ядро T-90"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Состояние / Характеристика</label><input type="text" id="mModStat" class="me-input" style="width:100%;" value="' + (m.stat === 'Не установлено' ? '' : meEsc(m.stat)) + '" placeholder="например: 100% Номинал / Активен"></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Описание и свойства</label><textarea id="mModDesc" class="me-input" style="width:100%;height:60px;" placeholder="Технические характеристики модуля...">' + (m.name === 'Слот пуст' ? '' : meEsc(m.desc)) + '</textarea></div>' +
+        '<div style="text-align:left;margin-top:6px;">' +
+          '<button type="button" class="btn-subtle" id="mModClearBtn" style="font-size:11px;color:#ff5555;border-color:rgba(255,85,85,0.3);">Очистить этот слот</button>' +
+        '</div>' +
+      '</div>';
+
+      meShowModal('НАСТРОЙКА МОДУЛЯ', meEsc(m.slot), htmlForm, function(){
+        var modName = (document.getElementById('mModName').value || '').trim();
+        var modStat = (document.getElementById('mModStat').value || '').trim();
+        var modDesc = (document.getElementById('mModDesc').value || '').trim();
+        if(!modName){
+          modName = 'Слот пуст';
+          modStat = 'Не установлено';
+          modDesc = 'Место под ' + m.slot.toLowerCase() + '.';
+        } else {
+          if(!modStat) modStat = 'Установлен';
+          if(!modDesc) modDesc = 'Модуль смонтирован и функционирует штатно.';
+        }
+        ME.updateShipModule(modId, modName, modStat, modDesc);
+        render();
+        return true;
+      });
+
+      var clearBtn = document.getElementById('mModClearBtn');
+      if(clearBtn){
+        clearBtn.onclick = function(){
+          document.getElementById('mModName').value = '';
+          document.getElementById('mModStat').value = '';
+          document.getElementById('mModDesc').value = '';
+        };
+      }
+    };
+  });
+
+  var openCrewForm = function(editCrew){
+    var c = editCrew || { name: '', race: 'Человек', role: 'Специалист', loyalty: 'В отряде', note: '' };
+    var isNew = !editCrew;
+    var htmlForm = '<div style="display:flex;flex-direction:column;gap:10px;">' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Имя / Позывной</label><input type="text" id="mCrewName" class="me-input" style="width:100%;" value="' + meEsc(c.name) + '" placeholder="Имя соратника..."></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Раса</label><input type="text" id="mCrewRace" class="me-input" style="width:100%;" value="' + meEsc(c.race) + '" placeholder="Человек, Турианец, Азари..."></div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Роль / Должность</label><input type="text" id="mCrewRole" class="me-input" style="width:100%;" value="' + meEsc(c.role) + '" placeholder="Пилот, Старпом, Инженер..."></div>' +
+        '<div><label style="font-size:11px;color:#7da5c9;">Статус / Лояльность</label><input type="text" id="mCrewLoyalty" class="me-input" style="width:100%;" value="' + meEsc(c.loyalty) + '" placeholder="Предан, В отряде..."></div>' +
+      '</div>' +
+      '<div><label style="font-size:11px;color:#7da5c9;">Заметки, навыки и биография</label><textarea id="mCrewNote" class="me-input" style="width:100%;height:60px;" placeholder="Особые черты, биография, специализация...">' + meEsc(c.note) + '</textarea></div>' +
+    '</div>';
+
+    meShowModal(isNew ? 'ДОБАВИТЬ ЧЛЕНА ЭКИПАЖА' : 'РЕДАКТИРОВАНИЕ ДАННЫХ СОРАТНИКА', 'СОСТАВ КОМАНДЫ СУДНА', htmlForm, function(){
+      var name = (document.getElementById('mCrewName').value || '').trim();
+      if(!name){ alert('Укажите имя члена экипажа!'); return false; }
+      var updated = {
+        id: editCrew ? editCrew.id : ('crew_' + Date.now()),
+        name: name,
+        race: document.getElementById('mCrewRace').value || 'Человек',
+        role: document.getElementById('mCrewRole').value || 'Специалист',
+        loyalty: document.getElementById('mCrewLoyalty').value || 'В отряде',
+        note: document.getElementById('mCrewNote').value || ''
+      };
+      if(isNew) ME.addCrewMember(updated);
+      else ME.updateCrewMember(updated);
+      render();
+      return true;
+    });
+  };
+
+  var addCrewBtn = document.getElementById('meAddCrewBtn') || document.getElementById('meAddCrewEmptyBtn');
+  if(addCrewBtn){
+    addCrewBtn.onclick = function(){ openCrewForm(null); };
+  }
+
+  document.querySelectorAll('.me-edit-crew-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      var item = ME.getShip().crew.find(function(x){ return x.id === id; });
+      if(item) openCrewForm(item);
+    };
+  });
+
+  document.querySelectorAll('.me-del-crew-btn').forEach(function(b){
+    b.onclick = function(){
+      var id = b.getAttribute('data-id');
+      if(confirm('Удалить этого соратника из состава экипажа?')){
+        ME.deleteCrewMember(id);
+        render();
+      }
+    };
+  });
+
 }
 
 /* ==========================================================================
