@@ -25128,7 +25128,8 @@ function finalizeElTechLaunch(mode, t, autoCopy){
   
   if(mode === 'claim' || mode === 'all'){
     var cStr = t.cost || '1 МВН';
-    var nStr = ' ['+t.element+']';
+    var scaleStr = ' [Степень ' + (t.scale !== undefined && t.scale !== null && t.scale !== '' ? t.scale : '1') + ']';
+    var nStr = ' ['+t.element+']' + scaleStr;
     var rankStr = elEsc(t.element);
     out.push('⚡ ФОРМА СТИХИИ: ' + t.name.toUpperCase());
     out.push('Параметры: ' + rankStr + ' · ' + cStr + nStr);
@@ -25327,8 +25328,16 @@ function wireElLaunchers() {
   ['elTechLaunchComboBtn', 'elTechCopyAllBtn', 'elTechLaunchAtkBtn', 'elTechLaunchDmgBtn', 'elTechLaunchExpBtn', 'elTechLaunchClaimBtn'].forEach(function(id){
     var btn = document.getElementById(id);
     if(btn) btn.onclick = function(){
-        if(id === 'elTechLaunchComboBtn') executeElTechLaunch('combo');
-        if(id === 'elTechCopyAllBtn') executeElTechLaunch('copyAll', true);
+        if(id === 'elTechLaunchComboBtn') executeElTechLaunch('all', false);
+        if(id === 'elTechCopyAllBtn') {
+            if(EL.launcher.lastResult) {
+                if(typeof copyText === 'function') copyText(EL.launcher.lastResult);
+                EL.launcher.lastResultCopied = true;
+                reRenderTechs();
+            } else {
+                executeElTechLaunch('all', true);
+            }
+        }
         if(id === 'elTechLaunchAtkBtn') executeElTechLaunch('atk', true);
         if(id === 'elTechLaunchDmgBtn') executeElTechLaunch('dmg', true);
         if(id === 'elTechLaunchExpBtn') executeElTechLaunch('exp', true);
@@ -25348,8 +25357,16 @@ function wireElLaunchers() {
   ['elMoveLaunchComboBtn', 'elMoveCopyAllBtn', 'elMoveLaunchAtkBtn', 'elMoveLaunchDmgBtn', 'elMoveLaunchExpBtn', 'elMoveLaunchClaimBtn'].forEach(function(id){
     var btn = document.getElementById(id);
     if(btn) btn.onclick = function(){
-        if(id === 'elMoveLaunchComboBtn') executeElMoveLaunch('combo');
-        if(id === 'elMoveCopyAllBtn') executeElMoveLaunch('copyAll', true);
+        if(id === 'elMoveLaunchComboBtn') executeElMoveLaunch('all', false);
+        if(id === 'elMoveCopyAllBtn') {
+            if(EL.moveLauncher.lastResult) {
+                if(typeof copyText === 'function') copyText(EL.moveLauncher.lastResult);
+                EL.moveLauncher.lastResultCopied = true;
+                reRenderMoves();
+            } else {
+                executeElMoveLaunch('all', true);
+            }
+        }
         if(id === 'elMoveLaunchAtkBtn') executeElMoveLaunch('atk', true);
         if(id === 'elMoveLaunchDmgBtn') executeElMoveLaunch('dmg', true);
         if(id === 'elMoveLaunchExpBtn') executeElMoveLaunch('exp', true);
