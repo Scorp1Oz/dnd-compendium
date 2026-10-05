@@ -13601,7 +13601,7 @@ function parseMoveDmg(str){
   if(!str || typeof str !== 'string') return null;
   var s = str.trim().replace(/\s+/g, '');
   if(!s) return null;
-  var m = s.match(/^(\d*)d(\d+)([+-]\d+)?$/i);
+  var m = s.match(/(\d*)d(\d+)([+-]\d+)?/i);
   if(m){
     var n = Math.max(1, Math.min(12, parseInt(m[1], 10) || 1));
     var sides = parseInt(m[2], 10) || 6;
