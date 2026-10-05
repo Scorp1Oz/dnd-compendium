@@ -29792,6 +29792,62 @@ function wireMe(){
 
   // Проводка экрана галактической карты
   if(typeof wireMeMap === 'function') wireMeMap();
+
+  // Вкладки и кнопки в Способностях
+  document.querySelectorAll('.me-tab-btn[data-branch]').forEach(function(btn){
+    btn.onclick = function(){
+      ME._activeBranch = this.getAttribute('data-branch');
+      render();
+    };
+  });
+  var powSearch = document.getElementById('mePowersSearchInput');
+  if(powSearch) powSearch.oninput = function(){
+    ME._powersSearch = this.value;
+    clearTimeout(powSearch._t);
+    powSearch._t = setTimeout(render, 300);
+  };
+  var addPow = document.getElementById('meAddPowerEmptyBtn');
+  if(!addPow) addPow = document.getElementById('meAddPowerBtn');
+  if(addPow) addPow.onclick = function(){ navigate('mePowerEdit:new'); };
+  
+  document.querySelectorAll('.me-edit-power-btn').forEach(function(btn){
+    btn.onclick = function(){ navigate('mePowerEdit:' + this.getAttribute('data-id')); };
+  });
+  document.querySelectorAll('.me-del-power-btn').forEach(function(btn){
+    btn.onclick = function(){
+      if(confirm('Удалить протокол?')){
+        var id = this.getAttribute('data-id');
+        var list = ME.getPowers().filter(function(x){ return x.id !== id; });
+        ME.savePowers(list);
+        render();
+      }
+    };
+  });
+
+  // Вкладки и кнопки в Арсенале
+  document.querySelectorAll('.me-tab-btn[data-arsenal-cat]').forEach(function(btn){
+    btn.onclick = function(){
+      ME._activeArsenalCat = this.getAttribute('data-arsenal-cat');
+      render();
+    };
+  });
+  var addWeap = document.getElementById('meAddWeapEmptyBtn');
+  if(!addWeap) addWeap = document.getElementById('meAddWeapBtn');
+  if(addWeap) addWeap.onclick = function(){ navigate('meArsenalEdit:new'); };
+  
+  document.querySelectorAll('.me-edit-weap-btn').forEach(function(btn){
+    btn.onclick = function(){ navigate('meArsenalEdit:' + this.getAttribute('data-id')); };
+  });
+  document.querySelectorAll('.me-del-weap-btn').forEach(function(btn){
+    btn.onclick = function(){
+      if(confirm('Списать оружие со склада?')){
+        var id = this.getAttribute('data-id');
+        var list = ME.getArsenal().filter(function(x){ return x.id !== id; });
+        ME.saveArsenal(list);
+        render();
+      }
+    };
+  });
 }
 
 /* ==========================================================================
