@@ -254,7 +254,9 @@ window.render=function(){
     if(s==='meHome'||!s) html = meHome();
     else if(s==='meChar') html = meData();
     else if(s==='mePowers') html = mePowers();
+    else if(s==='mePowerGen') html = mePowerGen();
     else if(s==='meArsenal') html = meArsenal();
+    else if(s==='meArsenalGen') html = meArsenalGen();
     else if(s==='meShip') html = meShip();
     else if(s==='meCodex') html = meCodex();
     else if(s==='meCodexView') html = meCodexView();
@@ -269,6 +271,8 @@ window.render=function(){
     if(typeof wireMe === 'function') wireMe();
     if(s==='mePowerEdit' && typeof wireMePowerEdit === 'function') wireMePowerEdit();
     if(s==='meArsenalEdit' && typeof wireMeArsenalEdit === 'function') wireMeArsenalEdit();
+    if(s==='mePowerGen' && typeof wireMePowerGen === 'function') wireMePowerGen();
+    if(s==='meArsenalGen' && typeof wireMeArsenalGen === 'function') wireMeArsenalGen();
     paintShBar();
     return;
   }
@@ -319,7 +323,9 @@ window.navigate=function(val){
       meHome: 'meHome',
       meChar: 'meData',
       mePowers: 'mePowers',
+      mePowerGen: 'mePowerGen',
       meArsenal: 'meArsenal',
+      meArsenalGen: 'meArsenalGen',
       meShip: 'meShip',
       meCodex: 'meCodex',
       meMissions: 'meMap',

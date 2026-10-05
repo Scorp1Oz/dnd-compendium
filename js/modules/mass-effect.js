@@ -1347,6 +1347,7 @@ function mePowers(){
       '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
         '<button class="btn-primary" id="meAddPowerEmptyBtn">+ Добавить способность</button>' +
         '<button class="btn-subtle" id="mePresetPowerEmptyBtn">⚡ Шаблоны из Кодекса</button>' +
+        '<button class="btn-ghost" style="color:#00d2ff;border-color:rgba(0,210,255,0.4);" data-nav="mePowerGen">✨ AI Генератор протоколов</button>' +
       '</div>' +
     '</div>';
   } else if(filteredList.length === 0){
@@ -1355,42 +1356,19 @@ function mePowers(){
     '</div>';
   } else {
     contentHtml = filteredList.map(function(p){
-      var branchColor = p.branch === 'Биотика' ? '#b266ff' : (p.branch === 'Техника' ? '#00d2ff' : (p.branch === 'Бой' ? '#ffaa33' : (p.branch === 'Медицина' ? '#33cc66' : '#ffd700')));
-      var cdText = (p.cd === 0 || p.cd === '0') ? 'БЕЗ КД' : 'КД: ' + p.cd + ' рнд';
-      var costText = p.cost ? (p.cost + ' ОР') : '1 ОР';
-      return '<div class="me-card" style="border-left:4px solid ' + branchColor + ';">' +
-        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">' +
-          '<div>' +
-            '<div style="font-size:16px;font-weight:700;color:#fff;">' + (p.icon || '⚡') + ' ' + meEsc(p.name) + '</div>' +
-            '<div style="font-size:11.5px;color:' + branchColor + ';margin-top:2px;">' + meEsc(p.branch || 'Кастомная') + ' • ' + meEsc(p.req || 'Узлы L-типа/Омни') + '</div>' +
-          '</div>' +
-          '<div style="display:flex;gap:4px;">' +
-            '<span class="me-tag-holo">' + meEsc(cdText) + '</span>' +
-            '<span class="me-tag-omni">' + meEsc(costText) + '</span>' +
-          '</div>' +
-        '</div>' +
-        '<div style="font-size:12.5px;color:#8bb1d6;margin:10px 0;line-height:1.5;">' + meEsc(p.desc) + '</div>' +
-        '<div class="me-ranks-box">' +
-          (p.r1 ? '<div class="rank-row"><strong>Ранг 1 (1 ОР):</strong> ' + meEsc(p.r1) + '</div>' : '') +
-          (p.r2 ? '<div class="rank-row"><strong>Ранг 2 (2 ОР):</strong> ' + meEsc(p.r2) + '</div>' : '') +
-          (p.r3 ? '<div class="rank-row"><strong>Ранг 3 (3 ОР):</strong> ' + meEsc(p.r3) + '</div>' : '') +
-        '</div>' +
-        '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;border-top:1px solid rgba(0,210,255,0.15);padding-top:8px;">' +
-          '<button class="btn-subtle me-edit-power-btn" data-id="' + p.id + '" style="font-size:11px;padding:3px 8px;">✎ Редактировать</button>' +
-          '<button class="btn-subtle me-del-power-btn" data-id="' + p.id + '" style="font-size:11px;padding:3px 8px;color:#ff5555;border-color:rgba(255,85,85,0.4);">🗑️ Удалить</button>' +
-        '</div>' +
-      '</div>';
+      return renderMePowerCard(p, false);
     }).join('');
   }
 
   return meNavHeader('ДРЕВО СПОСОБНОСТЕЙ // ПРОТОКОЛЫ A92', 'АКТИВНЫХ: ' + allPowers.length) +
     '<h1>СПОСОБНОСТИ И ДРЕВО НАВЫКОВ</h1>' +
     '<div class="subtitle">СИСТЕМА РОСТА A92 • КОРНИ, РАНГИ И ПРОИЗВОДНЫЕ ЗА ОЧКИ РАЗВИТИЯ (ОР)</div>' +
-'<div class="me-panel" style="margin-top:14px;">' +
+    '<div class="me-panel" style="margin-top:14px;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
           '<button class="btn-primary" id="meAddPowerBtn">+ Добавить способность</button>' +
           '<button class="btn-subtle" id="mePresetPowersBtn">⚡ Шаблоны из Кодекса</button>' +
+          '<button class="btn-ghost" style="color:#00d2ff;border-color:rgba(0,210,255,0.4);" data-nav="mePowerGen">✨ AI Генератор протоколов</button>' +
         '</div>' +
         '<input type="text" class="me-input" id="mePowersSearchInput" placeholder="🔍 Поиск способности..." value="' + meEsc(search) + '" style="min-width:200px;">' +
       '</div>' +
@@ -1449,6 +1427,7 @@ function meArsenal(){
         '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
           '<button class="btn-primary" id="meAddWeaponEmptyBtn">+ Вписать оружие</button>' +
           '<button class="btn-subtle" id="mePresetWeaponEmptyBtn">🔫 Каталог Альянса</button>' +
+          '<button class="btn-ghost" style="color:#00d2ff;border-color:rgba(0,210,255,0.4);" data-nav="meArsenalGen">✨ AI Конструктор оружия</button>' +
         '</div>' +
       '</div>';
     } else if(weapons.length === 0){
@@ -1457,24 +1436,7 @@ function meArsenal(){
       '</div>';
     } else {
       contentHtml = '<div class="grid-2">' + weapons.map(function(w){
-        return '<div class="me-card">' +
-          '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
-            '<div>' +
-              '<div style="font-size:16px;font-weight:700;color:#fff;">' + meEsc(w.name) + '</div>' +
-              '<div style="font-size:12px;color:#00d2ff;margin-top:2px;">' + meEsc(w.type || 'Огнестрел') + '</div>' +
-            '</div>' +
-            '<span class="me-tag-holo">' + meEsc(w.dmg || '1d8') + '</span>' +
-          '</div>' +
-          '<div style="font-size:12.5px;color:#8bb1d6;margin:10px 0;line-height:1.5;">' + meEsc(w.desc || '—') + '</div>' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(0,210,255,0.15);padding-top:8px;font-size:12px;color:#7da5c9;">' +
-            '<div>Дистанция: ' + meEsc(w.range || '—') + ' | Магазин: ' + (w.clip || '—') + '</div>' +
-            '<button class="btn-subtle me-roll-weapon-btn" data-weapon-name="' + meEsc(w.name) + '" data-dmg="' + meEsc(w.dmg || '1d8') + '" style="font-size:11.5px;padding:3px 8px;cursor:pointer;">🎲 Бросить урон</button>' +
-          '</div>' +
-          '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;padding-top:6px;border-top:1px dashed rgba(0,210,255,0.1);">' +
-            '<button class="btn-subtle me-edit-weapon-btn" data-id="' + w.id + '" style="font-size:11px;padding:2px 7px;">✎ Редактировать</button>' +
-            '<button class="btn-subtle me-del-weapon-btn" data-id="' + w.id + '" style="font-size:11px;padding:2px 7px;color:#ff5555;border-color:rgba(255,85,85,0.4);">🗑️ Удалить</button>' +
-          '</div>' +
-        '</div>';
+        return renderMeWeaponCard(w, false);
       }).join('') + '</div>';
     }
   }
@@ -1487,12 +1449,838 @@ function meArsenal(){
         '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
           '<button class="btn-primary" id="meAddWeaponBtn">+ Вписать оружие</button>' +
           '<button class="btn-subtle" id="mePresetWeaponsBtn">🔫 Каталог Альянса</button>' +
+          '<button class="btn-ghost" style="color:#00d2ff;border-color:rgba(0,210,255,0.4);" data-nav="meArsenalGen">✨ AI Конструктор оружия</button>' +
         '</div>' +
       '</div>' +
       '<div style="margin-bottom:14px;">' + tabsHtml + '</div>' +
       contentHtml +
     '</div>';
 }
+
+/* ============================================================
+   КАРТОЧКИ СПОСОБНОСТЕЙ И ОРУЖИЯ (КОМПОНЕНТЫ РЕНДЕРА)
+   ============================================================ */
+
+function renderMePowerCard(p, isPreview){
+  var branchColor = p.branch === 'Биотика' ? '#b266ff' : (p.branch === 'Техника' ? '#00d2ff' : (p.branch === 'Бой' ? '#ffaa33' : (p.branch === 'Медицина' ? '#33cc66' : '#ffd700')));
+  var cdText = (p.cd === 0 || p.cd === '0') ? 'БЕЗ КД' : 'КД: ' + p.cd + ' рнд';
+  var costText = p.cost ? (p.cost + ' ОР') : '1 ОР';
+  return '<div class="me-card" style="border-left:4px solid ' + branchColor + ';">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">' +
+      '<div>' +
+        '<div style="font-size:16px;font-weight:700;color:#fff;">' + (p.icon || '⚡') + ' ' + meEsc(p.name) + '</div>' +
+        '<div style="font-size:11.5px;color:' + branchColor + ';margin-top:2px;">' + meEsc(p.branch || 'Кастомная') + ' • ' + meEsc(p.req || 'Узлы L-типа/Омни') + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:4px;">' +
+        '<span class="me-tag-holo">' + meEsc(cdText) + '</span>' +
+        '<span class="me-tag-omni">' + meEsc(costText) + '</span>' +
+      '</div>' +
+    '</div>' +
+    '<div style="font-size:12.5px;color:#8bb1d6;margin:10px 0;line-height:1.5;">' + meEsc(p.desc) + '</div>' +
+    '<div class="me-ranks-box">' +
+      (p.r1 ? '<div class="rank-row"><strong>Ранг 1 (1 ОР):</strong> ' + meEsc(p.r1) + '</div>' : '') +
+      (p.r2 ? '<div class="rank-row"><strong>Ранг 2 (2 ОР):</strong> ' + meEsc(p.r2) + '</div>' : '') +
+      (p.r3 ? '<div class="rank-row"><strong>Ранг 3 (3 ОР):</strong> ' + meEsc(p.r3) + '</div>' : '') +
+    '</div>' +
+    (isPreview ? '' : '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;border-top:1px solid rgba(0,210,255,0.15);padding-top:8px;">' +
+      '<button class="btn-subtle me-edit-power-btn" data-id="' + p.id + '" style="font-size:11px;padding:3px 8px;">✎ Редактировать</button>' +
+      '<button class="btn-subtle me-del-power-btn" data-id="' + p.id + '" style="font-size:11px;padding:3px 8px;color:#ff5555;border-color:rgba(255,85,85,0.4);">🗑️ Удалить</button>' +
+    '</div>') +
+  '</div>';
+}
+window.renderMePowerCard = renderMePowerCard;
+
+function renderMeWeaponCard(w, isPreview){
+  return '<div class="me-card">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+      '<div>' +
+        '<div style="font-size:16px;font-weight:700;color:#fff;">' + meEsc(w.name) + '</div>' +
+        '<div style="font-size:12px;color:#00d2ff;margin-top:2px;">' + meEsc(w.type || 'Огнестрел') + '</div>' +
+      '</div>' +
+      '<span class="me-tag-holo">' + meEsc(w.dmg || '1d8') + '</span>' +
+    '</div>' +
+    '<div style="font-size:12.5px;color:#8bb1d6;margin:10px 0;line-height:1.5;">' + meEsc(w.desc || '—') + '</div>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(0,210,255,0.15);padding-top:8px;font-size:12px;color:#7da5c9;">' +
+      '<div>Дистанция: ' + meEsc(w.range || '—') + ' | Магазин: ' + (w.clip || '—') + '</div>' +
+      (isPreview ? '' : '<button class="btn-subtle me-roll-weapon-btn" data-weapon-name="' + meEsc(w.name) + '" data-dmg="' + meEsc(w.dmg || '1d8') + '" style="font-size:11.5px;padding:3px 8px;cursor:pointer;">🎲 Бросить урон</button>') +
+    '</div>' +
+    (isPreview ? '' : '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;padding-top:6px;border-top:1px dashed rgba(0,210,255,0.1);">' +
+      '<button class="btn-subtle me-edit-weapon-btn" data-id="' + w.id + '" style="font-size:11px;padding:2px 7px;">✎ Редактировать</button>' +
+      '<button class="btn-subtle me-del-weapon-btn" data-id="' + w.id + '" style="font-size:11px;padding:2px 7px;color:#ff5555;border-color:rgba(255,85,85,0.4);">🗑️ Удалить</button>' +
+    '</div>') +
+  '</div>';
+}
+window.renderMeWeaponCard = renderMeWeaponCard;
+
+/* ============================================================
+   GEMINI AI УТИЛИТЫ И АНИМАЦИИ ДЛЯ MASS EFFECT
+   ============================================================ */
+
+function meShowFade(el){
+  if(!el) return;
+  el.style.display = 'block';
+  el.classList.remove('fade-zoom');
+  void el.offsetWidth;
+  el.classList.add('fade-zoom');
+}
+
+function getMeGeminiApiKey(){
+  if(typeof window.getGeminiApiKey === 'function') return window.getGeminiApiKey();
+  try {
+    return localStorage.getItem('ttc_gemini_api_key') || localStorage.getItem('gemini_api_key') || '';
+  } catch(e){ return ''; }
+}
+
+function saveMeGeminiApiKey(key){
+  if(typeof window.saveGeminiApiKey === 'function'){
+    window.saveGeminiApiKey(key);
+    return;
+  }
+  try {
+    var trimmed = String(key || '').trim();
+    if(trimmed){
+      localStorage.setItem('ttc_gemini_api_key', trimmed);
+      localStorage.setItem('gemini_api_key', trimmed);
+    } else {
+      localStorage.removeItem('ttc_gemini_api_key');
+      localStorage.removeItem('gemini_api_key');
+    }
+  } catch(e){}
+}
+
+function meRequestGemini(prompt, apiKey, callback){
+  var reqFn = window.requestGeminiGenerateContent;
+  if(typeof reqFn === 'function'){
+    reqFn(prompt, apiKey, callback);
+    return;
+  }
+  if(!apiKey){
+    callback(new Error("API ключ не указан"), null);
+    return;
+  }
+  var models = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+  var preferred = null;
+  try { preferred = localStorage.getItem('gemini_preferred_model'); } catch(e){}
+  if(preferred && models.indexOf(preferred) !== -1){
+    models = [preferred].concat(models.filter(function(m){ return m !== preferred; }));
+  }
+  function tryModel(idx){
+    if(idx >= models.length){
+      callback(new Error('API status 404: Модель не найдена для данного API-ключа (проверены: ' + models.join(', ') + ')'), null);
+      return;
+    }
+    var model = models[idx];
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey);
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
+      })
+    }).then(function(res){
+      if(res.status === 404){
+        tryModel(idx + 1);
+        return;
+      }
+      if(!res.ok) throw new Error('API status ' + res.status);
+      return res.json().then(function(data){
+        try { localStorage.setItem('gemini_preferred_model', model); } catch(e){}
+        callback(null, data);
+      });
+    }).catch(function(err){
+      callback(err, null);
+    });
+  }
+  tryModel(0);
+}
+
+function meExtractJsonFromAi(data){
+  if(typeof window.extractJsonFromAi === 'function'){
+    return window.extractJsonFromAi(data);
+  }
+  if(!data) throw new Error("Пустой ответ от AI");
+  var rawTxt = '';
+  if(data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]){
+    rawTxt = data.candidates[0].content.parts[0].text || '';
+  } else if(typeof data === 'string'){
+    rawTxt = data;
+  }
+  var clean = rawTxt.replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  try {
+    return JSON.parse(clean);
+  } catch(e){
+    var firstOpen = clean.indexOf('{');
+    var lastClose = clean.lastIndexOf('}');
+    if(firstOpen !== -1 && lastClose > firstOpen){
+      return JSON.parse(clean.substring(firstOpen, lastClose + 1));
+    }
+    throw e;
+  }
+}
+
+/* ============================================================
+   AI ГЕНЕРАТОР СПОСОБНОСТЕЙ И ДРЕВА НАВЫКОВ (ME-POWERS)
+   ============================================================ */
+
+function callGeminiMePowerGenerator(opts, apiKey, callback){
+  if(!apiKey){
+    callback("API ключ не указан", null);
+    return;
+  }
+  var prompt = "Ты профессиональный ведущий (Dungeon Master) и глубокий знаток вселенной Mass Effect (BioWare) и правил настольных ролевых игр (D&D 5e / 2024 Sci-Fi адаптация A92). " +
+    "Синтезируй сбалансированную, тактическую и каноничную способность или боевой протокол для персонажа. " +
+    "КРИТИЧЕСКИ ВАЖНО: Это вселенная Mass Effect (Млечный Путь, эффекты массы, поля темной энергии, узлы нулевого элемента, омни-инструменты, боевые стимуляторы, кинетические барьеры, синтетики, геты, жнецы, Альянс, Цербер). Категорически запрещено использовать магию фэнтези, заклинания, слоты заклинаний, чакру, стихийную магию Аватара или Наруто!\n" +
+    "Параметры запроса оперативника:\n" +
+    "- Идея / Концепт: " + (opts.theme || "Случайный тактический протокол") + "\n" +
+    "- Ветка (Дисциплина): " + (opts.branch || "Авто (Биотика, Техника, Бой, Медицина или Производные)") + "\n" +
+    "- Тактическая роль / Фокус: " + (opts.focus || "Авто (Урон, Контроль/Левитация, Барьеры/Защита, Поддержка/Омни-гель, Скрытность/Диверсия)") + "\n" +
+    "- Желаемый откат (КД в раундах): " + (opts.cd !== '' && opts.cd !== undefined ? opts.cd : "Авто (от 0 до 5 раунда)") + "\n" +
+    "- Требования / Импланты: " + (opts.req || "Авто (Узлы L-типа / Омни-инструмент / Боевая подготовка N7 / Био-усилитель)") + "\n\n" +
+    "Требования к рангам A92 (прокачка за Очки Развития ОР):\n" +
+    "- Ранг 1 (1 ОР): базовый эффект разблокировки протокола.\n" +
+    "- Ранг 2 (2 ОР): усиление (увеличение урона/длительности/радиуса или снижение штрафов).\n" +
+    "- Ранг 3 (3 ОР): мастерская модификация (био-детонация, цепной эффект, пробитие щитов/брони, синергия с отрядом).\n\n" +
+    "Ответь ИСКЛЮЧИТЕЛЬНО валидным JSON-объектом без лишних символов и markdown-разметки (```json ... ```), со следующими полями:\n" +
+    "{\n" +
+    '  "name": "Название способности (например: «Сингулярность», «Биотический рывок», «Тактическая маскировка», «Крио-луч», «Взлом синтетиков», «Омни-клинок»)",\n' +
+    '  "branch": "Биотика / Техника / Бой / Медицина / Производные",\n' +
+    '  "icon": "Один подходящий эмодзи (например: 🌀, ⚡, 🔥, 🛡️, 💉, 💥, 👤, 🎯, 🧊, ❄️, 💻)",\n' +
+    '  "req": "Требования (например: Узлы L3, Омни-инструмент Omni-Tool Omni-Blade, Военная подготовка N7)",\n' +
+    '  "cd": 3,\n' +
+    '  "cost": 1,\n' +
+    '  "desc": "Художественное и тактическое описание: физика поля массы / омни-код / биохимия, визуальный эффект (синее биотическое свечение, оранжевая голограмма омни-инструмента), дальность и применение.",\n' +
+    '  "r1": "Четкое описание эффекта на Ранге 1 (1 ОР) с формулами d6/d8/d10 и спасбросками (СЛ 8+мод+БМ)",\n' +
+    '  "r2": "Четкое описание улучшения на Ранге 2 (2 ОР)",\n' +
+    '  "r3": "Четкое описание мастерского эффекта на Ранге 3 (3 ОР)"\n' +
+    "}";
+
+  meRequestGemini(prompt, apiKey, function(err, data){
+    if(err || !data){
+      callback(err ? (err.message || String(err)) : "Пустой ответ от AI", null);
+      return;
+    }
+    try{
+      var parsed = meExtractJsonFromAi(data);
+      callback(null, parsed);
+    }catch(err2){
+      callback("Ошибка разбора JSON: " + err2.message, null);
+    }
+  });
+}
+window.callGeminiMePowerGenerator = callGeminiMePowerGenerator;
+
+function mePowerGen(){
+  var key = getMeGeminiApiKey();
+  var html = meNavHeader('AI ГЕНЕРАТОР ПРОТОКОЛОВ // A92', 'СИНТЕЗ СПОСОБНОСТЕЙ') +
+    '<button class="back" data-nav="mePowers">← Назад к способностям</button>' +
+    '<h1>✨ AI Генератор способностей</h1>' +
+    '<div class="subtitle">СИНТЕЗ БИОТИКИ, ОМНИ-ПРОТОКОЛОВ И ТАКТИЧЕСКИХ ДИСЦИПЛИН A92</div>' +
+    
+    '<div class="me-panel" id="mePowerGenFormSection" style="margin-top:14px;">' +
+      '<div style="background:rgba(4,9,20,0.85);border:1px solid rgba(0,210,255,0.25);border-radius:4px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
+        '<div style="font-size:12.5px;color:#8bb1d6;display:flex;align-items:center;gap:6px;">' +
+          '<span>🔑 Gemini API:</span> ' + (key ? '<span style="color:#00d2ff;font-weight:600;">✓ Подключен (' + meEsc(key.slice(0,6)) + '...' + meEsc(key.slice(-4)) + ')</span>' : '<span style="color:#ff5555;font-weight:600;">Не указан</span>') +
+        '</div>' +
+        '<button type="button" class="btn-subtle" id="mePowerGenChangeKeyBtn" style="padding:4px 10px;font-size:11.5px;border-color:rgba(0,210,255,0.4);color:#00d2ff;cursor:pointer;">' + (key ? 'Изменить ключ' : 'Указать ключ') + '</button>' +
+      '</div>' +
+      '<p style="color:#8bb1d6;font-size:13px;line-height:1.5;margin-bottom:14px;">' +
+        'Опишите концепцию способности, выберите боевую дисциплину и тактическую направленность. Нейросеть смоделирует эффект поля массы, омни-код, кубы урона и трёхуровневую систему улучшений A92 (Ранги 1, 2 и 3) за Очки Развития.' +
+      '</p>' +
+      '<div style="margin-bottom:14px;">' +
+        '<label style="color:#00d2ff;font-size:11.5px;font-weight:700;display:block;margin-bottom:4px;letter-spacing:0.04em;">КОНЦЕПТ / НАЗВАНИЕ / ЭФФЕКТ ПРОТОКОЛА:</label>' +
+        '<textarea id="mePgTheme" class="me-input" style="height:70px;width:100%;box-sizing:border-box;" placeholder="Что должна делать способность? Например: «Сингулярный импульс, взрывающий барьеры врагов», «Омни-дрон защитник с заморозкой», «Биотический таран с поглощением щитов», «Нейро-паралич и взлом оружия»..."></textarea>' +
+      '</div>' +
+      '<div class="grid-2" style="margin-bottom:14px;">' +
+        '<div>' +
+          '<label style="color:#00d2ff;font-size:11.5px;font-weight:700;display:block;margin-bottom:4px;letter-spacing:0.04em;">ВЕТКА (ДИСЦИПЛИНА):</label>' +
+          '<select id="mePgBranch" class="me-input" style="width:100%;background:#040914;">' +
+            '<option value="">Авто (на усмотрение AI)</option>' +
+            '<option value="Биотика">🌀 Биотика (Тёмная энергия и поля массы)</option>' +
+            '<option value="Техника">⚡ Техника (Омни-инструмент, дроны, взлом)</option>' +
+            '<option value="Бой">🎯 Бой (Стрельба, адреналин, физическая мощь)</option>' +
+            '<option value="Медицина">💉 Медицина (Омни-гель, стимуляторы, лечение)</option>' +
+            '<option value="Производные">✨ Производные (Гибридные спецпротоколы)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div>' +
+          '<label style="color:#00d2ff;font-size:11.5px;font-weight:700;display:block;margin-bottom:4px;letter-spacing:0.04em;">ТАКТИЧЕСКИЙ ФОКУС:</label>' +
+          '<select id="mePgFocus" class="me-input" style="width:100%;background:#040914;">' +
+            '<option value="">Авто (на выбор AI)</option>' +
+            '<option value="Урон и комбо-детонации">💥 Урон и комбо-детонации</option>' +
+            '<option value="Контроль, левитация и оглушение">🌀 Контроль, левитация и оглушение</option>' +
+            '<option value="Щиты, барьеры и поглощение">🛡️ Щиты, барьеры и поглощение</option>' +
+            '<option value="Поддержка отряда и лечение">🩹 Поддержка отряда и лечение</option>' +
+            '<option value="Стелс, диверсия и перехват">👤 Стелс, диверсия и перехват</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2" style="margin-bottom:16px;">' +
+        '<div>' +
+          '<label style="color:#00d2ff;font-size:11.5px;font-weight:700;display:block;margin-bottom:4px;letter-spacing:0.04em;">ЖЕЛАЕМЫЙ ОТКАТ (КД):</label>' +
+          '<select id="mePgCd" class="me-input" style="width:100%;background:#040914;">' +
+            '<option value="">Авто (баланс по мощности)</option>' +
+            '<option value="0">Без отката (0 раундов / каждый ход)</option>' +
+            '<option value="2">Быстрый откат (2 раунда)</option>' +
+            '<option value="3">Стандартный откат (3 раунда)</option>' +
+            '<option value="4">Тяжелый протокол (4 раунда)</option>' +
+            '<option value="5">Ультимативный протокол (5 раундов)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div>' +
+          '<label style="color:#00d2ff;font-size:11.5px;font-weight:700;display:block;margin-bottom:4px;letter-spacing:0.04em;">ТРЕБОВАНИЯ / УЗЛЫ:</label>' +
+          '<input type="text" id="mePgReq" class="me-input" style="width:100%;box-sizing:border-box;" placeholder="Авто (Узлы L3, Омни-инструмент, N7...)">' +
+        '</div>' +
+      '</div>' +
+      '<button class="btn-ghost" id="btnMePowerGen" style="width:100%;color:#00d2ff;border-color:rgba(0,210,255,0.4);font-weight:700;font-size:14px;padding:12px 18px;">' +
+        '✨ Синтезировать способность A92' +
+      '</button>' +
+    '</div>' +
+    
+    '<div id="mePowerGenResult" style="display:none;margin-top:16px;">' +
+      '<div id="mePowerGenPreview" style="margin-bottom:16px;"></div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<button class="btn-primary" id="btnMePowerSave" style="width:100%;padding:12px;font-size:14px;">💾 Добавить в Древо Способностей</button>' +
+        '<div style="display:flex;gap:10px;">' +
+          '<button class="btn-ghost" id="btnMePowerRegen" style="flex:1;">🔄 Сгенерировать заново</button>' +
+          '<button class="btn-ghost" id="btnMePowerBack" style="flex:1;">✏️ Изменить параметры</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div id="mePowerGenHistoryWrap" style="margin-top:24px;border-top:1px solid rgba(0,210,255,0.15);padding-top:16px;display:none;">' +
+      '<div class="section-label" style="font-size:11px;letter-spacing:0.12em;color:#00d2ff;font-weight:700;margin-bottom:10px;font-family:\'JetBrains Mono\',monospace;">📜 ИСТОРИЯ СИНТЕЗА ПРОТОКОЛОВ (ЛОКАЛЬНО)</div>' +
+      '<div id="mePowerGenHistoryList" style="display:flex;flex-direction:column;gap:8px;"></div>' +
+    '</div>';
+
+  return html;
+}
+window.mePowerGen = mePowerGen;
+
+function wireMePowerGen(){
+  function renderPowerHistory(){
+    var wrap = document.getElementById('mePowerGenHistoryWrap');
+    var list = document.getElementById('mePowerGenHistoryList');
+    if(!wrap || !list) return;
+    try {
+      var h = JSON.parse(localStorage.getItem('me_ai_hist_powers') || '[]');
+      if(h.length === 0){ wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+      list.innerHTML = h.map(function(item, i){
+        var bColor = item.branch === 'Биотика' ? '#b266ff' : (item.branch === 'Техника' ? '#00d2ff' : (item.branch === 'Бой' ? '#ffaa33' : (item.branch === 'Медицина' ? '#33cc66' : '#ffd700')));
+        var cdTxt = (item.cd === 0 || item.cd === '0') ? 'БЕЗ КД' : 'КД: ' + item.cd + ' рнд';
+        return '<div class="me-card" style="cursor:pointer;margin-bottom:0;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-left:3px solid ' + bColor + ';" onclick="window._loadMePowerHist(' + i + ')">' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;">' +
+              (item.icon || '⚡') + ' ' + meEsc(item.name || 'Протокол') + ' <span class="me-tag-holo" style="font-size:10px;padding:1px 6px;">' + meEsc(item.branch || 'Биотика') + '</span>' +
+            '</div>' +
+            '<div style="font-size:11.5px;color:#8bb1d6;">' +
+              meEsc(cdTxt) + ' · ' + meEsc(item.cost ? item.cost + ' ОР' : '1 ОР') + ' · ' + meEsc(item.req || 'Узлы L-типа') +
+            '</div>' +
+          '</div>' +
+          '<button class="btn-subtle" style="padding:4px 8px;color:#ff5555;border-color:transparent;flex-shrink:0;font-size:13px;" onclick="event.stopPropagation(); window._delMePowerHist(' + i + ')" title="Удалить из истории">🗑️</button>' +
+        '</div>';
+      }).join('');
+    } catch(e){}
+  }
+
+  window._loadMePowerHist = function(i){
+    try {
+      var h = JSON.parse(localStorage.getItem('me_ai_hist_powers') || '[]');
+      var item = h[i];
+      if(!item) return;
+      window._lastGenMePower = item;
+      var form = document.getElementById('mePowerGenFormSection');
+      var resDiv = document.getElementById('mePowerGenResult');
+      var preview = document.getElementById('mePowerGenPreview');
+      if(form) form.style.display = 'none';
+      meShowFade(resDiv);
+      if(preview){
+        preview.innerHTML = renderMePowerCard(item, true);
+      }
+      window.scrollTo(0, 0);
+    } catch(e){}
+  };
+
+  window._delMePowerHist = function(i){
+    try {
+      var h = JSON.parse(localStorage.getItem('me_ai_hist_powers') || '[]');
+      h.splice(i, 1);
+      localStorage.setItem('me_ai_hist_powers', JSON.stringify(h));
+      renderPowerHistory();
+    } catch(e){}
+  };
+
+  renderPowerHistory();
+
+  var btnChangeKey = document.getElementById('mePowerGenChangeKeyBtn');
+  if(btnChangeKey){
+    btnChangeKey.onclick = function(){
+      var curKey = getMeGeminiApiKey();
+      var keyInput = prompt('Введите ваш Google Gemini API ключ (из Google AI Studio):', curKey || '');
+      if(keyInput !== null){
+        saveMeGeminiApiKey(keyInput.trim());
+        if(typeof render === 'function') render();
+      }
+    };
+  }
+
+  var btnGen = document.getElementById('btnMePowerGen');
+  if(btnGen){
+    btnGen.onclick = function(){
+      var k = getMeGeminiApiKey();
+      if(!k){
+        var keyInput = prompt('Введите ваш Google Gemini API ключ для генерации:');
+        if(keyInput && keyInput.trim()){
+          k = keyInput.trim();
+          saveMeGeminiApiKey(k);
+          if(typeof render === 'function') render();
+        } else {
+          return;
+        }
+      }
+
+      var theme = (document.getElementById('mePgTheme').value || '').trim();
+      var branch = document.getElementById('mePgBranch').value;
+      var focus = document.getElementById('mePgFocus').value;
+      var cd = document.getElementById('mePgCd').value;
+      var req = (document.getElementById('mePgReq').value || '').trim();
+
+      btnGen.disabled = true;
+      btnGen.textContent = 'Синтез протокола (ждите)...';
+
+      callGeminiMePowerGenerator({
+        theme: theme,
+        branch: branch,
+        focus: focus,
+        cd: cd,
+        req: req
+      }, k, function(err, result){
+        btnGen.disabled = false;
+        btnGen.textContent = '✨ Синтезировать способность A92';
+
+        if(err || !result){
+          var errMsg = (err && err.message) ? err.message : (err || 'Пустой ответ от AI');
+          if(String(errMsg).indexOf('400') !== -1 || String(errMsg).indexOf('403') !== -1){
+            errMsg += '\n\nПроверьте правильность API-ключа в Google AI Studio (aistudio.google.com).';
+          }
+          alert('Ошибка генерации способности: ' + errMsg);
+          return;
+        }
+
+        result.name = result.name || 'Боевой протокол';
+        var validBranches = ['Биотика', 'Техника', 'Бой', 'Медицина', 'Производные'];
+        if(validBranches.indexOf(result.branch) === -1) result.branch = branch || 'Биотика';
+        result.icon = result.icon || '⚡';
+        result.req = result.req || req || (result.branch === 'Биотика' ? 'Узлы L-типа' : (result.branch === 'Техника' ? 'Омни-инструмент' : 'Боевая подготовка N7'));
+        result.cd = (result.cd !== undefined ? parseInt(result.cd, 10) : 3);
+        if(isNaN(result.cd)) result.cd = 3;
+        result.cost = (result.cost !== undefined ? parseInt(result.cost, 10) : 1);
+        if(isNaN(result.cost)) result.cost = 1;
+        result.desc = result.desc || '';
+        result.r1 = result.r1 || '';
+        result.r2 = result.r2 || '';
+        result.r3 = result.r3 || '';
+
+        window._lastGenMePower = result;
+
+        try {
+          var h = JSON.parse(localStorage.getItem('me_ai_hist_powers') || '[]');
+          h.unshift(result);
+          if(h.length > 20) h.length = 20;
+          localStorage.setItem('me_ai_hist_powers', JSON.stringify(h));
+        } catch(e){}
+
+        var form = document.getElementById('mePowerGenFormSection');
+        var resDiv = document.getElementById('mePowerGenResult');
+        var preview = document.getElementById('mePowerGenPreview');
+
+        if(form) form.style.display = 'none';
+        meShowFade(resDiv);
+
+        if(preview){
+          preview.innerHTML = renderMePowerCard(result, true);
+        }
+
+        renderPowerHistory();
+        if(resDiv) resDiv.scrollIntoView({behavior: 'smooth'});
+      });
+    };
+  }
+
+  var btnBack = document.getElementById('btnMePowerBack');
+  if(btnBack){
+    btnBack.onclick = function(){
+      var form = document.getElementById('mePowerGenFormSection');
+      var resDiv = document.getElementById('mePowerGenResult');
+      if(resDiv) resDiv.style.display = 'none';
+      meShowFade(form);
+    };
+  }
+
+  var btnRegen = document.getElementById('btnMePowerRegen');
+  if(btnRegen){
+    btnRegen.onclick = function(){
+      var form = document.getElementById('mePowerGenFormSection');
+      var resDiv = document.getElementById('mePowerGenResult');
+      if(resDiv) resDiv.style.display = 'none';
+      meShowFade(form);
+      if(btnGen) btnGen.click();
+    };
+  }
+
+  var btnSave = document.getElementById('btnMePowerSave');
+  if(btnSave){
+    btnSave.onclick = function(){
+      var p = window._lastGenMePower;
+      if(!p) return;
+      var targetId = 'pow_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+      var record = {
+        id: targetId,
+        name: p.name,
+        branch: p.branch,
+        icon: p.icon,
+        req: p.req,
+        cd: p.cd,
+        cost: p.cost,
+        desc: p.desc,
+        r1: p.r1,
+        r2: p.r2,
+        r3: p.r3
+      };
+      ME.addPower(record);
+      window.navigate('mePowers');
+    };
+  }
+}
+window.wireMePowerGen = wireMePowerGen;
+
+/* ============================================================
+   AI КОНСТРУКТОР ОРУЖИЯ (ME-ARSENAL)
+   ============================================================ */
+
+function callGeminiMeWeaponGenerator(opts, apiKey, callback){
+  if(!apiKey){
+    callback("API ключ не указан", null);
+    return;
+  }
+  var prompt = "Ты профессиональный ведущий (Dungeon Master) и главный оружейник / эксперт по технологиям вселенной Mass Effect (BioWare) для настольной тактической ролевой игры D&D 5e Sci-Fi. " +
+    "Сконструируй лорное, детальное и сбалансированное стрелковое или тяжелое оружие Млечного Пути. " +
+    "КРИТИЧЕСКИ ВАЖНО: Это вселенная Mass Effect! Оружие разгоняет микро-снаряды размером с песчинку полем эффекта массы до околосветовых скоростей, использует сменные радиаторы (термозаряды / Thermal Clips) или лучевую физику (когезивные лазеры, плазменные сгустки, ускорители массы). Никаких лазерных мечей джедаев, бластеров Star Wars или пороховых мушкетов!\n" +
+    "Параметры запроса оперативника:\n" +
+    "- Концепт / Идея / Модель: " + (opts.theme || "Случайное передовое оружие") + "\n" +
+    "- Категория арсенала: " + (opts.cat || "Авто (rifles, pistols, shotguns, snipers, heavy)") + "\n" +
+    "- Производитель / Технологическая школа: " + (opts.maker || "Авто (Альянс Систем, Цербер, Оружейники Азари, Иерархия Турианцев, Саларианский ГОР, Кроганы, Геты / Кварианцы)") + "\n" +
+    "- Тип урона / Специфика: " + (opts.dmgType || "Авто (Кинетический, Бронебойный, Фазный по щитам, Плазменный, Криогенный)") + "\n" +
+    "- Спецмодуль: " + (opts.mod || "Авто") + "\n\n" +
+    "Стандарты урона Sci-Fi 5e (Матрица урона):\n" +
+    "- Винтовки (rifles): 1d8+2 кин. до 1d10+2 кин., дистанция 60/180 фт до 80/240 фт, магазин 24–40 выстр.\n" +
+    "- Пистолеты / ПП (pistols): 1d6+1 кин. (ПП очередь) до 1d8+2 кин. (тяжелый пистолет / магнум), дистанция 30/90 фт – 50/150 фт, магазин 6–24 выстр.\n" +
+    "- Дробовики (shotguns): 2d6+2 кин. до 2d8+3 кин., дистанция 20/40 фт, магазин 5–8 выстр. Огромный урон в упор.\n" +
+    "- Снайперские винтовки (snipers): 1d12+3 кин. до 2d10+4 кин., дистанция 150/600 фт до 200/800 фт, магазин 1–5 выстр. Смертельный урон по уязвимым точкам.\n" +
+    "- Тяжелое оружие (heavy): от 4d10 до 10d10 (взрывной / плазма / сингулярность), радиус взрыва, 1–2 выстрела на энергоблок.\n\n" +
+    "Ответь ИСКЛЮЧИТЕЛЬНО валидным JSON-объектом без лишних символов и markdown-разметки (```json ... ```), со следующими полями:\n" +
+    "{\n" +
+    '  "name": "Атмосферное военное название (например: «M-15 «Гадюка»», «Дробовик «Гнев Крогана»», «Плазменная винтовка гетов», «Цербер «Гончая»», «Снайперский комплекс «Клык турианца»»)",\n' +
+    '  "cat": "rifles / pistols / shotguns / snipers / heavy (строго одно из этих пяти значений)",\n' +
+    '  "type": "Точный подтип (например: Штурмовая винтовка, Тяжелый пистолет, Дробовик прорыва, Антиматериальная винтовка, Плазменный излучатель)",\n' +
+    '  "dmg": "Формула урона с типом (например: 1d10+2 кин., 2d6+2 кин., 2d10+4 бронеб., 3d8 плазма)",\n' +
+    '  "range": "Дистанция в футах (например: 60/180 фт, 20/40 фт, 150/600 фт)",\n' +
+    '  "clip": "Емкость термозаряда (число, например 30, 16, 8, 1)",\n' +
+    '  "desc": "Детальное описание: производитель, материалы корпуса, отдача, встроенные планки модификаций (ствол, прицел, охлаждение), особенности стрельбы и тактическое назначение."\n' +
+    "}";
+
+  meRequestGemini(prompt, apiKey, function(err, data){
+    if(err || !data){
+      callback(err ? (err.message || String(err)) : "Пустой ответ от AI", null);
+      return;
+    }
+    try{
+      var parsed = meExtractJsonFromAi(data);
+      callback(null, parsed);
+    }catch(err2){
+      callback("Ошибка разбора JSON: " + err2.message, null);
+    }
+  });
+}
+window.callGeminiMeWeaponGenerator = callGeminiMeWeaponGenerator;
+
+function meArsenalGen(){
+  var key = getMeGeminiApiKey();
+  var html = meNavHeader('AI КОНСТРУКТОР ВООРУЖЕНИЯ // ОМНИ-СКЛАД', 'РАЗРАБОТКА ТТХ') +
+    '<button class="back" data-nav="meArsenal">← Назад к арсеналу</button>' +
+    '<h1>✨ AI Конструктор оружия</h1>' +
+    '<div class="subtitle">РАЗРАБОТКА, МОДИФИКАЦИИ И БОЕВЫЕ ХАРАКТЕРИСТИКИ ВООРУЖЕНИЯ 5E SCI-FI</div>' +
+    
+    '<div class="me-panel" id="meArsenalGenFormSection" style="margin-top:14px;">' +
+      '<div style="background:rgba(4,9,20,0.85);border:1px solid rgba(0,210,255,0.25);border-radius:4px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
+        '<div style="font-size:12.5px;color:#8bb1d6;display:flex;align-items:center;gap:6px;">' +
+          '<span>🔑 Gemini API:</span> ' + (key ? '<span style="color:#00d2ff;font-weight:600;">✓ Подключен (' + meEsc(key.slice(0,6)) + '...' + meEsc(key.slice(-4)) + ')</span>' : '<span style="color:#ff5555;font-weight:600;">Не указан</span>') +
+        '</div>' +
+        '<button type="button" class="btn-subtle" id="meArsenalGenChangeKeyBtn" style="padding:4px 10px;font-size:11.5px;border-color:rgba(0,210,255,0.4);color:#00d2ff;cursor:pointer;">' + (key ? 'Изменить ключ' : 'Указать ключ') + '</button>' +
+      '</div>' +
+      '<p style="color:#8bb1d6;font-size:13px;line-height:1.5;margin-bottom:14px;">' +
+        'Опишите боевую модель или прототип вооружения. Нейросеть сгенерирует каноничные ТТХ Млечного Пути: кость урона D&D 2024, дистанцию стрельбы, ёмкость термозаряда и боевые особенности модификаций.' +
+      '</p>' +
+      '<div style="margin-bottom:14px;">' +
+        '<label style="color:#00d2ff;font-size:11.5px;font-weight:700;display:block;margin-bottom:4px;letter-spacing:0.04em;">ИДЕЯ / МОДЕЛЬ / КОНЦЕПТ ОРУЖИЯ:</label>' +
+        '<textarea id="meAgTheme" class="me-input" style="height:70px;width:100%;box-sizing:border-box;" placeholder="Например: «Тяжелый плазменный карабин Цербера с отсечкой по 2 выстрела», «Турианская снайперская винтовка с электромагнитным разгоном», «Кроганский автоматический дробовик со штыком», «Бесшумный пистолет Саларианского ГОР с крио-пулями»..."></textarea>' +
+      '</div>' +
+      '<div class="grid-2" style="margin-bottom:14px;">' +
+        '<div>' +
+          '<label style="color:#00d2ff;font-size:11.5px;font-weight:700;display:block;margin-bottom:4px;letter-spacing:0.04em;">КАТЕГОРИЯ АРСЕНАЛА:</label>' +
+          '<select id="meAgCat" class="me-input" style="width:100%;background:#040914;">' +
+            '<option value="">Авто (на усмотрение AI)</option>' +
+            '<option value="rifles">Винтовки (Штурмовые и боевые)</option>' +
+            '<option value="pistols">Пистолеты / ПП (Тяжелые пистолеты, пистолеты-пулеметы)</option>' +
+            '<option value="shotguns">Дробовики (Штурмовые и тактические)</option>' +
+            '<option value="snipers">Снайперские (Высокоточные и антиматериальные)</option>' +
+            '<option value="heavy">Тяжелое (Гранатометы, лазеры, тяжелые комплексы)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div>' +
+          '<label style="color:#00d2ff;font-size:11.5px;font-weight:700;display:block;margin-bottom:4px;letter-spacing:0.04em;">ПРОИЗВОДИТЕЛЬ / ТЕХНОЛОГИЯ:</label>' +
+          '<select id="meAgMaker" class="me-input" style="width:100%;background:#040914;">' +
+            '<option value="">Авто (на выбор AI)</option>' +
+            '<option value="Альянс Систем">Альянс Систем (Военная надежность, кинетика)</option>' +
+            '<option value="Цербер">«Цербер» (Передовые модификации, повышенный урон)</option>' +
+            '<option value="Оружейники Азари">Оружейники Азари (Элегантность, легкий сплав, био-резонанс)</option>' +
+            '<option value="Турианская Иерархия">Иерархия Турианцев (Высокая кучность, дальность)</option>' +
+            '<option value="Саларианский ГОР">Саларианский ГОР (Глушители, нестандартные датчики)</option>' +
+            '<option value="Кроганские кланы">Кроганские мастера (Колоссальная убойная мощь и отдача)</option>' +
+            '<option value="Геты / Кварианцы">Технологии Гетов / Кварианцев (Сгустки плазмы, дуговой разряд)</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="grid-2" style="margin-bottom:16px;">' +
+        '<div>' +
+          '<label style="color:#00d2ff;font-size:11.5px;font-weight:700;display:block;margin-bottom:4px;letter-spacing:0.04em;">ТИП УРОНА / БОЕПРИПАСЫ:</label>' +
+          '<select id="meAgDmgType" class="me-input" style="width:100%;background:#040914;">' +
+            '<option value="">Авто (Кинетический стандарт)</option>' +
+            '<option value="Кинетический">Кинетический (Стандартный разгон полем массы)</option>' +
+            '<option value="Бронебойный">Бронебойный (Вольфрамовые сердечники, x2 по броне)</option>' +
+            '<option value="Фазный / По щитам">Фазный (ЭМИ и дезинтеграция щитов и барьеров)</option>' +
+            '<option value="Зажигательный / Плазма">Зажигательный / Плазма (Термо-урон и горение)</option>' +
+            '<option value="Криогенный">Криогенный (Субнулевой холод и замедление)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div>' +
+          '<label style="color:#00d2ff;font-size:11.5px;font-weight:700;display:block;margin-bottom:4px;letter-spacing:0.04em;">СПЕЦИАЛЬНЫЙ МОДУЛЬ (ОПЦИОНАЛЬНО):</label>' +
+          '<input type="text" id="meAgMod" class="me-input" style="width:100%;box-sizing:border-box;" placeholder="Авто (Омни-штык, тепловизор, стабилизатор...)">' +
+        '</div>' +
+      '</div>' +
+      '<button class="btn-ghost" id="btnMeArsenalGen" style="width:100%;color:#00d2ff;border-color:rgba(0,210,255,0.4);font-weight:700;font-size:14px;padding:12px 18px;">' +
+        '✨ Сконструировать оружие' +
+      '</button>' +
+    '</div>' +
+
+    '<div id="meArsenalGenResult" style="display:none;margin-top:16px;">' +
+      '<div id="meArsenalGenPreview" style="margin-bottom:16px;"></div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<button class="btn-primary" id="btnMeArsenalSave" style="width:100%;padding:12px;font-size:14px;">💾 Вписать в Оружейный Арсенал</button>' +
+        '<div style="display:flex;gap:10px;">' +
+          '<button class="btn-ghost" id="btnMeArsenalRegen" style="flex:1;">🔄 Сконструировать заново</button>' +
+          '<button class="btn-ghost" id="btnMeArsenalBack" style="flex:1;">✏️ Изменить параметры</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div id="meArsenalGenHistoryWrap" style="margin-top:24px;border-top:1px solid rgba(0,210,255,0.15);padding-top:16px;display:none;">' +
+      '<div class="section-label" style="font-size:11px;letter-spacing:0.12em;color:#00d2ff;font-weight:700;margin-bottom:10px;font-family:\'JetBrains Mono\',monospace;">📜 ИСТОРИЯ КОНСТРУИРОВАНИЯ (ЛОКАЛЬНО)</div>' +
+      '<div id="meArsenalGenHistoryList" style="display:flex;flex-direction:column;gap:8px;"></div>' +
+    '</div>';
+
+  return html;
+}
+window.meArsenalGen = meArsenalGen;
+
+function wireMeArsenalGen(){
+  function renderWeaponHistory(){
+    var wrap = document.getElementById('meArsenalGenHistoryWrap');
+    var list = document.getElementById('meArsenalGenHistoryList');
+    if(!wrap || !list) return;
+    try {
+      var h = JSON.parse(localStorage.getItem('me_ai_hist_weapons') || '[]');
+      if(h.length === 0){ wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+      list.innerHTML = h.map(function(item, i){
+        return '<div class="me-card" style="cursor:pointer;margin-bottom:0;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-left:3px solid #00d2ff;" onclick="window._loadMeWeaponHist(' + i + ')">' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;">' +
+              '🔫 ' + meEsc(item.name || 'Оружие') + ' <span class="me-tag-holo" style="font-size:10px;padding:1px 6px;">' + meEsc(item.dmg || '1d8') + '</span>' +
+            '</div>' +
+            '<div style="font-size:11.5px;color:#8bb1d6;">' +
+              meEsc(item.type || 'Огнестрел') + ' · ' + meEsc(item.range || '—') + ' · Магазин: ' + meEsc(item.clip || '—') +
+            '</div>' +
+          '</div>' +
+          '<button class="btn-subtle" style="padding:4px 8px;color:#ff5555;border-color:transparent;flex-shrink:0;font-size:13px;" onclick="event.stopPropagation(); window._delMeWeaponHist(' + i + ')" title="Удалить из истории">🗑️</button>' +
+        '</div>';
+      }).join('');
+    } catch(e){}
+  }
+
+  window._loadMeWeaponHist = function(i){
+    try {
+      var h = JSON.parse(localStorage.getItem('me_ai_hist_weapons') || '[]');
+      var item = h[i];
+      if(!item) return;
+      window._lastGenMeWeapon = item;
+      var form = document.getElementById('meArsenalGenFormSection');
+      var resDiv = document.getElementById('meArsenalGenResult');
+      var preview = document.getElementById('meArsenalGenPreview');
+      if(form) form.style.display = 'none';
+      meShowFade(resDiv);
+      if(preview){
+        preview.innerHTML = renderMeWeaponCard(item, true);
+      }
+      window.scrollTo(0, 0);
+    } catch(e){}
+  };
+
+  window._delMeWeaponHist = function(i){
+    try {
+      var h = JSON.parse(localStorage.getItem('me_ai_hist_weapons') || '[]');
+      h.splice(i, 1);
+      localStorage.setItem('me_ai_hist_weapons', JSON.stringify(h));
+      renderWeaponHistory();
+    } catch(e){}
+  };
+
+  renderWeaponHistory();
+
+  var btnChangeKey = document.getElementById('meArsenalGenChangeKeyBtn');
+  if(btnChangeKey){
+    btnChangeKey.onclick = function(){
+      var curKey = getMeGeminiApiKey();
+      var keyInput = prompt('Введите ваш Google Gemini API ключ (из Google AI Studio):', curKey || '');
+      if(keyInput !== null){
+        saveMeGeminiApiKey(keyInput.trim());
+        if(typeof render === 'function') render();
+      }
+    };
+  }
+
+  var btnGen = document.getElementById('btnMeArsenalGen');
+  if(btnGen){
+    btnGen.onclick = function(){
+      var k = getMeGeminiApiKey();
+      if(!k){
+        var keyInput = prompt('Введите ваш Google Gemini API ключ для генерации:');
+        if(keyInput && keyInput.trim()){
+          k = keyInput.trim();
+          saveMeGeminiApiKey(k);
+          if(typeof render === 'function') render();
+        } else {
+          return;
+        }
+      }
+
+      var theme = (document.getElementById('meAgTheme').value || '').trim();
+      var cat = document.getElementById('meAgCat').value;
+      var maker = document.getElementById('meAgMaker').value;
+      var dmgType = document.getElementById('meAgDmgType').value;
+      var mod = (document.getElementById('meAgMod').value || '').trim();
+
+      btnGen.disabled = true;
+      btnGen.textContent = 'Конструирование (ждите)...';
+
+      callGeminiMeWeaponGenerator({
+        theme: theme,
+        cat: cat,
+        maker: maker,
+        dmgType: dmgType,
+        mod: mod
+      }, k, function(err, result){
+        btnGen.disabled = false;
+        btnGen.textContent = '✨ Сконструировать оружие';
+
+        if(err || !result){
+          var errMsg = (err && err.message) ? err.message : (err || 'Пустой ответ от AI');
+          if(String(errMsg).indexOf('400') !== -1 || String(errMsg).indexOf('403') !== -1){
+            errMsg += '\n\nПроверьте правильность API-ключа в Google AI Studio (aistudio.google.com).';
+          }
+          alert('Ошибка конструирования оружия: ' + errMsg);
+          return;
+        }
+
+        result.name = result.name || 'Оружие Альянса';
+        var validCats = ['rifles', 'pistols', 'shotguns', 'snipers', 'heavy'];
+        if(validCats.indexOf(result.cat) === -1) result.cat = cat || 'rifles';
+        result.type = result.type || 'Огнестрел';
+        result.dmg = result.dmg || '1d8+2 кин.';
+        result.range = result.range || '60/180 фт';
+        result.clip = (result.clip !== undefined && result.clip !== null) ? String(result.clip) : '30';
+        result.desc = result.desc || '';
+
+        window._lastGenMeWeapon = result;
+
+        try {
+          var h = JSON.parse(localStorage.getItem('me_ai_hist_weapons') || '[]');
+          h.unshift(result);
+          if(h.length > 20) h.length = 20;
+          localStorage.setItem('me_ai_hist_weapons', JSON.stringify(h));
+        } catch(e){}
+
+        var form = document.getElementById('meArsenalGenFormSection');
+        var resDiv = document.getElementById('meArsenalGenResult');
+        var preview = document.getElementById('meArsenalGenPreview');
+
+        if(form) form.style.display = 'none';
+        meShowFade(resDiv);
+
+        if(preview){
+          preview.innerHTML = renderMeWeaponCard(result, true);
+        }
+
+        renderWeaponHistory();
+        if(resDiv) resDiv.scrollIntoView({behavior: 'smooth'});
+      });
+    };
+  }
+
+  var btnBack = document.getElementById('btnMeArsenalBack');
+  if(btnBack){
+    btnBack.onclick = function(){
+      var form = document.getElementById('meArsenalGenFormSection');
+      var resDiv = document.getElementById('meArsenalGenResult');
+      if(resDiv) resDiv.style.display = 'none';
+      meShowFade(form);
+    };
+  }
+
+  var btnRegen = document.getElementById('btnMeArsenalRegen');
+  if(btnRegen){
+    btnRegen.onclick = function(){
+      var form = document.getElementById('meArsenalGenFormSection');
+      var resDiv = document.getElementById('meArsenalGenResult');
+      if(resDiv) resDiv.style.display = 'none';
+      meShowFade(form);
+      if(btnGen) btnGen.click();
+    };
+  }
+
+  var btnSave = document.getElementById('btnMeArsenalSave');
+  if(btnSave){
+    btnSave.onclick = function(){
+      var w = window._lastGenMeWeapon;
+      if(!w) return;
+      var targetId = 'wpn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+      var record = {
+        id: targetId,
+        name: w.name,
+        cat: w.cat,
+        type: w.type,
+        dmg: w.dmg,
+        range: w.range,
+        clip: w.clip,
+        desc: w.desc
+      };
+      ME.addWeapon(record);
+      window.navigate('meArsenal');
+    };
+  }
+}
+window.wireMeArsenalGen = wireMeArsenalGen;
 
 // 4. КОРАБЛЬ И ЭКИПАЖ (СТАНДАРТНЫЕ СЛОТЫ МОДУЛЕЙ И КАСТОМНЫЙ ЭКИПАЖ)
 function meShip(){
@@ -3623,6 +4411,8 @@ if(typeof ME !== 'undefined') ME.meData = meData;
 function wireMe(){
   if(typeof wireMePowerEdit === 'function') wireMePowerEdit();
   if(typeof wireMeArsenalEdit === 'function') wireMeArsenalEdit();
+  if(typeof wireMePowerGen === 'function') wireMePowerGen();
+  if(typeof wireMeArsenalGen === 'function') wireMeArsenalGen();
 
   // Поиск по Кодексу Галактики
   var codexSearchInput = document.getElementById('meCodexSearchInput');
