@@ -22405,7 +22405,7 @@ function wireMePowerEdit(){
       
       if(isNew) list.push(p);
       ME.savePowers(list);
-      navigate('mePowers');
+      window.navigate('mePowers');
     };
   }
 }
@@ -22469,7 +22469,7 @@ function wireMeArsenalEdit(){
       
       if(isNew) list.push(w);
       ME.saveArsenal(list);
-      navigate('meArsenal');
+      window.navigate('meArsenal');
     };
   }
 }
@@ -29508,10 +29508,10 @@ function wireMe(){
     powSearch._t = setTimeout(render, 300);
   };
   var addPow = document.getElementById('meAddPowerEmptyBtn') || document.getElementById('meAddPowerBtn');
-  if(addPow) addPow.onclick = function(){ navigate('mePowerEdit:new'); };
+  if(addPow) addPow.onclick = function(){ window.navigate('mePowerEdit:new'); };
   
   document.querySelectorAll('.me-edit-power-btn').forEach(function(btn){
-    btn.onclick = function(){ navigate('mePowerEdit:' + this.getAttribute('data-id')); };
+    btn.onclick = function(){ window.navigate('mePowerEdit:' + this.getAttribute('data-id')); };
   });
   document.querySelectorAll('.me-del-power-btn').forEach(function(btn){
     btn.onclick = function(){
@@ -29532,10 +29532,10 @@ function wireMe(){
     };
   });
   var addWeap = document.getElementById('meAddWeapEmptyBtn') || document.getElementById('meAddWeapBtn');
-  if(addWeap) addWeap.onclick = function(){ navigate('meArsenalEdit:new'); };
+  if(addWeap) addWeap.onclick = function(){ window.navigate('meArsenalEdit:new'); };
   
   document.querySelectorAll('.me-edit-weap-btn').forEach(function(btn){
-    btn.onclick = function(){ navigate('meArsenalEdit:' + this.getAttribute('data-id')); };
+    btn.onclick = function(){ window.navigate('meArsenalEdit:' + this.getAttribute('data-id')); };
   });
   document.querySelectorAll('.me-del-weap-btn').forEach(function(btn){
     btn.onclick = function(){
@@ -29808,10 +29808,10 @@ function wireMe(){
   };
   var addPow = document.getElementById('meAddPowerEmptyBtn');
   if(!addPow) addPow = document.getElementById('meAddPowerBtn');
-  if(addPow) addPow.onclick = function(){ navigate('mePowerEdit:new'); };
+  if(addPow) addPow.onclick = function(){ window.navigate('mePowerEdit:new'); };
   
   document.querySelectorAll('.me-edit-power-btn').forEach(function(btn){
-    btn.onclick = function(){ navigate('mePowerEdit:' + this.getAttribute('data-id')); };
+    btn.onclick = function(){ window.navigate('mePowerEdit:' + this.getAttribute('data-id')); };
   });
   document.querySelectorAll('.me-del-power-btn').forEach(function(btn){
     btn.onclick = function(){
@@ -29833,10 +29833,10 @@ function wireMe(){
   });
   var addWeap = document.getElementById('meAddWeapEmptyBtn');
   if(!addWeap) addWeap = document.getElementById('meAddWeapBtn');
-  if(addWeap) addWeap.onclick = function(){ navigate('meArsenalEdit:new'); };
+  if(addWeap) addWeap.onclick = function(){ window.navigate('meArsenalEdit:new'); };
   
   document.querySelectorAll('.me-edit-weap-btn').forEach(function(btn){
-    btn.onclick = function(){ navigate('meArsenalEdit:' + this.getAttribute('data-id')); };
+    btn.onclick = function(){ window.navigate('meArsenalEdit:' + this.getAttribute('data-id')); };
   });
   document.querySelectorAll('.me-del-weap-btn').forEach(function(btn){
     btn.onclick = function(){
