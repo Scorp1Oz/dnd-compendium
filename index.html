@@ -25314,7 +25314,7 @@ function elTechs(){
 
   var cardsHtml = filtered.length ? filtered.map(renderElTechCard).join('') : (allTechs.length === 0 ? '<div class="char-empty" style="padding:50px 20px;text-align:center;color:#94a3b8;background:rgba(0,0,0,0.25);border:1px dashed var(--el-accent-border);border-radius:8px;margin-top:16px;"><div style="font-size:36px;margin-bottom:10px;">✨</div><div style="font-size:16px;color:#f5f6fa;font-weight:700;margin-bottom:6px;font-family:Cinzel,serif;">Список форм стихий пуст</div><div style="font-size:13px;color:#94a3b8;max-width:500px;margin:0 auto 18px;line-height:1.5;">Стихийная магия вселенной Аватара рождается из вашего воображения и тактики. Нажмите кнопку <b>«+ Изучить новую форму»</b> или сгенерируйте форму через <b>AI Генератор</b>!</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"><button class="btn-primary" data-nav="elTechEdit:new">+ Изучить новую форму</button><button class="btn-ghost" style="color:var(--el-accent);border-color:var(--el-accent-border);" data-nav="elTechGen">✨ AI Генератор форм</button></div></div>' : '<div class="char-empty" style="padding:40px 20px;text-align:center;color:#94a3b8;font-style:italic;">В выбранной категории нет форм стихий.</div>');
 
-  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Формы стихий'}]) + '\n' + renderElTechLauncher() + '\n' +
+  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Формы стихий'}]) +
     '<button class="back" data-nav="home">← Назад в меню</button>' +
     '<h1>⚡ ФОРМЫ СТИХИЙ</h1>' +
     '<div class="subtitle">ИЗУЧЕННЫЕ МАГИЧЕСКИЕ ПРИМЕНЕНИЯ • ВЫСШИЕ ИСКУССТВА • ШКАЛА СИЛЫ 0–5 • ВЫНОСЛИВОСТЬ МВН</div>' +
@@ -25322,6 +25322,7 @@ function elTechs(){
       '<button class="btn-primary" data-nav="elTechEdit:new">+ Изучить новую форму</button>' +
       '<button class="btn-ghost" style="color:var(--el-accent);border-color:var(--el-accent-border);" data-nav="elTechGen">✨ AI Генератор форм</button>' +
     '</div>' +
+    '\n' + renderElTechLauncher() + '\n' +
     '<div class="el-ref-search-wrap" style="margin-bottom:12px;">' +
       '<span class="el-ref-search-icon">🔍</span>' +
       '<input type="text" id="elTechSearchInput" class="el-ref-search-input" placeholder="Поиск формы (молния, хлыст, полет, исцеление, лава, кинжалы)..." value="' + elEscA(window._elTechSearch || '') + '">' +
@@ -25354,6 +25355,7 @@ function wireElTechs(){
       wireElTechs();
     };
   });
+  if(typeof wireElLaunchers==='function') wireElLaunchers();
 }
 
 /* ============================================================
@@ -25959,7 +25961,7 @@ function elMoves(){
 
   var cardsHtml = filtered.length ? filtered.map(renderElMoveCard).join('') : (allMoves.length === 0 ? '<div class="char-empty" style="padding:50px 20px;text-align:center;color:#94a3b8;background:rgba(0,0,0,0.25);border:1px dashed var(--el-accent-border);border-radius:8px;margin-top:16px;"><div style="font-size:36px;margin-bottom:10px;">🥋</div><div style="font-size:16px;color:#f5f6fa;font-weight:700;margin-bottom:6px;font-family:Cinzel,serif;">Список боевых приёмов пуст</div><div style="font-size:13px;color:#94a3b8;max-width:500px;margin:0 auto 18px;line-height:1.5;">Создавайте собственные тактические приёмы, чи-блокинг и манёвры ближнего боя. Нажмите <b>«+ Добавить приём»</b> или сгенерируйте приём через <b>AI Генератор</b>!</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"><button class="btn-primary" data-nav="elMoveEdit:new">+ Добавить приём</button><button class="btn-ghost" style="color:var(--el-accent);border-color:var(--el-accent-border);" data-nav="elMoveGen">✨ AI Генератор приёмов</button></div></div>' : '<div class="char-empty" style="padding:40px 20px;text-align:center;color:#94a3b8;font-style:italic;">В выбранной категории нет приёмов.</div>');
 
-  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Боевые приёмы'}]) + '\n' + renderElMoveLauncher() + '\n' +
+  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Боевые приёмы'}]) +
     '<button class="back" data-nav="home">← Назад в меню</button>' +
     '<h1>🥋 БОЕВЫЕ ПРИЁМЫ</h1>' +
     '<div class="subtitle">ТАКТИЧЕСКИЕ ДЕЙСТВИЯ • ОТКРЫТИЕ ОКОН ВОЗМОЖНОСТЕЙ (A94/A95) • ЧИ-БЛОКИНГ • БОЙ БЕЗ МАГИИ</div>' +
@@ -25967,6 +25969,7 @@ function elMoves(){
       '<button class="btn-primary" data-nav="elMoveEdit:new">+ Добавить приём</button>' +
       '<button class="btn-ghost" style="color:var(--el-accent);border-color:var(--el-accent-border);" data-nav="elMoveGen">✨ AI Генератор приёмов</button>' +
     '</div>' +
+    '\n' + renderElMoveLauncher() + '\n' +
     '<div class="el-ref-search-wrap" style="margin-bottom:12px;">' +
       '<span class="el-ref-search-icon">🔍</span>' +
       '<input type="text" id="elMoveSearchInput" class="el-ref-search-input" placeholder="Поиск приёма (чи-блок, подсечка, веер Киоши, песок в глаза, залом)..." value="' + elEscA(window._elMoveSearch || '') + '">' +
@@ -25999,6 +26002,7 @@ function wireElMoves(){
       wireElMoves();
     };
   });
+  if(typeof wireElLaunchers==='function') wireElLaunchers();
 }
 
 /* ============================================================
