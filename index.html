@@ -25127,28 +25127,21 @@ function finalizeElTechLaunch(mode, t, autoCopy){
   var mods = EL.launcher.mods || {exp:0, atk:0, dmg:0};
   
   if(mode === 'claim' || mode === 'all'){
-    var cStr = t.cost || '1 МВН';
-    var scaleStr = ' [Степень ' + (t.scale !== undefined && t.scale !== null && t.scale !== '' ? t.scale : '1') + ']';
-    var nStr = ' ['+t.element+']' + scaleStr;
-    var rankStr = elEsc(t.element);
-    out.push('⚡ ФОРМА СТИХИИ: ' + t.name.toUpperCase());
-    out.push('Параметры: ' + rankStr + ' · ' + cStr + nStr);
-    if(t.desc) out.push('Описание: ' + t.desc);
-    if(mode === 'claim') out.push('Действие: ' + t.name);
+    var scale = t.scale !== undefined && t.scale !== null && t.scale !== '' ? t.scale : '1';
+    var cost = t.cost || '1 МВН';
+    out.push('*[Форма стихии: ' + t.name + ' | Степень: ' + scale + ' | Затраты: ' + cost + ']*');
   }
   
   if((mode === 'all' || mode === 'exp') && isExp){
     var r = vals.exp || 10;
     var res = r + mods.exp;
-    out.push('');
-    out.push('🌀 Исполнение стихии: 1d20' + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + r + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = **' + res + '**');
+    out.push('*[Результат броска Исполнение: 1d20' + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + r + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + res + ']*');
   }
   
   if(mode === 'all' || mode === 'atk'){
     var r = vals.atk || 10;
     var res = r + mods.atk;
-    out.push('');
-    out.push('⚔️ Атака стихией: 1d20' + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + r + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = **' + res + '**');
+    out.push('*[Результат броска Попадание: 1d20' + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + r + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + res + ']*');
   }
   
   var pDmg = typeof parseMoveDmg === 'function' ? parseMoveDmg(t.damage) : null;
@@ -25162,8 +25155,7 @@ function finalizeElTechLaunch(mode, t, autoCopy){
     }
     var totalMod = mods.dmg + pDmg.mod;
     sum += totalMod;
-    out.push('');
-    out.push('💥 Урон ('+pDmg.n+'d'+pDmg.sides+'): ['+rolls.join(', ')+']' + (totalMod>=0?'+'+totalMod:totalMod) + ' = **' + sum + '**');
+    out.push('*[Результат броска Урон: '+pDmg.n+'d'+pDmg.sides+' ('+rolls.join(', ')+')' + (totalMod>=0?'+'+totalMod:totalMod) + ' = ' + sum + ']*');
   }
   
   var output = out.join('\n').trim();
@@ -25254,25 +25246,20 @@ function finalizeElMoveLaunch(mode, m, autoCopy){
   var mods = EL.moveLauncher.mods || {atk:0, dmg:0, exp:0};
   
   if(mode === 'claim' || mode === 'all'){
-    var cStr = m.cost || '1 ФВН';
-    var nStr = ' ['+m.kind+']';
-    out.push('🥋 БОЕВОЙ ПРИЁМ: ' + m.name.toUpperCase());
-    out.push('Тип: ' + m.kind + ' · ' + cStr + nStr);
-    if(m.desc) out.push('Описание: ' + m.desc);
+    var cost = m.cost || '1 ФВН';
+    out.push('*[Боевой приём: ' + m.name + ' | Тип: ' + m.kind + ' | Затраты: ' + cost + ']*');
   }
   
   if((mode === 'all' || mode === 'exp') && isExp){
     var r = vals.exp || 10;
     var res = r + mods.exp;
-    out.push('');
-    out.push('🛡️ Защита стихией: 1d20' + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + r + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = **' + res + '**');
+    out.push('*[Результат броска Защита: 1d20' + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + r + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + res + ']*');
   }
 
   if(mode === 'all' || mode === 'atk'){
     var r = vals.atk || 10;
     var res = r + mods.atk;
-    out.push('');
-    out.push('🎯 Попадание приёма: 1d20' + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + r + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = **' + res + '**');
+    out.push('*[Результат броска Попадание: 1d20' + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + r + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + res + ']*');
   }
   
   var pDmg = typeof parseMoveDmg === 'function' ? parseMoveDmg(m.effect) : null;
@@ -25286,8 +25273,7 @@ function finalizeElMoveLaunch(mode, m, autoCopy){
     }
     var totalMod = mods.dmg + pDmg.mod;
     sum += totalMod;
-    out.push('');
-    out.push('💥 Урон/Эффект ('+pDmg.n+'d'+pDmg.sides+'): ['+rolls.join(', ')+']' + (totalMod>=0?'+'+totalMod:totalMod) + ' = **' + sum + '**');
+    out.push('*[Результат броска Урон/Эффект: '+pDmg.n+'d'+pDmg.sides+' ('+rolls.join(', ')+')' + (totalMod>=0?'+'+totalMod:totalMod) + ' = ' + sum + ']*');
   }
   
   var output = out.join('\n').trim();
