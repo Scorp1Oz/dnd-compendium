@@ -27725,6 +27725,21 @@ function elMap(){
         '<button class="el-quick-jump" data-jump="air">🌪️ Храмы Воздуха</button>' +
         '<button class="el-quick-jump" data-jump="world">🗺️ Вся карта</button>' +
       '</div>' +
+      (EL.map.warMode ? 
+        '<div class="el-war-palette" style="background:rgba(15,23,42,0.8); padding:8px; border-radius:6px; border:1px solid var(--el-accent-border); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
+          '<div style="display:flex; gap:8px; flex-wrap:wrap;">' +
+            '<button class="el-war-tool '+(EL.map.warNation==='pan'?'active':'')+'" data-nation="pan" title="Режим перемещения карты">✋ Перемещение</button>' +
+            '<button class="el-war-tool '+(EL.map.warNation==='fire_nation'?'active':'')+'" data-nation="fire_nation" style="border-left:1px solid rgba(255,255,255,0.1); padding-left:12px;">🔥 Огонь</button>' +
+            '<button class="el-war-tool '+(EL.map.warNation==='earth_kingdom'?'active':'')+'" data-nation="earth_kingdom">⛰️ Земля</button>' +
+            '<button class="el-war-tool '+(EL.map.warNation==='water_north'?'active':'')+'" data-nation="water_north">🌊 Вода</button>' +
+            '<button class="el-war-tool '+(EL.map.warNation==='air_west'?'active':'')+'" data-nation="air_west">🌪️ Воздух</button>' +
+          '</div>' +
+          '<div style="display:flex; gap:8px;">' +
+            '<button class="el-war-tool" onclick="elWarUndo()" title="Отменить последнее нарисованное пятно">↩️ Отменить шаг</button>' +
+            '<button class="el-war-tool" onclick="elWarClear()" style="color:#fca5a5;">🗑️ Очистить карту</button>' +
+          '</div>' +
+        '</div>' 
+      : '') +
       '<div class="sh-map-viewport '+(EL.map.warMode?'war-mode-active':'')+'" id="elMapViewport" title="Зажмите левую кнопку мыши для перемещения карты внутри бокса, колесико для зума">' +
         '<div class="sh-map-corner sh-map-corner-tl"></div>' +
         '<div class="sh-map-corner sh-map-corner-tr"></div>' +
@@ -27764,6 +27779,21 @@ function wireElMap(){
   var startX = 0, startY = 0;
   var startCx = 800, startCy = 600;
 
+  var getSvgCoord = function(clientX, clientY){
+    var rect = vp.getBoundingClientRect();
+    var mouseX = clientX - rect.left;
+    var mouseY = clientY - rect.top;
+    var z = EL.map.zoom || 1;
+    var vbW = 1600 / z;
+    var vbH = 1200 / z;
+    var vw = rect.width || 800;
+    var vh = rect.height || 440;
+    var scale = Math.max(vbW / vw, vbH / vh);
+    var minX = (EL.map.cx || 800) - vbW / 2;
+    var minY = (EL.map.cy || 600) - vbH / 2;
+    return { x: minX + mouseX * scale, y: minY + mouseY * scale };
+  };
+
   var updateViewBox = function(){
     var s = document.getElementById('elMapSvg');
     if(!s) return;
@@ -27793,7 +27823,15 @@ function wireElMap(){
     startY = e.clientY;
     startCx = EL.map.cx || 800;
     startCy = EL.map.cy || 600;
-    vp.classList.add('grabbing');
+
+    if (EL.map.warMode && EL.map.warNation !== 'pan' && e.button === 0) {
+      vp.style.cursor = 'crosshair';
+      var pt = getSvgCoord(e.clientX, e.clientY);
+      EL.map.warPaths.push({nation: EL.map.warNation, points: [pt]});
+      refreshElMapSvgOnly();
+    } else {
+      vp.classList.add('grabbing');
+    }
   };
 
   var onMouseMove = function(e){
@@ -27801,6 +27839,17 @@ function wireElMap(){
     var dx = e.clientX - startX;
     var dy = e.clientY - startY;
     if(Math.abs(dx) > 4 || Math.abs(dy) > 4) hasMoved = true;
+
+    if (EL.map.warMode && EL.map.warNation !== 'pan') {
+      var pt = getSvgCoord(e.clientX, e.clientY);
+      var currentPath = EL.map.warPaths[EL.map.warPaths.length - 1];
+      if(currentPath) {
+        currentPath.points.push(pt);
+        refreshElMapSvgOnly();
+      }
+      return;
+    }
+
     var z = Math.min(4.0, Math.max(1.0, EL.map.zoom || 1));
     if(z <= 1.001) return;
 
@@ -27820,6 +27869,10 @@ function wireElMap(){
     if(isDragging){
       isDragging = false;
       vp.classList.remove('grabbing');
+      vp.style.cursor = '';
+      if (EL.map.warMode && EL.map.warNation !== 'pan') {
+        try { localStorage.setItem('ttc_el_war_paths', JSON.stringify(EL.map.warPaths)); } catch(e){}
+      }
     }
   };
 
@@ -27886,6 +27939,22 @@ function wireElMap(){
   };
 
   // Режимы (Атлас, Маршруты, Метки)
+  var tglWar = document.getElementById('elMapToggleWarMode');
+  if(tglWar) tglWar.onchange = function(){
+    EL.map.warMode = this.checked;
+    refreshElMap();
+  };
+
+  document.querySelectorAll('.el-war-tool').forEach(function(btn){
+    btn.onclick = function(){
+      var n = this.getAttribute('data-nation');
+      if(n) {
+        EL.map.warNation = n;
+        refreshElMap();
+      }
+    };
+  });
+
   var btnInspect = document.getElementById('elMapModeInspect');
   if(btnInspect) btnInspect.onclick = function(){
     EL.map.mode = 'inspect';
