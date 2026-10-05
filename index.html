@@ -24712,6 +24712,562 @@ function renderElTechCard(t){
 }
 window.renderElTechCard = renderElTechCard;
 
+
+/* =========================================================================
+   AVATAR COMBAT LAUNCHERS
+   ========================================================================= */
+
+function renderElTechLauncher(){
+  var list = EL.getTechs();
+  if(!list || !list.length){
+    return '<div class="sh-launcher" style="margin-bottom:16px;">'+
+      '<div class="sh-launcher-title">⚔️ Боевой расчёт формы <span class="sh-badge-tag">AI Studio</span></div>'+
+      '<div class="char-empty" style="margin:10px 0 0;padding:12px;">Формы ещё не добавлены. Добавьте первую форму, чтобы использовать боевой расчёт.</div>'+
+    '</div>';
+  }
+
+  if(!EL.launcher) EL.launcher = {};
+  if(EL.launcher.isOpen === undefined) EL.launcher.isOpen = false;
+  var isOpen = !!EL.launcher.isOpen;
+  if(!EL.launcher.mods) EL.launcher.mods = { exp: 0, atk: 0, dmg: 0 };
+  if(!EL.launcher.selectedTarget) EL.launcher.selectedTarget = 'atk';
+
+  var selTech = list.find(t => t.id === EL.launcher.techId) || list[0];
+  if(!EL.launcher.techId && selTech){
+    EL.launcher.techId = selTech.id;
+    if(selTech.dmgMod) EL.launcher.mods.dmg = parseInt(selTech.dmgMod, 10) || 0;
+  }
+  EL.launcher.isExp = true; // Avatar forms always have execution
+
+  var selTarget = EL.launcher.selectedTarget;
+  var targetNames = { exp: '🌀 Исполнение стихии', atk: '⚔️ Атака стихией', dmg: '💥 Урон' };
+  var targetTitle = targetNames[selTarget] || '⚔️ Атака стихией';
+  var curModVal = EL.launcher.mods[selTarget] || 0;
+
+  var techOpts = list.map(function(t){
+    var cStr = t.cost || '1 МВН';
+    var nStr = ' ['+t.element+']';
+    return '<option value="'+t.id+'" '+(t.id===selTech.id?'selected':'')+'>'+
+      elEsc(t.element)+' · '+elEsc(t.name)+' ('+cStr+')'+nStr+
+    '</option>';
+  }).join('');
+
+  var screenHtml = renderLauncherDiceHtml(selTech, true, selTarget, EL.launcher.mods, EL.launcher.rolledValues);
+
+  var modBarHtml = 
+    '<div class="sh-mod-bar">'+
+      '<div class="sh-mod-target-info">'+
+        '<span>Модификатор цели:</span>'+
+        '<span class="sh-mod-target-tag" id="elTechModTargetName">'+targetTitle+'</span>'+
+      '</div>'+
+      '<div class="sh-mod-controls">'+
+        '<button class="sh-mod-step el-mod-step" data-mod-delta="-5" title="Уменьшить на 5">-5</button>'+
+        '<button class="sh-mod-step el-mod-step" data-mod-delta="-1" title="Уменьшить на 1">-1</button>'+
+        '<input type="number" id="elTechActiveModInput" class="sh-active-mod-input" value="'+curModVal+'" readonly>'+
+        '<button class="sh-mod-step el-mod-step" data-mod-delta="1" title="Увеличить на 1">+1</button>'+
+        '<button class="sh-mod-step el-mod-step" data-mod-delta="5" title="Увеличить на 5">+5</button>'+
+      '</div>'+
+    '</div>';
+
+  var actionsHtml = 
+    '<div class="sh-launcher-actions">'+
+      '<button class="sh-btn-launch" id="elTechLaunchComboBtn" title="Бросить все кости формы и зафиксировать результат">⚔️ Применить форму</button>'+
+      '<button class="sh-btn-copy-all" id="elTechCopyAllBtn" title="Скопировать готовый блок в буфер обмена для AI Studio">📋 Скопировать всё</button>'+
+      '<button class="sh-micro-btn" id="elTechLaunchAtkBtn" title="Бросить и скопировать только попадание">🎯 Попадание</button>'+
+      (selTech.damage && selTech.damage !== '—' ? '<button class="sh-micro-btn" id="elTechLaunchDmgBtn" title="Бросить и скопировать только урон">💥 Урон</button>' : '')+
+      '<button class="sh-micro-btn" id="elTechLaunchExpBtn" title="Бросить и скопировать Исполнение стихии">🌀 Исполнение</button>'+
+      '<button class="sh-micro-btn" id="elTechLaunchClaimBtn" title="Скопировать только заявку">📜 Только заявка</button>'+
+    '</div>';
+
+  var hasRes = !!(EL.launcher.lastResult);
+  var resultBoxHtml = 
+    '<div class="sh-launcher-result '+(hasRes?'has-result':'')+'" id="elTechLauncherResultBox">'+
+      '<div class="sh-launcher-result-text" id="elTechLauncherResultText">'+elEsc(EL.launcher.lastResult||'')+'</div>'+
+      '<div class="sh-copy-badge" id="elTechLauncherCopyBadge" style="display:'+(hasRes?'inline-flex':'none')+';">'+
+        '<span>'+(EL.launcher.lastResultCopied ? '✓ Скопировано в буфер обмена для AI Studio' : '⚠️ Бросок не скопирован. Нажмите «Скопировать всё»')+'</span>'+
+      '</div>'+
+    '</div>';
+
+  var toggleHeadHtml = 
+    '<div class="sh-launcher-toggle-head" id="elTechLauncherToggle" role="button" tabindex="0" title="Нажмите, чтобы развернуть или свернуть боевой расчёт формы">'+
+      '<div class="sh-launcher-title">'+
+        '<span>⚔️ Боевой расчёт формы</span>'+
+        '<span class="sh-badge-tag">AI Studio</span>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:10px;">'+
+        '<span class="sh-launcher-toggle-text">'+(isOpen?'СВЕРНУТЬ':'РАЗВЕРНУТЬ')+'</span>'+
+        '<span class="sh-launcher-toggle-arrow">'+(isOpen?'▲':'▼')+'</span>'+
+      '</div>'+
+    '</div>';
+
+  var bodyHtml = '';
+  if(isOpen){
+    bodyHtml = 
+      '<div class="sh-launcher-body">'+
+        '<div class="sh-launcher-row">'+
+          '<select class="sh-launcher-select" id="elTechLauncherTech">'+techOpts+'</select>'+
+        '</div>'+
+        '<div id="elTechLauncherScreen">'+screenHtml+'</div>'+
+        modBarHtml + actionsHtml +
+      '</div>';
+  }
+
+  return '<div class="sh-launcher" style="margin-bottom:16px;" id="elTechLauncherContainer">'+
+    toggleHeadHtml + bodyHtml + resultBoxHtml +
+  '</div>';
+}
+
+function renderElMoveLauncher(){
+  var list = EL.getMoves();
+  if(!list || !list.length){
+    return '<div class="sh-launcher" style="margin-bottom:16px;">'+
+      '<div class="sh-launcher-title">🥋 Боевой расчёт приёма <span class="sh-badge-tag">AI Studio</span></div>'+
+      '<div class="char-empty" style="margin:10px 0 0;padding:12px;">Приёмы ещё не добавлены. Добавьте первый приём, чтобы использовать боевой расчёт.</div>'+
+    '</div>';
+  }
+
+  if(!EL.moveLauncher) EL.moveLauncher = {};
+  if(EL.moveLauncher.isOpen === undefined) EL.moveLauncher.isOpen = false;
+  var isOpen = !!EL.moveLauncher.isOpen;
+  if(!EL.moveLauncher.mods) EL.moveLauncher.mods = { atk: 0, dmg: 0, exp: 0 };
+  if(!EL.moveLauncher.selectedTarget) EL.moveLauncher.selectedTarget = 'atk';
+
+  var selMove = list.find(t => t.id === EL.moveLauncher.moveId) || list[0];
+  if(!EL.moveLauncher.moveId && selMove){
+    EL.moveLauncher.moveId = selMove.id;
+  }
+
+  var selTarget = EL.moveLauncher.selectedTarget;
+  var targetNames = { atk: '🎯 Попадание', dmg: '💥 Урон', exp: '🛡️ Защита стихией' };
+  var targetTitle = targetNames[selTarget] || '🎯 Попадание';
+  var curModVal = EL.moveLauncher.mods[selTarget] || 0;
+
+  var opts = list.map(function(t){
+    var cStr = t.cost || '1 ФВН';
+    var nStr = ' ['+t.kind+']';
+    return '<option value="'+t.id+'" '+(t.id===selMove.id?'selected':'')+'>'+
+      elEsc(t.kind)+' · '+elEsc(t.name)+' ('+cStr+')'+nStr+
+    '</option>';
+  }).join('');
+
+  var screenHtml = renderMoveLauncherDiceHtml(selMove, selTarget, EL.moveLauncher.mods, EL.moveLauncher.rolledValues);
+
+  var modBarHtml = 
+    '<div class="sh-mod-bar">'+
+      '<div class="sh-mod-target-info">'+
+        '<span>Модификатор цели:</span>'+
+        '<span class="sh-mod-target-tag" id="elMoveModTargetName">'+targetTitle+'</span>'+
+      '</div>'+
+      '<div class="sh-mod-controls">'+
+        '<button class="sh-mod-step el-mod-step-move" data-mod-delta="-5" title="Уменьшить на 5">-5</button>'+
+        '<button class="sh-mod-step el-mod-step-move" data-mod-delta="-1" title="Уменьшить на 1">-1</button>'+
+        '<input type="number" id="elMoveActiveModInput" class="sh-active-mod-input" value="'+curModVal+'" readonly>'+
+        '<button class="sh-mod-step el-mod-step-move" data-mod-delta="1" title="Увеличить на 1">+1</button>'+
+        '<button class="sh-mod-step el-mod-step-move" data-mod-delta="5" title="Увеличить на 5">+5</button>'+
+      '</div>'+
+    '</div>';
+
+  var actionsHtml = 
+    '<div class="sh-launcher-actions">'+
+      '<button class="sh-btn-launch" id="elMoveLaunchComboBtn" title="Бросить все кости приёма и зафиксировать результат">⚔️ Применить приём</button>'+
+      '<button class="sh-btn-copy-all" id="elMoveCopyAllBtn" title="Скопировать готовый блок в буфер обмена для AI Studio">📋 Скопировать всё</button>'+
+      ((selMove.type==='Атака' || selMove.type==='Универсальный') ? '<button class="sh-micro-btn" id="elMoveLaunchAtkBtn" title="Бросить и скопировать только попадание">🎯 Попадание</button>' : '')+
+      '<button class="sh-micro-btn" id="elMoveLaunchDmgBtn" title="Бросить и скопировать только урон/эффект">💥 Урон/Эффект</button>'+
+      '<button class="sh-micro-btn" id="elMoveLaunchExpBtn" title="Бросить и скопировать Защиту стихией">🛡️ Защита</button>'+
+      '<button class="sh-micro-btn" id="elMoveLaunchClaimBtn" title="Скопировать только заявку">📜 Только заявка</button>'+
+    '</div>';
+
+  var hasRes = !!(EL.moveLauncher.lastResult);
+  var resultBoxHtml = 
+    '<div class="sh-launcher-result '+(hasRes?'has-result':'')+'" id="elMoveLauncherResultBox">'+
+      '<div class="sh-launcher-result-text" id="elMoveLauncherResultText">'+elEsc(EL.moveLauncher.lastResult||'')+'</div>'+
+      '<div class="sh-copy-badge" id="elMoveLauncherCopyBadge" style="display:'+(hasRes?'inline-flex':'none')+';">'+
+        '<span>'+(EL.moveLauncher.lastResultCopied ? '✓ Скопировано в буфер обмена для AI Studio' : '⚠️ Бросок не скопирован. Нажмите «Скопировать всё»')+'</span>'+
+      '</div>'+
+    '</div>';
+
+  var toggleHeadHtml = 
+    '<div class="sh-launcher-toggle-head" id="elMoveLauncherToggle" role="button" tabindex="0" title="Нажмите, чтобы развернуть или свернуть боевой расчёт приёма">'+
+      '<div class="sh-launcher-title">'+
+        '<span>🥋 Боевой расчёт приёма</span>'+
+        '<span class="sh-badge-tag">AI Studio</span>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:10px;">'+
+        '<span class="sh-launcher-toggle-text">'+(isOpen?'СВЕРНУТЬ':'РАЗВЕРНУТЬ')+'</span>'+
+        '<span class="sh-launcher-toggle-arrow">'+(isOpen?'▲':'▼')+'</span>'+
+      '</div>'+
+    '</div>';
+
+  var bodyHtml = '';
+  if(isOpen){
+    bodyHtml = 
+      '<div class="sh-launcher-body">'+
+        '<div class="sh-launcher-row">'+
+          '<select class="sh-launcher-select" id="elMoveLauncherMove">'+opts+'</select>'+
+        '</div>'+
+        '<div id="elMoveLauncherScreen">'+screenHtml+'</div>'+
+        modBarHtml + actionsHtml +
+      '</div>';
+  }
+
+  return '<div class="sh-launcher" style="margin-bottom:16px;" id="elMoveLauncherContainer">'+
+    toggleHeadHtml + bodyHtml + resultBoxHtml +
+  '</div>';
+}
+
+var executeElTechLaunch = function(mode, autoCopy){
+  var list = EL.getTechs();
+  var t = list.find(x => x.id === EL.launcher.techId) || list[0];
+  if(!t) return;
+  var isExp = true;
+
+  if(mode !== 'claim'){
+    var diceToRoll = [];
+    if((mode === 'all' || mode === 'exp') && isExp){
+      var exDie = document.getElementById('shScrDieExp'); if(exDie) diceToRoll.push(exDie);
+    }
+    if(mode === 'all' || mode === 'atk'){
+      var atDie = document.getElementById('shScrDieAtk'); if(atDie) diceToRoll.push(atDie);
+    }
+    var pDmg = parseTechDmg(t.damage);
+    if((mode === 'all' || mode === 'dmg') && pDmg){
+      for(var i = 0; i < pDmg.n; i++){
+        var dmDie = document.getElementById('shScrDieDmg_' + i); if(dmDie) diceToRoll.push(dmDie);
+      }
+    }
+    diceToRoll.forEach(function(el){ el.classList.add('rolling'); });
+
+    var rollInterval = setInterval(function(){
+      diceToRoll.forEach(function(el){
+        var vEl = el.querySelector('.val');
+        if(vEl){
+          var m = parseInt(el.getAttribute('data-max')||'20', 10);
+          vEl.textContent = Math.floor(Math.random() * m) + 1;
+        }
+      });
+    }, 50);
+
+    setTimeout(function(){
+      clearInterval(rollInterval);
+      if(!EL.launcher.rolledValues) EL.launcher.rolledValues = {};
+      diceToRoll.forEach(function(el){
+        var m = parseInt(el.getAttribute('data-max')||'20', 10);
+        var res = Math.floor(Math.random() * m) + 1;
+        var vEl = el.querySelector('.val');
+        if(vEl) vEl.textContent = res;
+        el.classList.remove('rolling');
+        var k = el.id; 
+        EL.launcher.rolledValues[k] = res;
+      });
+      finalizeElTechLaunch(mode, t, autoCopy);
+    }, 600);
+  } else {
+    finalizeElTechLaunch(mode, t, autoCopy);
+  }
+};
+
+function finalizeElTechLaunch(mode, t, autoCopy){
+  var out = [];
+  var isExp = true;
+  var vals = EL.launcher.rolledValues || {};
+  var mods = EL.launcher.mods || {exp:0, atk:0, dmg:0};
+  
+  if(mode === 'claim' || mode === 'all'){
+    var cStr = t.cost || '1 МВН';
+    var nStr = ' ['+t.element+']';
+    var rankStr = elEsc(t.element);
+    out.push('⚡ ФОРМА СТИХИИ: ' + t.name.toUpperCase());
+    out.push('Параметры: ' + rankStr + ' · ' + cStr + nStr);
+    if(t.desc) out.push('Описание: ' + t.desc);
+    if(mode === 'claim') out.push('Действие: ' + t.name);
+  }
+  
+  if((mode === 'all' || mode === 'exp') && isExp){
+    var r = vals['shScrDieExp'] || 10;
+    var res = r + mods.exp;
+    out.push('');
+    out.push('🌀 Исполнение стихии: 1d20' + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + r + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = **' + res + '**');
+  }
+  
+  if(mode === 'all' || mode === 'atk'){
+    var r = vals['shScrDieAtk'] || 10;
+    var res = r + mods.atk;
+    out.push('');
+    out.push('⚔️ Атака стихией: 1d20' + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + r + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = **' + res + '**');
+  }
+  
+  var pDmg = parseTechDmg(t.damage);
+  if((mode === 'all' || mode === 'dmg') && pDmg){
+    var sum = 0;
+    var rolls = [];
+    for(var i=0; i<pDmg.n; i++){
+      var v = vals['shScrDieDmg_'+i] || Math.ceil(pDmg.d/2);
+      sum += v;
+      rolls.push(v);
+    }
+    sum += mods.dmg;
+    out.push('');
+    out.push('💥 Урон ('+pDmg.n+'d'+pDmg.d+'): ['+rolls.join(', ')+']' + (mods.dmg>=0?'+'+mods.dmg:mods.dmg) + ' = **' + sum + '**');
+  }
+  
+  var output = out.join('\n').trim();
+  EL.launcher.lastResult = output;
+  EL.launcher.lastResultCopied = false;
+  
+  if(autoCopy && typeof copyText === 'function'){
+    copyText(output);
+    EL.launcher.lastResultCopied = true;
+  }
+  
+  var rBox = document.getElementById('elTechLauncherResultBox');
+  var rTxt = document.getElementById('elTechLauncherResultText');
+  var rBdg = document.getElementById('elTechLauncherCopyBadge');
+  
+  if(rBox && rTxt){
+    rBox.classList.add('has-result');
+    rTxt.textContent = output;
+  }
+  if(rBdg){
+    if(autoCopy){
+      var lineCount = output.split('\n').length;
+      rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio ('+lineCount+' стр.)</span>';
+      rBdg.style.display = 'inline-flex';
+    } else {
+      rBdg.style.display = 'none';
+    }
+  }
+  
+  if(typeof render === 'function') render();
+  else if(typeof elTechs === 'function') {
+      document.getElementById('app').innerHTML = elTechs();
+      if(typeof _w==='function') _w();
+      wireElLaunchers();
+      if(typeof wireElTechs==='function') wireElTechs();
+  }
+}
+
+var executeElMoveLaunch = function(mode, autoCopy){
+  var list = EL.getMoves();
+  var m = list.find(x => x.id === EL.moveLauncher.moveId) || list[0];
+  if(!m) return;
+
+  if(mode !== 'claim'){
+    var diceToRoll = [];
+    if(mode === 'all' || mode === 'atk'){
+      var atDie = document.getElementById('shScrDieMoveAtk'); if(atDie) diceToRoll.push(atDie);
+    }
+    if(mode === 'all' || mode === 'exp'){
+      var exDie = document.getElementById('shScrDieMoveExp'); if(exDie) diceToRoll.push(exDie);
+    }
+    var pDmg = parseMoveDmg(m.effect);
+    if((mode === 'all' || mode === 'dmg') && pDmg){
+      for(var i = 0; i < pDmg.n; i++){
+        var dmDie = document.getElementById('shScrDieMoveDmg_' + i); if(dmDie) diceToRoll.push(dmDie);
+      }
+    }
+    diceToRoll.forEach(function(el){ el.classList.add('rolling'); });
+
+    var rollInterval = setInterval(function(){
+      diceToRoll.forEach(function(el){
+        var vEl = el.querySelector('.val');
+        if(vEl){
+          var mx = parseInt(el.getAttribute('data-max')||'20', 10);
+          vEl.textContent = Math.floor(Math.random() * mx) + 1;
+        }
+      });
+    }, 50);
+
+    setTimeout(function(){
+      clearInterval(rollInterval);
+      if(!EL.moveLauncher.rolledValues) EL.moveLauncher.rolledValues = {};
+      diceToRoll.forEach(function(el){
+        var mx = parseInt(el.getAttribute('data-max')||'20', 10);
+        var res = Math.floor(Math.random() * mx) + 1;
+        var vEl = el.querySelector('.val');
+        if(vEl) vEl.textContent = res;
+        el.classList.remove('rolling');
+        EL.moveLauncher.rolledValues[el.id] = res;
+      });
+      finalizeElMoveLaunch(mode, m, autoCopy);
+    }, 600);
+  } else {
+    finalizeElMoveLaunch(mode, m, autoCopy);
+  }
+};
+
+function finalizeElMoveLaunch(mode, m, autoCopy){
+  var out = [];
+  var vals = EL.moveLauncher.rolledValues || {};
+  var mods = EL.moveLauncher.mods || {atk:0, dmg:0, exp:0};
+  
+  if(mode === 'claim' || mode === 'all'){
+    var cStr = m.cost || '1 ФВН';
+    var nStr = ' ['+m.kind+']';
+    out.push('🥋 БОЕВОЙ ПРИЁМ: ' + m.name.toUpperCase());
+    out.push('Тип: ' + m.kind + ' · ' + cStr + nStr);
+    if(m.desc) out.push('Описание: ' + m.desc);
+  }
+  
+  if(mode === 'all' || mode === 'exp'){
+    var r = vals['shScrDieMoveExp'] || 10;
+    var res = r + mods.exp;
+    out.push('');
+    out.push('🛡️ Защита стихией: 1d20' + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + r + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = **' + res + '**');
+  }
+
+  if(mode === 'all' || mode === 'atk'){
+    var r = vals['shScrDieMoveAtk'] || 10;
+    var res = r + mods.atk;
+    out.push('');
+    out.push('🎯 Попадание приёма: 1d20' + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + r + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = **' + res + '**');
+  }
+  
+  var pDmg = parseMoveDmg(m.effect);
+  if((mode === 'all' || mode === 'dmg') && pDmg){
+    var sum = 0;
+    var rolls = [];
+    for(var i=0; i<pDmg.n; i++){
+      var v = vals['shScrDieMoveDmg_'+i] || Math.ceil(pDmg.d/2);
+      sum += v;
+      rolls.push(v);
+    }
+    sum += mods.dmg;
+    out.push('');
+    out.push('💥 Урон/Эффект ('+pDmg.n+'d'+pDmg.d+'): ['+rolls.join(', ')+']' + (mods.dmg>=0?'+'+mods.dmg:mods.dmg) + ' = **' + sum + '**');
+  }
+  
+  var output = out.join('\n').trim();
+  EL.moveLauncher.lastResult = output;
+  EL.moveLauncher.lastResultCopied = false;
+  
+  if(autoCopy && typeof copyText === 'function'){
+    copyText(output);
+    EL.moveLauncher.lastResultCopied = true;
+  }
+  
+  if(typeof render === 'function') render();
+  else if(typeof elMoves === 'function') {
+      document.getElementById('app').innerHTML = elMoves();
+      if(typeof _w==='function') _w();
+      wireElLaunchers();
+      if(typeof wireElMoves==='function') wireElMoves();
+  }
+}
+
+function wireElLaunchers() {
+  function reRenderTechs() {
+    if(typeof elTechs==='function'){ document.getElementById('app').innerHTML = elTechs(); if(typeof _w==='function')_w(); wireElLaunchers(); if(typeof wireElTechs==='function')wireElTechs(); }
+  }
+  function reRenderMoves() {
+    if(typeof elMoves==='function'){ document.getElementById('app').innerHTML = elMoves(); if(typeof _w==='function')_w(); wireElLaunchers(); if(typeof wireElMoves==='function')wireElMoves(); }
+  }
+
+  var tc = document.getElementById('elTechLauncherTech');
+  if(tc) {
+      tc.onchange = function(){
+        if(!EL.launcher) EL.launcher = {};
+        EL.launcher.techId = this.value;
+        var t = EL.getTechs().find(x => x.id === EL.launcher.techId);
+        if(t && t.dmgMod) EL.launcher.mods.dmg = parseInt(t.dmgMod, 10) || 0;
+        reRenderTechs();
+      };
+  }
+
+  ['elTechLaunchComboBtn', 'elTechCopyAllBtn', 'elTechLaunchAtkBtn', 'elTechLaunchDmgBtn', 'elTechLaunchExpBtn', 'elTechLaunchClaimBtn'].forEach(function(id){
+    var btn = document.getElementById(id);
+    if(btn) btn.onclick = function(){
+        if(id === 'elTechLaunchComboBtn') executeElTechLaunch('combo');
+        if(id === 'elTechCopyAllBtn') executeElTechLaunch('copyAll', true);
+        if(id === 'elTechLaunchAtkBtn') executeElTechLaunch('atk', true);
+        if(id === 'elTechLaunchDmgBtn') executeElTechLaunch('dmg', true);
+        if(id === 'elTechLaunchExpBtn') executeElTechLaunch('exp', true);
+        if(id === 'elTechLaunchClaimBtn') executeElTechLaunch('claim', true);
+    };
+  });
+
+  var mc = document.getElementById('elMoveLauncherMove');
+  if(mc) {
+      mc.onchange = function(){
+        if(!EL.moveLauncher) EL.moveLauncher = {};
+        EL.moveLauncher.moveId = this.value;
+        var t = EL.getMoves().find(x => x.id === EL.moveLauncher.moveId);
+        if(t && t.dmgMod) EL.moveLauncher.mods.dmg = parseInt(t.dmgMod, 10) || 0;
+        reRenderMoves();
+      };
+  }
+
+  ['elMoveLaunchComboBtn', 'elMoveCopyAllBtn', 'elMoveLaunchAtkBtn', 'elMoveLaunchDmgBtn', 'elMoveLaunchExpBtn', 'elMoveLaunchClaimBtn'].forEach(function(id){
+    var btn = document.getElementById(id);
+    if(btn) btn.onclick = function(){
+        if(id === 'elMoveLaunchComboBtn') executeElMoveLaunch('combo');
+        if(id === 'elMoveCopyAllBtn') executeElMoveLaunch('copyAll', true);
+        if(id === 'elMoveLaunchAtkBtn') executeElMoveLaunch('atk', true);
+        if(id === 'elMoveLaunchDmgBtn') executeElMoveLaunch('dmg', true);
+        if(id === 'elMoveLaunchExpBtn') executeElMoveLaunch('exp', true);
+        if(id === 'elMoveLaunchClaimBtn') executeElMoveLaunch('claim', true);
+    };
+  });
+  
+  document.querySelectorAll('.el-mod-step').forEach(function(btn){
+    btn.onclick = function(e){
+        e.preventDefault();
+        var delta = parseInt(this.getAttribute('data-mod-delta'), 10);
+        if(!EL.launcher.mods) EL.launcher.mods = {exp:0, atk:0, dmg:0};
+        var target = EL.launcher.selectedTarget;
+        EL.launcher.mods[target] = (EL.launcher.mods[target]||0) + delta;
+        reRenderTechs();
+    };
+  });
+
+  document.querySelectorAll('.el-mod-step-move').forEach(function(btn){
+    btn.onclick = function(e){
+        e.preventDefault();
+        var delta = parseInt(this.getAttribute('data-mod-delta'), 10);
+        if(!EL.moveLauncher.mods) EL.moveLauncher.mods = {atk:0, dmg:0, exp:0};
+        var target = EL.moveLauncher.selectedTarget;
+        EL.moveLauncher.mods[target] = (EL.moveLauncher.mods[target]||0) + delta;
+        reRenderMoves();
+    };
+  });
+  
+  var tHead = document.getElementById('elTechLauncherToggle');
+  if(tHead) tHead.onclick = function(){
+      EL.launcher.isOpen = !EL.launcher.isOpen;
+      reRenderTechs();
+  };
+  
+  var mHead = document.getElementById('elMoveLauncherToggle');
+  if(mHead) mHead.onclick = function(){
+      EL.moveLauncher.isOpen = !EL.moveLauncher.isOpen;
+      reRenderMoves();
+  };
+
+  var elTechScr = document.getElementById('elTechLauncherScreen');
+  if(elTechScr){
+      var selectables = elTechScr.querySelectorAll('[data-select-roll]');
+      selectables.forEach(function(el){
+          el.onclick = function(){
+              var target = el.getAttribute('data-select-roll');
+              if(target) EL.launcher.selectedTarget = target;
+              reRenderTechs();
+          };
+      });
+  }
+
+  var elMoveScr = document.getElementById('elMoveLauncherScreen');
+  if(elMoveScr){
+      var selectables = elMoveScr.querySelectorAll('[data-select-move-roll]');
+      selectables.forEach(function(el){
+          el.onclick = function(){
+              var target = el.getAttribute('data-select-move-roll');
+              if(target) EL.moveLauncher.selectedTarget = target;
+              reRenderMoves();
+          };
+      });
+  }
+}
+
+
 function elTechs(){
   var allTechs = EL.getTechs();
   var elemCounts = { 'Огонь': 0, 'Вода': 0, 'Земля': 0, 'Воздух': 0, 'Тьма': 0 };
@@ -24758,7 +25314,7 @@ function elTechs(){
 
   var cardsHtml = filtered.length ? filtered.map(renderElTechCard).join('') : (allTechs.length === 0 ? '<div class="char-empty" style="padding:50px 20px;text-align:center;color:#94a3b8;background:rgba(0,0,0,0.25);border:1px dashed var(--el-accent-border);border-radius:8px;margin-top:16px;"><div style="font-size:36px;margin-bottom:10px;">✨</div><div style="font-size:16px;color:#f5f6fa;font-weight:700;margin-bottom:6px;font-family:Cinzel,serif;">Список форм стихий пуст</div><div style="font-size:13px;color:#94a3b8;max-width:500px;margin:0 auto 18px;line-height:1.5;">Стихийная магия вселенной Аватара рождается из вашего воображения и тактики. Нажмите кнопку <b>«+ Изучить новую форму»</b> или сгенерируйте форму через <b>AI Генератор</b>!</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"><button class="btn-primary" data-nav="elTechEdit:new">+ Изучить новую форму</button><button class="btn-ghost" style="color:var(--el-accent);border-color:var(--el-accent-border);" data-nav="elTechGen">✨ AI Генератор форм</button></div></div>' : '<div class="char-empty" style="padding:40px 20px;text-align:center;color:#94a3b8;font-style:italic;">В выбранной категории нет форм стихий.</div>');
 
-  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Формы стихий'}]) +
+  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Формы стихий'}]) + '\n' + renderElTechLauncher() + '\n' +
     '<button class="back" data-nav="home">← Назад в меню</button>' +
     '<h1>⚡ ФОРМЫ СТИХИЙ</h1>' +
     '<div class="subtitle">ИЗУЧЕННЫЕ МАГИЧЕСКИЕ ПРИМЕНЕНИЯ • ВЫСШИЕ ИСКУССТВА • ШКАЛА СИЛЫ 0–5 • ВЫНОСЛИВОСТЬ МВН</div>' +
@@ -25403,7 +25959,7 @@ function elMoves(){
 
   var cardsHtml = filtered.length ? filtered.map(renderElMoveCard).join('') : (allMoves.length === 0 ? '<div class="char-empty" style="padding:50px 20px;text-align:center;color:#94a3b8;background:rgba(0,0,0,0.25);border:1px dashed var(--el-accent-border);border-radius:8px;margin-top:16px;"><div style="font-size:36px;margin-bottom:10px;">🥋</div><div style="font-size:16px;color:#f5f6fa;font-weight:700;margin-bottom:6px;font-family:Cinzel,serif;">Список боевых приёмов пуст</div><div style="font-size:13px;color:#94a3b8;max-width:500px;margin:0 auto 18px;line-height:1.5;">Создавайте собственные тактические приёмы, чи-блокинг и манёвры ближнего боя. Нажмите <b>«+ Добавить приём»</b> или сгенерируйте приём через <b>AI Генератор</b>!</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"><button class="btn-primary" data-nav="elMoveEdit:new">+ Добавить приём</button><button class="btn-ghost" style="color:var(--el-accent);border-color:var(--el-accent-border);" data-nav="elMoveGen">✨ AI Генератор приёмов</button></div></div>' : '<div class="char-empty" style="padding:40px 20px;text-align:center;color:#94a3b8;font-style:italic;">В выбранной категории нет приёмов.</div>');
 
-  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Боевые приёмы'}]) +
+  return crumbEl([{label:'Стихия', nav:'home'}, {label:'Боевые приёмы'}]) + '\n' + renderElMoveLauncher() + '\n' +
     '<button class="back" data-nav="home">← Назад в меню</button>' +
     '<h1>🥋 БОЕВЫЕ ПРИЁМЫ</h1>' +
     '<div class="subtitle">ТАКТИЧЕСКИЕ ДЕЙСТВИЯ • ОТКРЫТИЕ ОКОН ВОЗМОЖНОСТЕЙ (A94/A95) • ЧИ-БЛОКИНГ • БОЙ БЕЗ МАГИИ</div>' +
