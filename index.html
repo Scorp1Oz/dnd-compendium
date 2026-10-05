@@ -8252,6 +8252,22 @@ body.sh-theme .ttc-select-check { color: #c9a45c; }
 body.me-theme .ttc-select-check { color: #38bdf8; }
 body.el-theme .ttc-select-check { color: var(--el-accent, #10b981); }
 
+
+  .el-war-palette {
+    display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;
+  }
+  .el-war-tool {
+    font-size:12px; padding:4px 10px; border-radius:4px; border:1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.4); color:#cbd5e1; cursor:pointer;
+  }
+  .el-war-tool:hover { background: rgba(255,255,255,0.1); }
+  .el-war-tool.active { border-color:#fff; background: rgba(255,255,255,0.2); color:#fff; font-weight:bold; }
+  .war-mode-active .el-territory-label,
+  .war-mode-active .el-map-pin,
+  .war-mode-active .el-map-pin-label,
+  .war-mode-active .el-route-path,
+  .war-mode-active .el-route-waypoint { display: none !important; }
+  
 </style>
 </head>
 <body>
@@ -26561,7 +26577,28 @@ function renderAvatarMapSvg(){
     }).join('');
   }
 
-// 2. Линия маршрута
+
+  var clipPathSvg = '<clipPath id="el-landmass-clip">' +
+    territoriesList.map(function(t){ return '<path d="'+t.d+'" />'; }).join('') +
+  '</clipPath>';
+
+  var warSvg = '';
+  if (st.warMode) {
+     var warPathsStr = (st.warPaths || []).map(function(wp){
+       if(wp.points.length===0) return '';
+       var pts = wp.points.map(function(p){ return p.x + ',' + p.y; }).join(' L ');
+       var color = '#ffffff';
+       if(wp.nation==='fire_nation') color='#ef4444';
+       if(wp.nation==='earth_kingdom') color='#22c55e';
+       if(wp.nation==='water_north' || wp.nation==='water_south') color='#38bdf8';
+       if(wp.nation==='air_west' || wp.nation==='air_north' || wp.nation==='air_south' || wp.nation==='air_east') color='#f59e0b';
+       return '<path d="M ' + pts + '" fill="none" stroke="' + color + '" stroke-width="45" stroke-linecap="round" stroke-linejoin="round" opacity="0.65" />';
+     }).join('');
+     warSvg = '<defs>'+clipPathSvg+'</defs><g class="war-layer" clip-path="url(#el-landmass-clip)">' + warPathsStr + '</g>';
+  }
+
+  territoriesSvg = warSvg + territoriesSvg;
+  // 2. Линия маршрута
   var routeSvg = '';
   if(st.routePoints && st.routePoints.length >= 2){
     var pathD = [];
@@ -26948,7 +26985,8 @@ function elMap(){
           )) +
         '</div>' +
         '<div class="sh-map-controls">' +
-          '<label class="sh-map-chk"><input type="checkbox" id="elMapToggleTerritories" ' + (EL.map.showTerritories!==false?'checked':'') + '> Границы</label>' +
+          '<label class="sh-map-chk"><input type="checkbox" id="elMapToggleWarMode" ' + (EL.map.warMode?'checked':'') + '> ⚔️ Тактика</label>' +
+            '<label class="sh-map-chk"><input type="checkbox" id="elMapToggleTerritories" ' + (EL.map.showTerritories!==false?'checked':'') + '> Границы</label>' +
           '<label class="sh-map-chk"><input type="checkbox" id="elMapTogglePins" ' + (EL.map.showVillages!==false?'checked':'') + '> Локации</label>' +
           '<label class="sh-map-chk"><input type="checkbox" id="elMapToggleLabels" ' + (EL.map.showLabels!==false?'checked':'') + '> Названия</label>' +
           '<label class="sh-map-chk"><input type="checkbox" id="elMapToggleUserMarkers" ' + (EL.map.showUserMarkers!==false?'checked':'') + '> Метки (' + markersCount + ')</label>' +
@@ -26966,7 +27004,7 @@ function elMap(){
         '<button class="el-quick-jump" data-jump="air">🌪️ Храмы Воздуха</button>' +
         '<button class="el-quick-jump" data-jump="world">🗺️ Вся карта</button>' +
       '</div>' +
-      '<div class="sh-map-viewport" id="elMapViewport" title="Зажмите левую кнопку мыши для перемещения карты внутри бокса, колесико для зума">' +
+      '<div class="sh-map-viewport '+(EL.map.warMode?'war-mode-active':'')+'" id="elMapViewport" title="Зажмите левую кнопку мыши для перемещения карты внутри бокса, колесико для зума">' +
         '<div class="sh-map-corner sh-map-corner-tl"></div>' +
         '<div class="sh-map-corner sh-map-corner-tr"></div>' +
         '<div class="sh-map-corner sh-map-corner-bl"></div>' +
@@ -26994,6 +27032,11 @@ function wireElMap(){
   if(typeof EL.map.zoom !== 'number') EL.map.zoom = 1;
   if(typeof EL.map.cx !== 'number') EL.map.cx = 800;
   if(typeof EL.map.cy !== 'number') EL.map.cy = 600;
+  if(typeof EL.map.warMode === 'undefined') EL.map.warMode = false;
+  if(typeof EL.map.warNation === 'undefined') EL.map.warNation = 'pan';
+  if(!EL.map.warPaths) {
+    try { EL.map.warPaths = JSON.parse(localStorage.getItem('ttc_el_war_paths')||'[]'); } catch(e) { EL.map.warPaths = []; }
+  }
 
   var isDragging = false;
   var hasMoved = false;
@@ -27476,7 +27519,21 @@ function refreshElMap(){
   if(typeof paintShBar === 'function') paintShBar();
 }
 
-function refreshElMapSvgOnly(){
+window.elWarUndo = function() {
+    if(EL.map.warPaths && EL.map.warPaths.length > 0) {
+      EL.map.warPaths.pop();
+      try{ localStorage.setItem('ttc_el_war_paths', JSON.stringify(EL.map.warPaths)); }catch(e){}
+      refreshElMapSvgOnly();
+    }
+  };
+  window.elWarClear = function() {
+    if(confirm("Очистить все захваченные территории?")) {
+      EL.map.warPaths = [];
+      try{ localStorage.setItem('ttc_el_war_paths', JSON.stringify(EL.map.warPaths)); }catch(e){}
+      refreshElMapSvgOnly();
+    }
+  };
+  function refreshElMapSvgOnly(){
   var wrap = document.getElementById('elMapSvgWrap');
   if(wrap){
     wrap.innerHTML = renderAvatarMapSvg();
