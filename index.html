@@ -24713,9 +24713,76 @@ function renderElTechCard(t){
 window.renderElTechCard = renderElTechCard;
 
 
+
 /* =========================================================================
    AVATAR COMBAT LAUNCHERS
    ========================================================================= */
+
+function renderElTechLauncherDiceHtml(tech, isExp, selTarget, mods, rolledValues){
+  if(!tech) return '<div class="sh-scr-no-dmg">Выберите форму для расчёта</div>';
+  mods = mods || { exp: 0, atk: 0, dmg: 0 };
+  rolledValues = rolledValues || {};
+
+  var expDieHtml = '';
+  if(isExp){
+      var eModStr = formatLauncherMod(mods.exp);
+      expDieHtml = 
+        '<div class="sh-scr-col '+(selTarget==='exp'?'selected':'')+'" data-select-roll="exp" title="Кликните для выбора кубика и настройки модификатора">'+
+          '<div class="sh-scr-label" style="color:#ff9085;">Исполнение</div>'+
+          '<div class="sh-scr-die die s20" id="shScrDieExp">'+
+            (typeof dieShapeSvg==='function' ? dieShapeSvg(20, 'screxp', null) : '')+
+            '<div class="val">'+(rolledValues.exp || 20)+'</div>'+
+          '</div>'+
+          '<div class="sh-scr-sub" id="shScrSub_exp">1d20'+(eModStr ? ' ' + eModStr : '')+'</div>'+
+        '</div>';
+  }
+
+  var aModStr = formatLauncherMod(mods.atk);
+  var atkDieHtml = 
+    '<div class="sh-scr-col '+(selTarget==='atk'?'selected':'')+'" data-select-roll="atk" title="Кликните для выбора кубика и настройки модификатора">'+
+      '<div class="sh-scr-label">Попадание</div>'+
+      '<div class="sh-scr-die die s20" id="shScrDieAtk">'+
+        (typeof dieShapeSvg==='function' ? dieShapeSvg(20, 'scratk', null) : '')+
+        '<div class="val">'+(rolledValues.atk || 20)+'</div>'+
+      '</div>'+
+      '<div class="sh-scr-sub" id="shScrSub_atk">1d20'+(aModStr ? ' ' + aModStr : '')+'</div>'+
+    '</div>';
+
+  var pDmg = typeof parseMoveDmg === 'function' ? parseMoveDmg(tech.damage) : null;
+  var dmgBlockHtml = '';
+  if(pDmg){
+    var n = pDmg.n;
+    var dSides = pDmg.sides;
+    var totalDmgMod = (parseInt(mods.dmg, 10) || 0) + (pDmg.mod || 0);
+    var dModStr = formatLauncherMod(totalDmgMod);
+    var dmgDiceList = [];
+    var rolls = rolledValues.dmgRolls || [];
+    for(var i = 0; i < n; i++){
+      var curVal = rolls[i] || dSides;
+      dmgDiceList.push(
+        '<div class="sh-scr-die die s' + dSides + '" id="shScrDieDmg_' + i + '">' +
+          (typeof dieShapeSvg === 'function' ? dieShapeSvg(dSides, 'scrdmg' + i, null) : '') +
+          '<div class="val">' + curVal + '</div>' +
+        '</div>'
+      );
+    }
+    var baseDmgFormula = n + 'd' + dSides + (pDmg.mod ? (pDmg.mod > 0 ? '+' + pDmg.mod : pDmg.mod) : '');
+    dmgBlockHtml = 
+      '<div class="sh-scr-dmg-group ' + (selTarget === 'dmg' ? 'selected' : '') + '" data-select-roll="dmg" title="Кликните для выбора кубика и настройки модификатора">' +
+        '<div class="sh-scr-label" style="color:#fbbf24;">Урон</div>' +
+        '<div class="sh-scr-dmg-dice">' + dmgDiceList.join('') + '</div>' +
+        '<div class="sh-scr-sub" id="shScrSub_dmg">' + baseDmgFormula + (dModStr ? ' ' + dModStr : '') + '</div>' +
+      '</div>';
+  } else {
+    dmgBlockHtml = 
+      '<div class="sh-scr-dmg-group ' + (selTarget === 'dmg' ? 'selected' : '') + '" data-select-roll="dmg">' +
+        '<div class="sh-scr-label" style="color:#fbbf24;">Эффект</div>' +
+        '<div class="sh-scr-no-dmg" style="margin-top:20px;font-size:12px;">(без броска урона)</div>' +
+      '</div>';
+  }
+
+  return '<div class="sh-launcher-screen">' + expDieHtml + atkDieHtml + dmgBlockHtml + '</div>';
+}
 
 function renderElTechLauncher(){
   var list = EL.getTechs();
@@ -24731,15 +24798,17 @@ function renderElTechLauncher(){
   var isOpen = !!EL.launcher.isOpen;
   if(!EL.launcher.mods) EL.launcher.mods = { exp: 0, atk: 0, dmg: 0 };
   if(!EL.launcher.selectedTarget) EL.launcher.selectedTarget = 'atk';
+  if(EL.launcher.isExp === undefined) EL.launcher.isExp = false;
 
   var selTech = list.find(t => t.id === EL.launcher.techId) || list[0];
   if(!EL.launcher.techId && selTech){
     EL.launcher.techId = selTech.id;
-    if(selTech.dmgMod) EL.launcher.mods.dmg = parseInt(selTech.dmgMod, 10) || 0;
   }
-  EL.launcher.isExp = true; // Avatar forms always have execution
-
+  
+  var isExp = EL.launcher.isExp;
   var selTarget = EL.launcher.selectedTarget;
+  if(selTarget === 'exp' && !isExp) selTarget = 'atk';
+  
   var targetNames = { exp: '🌀 Исполнение стихии', atk: '⚔️ Атака стихией', dmg: '💥 Урон' };
   var targetTitle = targetNames[selTarget] || '⚔️ Атака стихией';
   var curModVal = EL.launcher.mods[selTarget] || 0;
@@ -24752,7 +24821,7 @@ function renderElTechLauncher(){
     '</option>';
   }).join('');
 
-  var screenHtml = renderLauncherDiceHtml(selTech, true, selTarget, EL.launcher.mods, EL.launcher.rolledValues);
+  var screenHtml = renderElTechLauncherDiceHtml(selTech, isExp, selTarget, EL.launcher.mods, EL.launcher.rolledValues);
 
   var modBarHtml = 
     '<div class="sh-mod-bar">'+
@@ -24775,7 +24844,7 @@ function renderElTechLauncher(){
       '<button class="sh-btn-copy-all" id="elTechCopyAllBtn" title="Скопировать готовый блок в буфер обмена для AI Studio">📋 Скопировать всё</button>'+
       '<button class="sh-micro-btn" id="elTechLaunchAtkBtn" title="Бросить и скопировать только попадание">🎯 Попадание</button>'+
       (selTech.damage && selTech.damage !== '—' ? '<button class="sh-micro-btn" id="elTechLaunchDmgBtn" title="Бросить и скопировать только урон">💥 Урон</button>' : '')+
-      '<button class="sh-micro-btn" id="elTechLaunchExpBtn" title="Бросить и скопировать Исполнение стихии">🌀 Исполнение</button>'+
+      (isExp ? '<button class="sh-micro-btn" id="elTechLaunchExpBtn" title="Бросить и скопировать Исполнение стихии">🌀 Исполнение</button>' : '')+
       '<button class="sh-micro-btn" id="elTechLaunchClaimBtn" title="Скопировать только заявку">📜 Только заявка</button>'+
     '</div>';
 
@@ -24804,8 +24873,9 @@ function renderElTechLauncher(){
   if(isOpen){
     bodyHtml = 
       '<div class="sh-launcher-body">'+
-        '<div class="sh-launcher-row">'+
-          '<select class="sh-launcher-select" id="elTechLauncherTech">'+techOpts+'</select>'+
+        '<div class="sh-launcher-row" style="display:flex; gap:10px; align-items:center;">'+
+          '<select class="sh-launcher-select" id="elTechLauncherTech" style="flex:1;">'+techOpts+'</select>'+
+          '<label class="sh-exp-check"><input type="checkbox" id="elTechLauncherExp" '+(isExp?'checked':'')+'> 🌀 Исполнение</label>'+
         '</div>'+
         '<div id="elTechLauncherScreen">'+screenHtml+'</div>'+
         modBarHtml + actionsHtml +
@@ -24815,6 +24885,73 @@ function renderElTechLauncher(){
   return '<div class="sh-launcher" style="margin-bottom:16px;" id="elTechLauncherContainer">'+
     toggleHeadHtml + bodyHtml + resultBoxHtml +
   '</div>';
+}
+
+function renderElMoveLauncherDiceHtml(move, isExp, selTarget, mods, rolledValues){
+  if(!move) return '<div class="sh-scr-no-dmg">Выберите приём для расчёта</div>';
+  mods = mods || { atk: 0, dmg: 0, exp: 0 };
+  rolledValues = rolledValues || {};
+
+  var expDieHtml = '';
+  if(isExp){
+      var eModStr = formatLauncherMod(mods.exp);
+      expDieHtml = 
+        '<div class="sh-scr-col '+(selTarget==='exp'?'selected':'')+'" data-select-move-roll="exp" title="Кликните для выбора кубика и настройки модификатора">'+
+          '<div class="sh-scr-label" style="color:#60a5fa;">Защита</div>'+
+          '<div class="sh-scr-die die s20" id="shScrDieMoveExp">'+
+            (typeof dieShapeSvg==='function' ? dieShapeSvg(20, 'scrmvexp', null) : '')+
+            '<div class="val">'+(rolledValues.exp || 20)+'</div>'+
+          '</div>'+
+          '<div class="sh-scr-sub" id="shScrSub_moveExp">1d20'+(eModStr ? ' ' + eModStr : '')+'</div>'+
+        '</div>';
+  }
+
+  var aModStr = formatLauncherMod(mods.atk);
+  var atkLabel = move.atk ? ('Бросок (' + esc(move.atk) + ')') : 'Попадание';
+  var atkDieHtml = 
+    '<div class="sh-scr-col ' + (selTarget === 'atk' ? 'selected' : '') + '" data-select-move-roll="atk" title="Кликните для выбора кубика и настройки модификатора">' +
+      '<div class="sh-scr-label">' + atkLabel + '</div>' +
+      '<div class="sh-scr-die die s20" id="shScrDieMoveAtk">' +
+        (typeof dieShapeSvg === 'function' ? dieShapeSvg(20, 'scrmvatk', null) : '') +
+        '<div class="val">' + (rolledValues.atk || 20) + '</div>' +
+      '</div>' +
+      '<div class="sh-scr-sub" id="shScrSub_moveAtk">1d20' + (aModStr ? ' ' + aModStr : '') + '</div>' +
+    '</div>';
+
+  var pDmg = typeof parseMoveDmg === 'function' ? parseMoveDmg(move.effect) : null;
+  var dmgBlockHtml = '';
+  if(pDmg){
+    var n = pDmg.n;
+    var dSides = pDmg.sides;
+    var totalDmgMod = (parseInt(mods.dmg, 10) || 0) + (pDmg.mod || 0);
+    var dModStr = formatLauncherMod(totalDmgMod);
+    var dmgDiceList = [];
+    var rolls = rolledValues.dmgRolls || [];
+    for(var i = 0; i < n; i++){
+      var curVal = rolls[i] || dSides;
+      dmgDiceList.push(
+        '<div class="sh-scr-die die s' + dSides + '" id="shScrDieMoveDmg_' + i + '">' +
+          (typeof dieShapeSvg === 'function' ? dieShapeSvg(dSides, 'scrmvdmg' + i, null) : '') +
+          '<div class="val">' + curVal + '</div>' +
+        '</div>'
+      );
+    }
+    var baseDmgFormula = n + 'd' + dSides + (pDmg.mod ? (pDmg.mod > 0 ? '+' + pDmg.mod : pDmg.mod) : '');
+    dmgBlockHtml = 
+      '<div class="sh-scr-dmg-group ' + (selTarget === 'dmg' ? 'selected' : '') + '" data-select-move-roll="dmg" title="Кликните для выбора кубика и настройки модификатора">' +
+        '<div class="sh-scr-label" style="color:#fbbf24;">Урон/Эффект</div>' +
+        '<div class="sh-scr-dmg-dice">' + dmgDiceList.join('') + '</div>' +
+        '<div class="sh-scr-sub" id="shScrSub_moveDmg">' + baseDmgFormula + (dModStr ? ' ' + dModStr : '') + '</div>' +
+      '</div>';
+  } else {
+    dmgBlockHtml = 
+      '<div class="sh-scr-dmg-group ' + (selTarget === 'dmg' ? 'selected' : '') + '" data-select-move-roll="dmg">' +
+        '<div class="sh-scr-label" style="color:#fbbf24;">Эффект</div>' +
+        '<div class="sh-scr-no-dmg" style="margin-top:20px;font-size:12px;">(без броска урона)</div>' +
+      '</div>';
+  }
+
+  return '<div class="sh-launcher-screen">' + expDieHtml + atkDieHtml + dmgBlockHtml + '</div>';
 }
 
 function renderElMoveLauncher(){
@@ -24831,13 +24968,17 @@ function renderElMoveLauncher(){
   var isOpen = !!EL.moveLauncher.isOpen;
   if(!EL.moveLauncher.mods) EL.moveLauncher.mods = { atk: 0, dmg: 0, exp: 0 };
   if(!EL.moveLauncher.selectedTarget) EL.moveLauncher.selectedTarget = 'atk';
+  if(EL.moveLauncher.isExp === undefined) EL.moveLauncher.isExp = false;
 
   var selMove = list.find(t => t.id === EL.moveLauncher.moveId) || list[0];
   if(!EL.moveLauncher.moveId && selMove){
     EL.moveLauncher.moveId = selMove.id;
   }
-
+  
+  var isExp = EL.moveLauncher.isExp;
   var selTarget = EL.moveLauncher.selectedTarget;
+  if(selTarget === 'exp' && !isExp) selTarget = 'atk';
+
   var targetNames = { atk: '🎯 Попадание', dmg: '💥 Урон', exp: '🛡️ Защита стихией' };
   var targetTitle = targetNames[selTarget] || '🎯 Попадание';
   var curModVal = EL.moveLauncher.mods[selTarget] || 0;
@@ -24850,7 +24991,7 @@ function renderElMoveLauncher(){
     '</option>';
   }).join('');
 
-  var screenHtml = renderMoveLauncherDiceHtml(selMove, selTarget, EL.moveLauncher.mods, EL.moveLauncher.rolledValues);
+  var screenHtml = renderElMoveLauncherDiceHtml(selMove, isExp, selTarget, EL.moveLauncher.mods, EL.moveLauncher.rolledValues);
 
   var modBarHtml = 
     '<div class="sh-mod-bar">'+
@@ -24872,8 +25013,8 @@ function renderElMoveLauncher(){
       '<button class="sh-btn-launch" id="elMoveLaunchComboBtn" title="Бросить все кости приёма и зафиксировать результат">⚔️ Применить приём</button>'+
       '<button class="sh-btn-copy-all" id="elMoveCopyAllBtn" title="Скопировать готовый блок в буфер обмена для AI Studio">📋 Скопировать всё</button>'+
       ((selMove.type==='Атака' || selMove.type==='Универсальный') ? '<button class="sh-micro-btn" id="elMoveLaunchAtkBtn" title="Бросить и скопировать только попадание">🎯 Попадание</button>' : '')+
-      '<button class="sh-micro-btn" id="elMoveLaunchDmgBtn" title="Бросить и скопировать только урон/эффект">💥 Урон/Эффект</button>'+
-      '<button class="sh-micro-btn" id="elMoveLaunchExpBtn" title="Бросить и скопировать Защиту стихией">🛡️ Защита</button>'+
+      (typeof parseMoveDmg === 'function' && parseMoveDmg(selMove.effect) ? '<button class="sh-micro-btn" id="elMoveLaunchDmgBtn" title="Бросить и скопировать только урон/эффект">💥 Урон/Эффект</button>' : '')+
+      (isExp ? '<button class="sh-micro-btn" id="elMoveLaunchExpBtn" title="Бросить и скопировать Защиту стихией">🛡️ Защита</button>' : '')+
       '<button class="sh-micro-btn" id="elMoveLaunchClaimBtn" title="Скопировать только заявку">📜 Только заявка</button>'+
     '</div>';
 
@@ -24902,8 +25043,9 @@ function renderElMoveLauncher(){
   if(isOpen){
     bodyHtml = 
       '<div class="sh-launcher-body">'+
-        '<div class="sh-launcher-row">'+
-          '<select class="sh-launcher-select" id="elMoveLauncherMove">'+opts+'</select>'+
+        '<div class="sh-launcher-row" style="display:flex; gap:10px; align-items:center;">'+
+          '<select class="sh-launcher-select" id="elMoveLauncherMove" style="flex:1;">'+opts+'</select>'+
+          '<label class="sh-exp-check"><input type="checkbox" id="elMoveLauncherExp" '+(isExp?'checked':'')+'> 🛡️ Защита</label>'+
         '</div>'+
         '<div id="elMoveLauncherScreen">'+screenHtml+'</div>'+
         modBarHtml + actionsHtml +
@@ -24919,7 +25061,7 @@ var executeElTechLaunch = function(mode, autoCopy){
   var list = EL.getTechs();
   var t = list.find(x => x.id === EL.launcher.techId) || list[0];
   if(!t) return;
-  var isExp = true;
+  var isExp = !!EL.launcher.isExp;
 
   if(mode !== 'claim'){
     var diceToRoll = [];
@@ -24929,7 +25071,7 @@ var executeElTechLaunch = function(mode, autoCopy){
     if(mode === 'all' || mode === 'atk'){
       var atDie = document.getElementById('shScrDieAtk'); if(atDie) diceToRoll.push(atDie);
     }
-    var pDmg = parseTechDmg(t.damage);
+    var pDmg = typeof parseMoveDmg === 'function' ? parseMoveDmg(t.damage) : null;
     if((mode === 'all' || mode === 'dmg') && pDmg){
       for(var i = 0; i < pDmg.n; i++){
         var dmDie = document.getElementById('shScrDieDmg_' + i); if(dmDie) diceToRoll.push(dmDie);
@@ -24950,14 +25092,26 @@ var executeElTechLaunch = function(mode, autoCopy){
     setTimeout(function(){
       clearInterval(rollInterval);
       if(!EL.launcher.rolledValues) EL.launcher.rolledValues = {};
+      if(!EL.launcher.rolledValues.dmgRolls) EL.launcher.rolledValues.dmgRolls = [];
       diceToRoll.forEach(function(el){
-        var m = parseInt(el.getAttribute('data-max')||'20', 10);
-        var res = Math.floor(Math.random() * m) + 1;
-        var vEl = el.querySelector('.val');
-        if(vEl) vEl.textContent = res;
-        el.classList.remove('rolling');
-        var k = el.id; 
-        EL.launcher.rolledValues[k] = res;
+        var mx = parseInt(el.getAttribute('data-max')||'20', 10);
+        if(el.id && el.id.includes('Dmg_')){
+            var idParts = el.id.split('_');
+            var dIdx = parseInt(idParts[1], 10);
+            var dSides = pDmg ? pDmg.sides : 6;
+            var res = Math.floor(Math.random() * dSides) + 1;
+            var vEl = el.querySelector('.val');
+            if(vEl) vEl.textContent = res;
+            el.classList.remove('rolling');
+            EL.launcher.rolledValues.dmgRolls[dIdx] = res;
+        } else {
+            var res = Math.floor(Math.random() * mx) + 1;
+            var vEl = el.querySelector('.val');
+            if(vEl) vEl.textContent = res;
+            el.classList.remove('rolling');
+            var k = el.id.replace('shScrDie','').toLowerCase(); 
+            EL.launcher.rolledValues[k] = res;
+        }
       });
       finalizeElTechLaunch(mode, t, autoCopy);
     }, 600);
@@ -24968,7 +25122,7 @@ var executeElTechLaunch = function(mode, autoCopy){
 
 function finalizeElTechLaunch(mode, t, autoCopy){
   var out = [];
-  var isExp = true;
+  var isExp = !!EL.launcher.isExp;
   var vals = EL.launcher.rolledValues || {};
   var mods = EL.launcher.mods || {exp:0, atk:0, dmg:0};
   
@@ -24983,31 +25137,32 @@ function finalizeElTechLaunch(mode, t, autoCopy){
   }
   
   if((mode === 'all' || mode === 'exp') && isExp){
-    var r = vals['shScrDieExp'] || 10;
+    var r = vals.exp || 10;
     var res = r + mods.exp;
     out.push('');
     out.push('🌀 Исполнение стихии: 1d20' + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + r + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = **' + res + '**');
   }
   
   if(mode === 'all' || mode === 'atk'){
-    var r = vals['shScrDieAtk'] || 10;
+    var r = vals.atk || 10;
     var res = r + mods.atk;
     out.push('');
     out.push('⚔️ Атака стихией: 1d20' + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + r + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = **' + res + '**');
   }
   
-  var pDmg = parseTechDmg(t.damage);
+  var pDmg = typeof parseMoveDmg === 'function' ? parseMoveDmg(t.damage) : null;
   if((mode === 'all' || mode === 'dmg') && pDmg){
     var sum = 0;
     var rolls = [];
     for(var i=0; i<pDmg.n; i++){
-      var v = vals['shScrDieDmg_'+i] || Math.ceil(pDmg.d/2);
+      var v = (vals.dmgRolls && vals.dmgRolls[i]) ? vals.dmgRolls[i] : Math.ceil(pDmg.sides/2);
       sum += v;
       rolls.push(v);
     }
-    sum += mods.dmg;
+    var totalMod = mods.dmg + pDmg.mod;
+    sum += totalMod;
     out.push('');
-    out.push('💥 Урон ('+pDmg.n+'d'+pDmg.d+'): ['+rolls.join(', ')+']' + (mods.dmg>=0?'+'+mods.dmg:mods.dmg) + ' = **' + sum + '**');
+    out.push('💥 Урон ('+pDmg.n+'d'+pDmg.sides+'): ['+rolls.join(', ')+']' + (totalMod>=0?'+'+totalMod:totalMod) + ' = **' + sum + '**');
   }
   
   var output = out.join('\n').trim();
@@ -25019,29 +25174,11 @@ function finalizeElTechLaunch(mode, t, autoCopy){
     EL.launcher.lastResultCopied = true;
   }
   
-  var rBox = document.getElementById('elTechLauncherResultBox');
-  var rTxt = document.getElementById('elTechLauncherResultText');
-  var rBdg = document.getElementById('elTechLauncherCopyBadge');
-  
-  if(rBox && rTxt){
-    rBox.classList.add('has-result');
-    rTxt.textContent = output;
-  }
-  if(rBdg){
-    if(autoCopy){
-      var lineCount = output.split('\n').length;
-      rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio ('+lineCount+' стр.)</span>';
-      rBdg.style.display = 'inline-flex';
-    } else {
-      rBdg.style.display = 'none';
-    }
-  }
-  
   if(typeof render === 'function') render();
   else if(typeof elTechs === 'function') {
       document.getElementById('app').innerHTML = elTechs();
       if(typeof _w==='function') _w();
-      wireElLaunchers();
+      if(typeof wireElLaunchers==='function') wireElLaunchers();
       if(typeof wireElTechs==='function') wireElTechs();
   }
 }
@@ -25050,16 +25187,17 @@ var executeElMoveLaunch = function(mode, autoCopy){
   var list = EL.getMoves();
   var m = list.find(x => x.id === EL.moveLauncher.moveId) || list[0];
   if(!m) return;
+  var isExp = !!EL.moveLauncher.isExp;
 
   if(mode !== 'claim'){
     var diceToRoll = [];
+    if((mode === 'all' || mode === 'exp') && isExp){
+      var exDie = document.getElementById('shScrDieMoveExp'); if(exDie) diceToRoll.push(exDie);
+    }
     if(mode === 'all' || mode === 'atk'){
       var atDie = document.getElementById('shScrDieMoveAtk'); if(atDie) diceToRoll.push(atDie);
     }
-    if(mode === 'all' || mode === 'exp'){
-      var exDie = document.getElementById('shScrDieMoveExp'); if(exDie) diceToRoll.push(exDie);
-    }
-    var pDmg = parseMoveDmg(m.effect);
+    var pDmg = typeof parseMoveDmg === 'function' ? parseMoveDmg(m.effect) : null;
     if((mode === 'all' || mode === 'dmg') && pDmg){
       for(var i = 0; i < pDmg.n; i++){
         var dmDie = document.getElementById('shScrDieMoveDmg_' + i); if(dmDie) diceToRoll.push(dmDie);
@@ -25080,13 +25218,26 @@ var executeElMoveLaunch = function(mode, autoCopy){
     setTimeout(function(){
       clearInterval(rollInterval);
       if(!EL.moveLauncher.rolledValues) EL.moveLauncher.rolledValues = {};
+      if(!EL.moveLauncher.rolledValues.dmgRolls) EL.moveLauncher.rolledValues.dmgRolls = [];
       diceToRoll.forEach(function(el){
-        var mx = parseInt(el.getAttribute('data-max')||'20', 10);
-        var res = Math.floor(Math.random() * mx) + 1;
-        var vEl = el.querySelector('.val');
-        if(vEl) vEl.textContent = res;
-        el.classList.remove('rolling');
-        EL.moveLauncher.rolledValues[el.id] = res;
+        if(el.id && el.id.includes('Dmg_')){
+            var idParts = el.id.split('_');
+            var dIdx = parseInt(idParts[1], 10);
+            var dSides = pDmg ? pDmg.sides : 6;
+            var res = Math.floor(Math.random() * dSides) + 1;
+            var vEl = el.querySelector('.val');
+            if(vEl) vEl.textContent = res;
+            el.classList.remove('rolling');
+            EL.moveLauncher.rolledValues.dmgRolls[dIdx] = res;
+        } else {
+            var mx = parseInt(el.getAttribute('data-max')||'20', 10);
+            var res = Math.floor(Math.random() * mx) + 1;
+            var vEl = el.querySelector('.val');
+            if(vEl) vEl.textContent = res;
+            el.classList.remove('rolling');
+            var k = el.id.includes('Exp') ? 'exp' : 'atk';
+            EL.moveLauncher.rolledValues[k] = res;
+        }
       });
       finalizeElMoveLaunch(mode, m, autoCopy);
     }, 600);
@@ -25097,6 +25248,7 @@ var executeElMoveLaunch = function(mode, autoCopy){
 
 function finalizeElMoveLaunch(mode, m, autoCopy){
   var out = [];
+  var isExp = !!EL.moveLauncher.isExp;
   var vals = EL.moveLauncher.rolledValues || {};
   var mods = EL.moveLauncher.mods || {atk:0, dmg:0, exp:0};
   
@@ -25108,32 +25260,33 @@ function finalizeElMoveLaunch(mode, m, autoCopy){
     if(m.desc) out.push('Описание: ' + m.desc);
   }
   
-  if(mode === 'all' || mode === 'exp'){
-    var r = vals['shScrDieMoveExp'] || 10;
+  if((mode === 'all' || mode === 'exp') && isExp){
+    var r = vals.exp || 10;
     var res = r + mods.exp;
     out.push('');
     out.push('🛡️ Защита стихией: 1d20' + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = ' + r + (mods.exp>=0?'+'+mods.exp:mods.exp) + ' = **' + res + '**');
   }
 
   if(mode === 'all' || mode === 'atk'){
-    var r = vals['shScrDieMoveAtk'] || 10;
+    var r = vals.atk || 10;
     var res = r + mods.atk;
     out.push('');
     out.push('🎯 Попадание приёма: 1d20' + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = ' + r + (mods.atk>=0?'+'+mods.atk:mods.atk) + ' = **' + res + '**');
   }
   
-  var pDmg = parseMoveDmg(m.effect);
+  var pDmg = typeof parseMoveDmg === 'function' ? parseMoveDmg(m.effect) : null;
   if((mode === 'all' || mode === 'dmg') && pDmg){
     var sum = 0;
     var rolls = [];
     for(var i=0; i<pDmg.n; i++){
-      var v = vals['shScrDieMoveDmg_'+i] || Math.ceil(pDmg.d/2);
+      var v = (vals.dmgRolls && vals.dmgRolls[i]) ? vals.dmgRolls[i] : Math.ceil(pDmg.sides/2);
       sum += v;
       rolls.push(v);
     }
-    sum += mods.dmg;
+    var totalMod = mods.dmg + pDmg.mod;
+    sum += totalMod;
     out.push('');
-    out.push('💥 Урон/Эффект ('+pDmg.n+'d'+pDmg.d+'): ['+rolls.join(', ')+']' + (mods.dmg>=0?'+'+mods.dmg:mods.dmg) + ' = **' + sum + '**');
+    out.push('💥 Урон/Эффект ('+pDmg.n+'d'+pDmg.sides+'): ['+rolls.join(', ')+']' + (totalMod>=0?'+'+totalMod:totalMod) + ' = **' + sum + '**');
   }
   
   var output = out.join('\n').trim();
@@ -25149,17 +25302,17 @@ function finalizeElMoveLaunch(mode, m, autoCopy){
   else if(typeof elMoves === 'function') {
       document.getElementById('app').innerHTML = elMoves();
       if(typeof _w==='function') _w();
-      wireElLaunchers();
+      if(typeof wireElLaunchers==='function') wireElLaunchers();
       if(typeof wireElMoves==='function') wireElMoves();
   }
 }
 
 function wireElLaunchers() {
   function reRenderTechs() {
-    if(typeof elTechs==='function'){ document.getElementById('app').innerHTML = elTechs(); if(typeof _w==='function')_w(); wireElLaunchers(); if(typeof wireElTechs==='function')wireElTechs(); }
+    if(typeof elTechs==='function'){ document.getElementById('app').innerHTML = elTechs(); if(typeof _w==='function')_w(); if(typeof wireElLaunchers==='function')wireElLaunchers(); if(typeof wireElTechs==='function')wireElTechs(); }
   }
   function reRenderMoves() {
-    if(typeof elMoves==='function'){ document.getElementById('app').innerHTML = elMoves(); if(typeof _w==='function')_w(); wireElLaunchers(); if(typeof wireElMoves==='function')wireElMoves(); }
+    if(typeof elMoves==='function'){ document.getElementById('app').innerHTML = elMoves(); if(typeof _w==='function')_w(); if(typeof wireElLaunchers==='function')wireElLaunchers(); if(typeof wireElMoves==='function')wireElMoves(); }
   }
 
   var tc = document.getElementById('elTechLauncherTech');
@@ -25167,8 +25320,6 @@ function wireElLaunchers() {
       tc.onchange = function(){
         if(!EL.launcher) EL.launcher = {};
         EL.launcher.techId = this.value;
-        var t = EL.getTechs().find(x => x.id === EL.launcher.techId);
-        if(t && t.dmgMod) EL.launcher.mods.dmg = parseInt(t.dmgMod, 10) || 0;
         reRenderTechs();
       };
   }
@@ -25190,8 +25341,6 @@ function wireElLaunchers() {
       mc.onchange = function(){
         if(!EL.moveLauncher) EL.moveLauncher = {};
         EL.moveLauncher.moveId = this.value;
-        var t = EL.getMoves().find(x => x.id === EL.moveLauncher.moveId);
-        if(t && t.dmgMod) EL.moveLauncher.mods.dmg = parseInt(t.dmgMod, 10) || 0;
         reRenderMoves();
       };
   }
@@ -25241,6 +25390,18 @@ function wireElLaunchers() {
       EL.moveLauncher.isOpen = !EL.moveLauncher.isOpen;
       reRenderMoves();
   };
+
+  var chkTech = document.getElementById('elTechLauncherExp');
+  if(chkTech) chkTech.onchange = function(){
+      EL.launcher.isExp = this.checked;
+      reRenderTechs();
+  }
+
+  var chkMove = document.getElementById('elMoveLauncherExp');
+  if(chkMove) chkMove.onchange = function(){
+      EL.moveLauncher.isExp = this.checked;
+      reRenderMoves();
+  }
 
   var elTechScr = document.getElementById('elTechLauncherScreen');
   if(elTechScr){
