@@ -2058,6 +2058,10 @@
       if(raw){
         var data = JSON.parse(raw);
         if(data && Array.isArray(data.points)){
+          // Очищаем старые тестовые точки-заглушки (Новиград, Оксенфурт, Вызима, Понтар и т.д.)
+          data.points = data.points.filter(function(p){
+            return p && p.id && !p.id.startsWith('wp_novi') && !p.id.startsWith('wp_oxen') && !p.id.startsWith('wp_vizi') && !p.id.startsWith('wp_pontar');
+          });
           WI.map.routePoints = data.points;
           if(data.travelMode) WI.map.travelMode = data.travelMode;
           if(data.travelPace) WI.map.travelPace = data.travelPace;
@@ -2066,14 +2070,10 @@
       }
     } catch(e){}
 
-    WI.map.routePoints = [
-      { id: 'wp_novigrad', name: 'Новиград', x: 1170, y: 1025, stopType: 'inn' },
-      { id: 'wp_oxenfurt', name: 'Оксенфурт', x: 1265, y: 1035, stopType: 'inn' },
-      { id: 'wp_vizima', name: 'Вызима', x: 1615, y: 1125, stopType: 'camp' }
-    ];
+    WI.map.routePoints = [];
     WI.map.travelMode = 'horse';
     WI.map.travelPace = 'normal';
-    return { points: WI.map.routePoints, travelMode: WI.map.travelMode, travelPace: WI.map.travelPace };
+    return { points: [], travelMode: 'horse', travelPace: 'normal' };
   };
 
   WI.saveRoute = function(){
@@ -2481,8 +2481,8 @@
 
       var linesSvg = '';
       if(pathData){
-        linesSvg = '<path d="' + pathData + '" stroke="rgba(0,0,0,0.75)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>' +
-          '<path d="' + pathData + '" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="14,10" stroke-linecap="round" stroke-linejoin="round" filter="url(#wiPinGlow)">' +
+        linesSvg = '<path class="wi-route-path-bg" d="' + pathData + '" fill="none" stroke="rgba(0,0,0,0.75)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '<path class="wi-route-path-fg" d="' + pathData + '" fill="none" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="14,10" stroke-linecap="round" stroke-linejoin="round" filter="url(#wiPinGlow)">' +
             '<animate attributeName="stroke-dashoffset" values="48;0" dur="1.4s" repeatCount="indefinite"/>' +
           '</path>';
       }
@@ -2496,9 +2496,9 @@
         var badgeLabel = (idx + 1);
         var stopIcon = (pt.stopType === 'inn' ? '🍺' : (pt.stopType === 'camp' ? '⛺' : (pt.stopType === 'ferry' ? '⛵' : '')));
         var ptTer = getTerrainAt(pt.x, pt.y);
-        var hint = (isStart ? 'Старт: ' : (isEnd ? 'Цель: ' : 'Остановка ' + (idx + 1) + ': ')) + (pt.name || '') + ' (' + ptTer.name + ') — ПРАВЫЙ КЛИК: удалить';
+        var hint = (isStart ? 'Старт: ' : (isEnd ? 'Цель: ' : 'Остановка ' + (idx + 1) + ': ')) + (pt.name || '') + ' (' + ptTer.name + ') — Клик ЛКМ: удалить, Зажать: переместить';
 
-        return '<g class="wi-route-point" data-route-pt-id="' + pt.id + '" transform="translate(' + pt.x + ',' + pt.y + ')" style="cursor:pointer;">' +
+        return '<g class="wi-route-point" data-route-pt-id="' + pt.id + '" transform="translate(' + pt.x + ',' + pt.y + ')" style="cursor:grab;touch-action:none;">' +
           '<title>' + escA(hint) + '</title>' +
           '<circle r="18" fill="rgba(0,0,0,0.4)" stroke="' + pinColor + '" stroke-width="2" stroke-dasharray="4,2"/>' +
           '<circle r="13" fill="' + pinColor + '" stroke="#ffffff" stroke-width="2.2" filter="url(#wiPinGlow)"/>' +
@@ -2580,8 +2580,11 @@
         '</div>' +
       '</div>';
     } else if(m.mode === 'route'){
-      if(!m.routePoints || !m.routePoints.length) WI.loadRoute();
-      var rCalc = calcFullRoute(m.routePoints, m.travelMode || 'horse', m.travelPace || 'normal');
+      if(!m.routeLoaded){
+        WI.loadRoute();
+        m.routeLoaded = true;
+      }
+      var rCalc = calcFullRoute(m.routePoints || [], m.travelMode || 'horse', m.travelPace || 'normal');
 
       var encHtml = m.encounter ? ('<div style="background:rgba(245,158,11,0.12);border:1px solid var(--wi-amber);border-radius:6px;padding:12px;margin-top:12px;">' +
         '<div style="font-weight:700;color:#fbbf24;margin-bottom:4px;font-family:\'Cinzel\',serif;">' + esc(m.encounter.title) + '</div>' +
@@ -2622,7 +2625,7 @@
           '<td style="padding:8px 6px;font-size:12px;">' + distToNext + '</td>' +
           '<td style="padding:8px 6px;text-align:right;white-space:nowrap;">' +
             '<button class="btn btn-ghost" data-wi-pt-focus="' + pt.id + '" style="padding:3px 7px;font-size:11px;margin-right:4px;" title="Сфокусировать карту на точке">🎯</button>' +
-            '<button class="btn btn-ghost" data-wi-pt-del="' + pt.id + '" style="padding:3px 7px;font-size:11px;color:#ef4444;" title="Удалить точку (или правый клик)">🗑️</button>' +
+            '<button class="btn btn-ghost" data-wi-pt-del="' + pt.id + '" style="padding:3px 7px;font-size:11px;color:#ef4444;" title="Удалить точку">🗑️</button>' +
           '</td>' +
         '</tr>';
       }).join('') : '<tr><td colspan="6" class="char-empty" style="text-align:center;padding:16px;">Маршрут пуст. Кликните по карте в любом месте, чтобы поставить первую точку!</td></tr>';
@@ -2636,7 +2639,7 @@
           '</div>' +
         '</div>' +
         '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:6px;padding:8px 12px;margin-top:10px;font-size:12.5px;color:#e2e8f0;line-height:1.45;">' +
-          '💡 <b>Свободный выбор маршрута:</b> Кликайте по карте или по городам, чтобы добавлять новые точки и стоянки. <span style="color:#fca5a5;font-weight:700;">Клик правой кнопкой мыши по точке на карте удаляет её!</span>' +
+          '💡 <b>Свободный выбор маршрута:</b> Кликайте по карте для добавления путевых точек. <span style="color:#fbbf24;font-weight:700;">Клик ЛКМ по точке — удалить</span>, <span style="color:#6ee7b7;font-weight:700;">Зажать ЛКМ и тянуть — переместить</span>.' +
         '</div>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:12px;margin-top:12px;">' +
           '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wi-border);border-radius:6px;padding:10px;">' +
@@ -3112,12 +3115,10 @@
       }
     }
 
-    // Правый клик по строке таблицы для удаления
+    // Правый клик по строке таблицы ничего не делает
     document.querySelectorAll('.wi-route-row').forEach(function(row){
       row.addEventListener('contextmenu', function(e){
         e.preventDefault();
-        var ptId = row.getAttribute('data-wi-route-row-id');
-        removeRoutePoint(ptId);
       });
     });
 
@@ -3375,7 +3376,7 @@
       });
     }
 
-    // Drag, Wheel, Pinch-Zoom, клик по карте и правый клик для удаления точек
+    // Drag, Wheel, Pinch-Zoom, перемещение точек (drag-and-drop) и клик по карте
     var vport = document.getElementById('wiMapViewport');
     if(vport && !vport.__panBound){
       vport.__panBound = true;
@@ -3383,20 +3384,44 @@
       var startX, startY;
       var hasDragged = false;
 
-      // Правый клик мыши по точке маршрута для мгновенного удаления
+      var isDraggingPoint = false;
+      var dragPtId = null;
+      var dragPtObj = null;
+      var dragPtEl = null;
+      var dragStartClientX = 0, dragStartClientY = 0;
+      var dragPtHasMoved = false;
+      var justHandledPointAction = false;
+
+      // Правая кнопка мыши ничего не делает (стандартное контекстное меню также блокируется)
       vport.addEventListener('contextmenu', function(e){
-        var ptEl = e.target.closest && e.target.closest('.wi-route-point');
-        if(ptEl){
-          e.preventDefault();
-          e.stopPropagation();
-          var ptId = ptEl.getAttribute('data-route-pt-id');
-          removeRoutePoint(ptId);
-          return;
-        }
+        e.preventDefault();
+        e.stopPropagation();
       });
 
       vport.addEventListener('mousedown', function(e){
         if(e.button !== 0) return;
+
+        // Проверяем нажатие на путевую точку маршрута
+        var ptEl = e.target.closest && e.target.closest('.wi-route-point');
+        if(ptEl){
+          var ptId = ptEl.getAttribute('data-route-pt-id');
+          var ptObj = (m.routePoints || []).find(function(p){ return p.id === ptId; });
+          if(ptObj){
+            isDraggingPoint = true;
+            dragPtId = ptId;
+            dragPtObj = ptObj;
+            dragPtEl = ptEl;
+            dragStartClientX = e.clientX;
+            dragStartClientY = e.clientY;
+            dragPtHasMoved = false;
+            vport.style.cursor = 'grabbing';
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+        }
+
+        // Иначе обычное панорамирование карты
         isDown = true;
         hasDragged = false;
         startX = e.clientX;
@@ -3404,7 +3429,60 @@
         vport.style.cursor = 'grabbing';
       });
 
-      window.addEventListener('mousemove', function(e){
+      if(window.__wiMapOnMouseMove) window.removeEventListener('mousemove', window.__wiMapOnMouseMove);
+      if(window.__wiMapOnMouseUp) window.removeEventListener('mouseup', window.__wiMapOnMouseUp);
+
+      window.__wiMapOnMouseMove = function(e){
+        if(isDraggingPoint && dragPtObj){
+          var dxPt = e.clientX - dragStartClientX;
+          var dyPt = e.clientY - dragStartClientY;
+          if(Math.hypot(dxPt, dyPt) > 4){
+            dragPtHasMoved = true;
+          }
+
+          if(dragPtHasMoved){
+            var vwP = vport.clientWidth || 800;
+            var vhP = vport.clientHeight || 540;
+            var arP = vwP / vhP;
+            var zP = Math.max(0.4, Math.min(5.0, m.zoom || 1.1));
+            var baseWP = 2400;
+            var baseHP = baseWP / arP;
+            var vbWP = baseWP / zP;
+            var vbHP = baseHP / zP;
+            var minXP = (m.cx != null ? m.cx : 1440) - vbWP / 2;
+            var minYP = (m.cy != null ? m.cy : 1200) - vbHP / 2;
+            var rectP = vport.getBoundingClientRect();
+            var mouseXP = e.clientX - rectP.left;
+            var mouseYP = e.clientY - rectP.top;
+
+            var newPtX = Math.round(minXP + (mouseXP / vwP) * vbWP);
+            var newPtY = Math.round(minYP + (mouseYP / vhP) * vbHP);
+            newPtX = Math.max(20, Math.min(2860, newPtX));
+            newPtY = Math.max(20, Math.min(4076, newPtY));
+
+            dragPtObj.x = newPtX;
+            dragPtObj.y = newPtY;
+
+            if(dragPtEl){
+              dragPtEl.setAttribute('transform', 'translate(' + newPtX + ',' + newPtY + ')');
+            }
+
+            // Динамическое обновление полилинии пути в реальном времени
+            var rpts = m.routePoints || [];
+            if(rpts.length >= 2){
+              var pData = 'M ' + rpts[0].x + ' ' + rpts[0].y;
+              for(var k = 1; k < rpts.length; k++){
+                pData += ' L ' + rpts[k].x + ' ' + rpts[k].y;
+              }
+              var pathBg = vport.querySelector('.wi-route-path-bg');
+              var pathFg = vport.querySelector('.wi-route-path-fg');
+              if(pathBg) pathBg.setAttribute('d', pData);
+              if(pathFg) pathFg.setAttribute('d', pData);
+            }
+          }
+          return;
+        }
+
         if(!isDown) return;
         var dx = e.clientX - startX;
         var dy = e.clientY - startY;
@@ -3422,14 +3500,51 @@
         m.cx = Math.max(-200, Math.min(3080, (m.cx || 1440) - dx * scale));
         m.cy = Math.max(-200, Math.min(4296, (m.cy || 1200) - dy * scale));
         updateMapTransform();
-      });
+      };
 
-      window.addEventListener('mouseup', function(){
+      window.__wiMapOnMouseUp = function(){
+        if(isDraggingPoint){
+          var handledPtId = dragPtId;
+          var didMove = dragPtHasMoved;
+          var pt = dragPtObj;
+
+          isDraggingPoint = false;
+          dragPtId = null;
+          dragPtObj = null;
+          dragPtEl = null;
+          dragPtHasMoved = false;
+          if(vport) vport.style.cursor = 'grab';
+
+          justHandledPointAction = true;
+          setTimeout(function(){ justHandledPointAction = false; }, 200);
+
+          if(didMove){
+            if(pt){
+              var ter = getTerrainAt(pt.x, pt.y);
+              if(pt.name && (pt.name.indexOf('Точка') === 0 || pt.name.indexOf('Старт:') === 0)){
+                var isFirst = (m.routePoints && m.routePoints[0] && m.routePoints[0].id === pt.id);
+                var idx = (m.routePoints || []).findIndex(function(p){ return p.id === pt.id; });
+                pt.name = (isFirst ? 'Старт: ' : ('Точка ' + (idx + 1) + ' (')) + ter.name + (isFirst ? '' : ')');
+              }
+            }
+            WI.saveRoute();
+            WI.toast('✓ Точка перемещена', 'success');
+            if(typeof render === 'function') render();
+          } else {
+            // Короткий клик ЛКМ — мгновенное удаление точки
+            removeRoutePoint(handledPtId);
+          }
+          return;
+        }
+
         if(isDown){
           isDown = false;
           if(vport) vport.style.cursor = 'grab';
         }
-      });
+      };
+
+      window.addEventListener('mousemove', window.__wiMapOnMouseMove);
+      window.addEventListener('mouseup', window.__wiMapOnMouseUp);
 
       // Зум колесиком мыши с привязкой к курсору
       vport.addEventListener('wheel', function(e){
@@ -3464,6 +3579,7 @@
       // Клик по карте для установки путевой точки (route) или метки (markers)
       vport.addEventListener('click', function(e){
         if(hasDragged) return;
+        if(justHandledPointAction) return;
         if(e.button !== 0) return;
 
         var rect = vport.getBoundingClientRect();
@@ -3532,19 +3648,42 @@
         }
       });
 
-      // Сенсорное управление: перемещение и пинч-зум
+      // Сенсорное управление: перемещение, драг точек и пинч-зум
       var lastTouchDist = 0;
       var touchStartX = 0, touchStartY = 0;
       var isTouching = false;
 
       vport.addEventListener('touchstart', function(e){
         if(e.touches.length === 1){
+          var touch = e.touches[0];
+          var ptEl = (touch.target && touch.target.closest && touch.target.closest('.wi-route-point')) ||
+            (document.elementFromPoint ? (function(){
+              var el = document.elementFromPoint(touch.clientX, touch.clientY);
+              return el && el.closest && el.closest('.wi-route-point');
+            })() : null);
+
+          if(ptEl){
+            var ptId = ptEl.getAttribute('data-route-pt-id');
+            var ptObj = (m.routePoints || []).find(function(p){ return p.id === ptId; });
+            if(ptObj){
+              isDraggingPoint = true;
+              dragPtId = ptId;
+              dragPtObj = ptObj;
+              dragPtEl = ptEl;
+              dragStartClientX = touch.clientX;
+              dragStartClientY = touch.clientY;
+              dragPtHasMoved = false;
+              return;
+            }
+          }
+
           isTouching = true;
           hasDragged = false;
-          touchStartX = e.touches[0].clientX;
-          touchStartY = e.touches[0].clientY;
+          touchStartX = touch.clientX;
+          touchStartY = touch.clientY;
         } else if(e.touches.length === 2){
           isTouching = false;
+          isDraggingPoint = false;
           lastTouchDist = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
@@ -3553,6 +3692,55 @@
       }, { passive: true });
 
       vport.addEventListener('touchmove', function(e){
+        if(isDraggingPoint && dragPtObj && e.touches.length === 1){
+          var t = e.touches[0];
+          var dxPt = t.clientX - dragStartClientX;
+          var dyPt = t.clientY - dragStartClientY;
+          if(Math.hypot(dxPt, dyPt) > 5){
+            dragPtHasMoved = true;
+          }
+          if(dragPtHasMoved){
+            var vwP = vport.clientWidth || 800;
+            var vhP = vport.clientHeight || 540;
+            var arP = vwP / vhP;
+            var zP = Math.max(0.4, Math.min(5.0, m.zoom || 1.1));
+            var baseWP = 2400;
+            var baseHP = baseWP / arP;
+            var vbWP = baseWP / zP;
+            var vbHP = baseHP / zP;
+            var minXP = (m.cx != null ? m.cx : 1440) - vbWP / 2;
+            var minYP = (m.cy != null ? m.cy : 1200) - vbHP / 2;
+            var rectP = vport.getBoundingClientRect();
+            var mouseXP = t.clientX - rectP.left;
+            var mouseYP = t.clientY - rectP.top;
+
+            var newPtX = Math.round(minXP + (mouseXP / vwP) * vbWP);
+            var newPtY = Math.round(minYP + (mouseYP / vhP) * vbHP);
+            newPtX = Math.max(20, Math.min(2860, newPtX));
+            newPtY = Math.max(20, Math.min(4076, newPtY));
+
+            dragPtObj.x = newPtX;
+            dragPtObj.y = newPtY;
+
+            if(dragPtEl){
+              dragPtEl.setAttribute('transform', 'translate(' + newPtX + ',' + newPtY + ')');
+            }
+
+            var rpts = m.routePoints || [];
+            if(rpts.length >= 2){
+              var pData = 'M ' + rpts[0].x + ' ' + rpts[0].y;
+              for(var k = 1; k < rpts.length; k++){
+                pData += ' L ' + rpts[k].x + ' ' + rpts[k].y;
+              }
+              var pathBg = vport.querySelector('.wi-route-path-bg');
+              var pathFg = vport.querySelector('.wi-route-path-fg');
+              if(pathBg) pathBg.setAttribute('d', pData);
+              if(pathFg) pathFg.setAttribute('d', pData);
+            }
+          }
+          return;
+        }
+
         if(e.touches.length === 1 && isTouching){
           var dx = e.touches[0].clientX - touchStartX;
           var dy = e.touches[0].clientY - touchStartY;
@@ -3585,6 +3773,38 @@
       }, { passive: true });
 
       vport.addEventListener('touchend', function(){
+        if(isDraggingPoint){
+          var handledPtId = dragPtId;
+          var didMove = dragPtHasMoved;
+          var pt = dragPtObj;
+
+          isDraggingPoint = false;
+          dragPtId = null;
+          dragPtObj = null;
+          dragPtEl = null;
+          dragPtHasMoved = false;
+
+          justHandledPointAction = true;
+          setTimeout(function(){ justHandledPointAction = false; }, 250);
+
+          if(didMove){
+            if(pt){
+              var ter = getTerrainAt(pt.x, pt.y);
+              if(pt.name && (pt.name.indexOf('Точка') === 0 || pt.name.indexOf('Старт:') === 0)){
+                var isFirst = (m.routePoints && m.routePoints[0] && m.routePoints[0].id === pt.id);
+                var idx = (m.routePoints || []).findIndex(function(p){ return p.id === pt.id; });
+                pt.name = (isFirst ? 'Старт: ' : ('Точка ' + (idx + 1) + ' (')) + ter.name + (isFirst ? '' : ')');
+              }
+            }
+            WI.saveRoute();
+            WI.toast('✓ Точка перемещена', 'success');
+            if(typeof render === 'function') render();
+          } else {
+            removeRoutePoint(handledPtId);
+          }
+          return;
+        }
+
         isTouching = false;
         lastTouchDist = 0;
       }, { passive: true });
