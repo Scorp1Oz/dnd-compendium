@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v55';
+const CACHE_NAME = 'compendium-cache-v56';
 const APP_SHELL = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const APP_SHELL = [
   './css/mass-effect.css',
   './css/avatar.css',
   './css/witcher.css',
+  './css/witcher.css?v=56',
   './js/dnd-data.js',
   './js/core.js',
   './js/modules/homebrew.js',
@@ -19,6 +20,7 @@ const APP_SHELL = [
   './js/modules/mass-effect.js',
   './js/modules/avatar.js',
   './js/modules/witcher.js',
+  './js/modules/witcher.js?v=56',
   './js/modules/github-sync.js',
   './js/app.js',
   './mass_effect_galaxy_map.jpg',
@@ -106,10 +108,34 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  // Внешние ресурсы (шрифты, карта) — сеть в приоритете, без падения офлайн-кэша приложения.
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
+  // Для скриптов, страниц и стилей используем Network-First с fallback в кэш.
+  // Это гарантирует, что пользователь всегда сразу получает свежий код при онлайн-соединении.
+  const p = url.pathname;
+  const isCodeAsset = event.request.mode === 'navigate' ||
+    p.endsWith('.html') ||
+    p.endsWith('.js') ||
+    p.endsWith('.css') ||
+    p === '/' ||
+    p.endsWith('/') ||
+    p.indexOf('witcher') !== -1;
+
+  if (isCodeAsset) {
+    event.respondWith(
+      fetch(event.request).then((response) => {
+        if (response && response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        }
+        return response;
+      }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Для тяжелых медиа (карта, картинки) — Cache First
   event.respondWith(
     caches.match(event.request).then((cached) => {
       const network = fetch(event.request).then((response) => {

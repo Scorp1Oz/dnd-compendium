@@ -1011,4 +1011,14 @@ body.wi-theme .btn-ghost:hover:not(:disabled) {
   stroke-width: 2.5;
 }
 
+/* Отключение заливки путей маршрута на карте Ведьмака */
+.wi-route-path-bg,
+.wi-route-path-fg,
+#wiRouteLayer path,
+.wi-map-viewport svg path.wi-route-path-bg,
+.wi-map-viewport svg path.wi-route-path-fg {
+  fill: none !important;
+}
+
+
 

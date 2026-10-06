@@ -2481,8 +2481,8 @@
 
       var linesSvg = '';
       if(pathData){
-        linesSvg = '<path class="wi-route-path-bg" d="' + pathData + '" fill="none" stroke="rgba(0,0,0,0.75)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>' +
-          '<path class="wi-route-path-fg" d="' + pathData + '" fill="none" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="14,10" stroke-linecap="round" stroke-linejoin="round" filter="url(#wiPinGlow)">' +
+        linesSvg = '<path class="wi-route-path-bg" d="' + pathData + '" fill="none" style="fill:none !important;" stroke="rgba(0,0,0,0.75)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '<path class="wi-route-path-fg" d="' + pathData + '" fill="none" style="fill:none !important;" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="14,10" stroke-linecap="round" stroke-linejoin="round" filter="url(#wiPinGlow)">' +
             '<animate attributeName="stroke-dashoffset" values="48;0" dur="1.4s" repeatCount="indefinite"/>' +
           '</path>';
       }
@@ -3476,8 +3476,8 @@
               }
               var pathBg = vport.querySelector('.wi-route-path-bg');
               var pathFg = vport.querySelector('.wi-route-path-fg');
-              if(pathBg) pathBg.setAttribute('d', pData);
-              if(pathFg) pathFg.setAttribute('d', pData);
+              if(pathBg){ pathBg.setAttribute('d', pData); pathBg.style.fill = 'none'; }
+              if(pathFg){ pathFg.setAttribute('d', pData); pathFg.style.fill = 'none'; }
             }
           }
           return;
@@ -3734,8 +3734,8 @@
               }
               var pathBg = vport.querySelector('.wi-route-path-bg');
               var pathFg = vport.querySelector('.wi-route-path-fg');
-              if(pathBg) pathBg.setAttribute('d', pData);
-              if(pathFg) pathFg.setAttribute('d', pData);
+              if(pathBg){ pathBg.setAttribute('d', pData); pathBg.style.fill = 'none'; }
+              if(pathFg){ pathFg.setAttribute('d', pData); pathFg.style.fill = 'none'; }
             }
           }
           return;
