@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v52';
+const CACHE_NAME = 'compendium-cache-v53';
 const APP_SHELL = [
   './',
   './index.html',
@@ -24,6 +24,7 @@ const APP_SHELL = [
   './mass_effect_galaxy_map.jpg',
   './shinobi_map_accurate.svg',
   './v4-1600px-Avatar-the-Last-Airbender-Map-Summary-Version-2.jpg.webp',
+  './new-4k-map-of-the-continent-v0-s4ryngvic0ga1.webp',
   './symbols/Witcher/Aard.png',
   './symbols/Witcher/Axii.png',
   './symbols/Witcher/Igni.png',

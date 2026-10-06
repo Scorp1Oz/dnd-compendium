@@ -1531,18 +1531,38 @@
   var OLD_DEFAULT_MOVE_IDS = ['wi_move_whirl', 'wi_move_rend', 'wi_move_pirouette', 'wi_move_riposte', 'wi_move_deflect', 'wi_move_shield_bash', 'wi_move_low_sweep', 'wi_move_aimed_shot'];
 
   var WI_MAP_LOCATIONS = [
-    { id: 'novigrad', name: 'Вольный Город Новиград', x: 330, y: 190, icon: '🏰', region: 'Редания / Вольный город', desc: 'Крупнейший торговый мегаполис Континента, порт Великого Моря, цитадель культа Вечного Огня.' },
-    { id: 'vizima', name: 'Вызима', x: 370, y: 260, icon: '👑', region: 'Темерия', desc: 'Столица Темерии на берегу озера Вызима. Королевский замок Фольтеста, Храмовый квартал и Купеческий район.' },
-    { id: 'oxenfurt', name: 'Оксенфурт', x: 420, y: 220, icon: '🎓', region: 'Редания', desc: 'Город студентов, алхимиков и поэтов на реке Понтар. Знаменитая Оксенфуртская академия.' },
-    { id: 'kaer_morhen', name: 'Каэр Морхен', x: 620, y: 110, icon: '🐺', region: 'Синие Горы (Каэдвен)', desc: 'Крепость Старого Моря в уединенном ущелье Синих Гор. Древняя цитадель Школы Волка.' },
-    { id: 'beauclair', name: 'Боклер (Beauclair)', x: 490, y: 450, icon: '🍇', region: 'Туссент', desc: 'Сказочная столица княжества Туссент. Эльфский дворец Сансетре, рыцарские турниры и легендарные виноградники.' },
-    { id: 'vengerberg', name: 'Венгерберг', x: 530, y: 250, icon: '🔮', region: 'Аэдирн', desc: 'Столица Аэдирна и родина чародейки Йеннифэр. Крупный торговый и ремесленный узел.' },
-    { id: 'kaer_trolde', name: 'Каэр Трольде', x: 130, y: 260, icon: '⛵', region: 'Острова Скеллиге', desc: 'Неприступная цитадель ярлов клана ан Крайт на отвесной скале острова Ард Скеллиг.' },
-    { id: 'cintra', name: 'Цинтра', x: 310, y: 350, icon: '🦁', region: 'Королевство Цинтра', desc: 'Древняя столица королевства Цинтра на южном берегу устья реки Яруга. Родина княжны Цириллы.' },
-    { id: 'tretegor', name: 'Третогор', x: 460, y: 160, icon: '🏛️', region: 'Редания', desc: 'Официальная столица Редании, резиденция королей и тайной службы Сигизмунда Дийкстры.' },
-    { id: 'blaviken', name: 'Блавикен', x: 330, y: 110, icon: '⚔️', region: 'Редания', desc: 'Приморский городок, где Геральт получил прозвище «Мясник из Блавикена» в схватке с бандой Ренфри.' },
-    { id: 'pont_vannis', name: 'Понт Ваннис', x: 390, y: 50, icon: '💎', region: 'Ковир и Повисс', desc: 'Зимняя столица Ковира, вырубленная в гранитных скалах. Центр мировой добычи золота и соли.' },
-    { id: 'nilfgaard_city', name: 'Город Золотых Башен', x: 480, y: 570, icon: '☀️', region: 'Империя Нильфгаард', desc: 'Сердце Империи Великого Солнца на реке Альба. Императорский дворец Эмгыра вар Эмрейса.' }
+    { id: 'novigrad', name: 'Вольный Город Новиград', x: 1170, y: 1025, icon: '🏰', region: 'Вольный Город / Редания', ruler: 'Иерарх Хеммельфарт', climate: 'Приморский порт, умеренный', danger: 'Высокая (Охотники за колдуньями)', desc: 'Крупнейший торговый мегаполис Континента, порт Великого Моря, цитадель культа Вечного Огня и преступного синдиката.' },
+    { id: 'oxenfurt', name: 'Оксенфурт', x: 1265, y: 1035, icon: '🎓', region: 'Редания', ruler: 'Королевский магистрат', climate: 'Речная пойма Понтара', danger: 'Средняя (Реданская стража)', desc: 'Город студентов, алхимиков, поэтов и ученых на реке Понтар. Знаменитая Оксенфуртская академия.' },
+    { id: 'vizima', name: 'Вызима', x: 1615, y: 1125, icon: '👑', region: 'Темерия', ruler: 'Король Фольтест', climate: 'Озёрная долина, влажный', danger: 'Средняя (Городская стража)', desc: 'Столица Темерии на берегу озера Вызима. Королевский замок Фольтеста, Храмовый квартал и Купеческий район.' },
+    { id: 'white_orchard', name: 'Белый Сад (White Orchard)', x: 1680, y: 1175, icon: '🌸', region: 'Темерия', ruler: 'Нильфгаардский гарнизон', climate: 'Цветущие сады и речные заводи', danger: 'Высокая (Грифоны, гули, утопцы)', desc: 'Мирная темерская деревня, где Геральт и Весемир выслеживали Йеннифэр и взяли контракт на царственного грифона.' },
+    { id: 'crows_perch', name: 'Вроницы (Crow\'s Perch)', x: 1180, y: 1115, icon: '🏰', region: 'Велен', ruler: 'Филипп Стенгер (Кровавый Барон)', climate: 'Болота и топи Ничейной Земли', danger: 'Смертельная (Чудовища кривоуховых топей)', desc: 'Укрепленный частоколом деревянный замок Кровавого Барона посреди раздираемых войной болот Велена.' },
+    { id: 'gors_velen', name: 'Горс Велен', x: 1240, y: 1230, icon: '🏛️', region: 'Темерия', ruler: 'Городской совет и банкиры', climate: 'Морское побережье', danger: 'Средняя', desc: 'Богатый купеческий портовый город на побережье Великого Моря, ворота на священный остров Танедд.' },
+    { id: 'thanedd', name: 'Остров Танедд (Аретуза)', x: 1175, y: 1185, icon: '🔮', region: 'Темерия / Остров', ruler: 'Капитул Чародеев (Тиссая де Врие)', climate: 'Морские ветра, скалистый остров', danger: 'Экстремальная (Магические барьеры)', desc: 'Магическая академия Аретуза для юных чародеек, дворец Гарштанг и дворец Локсия на неприступной скале.' },
+    { id: 'kaer_morhen', name: 'Каэр Морхен', x: 2595, y: 245, icon: '🐺', region: 'Синие Горы (Каэдвен)', ruler: 'Весемир (Старейший ведьмак)', climate: 'Суровый высокогорный, ледники', danger: 'Высокая (Одичавшие чудовища)', desc: 'Крепость Старого Моря в уединенном ущелье Синих Гор. Древняя цитадель Школы Волка, где обучают ведьмаков.' },
+    { id: 'kaer_trolde', name: 'Каэр Трольде', x: 595, y: 1590, icon: '⛵', region: 'Острова Скеллиге', ruler: 'Крах ан Крайт / Бран Туирсеах', climate: 'Океанический, фьорды и скалы', danger: 'Высокая (Сирены, гарпии, шторма)', desc: 'Неприступная цитадель ярлов клана ан Крайт на отвесной скале острова Ард Скеллиг.' },
+    { id: 'beauclair', name: 'Боклер (Beauclair)', x: 2420, y: 2180, icon: '🍇', region: 'Княжество Туссент', ruler: 'Княгиня Анна-Генриетта', climate: 'Солнечный средиземноморский', danger: 'Низкая (Странствующие рыцари)', desc: 'Сказочная столица княжества Туссент. Эльфский дворец Сансетре, рыцарские турниры и легендарные виноградники.' },
+    { id: 'corvo_bianco', name: 'Корво Бьянко (Corvo Bianco)', x: 2445, y: 2260, icon: '🍷', region: 'Княжество Туссент', ruler: 'Геральт из Ривии (Поместье)', climate: 'Солнечная долина Сансретур', danger: 'Низкая (Баргесты, археспоры)', desc: 'Живописное винодельческое поместье, пожалованное княгиней Анной-Генриеттой. Погреба, сады и лаборатория.' },
+    { id: 'castel_ravello', name: 'Кастель Равелло', x: 2305, y: 2195, icon: '🏰', region: 'Княжество Туссент', ruler: 'Фабрицио (Княжеский сомелье)', climate: 'Холмы виноградников', danger: 'Низкая', desc: 'Главная княжеская винодельня Туссента, где производятся драгоценные сорта вин Эст-Эст, Эрвелис и Фьорано.' },
+    { id: 'cintra', name: 'Цинтра', x: 1290, y: 1815, icon: '🦁', region: 'Королевство Цинтра', ruler: 'Королева Калантэ (ранее) / Нильфгаард', climate: 'Устье Яруги, равнинный', danger: 'Высокая (Оккупационные гарнизоны)', desc: 'Древняя столица королевства Цинтра на южном берегу устья реки Яруга. Родина Львицы из Цинтры и Цири.' },
+    { id: 'brokilon', name: 'Лес Брокилон (Дуэн Канэлл)', x: 1360, y: 1550, icon: '🏹', region: 'Заповедный Лес Брокилон', ruler: 'Владычица Эитнэ', climate: 'Первобытная реликтовая чаща', danger: 'Смертельная для чужаков (Стрелы дриад)', desc: 'Сердце первобытного заповедного леса дриад, дуб Владычицы Эитнэ и священная Вода Брокилона.' },
+    { id: 'tretogor', name: 'Третогор', x: 1505, y: 805, icon: '🏛️', region: 'Редания', ruler: 'Король Радовид V / Сигизмунд Дийкстра', climate: 'Хлебные равнины Севера', danger: 'Средняя (Тайная служба Редании)', desc: 'Официальная столица Редании, резиденция королей и центр реданской разведки.' },
+    { id: 'blaviken', name: 'Блавикен', x: 1310, y: 510, icon: '⚔️', region: 'Редания / Побережье', ruler: 'Войт Калькштейн', climate: 'Приморский залив Пракседа', danger: 'Средняя (Банды наемников)', desc: 'Приморский городок на реке Буина, где Геральт сделал выбор меньшего зла в схватке с бандой Ренфри.' },
+    { id: 'vengerberg', name: 'Венгерберг', x: 2335, y: 1175, icon: '🔮', region: 'Аэдирн', ruler: 'Король Демавенд III', climate: 'Индустриальный, предгорья', danger: 'Средняя', desc: 'Столица Аэдирна и родина чародейки Йеннифэр. Крупный торговый, ремесленный и ткацкий узел Континента.' },
+    { id: 'rivia', name: 'Ривия', x: 2255, y: 1415, icon: '🛡️', region: 'Лирия и Ривия', ruler: 'Королева Мэва', climate: 'Озеро Лок Эскалотт, холмы', danger: 'Средняя (Краснолюдские наемники)', desc: 'Столичный озерный город объединенного королевства королевы Мэвы. Замок Ривии и долина реки Яруга.' },
+    { id: 'mahakam', name: 'Махакам (Гора Карбон)', x: 2030, y: 1120, icon: '🪓', region: 'Махакам', ruler: 'Старейшина Брувер Гоог', climate: 'Высокогорный, подземные плавильни', danger: 'Высокая (Охрана краснолюдов)', desc: 'Горная твердыня краснолюдов и гномов. Центр металлургии высочайшего класса, где куют легендарные мечи.' },
+    { id: 'brenna', name: 'Бренна (Поле Битвы)', x: 1665, y: 1440, icon: '⚔️', region: 'Темерия', ruler: 'Ян Наталис (Коннетабль)', climate: 'Открытые поля и перелески', danger: 'Высокая (Мародеры, призраки войны)', desc: 'Историческое поле грандиозной битвы при Бренне, решившей исход Второй Северной Войны против Нильфгаарда.' },
+    { id: 'maribor', name: 'Марибор', x: 1735, y: 1380, icon: '🏰', region: 'Темерия', ruler: 'Темерский наместник', climate: 'Старые дубравы реки Ина', danger: 'Средняя', desc: 'Второй по величине город Темерии, окруженный мощными каменными стенами и вековыми дубовыми лесами.' },
+    { id: 'flotsam', name: 'Флотзам (Flotsam)', x: 1925, y: 830, icon: '🌲', region: 'Темерия / Река Понтар', ruler: 'Комендант Бернард Лоредо', climate: 'Глухие девственные леса Понтара', danger: 'Высокая (Скоя\'таэли Иорвета, кейран)', desc: 'Лесной торговый факторий на реке Понтар, окруженный первобытной пущей и логовом речного кейрана.' },
+    { id: 'melitele', name: 'Храм Мелитэле (Элландер)', x: 1895, y: 870, icon: '🕊️', region: 'Темерия / Элландер', ruler: 'Настоятельница Нэннеке', climate: 'Цветущие холмы, лечебные сады', danger: 'Низкая (Священное убежище)', desc: 'Святилище богини плодородия Мелитэле. Здесь воспитывалась Цири и залечивал раны Геральт из Ривии.' },
+    { id: 'loc_muinne', name: 'Лок Муинне', x: 2625, y: 670, icon: '🏛️', region: 'Синие Горы', ruler: 'Древние эльфы (в руинах)', climate: 'Высокогорный каньон', danger: 'Смертельная (Горгульи, магический хаос)', desc: 'Древний эльфийский город-цитадель в Синих Горах, место Саммита Чародеев и возрождения Ложи Чародеек.' },
+    { id: 'ban_ard', name: 'Бан Ард', x: 2555, y: 590, icon: '⚡', region: 'Каэдвен', ruler: 'Совет Магов Бан Арда', climate: 'Горное предгорье, сухой', danger: 'Высокая (Эксперименты чародеев)', desc: 'Каэдвенский город магов и знаменитая академия магии для юношей, аналог Аретузы.' },
+    { id: 'ard_carraigh', name: 'Ард Каррайг', x: 2320, y: 320, icon: '👑', region: 'Каэдвен', ruler: 'Король Хенсельт', climate: 'Суровый северный, сосновые боры', danger: 'Средняя', desc: 'Суровая северная столица Каэдвена на реке Буина, окруженная деревянными и каменными валами.' },
+    { id: 'pont_vannis', name: 'Понт Ваннис', x: 840, y: 440, icon: '💎', region: 'Ковир и Повисс', ruler: 'Король Эстерид Тиссенид', climate: 'Северный приморский, гранитные фьорды', danger: 'Низкая (Неприступная стража)', desc: 'Зимняя столица Ковира, вырубленная в гранитных скалах. Центр мировой добычи золота, серебра и соли.' },
+    { id: 'lan_exeter', name: 'Лан Эксетер', x: 795, y: 270, icon: '⛵', region: 'Ковир и Повисс', ruler: 'Королевский флот Ковира', climate: 'Каналы, залив Пракседа', danger: 'Низкая (Богатейший мегаполис)', desc: 'Летняя столица Ковира на каналах и заливе, крупнейший торговый порт Севера с великолепными дворцами на воде.' },
+    { id: 'cidaris', name: 'Сидарис', x: 1020, y: 1180, icon: '⚓', region: 'Княжество Сидарис', ruler: 'Князь Этайл', climate: 'Теплые морские бризы', danger: 'Низкая', desc: 'Приморское княжество мореходов и корабелов, славящееся своими легкими винами и морскими клинками.' },
+    { id: 'kerack', name: 'Керак', x: 1130, y: 1390, icon: '⛵', region: 'Королевство Керак', ruler: 'Король Белогун', climate: 'Устье реки Адалатте', danger: 'Средняя (Морские разбойники)', desc: 'Королевство на реке Адалатте, порт каперов и торговцев, место событий саги «Сезон Гроз».' },
+    { id: 'brugge', name: 'Бругге', x: 1605, y: 1575, icon: '🏰', region: 'Княжество Бругге', ruler: 'Король Венцлав', climate: 'Лесостепь у реки Вроница', danger: 'Средняя', desc: 'Крепость и перекресток торговых путей на реке Вроница у границы Соддена и реки Яруга.' },
+    { id: 'nilfgaard_city', name: 'Город Золотых Башен (Нильфгаард)', x: 1710, y: 3800, icon: '☀️', region: 'Империя Нильфгаард', ruler: 'Император Эмгыр вар Эмрейс', climate: 'Южный континентальный, река Альба', danger: 'Смертельная (Имперская тайная полиция)', desc: 'Сердце Империи Великого Солнца на реке Альба. Императорский дворец Эмгыра вар Эмрейса Белое Пламя.' }
   ];
 
   var WI_MAP_REGIONS = [
@@ -1559,12 +1579,40 @@
   ];
 
   var WI_MAP_PRESETS = [
-    { from: 'novigrad', to: 'vizima', dist: 130, daysHorse: 3, daysFoot: 7, desc: 'Королевский тракт через реку Понтар. Оживленный торговый путь с частыми корчмами и патрулями.' },
-    { from: 'vizima', to: 'kaer_morhen', dist: 460, daysHorse: 12, daysFoot: 24, desc: 'Долгий и суровый путь в Синие Горы Каэдвена через глухие леса и переправы через реку Гвенллех.' },
-    { from: 'oxenfurt', to: 'beauclair', dist: 540, daysHorse: 14, daysFoot: 28, desc: 'Переход на юг через долину Яруги, Содден и предгорья Амелл в сказочный солнечный Туссент.' },
-    { from: 'novigrad', to: 'kaer_trolde', dist: 380, daysHorse: 6, daysFoot: 14, desc: 'Морской маршрут из порта Новиграда через Великое Море на архипелаг Скеллиге.' },
-    { from: 'vizima', to: 'cintra', dist: 220, daysHorse: 5, daysFoot: 11, desc: 'Южный тракт к устью Яруги через земли Нижней Соддении в королевство Цинтра.' }
+    { from: 'novigrad', to: 'vizima', dist: 130, daysHorse: 3, daysFoot: 7, desc: 'Королевский тракт через реку Понтар. Оживленный торговый путь с частыми корчмами, патрулями реданцев и темерцев.' },
+    { from: 'vizima', to: 'white_orchard', dist: 45, daysHorse: 1, daysFoot: 3, desc: 'Короткий переход на восток к цветущим садам, речным мельницам и нильфгаардскому гарнизону.' },
+    { from: 'novigrad', to: 'oxenfurt', dist: 35, daysHorse: 1, daysFoot: 2, desc: 'Оживленная речная дорога вдоль Понтара между вольным торговым портом и университетским городком.' },
+    { from: 'novigrad', to: 'crows_perch', dist: 95, daysHorse: 2, daysFoot: 5, desc: 'Путь на юг через переправу на реке Понтар в топкие болота Велена к замку Кровавого Барона.' },
+    { from: 'vizima', to: 'kaer_morhen', dist: 480, daysHorse: 13, daysFoot: 26, desc: 'Долгий и суровый путь в Синие Горы Каэдвена через глухие леса, переправу через Гвенллех и горные перевалы.' },
+    { from: 'oxenfurt', to: 'beauclair', dist: 560, daysHorse: 15, daysFoot: 30, desc: 'Грандиозный переход на юг через долину Яруги, Содден и перевалы Амелл в сказочный солнечный Туссент.' },
+    { from: 'novigrad', to: 'kaer_trolde', dist: 390, daysHorse: 7, daysFoot: 15, desc: 'Морской переход из порта Новиграда через коварное Великое Море на суровый архипелаг Скеллиге.' },
+    { from: 'vizima', to: 'cintra', dist: 240, daysHorse: 6, daysFoot: 12, desc: 'Южный тракт к устью Яруги через земли Соддена и Бругге в приморское королевство Цинтра.' },
+    { from: 'flotsam', to: 'loc_muinne', dist: 320, daysHorse: 8, daysFoot: 17, desc: 'Сложный переход вдоль русла Понтара на восток к заброшенной эльфской твердыне в Синих Горах.' },
+    { from: 'beauclair', to: 'corvo_bianco', dist: 15, daysHorse: 1, daysFoot: 1, desc: 'Живописная прогулка верхом на Плотве среди цветущих холмов Туссента прямо в уютное поместье Геральта.' }
   ];
+
+  function getRouteDetails(fromId, toId){
+    var preset = WI_MAP_PRESETS.find(function(p){
+      return (p.from === fromId && p.to === toId) || (p.from === toId && p.to === fromId);
+    });
+    if(preset) return preset;
+
+    var p1 = WI_MAP_LOCATIONS.find(function(l){ return l.id === fromId; });
+    var p2 = WI_MAP_LOCATIONS.find(function(l){ return l.id === toId; });
+    if(!p1 || !p2){
+      return { dist: 100, daysHorse: 3, daysFoot: 6, desc: 'Пользовательский маршрут по дорогам Континента.' };
+    }
+    var pixelDist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+    var dist = Math.max(10, Math.round(pixelDist * 0.26));
+    var daysHorse = Math.max(1, Math.round(dist / 35));
+    var daysFoot = Math.max(1, Math.round(dist / 16));
+    return {
+      dist: dist,
+      daysHorse: daysHorse,
+      daysFoot: daysFoot,
+      desc: 'Прямой континентальный переход из «' + p1.name + '» в «' + p2.name + '» (' + dist + ' миль).'
+    };
+  }
 
   var WI_MAP_ENCOUNTERS = [
     { title: '🐺 Волчья засада в тумане', desc: 'Из ночного болотного тумана на обочину выскакивает стая одичавших волков во главе с матерым варгом.' },
@@ -1586,16 +1634,15 @@
   WI.moveSearch = '';
   WI.map = {
     mode: 'inspect',
-    zoom: 1,
-    cx: 400,
-    cy: 325,
+    zoom: 1.1,
+    cx: 1440,
+    cy: 1200,
     selectedLocId: 'novigrad',
     selectedRegionId: null,
     userMarkers: [],
     routeFrom: 'novigrad',
     routeTo: 'vizima',
     showLabels: true,
-    showVillages: true,
     showUserMarkers: true,
     encounter: null,
     search: ''
@@ -2024,96 +2071,78 @@
 
   function renderWitcherMapSvg(){
     var m = WI.map;
-    var z = m.zoom || 1;
-    var cx = m.cx || 400;
-    var cy = m.cy || 325;
-    var vbW = 800 / z;
-    var vbH = 650 / z;
+    var z = Math.max(0.4, Math.min(5.0, m.zoom || 1.1));
+    var cx = m.cx != null ? m.cx : 1440;
+    var cy = m.cy != null ? m.cy : 1200;
+
+    var vp = document.getElementById('wiMapViewport');
+    var vw = (vp && vp.clientWidth) || 800;
+    var vh = (vp && vp.clientHeight) || 540;
+    var ar = vw / vh;
+
+    var baseW = 2400;
+    var baseH = baseW / ar;
+    var vbW = baseW / z;
+    var vbH = baseH / z;
     var minX = cx - vbW / 2;
     var minY = cy - vbH / 2;
 
     var selLoc = WI_MAP_LOCATIONS.find(function(l){ return l.id === m.selectedLocId; });
-    var selReg = WI_MAP_REGIONS.find(function(r){ return r.id === m.selectedRegionId; });
 
-    // 1. Океан и рельеф континента
-    var bgSvg = '<rect x="-1000" y="-1000" width="3000" height="3000" fill="#070c14" />' +
-      '<pattern id="wiOceanGrid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(56,189,248,0.03)" stroke-width="1"/></pattern>' +
-      '<rect x="-1000" y="-1000" width="3000" height="3000" fill="url(#wiOceanGrid)" />';
+    // 1. Defs: фильтры подсветки и теней
+    var defsSvg = '<defs>' +
+      '<filter id="wiPinGlow" x="-50%" y="-50%" width="200%" height="200%">' +
+        '<feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>' +
+        '<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>' +
+      '</filter>' +
+      '<filter id="wiLabelShadow" x="-30%" y="-30%" width="160%" height="160%">' +
+        '<feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.95"/>' +
+      '</filter>' +
+    '</defs>';
 
-    // Основная береговая линия Континента
-    var continentLand = '<path d="M 180,20 Q 280,30 350,20 Q 450,15 650,20 Q 750,80 770,250 Q 780,450 760,630 L 320,630 Q 300,550 330,480 Q 280,400 310,340 Q 240,320 230,240 Q 260,200 240,160 Q 200,120 180,20 Z" fill="#0f1520" stroke="#334155" stroke-width="2" />';
+    // 2. Растровая 4K карта Континента (Nolan Kotulan, 2880x4096)
+    var mapImg = '<image href="new-4k-map-of-the-continent-v0-s4ryngvic0ga1.webp" x="0" y="0" width="2880" height="4096" preserveAspectRatio="xMidYMid meet" />';
 
-    // Архипелаг Скеллиге
-    var skelligeIsles = '<g id="wiSkelligeGroup">' +
-      '<path d="M 110,240 Q 140,230 150,260 Q 135,290 115,280 Z" fill="#155e75" stroke="#38bdf8" stroke-width="1.5" />' +
-      '<path d="M 140,210 Q 160,205 165,220 Q 150,230 138,220 Z" fill="#155e75" stroke="#38bdf8" stroke-width="1.2" />' +
-      '<path d="M 90,260 Q 105,255 105,275 Q 90,280 85,270 Z" fill="#155e75" stroke="#38bdf8" stroke-width="1" />' +
-      '<text x="125" y="305" fill="#7dd3fc" font-size="10" font-family="Cinzel,serif" text-anchor="middle" font-weight="700">СКЕЛЛИГЕ</text>' +
-    '</g>';
-
-    // Реки (Яруга, Понтар, Гвенллех, Альба)
-    var rivers = '<g stroke="#38bdf8" fill="none" opacity="0.75">' +
-      // Яруга (граница Севера и Юга)
-      '<path d="M 310,350 Q 380,340 450,335 Q 560,330 650,310 Q 750,300 770,305" stroke-width="3" />' +
-      // Понтар (Темерия / Редания)
-      '<path d="M 325,195 Q 370,210 420,220 Q 480,215 540,230 Q 600,240 680,220" stroke-width="2.5" />' +
-      // Гвенллех (Каэр Морхен)
-      '<path d="M 620,110 Q 580,140 550,170 Q 540,230 540,230" stroke-width="1.8" />' +
-      // Альба (Нильфгаард)
-      '<path d="M 480,570 Q 520,530 550,490 Q 620,460 700,450" stroke-width="2.5" />' +
-    '</g>';
-
-    // Горы (Синие горы, Махакам, Амелл)
-    var mountains = '<g fill="none" stroke="#64748b" stroke-width="1.5" opacity="0.6">' +
-      // Синие горы (восток)
-      '<path d="M 640,60 L 650,45 L 660,60 M 655,75 L 665,55 L 675,75 M 680,100 L 690,80 L 700,100 M 710,130 L 720,110 L 730,130 M 720,170 L 730,150 L 740,170" />' +
-      // Махакам (центр)
-      '<path d="M 450,260 L 460,245 L 470,260 M 465,275 L 475,255 L 485,275 M 460,295 L 470,280 L 480,295" />' +
-      // Хребет Амелл (юг)
-      '<path d="M 400,420 L 415,400 L 430,420 M 435,430 L 450,410 L 465,430 M 470,440 L 485,420 L 500,440" />' +
-    '</g>';
-
-    // Подсветка выбранного региона
-    var regionHighlights = WI_MAP_REGIONS.map(function(reg){
-      var isSel = m.selectedRegionId === reg.id;
-      return '<path class="wi-map-region ' + (isSel ? 'active' : '') + '" data-region-id="' + reg.id + '" style="cursor:pointer;" />';
-    }).join('');
-
-    // Отрисовка маршрута, если активен режим маршрутов
+    // 3. Маршрут между выбранными точками (если активен режим route)
     var routeSvg = '';
     if(m.mode === 'route' && m.routeFrom && m.routeTo){
       var p1 = WI_MAP_LOCATIONS.find(function(l){ return l.id === m.routeFrom; });
       var p2 = WI_MAP_LOCATIONS.find(function(l){ return l.id === m.routeTo; });
       if(p1 && p2){
-        routeSvg = '<line x1="' + p1.x + '" y1="' + p1.y + '" x2="' + p2.x + '" y2="' + p2.y + '" stroke="#fbbf24" stroke-width="3" stroke-dasharray="6,4" opacity="0.9">' +
-          '<animate attributeName="stroke-dashoffset" values="20;0" dur="1.2s" repeatCount="indefinite" />' +
-        '</line>';
+        routeSvg = '<g id="wiRouteLayer">' +
+          '<line x1="' + p1.x + '" y1="' + p1.y + '" x2="' + p2.x + '" y2="' + p2.y + '" stroke="rgba(0,0,0,0.6)" stroke-width="8" stroke-linecap="round"/>' +
+          '<line x1="' + p1.x + '" y1="' + p1.y + '" x2="' + p2.x + '" y2="' + p2.y + '" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="14,10" stroke-linecap="round" filter="url(#wiPinGlow)">' +
+            '<animate attributeName="stroke-dashoffset" values="48;0" dur="1.4s" repeatCount="indefinite"/>' +
+          '</line>' +
+        '</g>';
       }
     }
 
-    // Города и ключевые пункты
+    // 4. Метки городов и крепостей Континента
     var pinsSvg = WI_MAP_LOCATIONS.map(function(loc){
       var isSel = m.selectedLocId === loc.id;
+      var radius = isSel ? 16 : 10;
       return '<g class="wi-map-pin ' + (isSel ? 'selected' : '') + '" data-loc-id="' + loc.id + '" transform="translate(' + loc.x + ',' + loc.y + ')" style="cursor:pointer;">' +
-        '<circle r="' + (isSel ? '14' : '9') + '" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="1.5">' +
-          (isSel ? '<animate attributeName="r" values="12;18;12" dur="2s" repeatCount="indefinite" />' : '') +
-        '</circle>' +
-        '<circle r="4" fill="#fbbf24" />' +
-        (m.showLabels !== false ? ('<text y="18" fill="#e2e8f0" font-size="10.5" font-family="Cinzel,serif" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 3px #000)">' + esc(loc.name) + '</text>') : '') +
+        (isSel ? ('<circle r="24" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3">' +
+          '<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="10s" repeatCount="indefinite"/>' +
+        '</circle>') : '') +
+        '<circle r="' + radius + '" fill="' + (isSel ? '#f59e0b' : 'rgba(15,23,42,0.85)') + '" stroke="' + (isSel ? '#fff' : '#f59e0b') + '" stroke-width="' + (isSel ? '2.5' : '2') + '" filter="url(#wiPinGlow)"/>' +
+        '<text y="4" text-anchor="middle" font-size="' + (isSel ? '13' : '10') + '" pointer-events="none">' + (loc.icon || '🏰') + '</text>' +
+        (m.showLabels !== false ? ('<text y="' + (radius + 16) + '" fill="' + (isSel ? '#fbbf24' : '#f8fafc') + '" font-size="' + (isSel ? '14' : '12') + '" font-family="Cinzel, serif" font-weight="700" text-anchor="middle" filter="url(#wiLabelShadow)">' + esc(loc.name) + '</text>') : '') +
       '</g>';
     }).join('');
 
-    // Пользовательские метки
+    // 5. Пользовательские тактические метки
     var userPinsSvg = (m.showUserMarkers !== false ? (m.userMarkers || []).map(function(um){
       return '<g class="wi-user-marker" data-user-marker-id="' + um.id + '" transform="translate(' + um.x + ',' + um.y + ')" style="cursor:pointer;">' +
-        '<circle r="10" fill="rgba(239,68,68,0.3)" stroke="#ef4444" stroke-width="1.5" />' +
-        '<text y="4" text-anchor="middle" font-size="11">' + (um.icon || '📍') + '</text>' +
-        (m.showLabels !== false ? ('<text y="20" fill="#fca5a5" font-size="9.5" text-anchor="middle" font-weight="600" filter="drop-shadow(0 1px 2px #000)">' + esc(um.title || 'Метка') + '</text>') : '') +
+        '<circle r="12" fill="rgba(239,68,68,0.75)" stroke="#fff" stroke-width="2" filter="url(#wiPinGlow)"/>' +
+        '<text y="4" text-anchor="middle" font-size="11" pointer-events="none">' + (um.icon || '📍') + '</text>' +
+        (m.showLabels !== false ? ('<text y="24" fill="#fca5a5" font-size="11.5" font-family="Cinzel, serif" text-anchor="middle" font-weight="700" filter="url(#wiLabelShadow)">' + esc(um.title || 'Метка') + '</text>') : '') +
       '</g>';
     }).join('') : '');
 
     return '<svg id="wiMapSvg" viewBox="' + minX + ' ' + minY + ' ' + vbW + ' ' + vbH + '" width="100%" height="100%" style="display:block;touch-action:none;user-select:none;">' +
-      bgSvg + continentLand + skelligeIsles + rivers + mountains + regionHighlights + routeSvg + pinsSvg + userPinsSvg +
+      defsSvg + mapImg + routeSvg + pinsSvg + userPinsSvg +
     '</svg>';
   }
 
@@ -2123,11 +2152,9 @@
     if(!m.userMarkers || !m.userMarkers.length) WI.loadUserMarkers();
 
     var markersCount = (m.userMarkers || []).length;
-
     var curLoc = WI_MAP_LOCATIONS.find(function(l){ return l.id === m.selectedLocId; }) || WI_MAP_LOCATIONS[0];
-    var curReg = WI_MAP_REGIONS.find(function(r){ return r.id === m.selectedRegionId; });
 
-    // Инспектор локации/региона/маршрута
+    // Инспектор локации/маршрута/меток
     var inspectorHtml = '';
 
     if(m.mode === 'inspect'){
@@ -2136,29 +2163,43 @@
           '<span>' + (curLoc.icon || '🏰') + ' <b>' + esc(curLoc.name) + '</b></span>' +
           '<span class="wi-school-badge" style="font-size:11px;">' + esc(curLoc.region) + '</span>' +
         '</div>' +
-        '<div class="desc" style="margin-top:8px;font-size:13px;line-height:1.5;">' + esc(curLoc.desc) + '</div>' +
-        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:8px;margin-top:10px;margin-bottom:10px;font-size:12.5px;">' +
+          '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wi-border);border-radius:4px;padding:8px 10px;">' +
+            '<span style="color:var(--wi-steel);font-size:11px;display:block;">ВЛАСТЬ / ПРАВИТЕЛЬ:</span>' +
+            '<b style="color:#f1f5f9;">' + esc(curLoc.ruler || '—') + '</b>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wi-border);border-radius:4px;padding:8px 10px;">' +
+            '<span style="color:var(--wi-steel);font-size:11px;display:block;">КЛИМАТ И МЕСТНОСТЬ:</span>' +
+            '<b style="color:#f1f5f9;">' + esc(curLoc.climate || '—') + '</b>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wi-border);border-radius:4px;padding:8px 10px;">' +
+            '<span style="color:var(--wi-steel);font-size:11px;display:block;">УРОВЕНЬ ОПАСНОСТИ:</span>' +
+            '<b style="color:#fca5a5;">' + esc(curLoc.danger || '—') + '</b>' +
+          '</div>' +
+        '</div>' +
+        '<div class="desc" style="margin-top:6px;font-size:13.5px;line-height:1.55;color:#e2e8f0;font-family:\'EB Garamond\',serif;font-style:italic;">' +
+          esc(curLoc.desc) +
+        '</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">' +
           '<button class="btn btn-primary" id="wiMapSetRouteDestBtn" data-loc-id="' + curLoc.id + '">🧭 Проложить путь сюда</button>' +
           '<button class="btn btn-ghost" id="wiMapSetRouteOriginBtn" data-loc-id="' + curLoc.id + '">🏁 Начать маршрут отсюда</button>' +
+          '<button class="btn btn-ghost" id="wiMapCenterOnLocBtn" data-loc-id="' + curLoc.id + '">🎯 Сфокусировать камеру</button>' +
         '</div>' +
       '</div>';
     } else if(m.mode === 'route'){
-      var curPreset = WI_MAP_PRESETS.find(function(p){ return p.from === m.routeFrom && p.to === m.routeTo; }) || {
-        dist: 250, daysHorse: 6, daysFoot: 13, desc: 'Пользовательский тракт через земли Континента.'
-      };
-
+      var routeData = getRouteDetails(m.routeFrom, m.routeTo);
       var locFrom = WI_MAP_LOCATIONS.find(function(l){ return l.id === m.routeFrom; }) || WI_MAP_LOCATIONS[0];
       var locTo = WI_MAP_LOCATIONS.find(function(l){ return l.id === m.routeTo; }) || WI_MAP_LOCATIONS[1];
 
-      var encHtml = m.encounter ? ('<div style="background:rgba(245,158,11,0.12);border:1px solid var(--wi-amber);border-radius:6px;padding:12px;margin-top:10px;">' +
-        '<div style="font-weight:700;color:#fbbf24;margin-bottom:4px;">' + esc(m.encounter.title) + '</div>' +
-        '<div style="font-size:13px;line-height:1.45;color:var(--wi-silver);">' + esc(m.encounter.desc) + '</div>' +
+      var encHtml = m.encounter ? ('<div style="background:rgba(245,158,11,0.12);border:1px solid var(--wi-amber);border-radius:6px;padding:12px;margin-top:12px;">' +
+        '<div style="font-weight:700;color:#fbbf24;margin-bottom:4px;font-family:\'Cinzel\',serif;">' + esc(m.encounter.title) + '</div>' +
+        '<div style="font-size:13px;line-height:1.45;color:var(--wi-silver);font-family:\'EB Garamond\',serif;font-style:italic;">' + esc(m.encounter.desc) + '</div>' +
       '</div>') : '';
 
       inspectorHtml = '<div class="wi-char-sheet-card" style="margin-top:14px;">' +
         '<div class="wi-char-header">' +
           '<span>🧭 Калькулятор переходов Континента</span>' +
-          '<span class="wi-school-badge" style="font-size:11px;">' + curPreset.dist + ' миль</span>' +
+          '<span class="wi-school-badge" style="font-size:11px;">' + routeData.dist + ' миль</span>' +
         '</div>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;margin-top:10px;">' +
           '<div>' +
@@ -2175,11 +2216,11 @@
           '</div>' +
         '</div>' +
         '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:13px;">' +
-          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);padding:8px 12px;border-radius:4px;">🐎 <b>На коне:</b> ' + curPreset.daysHorse + ' дн.</div>' +
-          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);padding:8px 12px;border-radius:4px;">🥾 <b>Пешком:</b> ' + curPreset.daysFoot + ' дн.</div>' +
-          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);padding:8px 12px;border-radius:4px;">🍖 <b>Провиант:</b> ' + (curPreset.daysHorse * 2) + ' рационов</div>' +
+          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);padding:8px 12px;border-radius:4px;">🐎 <b>На коне:</b> ' + routeData.daysHorse + ' дн.</div>' +
+          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);padding:8px 12px;border-radius:4px;">🥾 <b>Пешком:</b> ' + routeData.daysFoot + ' дн.</div>' +
+          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);padding:8px 12px;border-radius:4px;">🍖 <b>Провиант:</b> ' + (routeData.daysHorse * 2) + ' рационов</div>' +
         '</div>' +
-        '<div class="desc" style="margin-top:8px;font-size:12.5px;">' + esc(curPreset.desc) + '</div>' +
+        '<div class="desc" style="margin-top:8px;font-size:13px;line-height:1.5;color:#e2e8f0;font-family:\'EB Garamond\',serif;font-style:italic;">' + esc(routeData.desc) + '</div>' +
         '<div style="margin-top:10px;">' +
           '<button class="btn btn-primary" id="wiMapRollEncounterBtn">🎲 Случайная встреча на тракте</button>' +
         '</div>' +
@@ -2189,18 +2230,19 @@
       inspectorHtml = '<div class="wi-char-sheet-card" style="margin-top:14px;">' +
         '<div class="wi-char-header">' +
           '<span>📍 Тактические метки ведьмака (' + markersCount + ')</span>' +
-          '<button class="btn btn-primary" id="wiMapAddMarkerOpenBtn" style="font-size:11px;padding:3px 8px;">➕ Добавить метку в центр</button>' +
+          '<button class="btn btn-primary" id="wiMapAddMarkerOpenBtn" style="font-size:11px;padding:4px 10px;">➕ Добавить метку в центр</button>' +
         '</div>' +
-        '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:8px;margin-top:10px;">' +
+        '<div style="font-size:12px;color:var(--wi-steel);margin-top:4px;margin-bottom:10px;">💡 <b>Совет:</b> В режиме «Метки» вы можете просто кликнуть по любому месту на карте, чтобы поставить метку логова чудовища, места силы или тайника!</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:8px;">' +
           (m.userMarkers && m.userMarkers.length ? m.userMarkers.map(function(um){
             return '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wi-border);border-radius:4px;padding:8px;display:flex;justify-content:space-between;align-items:center;gap:6px;">' +
-              '<div>' +
-                '<div style="font-weight:700;font-size:12.5px;color:#fff;">' + (um.icon || '📍') + ' ' + esc(um.title || 'Метка') + '</div>' +
-                '<div style="font-size:11px;color:var(--wi-steel);">' + esc(um.desc || '') + '</div>' +
+              '<div style="flex:1;min-width:0;cursor:pointer;" class="wi-user-marker-row" data-marker-id="' + um.id + '">' +
+                '<div style="font-weight:700;font-size:12.5px;color:#fff;">' + (um.icon || '📍') + ' ' + esc(um.title || 'Метка') + ' <span style="font-size:10px;color:var(--wi-steel);font-weight:normal;">[' + um.x + ', ' + um.y + ']</span></div>' +
+                (um.desc ? ('<div style="font-size:11px;color:var(--wi-steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(um.desc) + '</div>') : '') +
               '</div>' +
-              '<button class="btn btn-ghost" data-wi-del-marker="' + um.id + '" style="font-size:11px;padding:2px 6px;color:#ef4444;">🗑️</button>' +
+              '<button class="btn btn-ghost" data-wi-del-marker="' + um.id + '" style="font-size:11px;padding:2px 6px;color:#ef4444;" title="Удалить метку">🗑️</button>' +
             '</div>';
-          }).join('') : '<div class="char-empty" style="grid-column:1/-1;">Нет меток. Нажмите кнопку выше, чтобы отметить логово чудовища или тайник.</div>') +
+          }).join('') : '<div class="char-empty" style="grid-column:1/-1;">Нет меток. Кликните по карте или нажмите кнопку выше, чтобы отметить контракт или тайник.</div>') +
         '</div>' +
       '</div>';
     }
@@ -2209,8 +2251,8 @@
       '<button class="back" data-nav="wiHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiHome\');">← Назад</button>' +
       '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">' +
         '<div>' +
-          '<h1 style="margin-bottom:4px;">🗺️ Карта Континента</h1>' +
-          '<div class="desc" style="margin-bottom:0;">Интерактивный атлас Северных Королевств, Великого Моря и Нильфгаарда, маршруты и путевой журнал.</div>' +
+          '<h1 style="margin-bottom:4px;">🗺️ Карта Континента (4K Атлас)</h1>' +
+          '<div class="desc" style="margin-bottom:0;">Подлинная 4K-карта Континента (Nolan Kotulan): Северные Королевства, Острова Скеллиге, Туссент и Нильфгаард.</div>' +
         '</div>' +
         '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
           '<button class="wi-pill ' + (m.mode === 'inspect' ? 'active' : '') + '" id="wiMapModeInspect">🗺️ Атлас</button>' +
@@ -2218,19 +2260,31 @@
           '<button class="wi-pill ' + (m.mode === 'markers' ? 'active' : '') + '" id="wiMapModeMarkers">📍 Метки (' + markersCount + ')</button>' +
         '</div>' +
       '</div>' +
-      '<div class="wi-map-container" style="background:#070c14;border:1px solid var(--wi-border);border-radius:6px;overflow:hidden;position:relative;">' +
-        '<div class="wi-map-toolbar" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(14,18,24,0.9);border-bottom:1px solid var(--wi-border);flex-wrap:wrap;gap:8px;">' +
-          '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:200px;">' +
+      '<div class="wi-map-container" style="background:#070c14;border:1px solid var(--wi-border);border-radius:8px;overflow:hidden;position:relative;box-shadow:0 8px 30px rgba(0,0,0,0.6);">' +
+        '<div class="wi-map-toolbar" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(14,18,24,0.95);border-bottom:1px solid var(--wi-border);flex-wrap:wrap;gap:8px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:220px;">' +
             '<span style="color:var(--wi-steel);font-size:13px;">🔍</span>' +
-            '<input type="text" id="wiMapSearch" class="wi-input" style="padding:4px 8px;font-size:12px;max-width:280px;" placeholder="Поиск города или крепости..." value="' + escA(m.search || '') + '">' +
+            '<input type="text" id="wiMapSearch" class="wi-input" style="padding:5px 10px;font-size:12.5px;max-width:320px;" placeholder="Поиск города, замка или реки..." value="' + escA(m.search || '') + '">' +
           '</div>' +
-          '<div style="display:flex;gap:6px;align-items:center;">' +
-            '<button class="btn btn-ghost" id="wiMapZoomIn" title="Приблизить" style="padding:3px 8px;font-size:12px;">➕</button>' +
-            '<button class="btn btn-ghost" id="wiMapZoomOut" title="Отдалить" style="padding:3px 8px;font-size:12px;">➖</button>' +
-            '<button class="btn btn-ghost" id="wiMapZoomReset" title="Сбросить масштаб" style="padding:3px 8px;font-size:12px;">⟲ 100%</button>' +
+          '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
+            '<button class="btn btn-ghost" id="wiMapToggleLabels" title="Показать/скрыть подписи городов" style="padding:4px 9px;font-size:12px;">' + (m.showLabels !== false ? '🏷️ Текст' : '🏷️ Без текста') + '</button>' +
+            '<button class="btn btn-ghost" id="wiMapZoomIn" title="Приблизить" style="padding:4px 10px;font-size:12px;">➕</button>' +
+            '<button class="btn btn-ghost" id="wiMapZoomOut" title="Отдалить" style="padding:4px 10px;font-size:12px;">➖</button>' +
+            '<button class="btn btn-ghost" id="wiMapZoomReset" title="Сбросить масштаб" style="padding:4px 10px;font-size:12px;">⟲ 100%</button>' +
           '</div>' +
         '</div>' +
-        '<div class="wi-map-viewport" id="wiMapViewport" style="height:480px;position:relative;cursor:grab;overflow:hidden;">' +
+        '<div class="wi-map-quick-jumps" style="display:flex;gap:6px;flex-wrap:wrap;padding:6px 12px;background:rgba(10,14,20,0.85);border-bottom:1px solid var(--wi-border);overflow-x:auto;">' +
+          '<span style="font-size:11px;color:var(--wi-steel);align-self:center;font-weight:600;font-family:\'JetBrains Mono\',monospace;">ФОКУС:</span>' +
+          '<button class="wi-pill" data-wi-jump="north">🐺 Север</button>' +
+          '<button class="wi-pill" data-wi-jump="novigrad">🏰 Новиград/Вызима</button>' +
+          '<button class="wi-pill" data-wi-jump="kaer_morhen">🐺 Каэр Морхен</button>' +
+          '<button class="wi-pill" data-wi-jump="skellige">⛵ Скеллиге</button>' +
+          '<button class="wi-pill" data-wi-jump="toussaint">🍇 Туссент</button>' +
+          '<button class="wi-pill" data-wi-jump="brokilon">🏹 Брокилон</button>' +
+          '<button class="wi-pill" data-wi-jump="nilfgaard">☀️ Нильфгаард</button>' +
+          '<button class="wi-pill" data-wi-jump="all">🗺️ Весь Континент</button>' +
+        '</div>' +
+        '<div class="wi-map-viewport" id="wiMapViewport" style="height:540px;position:relative;cursor:grab;overflow:hidden;background:#05080e;">' +
           renderWitcherMapSvg() +
         '</div>' +
       '</div>' +
@@ -2404,51 +2458,147 @@
       });
     }
 
+    function updateMapTransform(){
+      var svg = document.getElementById('wiMapSvg');
+      var vp = document.getElementById('wiMapViewport');
+      if(!svg || !vp) return;
+      var vw = vp.clientWidth || 800;
+      var vh = vp.clientHeight || 540;
+      var ar = vw / vh;
+      var z = Math.max(0.4, Math.min(5.0, m.zoom || 1.1));
+      var baseW = 2400;
+      var baseH = baseW / ar;
+      var vbW = baseW / z;
+      var vbH = baseH / z;
+      var minX = (m.cx != null ? m.cx : 1440) - vbW / 2;
+      var minY = (m.cy != null ? m.cy : 1200) - vbH / 2;
+      svg.setAttribute('viewBox', minX + ' ' + minY + ' ' + vbW + ' ' + vbH);
+    }
+
+    function focusOn(x, y, zoom){
+      m.cx = x;
+      m.cy = y;
+      if(zoom != null) m.zoom = zoom;
+      updateMapTransform();
+    }
+
+    // Кнопка переключения подписей городов
+    var toggleLabelsBtn = document.getElementById('wiMapToggleLabels');
+    if(toggleLabelsBtn){
+      toggleLabelsBtn.addEventListener('click', function(){
+        m.showLabels = (m.showLabels === false ? true : false);
+        if(typeof render === 'function') render();
+      });
+    }
+
     // Зум и центрирование
     var btnIn = document.getElementById('wiMapZoomIn');
     if(btnIn){
       btnIn.addEventListener('click', function(){
-        m.zoom = Math.min((m.zoom || 1) * 1.3, 4);
-        refreshMapSvg();
+        m.zoom = Math.min((m.zoom || 1.1) * 1.3, 5.0);
+        updateMapTransform();
       });
     }
 
     var btnOut = document.getElementById('wiMapZoomOut');
     if(btnOut){
       btnOut.addEventListener('click', function(){
-        m.zoom = Math.max((m.zoom || 1) / 1.3, 0.7);
-        refreshMapSvg();
+        m.zoom = Math.max((m.zoom || 1.1) / 1.3, 0.4);
+        updateMapTransform();
       });
     }
 
     var btnReset = document.getElementById('wiMapZoomReset');
     if(btnReset){
       btnReset.addEventListener('click', function(){
-        m.zoom = 1;
-        m.cx = 400;
-        m.cy = 325;
-        refreshMapSvg();
+        m.zoom = 1.1;
+        m.cx = 1440;
+        m.cy = 1200;
+        updateMapTransform();
       });
     }
 
+    // Быстрые прыжки / фокусировки
+    var presets = {
+      north: { cx: 1400, cy: 500, zoom: 1.6 },
+      novigrad: { cx: 1350, cy: 1080, zoom: 2.3 },
+      kaer_morhen: { cx: 2595, cy: 245, zoom: 2.7 },
+      skellige: { cx: 620, cy: 1600, zoom: 2.0 },
+      toussaint: { cx: 2430, cy: 2220, zoom: 2.5 },
+      brokilon: { cx: 1360, cy: 1550, zoom: 2.4 },
+      nilfgaard: { cx: 1710, cy: 3750, zoom: 2.0 },
+      all: { cx: 1440, cy: 2048, zoom: 0.65 }
+    };
+    document.querySelectorAll('[data-wi-jump]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var target = btn.getAttribute('data-wi-jump');
+        var cfg = presets[target];
+        if(cfg){
+          focusOn(cfg.cx, cfg.cy, cfg.zoom);
+        }
+      });
+    });
+
     // Клик по метке города/пункта
     document.querySelectorAll('.wi-map-pin').forEach(function(pin){
-      pin.addEventListener('click', function(){
+      pin.addEventListener('click', function(e){
+        e.stopPropagation();
         var lid = pin.getAttribute('data-loc-id');
         if(lid){
           m.selectedLocId = lid;
-          m.mode = 'inspect';
+          var loc = WI_MAP_LOCATIONS.find(function(l){ return l.id === lid; });
+          if(loc && (m.zoom || 1.1) < 1.5){
+            m.cx = loc.x;
+            m.cy = loc.y;
+          }
           if(typeof render === 'function') render();
         }
       });
     });
+
+    // Клик по пользовательской метке
+    document.querySelectorAll('.wi-user-marker').forEach(function(pin){
+      pin.addEventListener('click', function(e){
+        e.stopPropagation();
+        var mid = pin.getAttribute('data-user-marker-id');
+        var um = (m.userMarkers || []).find(function(x){ return x.id === mid; });
+        if(um){
+          WI.toast('📍 ' + um.title + (um.desc ? ': ' + um.desc : ''), 'info');
+        }
+      });
+    });
+
+    // Клик по строке метки в инспекторе
+    document.querySelectorAll('.wi-user-marker-row').forEach(function(row){
+      row.addEventListener('click', function(){
+        var mid = row.getAttribute('data-marker-id');
+        var um = (m.userMarkers || []).find(function(x){ return x.id === mid; });
+        if(um){
+          focusOn(um.x, um.y, Math.max(m.zoom || 1.1, 2.2));
+          WI.toast('📍 Камера перемещена к «' + um.title + '»', 'info');
+        }
+      });
+    });
+
+    // Центрировать камеру на выбранной локации из инспектора
+    var centerOnLocBtn = document.getElementById('wiMapCenterOnLocBtn');
+    if(centerOnLocBtn){
+      centerOnLocBtn.addEventListener('click', function(){
+        var id = centerOnLocBtn.getAttribute('data-loc-id');
+        var loc = WI_MAP_LOCATIONS.find(function(l){ return l.id === id; });
+        if(loc){
+          focusOn(loc.x, loc.y, Math.max(m.zoom || 1.1, 2.0));
+          WI.toast('🎯 Камера сфокусирована на ' + loc.name, 'info');
+        }
+      });
+    }
 
     // Маршруты: From / To
     var selFrom = document.getElementById('wiMapRouteFromSel');
     if(selFrom){
       selFrom.addEventListener('change', function(){
         m.routeFrom = selFrom.value;
-        refreshMapSvg();
+        if(typeof render === 'function') render();
       });
     }
 
@@ -2456,7 +2606,7 @@
     if(selTo){
       selTo.addEventListener('change', function(){
         m.routeTo = selTo.value;
-        refreshMapSvg();
+        if(typeof render === 'function') render();
       });
     }
 
@@ -2489,13 +2639,13 @@
       });
     }
 
-    // Метки: добавление и удаление
+    // Метки: добавление в центр экрана
     var addMarkerBtn = document.getElementById('wiMapAddMarkerOpenBtn');
     if(addMarkerBtn){
       addMarkerBtn.addEventListener('click', function(){
         var title = prompt('Название метки (например: Логово грифона, Заброшенная корчма):');
         if(!title) return;
-        var icon = prompt('Иконка-эмодзи (🐺, ⚔️, 🍺, 🔮, 🎒, 🐉):', '🐺') || '📍';
+        var icon = prompt('Иконка-эмодзи (🐺, ⚔️, 🍺, 🔮, 🎒, 🐉, 💀, 💎):', '⚔️') || '📍';
         var desc = prompt('Заметка к метке:') || '';
 
         var um = {
@@ -2503,8 +2653,8 @@
           title: title,
           icon: icon,
           desc: desc,
-          x: Math.round(m.cx || 400),
-          y: Math.round(m.cy || 325)
+          x: Math.round(m.cx || 1440),
+          y: Math.round(m.cy || 1200)
         };
         m.userMarkers.push(um);
         WI.saveUserMarkers();
@@ -2532,24 +2682,25 @@
         if(q){
           var found = WI_MAP_LOCATIONS.find(function(l){ return l.name.toLowerCase().indexOf(q) !== -1; });
           if(found){
-            m.cx = found.x;
-            m.cy = found.y;
             m.selectedLocId = found.id;
-            refreshMapSvg();
+            focusOn(found.x, found.y, Math.max(m.zoom || 1.1, 2.2));
           }
         }
       });
     }
 
-    // Drag / Pan карты
+    // Drag, Wheel, Pinch-Zoom и клик по карте для добавления метки
     var vport = document.getElementById('wiMapViewport');
     if(vport && !vport.__panBound){
       vport.__panBound = true;
       var isDown = false;
       var startX, startY;
+      var hasDragged = false;
 
       vport.addEventListener('mousedown', function(e){
+        if(e.button !== 0) return;
         isDown = true;
+        hasDragged = false;
         startX = e.clientX;
         startY = e.clientY;
         vport.style.cursor = 'grabbing';
@@ -2559,12 +2710,20 @@
         if(!isDown) return;
         var dx = e.clientX - startX;
         var dy = e.clientY - startY;
+        if(Math.hypot(dx, dy) > 4) hasDragged = true;
         startX = e.clientX;
         startY = e.clientY;
-        var z = m.zoom || 1;
-        m.cx -= dx / z;
-        m.cy -= dy / z;
-        refreshMapSvg();
+
+        var vw = vport.clientWidth || 800;
+        var vh = vport.clientHeight || 540;
+        var ar = vw / vh;
+        var z = Math.max(0.4, Math.min(5.0, m.zoom || 1.1));
+        var baseW = 2400;
+        var scale = (baseW / z) / vw;
+
+        m.cx = Math.max(-200, Math.min(3080, (m.cx || 1440) - dx * scale));
+        m.cy = Math.max(-200, Math.min(4296, (m.cy || 1200) - dy * scale));
+        updateMapTransform();
       });
 
       window.addEventListener('mouseup', function(){
@@ -2574,33 +2733,133 @@
         }
       });
 
+      // Зум колесиком мыши с привязкой к курсору
       vport.addEventListener('wheel', function(e){
         e.preventDefault();
-        var delta = e.deltaY > 0 ? 0.9 : 1.1;
-        m.zoom = Math.max(0.6, Math.min(4, (m.zoom || 1) * delta));
-        refreshMapSvg();
+        var vw = vport.clientWidth || 800;
+        var vh = vport.clientHeight || 540;
+        var ar = vw / vh;
+        var rect = vport.getBoundingClientRect();
+        var mouseX = e.clientX - rect.left;
+        var mouseY = e.clientY - rect.top;
+
+        var curZoom = Math.max(0.4, Math.min(5.0, m.zoom || 1.1));
+        var curVbW = 2400 / curZoom;
+        var curVbH = (2400 / ar) / curZoom;
+        var curMinX = (m.cx != null ? m.cx : 1440) - curVbW / 2;
+        var curMinY = (m.cy != null ? m.cy : 1200) - curVbH / 2;
+
+        var ptX = curMinX + (mouseX / vw) * curVbW;
+        var ptY = curMinY + (mouseY / vh) * curVbH;
+
+        var factor = e.deltaY > 0 ? 0.85 : 1.18;
+        var newZoom = Math.max(0.4, Math.min(5.0, curZoom * factor));
+        var newVbW = 2400 / newZoom;
+        var newVbH = (2400 / ar) / newZoom;
+
+        m.cx = ptX + (0.5 - mouseX / vw) * newVbW;
+        m.cy = ptY + (0.5 - mouseY / vh) * newVbH;
+        m.zoom = newZoom;
+        updateMapTransform();
       }, { passive: false });
-    }
 
-    function refreshMapSvg(){
-      var vp = document.getElementById('wiMapViewport');
-      if(vp){
-        vp.innerHTML = renderWitcherMapSvg();
-        wireWiMapPins();
-      }
-    }
+      // Клик по карте для установки метки в режиме 'markers'
+      vport.addEventListener('click', function(e){
+        if(hasDragged) return;
+        if(m.mode !== 'markers') return;
+        if(e.target.closest && (e.target.closest('.wi-map-pin') || e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
 
-    function wireWiMapPins(){
-      document.querySelectorAll('.wi-map-pin').forEach(function(pin){
-        pin.addEventListener('click', function(){
-          var lid = pin.getAttribute('data-loc-id');
-          if(lid){
-            m.selectedLocId = lid;
-            m.mode = 'inspect';
-            if(typeof render === 'function') render();
-          }
+        var rect = vport.getBoundingClientRect();
+        var mouseX = e.clientX - rect.left;
+        var mouseY = e.clientY - rect.top;
+        var vw = vport.clientWidth || 800;
+        var vh = vport.clientHeight || 540;
+        var ar = vw / vh;
+        var z = Math.max(0.4, Math.min(5.0, m.zoom || 1.1));
+        var baseW = 2400;
+        var baseH = baseW / ar;
+        var vbW = baseW / z;
+        var vbH = baseH / z;
+        var minX = (m.cx != null ? m.cx : 1440) - vbW / 2;
+        var minY = (m.cy != null ? m.cy : 1200) - vbH / 2;
+
+        var clickX = Math.round(minX + (mouseX / vw) * vbW);
+        var clickY = Math.round(minY + (mouseY / vh) * vbH);
+
+        var title = prompt('Название новой метки (например: Логово архигрифона, Затонувший сундук, Круг стихий):');
+        if(!title) return;
+        var icon = prompt('Иконка метки (🐺, ⚔️, 🍺, 🔮, 🎒, 🐉, 💀, 💎):', '⚔️') || '📍';
+        var desc = prompt('Заметка к метке (награда, контракт, секрет):') || '';
+
+        m.userMarkers.push({
+          id: 'um_' + Date.now(),
+          title: title,
+          icon: icon,
+          desc: desc,
+          x: clickX,
+          y: clickY
         });
+        WI.saveUserMarkers();
+        WI.toast('✓ Метка поставлена: ' + title, 'success');
+        if(typeof render === 'function') render();
       });
+
+      // Сенсорное управление: перемещение и пинч-зум
+      var lastTouchDist = 0;
+      var touchStartX = 0, touchStartY = 0;
+      var isTouching = false;
+
+      vport.addEventListener('touchstart', function(e){
+        if(e.touches.length === 1){
+          isTouching = true;
+          hasDragged = false;
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        } else if(e.touches.length === 2){
+          isTouching = false;
+          lastTouchDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+        }
+      }, { passive: true });
+
+      vport.addEventListener('touchmove', function(e){
+        if(e.touches.length === 1 && isTouching){
+          var dx = e.touches[0].clientX - touchStartX;
+          var dy = e.touches[0].clientY - touchStartY;
+          if(Math.hypot(dx, dy) > 4) hasDragged = true;
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+
+          var vw = vport.clientWidth || 800;
+          var vh = vport.clientHeight || 540;
+          var ar = vw / vh;
+          var z = Math.max(0.4, Math.min(5.0, m.zoom || 1.1));
+          var baseW = 2400;
+          var scale = (baseW / z) / vw;
+
+          m.cx = Math.max(-200, Math.min(3080, (m.cx || 1440) - dx * scale));
+          m.cy = Math.max(-200, Math.min(4296, (m.cy || 1200) - dy * scale));
+          updateMapTransform();
+        } else if(e.touches.length === 2){
+          var dist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          if(lastTouchDist > 0){
+            var factor = dist / lastTouchDist;
+            m.zoom = Math.max(0.4, Math.min(5.0, (m.zoom || 1.1) * factor));
+            updateMapTransform();
+          }
+          lastTouchDist = dist;
+        }
+      }, { passive: true });
+
+      vport.addEventListener('touchend', function(){
+        isTouching = false;
+        lastTouchDist = 0;
+      }, { passive: true });
     }
 
     wireWiNav();
