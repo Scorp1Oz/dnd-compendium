@@ -545,6 +545,20 @@ const DICE_LABEL_CATEGORIES = window.DICE_LABEL_CATEGORIES = [
       {icon:'⚔️', ru:'Атака стихией', std:20},
       {icon:'🛡️', ru:'Активная защита стихией', std:20}
     ]},
+  {key:'witcher', mode:'wi', icon:'🐺', ru:'Ведьмак', items:[
+    {icon:'🐺', ru:'Знак Аард (Телекинетический толчок)', std:20},
+    {icon:'🔥', ru:'Знак Игни (Выброс пламени)', std:20},
+    {icon:'🛡️', ru:'Знак Квен (Магический щит)', std:20},
+    {icon:'👁️', ru:'Знак Аксий (Контроль разума / Гипноз)', std:20},
+    {icon:'🕸️', ru:'Знак Ирден (Магическая ловушка)', std:20},
+    {icon:'⚔️', ru:'Атака: Стальной меч (люди/звери)', std:20},
+    {icon:'🗡️', ru:'Атака: Серебряный меч (чудовища)', std:20},
+    {icon:'💥', ru:'Урон оружия / Знака', std:null},
+    {icon:'🎯', ru:'Парирование и контратака', std:20},
+    {icon:'⚡', ru:'Ведьмачье чутьё (Внимание / Следы)', std:20},
+    {icon:'🧪', ru:'Спасбросок: Интоксикация от зелий (ТЕЛ)', std:20},
+    {icon:'💣', ru:'Урон бомбы (Картечь / Самум / Сев. Ветер)', std:null}
+  ]},
   {key:'core', icon:'⚔️', ru:'Основное', items:[
     {icon:'🎯', ru:'Попадание', std:20},
     {icon:'💥', ru:'Урон', std:null},
@@ -639,6 +653,11 @@ function renderDice(){
           '<button class="back" data-go="shHome">← Назад в Свитки</button>' +
           '<h1>Бросок костей</h1>' +
           '<p class="subtitle">Кости судьбы шиноби — чакра, техники и проверки характеристик.</p>';
+      } else if(HB.mode==='wi'){
+        return renderCrumb([{label:'Ведьмак', nav:'wiHome'},{label:'Бросок костей'}]) +
+          '<button class="back" data-go="wiHome">← Назад на большак</button>' +
+          '<h1>Кости Судьбы</h1>' +
+          '<p class="subtitle">ВЕДЬМАЧЬИ ЗНАКИ // СТАЛЬ И СЕРЕБРО // БРОСОК КОСТЕЙ</p>';
       } else if(HB.mode==='hb'){
         return renderCrumb([{label:'Технологии', nav:'hbHome'},{label:'Бросок костей'}]) +
           '<button class="back" data-go="hbHome">← Назад</button>' +

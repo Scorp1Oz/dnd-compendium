@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v41';
+const CACHE_NAME = 'compendium-cache-v42';
 const APP_SHELL = [
   './',
   './index.html',
@@ -11,12 +11,14 @@ const APP_SHELL = [
   './css/shinobi.css',
   './css/mass-effect.css',
   './css/avatar.css',
+  './css/witcher.css',
   './js/dnd-data.js',
   './js/core.js',
   './js/modules/homebrew.js',
   './js/modules/shinobi.js',
   './js/modules/mass-effect.js',
   './js/modules/avatar.js',
+  './js/modules/witcher.js',
   './js/modules/github-sync.js',
   './js/app.js',
   './mass_effect_galaxy_map.jpg',

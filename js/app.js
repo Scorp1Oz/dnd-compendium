@@ -14,6 +14,17 @@ function paintShBar(){
     seg.appendChild(bMe);
   }
 
+  if(!seg.querySelector('[data-hbmode="el"]')){
+    var bEl=document.createElement('button');
+    bEl.className='hb-seg-btn'; bEl.setAttribute('data-hbmode','el'); bEl.textContent='Стихия';
+    seg.appendChild(bEl);
+  }
+  if(!seg.querySelector('[data-hbmode="wi"]')){
+    var bWi=document.createElement('button');
+    bWi.className='hb-seg-btn'; bWi.setAttribute('data-hbmode','wi'); bWi.textContent='Ведьмак';
+    seg.appendChild(bWi);
+  }
+
   seg.querySelectorAll('.hb-seg-btn').forEach(function(b){
     b.classList.toggle('on', b.getAttribute('data-hbmode')===HB.mode);
   });
@@ -48,12 +59,24 @@ function paintShBar(){
     });
   }
 
+  var wiBtn = seg.querySelector('[data-hbmode="wi"]');
+  if(wiBtn && !wiBtn.__wiBound){
+    wiBtn.__wiBound = true;
+    wiBtn.addEventListener('click', function(){
+      HB.mode='wi';
+      try{ localStorage.setItem('ttc_mode','wi'); }catch(e){}
+      view={screen:'wiHome'}; render(); window.scrollTo(0,0);
+    });
+  }
+
   document.body.classList.toggle('sh-theme', HB.mode==='sh');
   document.body.classList.toggle('me-theme', HB.mode==='me');
   document.body.classList.toggle('el-theme', HB.mode==='el');
-  if(HB.mode==='sh' || HB.mode==='me' || HB.mode==='el') document.body.classList.remove('hb-theme');
+  document.body.classList.toggle('wi-theme', HB.mode==='wi');
+  if(HB.mode==='sh' || HB.mode==='me' || HB.mode==='el' || HB.mode==='wi') document.body.classList.remove('hb-theme');
   if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
   if(typeof EL !== 'undefined' && typeof EL.applyTheme === 'function') EL.applyTheme();
+  if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
 
   var lab=bar.querySelector('.hb-bar-world');
   if(HB.mode==='sh'){
@@ -72,6 +95,11 @@ function paintShBar(){
     var elFullName = elP ? (elP.firstName + (elP.lastName ? (' ' + elP.lastName) : '')).trim() : '';
     var elInfo = elFullName ? (' • ' + elFullName + ' (' + (elP.element || 'Стихия') + ')') : '';
     lab.textContent = 'Стихия' + elInfo;
+  } else if(HB.mode==='wi'){
+    if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
+    var wiP = (typeof WI !== 'undefined' && WI.getProfile) ? WI.getProfile() : null;
+    var wiName = wiP ? (' • ' + wiP.name + ' (' + (wiP.school || 'Школа Волка') + ')') : '';
+    lab.textContent = 'Ведьмак' + wiName;
   } else if(HB.mode==='hb'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
     lab.textContent = (HB.world && HB.world.name ? HB.world.name : 'Технологии');
@@ -88,8 +116,37 @@ var _r=window.render, _n=window.navigate, _w=window.wireEvents;
 
 window.render=function(){
   window.view = view;
+  if(HB.mode==='wi'){
+    document.body.classList.remove('sh-theme', 'me-theme', 'el-theme', 'hb-theme');
+    document.body.classList.add('wi-theme');
+    if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
+    var pCit = document.getElementById("meCitadelParticles"); if(pCit) pCit.style.display = "none";
+    var pOmni = document.getElementById("meOmniProjections"); if(pOmni) pOmni.style.display = "none";
+    var pN7 = document.getElementById("meN7Background"); if(pN7) pN7.style.display = "none";
+    var pCerb = document.getElementById("meCerberusBackground"); if(pCerb) pCerb.style.display = "none";
+    var oldCrt = document.getElementById("meCerberusCrtOverlay"); if(oldCrt && oldCrt.parentNode) oldCrt.parentNode.removeChild(oldCrt);
+    var elFx = document.getElementById('elThemeFx'); if(elFx) elFx.style.display = 'none';
+
+    var s = view.screen || '';
+    if(s === 'dice'){
+      _r();
+      paintShBar();
+      return;
+    }
+    var app = document.getElementById('app');
+    app.classList.remove('wide');
+    app.classList.add('home-wide');
+    var html = (typeof wiHome === 'function') ? wiHome() : '<div>Ведьмак</div>';
+    app.innerHTML = html;
+    _w();
+    paintShBar();
+    return;
+  }
+
+  if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
+
   if(HB.mode==='el'){
-    document.body.classList.remove('sh-theme', 'me-theme', 'hb-theme');
+    document.body.classList.remove('sh-theme', 'me-theme', 'hb-theme', 'wi-theme');
     document.body.classList.add('el-theme');
     if(typeof EL !== 'undefined' && typeof EL.applyTheme === 'function') EL.applyTheme();
     var pCit = document.getElementById("meCitadelParticles"); if(pCit) pCit.style.display = "none";
@@ -384,6 +441,19 @@ window.navigate=function(val){
       return;
     }
   }
+  if(HB.mode==='wi'){
+    var wiScreens = {
+      home: 'wiHome',
+      wiHome: 'wiHome',
+      dice: 'dice'
+    };
+    if(wiScreens[p[0]]){
+      window.view = view = { screen: wiScreens[p[0]] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+  }
   if(HB.mode==='sh'){
     var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shJutsuGen:'shJutsuGen',shMoveGen:'shMoveGen',shMoves:'shMoves',shSkillGen:'shSkillGen',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData',dice:'dice'};
     if(map[p[0]]){ window.view = view = {screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
@@ -406,6 +476,10 @@ if(HB.mode==='sh'){
   document.body.classList.add('el-theme');
   if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('el')!==0)) view={screen:'elHome'};
   if(typeof EL !== 'undefined' && typeof EL.applyTheme === 'function') EL.applyTheme();
+} else if(HB.mode==='wi'){
+  document.body.classList.add('wi-theme');
+  if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('wi')!==0)) view={screen:'wiHome'};
+  if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
 }
 render();
   if(typeof GHSync !== "undefined") GHSync.checkStartupSync();

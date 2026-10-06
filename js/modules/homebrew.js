@@ -190,6 +190,7 @@ function paintBar(){
   document.body.classList.toggle('sh-theme', curMode === 'sh');
   document.body.classList.toggle('me-theme', curMode === 'me');
   document.body.classList.toggle('el-theme', curMode === 'el');
+  document.body.classList.toggle('wi-theme', curMode === 'wi');
 
   var worldLabel = '';
   if(curMode === 'hb'){
@@ -204,6 +205,10 @@ function paintBar(){
     worldLabel = 'Космос' + meName + meShieldHp;
   } else if(curMode === 'el'){
     worldLabel = 'Стихия';
+  } else if(curMode === 'wi'){
+    var wiP = (typeof WI !== 'undefined' && WI.getProfile) ? WI.getProfile() : null;
+    var wiName = wiP ? (' • ' + wiP.name + ' (' + (wiP.school || 'Школа Волка') + ')') : '';
+    worldLabel = 'Ведьмак' + wiName;
   }
 
   bar.innerHTML =
@@ -214,6 +219,7 @@ function paintBar(){
         '<button class="hb-seg-btn ' + (curMode==='sh'?'on':'') + '" data-hbmode="sh">Шиноби</button>'+
         '<button class="hb-seg-btn ' + (curMode==='me'?'on':'') + '" data-hbmode="me">Космос</button>'+
         '<button class="hb-seg-btn ' + (curMode==='el'?'on':'') + '" data-hbmode="el">Стихия</button>'+
+        '<button class="hb-seg-btn ' + (curMode==='wi'?'on':'') + '" data-hbmode="wi">Ведьмак</button>'+
       '</div>'+
       (worldLabel ? '<div class="hb-bar-world">' + worldLabel + '</div>' : '')+
     '</div>';
@@ -232,6 +238,9 @@ function paintBar(){
       } else if(m === 'el'){
         if(typeof window.navigate === 'function') window.navigate('elHome');
         else { view = {screen:'elHome'}; render(); }
+      } else if(m === 'wi'){
+        if(typeof window.navigate === 'function') window.navigate('wiHome');
+        else { view = {screen:'wiHome'}; render(); }
       } else if(m === 'hb'){
         view = {screen:'hbHome'};
         render();
@@ -246,7 +255,7 @@ function paintBar(){
   });
   if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
   if(typeof applyMeTheme === 'function') applyMeTheme();
-  if(typeof applyMeTheme === 'function') applyMeTheme();
+  if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
 }
 
 /* ---------- экраны ---------- */
