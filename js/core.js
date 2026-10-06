@@ -2338,11 +2338,11 @@ function renderSub(){
 }
 
 function escapeAttr(s){
-  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
 }
 
 function escapeHtml(s){
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 /* ---------- Кастомные стилизованные селекты (Custom Themed Selects) ---------- */
@@ -3147,6 +3147,7 @@ var AppStorage = window.AppStorage = {
         if(mode === 'sh' && k.indexOf('sh_ai_hist_') === 0) keysToRemove.push(k);
         else if(mode === 'el' && k.indexOf('el_ai_hist_') === 0) keysToRemove.push(k);
         else if(mode === 'me' && k.indexOf('me_ai_hist_') === 0) keysToRemove.push(k);
+        else if(mode === 'wi' && k.indexOf('wi_ai_hist_') === 0) keysToRemove.push(k);
         else if(!mode || mode === 'all') keysToRemove.push(k);
       }
 
@@ -3378,6 +3379,53 @@ var AppStorage = window.AppStorage = {
         '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--el-accent-border);">' +
           '<button class="btn btn-primary" id="elStorageCleanAiBtn" style="background:var(--el-gradient);border:none;color:#fff;padding:8px 16px;border-radius:4px;font-weight:700;cursor:pointer;">🧹 Очистить архив свитков ИИ (' + AppStorage.formatBytes(info.categories.ai.bytes) + ')</button>' +
           '<button class="btn btn-ghost" id="elStorageIntegrityBtn" style="border:1px solid var(--el-accent-border);color:var(--el-tag-text);padding:8px 16px;border-radius:4px;cursor:pointer;">🛡️ Проверить свитки</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    if(mode === 'wi'){
+      // Witcher Continental Card
+      return '<div class="sheet-section" id="wiStorageSection" style="background:var(--wi-bg-surface, rgba(14, 18, 24, 0.88));border:1px solid var(--wi-border, rgba(180, 150, 100, 0.25));border-left:4px solid var(--wi-amber, #f59e0b);border-radius:6px;padding:16px 20px;margin-bottom:20px;box-shadow:0 4px 18px rgba(0,0,0,0.4);">' +
+        '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:var(--wi-amber, #f59e0b);font-weight:700;margin-bottom:12px;font-family:\'JetBrains Mono\',monospace;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+          '<span>💾 ПАМЯТЬ КОНТИНЕНТА // ЗАЩИТА ДАННЫХ ВЕДЬМАКОВ</span>' +
+          statusBadge +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#94a3b8;margin-bottom:12px;line-height:1.45;font-family:\'EB Garamond\',serif;font-style:italic;">' +
+          'Мониторинг хранилища браузера (лимит 5.0 МБ). Все профили ведьмаков, снаряжение, стальной и серебряный клинки и хроники Континента надёжно защищены.' +
+        '</div>' +
+        warningNotice +
+        '<div style="margin:12px 0 6px;">' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-dim);margin-bottom:5px;font-family:\'JetBrains Mono\',monospace;">' +
+            '<span>Занято: <b style="color:var(--wi-amber, #f59e0b);">' + info.totalFormatted + '</b> / ' + info.maxFormatted + '</span>' +
+            '<span style="font-weight:700;color:' + barColor + ';">' + info.percent + '%</span>' +
+          '</div>' +
+          '<div style="width:100%;height:14px;background:rgba(0,0,0,0.5);border:1px solid var(--wi-border, rgba(180, 150, 100, 0.25));border-radius:4px;overflow:hidden;padding:1px;box-sizing:border-box;">' +
+            '<div style="height:100%;width:' + info.percent + '%;background:linear-gradient(90deg, #f59e0b, #ef4444);border-radius:2px;transition:width 0.4s ease;box-shadow:0 0 8px ' + barColor + ';"></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;">' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid var(--wi-border, rgba(180, 150, 100, 0.25));border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">🤖 Архив ИИ:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#fca5a5;">' + AppStorage.formatBytes(info.categories.ai.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid var(--wi-border, rgba(180, 150, 100, 0.25));border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">🐺 Ростер ведьмаков:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#7dd3fc;">' + AppStorage.formatBytes(info.categories.profiles.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid var(--wi-border, rgba(180, 150, 100, 0.25));border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">⚔️ Снаряжение и мечи:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#c084fc;">' + AppStorage.formatBytes(info.categories.powers.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid var(--wi-border, rgba(180, 150, 100, 0.25));border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">📜 Хроники Континента:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#86efac;">' + AppStorage.formatBytes(info.categories.maps.bytes) + '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--wi-border, rgba(180, 150, 100, 0.25));">' +
+          '<button class="btn btn-primary" id="wiStorageCleanAiBtn" style="font-size:12px;">🧹 Очистить архив ИИ (' + AppStorage.formatBytes(info.categories.ai.bytes) + ')</button>' +
+          '<button class="btn btn-ghost" id="wiStorageIntegrityBtn" style="font-size:12px;border:1px solid var(--wi-border, rgba(180, 150, 100, 0.35));color:#e2e8f0;">🛡️ Проверить целостность</button>' +
         '</div>' +
       '</div>';
     }

@@ -98,7 +98,8 @@ function paintShBar(){
   } else if(HB.mode==='wi'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
     var wiP = (typeof WI !== 'undefined' && WI.getProfile) ? WI.getProfile() : null;
-    var wiName = wiP ? (' • ' + wiP.name + ' (' + (wiP.school || 'Школа Волка') + ')') : '';
+    var wiSchoolOrRole = wiP ? (wiP.school || wiP.role || '') : '';
+    var wiName = (wiP && wiP.name) ? (' • ' + wiP.name + (wiSchoolOrRole ? (' (' + wiSchoolOrRole + ')') : '')) : '';
     lab.textContent = 'Ведьмак' + wiName;
   } else if(HB.mode==='hb'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
@@ -133,12 +134,163 @@ window.render=function(){
       paintShBar();
       return;
     }
+    if(s === 'wiData'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wiData === 'function') ? wiData() : '<div>Данные ведьмака</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiData === 'function') wireWiData();
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wiRef'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wiRef === 'function') ? wiRef() : '<div>Справочник Континента</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiRef === 'function') wireWiRef();
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wiRefView'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var refKey = view.refKey || view.wiKey || '';
+      var html = (typeof wiRefView === 'function') ? wiRefView(refKey) : '<div>Статья Справочника</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiRefView === 'function') wireWiRefView(refKey);
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wiTechs'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wiTechs === 'function') ? wiTechs() : '<div>Способности</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiTechs === 'function') wireWiTechs();
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wiTechView'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var techId = view.techId || view.shId || '';
+      var html = (typeof wiTechView === 'function') ? wiTechView(techId) : '<div>Способность</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiTechView === 'function') wireWiTechView(techId);
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wiTechEdit'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var techId = view.techId || view.shId || '';
+      var html = (typeof wiTechEdit === 'function') ? wiTechEdit(techId) : '<div>Редактор способности</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiTechEdit === 'function') wireWiTechEdit(techId);
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wiTechGen'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wiTechGen === 'function') ? wiTechGen() : '<div>AI Генератор способностей</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiTechGen === 'function') wireWiTechGen();
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wiMoves'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wiMoves === 'function') ? wiMoves() : '<div>Боевые приёмы</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiMoves === 'function') wireWiMoves();
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wiMoveView'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var moveId = view.moveId || view.shId || '';
+      var html = (typeof wiMoveView === 'function') ? wiMoveView(moveId) : '<div>Боевой приём</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiMoveView === 'function') wireWiMoveView(moveId);
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wiMoveEdit'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var moveId = view.moveId || view.shId || '';
+      var html = (typeof wiMoveEdit === 'function') ? wiMoveEdit(moveId) : '<div>Редактор приёма</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiMoveEdit === 'function') wireWiMoveEdit(moveId);
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wiMoveGen'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wiMoveGen === 'function') ? wiMoveGen() : '<div>AI Генератор приёмов</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiMoveGen === 'function') wireWiMoveGen();
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wiMap'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wiMap === 'function') ? wiMap() : '<div>Карта Континента</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiMap === 'function') wireWiMap();
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
     var app = document.getElementById('app');
     app.classList.remove('wide');
     app.classList.add('home-wide');
     var html = (typeof wiHome === 'function') ? wiHome() : '<div>Ведьмак</div>';
     app.innerHTML = html;
     _w();
+    if(typeof wireWiHome === 'function') wireWiHome();
+    if(typeof wireWiNav === 'function') wireWiNav();
     paintShBar();
     return;
   }
@@ -445,10 +597,42 @@ window.navigate=function(val){
     var wiScreens = {
       home: 'wiHome',
       wiHome: 'wiHome',
+      wiData: 'wiData',
+      data: 'wiData',
+      wiRef: 'wiRef',
+      ref: 'wiRef',
+      wiTechs: 'wiTechs',
+      techs: 'wiTechs',
+      wiAbilities: 'wiTechs',
+      abilities: 'wiTechs',
+      wiMoves: 'wiMoves',
+      moves: 'wiMoves',
+      wiTechGen: 'wiTechGen',
+      wiMoveGen: 'wiMoveGen',
+      wiMap: 'wiMap',
+      map: 'wiMap',
       dice: 'dice'
     };
     if(wiScreens[p[0]]){
       window.view = view = { screen: wiScreens[p[0]] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'wiRefView'){
+      window.view = view = { screen: 'wiRefView', refKey: p[1], wiKey: p[1] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'wiTechView' || p[0] === 'wiTechEdit'){
+      window.view = view = { screen: p[0], techId: p[1], shId: p[1] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'wiMoveView' || p[0] === 'wiMoveEdit'){
+      window.view = view = { screen: p[0], moveId: p[1], shId: p[1] };
       render();
       window.scrollTo(0,0);
       return;
