@@ -1524,6 +1524,7 @@
   var WI_TECHS_KEY = 'ttc_wi_techs';
   var WI_MOVES_KEY = 'ttc_wi_moves';
   var WI_MARKERS_KEY = 'ttc_wi_markers';
+  var WI_ROUTE_KEY = 'ttc_wi_route_v2';
 
   var DEFAULT_WI_TECHS = [];
   var DEFAULT_WI_MOVES = [];
@@ -1578,6 +1579,297 @@
     { id: 'kovir', name: 'Ковир и Повисс', capital: 'Понт Ваннис', ruler: 'Король Эстерид Тиссенид', color: '#0284c7', desc: 'Самое богатое королевство крайнего Севера. 80% мировой добычи золота, нейтралитет в войнах и непревзойденный наемный флот.' }
   ];
 
+  /* ============================================================
+     ЛАНДШАФТ И СИСТЕМА ПУТЕШЕСТВИЙ ПО КОНТИНЕНТУ
+     ============================================================ */
+
+  var WI_TERRAINS = {
+    road: {
+      id: 'road',
+      name: 'Королевский тракт / Равнины',
+      icon: '🛣️',
+      speedHorse: 38,
+      speedFoot: 18,
+      speedWitcher: 28,
+      speedBoat: 0,
+      costMod: 1.0,
+      danger: 'Низкая (патрули, корчмы, редкие бандиты)',
+      desc: 'Укатанный каменный или грунтовый тракт. Идеально для верховой езды и быстрых повозок.'
+    },
+    hills: {
+      id: 'hills',
+      name: 'Холмы и перелески',
+      icon: '🌾',
+      speedHorse: 28,
+      speedFoot: 15,
+      speedWitcher: 24,
+      speedBoat: 0,
+      costMod: 1.3,
+      danger: 'Средняя (дикие звери, полуденницы)',
+      desc: 'Пересеченная холмистая местность, кустарники и полевые тропы. Лошади идут рысью.'
+    },
+    forest: {
+      id: 'forest',
+      name: 'Дремучий первобытный лес',
+      icon: '🌲',
+      speedHorse: 18,
+      speedFoot: 14,
+      speedWitcher: 22,
+      speedBoat: 0,
+      costMod: 1.8,
+      danger: 'Высокая (лешие, скоя’таэли, волчьи стаи)',
+      desc: 'Вековые чащи без дорог, коряги и буреломы. Лошади продвигаются с трудом только шагом.'
+    },
+    swamp: {
+      id: 'swamp',
+      name: 'Топкие болота и трясины',
+      icon: '🌫️',
+      speedHorse: 10,
+      speedFoot: 9,
+      speedWitcher: 16,
+      speedBoat: 14,
+      costMod: 2.4,
+      danger: 'Смертельная (утопцы, водные бабы, туманники, болотный газ)',
+      desc: 'Коварные топи Велена или Ангрена. Лошадь вязнет по брюхо, пеший идет по пояс в зловонной жиже.'
+    },
+    mountain: {
+      id: 'mountain',
+      name: 'Горные перевалы и скалы',
+      icon: '⛰️',
+      speedHorse: 12,
+      speedFoot: 11,
+      speedWitcher: 18,
+      speedBoat: 0,
+      costMod: 2.2,
+      danger: 'Очень высокая (гарпии, виверны, камнепады, мороз)',
+      desc: 'Крутые скалистые тропы Синих Гор или Махакама. Холодные ветра, обрывы и узкие карнизы.'
+    },
+    water: {
+      id: 'water',
+      name: 'Великое Море / Глубокие реки',
+      icon: '⛵',
+      speedHorse: 0,
+      speedFoot: 0,
+      speedWitcher: 0,
+      speedBoat: 48,
+      costMod: 1.0,
+      danger: 'Морская (сирены, эхидны, шторма, пираты)',
+      desc: 'Морские просторы или полноводные фарватеры рек Понтар и Яруга. Требуется лодка, когг или паром.'
+    }
+  };
+
+  function getTerrainAt(x, y){
+    // 1. Великое море и морские заливы
+    var isSkelligeLand = (x >= 450 && x <= 780 && y >= 1420 && y <= 1780);
+    if(!isSkelligeLand){
+      if(x < 880 && y >= 500 && y <= 3500) return WI_TERRAINS.water;
+      if(x < 1050 && y >= 920 && y <= 1380) return WI_TERRAINS.water;
+      if(x < 1200 && y >= 1850 && y <= 2200) return WI_TERRAINS.water;
+    }
+
+    // 2. Болота и трясины (Велен, Ангрен)
+    if(x >= 1100 && x <= 1400 && y >= 1150 && y <= 1420) return WI_TERRAINS.swamp;
+    if(x >= 1950 && x <= 2350 && y >= 1600 && y <= 1860) return WI_TERRAINS.swamp;
+
+    // 3. Горы и скалистые хребты (Синие Горы, Драконьи, Махакам, Амелл, Тир Тохар)
+    if((x >= 2400 && y <= 1450) || (x >= 2520 && y <= 2100)) return WI_TERRAINS.mountain;
+    if(y <= 420 && x >= 1500) return WI_TERRAINS.mountain;
+    if(x >= 1850 && x <= 2180 && y >= 1220 && y <= 1530) return WI_TERRAINS.mountain;
+    if(x >= 1750 && x <= 2350 && y >= 1860 && y <= 2160) return WI_TERRAINS.mountain;
+    if(x >= 2500 && y >= 2100 && y <= 3000) return WI_TERRAINS.mountain;
+    if(y >= 3920 && x >= 1200 && x <= 2400) return WI_TERRAINS.mountain;
+
+    // 4. Дремучие реликтовые леса (Брокилон, Каэдвенские чащи, Содден)
+    if(x >= 1260 && x <= 1500 && y >= 1440 && y <= 1700) return WI_TERRAINS.forest;
+    if(x >= 1800 && x <= 2450 && y >= 400 && y <= 750) return WI_TERRAINS.forest;
+    if(x >= 1480 && x <= 1780 && y >= 1560 && y <= 1820) return WI_TERRAINS.forest;
+
+    // 5. Королевские тракты, долины и открытые равнины
+    if(x >= 1100 && x <= 1800 && y >= 700 && y <= 1120) return WI_TERRAINS.road;
+    if(x >= 1450 && x <= 1850 && y >= 1100 && y <= 1360) return WI_TERRAINS.road;
+    if(x >= 2320 && x <= 2560 && y >= 2150 && y <= 2400) return WI_TERRAINS.road;
+    if(x >= 1550 && x <= 1950 && y >= 3600 && y <= 3880) return WI_TERRAINS.road;
+
+    return WI_TERRAINS.hills;
+  }
+
+  function calcFullRoute(points, mode, pace){
+    mode = mode || 'horse';
+    pace = pace || 'normal';
+
+    var paceConfig = {
+      normal: { name: 'Обычный шаг', speedMod: 1.0, hoursPerDay: 8, fatigue: 'Нет', ambushMod: 1.0, desc: 'Переход по 8 часов в сутки с плановыми привалами.' },
+      fast: { name: 'Форсированный марш', speedMod: 1.3, hoursPerDay: 12, fatigue: '+1 уровень истощения в сутки', ambushMod: 1.25, desc: 'Быстрый марш по 12 часов. Повышенный расход сил и усталость.' },
+      stealth: { name: 'Скрытный / Осторожный шаг', speedMod: 0.7, hoursPerDay: 7, fatigue: 'Нет', ambushMod: 0.45, desc: 'Осторожное передвижение, обход засад и маскировка следов.' }
+    };
+    var pCfg = paceConfig[pace] || paceConfig.normal;
+
+    if(!points || points.length < 2){
+      return {
+        points: points || [],
+        segments: [],
+        totalDist: 0,
+        totalDays: 0,
+        wholeDays: 0,
+        remHours: 0,
+        rations: 0,
+        campsCount: 0,
+        innsCount: 0,
+        warnings: ['Кликните по карте или по городам, чтобы поставить первую и последующие точки маршрута.'],
+        dominantTerrain: WI_TERRAINS.road,
+        mode: mode,
+        pace: pace,
+        pCfg: pCfg
+      };
+    }
+
+    var segments = [];
+    var totalDist = 0;
+    var totalDays = 0;
+    var allTerrains = [];
+    var warnings = [];
+    var hasWaterWarning = false;
+    var hasSwampWarning = false;
+
+    for(var i = 0; i < points.length - 1; i++){
+      var p1 = points[i];
+      var p2 = points[i + 1];
+      var pixelDist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      var dist = Math.max(1, Math.round(pixelDist * 0.26));
+      totalDist += dist;
+
+      var sampled = [];
+      var sampleSteps = [0.1, 0.3, 0.5, 0.7, 0.9];
+      for(var s = 0; s < sampleSteps.length; s++){
+        var t = sampleSteps[s];
+        var sx = p1.x + t * (p2.x - p1.x);
+        var sy = p1.y + t * (p2.y - p1.y);
+        var ter = getTerrainAt(sx, sy);
+        sampled.push(ter);
+        allTerrains.push(ter);
+      }
+
+      var counts = {};
+      sampled.forEach(function(t){ counts[t.id] = (counts[t.id] || 0) + 1; });
+      var domTerId = Object.keys(counts).reduce(function(a, b){ return counts[a] >= counts[b] ? a : b; });
+      var domTer = WI_TERRAINS[domTerId] || WI_TERRAINS.hills;
+
+      var crossesWater = sampled.some(function(t){ return t.id === 'water'; });
+      if(crossesWater && mode !== 'boat'){
+        if(!hasWaterWarning){
+          warnings.push('⚠️ Отрезок пересекает открытые воды/море! Пешие и всадники не преодолеют их без лодки или парома.');
+          hasWaterWarning = true;
+        }
+      }
+
+      var crossesSwamp = sampled.some(function(t){ return t.id === 'swamp'; });
+      if(crossesSwamp && !hasSwampWarning){
+        warnings.push('🌫️ Путь проходит через зловонные топи (Кривоуховы Топи/Ангрен): высокий риск утопцев и болотного газа!');
+        hasSwampWarning = true;
+      }
+
+      var segDays = 0;
+      var stepDist = dist / sampled.length;
+      for(var j = 0; j < sampled.length; j++){
+        var st = sampled[j];
+        var baseSpeed = 18;
+        if(mode === 'horse') baseSpeed = st.speedHorse;
+        else if(mode === 'foot') baseSpeed = st.speedFoot;
+        else if(mode === 'witcher') baseSpeed = st.speedWitcher;
+        else if(mode === 'boat') baseSpeed = st.speedBoat;
+
+        if(baseSpeed <= 0){
+          baseSpeed = (mode === 'boat') ? 4 : 5;
+        }
+        var effectiveSpeed = baseSpeed * pCfg.speedMod;
+        segDays += stepDist / effectiveSpeed;
+      }
+
+      totalDays += segDays;
+
+      segments.push({
+        index: i + 1,
+        fromName: p1.name || ('Точка ' + (i + 1)),
+        toName: p2.name || ('Точка ' + (i + 2)),
+        dist: dist,
+        days: Math.round(segDays * 10) / 10,
+        dominantTerrain: domTer,
+        crossesWater: crossesWater,
+        stopType: p2.stopType || 'none'
+      });
+    }
+
+    var campsCount = 0;
+    var innsCount = 0;
+    points.forEach(function(pt, idx){
+      if(idx > 0 && idx < points.length - 1){
+        if(pt.stopType === 'camp') campsCount++;
+        if(pt.stopType === 'inn') innsCount++;
+      }
+    });
+
+    var rationPerDay = (mode === 'horse') ? 2 : 1;
+    var totalRations = Math.max(1, Math.ceil(totalDays * rationPerDay));
+
+    var wholeDays = Math.floor(totalDays);
+    var remHours = Math.round((totalDays - wholeDays) * pCfg.hoursPerDay);
+    if(remHours >= pCfg.hoursPerDay){
+      wholeDays += 1;
+      remHours = 0;
+    }
+
+    var allCounts = {};
+    allTerrains.forEach(function(t){ allCounts[t.id] = (allCounts[t.id] || 0) + 1; });
+    var overallDomId = Object.keys(allCounts).length ? Object.keys(allCounts).reduce(function(a, b){ return allCounts[a] >= allCounts[b] ? a : b; }) : 'road';
+
+    return {
+      points: points,
+      segments: segments,
+      totalDist: totalDist,
+      totalDays: totalDays,
+      wholeDays: wholeDays,
+      remHours: remHours,
+      rations: totalRations,
+      campsCount: campsCount,
+      innsCount: innsCount,
+      warnings: warnings,
+      dominantTerrain: WI_TERRAINS[overallDomId] || WI_TERRAINS.road,
+      mode: mode,
+      pace: pace,
+      pCfg: pCfg
+    };
+  }
+
+  var WI_ROUTE_PRESETS = {
+    novi_vizima: [
+      { id: 'wp_novigrad', name: 'Новиград', x: 1170, y: 1025, stopType: 'inn' },
+      { id: 'wp_oxenfurt', name: 'Оксенфурт', x: 1265, y: 1035, stopType: 'inn' },
+      { id: 'wp_pontar', name: 'Переправа через Понтар', x: 1420, y: 1080, stopType: 'camp' },
+      { id: 'wp_vizima', name: 'Вызима', x: 1615, y: 1125, stopType: 'camp' }
+    ],
+    vizima_km: [
+      { id: 'wp_vizima', name: 'Вызима', x: 1615, y: 1125, stopType: 'inn' },
+      { id: 'wp_flotsam', name: 'Флотзам (Понтар)', x: 1925, y: 830, stopType: 'camp' },
+      { id: 'wp_ban_ard', name: 'Бан Ард (Школа Магии)', x: 2390, y: 490, stopType: 'inn' },
+      { id: 'wp_gwenllech', name: 'Река Гвенллех (Перевал)', x: 2510, y: 340, stopType: 'camp' },
+      { id: 'wp_kaer_morhen', name: 'Каэр Морхен', x: 2595, y: 245, stopType: 'camp' }
+    ],
+    oxen_toussaint: [
+      { id: 'wp_oxenfurt', name: 'Оксенфурт', x: 1265, y: 1035, stopType: 'inn' },
+      { id: 'wp_mahakam', name: 'Махакам (Горный проход)', x: 1980, y: 1380, stopType: 'camp' },
+      { id: 'wp_jaruga', name: 'Переправа через Яругу', x: 2050, y: 1780, stopType: 'camp' },
+      { id: 'wp_amell', name: 'Перевал Амелл (Горгона)', x: 2280, y: 2060, stopType: 'camp' },
+      { id: 'wp_beauclair', name: 'Боклер (Туссент)', x: 2420, y: 2180, stopType: 'inn' },
+      { id: 'wp_corvo', name: 'Корво Бьянко', x: 2445, y: 2260, stopType: 'inn' }
+    ],
+    novi_skellige: [
+      { id: 'wp_novi_port', name: 'Новиград (Главный причал)', x: 1150, y: 1020, stopType: 'inn' },
+      { id: 'wp_great_sea', name: 'Великое Море (Открытый фарватер)', x: 880, y: 1240, stopType: 'ferry' },
+      { id: 'wp_an_skellig', name: 'Остров Ан Скеллиг', x: 740, y: 1480, stopType: 'camp' },
+      { id: 'wp_kaer_trolde', name: 'Каэр Трольде (Пристань)', x: 595, y: 1590, stopType: 'inn' }
+    ]
+  };
+
   var WI_MAP_PRESETS = [
     { from: 'novigrad', to: 'vizima', dist: 130, daysHorse: 3, daysFoot: 7, desc: 'Королевский тракт через реку Понтар. Оживленный торговый путь с частыми корчмами, патрулями реданцев и темерцев.' },
     { from: 'vizima', to: 'white_orchard', dist: 45, daysHorse: 1, daysFoot: 3, desc: 'Короткий переход на восток к цветущим садам, речным мельницам и нильфгаардскому гарнизону.' },
@@ -1614,16 +1906,50 @@
     };
   }
 
-  var WI_MAP_ENCOUNTERS = [
-    { title: '🐺 Волчья засада в тумане', desc: 'Из ночного болотного тумана на обочину выскакивает стая одичавших волков во главе с матерым варгом.' },
-    { title: '🧟 Утопцы у брода', desc: 'У разрушенного моста через ручей копошатся четыре утопца и мерзкая Водная баба, швыряющаяся грязью.' },
-    { title: '⚔️ Застава дезертиров', desc: 'Шайка бывших солдат «Ганзы» перегородила тракт бревнами и требует 20 крон «подорожного налога».' },
-    { title: '🍺 Придорожная корчма «Под дубом»', desc: 'Дым из трубы, теплый очаг, махакамский эль, бродячий бард и доска со свежими заказами на чудовищ.' },
-    { title: '👻 Полуденница над полями', desc: 'В полдень над залитым солнцем золотым полем колышется полупрозрачный призрак невесты в рваном венке.' },
-    { title: '🔮 Странствующий друид', desc: 'Седой друид у священного менгира предлагает целебные травы в обмен на редкие алхимические ингредиенты.' },
-    { title: '🛡️ Разъезд Синих Полосок', desc: 'Конный патруль темерского спецназа проверяет подорожные грамоты в поисках шпионов Нильфгаарда.' },
-    { title: '🐉 Тень виверны в небе', desc: 'Огромная чешуйчатая виверна делает круги над трактом, высматривая отбившихся лошадей.' }
-  ];
+  var WI_MAP_ENCOUNTERS_BY_TERRAIN = {
+    swamp: [
+      { title: '🧟 Водная баба в затопленной низине', desc: 'Среди зловонной тины и коряг подстерегает жирная Водная баба в окружении пяти утопцев, швыряющая комья ядовитой болотной грязи.' },
+      { title: '🌫️ Туманники на старой гати', desc: 'Внезапный густой туман с запахом гнили скрывает дорогу. В дымке вспыхивают блуждающие огоньки — засада туманников, использующих иллюзии.' },
+      { title: '🐊 Ослизг над гнилыми топями', desc: 'Огромный болотный драконид пикирует из серых облаков на обоз. Его ядовитый шип на хвосте готов пробить любые латы.' },
+      { title: '🕯️ Игоша у заброшенной избы', desc: 'Жуткий детский плач доносится из-под порога сгоревшей хаты в болотах. Неупокоенный дух может быть расколдован или уничтожен.' }
+    ],
+    mountain: [
+      { title: '🦅 Стая гарпий на скальном карнизе', desc: 'Визжащие гарпии атакуют с высоты, пытаясь сбросить путников в пропасть и забрать блестящие амулеты и серебро.' },
+      { title: '🐉 Вилохвост у горного перевала', desc: 'Чешуйчатый вилохвост устроил гнездо прямо над горной тропой. Проход заблокирован, если не одолеть чудовище.' },
+      { title: '🪨 Внезапный камнепад и обвал', desc: 'Грохот раскалывает тишину ущелья! Огромные валуны катятся вниз по склону. Нужна проверка ловкости (DC 14), чтобы спасти коней и груз.' },
+      { title: '❄️ Ледяная буря на высоте', desc: 'Свирепый ветер и снежная крупа сбивают с ног. Видимость падает до 5 шагов, температура стремительно падает. Требуется срочный поиск пещеры.' }
+    ],
+    forest: [
+      { title: '🌲 Древний Леший на священной поляне', desc: 'Вековые сосны скрипят и смыкают ветви. Двухметровый Леший с оленьим черепом вместо головы насылает стаю матерых волков и стаи воронья.' },
+      { title: '🏹 Засада скоя’таэлей («Белок»)', desc: 'С ветвей свистят стрелы с серыми перьями. Эльфский отряд скоя’таэлей окружает тропу, требуя сложить оружие и отдать провиант на нужды партизан.' },
+      { title: '🐺 Стая бешеных варгов', desc: 'Семеро волков во главе с гигантским черным варгом берут отряд в полукольцо, отрезая путь к отступлению.' },
+      { title: '🔮 Круг стихий и друидский менгир', desc: 'Древний каменный монолит пульсирует магической энергией. Ведьмак может восстановить запас энергии и усилить Знаки на 24 часа.' }
+    ],
+    road: [
+      { title: '⚔️ Застава дезертиров и «Ганзы»', desc: 'Шайка бывших солдат перегородила тракт срубленными деревьями и требует 30 новиградских крон «подорожного сбора».' },
+      { title: '🍺 Переполненная корчма «Под дубом»', desc: 'Уютный очаг, горячая похлебка, махакамский эль и доска объявлений с новым контрактом на полуденницу на пшеничном поле.' },
+      { title: '🛡️ Разъезд королевской стражи', desc: 'Конный патруль проверяет подорожные грамоты и осматривает мешки в поисках контрабанды фисстеха и нильфгаардских шпионов.' },
+      { title: '🛒 Сломанная повозка купца', desc: 'Краснолюдский купец с перевернутой телегой просит помощи с починкой колеса и готов щедро отплатить редкой рудой или серебряными слитками.' }
+    ],
+    water: [
+      { title: '🧜‍♀️ Стая сирен и эхидн у рифов', desc: 'Очаровательное пение оборачивается яростным нападением крылатых морских бестий, рвущих паруса и пытающихся опрокинуть судно.' },
+      { title: '🏴‍☠️ Драккар пиратов Скеллиге', desc: 'Быстроходный драккар под черным парусом настигает лодку. Суровые островитяне предлагают решить дело поединком капитанов или мечами.' },
+      { title: '🌪️ Морской шквал и водоворот', desc: 'Темные свинцовые волны захлестывают борт. Мачта трещит под напором ветра, а впереди пенится коварный рифовый водоворот.' }
+    ],
+    hills: [
+      { title: '👻 Полуденница над колосьями', desc: 'В полуденный зной над золотым холмом мерцает полупрозрачный призрак невесты. Палящее солнце слепит глаза, а в воздухе звенит траурная песнь.' },
+      { title: '🐗 Разъяренный секач', desc: 'Огромный дикий вепрь вылетает из кустарника прямо под копыта коня, рискуя покалечить скакуна.' },
+      { title: '⛪ Заброшенное святилище Мелитэле', desc: 'Осыпавшийся алтарь богини плодородия, где можно набрать целебных трав и спокойно передохнуть без риска нападения чудовищ.' }
+    ]
+  };
+
+  function getRandomEncounterForRoute(routeCalc){
+    var terId = (routeCalc && routeCalc.dominantTerrain && routeCalc.dominantTerrain.id) || 'road';
+    var pool = WI_MAP_ENCOUNTERS_BY_TERRAIN[terId] || WI_MAP_ENCOUNTERS_BY_TERRAIN.road;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  var WI_MAP_ENCOUNTERS = WI_MAP_ENCOUNTERS_BY_TERRAIN.road;
 
   /* Расширение методов WI */
   WI.techs = [];
@@ -1640,6 +1966,9 @@
     selectedLocId: 'novigrad',
     selectedRegionId: null,
     userMarkers: [],
+    routePoints: [],
+    travelMode: 'horse',
+    travelPace: 'normal',
     routeFrom: 'novigrad',
     routeTo: 'vizima',
     showLabels: true,
@@ -1720,6 +2049,41 @@
   WI.saveUserMarkers = function(){
     try {
       localStorage.setItem(WI_MARKERS_KEY, JSON.stringify(WI.map.userMarkers || []));
+    } catch(e){}
+  };
+
+  WI.loadRoute = function(){
+    try {
+      var raw = localStorage.getItem(WI_ROUTE_KEY);
+      if(raw){
+        var data = JSON.parse(raw);
+        if(data && Array.isArray(data.points)){
+          WI.map.routePoints = data.points;
+          if(data.travelMode) WI.map.travelMode = data.travelMode;
+          if(data.travelPace) WI.map.travelPace = data.travelPace;
+          return data;
+        }
+      }
+    } catch(e){}
+
+    WI.map.routePoints = [
+      { id: 'wp_novigrad', name: 'Новиград', x: 1170, y: 1025, stopType: 'inn' },
+      { id: 'wp_oxenfurt', name: 'Оксенфурт', x: 1265, y: 1035, stopType: 'inn' },
+      { id: 'wp_vizima', name: 'Вызима', x: 1615, y: 1125, stopType: 'camp' }
+    ];
+    WI.map.travelMode = 'horse';
+    WI.map.travelPace = 'normal';
+    return { points: WI.map.routePoints, travelMode: WI.map.travelMode, travelPace: WI.map.travelPace };
+  };
+
+  WI.saveRoute = function(){
+    try {
+      var data = {
+        points: WI.map.routePoints || [],
+        travelMode: WI.map.travelMode || 'horse',
+        travelPace: WI.map.travelPace || 'normal'
+      };
+      localStorage.setItem(WI_ROUTE_KEY, JSON.stringify(data));
     } catch(e){}
   };
 
@@ -2105,17 +2469,46 @@
 
     // 3. Маршрут между выбранными точками (если активен режим route)
     var routeSvg = '';
-    if(m.mode === 'route' && m.routeFrom && m.routeTo){
-      var p1 = WI_MAP_LOCATIONS.find(function(l){ return l.id === m.routeFrom; });
-      var p2 = WI_MAP_LOCATIONS.find(function(l){ return l.id === m.routeTo; });
-      if(p1 && p2){
-        routeSvg = '<g id="wiRouteLayer">' +
-          '<line x1="' + p1.x + '" y1="' + p1.y + '" x2="' + p2.x + '" y2="' + p2.y + '" stroke="rgba(0,0,0,0.6)" stroke-width="8" stroke-linecap="round"/>' +
-          '<line x1="' + p1.x + '" y1="' + p1.y + '" x2="' + p2.x + '" y2="' + p2.y + '" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="14,10" stroke-linecap="round" filter="url(#wiPinGlow)">' +
-            '<animate attributeName="stroke-dashoffset" values="48;0" dur="1.4s" repeatCount="indefinite"/>' +
-          '</line>' +
-        '</g>';
+    if(m.mode === 'route' && m.routePoints && m.routePoints.length >= 1){
+      var rpts = m.routePoints;
+      var pathData = '';
+      if(rpts.length >= 2){
+        pathData = 'M ' + rpts[0].x + ' ' + rpts[0].y;
+        for(var k = 1; k < rpts.length; k++){
+          pathData += ' L ' + rpts[k].x + ' ' + rpts[k].y;
+        }
       }
+
+      var linesSvg = '';
+      if(pathData){
+        linesSvg = '<path d="' + pathData + '" stroke="rgba(0,0,0,0.75)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '<path d="' + pathData + '" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="14,10" stroke-linecap="round" stroke-linejoin="round" filter="url(#wiPinGlow)">' +
+            '<animate attributeName="stroke-dashoffset" values="48;0" dur="1.4s" repeatCount="indefinite"/>' +
+          '</path>';
+      }
+
+      // Waypoint markers
+      var waypointsSvg = rpts.map(function(pt, idx){
+        var isStart = (idx === 0);
+        var isEnd = (idx === rpts.length - 1 && rpts.length > 1);
+
+        var pinColor = isStart ? '#10b981' : (isEnd ? '#ef4444' : '#f59e0b');
+        var badgeLabel = (idx + 1);
+        var stopIcon = (pt.stopType === 'inn' ? '🍺' : (pt.stopType === 'camp' ? '⛺' : (pt.stopType === 'ferry' ? '⛵' : '')));
+        var ptTer = getTerrainAt(pt.x, pt.y);
+        var hint = (isStart ? 'Старт: ' : (isEnd ? 'Цель: ' : 'Остановка ' + (idx + 1) + ': ')) + (pt.name || '') + ' (' + ptTer.name + ') — ПРАВЫЙ КЛИК: удалить';
+
+        return '<g class="wi-route-point" data-route-pt-id="' + pt.id + '" transform="translate(' + pt.x + ',' + pt.y + ')" style="cursor:pointer;">' +
+          '<title>' + escA(hint) + '</title>' +
+          '<circle r="18" fill="rgba(0,0,0,0.4)" stroke="' + pinColor + '" stroke-width="2" stroke-dasharray="4,2"/>' +
+          '<circle r="13" fill="' + pinColor + '" stroke="#ffffff" stroke-width="2.2" filter="url(#wiPinGlow)"/>' +
+          '<text y="4" text-anchor="middle" font-size="10.5" font-weight="900" font-family="\'JetBrains Mono\',monospace" fill="#0f172a" pointer-events="none">' + badgeLabel + '</text>' +
+          (stopIcon ? ('<text x="14" y="-7" font-size="12" pointer-events="none">' + stopIcon + '</text>') : '') +
+          (m.showLabels !== false ? ('<text y="27" fill="' + (isStart ? '#6ee7b7' : (isEnd ? '#fca5a5' : '#fbbf24')) + '" font-size="11.5" font-family="Cinzel, serif" font-weight="700" text-anchor="middle" filter="url(#wiLabelShadow)">' + esc(pt.name || ('Точка ' + (idx + 1))) + '</text>') : '') +
+        '</g>';
+      }).join('');
+
+      routeSvg = '<g id="wiRouteLayer">' + linesSvg + waypointsSvg + '</g>';
     }
 
     // 4. Метки городов и крепостей Континента
@@ -2187,42 +2580,139 @@
         '</div>' +
       '</div>';
     } else if(m.mode === 'route'){
-      var routeData = getRouteDetails(m.routeFrom, m.routeTo);
-      var locFrom = WI_MAP_LOCATIONS.find(function(l){ return l.id === m.routeFrom; }) || WI_MAP_LOCATIONS[0];
-      var locTo = WI_MAP_LOCATIONS.find(function(l){ return l.id === m.routeTo; }) || WI_MAP_LOCATIONS[1];
+      if(!m.routePoints || !m.routePoints.length) WI.loadRoute();
+      var rCalc = calcFullRoute(m.routePoints, m.travelMode || 'horse', m.travelPace || 'normal');
 
       var encHtml = m.encounter ? ('<div style="background:rgba(245,158,11,0.12);border:1px solid var(--wi-amber);border-radius:6px;padding:12px;margin-top:12px;">' +
         '<div style="font-weight:700;color:#fbbf24;margin-bottom:4px;font-family:\'Cinzel\',serif;">' + esc(m.encounter.title) + '</div>' +
         '<div style="font-size:13px;line-height:1.45;color:var(--wi-silver);font-family:\'EB Garamond\',serif;font-style:italic;">' + esc(m.encounter.desc) + '</div>' +
       '</div>') : '';
 
+      var warningsHtml = (rCalc.warnings && rCalc.warnings.length) ? ('<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">' +
+        rCalc.warnings.map(function(w){
+          return '<div style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.35);border-radius:4px;padding:8px 12px;font-size:12.5px;color:#fca5a5;">' + esc(w) + '</div>';
+        }).join('') +
+      '</div>') : '';
+
+      var pointsTableRows = (m.routePoints && m.routePoints.length) ? m.routePoints.map(function(pt, idx){
+        var isStart = (idx === 0);
+        var isEnd = (idx === m.routePoints.length - 1 && m.routePoints.length > 1);
+        var badgeColor = isStart ? '#10b981' : (isEnd ? '#ef4444' : '#f59e0b');
+        var badgeText = isStart ? '1 (Старт)' : (isEnd ? (idx + 1) + ' (Цель)' : (idx + 1) + ' (Стоянка)');
+        var ter = getTerrainAt(pt.x, pt.y);
+
+        var segInfo = rCalc.segments[idx];
+        var distToNext = segInfo ? ('<span style="color:#fbbf24;font-weight:700;">' + segInfo.dist + ' миль</span> <span style="color:var(--wi-steel);font-size:11px;">(~' + segInfo.days + ' дн.)</span>') : '<span style="color:var(--wi-steel);">Финиш</span>';
+
+        return '<tr class="wi-route-row" data-wi-route-row-id="' + pt.id + '" style="border-bottom:1px solid rgba(255,255,255,0.06);">' +
+          '<td style="padding:8px 6px;text-align:center;"><span style="background:' + badgeColor + ';color:#0f172a;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:900;font-family:\'JetBrains Mono\',monospace;">' + badgeText + '</span></td>' +
+          '<td style="padding:8px 6px;">' +
+            '<div style="font-weight:700;color:#fff;cursor:pointer;" class="wi-pt-name-edit" data-wi-pt-id="' + pt.id + '" title="Кликните, чтобы переименовать">' + esc(pt.name || ('Точка ' + (idx + 1))) + ' ✏️</div>' +
+            '<div style="font-size:11px;color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;">[' + pt.x + ', ' + pt.y + ']</div>' +
+          '</td>' +
+          '<td style="padding:8px 6px;font-size:12px;">' + ter.icon + ' ' + esc(ter.name) + '</td>' +
+          '<td style="padding:8px 6px;">' +
+            '<select class="wi-input" data-wi-pt-stop="' + pt.id + '" style="padding:3px 6px;font-size:11.5px;max-width:160px;">' +
+              '<option value="none" ' + (pt.stopType === 'none' ? 'selected' : '') + '>📍 Без остановки</option>' +
+              '<option value="camp" ' + (pt.stopType === 'camp' ? 'selected' : '') + '>⛺ Привал / Лагерь</option>' +
+              '<option value="inn" ' + (pt.stopType === 'inn' ? 'selected' : '') + '>🍺 Корчма / Постой</option>' +
+              '<option value="ferry" ' + (pt.stopType === 'ferry' ? 'selected' : '') + '>⛵ Паромная пристань</option>' +
+            '</select>' +
+          '</td>' +
+          '<td style="padding:8px 6px;font-size:12px;">' + distToNext + '</td>' +
+          '<td style="padding:8px 6px;text-align:right;white-space:nowrap;">' +
+            '<button class="btn btn-ghost" data-wi-pt-focus="' + pt.id + '" style="padding:3px 7px;font-size:11px;margin-right:4px;" title="Сфокусировать карту на точке">🎯</button>' +
+            '<button class="btn btn-ghost" data-wi-pt-del="' + pt.id + '" style="padding:3px 7px;font-size:11px;color:#ef4444;" title="Удалить точку (или правый клик)">🗑️</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('') : '<tr><td colspan="6" class="char-empty" style="text-align:center;padding:16px;">Маршрут пуст. Кликните по карте в любом месте, чтобы поставить первую точку!</td></tr>';
+
       inspectorHtml = '<div class="wi-char-sheet-card" style="margin-top:14px;">' +
         '<div class="wi-char-header">' +
-          '<span>🧭 Калькулятор переходов Континента</span>' +
-          '<span class="wi-school-badge" style="font-size:11px;">' + routeData.dist + ' миль</span>' +
-        '</div>' +
-        '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;margin-top:10px;">' +
-          '<div>' +
-            '<label style="font-size:11px;color:var(--wi-steel);font-weight:600;">Откуда:</label>' +
-            '<select id="wiMapRouteFromSel" class="wi-input">' +
-              WI_MAP_LOCATIONS.map(function(l){ return '<option value="' + l.id + '" ' + (l.id === m.routeFrom ? 'selected' : '') + '>' + l.icon + ' ' + esc(l.name) + '</option>'; }).join('') +
-            '</select>' +
-          '</div>' +
-          '<div>' +
-            '<label style="font-size:11px;color:var(--wi-steel);font-weight:600;">Куда:</label>' +
-            '<select id="wiMapRouteToSel" class="wi-input">' +
-              WI_MAP_LOCATIONS.map(function(l){ return '<option value="' + l.id + '" ' + (l.id === m.routeTo ? 'selected' : '') + '>' + l.icon + ' ' + esc(l.name) + '</option>'; }).join('') +
-            '</select>' +
+          '<span>🧭 Свободный планировщик маршрутов Континента</span>' +
+          '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
+            '<span class="wi-school-badge" style="font-size:12px;background:rgba(245,158,11,0.2);color:#fbbf24;">📏 ' + rCalc.totalDist + ' миль</span>' +
+            '<span class="wi-school-badge" style="font-size:12px;background:rgba(59,130,246,0.2);color:#93c5fd;">⏳ ' + rCalc.wholeDays + ' дн. ' + rCalc.remHours + ' ч.</span>' +
           '</div>' +
         '</div>' +
-        '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:13px;">' +
-          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);padding:8px 12px;border-radius:4px;">🐎 <b>На коне:</b> ' + routeData.daysHorse + ' дн.</div>' +
-          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);padding:8px 12px;border-radius:4px;">🥾 <b>Пешком:</b> ' + routeData.daysFoot + ' дн.</div>' +
-          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);padding:8px 12px;border-radius:4px;">🍖 <b>Провиант:</b> ' + (routeData.daysHorse * 2) + ' рационов</div>' +
+        '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:6px;padding:8px 12px;margin-top:10px;font-size:12.5px;color:#e2e8f0;line-height:1.45;">' +
+          '💡 <b>Свободный выбор маршрута:</b> Кликайте по карте или по городам, чтобы добавлять новые точки и стоянки. <span style="color:#fca5a5;font-weight:700;">Клик правой кнопкой мыши по точке на карте удаляет её!</span>' +
         '</div>' +
-        '<div class="desc" style="margin-top:8px;font-size:13px;line-height:1.5;color:#e2e8f0;font-family:\'EB Garamond\',serif;font-style:italic;">' + esc(routeData.desc) + '</div>' +
-        '<div style="margin-top:10px;">' +
-          '<button class="btn btn-primary" id="wiMapRollEncounterBtn">🎲 Случайная встреча на тракте</button>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:12px;margin-top:12px;">' +
+          '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wi-border);border-radius:6px;padding:10px;">' +
+            '<div style="font-size:11px;font-weight:700;color:var(--wi-steel);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Тип передвижения:</div>' +
+            '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+              '<button class="wi-pill ' + (rCalc.mode === 'horse' ? 'active' : '') + '" data-wi-route-mode="horse" title="38 миль/день на тракте">🐎 Верхом (Плотва)</button>' +
+              '<button class="wi-pill ' + (rCalc.mode === 'foot' ? 'active' : '') + '" data-wi-route-mode="foot" title="18 миль/день">🥾 Пешком</button>' +
+              '<button class="wi-pill ' + (rCalc.mode === 'witcher' ? 'active' : '') + '" data-wi-route-mode="witcher" title="28 миль/день, мутации, эликсиры">🐺 Ведьмачий марш</button>' +
+              '<button class="wi-pill ' + (rCalc.mode === 'boat' ? 'active' : '') + '" data-wi-route-mode="boat" title="48 миль/день по воде">⛵ На лодке</button>' +
+            '</div>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wi-border);border-radius:6px;padding:10px;">' +
+            '<div style="font-size:11px;font-weight:700;color:var(--wi-steel);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Темп движения:</div>' +
+            '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+              '<button class="wi-pill ' + (rCalc.pace === 'normal' ? 'active' : '') + '" data-wi-route-pace="normal">⚖️ Обычный (8 ч/дн)</button>' +
+              '<button class="wi-pill ' + (rCalc.pace === 'fast' ? 'active' : '') + '" data-wi-route-pace="fast">⚡ Форсированный (+30% скор.)</button>' +
+              '<button class="wi-pill ' + (rCalc.pace === 'stealth' ? 'active' : '') + '" data-wi-route-pace="stealth">🕵️ Скрытный (-30% скор.)</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:8px;margin-top:12px;font-size:12.5px;">' +
+          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);border-radius:4px;padding:8px 10px;">' +
+            '<span style="color:var(--wi-steel);font-size:11px;display:block;">РЕЛЬЕФ ПУТИ:</span>' +
+            '<b>' + rCalc.dominantTerrain.icon + ' ' + esc(rCalc.dominantTerrain.name) + '</b>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);border-radius:4px;padding:8px 10px;">' +
+            '<span style="color:var(--wi-steel);font-size:11px;display:block;">ВРЕМЯ ПЕРЕХОДА:</span>' +
+            '<b style="color:#93c5fd;">⏳ ' + rCalc.wholeDays + ' дн. ' + rCalc.remHours + ' ч.</b>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);border-radius:4px;padding:8px 10px;">' +
+            '<span style="color:var(--wi-steel);font-size:11px;display:block;">ПРОЗАПАС / РАЦИОНЫ:</span>' +
+            '<b style="color:#fcd34d;">🍖 ' + rCalc.rations + ' рационов</b>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--wi-border);border-radius:4px;padding:8px 10px;">' +
+            '<span style="color:var(--wi-steel);font-size:11px;display:block;">СТОЯНКИ И НОЧЛЕГ:</span>' +
+            '<b>⛺ ' + rCalc.campsCount + ' привалов / 🍺 ' + rCalc.innsCount + ' корчм</b>' +
+          '</div>' +
+        '</div>' +
+        warningsHtml +
+        '<div style="margin-top:16px;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">' +
+            '<div style="font-weight:700;font-size:13.5px;color:#fff;font-family:\'Cinzel\',serif;">Маршрутный лист и стоянки (' + (m.routePoints || []).length + ')</div>' +
+            '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+              '<button class="btn btn-ghost" id="wiRouteAddCenterBtn" style="font-size:11px;padding:3px 8px;">➕ Точка в центр</button>' +
+              '<button class="btn btn-ghost" id="wiRouteReverseBtn" style="font-size:11px;padding:3px 8px;" title="Развернуть маршрут в обратную сторону">🔄 Обратный</button>' +
+              '<button class="btn btn-ghost" id="wiRouteLoopBtn" style="font-size:11px;padding:3px 8px;" title="Вернуться в начальную точку">🔁 Замкнуть</button>' +
+              '<button class="btn btn-ghost" id="wiRouteClearBtn" style="font-size:11px;padding:3px 8px;color:#ef4444;" title="Удалить все точки">🧹 Очистить</button>' +
+            '</div>' +
+          '</div>' +
+          '<div style="overflow-x:auto;background:rgba(10,14,20,0.6);border:1px solid var(--wi-border);border-radius:6px;">' +
+            '<table style="width:100%;border-collapse:collapse;font-size:12.5px;">' +
+              '<thead>' +
+                '<tr style="background:rgba(255,255,255,0.04);border-bottom:1px solid var(--wi-border);color:var(--wi-steel);font-size:11px;text-transform:uppercase;">' +
+                  '<th style="padding:6px 8px;text-align:center;">#</th>' +
+                  '<th style="padding:6px 8px;text-align:left;">Название точки</th>' +
+                  '<th style="padding:6px 8px;text-align:left;">Рельеф</th>' +
+                  '<th style="padding:6px 8px;text-align:left;">Тип стоянки</th>' +
+                  '<th style="padding:6px 8px;text-align:left;">До следующей</th>' +
+                  '<th style="padding:6px 8px;text-align:right;">Действия</th>' +
+                '</tr>' +
+              '</thead>' +
+              '<tbody>' + pointsTableRows + '</tbody>' +
+            '</table>' +
+          '</div>' +
+        '</div>' +
+        '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--wi-border);">' +
+          '<div style="font-size:11px;color:var(--wi-steel);font-weight:700;margin-bottom:6px;text-transform:uppercase;">Каноничные шаблоны переходов:</div>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+            '<button class="wi-pill" data-wi-route-preset="novi_vizima">🏰 Новиград ➔ Оксенфурт ➔ Вызима</button>' +
+            '<button class="wi-pill" data-wi-route-preset="vizima_km">🐺 Вызима ➔ Бан Ард ➔ Каэр Морхен</button>' +
+            '<button class="wi-pill" data-wi-route-preset="oxen_toussaint">🍇 Оксенфурт ➔ Махакам ➔ Боклер</button>' +
+            '<button class="wi-pill" data-wi-route-preset="novi_skellige">⛵ Новиград ➔ Каэр Трольде (Скеллиге)</button>' +
+          '</div>' +
+        '</div>' +
+        '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
+          '<button class="btn btn-primary" id="wiMapRollEncounterBtn">🎲 Случайная встреча для рельефа маршрута</button>' +
         '</div>' +
         encHtml +
       '</div>';
@@ -2544,15 +3034,32 @@
       pin.addEventListener('click', function(e){
         e.stopPropagation();
         var lid = pin.getAttribute('data-loc-id');
-        if(lid){
-          m.selectedLocId = lid;
-          var loc = WI_MAP_LOCATIONS.find(function(l){ return l.id === lid; });
-          if(loc && (m.zoom || 1.1) < 1.5){
-            m.cx = loc.x;
-            m.cy = loc.y;
-          }
+        if(!lid) return;
+        var loc = WI_MAP_LOCATIONS.find(function(l){ return l.id === lid; });
+        if(!loc) return;
+
+        if(m.mode === 'route'){
+          m.routePoints = m.routePoints || [];
+          var count = m.routePoints.length;
+          m.routePoints.push({
+            id: 'wp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+            name: loc.name,
+            x: loc.x,
+            y: loc.y,
+            stopType: count > 0 ? 'inn' : 'none'
+          });
+          WI.saveRoute();
+          WI.toast('✓ «' + loc.name + '» добавлен в маршрут', 'success');
           if(typeof render === 'function') render();
+          return;
         }
+
+        m.selectedLocId = lid;
+        if((m.zoom || 1.1) < 1.5){
+          m.cx = loc.x;
+          m.cy = loc.y;
+        }
+        if(typeof render === 'function') render();
       });
     });
 
@@ -2593,47 +3100,226 @@
       });
     }
 
-    // Маршруты: From / To
-    var selFrom = document.getElementById('wiMapRouteFromSel');
-    if(selFrom){
-      selFrom.addEventListener('change', function(){
-        m.routeFrom = selFrom.value;
+    // Удаление точки маршрута
+    function removeRoutePoint(ptId){
+      m.routePoints = m.routePoints || [];
+      var idx = m.routePoints.findIndex(function(p){ return p.id === ptId; });
+      if(idx !== -1){
+        var removed = m.routePoints.splice(idx, 1)[0];
+        WI.saveRoute();
+        WI.toast('🗑️ Точка «' + (removed.name || ('#' + (idx + 1))) + '» удалена из маршрута', 'info');
+        if(typeof render === 'function') render();
+      }
+    }
+
+    // Правый клик по строке таблицы для удаления
+    document.querySelectorAll('.wi-route-row').forEach(function(row){
+      row.addEventListener('contextmenu', function(e){
+        e.preventDefault();
+        var ptId = row.getAttribute('data-wi-route-row-id');
+        removeRoutePoint(ptId);
+      });
+    });
+
+    // Кнопка удаления точки из таблицы
+    document.querySelectorAll('[data-wi-pt-del]').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var ptId = btn.getAttribute('data-wi-pt-del');
+        removeRoutePoint(ptId);
+      });
+    });
+
+    // Кнопка фокусировки камеры на точке
+    document.querySelectorAll('[data-wi-pt-focus]').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var ptId = btn.getAttribute('data-wi-pt-focus');
+        var pt = (m.routePoints || []).find(function(p){ return p.id === ptId; });
+        if(pt){
+          focusOn(pt.x, pt.y, Math.max(m.zoom || 1.1, 2.2));
+          WI.toast('🎯 Фокус на: ' + pt.name, 'info');
+        }
+      });
+    });
+
+    // Клик по названию для переименования точки
+    document.querySelectorAll('.wi-pt-name-edit').forEach(function(el){
+      el.addEventListener('click', function(){
+        var ptId = el.getAttribute('data-wi-pt-id');
+        var pt = (m.routePoints || []).find(function(p){ return p.id === ptId; });
+        if(!pt) return;
+        var newName = prompt('Новое название точки маршрута:', pt.name);
+        if(newName && newName.trim()){
+          pt.name = newName.trim();
+          WI.saveRoute();
+          if(typeof render === 'function') render();
+        }
+      });
+    });
+
+    // Изменение типа стоянки (привал / корчма / паром)
+    document.querySelectorAll('[data-wi-pt-stop]').forEach(function(sel){
+      sel.addEventListener('change', function(){
+        var ptId = sel.getAttribute('data-wi-pt-stop');
+        var pt = (m.routePoints || []).find(function(p){ return p.id === ptId; });
+        if(pt){
+          pt.stopType = sel.value;
+          WI.saveRoute();
+          if(typeof render === 'function') render();
+        }
+      });
+    });
+
+    // Добавить точку в центр экрана
+    var addCenterPtBtn = document.getElementById('wiRouteAddCenterBtn');
+    if(addCenterPtBtn){
+      addCenterPtBtn.addEventListener('click', function(){
+        var cx = Math.round(m.cx || 1440);
+        var cy = Math.round(m.cy || 1200);
+        var ter = getTerrainAt(cx, cy);
+        m.routePoints = m.routePoints || [];
+        var count = m.routePoints.length;
+        m.routePoints.push({
+          id: 'wp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          name: (count === 0 ? 'Старт: ' : 'Точка ' + (count + 1) + ': ') + ter.name,
+          x: cx,
+          y: cy,
+          stopType: count > 0 ? 'camp' : 'none'
+        });
+        WI.saveRoute();
+        WI.toast('✓ Добавлена точка #' + (count + 1) + ' в центре карты', 'success');
         if(typeof render === 'function') render();
       });
     }
 
-    var selTo = document.getElementById('wiMapRouteToSel');
-    if(selTo){
-      selTo.addEventListener('change', function(){
-        m.routeTo = selTo.value;
+    // Развернуть маршрут в обратную сторону
+    var revBtn = document.getElementById('wiRouteReverseBtn');
+    if(revBtn){
+      revBtn.addEventListener('click', function(){
+        if(!m.routePoints || m.routePoints.length < 2) return;
+        m.routePoints.reverse();
+        WI.saveRoute();
+        WI.toast('🔄 Маршрут развернут в обратную сторону', 'info');
         if(typeof render === 'function') render();
       });
     }
 
+    // Замкнуть маршрут в кольцо
+    var loopBtn = document.getElementById('wiRouteLoopBtn');
+    if(loopBtn){
+      loopBtn.addEventListener('click', function(){
+        if(!m.routePoints || m.routePoints.length < 2) return;
+        var p0 = m.routePoints[0];
+        m.routePoints.push({
+          id: 'wp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          name: 'Возвращение: ' + p0.name,
+          x: p0.x,
+          y: p0.y,
+          stopType: 'camp'
+        });
+        WI.saveRoute();
+        WI.toast('🔁 Маршрут замкнут в кольцо', 'success');
+        if(typeof render === 'function') render();
+      });
+    }
+
+    // Очистить все точки маршрута
+    var clearBtn = document.getElementById('wiRouteClearBtn');
+    if(clearBtn){
+      clearBtn.addEventListener('click', function(){
+        if(!m.routePoints || !m.routePoints.length) return;
+        if(!confirm('Очистить все точки текущего маршрута?')) return;
+        m.routePoints = [];
+        WI.saveRoute();
+        WI.toast('🧹 Маршрут очищен', 'info');
+        if(typeof render === 'function') render();
+      });
+    }
+
+    // Переключение типа передвижения
+    document.querySelectorAll('[data-wi-route-mode]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        m.travelMode = btn.getAttribute('data-wi-route-mode');
+        WI.saveRoute();
+        if(typeof render === 'function') render();
+      });
+    });
+
+    // Переключение темпа движения
+    document.querySelectorAll('[data-wi-route-pace]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        m.travelPace = btn.getAttribute('data-wi-route-pace');
+        WI.saveRoute();
+        if(typeof render === 'function') render();
+      });
+    });
+
+    // Каноничные шаблоны маршрутов
+    document.querySelectorAll('[data-wi-route-preset]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var pKey = btn.getAttribute('data-wi-route-preset');
+        var pts = WI_ROUTE_PRESETS[pKey];
+        if(pts){
+          m.routePoints = JSON.parse(JSON.stringify(pts));
+          if(pKey === 'novi_skellige') m.travelMode = 'boat';
+          else if(m.travelMode === 'boat') m.travelMode = 'horse';
+          WI.saveRoute();
+          WI.toast('✓ Загружен маршрут «' + btn.textContent.trim() + '»', 'success');
+          if(typeof render === 'function') render();
+        }
+      });
+    });
+
+    // Кнопка из карточки города «Проложить путь сюда»
     var setRouteDestBtn = document.getElementById('wiMapSetRouteDestBtn');
     if(setRouteDestBtn){
       setRouteDestBtn.addEventListener('click', function(){
         var id = setRouteDestBtn.getAttribute('data-loc-id');
-        m.routeTo = id;
-        m.mode = 'route';
-        if(typeof render === 'function') render();
+        var loc = WI_MAP_LOCATIONS.find(function(l){ return l.id === id; });
+        if(loc){
+          m.routePoints = m.routePoints || [];
+          m.routePoints.push({
+            id: 'wp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+            name: loc.name,
+            x: loc.x,
+            y: loc.y,
+            stopType: m.routePoints.length > 0 ? 'inn' : 'none'
+          });
+          m.mode = 'route';
+          WI.saveRoute();
+          if(typeof render === 'function') render();
+        }
       });
     }
 
+    // Кнопка из карточки города «Начать маршрут отсюда»
     var setRouteOrigBtn = document.getElementById('wiMapSetRouteOriginBtn');
     if(setRouteOrigBtn){
       setRouteOrigBtn.addEventListener('click', function(){
         var id = setRouteOrigBtn.getAttribute('data-loc-id');
-        m.routeFrom = id;
-        m.mode = 'route';
-        if(typeof render === 'function') render();
+        var loc = WI_MAP_LOCATIONS.find(function(l){ return l.id === id; });
+        if(loc){
+          m.routePoints = [{
+            id: 'wp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+            name: 'Старт: ' + loc.name,
+            x: loc.x,
+            y: loc.y,
+            stopType: 'inn'
+          }];
+          m.mode = 'route';
+          WI.saveRoute();
+          if(typeof render === 'function') render();
+        }
       });
     }
 
+    // Случайная встреча с учетом рельефа
     var rollEncBtn = document.getElementById('wiMapRollEncounterBtn');
     if(rollEncBtn){
       rollEncBtn.addEventListener('click', function(){
-        var rnd = WI_MAP_ENCOUNTERS[Math.floor(Math.random() * WI_MAP_ENCOUNTERS.length)];
+        var rCalc = calcFullRoute(m.routePoints, m.travelMode || 'horse', m.travelPace || 'normal');
+        var rnd = getRandomEncounterForRoute(rCalc);
         m.encounter = rnd;
         if(typeof render === 'function') render();
       });
@@ -2689,13 +3375,25 @@
       });
     }
 
-    // Drag, Wheel, Pinch-Zoom и клик по карте для добавления метки
+    // Drag, Wheel, Pinch-Zoom, клик по карте и правый клик для удаления точек
     var vport = document.getElementById('wiMapViewport');
     if(vport && !vport.__panBound){
       vport.__panBound = true;
       var isDown = false;
       var startX, startY;
       var hasDragged = false;
+
+      // Правый клик мыши по точке маршрута для мгновенного удаления
+      vport.addEventListener('contextmenu', function(e){
+        var ptEl = e.target.closest && e.target.closest('.wi-route-point');
+        if(ptEl){
+          e.preventDefault();
+          e.stopPropagation();
+          var ptId = ptEl.getAttribute('data-route-pt-id');
+          removeRoutePoint(ptId);
+          return;
+        }
+      });
 
       vport.addEventListener('mousedown', function(e){
         if(e.button !== 0) return;
@@ -2763,11 +3461,10 @@
         updateMapTransform();
       }, { passive: false });
 
-      // Клик по карте для установки метки в режиме 'markers'
+      // Клик по карте для установки путевой точки (route) или метки (markers)
       vport.addEventListener('click', function(e){
         if(hasDragged) return;
-        if(m.mode !== 'markers') return;
-        if(e.target.closest && (e.target.closest('.wi-map-pin') || e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
+        if(e.button !== 0) return;
 
         var rect = vport.getBoundingClientRect();
         var mouseX = e.clientX - rect.left;
@@ -2785,23 +3482,54 @@
 
         var clickX = Math.round(minX + (mouseX / vw) * vbW);
         var clickY = Math.round(minY + (mouseY / vh) * vbH);
+        clickX = Math.max(20, Math.min(2860, clickX));
+        clickY = Math.max(20, Math.min(4076, clickY));
 
-        var title = prompt('Название новой метки (например: Логово архигрифона, Затонувший сундук, Круг стихий):');
-        if(!title) return;
-        var icon = prompt('Иконка метки (🐺, ⚔️, 🍺, 🔮, 🎒, 🐉, 💀, 💎):', '⚔️') || '📍';
-        var desc = prompt('Заметка к метке (награда, контракт, секрет):') || '';
+        // В режиме 'route' - свободное добавление путевой точки по клику на карте
+        if(m.mode === 'route'){
+          if(e.target.closest && (e.target.closest('.wi-route-point') || e.target.closest('.wi-map-pin') || e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
 
-        m.userMarkers.push({
-          id: 'um_' + Date.now(),
-          title: title,
-          icon: icon,
-          desc: desc,
-          x: clickX,
-          y: clickY
-        });
-        WI.saveUserMarkers();
-        WI.toast('✓ Метка поставлена: ' + title, 'success');
-        if(typeof render === 'function') render();
+          m.routePoints = m.routePoints || [];
+          var ter = getTerrainAt(clickX, clickY);
+          var count = m.routePoints.length;
+          var isFirst = count === 0;
+          var defaultName = isFirst ? ('Старт: ' + ter.name) : ('Точка ' + (count + 1) + ' (' + ter.name + ')');
+
+          m.routePoints.push({
+            id: 'wp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+            name: defaultName,
+            x: clickX,
+            y: clickY,
+            stopType: isFirst ? 'none' : 'camp'
+          });
+          WI.saveRoute();
+          WI.toast('✓ Добавлена точка #' + (count + 1) + ' (' + ter.icon + ' ' + ter.name + ')', 'success');
+          if(typeof render === 'function') render();
+          return;
+        }
+
+        // В режиме 'markers' - добавление пользовательской тактической метки
+        if(m.mode === 'markers'){
+          if(e.target.closest && (e.target.closest('.wi-map-pin') || e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
+
+          var title = prompt('Название новой метки (например: Логово архигрифона, Затонувший сундук, Круг стихий):');
+          if(!title) return;
+          var icon = prompt('Иконка метки (🐺, ⚔️, 🍺, 🔮, 🎒, 🐉, 💀, 💎):', '⚔️') || '📍';
+          var desc = prompt('Заметка к метке (награда, контракт, секрет):') || '';
+
+          m.userMarkers.push({
+            id: 'um_' + Date.now(),
+            title: title,
+            icon: icon,
+            desc: desc,
+            x: clickX,
+            y: clickY
+          });
+          WI.saveUserMarkers();
+          WI.toast('✓ Метка поставлена: ' + title, 'success');
+          if(typeof render === 'function') render();
+          return;
+        }
       });
 
       // Сенсорное управление: перемещение и пинч-зум
