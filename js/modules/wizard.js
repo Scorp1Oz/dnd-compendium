@@ -287,37 +287,7 @@
       mistBtm.className = 'wz-magic-mist';
       cont.appendChild(mistBtm);
 
-      // 3. Парящие магические символы и руны
-      var glyphContainer = document.createElement('div');
-      glyphContainer.className = 'wz-bg-glyphs';
-
-      var glyphDefs = [
-        { text: '⚡', cls: 'wz-glyph-gold', top: 16, left: 14, dir: 'up-right', dur: 23, delay: -5, size: 24 },
-        { text: '△⃒⃘', cls: 'wz-glyph-gold', top: 74, left: 82, dir: 'up-left', dur: 26, delay: -12, size: 28 },
-        { text: '✨', cls: 'wz-glyph-blue', top: 22, left: 80, dir: 'down-left', dur: 22, delay: -15, size: 22 },
-        { text: '🗝️', cls: 'wz-glyph-gold', top: 68, left: 20, dir: 'down-right', dur: 24, delay: -8, size: 22 },
-        { text: '🪄', cls: 'wz-glyph-purple', top: 44, left: 86, dir: 'wave', dur: 25, delay: -18, size: 22 },
-        { text: '🔮', cls: 'wz-glyph-purple', top: 78, left: 48, dir: 'cross', dur: 24, delay: -6, size: 22 },
-        { text: 'ᚱ', cls: 'wz-glyph-blue', top: 32, left: 24, dir: 'up-right', dur: 27, delay: -14, size: 24 },
-        { text: 'ᛟ', cls: 'wz-glyph-emerald', top: 82, left: 16, dir: 'up-left', dur: 25, delay: -10, size: 24 },
-        { text: '🜚', cls: 'wz-glyph-gold', top: 14, left: 52, dir: 'down-left', dur: 23, delay: -4, size: 22 },
-        { text: '🜂', cls: 'wz-glyph-crimson', top: 58, left: 76, dir: 'wave', dur: 26, delay: -16, size: 22 }
-      ];
-
-      glyphDefs.forEach(function(g){
-        var el = document.createElement('div');
-        el.className = 'wz-glyph-particle ' + g.cls + ' wz-dir-' + g.dir;
-        el.textContent = g.text;
-        el.style.top = g.top + '%';
-        el.style.left = g.left + '%';
-        el.style.fontSize = g.size + 'px';
-        el.style.animationDuration = g.dur + 's';
-        el.style.animationDelay = g.delay + 's';
-        glyphContainer.appendChild(el);
-      });
-      cont.appendChild(glyphContainer);
-
-      // 4. Зачарованный звёздный потолок (мерцающие звёзды)
+      // 3. Зачарованный звёздный потолок (мерцающие звёзды)
       var starCount = 35;
       for(var s = 0; s < starCount; s++){
         var star = document.createElement('div');
