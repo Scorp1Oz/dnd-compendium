@@ -736,213 +736,13 @@
      БАЗОВЫЙ НАБОР ЗАКЛИНАНИЙ (DEFAULT_WZ_SPELLS)
      ============================================================ */
 
-  var DEFAULT_WZ_SPELLS = [
-    {
-      id: 'sp_expelliarmus',
-      name: 'Экспеллиармус (Expelliarmus)',
-      icon: '⚡',
-      cat: 'Боевые заклятия',
-      incantation: 'Expelliarmus',
-      action: 'Основное действие',
-      cost: '10 Маны',
-      req: '2 курс',
-      dmgN: 2, dmgD: 'd6', dmgMod: 2,
-      desc: 'Обезоруживающее заклятие. Из кончика палочки вырывается ослепительный алый луч. При попадании выбивает волшебную палочку или оружие из рук цели прямо в воздух или в руку заклинателя. При мощном наложении сбивает врага с ног.'
-    },
-    {
-      id: 'sp_protego',
-      name: 'Протего (Protego)',
-      icon: '🛡️',
-      cat: 'Защитные чары',
-      incantation: 'Protego',
-      action: 'Реакция',
-      cost: '15 Маны',
-      req: '3 курс',
-      dmgN: 0, dmgD: 'd0', dmgMod: 0,
-      desc: 'Щитовые чары. Создает перед волшебником невидимый мерцающий щит, отражающий слабые и средние заклятия, а также физические снаряды. При идеальном расчете времени способно отбросить луч обратно во врага.'
-    },
-    {
-      id: 'sp_stupefy',
-      name: 'Ступефай (Stupefy)',
-      icon: '💥',
-      cat: 'Боевые заклятия',
-      incantation: 'Stupefy',
-      action: 'Основное действие',
-      cost: '15 Маны',
-      req: '3 курс',
-      dmgN: 2, dmgD: 'd8', dmgMod: 3,
-      desc: 'Оглушающее заклятие. Выпускает сноп ярких красных искр. Противник, в которого попал луч, мгновенно падает без сознания. Снимается контрзаклятием «Энервейт» (Реннервейт).'
-    },
-    {
-      id: 'sp_patronus',
-      name: 'Экспекто Патронум (Expecto Patronum)',
-      icon: '🦌',
-      cat: 'Высшие чары',
-      incantation: 'Expecto Patronum',
-      action: 'Основное действие',
-      cost: '30 Маны',
-      req: '5 курс / Сильная воля',
-      dmgN: 4, dmgD: 'd8', dmgMod: 5,
-      desc: 'Призыв телесного Патронуса. Требует сосредоточения на самом ярком и счастливом воспоминании. Из палочки вырывается серебряный защитник в форме священного животного, разгоняющий дементоров и смеркутов.'
-    },
-    {
-      id: 'sp_petrificus',
-      name: 'Петрификус Тоталус (Petrificus Totalus)',
-      icon: '🗿',
-      cat: 'Боевые заклятия',
-      incantation: 'Petrificus Totalus',
-      action: 'Основное действие',
-      cost: '15 Маны',
-      req: '1 курс',
-      dmgN: 1, dmgD: 'd6', dmgMod: 0,
-      desc: 'Проклятие полной парализации тела. Руки и ноги жертвы мгновенно прижимаются к бокам, челюсти сжимаются, и тело каменеет, падая на пол как бревно. Человек сохраняет зрение и слух.'
-    },
-    {
-      id: 'sp_lumos',
-      name: 'Люмос / Нокс (Lumos & Nox)',
-      icon: '💡',
-      cat: 'Бытовые чары',
-      incantation: 'Lumos / Nox',
-      action: 'Бонусное действие',
-      cost: '2 Маны',
-      req: '1 курс',
-      dmgN: 0, dmgD: 'd0', dmgMod: 0,
-      desc: 'Зажигает ровный луч теплого белого света на кончике палочки, освещая темноту в радиусе 30 футов. Заклинание «Нокс» мгновенно гасит свечение.'
-    },
-    {
-      id: 'sp_wingardium',
-      name: 'Вингардиум Левиоса (Wingardium Leviosa)',
-      icon: '🪶',
-      cat: 'Чары левитации',
-      incantation: 'Wingardium Leviosa',
-      action: 'Основное действие',
-      cost: '10 Маны',
-      req: '1 курс',
-      dmgN: 0, dmgD: 'd0', dmgMod: 0,
-      desc: 'Чары левитации предметов. Знаменитый жест: «Взмахнуть и скомандовать!» (Swish and flick). Заставляет предмет воспарить в воздух и плавно перемещаться по воле волшебника.'
-    },
-    {
-      id: 'sp_accio',
-      name: 'Акцио (Accio)',
-      icon: '🧲',
-      cat: 'Манящие чары',
-      incantation: 'Accio [Предмет]',
-      action: 'Основное действие',
-      cost: '10 Маны',
-      req: '4 курс',
-      dmgN: 0, dmgD: 'd0', dmgMod: 0,
-      desc: 'Манящие чары. Притягивает названный предмет прямо в руку волшебника на огромных дистанциях, даже если вещь находится вне поля зрения.'
-    },
-    {
-      id: 'sp_sectumsempra',
-      name: 'Сектумсемпра (Sectumsempra)',
-      icon: '🗡️',
-      cat: 'Тёмные искусства',
-      incantation: 'Sectumsempra',
-      action: 'Основное действие',
-      cost: '25 Маны',
-      req: '6 курс / Снейп',
-      dmgN: 4, dmgD: 'd10', dmgMod: 4,
-      desc: 'Изобретение Принца-полукровки «для врагов». Невидимый клинок рассекает тело врага на расстоянии, нанося глубокие кровоточащие раны. Излечивается лишь специальным напевом Вульнера Санентур.'
-    },
-    {
-      id: 'sp_incendio',
-      name: 'Инсендио (Incendio)',
-      icon: '🔥',
-      cat: 'Боевые заклятия',
-      incantation: 'Incendio',
-      action: 'Основное действие',
-      cost: '15 Маны',
-      req: '1 курс',
-      dmgN: 3, dmgD: 'd6', dmgMod: 2,
-      desc: 'Выпускает из кончика волшебной палочки мощную струю ревущего пламени, поджигающую предметы и наносящую огненный урон противнику.'
-    },
-    {
-      id: 'sp_alohomora',
-      name: 'Алохомора (Alohomora)',
-      icon: '🗝️',
-      cat: 'Отпирающие чары',
-      incantation: 'Alohomora',
-      action: 'Основное действие',
-      cost: '5 Маны',
-      req: '1 курс',
-      dmgN: 0, dmgD: 'd0', dmgMod: 0,
-      desc: 'Отпирает запертые механические и простые магические замки, засовы и двери.'
-    },
-    {
-      id: 'sp_avada',
-      name: 'Авада Кедавра (Avada Kedavra)',
-      icon: '☠️',
-      cat: 'Непростительные заклятия',
-      incantation: 'Avada Kedavra',
-      action: 'Основное действие',
-      cost: '50 Маны',
-      req: 'Высшая тёмная магия',
-      dmgN: 10, dmgD: 'd12', dmgMod: 20,
-      desc: 'Смертоносное Непростительное заклятие. Ослепительный зеленый луч убивает цель мгновенно. Не может быть заблокировано щитовыми чарами Протего.'
-    }
-  ];
+  var DEFAULT_WZ_SPELLS = [];
 
   /* ============================================================
      БАЗОВЫЙ НАБОР ДУЭЛЬНЫХ ПРИЁМОВ (DEFAULT_WZ_DUELS)
      ============================================================ */
 
-  var DEFAULT_WZ_DUELS = [
-    {
-      id: 'duel_protego_reflect',
-      name: 'Идеальное отражение Протего',
-      icon: '🛡️',
-      kind: 'Защитный рипост',
-      action: 'Реакция при попадании',
-      trigger: 'Атака вражеским лучом',
-      desc: 'Мастерский взмах палочки под острым углом в момент столкновения с вражеским заклятием. Луч не просто гасится, а рикошетит обратно в стрелка с удвоенной силой.'
-    },
-    {
-      id: 'duel_nonverbal_snap',
-      name: 'Невербальный щелчок',
-      icon: '🤫',
-      kind: 'Атакующий финт',
-      action: 'Основное действие',
-      trigger: 'Начало дуэльного размена',
-      desc: 'Наложение заклинания исключительно силой мысли и резким движением кисти. Противник не слышит инкантацию и не успевает выставить щит вовремя.'
-    },
-    {
-      id: 'duel_stupefy_disarm',
-      name: 'Дуэльная связка Снейпа',
-      icon: '⚡',
-      kind: 'Комбо-атака',
-      action: '2 действия',
-      trigger: 'Успешное оглушение',
-      desc: 'Молниеносная комбинация: взмах Ступефай в корпус для потери равновесия, и следующий через долю секунды подкрученный Экспеллиармус, ловящий чужую палочку в воздухе.'
-    },
-    {
-      id: 'duel_transfig_shield',
-      name: 'Трансфигурация окружения',
-      icon: '🧱',
-      kind: 'Тактическая защита',
-      action: 'Реакция / Действие',
-      trigger: 'Атака Авада Кедавра или огнем',
-      desc: 'Выхватывание камня пола или статуи заклинанием и превращение его в живой барьер или стаю змей, перехватывающих смертоносный луч вместо тела волшебника.'
-    },
-    {
-      id: 'duel_combat_apparate',
-      name: 'Боевая тактическая аппарация',
-      icon: '🌀',
-      kind: 'Перемещение',
-      action: 'Бонусное действие',
-      trigger: 'Угроза окружения',
-      desc: 'Мгновенный звучный хлопок аппарации на 20 футов за спину дуэлянта со смещением угла атаки.'
-    },
-    {
-      id: 'duel_wand_feint',
-      name: 'Дуэльный финт профессора Флитвика',
-      icon: '🪄',
-      kind: 'Тактический обман',
-      action: 'Бонусное действие',
-      trigger: 'Перед наложением чар',
-      desc: 'Быстрый ложный замах палочки влево провоцирует противника выставить щит с неправильной стороны, открывая правый фланг для прямого удара.'
-    }
-  ];
+  var DEFAULT_WZ_DUELS = [];
 
   /* ============================================================
      ЛОКАЦИИ КАРТЫ МАРОДЁРОВ: ХОГВАРТС (ИНТЕРЬЕР) И МИР ВОКРУГ
@@ -1401,14 +1201,16 @@
       var raw = localStorage.getItem(WZ_SPELLS_KEY);
       if(raw){
         var arr = JSON.parse(raw);
-        if(Array.isArray(arr) && arr.length > 0){
-          WZ.spells = arr;
-          return arr;
+        if(Array.isArray(arr)){
+          var userArr = arr.filter(function(s){
+            return s && s.id && !s.id.match(/^sp_(expelliarmus|protego|stupefy|lumos|wingardium|avada|incendio|accio|sectumsempra|patronum)$/);
+          });
+          WZ.spells = userArr;
+          return userArr;
         }
       }
     } catch(e){}
-    WZ.spells = JSON.parse(JSON.stringify(DEFAULT_WZ_SPELLS));
-    WZ.saveSpells();
+    WZ.spells = [];
     return WZ.spells;
   };
 
@@ -1428,14 +1230,16 @@
       var raw = localStorage.getItem(WZ_DUELS_KEY);
       if(raw){
         var arr = JSON.parse(raw);
-        if(Array.isArray(arr) && arr.length > 0){
-          WZ.duels = arr;
-          return arr;
+        if(Array.isArray(arr)){
+          var userArr = arr.filter(function(d){
+            return d && d.id && !d.id.match(/^duel_(protego_reflect|nonverbal_snap|stupefy_disarm|transfig_shield|combat_apparate|wand_feint)$/);
+          });
+          WZ.duels = userArr;
+          return userArr;
         }
       }
     } catch(e){}
-    WZ.duels = JSON.parse(JSON.stringify(DEFAULT_WZ_DUELS));
-    WZ.saveDuels();
+    WZ.duels = [];
     return WZ.duels;
   };
 
@@ -2254,7 +2058,7 @@
 
   /* Экран ЗАКЛИНАНИЯ (wzSpells) */
   function wzSpells(){
-    if(!WZ.spells || !WZ.spells.length) WZ.loadSpells();
+    if(!WZ.spells) WZ.loadSpells();
     var list = WZ.spells || [];
 
     var curFilter = WZ.spellFilter || 'all';
@@ -2321,7 +2125,15 @@
       '</div>' +
       filterPills +
       '<div class="wi-ref-cards-grid" style="margin-top:14px;">' +
-        (cards || '<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:36px 16px;">Список заклинаний пуст.</div>') +
+        (cards || ('<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:44px 16px;border:1px dashed var(--wz-border);border-radius:12px;background:rgba(255,255,255,0.02);">' +
+          '<div style="font-size:40px;margin-bottom:8px;">✨ 📜</div>' +
+          '<div style="font-family:Cinzel,serif;font-size:17px;color:var(--wz-gold-light);margin-bottom:6px;">Гримуар заклинаний пуст</div>' +
+          '<div style="color:var(--wz-text-muted);font-size:13px;max-width:440px;margin:0 auto 16px;">Создайте заклинание вручную или воспользуйтесь AI Генератором для создания уникальных чар Хогвартса.</div>' +
+          '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
+            '<button class="btn btn-primary" data-nav="wzSpellEdit:new" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSpellEdit:new\');">➕ Создать заклинание</button>' +
+            '<button class="btn btn-ghost" data-nav="wzSpellGen" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSpellGen\');" style="color:var(--wz-gold);border-color:var(--wz-border-strong);">✨ AI Генератор заклинаний</button>' +
+          '</div>' +
+        '</div>')) +
       '</div>';
   }
 
@@ -2453,7 +2265,7 @@
 
   /* Экран ДУЭЛЬНЫЙ КЛУБ И ПРИЁМЫ (wzDuels) */
   function wzDuels(){
-    if(!WZ.duels || !WZ.duels.length) WZ.loadDuels();
+    if(!WZ.duels) WZ.loadDuels();
     var list = WZ.duels || [];
 
     var curFilter = WZ.duelFilter || 'all';
@@ -2517,7 +2329,15 @@
       '</div>' +
       filterPills +
       '<div class="wi-ref-cards-grid" style="margin-top:14px;">' +
-        (cards || '<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:36px 16px;">Список дуэльных приёмов пуст.</div>') +
+        (cards || ('<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:44px 16px;border:1px dashed var(--wz-border);border-radius:12px;background:rgba(255,255,255,0.02);">' +
+          '<div style="font-size:40px;margin-bottom:8px;">⚔️ 🪄</div>' +
+          '<div style="font-family:Cinzel,serif;font-size:17px;color:var(--wz-gold-light);margin-bottom:6px;">Список дуэльных приёмов пуст</div>' +
+          '<div style="color:var(--wz-text-muted);font-size:13px;max-width:440px;margin:0 auto 16px;">Добавьте боевой приём вручную или воспользуйтесь AI Генератором для создания дуэльных финтов и связок.</div>' +
+          '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
+            '<button class="btn btn-primary" data-nav="wzDuelEdit:new" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzDuelEdit:new\');">➕ Создать приём</button>' +
+            '<button class="btn btn-ghost" data-nav="wzDuelGen" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzDuelGen\');" style="color:var(--wz-gold);border-color:var(--wz-border-strong);">⚔️ AI Генератор приёмов</button>' +
+          '</div>' +
+        '</div>')) +
       '</div>';
   }
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v61';
+const CACHE_NAME = 'compendium-cache-v62';
 const APP_SHELL = [
   './',
   './index.html',
@@ -14,7 +14,7 @@ const APP_SHELL = [
   './css/witcher.css',
   './css/witcher.css?v=58',
   './css/wizard.css',
-  './css/wizard.css?v=61',
+  './css/wizard.css?v=62',
   './js/dnd-data.js',
   './js/core.js',
   './js/modules/homebrew.js',
