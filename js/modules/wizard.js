@@ -335,19 +335,22 @@
         cont.appendChild(star);
       }
 
-      // 5. Парящие искры Lumos / магическая пыльца (32 шт.)
-      var sparkCount = 32;
+      // 5. Парящая магическая пыльца / пыль, медленно летающая в разные стороны (38 шт.)
+      var sparkCount = 38;
       var sparkTypes = ['wz-spark-gold', 'wz-spark-gold', 'wz-spark-blue', 'wz-spark-purple', 'wz-spark-white'];
       for(var i = 0; i < sparkCount; i++){
         var spark = document.createElement('div');
         var type = sparkTypes[i % sparkTypes.length];
+        var animIndex = (i % 8) + 1; // 8 разнонаправленных траекторий wzDustDrift1..8
         spark.className = 'wz-spark ' + type;
-        var spSize = (Math.random() * 3.5 + 2).toFixed(1);
+        var spSize = (Math.random() * 2.6 + 1.8).toFixed(1); // 1.8px - 4.4px
         spark.style.width = spSize + 'px';
         spark.style.height = spSize + 'px';
         spark.style.left = (Math.random() * 100).toFixed(1) + '%';
-        spark.style.animationDuration = (Math.random() * 9 + 7).toFixed(1) + 's';
-        spark.style.animationDelay = (-Math.random() * 16).toFixed(1) + 's';
+        spark.style.top = (Math.random() * 100).toFixed(1) + '%';
+        var duration = (Math.random() * 10 + 14).toFixed(1); // 14s - 24s (медленное парение пыли)
+        var delay = (-Math.random() * 24).toFixed(1);
+        spark.style.animation = 'wzDustDrift' + animIndex + ' ' + duration + 's ease-in-out ' + delay + 's infinite';
         cont.appendChild(spark);
       }
 

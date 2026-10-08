@@ -155,56 +155,99 @@ body.wz-theme {
   100% { transform: scale(0.6); opacity: 0.25; }
 }
 
-/* Парящие искры Lumos / магическая пыльца */
+/* Парящая магическая пыльца / пыль (медленно парит во все разные стороны) */
 .wz-spark {
   position: absolute;
-  bottom: -20px;
   border-radius: 50%;
   pointer-events: none;
-  animation: wzSparkRise linear infinite;
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
 .wz-spark-gold {
   background: radial-gradient(circle, #fff 15%, #facc15 65%, rgba(212,175,55,0) 100%);
-  box-shadow: 0 0 8px #fde047, 0 0 16px rgba(234, 179, 8, 0.85);
+  box-shadow: 0 0 6px #fde047, 0 0 14px rgba(234, 179, 8, 0.7);
 }
 
 .wz-spark-blue {
   background: radial-gradient(circle, #fff 15%, #38bdf8 65%, rgba(56,189,248,0) 100%);
-  box-shadow: 0 0 8px #7dd3fc, 0 0 18px rgba(56, 189, 248, 0.85);
+  box-shadow: 0 0 6px #7dd3fc, 0 0 14px rgba(56, 189, 248, 0.7);
 }
 
 .wz-spark-purple {
   background: radial-gradient(circle, #fff 15%, #c084fc 65%, rgba(192,132,252,0) 100%);
-  box-shadow: 0 0 8px #d8b4fe, 0 0 16px rgba(192, 132, 252, 0.85);
+  box-shadow: 0 0 6px #d8b4fe, 0 0 14px rgba(192, 132, 252, 0.7);
 }
 
 .wz-spark-white {
   background: radial-gradient(circle, #fff 25%, #f1f5f9 65%, rgba(255,255,255,0) 100%);
-  box-shadow: 0 0 6px #ffffff, 0 0 14px rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 5px #ffffff, 0 0 12px rgba(255, 255, 255, 0.65);
 }
 
-@keyframes wzSparkRise {
-  0% {
-    transform: translateY(0) translateX(0) scale(0.6);
-    opacity: 0;
-  }
-  15% {
-    opacity: 0.95;
-    transform: translateY(-15vh) translateX(12px) scale(1.1);
-  }
-  50% {
-    transform: translateY(-50vh) translateX(-16px) scale(0.9);
-    opacity: 0.85;
-  }
-  85% {
-    opacity: 0.7;
-    transform: translateY(-85vh) translateX(18px) scale(1);
-  }
-  100% {
-    transform: translateY(-108vh) translateX(-8px) scale(0.4);
-    opacity: 0;
-  }
+/* 8 разнонаправленных траекторий плавного парения пыли в воздухе */
+@keyframes wzDustDrift1 {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  20% { opacity: 0.8; transform: translate(16px, -18px) scale(1); }
+  50% { opacity: 0.95; transform: translate(38px, -42px) scale(1.1); }
+  75% { opacity: 0.6; transform: translate(62px, -60px) scale(0.9); }
+  100% { transform: translate(84px, -82px) scale(0.5); opacity: 0; }
+}
+
+@keyframes wzDustDrift2 {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  25% { opacity: 0.75; transform: translate(-22px, 16px) scale(1); }
+  55% { opacity: 0.9; transform: translate(-48px, 38px) scale(1.15); }
+  80% { opacity: 0.55; transform: translate(-72px, 56px) scale(0.85); }
+  100% { transform: translate(-96px, 76px) scale(0.4); opacity: 0; }
+}
+
+@keyframes wzDustDrift3 {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  20% { opacity: 0.7; transform: translate(28px, -8px) scale(0.95); }
+  50% { opacity: 0.9; transform: translate(62px, 14px) scale(1.1); }
+  75% { opacity: 0.65; transform: translate(92px, 4px) scale(0.9); }
+  100% { transform: translate(120px, 20px) scale(0.4); opacity: 0; }
+}
+
+@keyframes wzDustDrift4 {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  25% { opacity: 0.8; transform: translate(-20px, -24px) scale(1); }
+  55% { opacity: 0.9; transform: translate(-46px, -52px) scale(1.1); }
+  80% { opacity: 0.55; transform: translate(-68px, -76px) scale(0.85); }
+  100% { transform: translate(-88px, -100px) scale(0.4); opacity: 0; }
+}
+
+@keyframes wzDustDrift5 {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  20% { opacity: 0.75; transform: translate(14px, 24px) scale(1); }
+  50% { opacity: 0.85; transform: translate(-14px, 58px) scale(1.1); }
+  75% { opacity: 0.6; transform: translate(18px, 88px) scale(0.85); }
+  100% { transform: translate(-6px, 116px) scale(0.5); opacity: 0; }
+}
+
+@keyframes wzDustDrift6 {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  25% { opacity: 0.75; transform: translate(-26px, 12px) scale(1); }
+  50% { opacity: 0.9; transform: translate(-58px, -14px) scale(1.15); }
+  75% { opacity: 0.6; transform: translate(-88px, 12px) scale(0.85); }
+  100% { transform: translate(-118px, -8px) scale(0.4); opacity: 0; }
+}
+
+@keyframes wzDustDrift7 {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  25% { opacity: 0.8; transform: translate(28px, -20px) scale(1); }
+  45% { opacity: 0.9; transform: translate(36px, 18px) scale(1.1); }
+  70% { opacity: 0.7; transform: translate(8px, 36px) scale(0.95); }
+  88% { opacity: 0.45; transform: translate(-24px, 14px) scale(0.8); }
+  100% { transform: translate(0, 0) scale(0.4); opacity: 0; }
+}
+
+@keyframes wzDustDrift8 {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  22% { opacity: 0.8; transform: translate(22px, 24px) scale(1); }
+  50% { opacity: 0.9; transform: translate(48px, 12px) scale(1.1); }
+  75% { opacity: 0.6; transform: translate(72px, 42px) scale(0.85); }
+  100% { transform: translate(96px, 32px) scale(0.4); opacity: 0; }
 }
 
 /* Вспышка искр палочки при клике */
