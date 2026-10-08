@@ -380,12 +380,6 @@ body.wz-theme .hb-seg-btn.on,
   color: var(--wz-gold-light, #fef08a);
 }
 
-.wz-stat-badge.mana {
-  border-color: rgba(168, 85, 247, 0.35);
-  background: rgba(168, 85, 247, 0.12);
-  color: #d8b4fe;
-}
-
 .wz-house-badge {
   display: inline-flex;
   align-items: center;

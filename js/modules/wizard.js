@@ -1258,14 +1258,22 @@
       if(raw){
         var arr = JSON.parse(raw);
         if(Array.isArray(arr)){
+          var hadMana = false;
           var userArr = arr.filter(function(s){
             if(!s || !s.id) return false;
             if(s.id.match(/^sp_(expelliarmus|protego|stupefy|lumos|wingardium|avada|incendio|accio|sectumsempra|patronum|expecto|alohomora|petrificus)/i)) return false;
             if(!s.id.match(/\d{6,}/) && !s.id.startsWith('wz_sp_')) return false;
             return true;
+          }).map(function(s){
+            if(s && typeof s.cost === 'string' && /ман/i.test(s.cost)){
+              var cleaned = s.cost.replace(/\b\d*\s*ман[а-яё]*/gi, '').trim();
+              s.cost = cleaned || 'Мгновенно';
+              hadMana = true;
+            }
+            return s;
           });
           WZ.spells = userArr;
-          if(userArr.length !== arr.length){
+          if(userArr.length !== arr.length || hadMana){
             WZ.saveSpells();
           }
           return userArr;
@@ -2102,7 +2110,7 @@
       });
     }
 
-    // Сброс статов (восстановление HP/Маны)
+    // Сброс статов (восстановление HP)
     var resetBtn = g('wzDataResetProfileBtn');
     if(resetBtn){
       resetBtn.addEventListener('click', function(){
@@ -2707,8 +2715,8 @@
             '<b>' + esc(s.action || 'Основное действие') + '</b>' +
           '</div>' +
           '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:6px;padding:8px 12px;">' +
-            '<span style="color:var(--wz-text-muted);font-size:11px;display:block;">ЗАТРАТЫ:</span>' +
-            '<b style="color:#fde047;">' + esc(s.cost || '10 Маны') + '</b>' +
+            '<span style="color:var(--wz-text-muted);font-size:11px;display:block;">ФОКУСИРОВКА:</span>' +
+            '<b style="color:#fde047;">' + esc(s.cost || 'Мгновенно') + '</b>' +
           '</div>' +
           '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:6px;padding:8px 12px;">' +
             '<span style="color:var(--wz-text-muted);font-size:11px;display:block;">УРОН / ЭФФЕКТ:</span>' +
@@ -2731,7 +2739,7 @@
       cat: 'Боевые заклятия',
       incantation: '',
       action: 'Основное действие',
-      cost: '10 Маны',
+      cost: 'Мгновенно',
       req: '1 курс',
       dmgN: 2, dmgD: 'd6', dmgMod: 0,
       desc: ''
@@ -2773,8 +2781,8 @@
             '<input type="text" id="wzEdSpellAction" class="wz-input" value="' + escA(s.action || 'Основное действие') + '" placeholder="Основное действие / Бонусное / Реакция">' +
           '</div>' +
           '<div class="wz-edit-item">' +
-            '<label>Затраты маны / концентрации</label>' +
-            '<input type="text" id="wzEdSpellCost" class="wz-input" value="' + escA(s.cost || '10 Маны') + '" placeholder="15 Маны / Пассивно">' +
+            '<label>Фокусировка / Концентрация</label>' +
+            '<input type="text" id="wzEdSpellCost" class="wz-input" value="' + escA(s.cost || 'Мгновенно') + '" placeholder="Мгновенно / Концентрация / Ритуал / Пассивно">' +
           '</div>' +
           '<div class="wz-edit-item">' +
             '<label>Требования (курс / факультет)</label>' +
@@ -4460,7 +4468,7 @@
       '  "icon": "Один подходящий эмодзи (например: ⚡, ✨, 🔥, 🛡️, 🦌, 💥, 🌀, 🗡️)",\n' +
       '  "cat": "Категория (строго одно из: Боевые заклятия, Защитные чары, Высшие чары, Чары левитации, Манящие чары, Бытовые чары, Трансфигурация, Тёмные искусства, Непростительные заклятия)",\n' +
       '  "action": "Основное действие / Бонусное действие / Реакция",\n' +
-      '  "cost": "Затраты (например: 10 Маны, 20 Маны, Пассивно)",\n' +
+      '  "cost": "Фокусировка и концентрация (строго одно из: Мгновенно, Концентрация (до 1 мин), Поддержание, Ритуал, Пассивно)",\n' +
       '  "req": "Требования (например: 3 курс Хогвартса, или Староста)",\n' +
       '  "dmgN": "Количество кубов урона (целое число, например 2. Если урона нет, то 0)",\n' +
       '  "dmgD": "Тип куба (строго одно из: d0, d4, d6, d8, d10, d12)",\n' +
@@ -5040,7 +5048,7 @@
           icon: s.icon || '✨',
           cat: s.cat || 'Боевые заклятия',
           action: s.action || 'Основное действие',
-          cost: s.cost || '10 Маны',
+          cost: s.cost || 'Мгновенно',
           req: s.req || '',
           dmgN: parseInt(s.dmgN, 10) || 0,
           dmgD: s.dmgD || 'd6',
