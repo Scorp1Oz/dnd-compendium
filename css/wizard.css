@@ -256,7 +256,7 @@ body.wz-theme {
   border: 1px solid var(--wz-border);
   border-radius: 12px;
   padding: 16px 20px;
-  margin-bottom: 20px;
+  margin: 12px 0 24px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 24px rgba(212, 175, 55, 0.05);
   position: relative;
   overflow: hidden;
@@ -384,7 +384,7 @@ body.wz-theme {
   border: 1px solid var(--wz-gold);
   border-radius: 12px;
   padding: 22px 24px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   cursor: pointer;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
@@ -447,7 +447,7 @@ body.wz-theme .section-label {
   text-transform: uppercase;
   color: var(--wz-gold);
   opacity: 0.85;
-  margin: 22px 0 10px;
+  margin: 30px 0 14px;
 }
 
 /* Карточки разделов */
@@ -546,7 +546,7 @@ body.wz-theme .section-label {
 .wz-rule {
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--wz-border), var(--wz-gold), var(--wz-border), transparent);
-  margin: 0 0 18px;
+  margin: 0 0 34px;
   opacity: 0.6;
 }
 
@@ -895,3 +895,10 @@ body.wz-theme .btn-ghost:hover:not(:disabled) {
   border-radius: 6px;
   padding: 10px 14px;
 }
+
+@media (max-width: 600px) {
+  .wz-hud { margin: 8px 0 18px; }
+  .wz-rule { margin-bottom: 24px; }
+  body.wz-theme .section-label { margin: 24px 0 12px; }
+}
+

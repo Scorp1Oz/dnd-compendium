@@ -1695,7 +1695,7 @@
     var label = '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // ВОЛШЕБНИК</div>';
 
     // 3. Список разделов в сетке menu-list grid-2 (как в Ведьмаке и Шиноби!)
-    var sectionsList = '<div class="menu-list grid-2" style="margin-top:10px;">' +
+    var sectionsList = '<div class="menu-list grid-2">' +
       '<div class="wz-card wz-card-clickable" data-nav="wzSpells" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSpells\');" role="button" tabindex="0" title="Открыть Заклинания">' +
         '<div style="flex:1;min-width:0;">' +
           '<div class="wz-card-title"><span>✨</span> Заклинания</div>' +
