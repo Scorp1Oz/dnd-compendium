@@ -322,6 +322,23 @@ body.wz-theme .section-label {
   opacity: 1;
 }
 
+.wz-card-disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  border-style: dashed;
+  filter: grayscale(0.35);
+}
+
+.wz-card-disabled:hover {
+  transform: none !important;
+  border-color: var(--wz-border) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35) !important;
+}
+
+.wz-card-disabled:hover::before {
+  opacity: 0 !important;
+}
+
 .wz-card-title {
   font-family: 'Cinzel', serif;
   font-size: 16px;
@@ -523,6 +540,46 @@ body.wz-theme .section-label {
   font-size: 14px;
   margin-bottom: 6px;
   letter-spacing: 0.02em;
+}
+
+/* Переключатель режимов карты (Хогвартс / Мир вокруг) */
+.wz-realm-switch {
+  display: inline-flex;
+  gap: 4px;
+  background: rgba(14, 18, 26, 0.95);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--wz-border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.wz-realm-btn {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--wz-text-muted);
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.wz-realm-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.wz-realm-btn.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(180, 83, 9, 0.35) 100%);
+  border-color: var(--wz-gold);
+  color: #fbbf24;
+  box-shadow: 0 0 12px var(--wz-gold-glow);
 }
 
 /* Интерактивная карта Хогвартса и окрестностей */

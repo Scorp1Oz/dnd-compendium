@@ -47,15 +47,20 @@
     meta: { name: 'Волшебный мир: Хогвартс', note: 'Книга заклинаний, дуэльный клуб, Карта Мародёров и картотека магов.' },
     map: {
       zoom: 1.0,
-      cx: 1400,
-      cy: 1100,
-      mode: 'inspect',
-      selectedLocId: 'hogwarts_castle',
+      cx: 1200,
+      cy: 1150,
+      scope: 'hogwarts', // 'hogwarts' (интерьер замка) | 'world' (окрестности и нагорье)
+      mode: 'inspect',   // 'inspect' | 'route' | 'markers'
+      selectedLocId: 'great_hall',
       showLabels: true,
       routePoints: [],
-      travelMode: 'broom',
+      travelMode: 'walk',
       travelPace: 'normal',
-      userMarkers: []
+      userMarkers: [],
+      routes: {
+        hogwarts: { points: [], travelMode: 'walk', travelPace: 'normal' },
+        world: { points: [], travelMode: 'broom', travelPace: 'normal' }
+      }
     },
 
     loadProfiles: function(){
@@ -865,43 +870,290 @@
   ];
 
   /* ============================================================
-     ЛОКАЦИИ КАРТЫ МАРОДЁРОВ (WZ_MAP_LOCATIONS)
-     Координаты на пергаментном полотне 2800 x 2400
+     ЛОКАЦИИ КАРТЫ МАРОДЁРОВ: ХОГВАРТС (ИНТЕРЬЕР) И МИР ВОКРУГ
+     Координаты на полотне 2800 x 2400
      ============================================================ */
 
-  var WZ_MAP_LOCATIONS = [
+  // 1. Внутренние залы, башни, подземелья и тайные ходы замка Хогвартс
+  var WZ_HOGWARTS_LOCATIONS = [
+    {
+      id: 'great_hall',
+      name: 'Большой Зал Хогвартса',
+      region: '1 этаж / Главный дворец',
+      x: 1480, y: 1150,
+      icon: '🕯️',
+      climate: 'Заколдованное небо',
+      ruler: 'Профессор Макгонагалл',
+      danger: 'Безопасно',
+      desc: 'Величественный каменный зал: четыре факультетских стола, стол преподавателей на помосте, парящие тысячи свечей и зачарованный потолок, отражающий погоду за окном.'
+    },
+    {
+      id: 'entrance_hall',
+      name: 'Вестибюль и Парадный вход',
+      region: '1 этаж / Входная группа',
+      x: 1280, y: 1150,
+      icon: '🚪',
+      climate: 'Каменный холл',
+      ruler: 'Аргус Филч (вахта)',
+      danger: 'Песочные часы очков факультетов',
+      desc: 'Грандиозный вестибюль с коваными дубовыми дверями. Отсюда ведут арки в Большой Зал, спуск в Подземелья Слизерина и проход к Движущейся Лестнице.'
+    },
+    {
+      id: 'grand_staircase',
+      name: 'Парадная Движущаяся Лестница',
+      region: 'Центральная башня (1-7 этажи)',
+      x: 1080, y: 1150,
+      icon: '🪜',
+      climate: 'Постоянно меняющаяся магия',
+      ruler: 'Живые портреты предков',
+      danger: 'Обманчивые ступеньки и внезапные повороты',
+      desc: '142 заколдованные лестницы Хогвартса, которые непрерывно поворачиваются в воздухе. Стены от фундамента до шпилей увешаны сотнями говорящих портретов.'
+    },
+    {
+      id: 'dumbledore_office',
+      name: 'Кабинет Директора Дамблдора',
+      region: 'Высокая круглая башня',
+      x: 1080, y: 650,
+      icon: '🧙‍♂️',
+      climate: 'Древнейшая магия',
+      ruler: 'Альбус Дамблдор',
+      danger: 'Омут Памяти и серебряные приборы',
+      desc: 'Светлый круглый кабинет за каменной горгульей («Лимонный шербет»). Здесь дремлют на стенах портреты прошлых директоров, сидит феникс Фоукс и хранится Распределяющая Шляпа.'
+    },
+    {
+      id: 'gryffindor_tower',
+      name: 'Башня Гриффиндора и Гостиная',
+      region: '7 этаж / Восточное крыло',
+      x: 680, y: 920,
+      icon: '🦁',
+      climate: 'Теплый огонь камина',
+      ruler: 'Портрет Полной Дамы',
+      danger: 'Безопасно для львов («Драконье брюхо»)',
+      desc: 'Уютная круглая гостиная в ало-золотых тонах с ревущим пламенем в очаге, мягкими бархатными креслами и винтовыми лестницами в спальни мальчиков и девочек.'
+    },
+    {
+      id: 'slytherin_dungeon',
+      name: 'Подземелья и Гостиная Слизерина',
+      region: 'Дно Чёрного Озера',
+      x: 920, y: 1650,
+      icon: '🐍',
+      climate: 'Сырость и изумрудный полумрак',
+      ruler: 'Профессор Северус Снейп',
+      danger: 'Холод глубин и древние проклятия',
+      desc: 'Низкая каменная зала под дном озера. Сквозь толстые зачарованные витражи льется зеленый свет воды, слышен плеск гигантского кальмара, горят резные черепа.'
+    },
+    {
+      id: 'ravenclaw_tower',
+      name: 'Башня Когтеврана',
+      region: 'Западная высокая башня (7 этаж)',
+      x: 1480, y: 550,
+      icon: '🦅',
+      climate: 'Горный бриз и звезды',
+      ruler: 'Бронзовый молоточек-орел',
+      danger: 'Философские логические загадки',
+      desc: 'Изящный круглый зал с шелковыми лазурными шторами, мраморной статуей Кандиды Когтевран, звездным расписным куполом и богатейшей библиотекой поэзии.'
+    },
+    {
+      id: 'hufflepuff_basement',
+      name: 'Цоколь и Гостиная Пуффендуя',
+      region: 'Рядом с кухнями (коридор бочек)',
+      x: 1720, y: 1550,
+      icon: '🦡',
+      climate: 'Теплота, травы и выпечка',
+      ruler: 'Профессор Помона Стебль',
+      danger: 'Уксусная ловушка при неверном стуке',
+      desc: 'Круглая, пронизанная солнцем комната с круглыми дубовыми дверями, похожими на крышки бочек. Повсюду кашпо с редкими цветущими суккулентами и медные чайники.'
+    },
+    {
+      id: 'potions_class',
+      name: 'Класс Зельеварения Снейпа',
+      region: 'Подземелья Хогвартса',
+      x: 1220, y: 1600,
+      icon: '🧪',
+      climate: 'Ледяной сквозняк и пар котлов',
+      ruler: 'Профессор Снейп',
+      danger: 'Ядовитые испарения и строжайший допрос',
+      desc: 'Мрачный каменный подвал, уставленный стеклянными банками с маринованными ингредиентами, пучками трав и кипящими медными и оловянными котлами.'
+    },
+    {
+      id: 'hogwarts_kitchens',
+      name: 'Кухни Хогвартса (Эльфы-домовики)',
+      region: 'Под Большим Залом',
+      x: 1480, y: 1600,
+      icon: '🥧',
+      climate: 'Аромат жареного мяса и пирогов',
+      ruler: 'Домовики (Добби, Винки)',
+      danger: 'Риск переедания тыквенных пирожков',
+      desc: 'Огромный зал точь-в-точь под Большим Залом. Чтобы войти, нужно пощекотать нарисованную грушу на натюрморте. Сотня эльфов готовит пиры на огромных очагах.'
+    },
+    {
+      id: 'library_restricted',
+      name: 'Библиотека и Запретная секция',
+      region: '2 этаж / Восточное крыло',
+      x: 1680, y: 850,
+      icon: '📚',
+      climate: 'Шелест пергамента и пыль веков',
+      ruler: 'Мадам Ирма Пинс',
+      danger: 'Кричащие книги черной магии на цепях',
+      desc: 'Лабиринт высоких стеллажей до потолка. За железной решеткой скрыта Запретная Секция с гримуарами по темнейшим искусствам, требующая письменного разрешения преподавателя.'
+    },
+    {
+      id: 'room_of_requirement',
+      name: 'Выручай-комната («Так-и-сяк»)',
+      region: '7 этаж, напротив гобелена Варнавы',
+      x: 880, y: 780,
+      icon: '🚪',
+      climate: 'Волшебная адаптация под любую нужду',
+      ruler: 'Магия замка Хогвартс',
+      danger: 'Непредсказуемость содержимого',
+      desc: 'Потайная комната, проявляющаяся на голой стене, если трижды пройти мимо с сильной нуждой в сердце. Штаб-квартира Отряда Дамблдора и хранилище забытых вещей.'
+    },
+    {
+      id: 'hospital_wing',
+      name: 'Больничное крыло мадам Помфри',
+      region: '2 этаж / Башня',
+      x: 1180, y: 880,
+      icon: '🩹',
+      climate: 'Запах Костероста и чистоты',
+      ruler: 'Мадам Поппи Помфри',
+      danger: 'Строжайший постельный режим',
+      desc: 'Светлые палаты с белоснежными занавесками и ширмами. Место исцеления от укусов драконов, переломов после квиддича и проклятий шальной магии.'
+    },
+    {
+      id: 'astronomy_tower_int',
+      name: 'Астрономическая Башня (Шпиль)',
+      region: 'Самая высокая точка Хогвартса',
+      x: 720, y: 620,
+      icon: '🔭',
+      climate: 'Ледяной ночной ветер',
+      ruler: 'Профессор Аврора Синистра',
+      danger: 'Опасность падения с высоты парапета',
+      desc: 'Самый высокий шпиль замка. Верхняя открытая терраса с бронзовыми телескопами и небесными глобусами для полуночных наблюдений за движением планет и комет.'
+    },
+    {
+      id: 'dada_classroom',
+      name: 'Класс Защиты от Темных Искусств',
+      region: '3 этаж / Башня ЗОТИ',
+      x: 1080, y: 1380,
+      icon: '🛡️',
+      climate: 'Запах пороха и сухих трав',
+      ruler: 'Профессор Люпин / Грозный Глаз',
+      danger: 'Боггарты, корнуэльские пикси и дуэли',
+      desc: 'Просторная аудитория со скелетом виверны под стропилами, кованой винтовой лестницей в кабинет профессора и шкафом, в котором частенько стучит взаперти боггарт.'
+    },
+    {
+      id: 'charms_classroom',
+      name: 'Класс Заклинаний (Флитвик)',
+      region: '3 этаж / Северный коридор',
+      x: 1320, y: 1380,
+      icon: '🪄',
+      climate: 'Парящие перья и искры',
+      ruler: 'Профессор Филиус Флитвик',
+      danger: 'Шальные лучи и случайная левитация',
+      desc: 'Ярусная аудитория со старинными деревянными скамьями. Крошечный профессор Флитвик ведет урок, стоя на кипе энциклопедий, обучая жестам палочки.'
+    },
+    {
+      id: 'transfiguration_class',
+      name: 'Класс Трансфигурации',
+      region: 'Внутренний двор / 1 этаж',
+      x: 1540, y: 1380,
+      icon: '🐈',
+      climate: 'Строгий порядок и тишина',
+      ruler: 'Профессор Макгонагалл',
+      danger: 'Превращение спичек в иголки и мышей в табакерки',
+      desc: 'Строгая аудитория с высокими готическими окнами, выходящими в монастырский дворик. Клетки с птицами и крысами, на доске — формулы превращения живой материи.'
+    },
+    {
+      id: 'divination_tower',
+      name: 'Башня Прорицаний (Трелони)',
+      region: 'Чердак Северной башни (люк)',
+      x: 1780, y: 650,
+      icon: '🔮',
+      climate: 'Душный пар хереса и благовоний',
+      ruler: 'Профессор Сивилла Трелони',
+      danger: 'Регулярные предсказания смерти («Грим!»)',
+      desc: 'Круглая теплая чердачная комната, куда поднимаются по висячей серебряной лестнице через люк. Заставлена ситцевыми пуфами, чаинками и хрустальными шарами.'
+    },
+    {
+      id: 'owlery_tower',
+      name: 'Совятня Хогвартса',
+      region: 'Западная отдельно стоящая башня',
+      x: 550, y: 1200,
+      icon: '🦉',
+      climate: 'Холодные сквозняки и шорох перьев',
+      ruler: 'Школьные почтовые совы',
+      danger: 'Скользкий каменный пол и совиный помет',
+      desc: 'Круглая высокая каменная башня без оконных стекол. Вверх уходят ряды деревянных насестов для сотен почтовых сов всех мастей — от крошечных сычей до полярных сов.'
+    },
+    {
+      id: 'trophy_room',
+      name: 'Комната Наград и Доспехов',
+      region: '3 этаж / Галерея славы',
+      x: 920, y: 1020,
+      icon: '🏆',
+      climate: 'Блеск начищенного серебра и золота',
+      ruler: 'Аргус Филч (надзиратель за отработками)',
+      danger: 'Скрипящие рыцарские доспехи',
+      desc: 'Стеклянные витрины с кубками школы, щитами старост и наградами по квиддичу за столетия. Место, где Малфой назначил Гарри Поттеру полночную дуэль.'
+    },
+    {
+      id: 'myrtle_bathroom',
+      name: 'Туалет Плаксы Миртл (Тайная Комната)',
+      region: '2 этаж / Заброшенное крыло',
+      x: 1120, y: 1780,
+      icon: '🐍',
+      climate: 'Вечно капающая вода и сырость',
+      ruler: 'Призрак Плаксы Миртл',
+      danger: 'Смертоносный взгляд Василиска Слизерина',
+      desc: 'Заброшенный затопленный туалет. На медном кране одной из раковин выгравирована незаметная змейка — вход в тоннель к Тайной Комнате, открываемый Парселтангом.'
+    },
+    {
+      id: 'secret_honeydukes',
+      name: 'Ход за Одноглазой Ведьмой → Сладкое Королевство',
+      region: '3 этаж / Секретный лаз Мародёров',
+      x: 1360, y: 1850,
+      icon: '🍬',
+      climate: 'Узкий каменный желоб',
+      ruler: 'Статуя Гунхильды из Горсмура',
+      danger: 'Пароль «Диссендиум»',
+      desc: 'Потайной лаз за горбом каменной ведьмы. Спуск по каменной горке ведет через километровый тоннель прямиком в подвал кондитерской лавки Хогсмида.'
+    },
+    {
+      id: 'secret_willow_passage',
+      name: 'Тайный лаз под Ивой → Воющая Хижина',
+      region: 'Корни Гремучей Ивы',
+      x: 1600, y: 1850,
+      icon: '🏚️',
+      climate: 'Темный подземный лаз',
+      ruler: 'Сучок на стволе дерева',
+      danger: 'Удары ветвей яростного дерева',
+      desc: 'Подземный ход, вырытый Дамблдором для Римуса Люпина. Начинается под корнями смертоносной Гремучей Ивы и заканчивается в заколоченной спальне Воющей Хижины.'
+    },
+    {
+      id: 'secret_room_passage',
+      name: 'Ход из Выручай-комнаты → «Кабанья Голова»',
+      region: '7 этаж / Тайный путь сопротивления',
+      x: 880, y: 640,
+      icon: '🍻',
+      climate: 'Свежий горный воздух свободы',
+      ruler: 'Аберфорт Дамблдор / Портрет Арианы',
+      danger: 'Безопасный путь при осаде замка',
+      desc: 'Тайный проход за волшебным портретом сестры Дамблдора Арианы в пабе Хогсмида. Единственный тайный ход, не нанесенный на старую Карту Мародёров.'
+    }
+  ];
+
+  // 2. Внешний мир: окрестности Хогвартса, Шотландское нагорье, Хогсмид, Лондон и Азкабан
+  var WZ_WORLD_LOCATIONS = [
     {
       id: 'hogwarts_castle',
-      name: 'Замок Хогвартс',
-      region: 'Шотландия / Горы',
+      name: 'Замок Хогвартс (Внешний контур)',
+      region: 'Шотландия / Высокогорье',
       x: 1400, y: 1100,
       icon: '🏰',
       climate: 'Магическая цитадель',
       ruler: 'Альбус Дамблдор',
       danger: 'Безопасно (Древние защитные чары)',
-      desc: 'Величественный тысячелетний замок. Здесь расположены Большой Зал, живые лестницы, гостиные четырех факультетов, Выручай-комната и Тайная комната.'
-    },
-    {
-      id: 'great_hall',
-      name: 'Большой Зал и Башни',
-      region: 'Хогвартс',
-      x: 1470, y: 1030,
-      icon: '🕯️',
-      climate: 'Заколдованное небо',
-      ruler: 'Профессор Макгонагалл',
-      danger: 'Безопасно',
-      desc: 'Четыре длинных факультетских стола, парящие в воздухе тысячи свечей, стол преподавателей и распределяющая шляпа.'
-    },
-    {
-      id: 'astronomy_tower',
-      name: 'Астрономическая Башня',
-      region: 'Хогвартс / Высота',
-      x: 1360, y: 970,
-      icon: '🔭',
-      climate: 'Горные ветры',
-      ruler: 'Профессор Синистра',
-      danger: 'Высота',
-      desc: 'Самая высокая точка замка Хогвартс, откуда открывается потрясающий вид на Черное озеро и Запретный Лес.'
+      desc: 'Величественный тысячелетний замок над горной долиной. Главные ворота с крылатыми вепрями, башни и неприступные скалы.'
     },
     {
       id: 'quidditch_pitch',
@@ -909,9 +1161,9 @@
       region: 'Территория Хогвартса',
       x: 1720, y: 1120,
       icon: '🏟️',
-      climate: 'Открытое поле',
+      climate: 'Открытое поле и трибуны',
       ruler: 'Мадам Трюк',
-      danger: 'Опасность падения и бладжеров',
+      danger: 'Падения с высоты и дикие бладжеры',
       desc: 'Овальный стадион с высокими трибунами в цветах четырех факультетов и золотыми кольцами ворот высотой пятьдесят футов.'
     },
     {
@@ -920,18 +1172,18 @@
       region: 'Опушка Запретного Леса',
       x: 1260, y: 1280,
       icon: '🛖',
-      climate: 'Опушка леса / Тыквенное поле',
+      climate: 'Опушка леса / Тыквенная грядка',
       ruler: 'Рубеус Хагрид',
-      danger: 'Низкая (пес Клык)',
+      danger: 'Низкая (волкодав Клык)',
       desc: 'Уютная каменная хижина лесничего. Вокруг раскинулась тыквенная грядка, сушатся шкуры, а в очаге греется медный чайник.'
     },
     {
       id: 'whomping_willow',
       name: 'Гремучая Ива',
-      region: 'Территория Хогвартса',
+      region: 'Территория школы',
       x: 1510, y: 1260,
       icon: '🌳',
-      climate: 'Опасное растение',
+      climate: 'Опасное заколдованное растение',
       ruler: 'Охраняет тайный ход',
       danger: 'Крайне агрессивное дерево',
       desc: 'Яростное магическое дерево, крушащее ветвями все живое. В корнях спрятан тайный лаз, ведущий прямо в Воющую Хижину Хогсмида.'
@@ -939,32 +1191,32 @@
     {
       id: 'black_lake',
       name: 'Чёрное Озеро (Great Lake)',
-      region: 'Хогвартс',
+      region: 'Шотландия',
       x: 1540, y: 1520,
       icon: '🌊',
-      climate: 'Ледяные глубины',
+      climate: 'Ледяные озерные глубины',
       ruler: 'Гигантский Кальмар и Русалки',
       danger: 'Гриндилоу и русалочий народ',
-      desc: 'Глубокое холодное озеро. В темных водах обитают русалки, гриндилоу и добродушный Гигантский Кальмар, любящий тосты.'
+      desc: 'Глубокое холодное горное озеро. В темных водах обитают русалки, гриндилоу и добродушный Гигантский Кальмар, любящий тосты.'
     },
     {
       id: 'boathouse',
-      name: 'Лодочный сарай Хогвартса',
-      region: 'Пристань у озера',
+      name: 'Лодочный сарай и причал',
+      region: 'Озерная пристань',
       x: 1390, y: 1290,
       icon: '⛵',
-      climate: 'Водная гладь',
+      climate: 'Водная гладь и туман',
       ruler: 'Хагрид (встреча первокурсников)',
       danger: 'Низкая',
-      desc: 'Старинная лодочная станция, куда каждый сентябрь приплывают заколдованные лодки с первокурсниками.'
+      desc: 'Старинная лодочная станция у подножия замковых скал, куда каждый сентябрь приплывают заколдованные лодки с первокурсниками.'
     },
     {
       id: 'forbidden_forest',
       name: 'Запретный Лес (Forbidden Forest)',
-      region: 'Граница школы',
+      region: 'Дикие границы школы',
       x: 1040, y: 1400,
       icon: '🌲',
-      climate: 'Древняя чаща',
+      climate: 'Дремучая древняя чаща',
       ruler: 'Кентавры (Магориан, Бейн)',
       danger: 'Высокая (Хищники, акромантулы)',
       desc: 'Дремучий вековой лес, вход в который строжайше запрещен ученикам. Здесь живут табуны кентавров, единороги и дикий Фордик «Англия».'
@@ -975,7 +1227,7 @@
       region: 'Сердце Запретного Леса',
       x: 840, y: 1560,
       icon: '🕷️',
-      climate: 'Паучья паутина',
+      climate: 'Паучья паутина и мгла',
       ruler: 'Арагог и Мосаг',
       danger: 'Смертельная (Акромантулы)',
       desc: 'Глубокая впадина посреди леса, полностью затянутая белой паутиной. Дом гигантских плотоядных пауков-акромантулов.'
@@ -983,7 +1235,7 @@
     {
       id: 'hogsmeade_station',
       name: 'Станция Хогсмид',
-      region: 'Железная дорога',
+      region: 'Горная ветка железной дороги',
       x: 1880, y: 1360,
       icon: '🚂',
       climate: 'Перрон / Горный пар',
@@ -994,24 +1246,24 @@
     {
       id: 'hogsmeade_village',
       name: 'Деревня Хогсмид',
-      region: 'Хогсмид',
+      region: 'Единственная маг-деревня Британии',
       x: 2120, y: 1220,
       icon: '🍺',
-      climate: 'Уютная деревня',
+      climate: 'Уютная заснеженная деревня',
       ruler: 'Мадам Розмерта / Совет магов',
       danger: 'Безопасно',
-      desc: 'Волшебная деревня. Паб «Три Метлы», кондитерская «Сладкое Королевство», лавка приколов «Зонко» и почтовая станция сотен сов.'
+      desc: 'Паб «Три Метлы» с теплым сливочным пивом, кондитерская «Сладкое Королевство», лавка приколов «Зонко» и почтовая станция сотен сов.'
     },
     {
       id: 'shrieking_shack',
       name: 'Воющая Хижина',
-      region: 'Окраина Хогсмида',
+      region: 'Окраина Хогсмида на холме',
       x: 2040, y: 1040,
       icon: '🏚️',
-      climate: 'Заколоченные окна',
-      ruler: 'Тайное убежище Римуса Люпина',
+      climate: 'Заколоченные окна и скрип полов',
+      ruler: 'Убежище Римуса Люпина',
       danger: 'Привидения и старые проклятия',
-      desc: 'Самое пугающее здание в Британии. Место, построенное Дамблдором для безопасных превращений оборотня Римуса Люпина в полнолуние.'
+      desc: 'Самое пугающее здание в Британии. Построено Дамблдором для безопасных превращений оборотня Римуса Люпина в полнолуние.'
     },
     {
       id: 'kings_cross',
@@ -1019,32 +1271,32 @@
       region: 'Лондон',
       x: 2520, y: 1960,
       icon: '🧱',
-      climate: 'Городской вокзал',
+      climate: 'Городской викторианский вокзал',
       ruler: 'Министерство магии',
       danger: 'Маглы (требуется скрытность)',
-      desc: 'Знаменитый кирпичный барьер между платформами 9 и 10, через который волшебники проходят к алому Хогвартс-экспрессу.'
+      desc: 'Знаменитый кирпичный барьер между платформами 9 и 10, через который волшебники проходят к алому паровозу Хогвартс-экспресс.'
     },
     {
       id: 'diagon_alley_loc',
       name: 'Косой Переулок и Гринготтс',
-      region: 'Лондон (Тайный)',
+      region: 'Лондон (Магический сектор)',
       x: 2440, y: 2180,
       icon: '🪙',
-      climate: 'Булыжная мостовая',
+      climate: 'Булыжная мостовая и витрины',
       ruler: 'Гоблины банка Гринготтс',
       danger: 'Низкая (карманники Лютьего переулка)',
-      desc: 'Главная торговая артерия магов Британии. Банк Гринготтс с подземными хранилищами, лавка Олливандера и волшебные магазины.'
+      desc: 'Главная торговая улица магов Великобритании. Банк Гринготтс с подземными рельсами, лавка Олливандера и аптеки ингредиентов.'
     },
     {
       id: 'ministry_magic_loc',
       name: 'Министерство Магии',
-      region: 'Лондон (Подземелья)',
+      region: 'Лондон (Подземный комплекс)',
       x: 2320, y: 2320,
       icon: '⚖️',
-      climate: 'Атриум с каминами',
+      climate: 'Атриум с золотыми фонтанами',
       ruler: 'Министр магии',
       danger: 'Охрана мракоборцев',
-      desc: 'Подземный правительственный комплекс. Огромный Атриум с золотыми фонтанами, суды Визенгамота и сверхсекретный Отдел Тайн.'
+      desc: 'Подземный правительственный дворец. Атриум с зеленым каминным пламенем, залы Визенгамота и сверхсекретный Отдел Тайн.'
     },
     {
       id: 'azkaban_loc',
@@ -1054,10 +1306,19 @@
       icon: '⚓',
       climate: 'Штормовые ледяные скалы',
       ruler: 'Дементоры / Министерство',
-      danger: 'Чрезвычайная (Дементоры)',
-      desc: 'Одинокая треугольная крепость посреди свирепого Северного моря. Тюрьма для самых опасных темных магов.'
+      danger: 'Чрезвычайная (Дементоры и отчаяние)',
+      desc: 'Одинокая треугольная крепость посреди свирепого Северного моря. Тюрьма строгого режима для самых опасных темных магов.'
     }
   ];
+
+  // Активный список локаций в зависимости от режима карты
+  function getActiveLocations(){
+    var sc = (WZ.map && WZ.map.scope) || 'hogwarts';
+    return sc === 'hogwarts' ? WZ_HOGWARTS_LOCATIONS : WZ_WORLD_LOCATIONS;
+  }
+
+  // Для обратной совместимости
+  var WZ_MAP_LOCATIONS = WZ_HOGWARTS_LOCATIONS;
 
   /* Методы загрузки и сохранения заклинаний и приёмов */
   WZ.loadSpells = function(){
@@ -1119,25 +1380,44 @@
       var raw = localStorage.getItem(WZ_ROUTE_KEY);
       if(raw){
         var data = JSON.parse(raw);
-        if(data && Array.isArray(data.points)){
-          WZ.map.routePoints = data.points;
-          if(data.travelMode) WZ.map.travelMode = data.travelMode;
-          if(data.travelPace) WZ.map.travelPace = data.travelPace;
+        if(data){
+          if(data.scope) WZ.map.scope = data.scope;
+          if(data.routes && typeof data.routes === 'object') WZ.map.routes = data.routes;
+          var sc = WZ.map.scope || 'hogwarts';
+          if(WZ.map.routes && WZ.map.routes[sc]){
+            WZ.map.routePoints = WZ.map.routes[sc].points || [];
+            WZ.map.travelMode = WZ.map.routes[sc].travelMode || (sc === 'hogwarts' ? 'walk' : 'broom');
+            WZ.map.travelPace = WZ.map.routes[sc].travelPace || 'normal';
+          } else if(Array.isArray(data.points)){
+            WZ.map.routePoints = data.points;
+            WZ.map.travelMode = data.travelMode || (sc === 'hogwarts' ? 'walk' : 'broom');
+            WZ.map.travelPace = data.travelPace || 'normal';
+          }
           return data;
         }
       }
     } catch(e){}
+    var scDef = WZ.map.scope || 'hogwarts';
     WZ.map.routePoints = [];
-    WZ.map.travelMode = 'broom';
+    WZ.map.travelMode = (scDef === 'hogwarts' ? 'walk' : 'broom');
     WZ.map.travelPace = 'normal';
-    return { points: [], travelMode: 'broom', travelPace: 'normal' };
+    return { points: [], travelMode: WZ.map.travelMode, travelPace: 'normal' };
   };
 
   WZ.saveRoute = function(){
     try {
-      var data = {
+      var sc = WZ.map.scope || 'hogwarts';
+      if(!WZ.map.routes) WZ.map.routes = {};
+      WZ.map.routes[sc] = {
         points: WZ.map.routePoints || [],
-        travelMode: WZ.map.travelMode || 'broom',
+        travelMode: WZ.map.travelMode || (sc === 'hogwarts' ? 'walk' : 'broom'),
+        travelPace: WZ.map.travelPace || 'normal'
+      };
+      var data = {
+        scope: sc,
+        routes: WZ.map.routes,
+        points: WZ.map.routePoints || [],
+        travelMode: WZ.map.travelMode || (sc === 'hogwarts' ? 'walk' : 'broom'),
         travelPace: WZ.map.travelPace || 'normal'
       };
       localStorage.setItem(WZ_ROUTE_KEY, JSON.stringify(data));
@@ -1165,8 +1445,22 @@
     } catch(e){}
   };
 
-  /* Логистика перемещения по волшебному миру */
+  /* Логистика перемещения по волшебному миру и Хогвартсу */
   function getWzTerrainAt(x, y){
+    var sc = (WZ.map && WZ.map.scope) || 'hogwarts';
+    if(sc === 'hogwarts'){
+      if(y > 1520) return { type: 'dungeon', name: 'Подземелья и Зельеварение', icon: '🧪', mult: 1.2 };
+      if(x < 850 && y < 1050) return { type: 'tower', name: 'Башня Гриффиндора', icon: '🦁', mult: 1.3 };
+      if(x > 1400 && y < 750) return { type: 'tower', name: 'Башня Когтеврана', icon: '🦅', mult: 1.3 };
+      if(y < 780 && x < 1250) return { type: 'tower', name: 'Башня Директора / Астрономия', icon: '🔭', mult: 1.4 };
+      if(x > 950 && x < 1200 && y > 980 && y < 1300) return { type: 'stairs', name: 'Движущиеся Лестницы', icon: '🪜', mult: 1.5 };
+      if(x > 1250 && x < 1650 && y > 980 && y < 1300) return { type: 'hall', name: 'Большой Зал и Вестибюль', icon: '🕯️', mult: 1.0 };
+      if(x > 1550 && y > 750 && y < 1050) return { type: 'library', name: 'Библиотека Хогвартса', icon: '📚', mult: 1.1 };
+      if(y > 1750 || (x < 920 && y > 1700)) return { type: 'secret', name: 'Тайный ход Мародёров', icon: '🗝️', mult: 0.8 };
+      return { type: 'corridor', name: 'Замковый коридор', icon: '🏰', mult: 1.0 };
+    }
+
+    // Мир вокруг: нагорье, озеро, лес, Хогсмид, Лондон
     if(x < 1150 && y > 1300) return { type: 'forest', name: 'Запретный Лес', icon: '🌲', mult: 1.6 };
     if(x > 1400 && y > 1380 && y < 1700) return { type: 'lake', name: 'Чёрное Озеро', icon: '🌊', mult: 1.4 };
     if(x > 1850 && y < 1350) return { type: 'hogsmeade', name: 'Окрестности Хогсмида', icon: '🏘️', mult: 1.0 };
@@ -1177,10 +1471,113 @@
   }
 
   function calcWzRoute(points, mode, pace){
-    mode = mode || 'broom';
+    var sc = (WZ.map && WZ.map.scope) || 'hogwarts';
     pace = pace || 'normal';
 
-    // Скорости: метла («Молния») - 90 миль/день; Фестрал - 110 миль/день; Пешком - 20 миль/день; Экспресс - 160 миль/день
+    if(sc === 'hogwarts'){
+      mode = mode || 'walk';
+      // Внутренние скорости Хогвартса (ярдов в минуту):
+      var speedMapH = { walk: 60, sprint: 120, cloak: 40, secret: 90 };
+      var baseSpeedH = speedMapH[mode] || 60;
+      var paceMultH = (pace === 'fast' ? 1.3 : (pace === 'stealth' ? 0.75 : 1.0));
+      var yardsPerMin = baseSpeedH * paceMultH;
+
+      if(!points || points.length < 2){
+        return {
+          scope: 'hogwarts',
+          totalDist: 0,
+          totalMinutes: 0,
+          totalSeconds: 0,
+          dominantTerrain: { name: 'Замковые коридоры', icon: '🏰' },
+          segments: [],
+          mode: mode,
+          pace: pace,
+          warnings: []
+        };
+      }
+
+      var totalYards = 0;
+      var totalWeightedYards = 0;
+      var segmentsH = [];
+      var terCountsH = {};
+      var warningsH = [];
+
+      for(var h = 0; h < points.length - 1; h++){
+        var hp1 = points[h];
+        var hp2 = points[h + 1];
+        var pDistH = Math.hypot(hp2.x - hp1.x, hp2.y - hp1.y);
+
+        // Масштаб внутри Хогвартса: 100px ~ 40 ярдов
+        var yards = Math.max(5, Math.round(pDistH * 0.4));
+        totalYards += yards;
+
+        var mXh = Math.round((hp1.x + hp2.x) / 2);
+        var mYh = Math.round((hp1.y + hp2.y) / 2);
+        var terH = getWzTerrainAt(mXh, mYh);
+
+        terCountsH[terH.name] = (terCountsH[terH.name] || 0) + yards;
+
+        var effMultH = terH.mult || 1.0;
+        if(mode === 'secret' && terH.type === 'secret') effMultH = 0.6;
+        if(mode === 'cloak') effMultH = Math.min(effMultH, 1.05);
+
+        var wDistH = yards * effMultH;
+        totalWeightedYards += wDistH;
+
+        var segMinsFloat = (wDistH / yardsPerMin);
+        var segMins = Math.floor(segMinsFloat);
+        var segSecs = Math.round((segMinsFloat - segMins) * 60);
+
+        segmentsH.push({
+          from: hp1.name || ('Точка ' + (h + 1)),
+          to: hp2.name || ('Точка ' + (h + 2)),
+          dist: yards,
+          terrain: terH,
+          timeStr: segMins > 0 ? (segMins + ' мин. ' + segSecs + ' с.') : (segSecs + ' с.')
+        });
+      }
+
+      var topTerNameH = 'Замковые коридоры';
+      var topTerYards = 0;
+      for(var kh in terCountsH){
+        if(terCountsH[kh] > topTerYards){
+          topTerYards = terCountsH[kh];
+          topTerNameH = kh;
+        }
+      }
+      var sampleTerH = getWzTerrainAt(points[0].x, points[0].y);
+      var dominantTerH = { name: topTerNameH, icon: sampleTerH.icon };
+
+      var totalTimeMinsRaw = totalWeightedYards / yardsPerMin;
+      var totalMinutes = Math.floor(totalTimeMinsRaw);
+      var totalSeconds = Math.round((totalTimeMinsRaw - totalMinutes) * 60);
+      if(totalSeconds >= 60){
+        totalMinutes += 1;
+        totalSeconds = 0;
+      }
+
+      if(mode === 'sprint'){
+        warningsH.push('⚠️ Бег по коридорам: риск столкнуться с завхозом Филчем или привлечь внимание старост!');
+      }
+      if(totalYards > 600 && mode !== 'secret'){
+        warningsH.push('💡 Маршрут длинный: можно срезать через потайной лаз или обойти лестницы через Выручай-комнату.');
+      }
+
+      return {
+        scope: 'hogwarts',
+        totalDist: totalYards,
+        totalMinutes: totalMinutes,
+        totalSeconds: totalSeconds,
+        dominantTerrain: dominantTerH,
+        segments: segmentsH,
+        mode: mode,
+        pace: pace,
+        warnings: warningsH
+      };
+    }
+
+    // World scope
+    mode = mode || 'broom';
     var speedMap = { broom: 90, thestral: 110, foot: 20, express: 160 };
     var baseSpeed = speedMap[mode] || 90;
 
@@ -1189,6 +1586,7 @@
 
     if(!points || points.length < 2){
       return {
+        scope: 'world',
         totalDist: 0,
         wholeDays: 0,
         remHours: 0,
@@ -1272,6 +1670,7 @@
     }
 
     return {
+      scope: 'world',
       totalDist: totalDist,
       wholeDays: wholeDays,
       remHours: remHours,
@@ -1406,12 +1805,12 @@
         '</div>' +
         '<div class="wz-card-arrow">→</div>' +
       '</div>' +
-      '<div class="wz-card wz-card-clickable" data-nav="wzMap" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzMap\');" role="button" tabindex="0" title="Открыть Карту мира">' +
+      '<div class="wz-card wz-card-disabled" id="wzMapBlockedBtn" role="button" aria-disabled="true" tabindex="-1" title="Карта временно заблокирована">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>🗺️</span> Карта мира</div>' +
-          '<div class="wz-card-desc">Интерактивная Карта Мародёров: замок, окрестности, свободные маршруты и тайники</div>' +
+          '<div class="wz-card-title" style="color:var(--wz-text-muted);"><span>🗺️</span> Карта мира <span class="wz-stat-badge" style="margin-left:6px;font-size:10px;background:rgba(239,68,68,0.18);border-color:rgba(239,68,68,0.45);color:#fca5a5;padding:1px 6px;">🔒 Заблокировано</span></div>' +
+          '<div class="wz-card-desc" style="color:var(--wz-text-muted);">Интерактивная Карта Мародёров (раздел временно на реконструкции)</div>' +
         '</div>' +
-        '<div class="wz-card-arrow">→</div>' +
+        '<div class="wz-card-arrow" style="opacity:0.35;font-size:14px;">🔒</div>' +
       '</div>' +
       '<div class="wz-card wz-card-clickable" data-nav="wzRef" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRef\');" role="button" tabindex="0" title="Открыть Справочник Магии">' +
         '<div style="flex:1;min-width:0;">' +
@@ -1434,6 +1833,14 @@
 
   function wireWzHome(){
     wireWzNav();
+    var mapBlockedBtn = document.getElementById('wzMapBlockedBtn');
+    if(mapBlockedBtn){
+      mapBlockedBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        WZ.toast('🔒 Карта Мародёров временно заблокирована на реконструкцию', 'warning');
+      });
+    }
   }
 
   /* ============================================================
@@ -2140,8 +2547,8 @@
   function renderWizardMapSvg(){
     var m = WZ.map;
     var z = Math.max(0.4, Math.min(5.0, m.zoom || 1.0));
-    var cx = m.cx != null ? m.cx : 1400;
-    var cy = m.cy != null ? m.cy : 1100;
+    var cx = m.cx != null ? m.cx : (m.scope === 'hogwarts' ? 1200 : 1400);
+    var cy = m.cy != null ? m.cy : (m.scope === 'hogwarts' ? 1150 : 1300);
 
     var vp = (typeof document !== 'undefined') ? document.getElementById('wzMapViewport') : null;
     var vw = (vp && vp.clientWidth) || 800;
@@ -2173,8 +2580,184 @@
       '</pattern>' +
     '</defs>';
 
-    // Фоновое полотно пергамента Карты Мародёров (2800 x 2400)
-    var bgSvg = '<rect x="0" y="0" width="2800" height="2400" fill="url(#wzParchmentBg)" />' +
+    // 1. Внутренняя архитектурная карта замка Хогвартс
+    var bgSvgHogwarts = 
+      '<rect x="0" y="0" width="2800" height="2400" fill="url(#wzParchmentBg)" />' +
+      '<rect x="0" y="0" width="2800" height="2400" fill="url(#wzGrid)" />' +
+
+      // Внешние крепостные стены замка с контрфорсами и парапетами
+      '<path d="M 500 1280 L 500 1140 L 600 920 L 560 800 L 700 580 L 1000 580 L 1080 480 L 1160 580 L 1400 480 L 1560 520 L 1760 600 L 1860 680 L 1880 1020 L 1840 1480 L 1860 1820 L 1400 1840 L 780 1820 L 680 1520 L 500 1280 Z" fill="rgba(30, 24, 18, 0.75)" stroke="#d4af37" stroke-width="4.5" stroke-linejoin="round" />' +
+      '<path d="M 520 1260 L 520 1160 L 615 935 L 580 820 L 715 600 L 985 600 L 1080 510 L 1145 600 L 1390 505 L 1545 540 L 1740 615 L 1840 690 L 1860 1010 L 1820 1470 L 1840 1800 L 1410 1820 L 800 1800 L 700 1510 L 520 1260 Z" fill="none" stroke="rgba(212,175,55,0.35)" stroke-width="1.5" stroke-dasharray="8,4" />' +
+
+      // Башни замка
+      // Астрономический шпиль (Северо-запад)
+      '<circle cx="720" cy="620" r="52" fill="rgba(15,23,42,0.85)" stroke="#d4af37" stroke-width="2.5" />' +
+      '<circle cx="720" cy="620" r="38" fill="none" stroke="#d4af37" stroke-width="1.2" stroke-dasharray="4,2" />' +
+      '<path d="M 695 620 L 745 620 M 720 595 L 720 645" stroke="#fde047" stroke-width="1.5" />' +
+      '<text x="720" y="690" fill="#fde047" font-size="12" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Астрономический Шпиль</text>' +
+
+      // Башня Директора (Север)
+      '<circle cx="1080" cy="650" r="56" fill="rgba(32,24,18,0.9)" stroke="#d4af37" stroke-width="3" />' +
+      '<circle cx="1080" cy="650" r="42" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="5,3" />' +
+      '<path d="M 1055 650 A 25 25 0 0 1 1105 650 A 25 25 0 0 1 1080 675" fill="none" stroke="#d4af37" stroke-width="2" />' +
+      '<text x="1080" y="722" fill="#fde047" font-size="12" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Кабинет Директора</text>' +
+
+      // Башня Когтеврана (Северо-восток)
+      '<circle cx="1480" cy="550" r="52" fill="rgba(30,58,138,0.3)" stroke="#38bdf8" stroke-width="2.5" />' +
+      '<circle cx="1480" cy="550" r="38" fill="none" stroke="#93c5fd" stroke-width="1.2" stroke-dasharray="4,2" />' +
+      '<text x="1480" y="618" fill="#93c5fd" font-size="12" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Башня Когтеврана</text>' +
+
+      // Башня Гриффиндора (Запад)
+      '<circle cx="680" cy="920" r="62" fill="rgba(185,28,28,0.25)" stroke="#ef4444" stroke-width="3" />' +
+      '<circle cx="680" cy="920" r="46" fill="none" stroke="#fca5a5" stroke-width="1.5" stroke-dasharray="6,3" />' +
+      '<text x="680" y="998" fill="#fca5a5" font-size="12" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Башня Гриффиндора</text>' +
+
+      // Совятня (Отдельная башня)
+      '<circle cx="550" cy="1200" r="46" fill="rgba(15,23,42,0.85)" stroke="#cbd5e1" stroke-width="2" />' +
+      '<text x="550" y="1262" fill="#cbd5e1" font-size="11" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Совятня</text>' +
+
+      // Часовая башня и Крытый Мост
+      '<circle cx="850" cy="1400" r="52" fill="rgba(32,24,18,0.9)" stroke="#d4af37" stroke-width="2.5" />' +
+      '<path d="M 850 1370 L 850 1430 M 820 1400 L 880 1400" stroke="#d4af37" stroke-width="1.5" />' +
+      '<path d="M 810 1430 L 680 1470 L 670 1440 L 800 1400 Z" fill="rgba(120,53,15,0.45)" stroke="#92400e" stroke-width="2" />' +
+      '<text x="735" y="1475" fill="#fbbf24" font-size="10.5" font-family="Cinzel, serif" font-weight="700">Крытый Мост</text>' +
+
+      // Парадная Движущаяся Лестница (Grand Staircase)
+      '<rect x="970" y="1040" width="220" height="220" rx="16" fill="rgba(24,18,12,0.95)" stroke="#d4af37" stroke-width="3" />' +
+      '<rect x="990" y="1060" width="180" height="180" rx="10" fill="none" stroke="rgba(212,175,55,0.3)" stroke-width="1.5" stroke-dasharray="6,3" />' +
+      '<path d="M 1010 1080 L 1060 1080 M 1010 1100 L 1060 1100 M 1010 1120 L 1060 1120" stroke="#fde047" stroke-width="2" />' +
+      '<path d="M 1110 1180 L 1160 1180 M 1110 1200 L 1160 1200 M 1110 1220 L 1160 1220" stroke="#fde047" stroke-width="2" />' +
+      '<g transform="translate(1080, 1150)">' +
+        '<path d="M -40 -8 L 40 -8 L 40 8 L -40 8 Z" fill="#d4af37" stroke="#fff" stroke-width="1.5" opacity="0.9">' +
+          '<animateTransform attributeName="transform" type="rotate" values="0; 60; 0; -60; 0" dur="16s" repeatCount="indefinite" />' +
+        '</path>' +
+      '</g>' +
+      '<text x="1080" y="1154" fill="#0f172a" font-size="9" font-weight="900" font-family="monospace" text-anchor="middle" pointer-events="none">142 ЛЕСТНИЦЫ</text>' +
+      '<text x="1080" y="1030" fill="#fde047" font-size="13" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Парадная Лестница</text>' +
+
+      // Вестибюль (Entrance Hall)
+      '<rect x="1200" y="1050" width="150" height="200" fill="rgba(28,22,16,0.9)" stroke="#d4af37" stroke-width="2.5" />' +
+      '<path d="M 1240 1250 L 1310 1250" stroke="#fde047" stroke-width="6" stroke-linecap="round" />' +
+      '<text x="1275" y="1270" fill="#fde047" font-size="10" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Главные Дубовые Ворота</text>' +
+      '<text x="1275" y="1145" fill="#f8fafc" font-size="12" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Вестибюль</text>' +
+
+      // Большой Зал (Great Hall)
+      '<rect x="1360" y="1050" width="280" height="200" fill="rgba(35,26,16,0.95)" stroke="#d4af37" stroke-width="3" />' +
+      '<rect x="1390" y="1080" width="180" height="12" rx="3" fill="#7f1d1d" stroke="#f87171" stroke-width="1" />' +
+      '<text x="1480" y="1090" fill="#fecaca" font-size="8.5" font-family="sans-serif" font-weight="bold" text-anchor="middle">СТОЛ ГРИФФИНДОРА</text>' +
+      '<rect x="1390" y="1115" width="180" height="12" rx="3" fill="#14532d" stroke="#4ade80" stroke-width="1" />' +
+      '<text x="1480" y="1125" fill="#bbf7d0" font-size="8.5" font-family="sans-serif" font-weight="bold" text-anchor="middle">СТОЛ СЛИЗЕРИНА</text>' +
+      '<rect x="1390" y="1150" width="180" height="12" rx="3" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1" />' +
+      '<text x="1480" y="1160" fill="#bfdbfe" font-size="8.5" font-family="sans-serif" font-weight="bold" text-anchor="middle">СТОЛ КОГТЕВРАНА</text>' +
+      '<rect x="1390" y="1185" width="180" height="12" rx="3" fill="#78350f" stroke="#fbbf24" stroke-width="1" />' +
+      '<text x="1480" y="1195" fill="#fef08a" font-size="8.5" font-family="sans-serif" font-weight="bold" text-anchor="middle">СТОЛ ПУФФЕНДУЯ</text>' +
+      '<rect x="1590" y="1075" width="16" height="125" rx="3" fill="#451a03" stroke="#fde047" stroke-width="1.5" />' +
+      '<text x="1500" y="1040" fill="#fde047" font-size="15" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Большой Зал</text>' +
+
+      // Внутренний двор и Клуатр (Middle Courtyard / Cloister)
+      '<rect x="1240" y="740" width="310" height="240" fill="rgba(18,22,30,0.85)" stroke="#d4af37" stroke-width="2.5" />' +
+      '<rect x="1270" y="770" width="250" height="180" fill="none" stroke="rgba(212,175,55,0.4)" stroke-width="1.5" stroke-dasharray="6,3" />' +
+      '<circle cx="1395" cy="860" r="28" fill="rgba(56,189,248,0.2)" stroke="#38bdf8" stroke-width="2" />' +
+      '<circle cx="1395" cy="860" r="14" fill="rgba(56,189,248,0.4)" stroke="#fff" stroke-width="1" />' +
+      '<text x="1395" y="864" fill="#e0f2fe" font-size="8" font-weight="bold" text-anchor="middle">ФОНТАН</text>' +
+      '<text x="1395" y="730" fill="#e2e8f0" font-size="13" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Внутренний Двор и Колоннада</text>' +
+
+      // Библиотека и Запретная Секция
+      '<rect x="1560" y="740" width="260" height="240" fill="rgba(25,20,15,0.9)" stroke="#d4af37" stroke-width="2.5" />' +
+      '<path d="M 1590 770 L 1790 770 M 1590 800 L 1790 800 M 1590 830 L 1790 830 M 1590 860 L 1790 860" stroke="#a16207" stroke-width="4" stroke-dasharray="14,8" />' +
+      '<rect x="1590" y="890" width="200" height="60" fill="rgba(127,29,29,0.3)" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2" />' +
+      '<text x="1690" y="925" fill="#fca5a5" font-size="10" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">🔒 Запретная Секция</text>' +
+      '<text x="1690" y="730" fill="#fde047" font-size="13" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Библиотека Хогвартса</text>' +
+
+      // Больничное крыло
+      '<rect x="1080" y="780" width="150" height="180" fill="rgba(20,24,32,0.9)" stroke="#94a3b8" stroke-width="2" />' +
+      '<rect x="1100" y="810" width="30" height="16" fill="#f1f5f9" stroke="#94a3b8" rx="2" />' +
+      '<rect x="1100" y="845" width="30" height="16" fill="#f1f5f9" stroke="#94a3b8" rx="2" />' +
+      '<rect x="1100" y="880" width="30" height="16" fill="#f1f5f9" stroke="#94a3b8" rx="2" />' +
+      '<text x="1155" y="770" fill="#e2e8f0" font-size="12" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Больничное Крыло</text>' +
+
+      // Подземелья и Зельеварение (Нижний уровень)
+      '<rect x="800" y="1500" width="600" height="240" fill="rgba(10,14,20,0.95)" stroke="#10b981" stroke-width="2.5" />' +
+      '<text x="1100" y="1490" fill="#86efac" font-size="14" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Подземелья и Класс Зельеварения</text>' +
+      // Окно Слизерина в озеро
+      '<rect x="830" y="1600" width="130" height="90" rx="6" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="2" stroke-dasharray="5,3" />' +
+      '<text x="895" y="1645" fill="#a7f3d0" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle">ОКНО В ОЗЕРО</text>' +
+
+      // Кухни Хогвартса и Пуффендуй (Нижний уровень)
+      '<rect x="1410" y="1500" width="390" height="240" fill="rgba(24,18,12,0.95)" stroke="#eab308" stroke-width="2.5" />' +
+      '<text x="1605" y="1490" fill="#fde047" font-size="14" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">Кухни Хогвартса и Цоколь Пуффендуя</text>' +
+
+      // Тайные ходы (Dotted trails)
+      '<path d="M 1360 1850 L 1360 1740 L 1280 1740" fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6,4" />' +
+      '<text x="1360" y="1875" fill="#fbbf24" font-size="10.5" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">🗝️ Ход в «Сладкое Королевство»</text>' +
+      '<path d="M 1600 1850 L 1600 1740" fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6,4" />' +
+      '<text x="1600" y="1875" fill="#fbbf24" font-size="10.5" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">🗝️ Лаз под Гремучую Иву</text>' +
+      '<path d="M 880 780 L 880 660" fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6,4" />' +
+      '<text x="880" y="630" fill="#fbbf24" font-size="10.5" font-family="Cinzel, serif" font-weight="700" text-anchor="middle">🗝️ В «Кабанью Голову»</text>' +
+
+      // АНИМИРОВАННЫЕ СЛЕДЫ МАРОДЁРОВ (MARAUDER FOOTPRINTS)
+      // 1: Гарри Поттер & Рон Уизли (Вестибюль -> Большой Зал)
+      '<g class="wz-marauder-footsteps" transform="translate(1220, 1140)">' +
+        '<path d="M 0 0 C 2 -3, 5 -3, 7 0 C 9 4, 8 10, 6 12 C 4 14, 2 13, 1 12 C 0 10, -1 4, 0 0 Z" fill="#d4af37">' +
+          '<animate attributeName="opacity" values="0.2;1;0.4;0.2" dur="3s" repeatCount="indefinite" />' +
+        '</path>' +
+        '<path d="M 14 6 C 16 3, 19 3, 21 6 C 23 10, 22 16, 20 18 C 18 20, 16 19, 15 18 C 14 16, 13 10, 14 6 Z" fill="#d4af37">' +
+          '<animate attributeName="opacity" values="0.2;0.3;1;0.3" dur="3s" repeatCount="indefinite" />' +
+        '</path>' +
+        '<path d="M 32 0 C 34 -3, 37 -3, 39 0 C 41 4, 40 10, 38 12 C 36 14, 34 13, 33 12 C 32 10, 31 4, 32 0 Z" fill="#d4af37">' +
+          '<animate attributeName="opacity" values="0.3;0.2;0.4;1" dur="3s" repeatCount="indefinite" />' +
+        '</path>' +
+        '<path d="M 46 6 C 48 3, 51 3, 53 6 C 55 10, 54 16, 52 18 C 50 20, 48 19, 47 18 C 46 16, 45 10, 46 6 Z" fill="#d4af37">' +
+          '<animate attributeName="opacity" values="1;0.2;0.3;0.5" dur="3s" repeatCount="indefinite" />' +
+        '</path>' +
+        '<text x="25" y="-12" fill="#fbbf24" font-family="\'EB Garamond\', serif" font-size="12.5" font-style="italic" font-weight="bold" filter="url(#wzTextShadow)">Гарри Поттер &amp; Рон Уизли</text>' +
+      '</g>' +
+
+      // 2: Гермиона Грейнджер (Библиотека)
+      '<g class="wz-marauder-footsteps" transform="translate(1620, 810)">' +
+        '<path d="M 0 0 C 2 -3, 4 -3, 6 0 C 8 3, 7 8, 5 10 C 3 11, 2 11, 1 10 C 0 8, -1 3, 0 0 Z" fill="#d4af37">' +
+          '<animate attributeName="opacity" values="0.3;1;0.3;0.3" dur="2.5s" repeatCount="indefinite" />' +
+        '</path>' +
+        '<path d="M 12 5 C 14 2, 16 2, 18 5 C 20 8, 19 13, 17 15 C 15 16, 14 16, 13 15 C 12 13, 11 8, 12 5 Z" fill="#d4af37">' +
+          '<animate attributeName="opacity" values="0.3;0.3;1;0.3" dur="2.5s" repeatCount="indefinite" />' +
+        '</path>' +
+        '<text x="10" y="-10" fill="#fbbf24" font-family="\'EB Garamond\', serif" font-size="12" font-style="italic" font-weight="bold" filter="url(#wzTextShadow)">Гермиона Грейнджер</text>' +
+      '</g>' +
+
+      // 3: Северус Снейп (Подземелья)
+      '<g class="wz-marauder-footsteps" transform="translate(1020, 1620)">' +
+        '<path d="M 0 0 C 2 -4, 6 -4, 8 0 C 10 5, 9 12, 7 14 C 5 16, 3 15, 2 14 C 0 12, -1 5, 0 0 Z" fill="#a7f3d0">' +
+          '<animate attributeName="opacity" values="0.2;0.8;0.2;0.2" dur="3.5s" repeatCount="indefinite" />' +
+        '</path>' +
+        '<path d="M 18 8 C 20 4, 24 4, 26 8 C 28 13, 27 20, 25 22 C 23 24, 21 23, 20 22 C 18 20, 17 13, 18 8 Z" fill="#a7f3d0">' +
+          '<animate attributeName="opacity" values="0.2;0.2;0.8;0.2" dur="3.5s" repeatCount="indefinite" />' +
+        '</path>' +
+        '<text x="12" y="-12" fill="#86efac" font-family="\'EB Garamond\', serif" font-size="12" font-style="italic" font-weight="bold" filter="url(#wzTextShadow)">Северус Снейп</text>' +
+      '</g>' +
+
+      // 4: Альбус Дамблдор (Кабинет директора)
+      '<g class="wz-marauder-footsteps" transform="translate(1060, 640)">' +
+        '<circle cx="0" cy="0" r="4" fill="#fbbf24">' +
+          '<animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite" />' +
+        '</circle>' +
+        '<text x="12" y="4" fill="#fde047" font-family="\'EB Garamond\', serif" font-size="12" font-style="italic" font-weight="bold" filter="url(#wzTextShadow)">Альбус Дамблдор</text>' +
+      '</g>' +
+
+      // 5: Аргус Филч & Миссис Норрис (Коридор 3 этажа)
+      '<g class="wz-marauder-footsteps" transform="translate(940, 1370)">' +
+        '<path d="M 0 0 C 2 -3, 5 -3, 7 0 C 9 4, 8 10, 6 12 C 4 14, 2 13, 1 12 C 0 10, -1 4, 0 0 Z" fill="#fca5a5">' +
+          '<animate attributeName="opacity" values="0.3;1;0.4;0.3" dur="2.8s" repeatCount="indefinite" />' +
+        '</path>' +
+        '<circle cx="16" cy="6" r="2.5" fill="#fca5a5" />' +
+        '<circle cx="14" cy="2" r="1.2" fill="#fca5a5" />' +
+        '<circle cx="16" cy="1" r="1.2" fill="#fca5a5" />' +
+        '<circle cx="18" cy="2" r="1.2" fill="#fca5a5" />' +
+        '<text x="5" y="-10" fill="#fca5a5" font-family="\'EB Garamond\', serif" font-size="11.5" font-style="italic" font-weight="bold" filter="url(#wzTextShadow)">Аргус Филч &amp; Миссис Норрис</text>' +
+      '</g>';
+
+    // 2. Внешняя карта окрестностей Хогвартса и Шотландии
+    var bgSvgWorld = 
+      '<rect x="0" y="0" width="2800" height="2400" fill="url(#wzParchmentBg)" />' +
       '<rect x="0" y="0" width="2800" height="2400" fill="url(#wzGrid)" />' +
       // Контуры Чёрного Озера
       '<path d="M 1350 1420 C 1450 1380, 1680 1400, 1750 1520 C 1820 1640, 1650 1780, 1500 1720 C 1380 1670, 1280 1500, 1350 1420 Z" fill="rgba(30, 58, 138, 0.25)" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,4" />' +
@@ -2184,7 +2767,10 @@
       '<text x="900" y="1460" fill="#86efac" font-size="22" font-family="Cinzel, serif" font-weight="700" text-anchor="middle" opacity="0.6">Запретный Лес (Forbidden Forest)</text>' +
       // Контуры Хогвартса
       '<circle cx="1400" cy="1100" r="160" fill="rgba(212,175,55,0.06)" stroke="#d4af37" stroke-width="2" stroke-dasharray="5,3" />' +
-      '<text x="1400" y="1170" fill="#fde047" font-size="16" font-family="Cinzel, serif" font-weight="700" text-anchor="middle" opacity="0.5">Территория Школы Чародейства и Волшебства</text>' +
+      '<text x="1400" y="1170" fill="#fde047" font-size="16" font-family="Cinzel, serif" font-weight="700" text-anchor="middle" opacity="0.5">Земли Школы Чародейства и Волшебства</text>' +
+      // Железная дорога к Хогсмиду
+      '<path d="M 2520 1960 Q 2200 1600 1880 1360" fill="none" stroke="#e2e8f0" stroke-width="3" stroke-dasharray="8,6" opacity="0.4" />' +
+      '<text x="2180" y="1620" fill="#cbd5e1" font-size="11" font-family="Cinzel, serif" opacity="0.5" transform="rotate(-35, 2180, 1620)">Хогвартс-экспресс</text>' +
       // Декоративный герб Карты Мародёров в углу
       '<g transform="translate(180, 200)">' +
         '<circle r="90" fill="rgba(0,0,0,0.5)" stroke="#d4af37" stroke-width="2" />' +
@@ -2193,6 +2779,8 @@
         '<text y="16" text-anchor="middle" fill="#f4ecd8" font-family="Cinzel, serif" font-size="10">PADFOOT &amp; PRONGS</text>' +
         '<text y="40" text-anchor="middle" fill="#fbbf24" font-family="EB Garamond, serif" font-style="italic" font-size="11">«Шалость удалась»</text>' +
       '</g>';
+
+    var bgSvg = (m.scope === 'hogwarts' ? bgSvgHogwarts : bgSvgWorld);
 
     // Маршрут (route)
     var routeSvg = '';
@@ -2208,7 +2796,6 @@
 
       var linesSvg = '';
       if(pathData){
-        // Полное отключение заливки: fill="none" и style="fill:none !important;"
         linesSvg = '<path class="wz-route-path-bg" d="' + pathData + '" fill="none" style="fill:none !important;" stroke="rgba(0,0,0,0.8)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>' +
           '<path class="wz-route-path-fg" d="' + pathData + '" fill="none" style="fill:none !important;" stroke="#facc15" stroke-width="4.5" stroke-dasharray="14,10" stroke-linecap="round" stroke-linejoin="round" filter="url(#wzPinGlow)">' +
             '<animate attributeName="stroke-dashoffset" values="48;0" dur="1.5s" repeatCount="indefinite"/>' +
@@ -2235,8 +2822,9 @@
       routeSvg = '<g id="wzRouteLayer">' + linesSvg + waypointsSvg + '</g>';
     }
 
-    // Метки локаций
-    var pinsSvg = WZ_MAP_LOCATIONS.map(function(loc){
+    // Метки локаций (активный срез: Хогвартс либо Мир вокруг)
+    var locs = getActiveLocations();
+    var pinsSvg = locs.map(function(loc){
       var isSel = m.selectedLocId === loc.id;
       var radius = isSel ? 16 : 11;
       return '<g class="wz-map-pin ' + (isSel ? 'selected' : '') + '" data-loc-id="' + loc.id + '" transform="translate(' + loc.x + ',' + loc.y + ')" style="cursor:pointer;">' +
@@ -2263,12 +2851,35 @@
     '</svg>';
   }
 
+  /* Экран КАРТА МАРОДЁРОВ (wzMap) - временно заблокирован по запросу */
   function wzMap(){
+    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Карта Мародёров' }]) +
+      '<button class="back" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">← Назад</button>' +
+      '<div class="wz-char-sheet-card" style="text-align:center;padding:50px 20px;margin-top:20px;border-style:dashed;">' +
+        '<div style="font-size:52px;margin-bottom:14px;filter:drop-shadow(0 0 16px rgba(212,175,55,0.3));">🔒 🗺️</div>' +
+        '<h2 style="font-family:Cinzel,serif;color:var(--wz-gold);margin-bottom:10px;font-size:22px;">Карта Мародёров временно заблокирована</h2>' +
+        '<p style="color:var(--wz-text-muted);max-width:520px;margin:0 auto 24px;font-size:14px;line-height:1.6;">' +
+          '«Торжественно клянусь, что замышляю шалость, и только шалость...»<br>' +
+          'Раздел интерактивной карты Хогвартса и окрестностей временно закрыт маскировочными чарами на период реконструкции.' +
+        '</p>' +
+        '<button class="btn btn-primary" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">← Вернуться на главную Волшебника</button>' +
+      '</div>';
+  }
+
+  function wireWzMap(){
+    wireWzNav();
+  }
+
+  /* Полная интерактивная карта (сохранена для последующей разблокировки) */
+  function wzMapContent(){
     var m = WZ.map;
+    if(!m.scope) m.scope = 'hogwarts';
     if(!m.userMarkers || !m.userMarkers.length) WZ.loadUserMarkers();
 
     var markersCount = (m.userMarkers || []).length;
-    var curLoc = WZ_MAP_LOCATIONS.find(function(l){ return l.id === m.selectedLocId; }) || WZ_MAP_LOCATIONS[0];
+    var locs = getActiveLocations();
+    var curLoc = locs.find(function(l){ return l.id === m.selectedLocId; }) || locs[0];
+    m.selectedLocId = curLoc.id;
 
     var inspectorHtml = '';
 
@@ -2284,7 +2895,7 @@
             '<b style="color:#f1f5f9;">' + esc(curLoc.ruler || '—') + '</b>' +
           '</div>' +
           '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:4px;padding:8px 10px;">' +
-            '<span style="color:var(--wz-text-muted);font-size:11px;display:block;">ТИП МЕСТНОСТИ:</span>' +
+            '<span style="color:var(--wz-text-muted);font-size:11px;display:block;">ОБЛАСТЬ / ТИП:</span>' +
             '<b style="color:#f1f5f9;">' + esc(curLoc.climate || '—') + '</b>' +
           '</div>' +
           '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:4px;padding:8px 10px;">' +
@@ -2306,7 +2917,7 @@
         WZ.loadRoute();
         m.routeLoaded = true;
       }
-      var rCalc = calcWzRoute(m.routePoints || [], m.travelMode || 'broom', m.travelPace || 'normal');
+      var rCalc = calcWzRoute(m.routePoints || [], m.travelMode || (m.scope === 'hogwarts' ? 'walk' : 'broom'), m.travelPace || 'normal');
 
       var warningsHtml = (rCalc.warnings && rCalc.warnings.length) ? ('<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">' +
         rCalc.warnings.map(function(w){
@@ -2322,7 +2933,12 @@
         var ter = getWzTerrainAt(pt.x, pt.y);
 
         var segInfo = rCalc.segments[idx];
-        var distToNext = segInfo ? ('<span style="color:#fde047;font-weight:700;">' + segInfo.dist + ' миль</span> <span style="color:var(--wz-text-muted);font-size:11px;">(~' + segInfo.days + ' дн.)</span>') : '<span style="color:var(--wz-text-muted);">Финиш</span>';
+        var distToNext = '';
+        if(m.scope === 'hogwarts'){
+          distToNext = segInfo ? ('<span style="color:#fde047;font-weight:700;">' + segInfo.dist + ' ярдов</span> <span style="color:var(--wz-text-muted);font-size:11px;">(~' + segInfo.timeStr + ')</span>') : '<span style="color:var(--wz-text-muted);">Финиш</span>';
+        } else {
+          distToNext = segInfo ? ('<span style="color:#fde047;font-weight:700;">' + segInfo.dist + ' миль</span> <span style="color:var(--wz-text-muted);font-size:11px;">(~' + segInfo.days + ' дн.)</span>') : '<span style="color:var(--wz-text-muted);">Финиш</span>';
+        }
 
         return '<tr class="wz-route-row" data-wz-route-row-id="' + pt.id + '" style="border-bottom:1px solid rgba(255,255,255,0.06);">' +
           '<td style="padding:8px 6px;text-align:center;"><span style="background:' + badgeColor + ';color:#0f172a;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:900;font-family:\'JetBrains Mono\',monospace;">' + badgeText + '</span></td>' +
@@ -2339,12 +2955,29 @@
         '</tr>';
       }).join('') : '<tr><td colspan="5" class="char-empty" style="text-align:center;padding:16px;">Маршрут пуст. Кликните по карте в любом месте, чтобы поставить первую путевую точку!</td></tr>';
 
+      var distBadge = (m.scope === 'hogwarts') ? 
+        ('<span class="wz-stat-badge" style="color:#fde047;">📏 ' + rCalc.totalDist + ' ярдов</span>' +
+         '<span class="wz-stat-badge" style="color:#93c5fd;">⏳ ' + (rCalc.totalMinutes > 0 ? (rCalc.totalMinutes + ' мин. ' + rCalc.totalSeconds + ' с.') : (rCalc.totalSeconds + ' с.')) + '</span>') :
+        ('<span class="wz-stat-badge" style="color:#fde047;">📏 ' + rCalc.totalDist + ' миль</span>' +
+         '<span class="wz-stat-badge" style="color:#93c5fd;">⏳ ' + rCalc.wholeDays + ' дн. ' + rCalc.remHours + ' ч.</span>');
+
+      var travelModeButtons = (m.scope === 'hogwarts') ? (
+        '<button class="wz-pill ' + (rCalc.mode === 'walk' ? 'active' : '') + '" data-wz-route-mode="walk">🚶 Шаг ученика (60 ярд/мин)</button>' +
+        '<button class="wz-pill ' + (rCalc.mode === 'sprint' ? 'active' : '') + '" data-wz-route-mode="sprint">🏃 Бег на урок (120 ярд/мин)</button>' +
+        '<button class="wz-pill ' + (rCalc.mode === 'cloak' ? 'active' : '') + '" data-wz-route-mode="cloak">🕵️ Под Мантией (40 ярд/мин)</button>' +
+        '<button class="wz-pill ' + (rCalc.mode === 'secret' ? 'active' : '') + '" data-wz-route-mode="secret">🗝️ Тайный лаз (90 ярд/мин)</button>'
+      ) : (
+        '<button class="wz-pill ' + (rCalc.mode === 'broom' ? 'active' : '') + '" data-wz-route-mode="broom">🧹 Скоростная метла (90 миль/день)</button>' +
+        '<button class="wz-pill ' + (rCalc.mode === 'thestral' ? 'active' : '') + '" data-wz-route-mode="thestral">🐴 Полет на Фестрале (110 миль/день)</button>' +
+        '<button class="wz-pill ' + (rCalc.mode === 'express' ? 'active' : '') + '" data-wz-route-mode="express">🚂 Хогвартс-экспресс (160 миль/день)</button>' +
+        '<button class="wz-pill ' + (rCalc.mode === 'foot' ? 'active' : '') + '" data-wz-route-mode="foot">🥾 Пешком (20 миль/день)</button>'
+      );
+
       inspectorHtml = '<div class="wz-char-sheet-card" style="margin-top:14px;">' +
         '<div class="wz-char-header">' +
-          '<span>🧭 Планировщик маршрутов Карты Мародёров</span>' +
+          '<span>🧭 Планировщик маршрутов: ' + (m.scope === 'hogwarts' ? 'Коридоры Хогвартса' : 'Окрестности и Британия') + '</span>' +
           '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
-            '<span class="wz-stat-badge" style="color:#fde047;">📏 ' + rCalc.totalDist + ' миль</span>' +
-            '<span class="wz-stat-badge" style="color:#93c5fd;">⏳ ' + rCalc.wholeDays + ' дн. ' + rCalc.remHours + ' ч.</span>' +
+            distBadge +
           '</div>' +
         '</div>' +
         '<div style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);border-radius:6px;padding:8px 12px;margin-top:10px;font-size:12.5px;color:#e2e8f0;line-height:1.45;">' +
@@ -2354,10 +2987,7 @@
           '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:6px;padding:10px;">' +
             '<div style="font-size:11px;font-weight:700;color:var(--wz-text-muted);text-transform:uppercase;margin-bottom:6px;">Способ перемещения:</div>' +
             '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-              '<button class="wz-pill ' + (rCalc.mode === 'broom' ? 'active' : '') + '" data-wz-route-mode="broom">🧹 Скоростная метла (90 миль/день)</button>' +
-              '<button class="wz-pill ' + (rCalc.mode === 'thestral' ? 'active' : '') + '" data-wz-route-mode="thestral">🐴 Полет на Фестрале (110 миль/день)</button>' +
-              '<button class="wz-pill ' + (rCalc.mode === 'express' ? 'active' : '') + '" data-wz-route-mode="express">🚂 Хогвартс-экспресс (160 миль/день)</button>' +
-              '<button class="wz-pill ' + (rCalc.mode === 'foot' ? 'active' : '') + '" data-wz-route-mode="foot">🥾 Пешком (20 миль/день)</button>' +
+              travelModeButtons +
             '</div>' +
           '</div>' +
           '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:6px;padding:10px;">' +
@@ -2384,7 +3014,7 @@
                 '<tr style="background:rgba(255,255,255,0.04);border-bottom:1px solid var(--wz-border);color:var(--wz-text-muted);font-size:11px;text-transform:uppercase;">' +
                   '<th style="padding:6px 8px;text-align:center;">#</th>' +
                   '<th style="padding:6px 8px;text-align:left;">Название</th>' +
-                  '<th style="padding:6px 8px;text-align:left;">Рельеф</th>' +
+                  '<th style="padding:6px 8px;text-align:left;">Локация / Рельеф</th>' +
                   '<th style="padding:6px 8px;text-align:left;">До следующей</th>' +
                   '<th style="padding:6px 8px;text-align:right;">Действия</th>' +
                 '</tr>' +
@@ -2400,7 +3030,7 @@
           '<span>📍 Тактические метки и тайники (' + markersCount + ')</span>' +
           '<button class="btn btn-primary" id="wzMapAddMarkerOpenBtn" style="font-size:11px;padding:4px 10px;">➕ Метка в центр</button>' +
         '</div>' +
-        '<div style="font-size:12px;color:var(--wz-text-muted);margin-top:4px;margin-bottom:10px;">💡 <b>Совет:</b> В режиме «Метки» кликайте по карте, чтобы отметить тайные проходы Хогвартса, убежища или схроны ингредиентов.</div>' +
+        '<div style="font-size:12px;color:var(--wz-text-muted);margin-top:4px;margin-bottom:10px;">💡 <b>Совет:</b> В режиме «Метки» кликайте по карте, чтобы отметить тайные проходы, убежища или схроны ингредиентов.</div>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:8px;">' +
           (m.userMarkers && m.userMarkers.length ? m.userMarkers.map(function(um){
             return '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:4px;padding:8px;display:flex;justify-content:space-between;align-items:center;gap:6px;">' +
@@ -2417,22 +3047,30 @@
 
     return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Карта Мародёров' }]) +
       '<button class="back" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">← Назад</button>' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">' +
         '<div>' +
-          '<h1 style="margin-bottom:4px;">🗺️ Карта Мародёров (Хогвартс и окрестности)</h1>' +
-          '<div class="desc" style="margin-bottom:0;">«Торжественно клянусь, что замышляю шалость, и только шалость!» Интерактивный план замка, окрестностей и тайных проходов.</div>' +
+          '<h1 style="margin-bottom:4px;">🗺️ Карта Мародёров: ' + (m.scope === 'hogwarts' ? 'Хогвартс (Интерьер замка)' : 'Мир вокруг (Окрестности и Шотландия)') + '</h1>' +
+          '<div class="desc" style="margin-bottom:0;">«Торжественно клянусь, что замышляю шалость, и только шалость!» ' +
+            (m.scope === 'hogwarts' ? 'Внутренний архитектурный план залов, лестниц, башен, подземелий и тайных лазов Хогвартса.' : 'План окрестностей замка: Чёрное Озеро, Запретный Лес, Хогсмид и нагорье.') +
+          '</div>' +
         '</div>' +
-        '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-          '<button class="wz-pill ' + (m.mode === 'inspect' ? 'active' : '') + '" id="wzMapModeInspect">🗺️ Атлас</button>' +
-          '<button class="wz-pill ' + (m.mode === 'route' ? 'active' : '') + '" id="wzMapModeRoute">🧭 Маршруты</button>' +
-          '<button class="wz-pill ' + (m.mode === 'markers' ? 'active' : '') + '" id="wzMapModeMarkers">📍 Метки (' + markersCount + ')</button>' +
+        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">' +
+          '<div class="wz-realm-switch">' +
+            '<button class="wz-realm-btn ' + (m.scope === 'hogwarts' ? 'active' : '') + '" id="wzScopeHogwarts" type="button">🏰 Хогвартс</button>' +
+            '<button class="wz-realm-btn ' + (m.scope === 'world' ? 'active' : '') + '" id="wzScopeWorld" type="button">🌍 Мир вокруг</button>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+            '<button class="wz-pill ' + (m.mode === 'inspect' ? 'active' : '') + '" id="wzMapModeInspect">🗺️ Атлас</button>' +
+            '<button class="wz-pill ' + (m.mode === 'route' ? 'active' : '') + '" id="wzMapModeRoute">🧭 Маршруты</button>' +
+            '<button class="wz-pill ' + (m.mode === 'markers' ? 'active' : '') + '" id="wzMapModeMarkers">📍 Метки (' + markersCount + ')</button>' +
+          '</div>' +
         '</div>' +
       '</div>' +
       '<div class="wz-map-container">' +
         '<div class="wi-map-toolbar" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(14,18,24,0.95);border-bottom:1px solid var(--wz-border);flex-wrap:wrap;gap:8px;">' +
           '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:220px;">' +
             '<span style="color:var(--wz-gold);font-size:13px;">🔍</span>' +
-            '<input type="text" id="wzMapSearch" class="wz-input" style="padding:5px 10px;font-size:12.5px;max-width:320px;" placeholder="Поиск локации или тайного прохода..." value="' + escA(m.search || '') + '">' +
+            '<input type="text" id="wzMapSearch" class="wz-input" style="padding:5px 10px;font-size:12.5px;max-width:320px;" placeholder="' + (m.scope === 'hogwarts' ? 'Поиск зала, башни или тайного хода...' : 'Поиск локации в окрестностях...') + '" value="' + escA(m.search || '') + '">' +
           '</div>' +
           '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
             '<button class="btn btn-ghost" id="wzMapToggleLabels" title="Показать/скрыть подписи" style="padding:4px 9px;font-size:12px;">' + (m.showLabels !== false ? '🏷️ Текст' : '🏷️ Без текста') + '</button>' +
@@ -2441,17 +3079,6 @@
             '<button class="btn btn-ghost" id="wzMapZoomReset" title="Сбросить масштаб" style="padding:4px 10px;font-size:12px;">⟲ 100%</button>' +
           '</div>' +
         '</div>' +
-        '<div class="wi-map-quick-jumps" style="display:flex;gap:6px;flex-wrap:wrap;padding:6px 12px;background:rgba(10,14,20,0.85);border-bottom:1px solid var(--wz-border);overflow-x:auto;">' +
-          '<span style="font-size:11px;color:var(--wz-gold);align-self:center;font-weight:700;font-family:\'Cinzel\',serif;">ФОКУС:</span>' +
-          '<button class="wz-pill" data-wz-jump="hogwarts">🏰 Хогвартс</button>' +
-          '<button class="wz-pill" data-wz-jump="quidditch">🏟️ Квиддич</button>' +
-          '<button class="wz-pill" data-wz-jump="forest">🌲 Запретный Лес</button>' +
-          '<button class="wz-pill" data-wz-jump="lake">🌊 Чёрное Озеро</button>' +
-          '<button class="wz-pill" data-wz-jump="hogsmeade">🍻 Хогсмид</button>' +
-          '<button class="wz-pill" data-wz-jump="london">🇬🇧 Лондон / Косой пер.</button>' +
-          '<button class="wz-pill" data-wz-jump="azkaban">⚓ Азкабан</button>' +
-          '<button class="wz-pill" data-wz-jump="all">🗺️ Вся Карта</button>' +
-        '</div>' +
         '<div class="wz-map-viewport" id="wzMapViewport">' +
           renderWizardMapSvg() +
         '</div>' +
@@ -2459,8 +3086,8 @@
       inspectorHtml;
   }
 
-  /* Привязка событий карты Мародёров */
-  function wireWzMap(){
+  /* Привязка событий карты Мародёров (сохранена для разблокировки) */
+  function wireWzMapContent(){
     var m = WZ.map;
 
     var modeInspect = document.getElementById('wzMapModeInspect');
@@ -2499,8 +3126,10 @@
       var baseH = baseW / ar;
       var vbW = baseW / z;
       var vbH = baseH / z;
-      var minX = (m.cx != null ? m.cx : 1400) - vbW / 2;
-      var minY = (m.cy != null ? m.cy : 1100) - vbH / 2;
+      var defCx = (m.scope === 'hogwarts' ? 1200 : 1400);
+      var defCy = (m.scope === 'hogwarts' ? 1150 : 1300);
+      var minX = (m.cx != null ? m.cx : defCx) - vbW / 2;
+      var minY = (m.cy != null ? m.cy : defCy) - vbH / 2;
       svg.setAttribute('viewBox', minX + ' ' + minY + ' ' + vbW + ' ' + vbH);
     }
 
@@ -2539,30 +3168,73 @@
     if(btnReset){
       btnReset.addEventListener('click', function(){
         m.zoom = 1.0;
-        m.cx = 1400;
-        m.cy = 1100;
+        m.cx = (m.scope === 'hogwarts' ? 1200 : 1400);
+        m.cy = (m.scope === 'hogwarts' ? 1150 : 1300);
         updateMapTransform();
       });
     }
 
-    var presets = {
-      hogwarts: { cx: 1400, cy: 1100, zoom: 2.0 },
-      quidditch: { cx: 1720, cy: 1120, zoom: 2.5 },
-      forest: { cx: 1040, cy: 1400, zoom: 1.8 },
-      lake: { cx: 1540, cy: 1520, zoom: 2.0 },
-      hogsmeade: { cx: 2120, cy: 1220, zoom: 2.2 },
-      london: { cx: 2440, cy: 2180, zoom: 2.2 },
-      azkaban: { cx: 620, cy: 520, zoom: 2.5 },
-      all: { cx: 1400, cy: 1200, zoom: 0.8 }
-    };
+    function switchMapScope(newScope){
+      if(m.scope === newScope) return;
+      if(!m.routes) m.routes = { hogwarts: {}, world: {} };
+      m.routes[m.scope] = {
+        points: (m.routePoints || []).slice(),
+        mode: m.travelMode,
+        pace: m.travelPace
+      };
+      m.scope = newScope;
+      WZ.loadRoute();
+      if(newScope === 'hogwarts'){
+        m.cx = 1200;
+        m.cy = 1150;
+        m.zoom = 1.0;
+        m.selectedLocId = 'great_hall';
+      } else {
+        m.cx = 1400;
+        m.cy = 1300;
+        m.zoom = 1.0;
+        m.selectedLocId = 'hogwarts_castle';
+      }
+      if(typeof render === 'function') render();
+    }
 
-    document.querySelectorAll('[data-wz-jump]').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        var target = btn.getAttribute('data-wz-jump');
-        var cfg = presets[target];
-        if(cfg) focusOn(cfg.cx, cfg.cy, cfg.zoom);
+    var btnHogwarts = document.getElementById('wzScopeHogwarts');
+    if(btnHogwarts){
+      btnHogwarts.addEventListener('click', function(){
+        switchMapScope('hogwarts');
       });
-    });
+    }
+
+    var btnWorld = document.getElementById('wzScopeWorld');
+    if(btnWorld){
+      btnWorld.addEventListener('click', function(){
+        switchMapScope('world');
+      });
+    }
+
+    var searchInput = document.getElementById('wzMapSearch');
+    if(searchInput){
+      searchInput.addEventListener('keydown', function(e){
+        if(e.key === 'Enter'){
+          var query = (searchInput.value || '').trim().toLowerCase();
+          if(!query) return;
+          var locs = getActiveLocations();
+          var found = locs.find(function(l){
+            return l.name.toLowerCase().indexOf(query) !== -1 ||
+                   (l.desc && l.desc.toLowerCase().indexOf(query) !== -1) ||
+                   (l.region && l.region.toLowerCase().indexOf(query) !== -1);
+          });
+          if(found){
+            m.selectedLocId = found.id;
+            focusOn(found.x, found.y, Math.max(m.zoom || 1.0, 2.0));
+            WZ.toast('🔍 Найдено: ' + found.name, 'success');
+            if(typeof render === 'function') render();
+          } else {
+            WZ.toast('Ничего не найдено по запросу «' + query + '»', 'warning');
+          }
+        }
+      });
+    }
 
     // Клик по метке локации
     document.querySelectorAll('.wz-map-pin').forEach(function(pin){
@@ -2570,7 +3242,7 @@
         e.stopPropagation();
         var lid = pin.getAttribute('data-loc-id');
         if(!lid) return;
-        var loc = WZ_MAP_LOCATIONS.find(function(l){ return l.id === lid; });
+        var loc = getActiveLocations().find(function(l){ return l.id === lid; });
         if(!loc) return;
 
         if(m.mode === 'route'){
@@ -2698,7 +3370,7 @@
     if(setRouteDestBtn){
       setRouteDestBtn.addEventListener('click', function(){
         var id = setRouteDestBtn.getAttribute('data-loc-id');
-        var loc = WZ_MAP_LOCATIONS.find(function(l){ return l.id === id; });
+        var loc = getActiveLocations().find(function(l){ return l.id === id; });
         if(loc){
           m.routePoints = m.routePoints || [];
           m.routePoints.push({
@@ -2718,7 +3390,7 @@
     if(setRouteOrigBtn){
       setRouteOrigBtn.addEventListener('click', function(){
         var id = setRouteOrigBtn.getAttribute('data-loc-id');
-        var loc = WZ_MAP_LOCATIONS.find(function(l){ return l.id === id; });
+        var loc = getActiveLocations().find(function(l){ return l.id === id; });
         if(loc){
           m.routePoints = [{
             id: 'wp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
@@ -2737,7 +3409,7 @@
     if(centerOnLocBtn){
       centerOnLocBtn.addEventListener('click', function(){
         var id = centerOnLocBtn.getAttribute('data-loc-id');
-        var loc = WZ_MAP_LOCATIONS.find(function(l){ return l.id === id; });
+        var loc = getActiveLocations().find(function(l){ return l.id === id; });
         if(loc){
           focusOn(loc.x, loc.y, Math.max(m.zoom || 1.0, 2.0));
           WZ.toast('🎯 Камера сфокусирована на: ' + loc.name, 'info');
@@ -3677,6 +4349,7 @@
   WZ.wzDuelEdit = wzDuelEdit;
   WZ.wzDuelGen = wzDuelGen;
   WZ.wzMap = wzMap;
+  WZ.wzMapContent = wzMapContent;
   WZ.wireWzHome = wireWzHome;
   WZ.wireWzData = wireWzData;
   WZ.wireWzRef = wireWzRef;
@@ -3690,6 +4363,7 @@
   WZ.wireWzDuelEdit = wireWzDuelEdit;
   WZ.wireWzDuelGen = wireWzDuelGen;
   WZ.wireWzMap = wireWzMap;
+  WZ.wireWzMapContent = wireWzMapContent;
   WZ.wireWzNav = wireWzNav;
 
 })();
