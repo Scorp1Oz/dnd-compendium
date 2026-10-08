@@ -1688,16 +1688,16 @@
 
     // 3. Список разделов в сетке menu-list grid-2 (как в Ведьмаке и Шиноби!)
     var sectionsList = '<div class="menu-list grid-2" style="margin-top:10px;">' +
-      '<div class="wz-card wz-card-clickable" data-nav="wzSpells" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSpells\');" role="button" tabindex="0" title="Открыть Способности">' +
+      '<div class="wz-card wz-card-clickable" data-nav="wzSpells" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSpells\');" role="button" tabindex="0" title="Открыть Заклинания">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>✨</span> Способности (Заклинания)</div>' +
+          '<div class="wz-card-title"><span>✨</span> Заклинания</div>' +
           '<div class="wz-card-desc">Книга заклинаний Хогвартса, боевые чары, инкантации и AI Генератор заклинаний</div>' +
         '</div>' +
         '<div class="wz-card-arrow">→</div>' +
       '</div>' +
-      '<div class="wz-card wz-card-clickable" data-nav="wzDuels" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzDuels\');" role="button" tabindex="0" title="Открыть Боевые приёмы">' +
+      '<div class="wz-card wz-card-clickable" data-nav="wzDuels" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzDuels\');" role="button" tabindex="0" title="Открыть Дуэльные приёмы">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>⚔️</span> Боевые приёмы (Дуэли)</div>' +
+          '<div class="wz-card-title"><span>⚔️</span> Дуэльные приёмы</div>' +
           '<div class="wz-card-desc">Палочковые дуэли, парирование Протего, боевая аппарация, финты и AI Генератор</div>' +
         '</div>' +
         '<div class="wz-card-arrow">→</div>' +
@@ -1709,17 +1709,17 @@
         '</div>' +
         '<div class="wz-card-arrow" style="opacity:0.35;font-size:14px;">🔒</div>' +
       '</div>' +
-      '<div class="wz-card wz-card-clickable" data-nav="wzRef" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRef\');" role="button" tabindex="0" title="Открыть Справочник Магии">' +
+      '<div class="wz-card wz-card-clickable" data-nav="wzRef" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRef\');" role="button" tabindex="0" title="Открыть Справочник">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>📚</span> Справочник Магии</div>' +
+          '<div class="wz-card-title"><span>📚</span> Справочник</div>' +
           '<div class="wz-card-desc">4 факультета, палочки Олливандера, зелья, бестиарий, Дары Смерти и Квиддич</div>' +
         '</div>' +
         '<div class="wz-card-arrow">→</div>' +
       '</div>' +
-      '<div class="wz-card wz-card-clickable" data-nav="wzData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzData\');" role="button" tabindex="0" title="Открыть Данные и Ростер">' +
+      '<div class="wz-card wz-card-clickable" data-nav="wzData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzData\');" role="button" tabindex="0" title="Открыть Данные">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>💾</span> Данные и Ростер</div>' +
-          '<div class="wz-card-desc">Анкета волшебника, параметры палочки, факультет, управление ростером персонажей</div>' +
+          '<div class="wz-card-title"><span>💾</span> Данные</div>' +
+          '<div class="wz-card-desc">Анкета волшебника, характеристики, факультет и управление персонажами</div>' +
         '</div>' +
         '<div class="wz-card-arrow">→</div>' +
       '</div>' +
@@ -1798,7 +1798,7 @@
 
     return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Данные' }]) +
       '<button class="back" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">← На главную</button>' +
-      '<h1>Данные и Ростер Волшебников</h1>' +
+      '<h1>Данные</h1>' +
 
       '<div class="sheet-section wz-data-section">' +
         '<div class="section-label" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
@@ -2141,12 +2141,12 @@
   /* Общий переключатель вкладок Заклинания / Дуэли */
   function renderWzAbilitiesTabBar(activeTab){
     return '<div class="wz-nav-tabs">' +
-      '<button class="wz-nav-tab ' + (activeTab === 'spells' ? 'active' : '') + '" data-nav="wzSpells" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSpells\');">✨ Заклинания и Чары</button>' +
-      '<button class="wz-nav-tab ' + (activeTab === 'duels' ? 'active' : '') + '" data-nav="wzDuels" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzDuels\');">⚔️ Дуэльный клуб и Приёмы</button>' +
+      '<button class="wz-nav-tab ' + (activeTab === 'spells' ? 'active' : '') + '" data-nav="wzSpells" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSpells\');">✨ Заклинания</button>' +
+      '<button class="wz-nav-tab ' + (activeTab === 'duels' ? 'active' : '') + '" data-nav="wzDuels" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzDuels\');">⚔️ Дуэльные приёмы</button>' +
     '</div>';
   }
 
-  /* Экран СПРАВОЧНИК МАГИИ (wzRef) */
+  /* Экран СПРАВОЧНИК (wzRef) */
   function wzRef(){
     var sectionsHtml = WZ_REF_SECTIONS.map(function(sec){
       var items = Object.keys(WZ_REF).filter(function(k){ return WZ_REF[k].sec === sec.id; });
@@ -2172,10 +2172,10 @@
       '</div>';
     }).join('');
 
-    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Справочник магии' }]) +
+    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Справочник' }]) +
       '<button class="back" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">← Назад</button>' +
       '<div style="margin-bottom:14px;">' +
-        '<h1 style="margin-bottom:4px;">📚 Справочник Магического Мира</h1>' +
+        '<h1 style="margin-bottom:4px;">📚 Справочник</h1>' +
         '<div class="desc" style="margin-bottom:0;">Подробная энциклопедия: 4 факультета Хогвартса, свойства палочек Олливандера, зелья, бестиарий волшебных существ, Дары Смерти и Квиддич.</div>' +
       '</div>' +
       sectionsHtml;
@@ -2257,7 +2257,7 @@
       renderWzAbilitiesTabBar('spells') +
       '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">' +
         '<div>' +
-          '<h1 style="margin-bottom:4px;">✨ Гримуар и Книга заклинаний</h1>' +
+          '<h1 style="margin-bottom:4px;">✨ Заклинания</h1>' +
           '<div class="desc" style="margin-bottom:0;">Боевые дуэльные чары, трансфигурация, бытовая магия и патронус. Создавайте свои или генерируйте через ИИ!</div>' +
         '</div>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
@@ -2461,7 +2461,7 @@
       renderWzAbilitiesTabBar('duels') +
       '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">' +
         '<div>' +
-          '<h1 style="margin-bottom:4px;">⚔️ Дуэльный клуб и Боевые приёмы</h1>' +
+          '<h1 style="margin-bottom:4px;">⚔️ Дуэльные приёмы</h1>' +
           '<div class="desc" style="margin-bottom:0;">Тактические взмахи палочкой, парирование, боевая аппарация, невербальные броски и финты.</div>' +
         '</div>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
