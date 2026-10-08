@@ -1929,13 +1929,6 @@
         '</div>' +
         '<div class="wz-card-arrow">→</div>' +
       '</div>' +
-      '<div class="wz-card wz-card-disabled" id="wzMapBlockedBtn" role="button" aria-disabled="true" tabindex="-1" title="Карта временно заблокирована">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title" style="color:var(--wz-text-muted);"><span>🗺️</span> Карта мира <span class="wz-stat-badge" style="margin-left:6px;font-size:10px;background:rgba(239,68,68,0.18);border-color:rgba(239,68,68,0.45);color:#fca5a5;padding:1px 6px;">🔒 Заблокировано</span></div>' +
-          '<div class="wz-card-desc" style="color:var(--wz-text-muted);">Интерактивная Карта Мародёров (раздел временно на реконструкции)</div>' +
-        '</div>' +
-        '<div class="wz-card-arrow" style="opacity:0.35;font-size:14px;">🔒</div>' +
-      '</div>' +
       '<div class="wz-card wz-card-clickable" data-nav="wzRef" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRef\');" role="button" tabindex="0" title="Открыть Справочник">' +
         '<div style="flex:1;min-width:0;">' +
           '<div class="wz-card-title"><span>📚</span> Справочник</div>' +
@@ -1957,14 +1950,6 @@
 
   function wireWzHome(){
     wireWzNav();
-    var mapBlockedBtn = document.getElementById('wzMapBlockedBtn');
-    if(mapBlockedBtn){
-      mapBlockedBtn.addEventListener('click', function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        WZ.toast('🔒 Карта Мародёров временно заблокирована на реконструкцию', 'warning');
-      });
-    }
   }
 
   /* ============================================================
