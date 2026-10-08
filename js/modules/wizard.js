@@ -4414,6 +4414,35 @@
     '</div>';
   }
 
+  function wzRequestGemini(prompt, apiKey, callback){
+    var reqFn = window.requestGeminiGenerateContent;
+    if(typeof reqFn === 'function'){
+      reqFn(prompt, apiKey, callback);
+      return;
+    }
+    if(!apiKey){
+      callback(new Error('API ключ Google Gemini не указан'), null);
+      return;
+    }
+    var model = 'gemini-3.8-flash';
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey);
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.8, responseMimeType: 'application/json' }
+      })
+    }).then(function(res){
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json().then(function(data){
+        callback(null, data);
+      });
+    }).catch(function(err){
+      callback(err, null);
+    });
+  }
+
   function callGeminiWzSpellGenerator(opts, apiKey, callback){
     if(!apiKey){
       callback('API ключ Google Gemini не указан', null);
@@ -4439,30 +4468,21 @@
       '  "desc": "Атмосферное описание луча, жеста волшебной палочки, звука и магического эффекта (3-4 предложения)"\n' +
       '}';
 
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + encodeURIComponent(apiKey);
-    var payload = { contents: [{ parts: [{ text: prompt }] }] };
-
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-    .then(function(res){
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    })
-    .then(function(data){
+    wzRequestGemini(prompt, apiKey, function(err, data){
+      if(err || !data){
+        callback(err ? (err.message || String(err)) : 'Пустой ответ от AI', null);
+        return;
+      }
       try {
-        var rawText = data.candidates[0].content.parts[0].text;
-        var clean = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-        var parsed = JSON.parse(clean);
+        var extractFn = window.extractJsonFromAi || function(d){
+          var raw = (d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts && d.candidates[0].content.parts[0].text) || d;
+          return JSON.parse(String(raw).replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim());
+        };
+        var parsed = extractFn(data);
         callback(null, parsed);
       } catch(e){
         callback('Ошибка разбора ответа ИИ: ' + e.message, null);
       }
-    })
-    .catch(function(err){
-      callback('Ошибка сети Gemini API: ' + err.message, null);
     });
   }
 
@@ -4485,30 +4505,21 @@
       '  "desc": "Детальное тактическое описание движения кисти, траектории палочки и боевого преимущества (3-4 предложения)"\n' +
       '}';
 
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + encodeURIComponent(apiKey);
-    var payload = { contents: [{ parts: [{ text: prompt }] }] };
-
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-    .then(function(res){
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    })
-    .then(function(data){
+    wzRequestGemini(prompt, apiKey, function(err, data){
+      if(err || !data){
+        callback(err ? (err.message || String(err)) : 'Пустой ответ от AI', null);
+        return;
+      }
       try {
-        var rawText = data.candidates[0].content.parts[0].text;
-        var clean = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-        var parsed = JSON.parse(clean);
+        var extractFn = window.extractJsonFromAi || function(d){
+          var raw = (d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts && d.candidates[0].content.parts[0].text) || d;
+          return JSON.parse(String(raw).replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim());
+        };
+        var parsed = extractFn(data);
         callback(null, parsed);
       } catch(e){
         callback('Ошибка разбора ответа ИИ: ' + e.message, null);
       }
-    })
-    .catch(function(err){
-      callback('Ошибка сети Gemini API: ' + err.message, null);
     });
   }
 
@@ -4631,30 +4642,21 @@
       '  "desc": "Тонкости, ограничения и правила применения (2-3 предложения)"\n' +
       '}';
 
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + encodeURIComponent(apiKey);
-    var payload = { contents: [{ parts: [{ text: prompt }] }] };
-
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-    .then(function(res){
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    })
-    .then(function(data){
+    wzRequestGemini(prompt, apiKey, function(err, data){
+      if(err || !data){
+        callback(err ? (err.message || String(err)) : 'Пустой ответ от AI', null);
+        return;
+      }
       try {
-        var rawText = data.candidates[0].content.parts[0].text;
-        var clean = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-        var parsed = JSON.parse(clean);
+        var extractFn = window.extractJsonFromAi || function(d){
+          var raw = (d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts && d.candidates[0].content.parts[0].text) || d;
+          return JSON.parse(String(raw).replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim());
+        };
+        var parsed = extractFn(data);
         callback(null, parsed);
       } catch(e){
         callback('Ошибка разбора ответа ИИ: ' + e.message, null);
       }
-    })
-    .catch(function(err){
-      callback('Ошибка сети Gemini API: ' + err.message, null);
     });
   }
 

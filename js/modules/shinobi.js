@@ -4846,49 +4846,25 @@ function requestGeminiGenerateContent(prompt, apiKey, callback){
     callback(new Error("API ключ не указан"), null);
     return;
   }
-  var models = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
-  var preferred = null;
-  try{
-    preferred = localStorage.getItem('gemini_preferred_model');
-  }catch(e){}
-  if(preferred && models.indexOf(preferred) !== -1){
-    models = [preferred].concat(models.filter(function(m){ return m !== preferred; }));
-  }
-
-  function tryModel(idx){
-    if(idx >= models.length){
-      callback(new Error('API status 404: Модель не найдена для данного API-ключа (проверены: ' + models.join(', ') + ')'), null);
-      return;
+  var model = 'gemini-3.8-flash';
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey);
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
+    })
+  }).then(function(res){
+    if(!res.ok){
+      throw new Error('HTTP ' + res.status);
     }
-    var model = models[idx];
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey);
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.8, responseMimeType: "application/json" }
-      })
-    }).then(function(res){
-      if(res.status === 404){
-        tryModel(idx + 1);
-        return;
-      }
-      if(!res.ok){
-        throw new Error('API status ' + res.status);
-      }
-      return res.json().then(function(data){
-        try{
-          localStorage.setItem('gemini_preferred_model', model);
-        }catch(e){}
-        callback(null, data);
-      });
-    }).catch(function(err){
-      callback(err, null);
+    return res.json().then(function(data){
+      callback(null, data);
     });
-  }
-
-  tryModel(0);
+  }).catch(function(err){
+    callback(err, null);
+  });
 }
 window.requestGeminiGenerateContent = requestGeminiGenerateContent;
 
