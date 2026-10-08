@@ -3148,6 +3148,7 @@ var AppStorage = window.AppStorage = {
         else if(mode === 'el' && k.indexOf('el_ai_hist_') === 0) keysToRemove.push(k);
         else if(mode === 'me' && k.indexOf('me_ai_hist_') === 0) keysToRemove.push(k);
         else if(mode === 'wi' && k.indexOf('wi_ai_hist_') === 0) keysToRemove.push(k);
+        else if(mode === 'wz' && k.indexOf('wz_ai_hist_') === 0) keysToRemove.push(k);
         else if(!mode || mode === 'all') keysToRemove.push(k);
       }
 
@@ -3426,6 +3427,53 @@ var AppStorage = window.AppStorage = {
         '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--wi-border, rgba(180, 150, 100, 0.25));">' +
           '<button class="btn btn-primary" id="wiStorageCleanAiBtn" style="font-size:12px;">🧹 Очистить архив ИИ (' + AppStorage.formatBytes(info.categories.ai.bytes) + ')</button>' +
           '<button class="btn btn-ghost" id="wiStorageIntegrityBtn" style="font-size:12px;border:1px solid var(--wi-border, rgba(180, 150, 100, 0.35));color:#e2e8f0;">🛡️ Проверить целостность</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    if(mode === 'wz'){
+      // Wizard Hogwarts Storage Card
+      return '<div class="sheet-section" id="wzStorageSection" style="background:var(--wz-surface, rgba(14, 18, 32, 0.92));border:1px solid var(--wz-border, rgba(212, 175, 55, 0.28));border-left:4px solid var(--wz-gold, #d4af37);border-radius:6px;padding:16px 20px;margin-bottom:20px;box-shadow:0 4px 18px rgba(0,0,0,0.4);">' +
+        '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:var(--wz-gold, #d4af37);font-weight:700;margin-bottom:12px;font-family:\'Cinzel\',serif;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+          '<span>💾 ХРАНИЛИЩЕ ХОГВАРТСА // ЗАЩИТА МАГИЧЕСКИХ ДАННЫХ</span>' +
+          statusBadge +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#94a3b8;margin-bottom:12px;line-height:1.45;font-family:\'EB Garamond\',serif;font-style:italic;">' +
+          'Мониторинг хранилища браузера (лимит 5.0 МБ). Все анкеты волшебников, заклинания, дуэли, инвентарь и хроники магии надёжно защищены.' +
+        '</div>' +
+        warningNotice +
+        '<div style="margin:12px 0 6px;">' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-dim);margin-bottom:5px;font-family:\'Cinzel\',serif;">' +
+            '<span>Занято: <b style="color:var(--wz-gold, #d4af37);">' + info.totalFormatted + '</b> / ' + info.maxFormatted + '</span>' +
+            '<span style="font-weight:700;color:' + barColor + ';">' + info.percent + '%</span>' +
+          '</div>' +
+          '<div style="width:100%;height:14px;background:rgba(0,0,0,0.5);border:1px solid var(--wz-border, rgba(212, 175, 55, 0.28));border-radius:4px;overflow:hidden;padding:1px;box-sizing:border-box;">' +
+            '<div style="height:100%;width:' + info.percent + '%;background:linear-gradient(90deg, #d4af37, #f59e0b);border-radius:2px;transition:width 0.4s ease;box-shadow:0 0 8px ' + barColor + ';"></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;">' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid var(--wz-border, rgba(212, 175, 55, 0.25));border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">🤖 Архив ИИ:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#fca5a5;">' + AppStorage.formatBytes(info.categories.ai.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid var(--wz-border, rgba(212, 175, 55, 0.25));border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">🧙 Ростер волшебников:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#7dd3fc;">' + AppStorage.formatBytes(info.categories.profiles.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid var(--wz-border, rgba(212, 175, 55, 0.25));border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">✨ Заклинания и дуэли:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#c084fc;">' + AppStorage.formatBytes(info.categories.powers.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid var(--wz-border, rgba(212, 175, 55, 0.25));border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">📜 Хроники магии:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#86efac;">' + AppStorage.formatBytes(info.categories.maps.bytes) + '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--wz-border, rgba(212, 175, 55, 0.25));">' +
+          '<button class="btn btn-primary" id="wzStorageCleanAiBtn" style="font-size:12px;">🧹 Очистить архив ИИ (' + AppStorage.formatBytes(info.categories.ai.bytes) + ')</button>' +
+          '<button class="btn btn-ghost" id="wzStorageIntegrityBtn" style="font-size:12px;border:1px solid var(--wz-border, rgba(212, 175, 55, 0.35));color:#e2e8f0;">🛡️ Проверить целостность</button>' +
         '</div>' +
       '</div>';
     }

@@ -88,6 +88,18 @@ var GHSync = window.GHSync = {
         ship: (typeof ME !== 'undefined' && ME.getShip) ? ME.getShip() : {},
         char: (typeof ME !== 'undefined' && ME.getChar) ? ME.getChar() : {}
       },
+      witcher: {
+        profiles: (typeof WI !== 'undefined' && WI.profiles) ? WI.profiles : (function(){ try{ return JSON.parse(localStorage.getItem('ttc_wi_profiles')); }catch(e){ return []; } })(),
+        activeProfileId: (typeof WI !== 'undefined' && WI.activeProfileId) ? WI.activeProfileId : localStorage.getItem('ttc_wi_active_id'),
+        meta: (typeof WI !== 'undefined' && WI.meta) ? WI.meta : {}
+      },
+      wizard: {
+        profiles: (typeof WZ !== 'undefined' && WZ.profiles) ? WZ.profiles : (function(){ try{ return JSON.parse(localStorage.getItem('ttc_wz_profiles')); }catch(e){ return []; } })(),
+        activeProfileId: (typeof WZ !== 'undefined' && WZ.activeProfileId) ? WZ.activeProfileId : localStorage.getItem('ttc_wz_active_id'),
+        spells: (typeof WZ !== 'undefined' && WZ.spells) ? WZ.spells : (function(){ try{ return JSON.parse(localStorage.getItem('ttc_wz_spells')); }catch(e){ return []; } })(),
+        duels: (typeof WZ !== 'undefined' && WZ.duels) ? WZ.duels : (function(){ try{ return JSON.parse(localStorage.getItem('ttc_wz_duels')); }catch(e){ return []; } })(),
+        meta: (typeof WZ !== 'undefined' && WZ.meta) ? WZ.meta : {}
+      },
       dnd: {
         characters: (typeof CHARACTERS !== 'undefined') ? CHARACTERS : (function(){ try{ return JSON.parse(localStorage.getItem('ttc_characters')); }catch(e){ return []; } })()
       }
@@ -132,6 +144,44 @@ var GHSync = window.GHSync = {
         if(bundle.massEffect.arsenal) ME.saveArsenal(bundle.massEffect.arsenal);
         if(bundle.massEffect.ship) ME.saveShip(bundle.massEffect.ship);
         if(bundle.massEffect.char) ME.saveChar(bundle.massEffect.char);
+      }
+
+      if(bundle.witcher){
+        if(bundle.witcher.profiles && Array.isArray(bundle.witcher.profiles)){
+          if(typeof WI !== 'undefined') WI.profiles = bundle.witcher.profiles;
+          localStorage.setItem('ttc_wi_profiles', JSON.stringify(bundle.witcher.profiles));
+        }
+        if(bundle.witcher.activeProfileId){
+          if(typeof WI !== 'undefined') WI.activeProfileId = bundle.witcher.activeProfileId;
+          localStorage.setItem('ttc_wi_active_id', bundle.witcher.activeProfileId);
+        }
+        if(bundle.witcher.meta){
+          if(typeof WI !== 'undefined') WI.meta = bundle.witcher.meta;
+          try{ localStorage.setItem('ttc_wi_meta', JSON.stringify(bundle.witcher.meta)); }catch(e){}
+        }
+      }
+
+      if(bundle.wizard){
+        if(bundle.wizard.profiles && Array.isArray(bundle.wizard.profiles)){
+          if(typeof WZ !== 'undefined') WZ.profiles = bundle.wizard.profiles;
+          localStorage.setItem('ttc_wz_profiles', JSON.stringify(bundle.wizard.profiles));
+        }
+        if(bundle.wizard.activeProfileId){
+          if(typeof WZ !== 'undefined') WZ.activeProfileId = bundle.wizard.activeProfileId;
+          localStorage.setItem('ttc_wz_active_id', bundle.wizard.activeProfileId);
+        }
+        if(bundle.wizard.spells && Array.isArray(bundle.wizard.spells)){
+          if(typeof WZ !== 'undefined') WZ.spells = bundle.wizard.spells;
+          localStorage.setItem('ttc_wz_spells', JSON.stringify(bundle.wizard.spells));
+        }
+        if(bundle.wizard.duels && Array.isArray(bundle.wizard.duels)){
+          if(typeof WZ !== 'undefined') WZ.duels = bundle.wizard.duels;
+          localStorage.setItem('ttc_wz_duels', JSON.stringify(bundle.wizard.duels));
+        }
+        if(bundle.wizard.meta){
+          if(typeof WZ !== 'undefined') WZ.meta = bundle.wizard.meta;
+          try{ localStorage.setItem('ttc_wz_meta', JSON.stringify(bundle.wizard.meta)); }catch(e){}
+        }
       }
 
       if(bundle.dnd && bundle.dnd.characters){

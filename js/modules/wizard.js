@@ -13,30 +13,60 @@
   var WZ_ROUTE_KEY = 'ttc_wz_route';
   var WZ_MARKERS_KEY = 'ttc_wz_markers';
 
+  // Принудительная очистка устаревших предзаписанных заклинаний и приёмов из localStorage браузера
+  try {
+    var purgeKey = 'ttc_wz_purge_defaults_v4';
+    if(!localStorage.getItem(purgeKey)){
+      localStorage.setItem(purgeKey, '1');
+      var rawSp = localStorage.getItem(WZ_SPELLS_KEY);
+      if(rawSp){
+        var listSp = JSON.parse(rawSp);
+        if(Array.isArray(listSp)){
+          var cleanSp = listSp.filter(function(s){
+            if(!s || !s.id) return false;
+            if(s.id.match(/^sp_(expelliarmus|protego|stupefy|lumos|wingardium|avada|incendio|accio|sectumsempra|patronum|expecto|alohomora|petrificus)/i)) return false;
+            if(!s.id.match(/\d{6,}/) && !s.id.startsWith('wz_sp_')) return false;
+            return true;
+          });
+          localStorage.setItem(WZ_SPELLS_KEY, JSON.stringify(cleanSp));
+        }
+      }
+      var rawDu = localStorage.getItem(WZ_DUELS_KEY);
+      if(rawDu){
+        var listDu = JSON.parse(rawDu);
+        if(Array.isArray(listDu)){
+          var cleanDu = listDu.filter(function(d){
+            if(!d || !d.id) return false;
+            if(d.id.match(/^duel_(protego_reflect|nonverbal_snap|stupefy_disarm|transfig_shield|combat_apparate|wand_feint)/i)) return false;
+            if(!d.id.match(/\d{6,}/) && !d.id.startsWith('wz_duel_')) return false;
+            return true;
+          });
+          localStorage.setItem(WZ_DUELS_KEY, JSON.stringify(cleanDu));
+        }
+      }
+    }
+  } catch(e){}
+
   function defaultWizardProfile(){
     return {
       id: 'wz_prof_primary',
       name: '',
       title: '',
       house: '',
-      year: '',
-      blood: '',
-      wandWood: '',
-      wandCore: '',
-      wandLength: '',
-      wandFlex: '',
-      patronus: '',
-      pet: '',
-      broom: '',
       level: 1,
       hp: 20,
       maxHp: 20,
       ac: 10,
       mana: 50,
       maxMana: 50,
+      wand: '',
+      robe: '',
+      relic: '',
+      patronus: '',
       galleons: 0,
       sickles: 0,
       knuts: 0,
+      inventory: '',
       notes: ''
     };
   }
@@ -1203,14 +1233,21 @@
         var arr = JSON.parse(raw);
         if(Array.isArray(arr)){
           var userArr = arr.filter(function(s){
-            return s && s.id && !s.id.match(/^sp_(expelliarmus|protego|stupefy|lumos|wingardium|avada|incendio|accio|sectumsempra|patronum)$/);
+            if(!s || !s.id) return false;
+            if(s.id.match(/^sp_(expelliarmus|protego|stupefy|lumos|wingardium|avada|incendio|accio|sectumsempra|patronum|expecto|alohomora|petrificus)/i)) return false;
+            if(!s.id.match(/\d{6,}/) && !s.id.startsWith('wz_sp_')) return false;
+            return true;
           });
           WZ.spells = userArr;
+          if(userArr.length !== arr.length){
+            WZ.saveSpells();
+          }
           return userArr;
         }
       }
     } catch(e){}
     WZ.spells = [];
+    WZ.saveSpells();
     return WZ.spells;
   };
 
@@ -1232,14 +1269,21 @@
         var arr = JSON.parse(raw);
         if(Array.isArray(arr)){
           var userArr = arr.filter(function(d){
-            return d && d.id && !d.id.match(/^duel_(protego_reflect|nonverbal_snap|stupefy_disarm|transfig_shield|combat_apparate|wand_feint)$/);
+            if(!d || !d.id) return false;
+            if(d.id.match(/^duel_(protego_reflect|nonverbal_snap|stupefy_disarm|transfig_shield|combat_apparate|wand_feint)/i)) return false;
+            if(!d.id.match(/\d{6,}/) && !d.id.startsWith('wz_duel_')) return false;
+            return true;
           });
           WZ.duels = userArr;
+          if(userArr.length !== arr.length){
+            WZ.saveDuels();
+          }
           return userArr;
         }
       }
     } catch(e){}
     WZ.duels = [];
+    WZ.saveDuels();
     return WZ.duels;
   };
 
@@ -1597,18 +1641,14 @@
     }
 
     var charDisplayName = p.name ? esc(p.name) : 'Новый персонаж';
-    var charDisplayTitle = p.title ? esc(p.title) : (p.house ? (esc(p.house) + (p.year ? ' • ' + esc(p.year) : '')) : (p.year ? (esc(p.year) + ' • Хогвартс') : 'Ученик Хогвартса'));
+    var charDisplayTitle = p.title ? esc(p.title) : (p.house ? (esc(p.house) + ' • Маг') : 'Волшебник');
 
-    var wandSummary = [];
-    if(p.wandWood) wandSummary.push(esc(p.wandWood));
-    if(p.wandCore) wandSummary.push(esc(p.wandCore));
-    if(p.wandLength) wandSummary.push(esc(p.wandLength));
-    var wandText = wandSummary.length ? wandSummary.join(', ') : 'Палочка не выбрана';
+    var wandText = p.wand ? esc(p.wand) : ((p.wandWood || p.wandCore || p.wandLength) ? [p.wandWood, p.wandCore, p.wandLength].filter(Boolean).map(esc).join(', ') : 'Палочка не указана');
 
     var companions = [];
+    if(p.robe) companions.push('🛡️ ' + esc(p.robe));
+    if(p.relic) companions.push('✨ ' + esc(p.relic));
     if(p.patronus) companions.push('🦌 ' + esc(p.patronus));
-    if(p.pet) companions.push('🦉 ' + esc(p.pet));
-    if(p.broom) companions.push('🧹 ' + esc(p.broom));
     var companionText = companions.length ? companions.join(' • ') : '';
 
     var subBarItems = [];
@@ -1727,265 +1767,395 @@
      ============================================================ */
 
   function wzData(){
-    if(!Array.isArray(WZ.profiles) || WZ.profiles.length === 0) WZ.loadProfiles();
-    var p = WZ.getProfile();
-    var hIcon = getHouseIcon(p.house);
-
-    var profileOptions = (WZ.profiles || []).map(function(item){
-      var itemHouseIcon = getHouseIcon(item.house);
-      var itemLabel = (item.name || 'Безымянный маг') + ' (' + (item.house || 'Хогвартс') + ')';
-      return '<option value="' + escA(item.id) + '" ' + (item.id === p.id ? 'selected' : '') + '>' + itemHouseIcon + ' ' + esc(itemLabel) + '</option>';
-    }).join('');
+    var profList = WZ.profiles || [];
+    if(!profList.length){
+      WZ.loadProfiles();
+      profList = WZ.profiles || [];
+    }
+    var p = WZ.getActiveProfile();
+    var meta = (typeof WZ.getMeta === 'function') ? WZ.getMeta() : (WZ.meta || {});
 
     var houseList = [
-      { id: '', label: 'Не распределен / Без факультета', icon: '👤' },
-      { id: 'Гриффиндор', label: 'Гриффиндор', icon: '🦁' },
-      { id: 'Слизерин', label: 'Слизерин', icon: '🐍' },
-      { id: 'Когтевран', label: 'Когтевран', icon: '🦅' },
-      { id: 'Пуффендуй', label: 'Пуффендуй', icon: '🦡' },
-      { id: 'Без факультета', label: 'Без факультета', icon: '✨' }
+      { id: '', label: 'Без факультета (Не распределен / Свободный маг)', icon: '👤' },
+      { id: 'Гриффиндор', label: 'Гриффиндор (Храбрость и благородство)', icon: '🦁' },
+      { id: 'Слизерин', label: 'Слизерин (Амбиции и хитрость)', icon: '🐍' },
+      { id: 'Когтевран', label: 'Когтевран (Мудрость и острый ум)', icon: '🦅' },
+      { id: 'Пуффендуй', label: 'Пуффендуй (Верность и трудолюбие)', icon: '🦡' },
+      { id: 'Мракоборец / Орден Феникса', label: 'Мракоборец / Орден Феникса', icon: '⚔️' },
+      { id: 'Министерство Магии', label: 'Служащий Министерства Магии', icon: '🏛️' },
+      { id: 'Пожиратель Смерти', label: 'Пожиратель Смерти (Тёмные искусства)', icon: '💀' }
     ];
+
+    var profOptions = profList.map(function(item){
+      var hIcon = getHouseIcon(item.house);
+      var hLabel = item.house ? (' • ' + item.house) : ' • Без факультета';
+      var pTitle = hIcon + ' ' + (item.name || 'Безымянный маг') + hLabel + ' (Ур. ' + (item.level || 1) + ')';
+      return '<option value="' + escA(item.id) + '" ' + (item.id === WZ.activeProfileId ? 'selected' : '') + '>' + esc(pTitle) + '</option>';
+    }).join('');
+
     var houseOptions = houseList.map(function(h){
       return '<option value="' + escA(h.id) + '" ' + ((p.house || '') === h.id ? 'selected' : '') + '>' + h.icon + ' ' + esc(h.label) + '</option>';
     }).join('');
+    if(p.house && !houseList.some(function(h){ return h.id === p.house; })){
+      houseOptions = '<option value="' + escA(p.house) + '" selected>🪄 ' + esc(p.house) + '</option>' + houseOptions;
+    }
 
-    var bloodList = [
-      { id: '', label: 'Не указано' },
-      { id: 'Чистокровный', label: 'Чистокровный' },
-      { id: 'Полукровка', label: 'Полукровка' },
-      { id: 'Маглорожденный', label: 'Маглорожденный' },
-      { id: 'Сквиб', label: 'Сквиб' }
-    ];
-    var bloodOptions = bloodList.map(function(b){
-      return '<option value="' + escA(b.id) + '" ' + ((p.blood || '') === b.id ? 'selected' : '') + '>' + esc(b.label) + '</option>';
-    }).join('');
+    var houseIcon = getHouseIcon(p.house);
 
-    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Данные волшебника' }]) +
+    // Wand unified string for backward compatibility
+    var wandDisplay = p.wand || '';
+    if(!wandDisplay && (p.wandWood || p.wandCore || p.wandLength)){
+      var wandParts = [];
+      if(p.wandWood) wandParts.push(p.wandWood);
+      if(p.wandCore) wandParts.push(p.wandCore);
+      if(p.wandLength) wandParts.push(p.wandLength);
+      if(p.wandFlex) wandParts.push(p.wandFlex);
+      wandDisplay = wandParts.join(', ');
+    }
+
+    // Companions unified string for backward compatibility
+    var companionsDisplay = p.patronus || '';
+    if(p.pet && companionsDisplay.indexOf(p.pet) === -1){
+      companionsDisplay = (companionsDisplay ? (companionsDisplay + ' • ') : '') + 'Питомец: ' + p.pet;
+    }
+    if(p.broom && companionsDisplay.indexOf(p.broom) === -1){
+      companionsDisplay = (companionsDisplay ? (companionsDisplay + ' • ') : '') + 'Метла: ' + p.broom;
+    }
+
+    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Данные' }]) +
       '<button class="back" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">← На главную</button>' +
-      '<div class="wz-char-sheet-card" style="margin-top:12px;">' +
-        '<div class="wz-char-header">' +
-          '<span>' + hIcon + ' Картотека и ростер волшебников</span>' +
-          '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-            '<button class="btn btn-ghost" id="wzProfNewBtn" style="font-size:11px;padding:4px 8px;">➕ Новый</button>' +
-            '<button class="btn btn-ghost" id="wzProfCloneBtn" style="font-size:11px;padding:4px 8px;">📑 Копия</button>' +
-            '<button class="btn btn-ghost" id="wzProfDelBtn" style="font-size:11px;padding:4px 8px;color:#ef4444;">🗑️ Удалить</button>' +
-            '<button class="btn btn-ghost" id="wzProfResetBtn" style="font-size:11px;padding:4px 8px;">🔄 Сброс HP/MP</button>' +
+      '<h1>Данные и Ростер Волшебников</h1>' +
+
+      '<div class="sheet-section wz-data-section">' +
+        '<div class="section-label" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+          '<span>👥 Выбор и управление персонажами</span>' +
+          '<span style="font-size:12px;color:var(--wz-text-muted);">Всего профилей: ' + profList.length + '</span>' +
+        '</div>' +
+        '<div class="desc">' +
+          'Выберите активного волшебника (ученика Хогвартса, профессора, мракоборца или дуэлянта) или создайте нового. Характеристики, палочка, мантия, инвентарь и личные заметки сохраняются индивидуально для каждого мага.' +
+        '</div>' +
+
+        '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:14px 0 12px 0;">' +
+          '<div style="flex:1;min-width:240px;">' +
+            '<label style="display:block;font-size:12px;color:var(--wz-text-muted);margin-bottom:4px;font-weight:600;">Активный персонаж (переключение на лету):</label>' +
+            '<select id="wzDataProfileSelect" class="wz-input" style="width:100%;font-size:14px;padding:9px 12px;border-radius:4px;">' +
+              profOptions +
+            '</select>' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+            '<button class="btn btn-primary" id="wzDataNewProfileBtn" title="Создать нового волшебника">➕ Новый персонаж</button>' +
+            '<button class="btn" id="wzDataCloneProfileBtn" title="Клонировать текущего волшебника">📋 Дублировать</button>' +
           '</div>' +
         '</div>' +
-        '<div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;">' +
-          '<label style="font-size:12px;color:var(--wz-text-muted);font-weight:700;">АКТИВНЫЙ ПРОФИЛЬ:</label>' +
-          '<select id="wzProfSelect" class="wz-input" style="flex:1;min-width:220px;max-width:400px;">' + profileOptions + '</select>' +
+
+        '<div class="wz-char-sheet-card">' +
+          '<div class="wz-char-header">' +
+            '<span>Анкета волшебника: <b style="color:var(--wz-gold, #d4af37);">' + houseIcon + ' ' + esc(p.name || 'Новый волшебник') + '</b></span>' +
+            (p.house ? ('<span class="wz-house-badge ' + getHouseSlug(p.house) + '" style="font-size:11px;">' + houseIcon + ' ' + esc(p.house) + '</span>') : '<span class="wz-house-badge none" style="font-size:11px;">👤 Без факультета</span>') +
+          '</div>' +
+
+          '<div class="wz-edit-grid">' +
+            '<div class="wz-edit-item">' +
+              '<label>Имя и фамилия</label>' +
+              '<input type="text" id="wzDataInName" class="wz-input" value="' + escA(p.name || '') + '" placeholder="Имя волшебника">' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>Факультет / Принадлежность</label>' +
+              '<select id="wzDataInHouse" class="wz-input">' + houseOptions + '</select>' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>Титул / Прозвище / Роль</label>' +
+              '<input type="text" id="wzDataInTitle" class="wz-input" value="' + escA(p.title || '') + '" placeholder="Например: Ловец сборной, Мракоборец, Мастер зелий">' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>Уровень волшебника</label>' +
+              '<input type="number" min="1" max="20" id="wzDataInLevel" class="wz-input" value="' + escA(p.level != null ? p.level : '1') + '" placeholder="1">' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>Очки здоровья (HP)</label>' +
+              '<input type="number" id="wzDataInHp" class="wz-input" value="' + escA(p.hp != null ? p.hp : '20') + '" placeholder="20">' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>Максимум HP</label>' +
+              '<input type="number" id="wzDataInMaxHp" class="wz-input" value="' + escA(p.maxHp != null ? p.maxHp : '20') + '" placeholder="20">' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>Класс брони (КБ / Защитные чары)</label>' +
+              '<input type="number" id="wzDataInAc" class="wz-input" value="' + escA(p.ac != null ? p.ac : '10') + '" placeholder="10">' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>Запас Маны / MP</label>' +
+              '<input type="number" id="wzDataInMana" class="wz-input" value="' + escA(p.mana != null ? p.mana : '50') + '" placeholder="50">' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>Максимум Маны</label>' +
+              '<input type="number" id="wzDataInMaxMana" class="wz-input" value="' + escA(p.maxMana != null ? p.maxMana : '50') + '" placeholder="50">' +
+            '</div>' +
+            '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+              '<label>🪄 Волшебная палочка (Древесина, сердцевина, длина)</label>' +
+              '<input type="text" id="wzDataInWand" class="wz-input" value="' + escA(wandDisplay) + '" placeholder="Например: Остролист и перо феникса, 11 дюймов, упругая">' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>🛡️ Мантия / Защитное облачение</label>' +
+              '<input type="text" id="wzDataInRobe" class="wz-input" value="' + escA(p.robe || '') + '" placeholder="Школьная мантия, Защитный плащ, Шерсть демимаски">' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>✨ Особый артефакт / Реликвия</label>' +
+              '<input type="text" id="wzDataInRelic" class="wz-input" value="' + escA(p.relic || '') + '" placeholder="Мантия-невидимка, Маховик времени, Напоминалка">' +
+            '</div>' +
+            '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+              '<label>🦌 Патронус / Фамильяр / Метла</label>' +
+              '<input type="text" id="wzDataInPatronus" class="wz-input" value="' + escA(companionsDisplay) + '" placeholder="Например: Патронус Олень • Сова Букля • Метла «Молния»">' +
+            '</div>' +
+            '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+              '<label>🪙 Сейф Гринготтса (Валюта волшебников)</label>' +
+              '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">' +
+                '<input type="number" min="0" id="wzDataInGalleons" class="wz-input" value="' + escA(p.galleons || 0) + '" placeholder="0" title="Золотые галеоны"> ' +
+                '<input type="number" min="0" id="wzDataInSickles" class="wz-input" value="' + escA(p.sickles || 0) + '" placeholder="0" title="Серебряные сикли"> ' +
+                '<input type="number" min="0" id="wzDataInKnuts" class="wz-input" value="' + escA(p.knuts || 0) + '" placeholder="0" title="Бронзовые кнаты"> ' +
+              '</div>' +
+              '<div style="font-size:11px;color:var(--wz-text-muted);margin-top:4px;">1 Галеон (слева) = 17 Сиклей (в центре) = 493 Кната (справа).</div>' +
+            '</div>' +
+            '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+              '<label>🎒 Инвентарь, флаконы с зельями и ингредиенты</label>' +
+              '<textarea id="wzDataInInventory" class="wz-input" rows="3" placeholder="Котёл, флаконы рябинового отвара, корень мандрагоры, пергаменты...">' + esc(p.inventory || '') + '</textarea>' +
+            '</div>' +
+            '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+              '<label>📜 Заметки, биография и магические цели</label>' +
+              '<textarea id="wzDataInNotes" class="wz-input" rows="3" placeholder="История волшебника, анимагическая форма, союзники, дуэльные рекорды...">' + esc(p.notes || '') + '</textarea>' +
+            '</div>' +
+          '</div>' +
+
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px;">' +
+            '<button class="btn btn-primary" id="wzDataSaveCharBtn">✓ Сохранить анкету</button>' +
+            '<button class="btn" id="wzDataResetProfileBtn" title="Восстановить HP и Ману персонажа">🔄 Сбросить статы</button>' +
+            '<button class="btn" id="wzDataDelProfileBtn" style="color:#ff7675;border-color:rgba(231,76,60,0.4);margin-left:auto;" title="Удалить текущий профиль">🗑️ Удалить профиль</button>' +
+          '</div>' +
         '</div>' +
       '</div>' +
 
-      '<div class="wz-char-sheet-card" style="margin-top:16px;">' +
-        '<div class="wz-char-header"><span>🧙‍♂️ Личное дело учащегося / мага</span></div>' +
-        '<div class="wz-edit-grid">' +
-          '<div class="wz-edit-item">' +
-            '<label>Имя и фамилия</label>' +
-            '<input type="text" id="wzCharName" class="wz-input" value="' + escA(p.name || '') + '" placeholder="Например: Гарри Поттер">' +
+      '<div class="sheet-section wz-data-section">' +
+        '<div class="section-label">Параметры мира и кампании</div>' +
+        fldWz('Название хроник / Кампании', '<input id="wzWName" class="wz-input" type="text" value="' + escA(meta.name || '') + '">') +
+        fldWz('Заметки хроник Хогвартса и Магического Мира', '<textarea id="wzWNote" class="wz-input" rows="3">' + esc(meta.note || '') + '</textarea>') +
+        '<div class="sheet-actions"><button class="btn-primary" id="wzWSave">Сохранить мир</button></div>' +
+      '</div>' +
+
+      (typeof GHSync !== 'undefined' ? GHSync.renderUI() : '') +
+
+      '<div class="gh-sync-card" id="wzGeminiApiSection" style="margin-top:20px; margin-bottom:20px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">' +
+          '<span style="font-size:20px;">🤖</span>' +
+          '<div>' +
+            '<div style="font-weight:700;font-size:14px;color:var(--wz-gold, #d4af37);">Google Gemini AI (Интеграция ИИ)</div>' +
+            '<div style="font-size:12px;color:var(--wz-text-muted);">Генерация уникальных заклинаний, дуэльных приёмов и магических тайн</div>' +
           '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Титул / Прозвище / Звание</label>' +
-            '<input type="text" id="wzCharTitle" class="wz-input" value="' + escA(p.title || '') + '" placeholder="Например: Ловец сборной Гриффиндора">' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Факультет Хогвартса</label>' +
-            '<select id="wzCharHouse" class="wz-input">' + houseOptions + '</select>' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Курс / Статус</label>' +
-            '<input type="text" id="wzCharYear" class="wz-input" value="' + escA(p.year || '') + '" placeholder="1-7 курс / Выпускник / Мракоборец">' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Чистота крови</label>' +
-            '<select id="wzCharBlood" class="wz-input">' + bloodOptions + '</select>' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Уровень волшебника</label>' +
-            '<input type="number" id="wzCharLevel" class="wz-input" value="' + (p.level || 1) + '" min="1" max="20">' +
-          '</div>' +
+        '</div>' +
+        '<p style="font-size:12px;color:var(--wz-text-muted);margin:0 0 12px 0;">Ключ безопасно хранится <b style="color:var(--wz-gold, #d4af37);">только в браузере этого устройства</b>. Получить бесплатный API-ключ можно за пару минут в <a href="https://aistudio.google.com/" target="_blank" style="color:var(--wz-gold-light, #fef08a);text-decoration:underline;">Google AI Studio</a>.</p>' +
+        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">' +
+          '<input type="password" id="wzDataGeminiKey" value="' + escA(typeof window.getGeminiApiKey === 'function' ? window.getGeminiApiKey() : '') + '" placeholder="Вставьте ключ AIzaSy..." style="flex:1; min-width:200px; background:rgba(0,0,0,0.5); border:1px solid rgba(212,175,55,0.3); color:#fff; padding:8px 12px; border-radius:4px; font-family:monospace; font-size:13px;">' +
+          '<button class="btn-primary" id="wzDataSaveGeminiKey" style="background:linear-gradient(135deg, #78350f, #d4af37); border:none; padding:8px 16px; border-radius:4px; color:#fff; font-weight:bold; cursor:pointer;">💾 Сохранить API Ключ</button>' +
         '</div>' +
       '</div>' +
 
-      '<div class="wz-char-sheet-card" style="margin-top:16px;">' +
-        '<div class="wz-char-header"><span>🪄 Волшебная палочка (Мастерская Олливандера)</span></div>' +
-        '<div class="wz-edit-grid">' +
-          '<div class="wz-edit-item">' +
-            '<label>Древесина</label>' +
-            '<input type="text" id="wzCharWandWood" class="wz-input" value="' + escA(p.wandWood || '') + '" placeholder="Остролист, Тис, Бузина, Дуб, Ясень">' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Сердцевина</label>' +
-            '<input type="text" id="wzCharWandCore" class="wz-input" value="' + escA(p.wandCore || '') + '" placeholder="Перо феникса, Жила дракона, Волос единорога">' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Длина палочки</label>' +
-            '<input type="text" id="wzCharWandLength" class="wz-input" value="' + escA(p.wandLength || '') + '" placeholder="Например: 11 дюймов (28 см)">' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Гибкость / Характер</label>' +
-            '<input type="text" id="wzCharWandFlex" class="wz-input" value="' + escA(p.wandFlex || '') + '" placeholder="Упругая, Жесткая, Гибкая">' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
+      (typeof AppStorage !== 'undefined' ? AppStorage.renderWidget('wz') : '') +
 
-      '<div class="wz-char-sheet-card" style="margin-top:16px;">' +
-        '<div class="wz-char-header"><span>🦌 Магические спутники и снаряжение</span></div>' +
-        '<div class="wz-edit-grid">' +
-          '<div class="wz-edit-item">' +
-            '<label>Телесный Патронус</label>' +
-            '<input type="text" id="wzCharPatronus" class="wz-input" value="' + escA(p.patronus || '') + '" placeholder="Олень, Выдра, Лань, Феникс, Волк">' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Питомец / Фамильяр</label>' +
-            '<input type="text" id="wzCharPet" class="wz-input" value="' + escA(p.pet || '') + '" placeholder="Полярная сова, Черный кот, Жаба, Крыса">' +
-          '</div>' +
-          '<div class="wz-edit-item" style="grid-column:1/-1;">' +
-            '<label>Летающая метла</label>' +
-            '<input type="text" id="wzCharBroom" class="wz-input" value="' + escA(p.broom || '') + '" placeholder="«Молния», «Нимбус-2000», «Чистомёт-7»">' +
-          '</div>' +
+      '<div class="sheet-section wz-data-section">' +
+        '<div class="section-label">Экспорт и импорт</div>' +
+        '<div class="desc">Единый файл на весь режим «Волшебник»: все профили волшебников, заклинания, дуэли, инвентарь и хроники Хогвартса. Импорт заменяет текущее содержимое.</div>' +
+        '<div class="sheet-actions">' +
+          '<button class="btn-primary" id="wzExport">Экспорт в файл</button>' +
+          '<button class="btn-ghost" id="wzImportBtn">Импорт из файла</button>' +
+          '<input type="file" id="wzImportFile" accept="application/json,.json" style="display:none">' +
         '</div>' +
-      '</div>' +
-
-      '<div class="wz-char-sheet-card" style="margin-top:16px;">' +
-        '<div class="wz-char-header"><span>⚔️ Боевые параметры и характеристики</span></div>' +
-        '<div class="wz-edit-grid">' +
-          '<div class="wz-edit-item">' +
-            '<label>Текущее HP</label>' +
-            '<input type="number" id="wzCharHp" class="wz-input" value="' + (p.hp != null ? p.hp : 20) + '">' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Максимальное HP</label>' +
-            '<input type="number" id="wzCharMaxHp" class="wz-input" value="' + (p.maxHp != null ? p.maxHp : 20) + '">' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Текущая Мана / MP</label>' +
-            '<input type="number" id="wzCharMana" class="wz-input" value="' + (p.mana != null ? p.mana : 50) + '">' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Максимальная Мана</label>' +
-            '<input type="number" id="wzCharMaxMana" class="wz-input" value="' + (p.maxMana != null ? p.maxMana : 50) + '">' +
-          '</div>' +
-          '<div class="wz-edit-item" style="grid-column:1/-1;">' +
-            '<label>Класс брони (КБ / Защитные чары)</label>' +
-            '<input type="number" id="wzCharAc" class="wz-input" value="' + (p.ac != null ? p.ac : 10) + '">' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-
-      '<div class="wz-char-sheet-card" style="margin-top:16px;">' +
-        '<div class="wz-char-header"><span>🪙 Сейф в Банке Гринготтс (Валюта)</span></div>' +
-        '<div class="wz-edit-grid">' +
-          '<div class="wz-edit-item">' +
-            '<label>Золотые галеоны (Galleons)</label>' +
-            '<input type="number" id="wzCharGalleons" class="wz-input" value="' + (p.galleons || 0) + '">' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Серебряные сикли (Sickles)</label>' +
-            '<input type="number" id="wzCharSickles" class="wz-input" value="' + (p.sickles || 0) + '">' +
-          '</div>' +
-          '<div class="wz-edit-item">' +
-            '<label>Бронзовые кнаты (Knuts)</label>' +
-            '<input type="number" id="wzCharKnuts" class="wz-input" value="' + (p.knuts || 0) + '">' +
-          '</div>' +
-        '</div>' +
-        '<div style="font-size:11.5px;color:var(--wz-text-muted);margin-top:8px;">Курс Гринготтса: 1 Галеон = 17 Сиклей = 493 Кната.</div>' +
-      '</div>' +
-
-      '<div class="wz-char-sheet-card" style="margin-top:16px;">' +
-        '<div class="wz-char-header"><span>📝 Биография, таланты и заметки</span></div>' +
-        '<div class="wz-edit-item" style="margin-top:10px;">' +
-          '<textarea id="wzCharNotes" class="wz-input" rows="5" placeholder="История волшебника, анимагическая форма, особые способности, связи с Пожирателями смерти или Орденом Феникса...">' + esc(p.notes || '') + '</textarea>' +
-        '</div>' +
-      '</div>' +
-
-      '<div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px;margin-bottom:30px;">' +
-        '<button class="btn btn-ghost" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">Отмена</button>' +
-        '<button class="btn btn-primary" id="wzCharSaveBtn" style="padding:10px 24px;font-size:14px;">💾 Сохранить анкету</button>' +
       '</div>';
   }
 
   function wireWzData(){
-    var sel = document.getElementById('wzProfSelect');
+    if(typeof HB === 'undefined' || HB.mode !== 'wz') return;
+    if(typeof GHSync !== 'undefined' && GHSync.wireUI) GHSync.wireUI();
+    if(typeof AppStorage !== 'undefined' && AppStorage.wireWidget) AppStorage.wireWidget('wz');
+
+    var g = function(id){ return document.getElementById(id); };
+    var v = function(id){ var e = g(id); return e ? e.value : ''; };
+
+    // Выбор активного профиля
+    var sel = g('wzDataProfileSelect');
     if(sel){
       sel.addEventListener('change', function(){
-        WZ.switchProfile(sel.value);
+        WZ.switchProfile(this.value);
       });
     }
 
-    var newBtn = document.getElementById('wzProfNewBtn');
+    // Создание нового профиля
+    var newBtn = g('wzDataNewProfileBtn');
     if(newBtn){
       newBtn.addEventListener('click', function(){
-        var name = prompt('Имя нового волшебника:');
+        var name = prompt('Введите имя нового волшебника (или оставьте пустым):', '');
         if(name !== null){
           WZ.createProfile({ name: name.trim() });
-          WZ.toast('✓ Создана новая анкета: ' + (name.trim() || 'Новый маг'), 'success');
+          WZ.toast('✓ Создана новая анкета: ' + (name.trim() || 'Новый волшебник'), 'success');
         }
       });
     }
 
-    var cloneBtn = document.getElementById('wzProfCloneBtn');
+    // Дублирование профиля
+    var cloneBtn = g('wzDataCloneProfileBtn');
     if(cloneBtn){
       cloneBtn.addEventListener('click', function(){
-        WZ.cloneProfile();
+        WZ.cloneProfile(WZ.activeProfileId);
         WZ.toast('✓ Анкета скопирована', 'success');
       });
     }
 
-    var delBtn = document.getElementById('wzProfDelBtn');
+    // Сброс статов
+    var resetBtn = g('wzDataResetProfileBtn');
+    if(resetBtn){
+      resetBtn.addEventListener('click', function(){
+        var p = WZ.getActiveProfile();
+        var name = p && p.name ? ('«' + p.name + '»') : 'текущего волшебника';
+        if(confirm('Восстановить HP и Ману персонажа ' + name + ' до максимума? Снаряжение и заклинания сохранятся.')){
+          WZ.resetProfile(WZ.activeProfileId);
+          WZ.toast('🔄 HP и Мана восстановлены до максимума', 'success');
+        }
+      });
+    }
+
+    // Удаление профиля
+    var delBtn = g('wzDataDelProfileBtn');
     if(delBtn){
       delBtn.addEventListener('click', function(){
-        var p = WZ.getProfile();
-        if(!confirm('Удалить анкету «' + (p.name || 'Безымянный маг') + '»?')) return;
-        WZ.deleteProfile();
+        var p = WZ.getActiveProfile();
+        var name = p && p.name ? ('«' + p.name + '»') : 'этого волшебника';
+        if(!confirm('Удалить анкету ' + name + '? Это действие необратимо.')) return;
+        WZ.deleteProfile(WZ.activeProfileId);
         WZ.toast('🗑️ Анкета удалена', 'info');
       });
     }
 
-    var resetBtn = document.getElementById('wzProfResetBtn');
-    if(resetBtn){
-      resetBtn.addEventListener('click', function(){
-        WZ.resetProfile();
-        WZ.toast('🔄 HP и Мана восстановлены до максимума', 'success');
-      });
-    }
+    // Сохранение анкеты
+    var saveCharBtn = g('wzDataSaveCharBtn');
+    if(saveCharBtn){
+      saveCharBtn.addEventListener('click', function(){
+        var p = WZ.getActiveProfile();
+        p.name = (v('wzDataInName') || '').trim();
+        p.house = (v('wzDataInHouse') || '').trim();
+        p.title = (v('wzDataInTitle') || '').trim();
+        p.level = parseInt(v('wzDataInLevel'), 10) || 1;
+        p.hp = parseInt(v('wzDataInHp'), 10) || 0;
+        p.maxHp = parseInt(v('wzDataInMaxHp'), 10) || 20;
+        p.ac = parseInt(v('wzDataInAc'), 10) || 10;
+        p.mana = parseInt(v('wzDataInMana'), 10) || 0;
+        p.maxMana = parseInt(v('wzDataInMaxMana'), 10) || 50;
 
-    var saveBtn = document.getElementById('wzCharSaveBtn');
-    if(saveBtn){
-      saveBtn.addEventListener('click', function(){
-        var p = WZ.getProfile();
-        p.name = (document.getElementById('wzCharName').value || '').trim();
-        p.title = (document.getElementById('wzCharTitle').value || '').trim();
-        p.house = document.getElementById('wzCharHouse').value;
-        p.year = (document.getElementById('wzCharYear').value || '').trim();
-        p.blood = document.getElementById('wzCharBlood').value;
-        p.level = parseInt(document.getElementById('wzCharLevel').value, 10) || 1;
+        p.wand = (v('wzDataInWand') || '').trim();
+        p.robe = (v('wzDataInRobe') || '').trim();
+        p.relic = (v('wzDataInRelic') || '').trim();
+        p.patronus = (v('wzDataInPatronus') || '').trim();
 
-        p.wandWood = (document.getElementById('wzCharWandWood').value || '').trim();
-        p.wandCore = (document.getElementById('wzCharWandCore').value || '').trim();
-        p.wandLength = (document.getElementById('wzCharWandLength').value || '').trim();
-        p.wandFlex = (document.getElementById('wzCharWandFlex').value || '').trim();
+        p.galleons = parseInt(v('wzDataInGalleons'), 10) || 0;
+        p.sickles = parseInt(v('wzDataInSickles'), 10) || 0;
+        p.knuts = parseInt(v('wzDataInKnuts'), 10) || 0;
 
-        p.patronus = (document.getElementById('wzCharPatronus').value || '').trim();
-        p.pet = (document.getElementById('wzCharPet').value || '').trim();
-        p.broom = (document.getElementById('wzCharBroom').value || '').trim();
-
-        p.hp = parseInt(document.getElementById('wzCharHp').value, 10) || 0;
-        p.maxHp = parseInt(document.getElementById('wzCharMaxHp').value, 10) || 1;
-        p.mana = parseInt(document.getElementById('wzCharMana').value, 10) || 0;
-        p.maxMana = parseInt(document.getElementById('wzCharMaxMana').value, 10) || 1;
-        p.ac = parseInt(document.getElementById('wzCharAc').value, 10) || 10;
-
-        p.galleons = parseInt(document.getElementById('wzCharGalleons').value, 10) || 0;
-        p.sickles = parseInt(document.getElementById('wzCharSickles').value, 10) || 0;
-        p.knuts = parseInt(document.getElementById('wzCharKnuts').value, 10) || 0;
-
-        p.notes = (document.getElementById('wzCharNotes').value || '').trim();
+        p.inventory = (v('wzDataInInventory') || '').trim();
+        p.notes = (v('wzDataInNotes') || '').trim();
 
         WZ.saveProfiles();
         WZ.toast('✓ Анкета успешно сохранена!', 'success');
         if(typeof render === 'function') render();
+      });
+    }
+
+    // Сохранение параметров мира
+    var saveWorldBtn = g('wzWSave');
+    if(saveWorldBtn){
+      saveWorldBtn.addEventListener('click', function(){
+        var meta = WZ.getMeta();
+        meta.name = (v('wzWName') || '').trim();
+        meta.note = (v('wzWNote') || '').trim();
+        WZ.saveMeta(meta);
+        WZ.toast('✓ Параметры магического мира сохранены!', 'success');
+      });
+    }
+
+    // Сохранение Gemini API ключа
+    var saveGeminiBtn = g('wzDataSaveGeminiKey');
+    if(saveGeminiBtn){
+      saveGeminiBtn.addEventListener('click', function(){
+        var inp = g('wzDataGeminiKey');
+        var k = inp ? inp.value.trim() : '';
+        if(typeof window.setGeminiApiKey === 'function'){
+          window.setGeminiApiKey(k);
+        } else {
+          try{ localStorage.setItem('gemini_api_key', k); }catch(e){}
+        }
+        WZ.toast(k ? '✓ API-ключ Gemini успешно сохранён!' : 'API-ключ удалён', 'success');
+      });
+    }
+
+    // Экспорт в файл (JSON)
+    var ex = g('wzExport');
+    if(ex){
+      ex.addEventListener('click', function(){
+        var payload = {
+          kind: 'wizard',
+          version: 1,
+          meta: WZ.meta,
+          profiles: WZ.profiles,
+          activeProfileId: WZ.activeProfileId,
+          spells: WZ.spells || [],
+          duels: WZ.duels || [],
+          routes: WZ.map ? WZ.map.routes : null
+        };
+        var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = ((WZ.meta && WZ.meta.name) || 'wizard_chronicles').replace(/[^\wа-яА-ЯёЁ\- ]/g, '') + '.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); }, 600);
+      });
+    }
+
+    // Импорт из файла
+    var ib = g('wzImportBtn'), ifl = g('wzImportFile');
+    if(ib && ifl){
+      ib.addEventListener('click', function(){ ifl.click(); });
+      ifl.addEventListener('change', function(){
+        var f = ifl.files && ifl.files[0];
+        if(!f) return;
+        var fr = new FileReader();
+        fr.onload = function(){
+          try {
+            var data = JSON.parse(fr.result);
+            if(!data || (!Array.isArray(data.profiles) && !data.meta)) throw 0;
+            if(!confirm('Заменить текущие данные режима «Волшебник» данными из файла?')) return;
+            if(Array.isArray(data.profiles) && data.profiles.length > 0){
+              WZ.profiles = data.profiles;
+              WZ.activeProfileId = data.activeProfileId || data.profiles[0].id;
+              WZ.saveProfiles();
+            }
+            if(Array.isArray(data.spells)){
+              WZ.spells = data.spells;
+              WZ.saveSpells();
+            }
+            if(Array.isArray(data.duels)){
+              WZ.duels = data.duels;
+              WZ.saveDuels();
+            }
+            if(data.meta){
+              WZ.meta = data.meta;
+              WZ.saveMeta(data.meta);
+            }
+            if(typeof paintShBar === 'function') paintShBar();
+            if(typeof render === 'function') render();
+            WZ.toast('✓ Данные успешно импортированы!', 'success');
+          } catch(e){
+            alert('Не удалось прочитать файл резервной копии.');
+          }
+        };
+        fr.readAsText(f);
       });
     }
 
@@ -2188,7 +2358,7 @@
   function wzSpellEdit(id){
     var isNew = (id === 'new' || !id);
     var s = isNew ? {
-      id: 'sp_' + Date.now(),
+      id: 'wz_sp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
       name: '',
       icon: '✨',
       cat: 'Боевые заклятия',
@@ -2383,7 +2553,7 @@
   function wzDuelEdit(id){
     var isNew = (id === 'new' || !id);
     var d = isNew ? {
-      id: 'duel_' + Date.now(),
+      id: 'wz_duel_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
       name: '',
       icon: '⚔️',
       kind: 'Атакующий финт',
@@ -4062,7 +4232,7 @@
         var s = window._lastGenWzSpell;
         if(!s) return;
         var item = {
-          id: 'sp_' + Date.now(),
+          id: 'wz_sp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
           name: s.name || 'Сгенерированное заклинание',
           incantation: s.incantation || '',
           icon: s.icon || '✨',
@@ -4172,7 +4342,7 @@
         var d = window._lastGenWzDuel;
         if(!d) return;
         var item = {
-          id: 'duel_' + Date.now(),
+          id: 'wz_duel_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
           name: d.name || 'Дуэльный приём',
           icon: d.icon || '⚔️',
           kind: d.kind || 'Атакующий финт',
