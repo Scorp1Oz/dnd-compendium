@@ -310,6 +310,56 @@ window.render=function(){
       paintShBar();
       return;
     }
+    if(s === 'wzSkills'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzSkills === 'function') ? wzSkills() : '<div>Навыки</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzSkills === 'function') wireWzSkills();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzSkillView'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var skillId = view.skillId || view.shId || '';
+      var html = (typeof wzSkillView === 'function') ? wzSkillView(skillId) : '<div>Навык</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzSkillView === 'function') wireWzSkillView(skillId);
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzSkillEdit'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var skillId = view.skillId || view.shId || '';
+      var html = (typeof wzSkillEdit === 'function') ? wzSkillEdit(skillId) : '<div>Редактор навыка</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzSkillEdit === 'function') wireWzSkillEdit(skillId);
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzSkillGen'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzSkillGen === 'function') ? wzSkillGen() : '<div>AI Генератор навыков</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzSkillGen === 'function') wireWzSkillGen();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
     if(s === 'wzMap'){
       var app = document.getElementById('app');
       app.classList.remove('wide');
@@ -828,6 +878,9 @@ window.navigate=function(val){
       spells: 'wzSpells',
       wzDuels: 'wzDuels',
       duels: 'wzDuels',
+      wzSkills: 'wzSkills',
+      skills: 'wzSkills',
+      wzSkillGen: 'wzSkillGen',
       wzSpellGen: 'wzSpellGen',
       wzDuelGen: 'wzDuelGen',
       wzMap: 'wzMap',
@@ -854,6 +907,12 @@ window.navigate=function(val){
     }
     if(p[0] === 'wzDuelView' || p[0] === 'wzDuelEdit'){
       window.view = view = { screen: p[0], duelId: p[1], shId: p[1] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'wzSkillView' || p[0] === 'wzSkillEdit'){
+      window.view = view = { screen: p[0], skillId: p[1], shId: p[1] };
       render();
       window.scrollTo(0,0);
       return;

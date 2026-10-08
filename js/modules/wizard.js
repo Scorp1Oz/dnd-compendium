@@ -10,6 +10,7 @@
   var WZ_META_KEY = 'ttc_wz_meta';
   var WZ_SPELLS_KEY = 'ttc_wz_spells';
   var WZ_DUELS_KEY = 'ttc_wz_duels';
+  var WZ_SKILLS_KEY = 'ttc_wz_skills';
   var WZ_ROUTE_KEY = 'ttc_wz_route';
   var WZ_MARKERS_KEY = 'ttc_wz_markers';
 
@@ -422,6 +423,17 @@
 
     triggerModeSwitchEffect: function(targetElement, event){
       if(typeof document === 'undefined' || !document.body) return;
+      // Вспышка на кнопке
+      if(targetElement && targetElement.classList){
+        targetElement.classList.remove('wz-btn-flare');
+        void targetElement.offsetWidth;
+        targetElement.classList.add('wz-btn-flare');
+        setTimeout(function(){
+          if(targetElement.classList) targetElement.classList.remove('wz-btn-flare');
+        }, 400);
+      }
+
+      // Тонкие золотистые искры возле кнопки (аккуратный ненавязчивый микро-эффект)
       var x, y;
       if(event && event.clientX && event.clientY){
         x = event.clientX;
@@ -431,45 +443,20 @@
         x = r.left + r.width / 2;
         y = r.top + r.height / 2;
       } else {
-        x = window.innerWidth / 2;
-        y = 48;
+        return;
       }
 
-      // 1. Вспышка на кнопке
-      if(targetElement && targetElement.classList){
-        targetElement.classList.remove('wz-btn-flare');
-        void targetElement.offsetWidth;
-        targetElement.classList.add('wz-btn-flare');
-        setTimeout(function(){
-          if(targetElement && targetElement.classList) targetElement.classList.remove('wz-btn-flare');
-        }, 600);
-      }
-
-      // 2. Расширяющаяся световая волна заклинания
-      var ripple = document.createElement('div');
-      ripple.className = 'wz-spell-ripple';
-      ripple.style.left = x + 'px';
-      ripple.style.top = y + 'px';
-      document.body.appendChild(ripple);
-      setTimeout(function(){
-        if(ripple && ripple.parentNode) ripple.parentNode.removeChild(ripple);
-      }, 850);
-
-      // 3. Россыпь магических искр из точки клика
       var sparkColors = [
-        { bg: 'radial-gradient(circle, #fff 20%, #facc15 65%, rgba(212,175,55,0) 100%)', shadow: '0 0 8px #fde047, 0 0 16px rgba(234, 179, 8, 0.85)' },
-        { bg: 'radial-gradient(circle, #fff 20%, #c084fc 65%, rgba(192,132,252,0) 100%)', shadow: '0 0 8px #d8b4fe, 0 0 16px rgba(192, 132, 252, 0.85)' },
-        { bg: 'radial-gradient(circle, #fff 20%, #38bdf8 65%, rgba(56,189,248,0) 100%)', shadow: '0 0 8px #7dd3fc, 0 0 16px rgba(56, 189, 248, 0.85)' },
-        { bg: 'radial-gradient(circle, #fff 35%, #f1f5f9 70%, rgba(255,255,255,0) 100%)', shadow: '0 0 7px #ffffff, 0 0 14px rgba(255, 255, 255, 0.9)' }
+        { bg: 'radial-gradient(circle, #fff 30%, #facc15 70%, rgba(212,175,55,0) 100%)', shadow: '0 0 5px #fde047' },
+        { bg: 'radial-gradient(circle, #fff 30%, #c084fc 70%, rgba(192,132,252,0) 100%)', shadow: '0 0 5px #d8b4fe' }
       ];
 
-      var sparkCount = 18;
-      for(var i = 0; i < sparkCount; i++){
+      for(var i = 0; i < 6; i++){
         (function(idx){
           var sp = document.createElement('div');
           sp.className = 'wz-mode-spark';
           var col = sparkColors[idx % sparkColors.length];
-          var sz = Math.random() * 4 + 3.5;
+          var sz = Math.random() * 2.5 + 2.5;
           sp.style.width = sz + 'px';
           sp.style.height = sz + 'px';
           sp.style.background = col.bg;
@@ -477,14 +464,14 @@
           sp.style.left = x + 'px';
           sp.style.top = y + 'px';
           sp.style.transform = 'translate(-50%, -50%) scale(1)';
-          sp.style.transition = 'transform 0.75s cubic-bezier(0.1, 0.8, 0.25, 1), opacity 0.75s ease-out';
-          sp.style.opacity = '1';
+          sp.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
+          sp.style.opacity = '0.9';
           document.body.appendChild(sp);
 
-          var angle = (idx / sparkCount) * 2 * Math.PI + (Math.random() * 0.4 - 0.2);
-          var dist = Math.random() * 75 + 45;
+          var angle = (idx / 6) * 2 * Math.PI + (Math.random() * 0.4 - 0.2);
+          var dist = Math.random() * 28 + 18;
           var destX = Math.cos(angle) * dist;
-          var destY = Math.sin(angle) * dist + (Math.random() * 18);
+          var destY = Math.sin(angle) * dist;
 
           requestAnimationFrame(function(){
             sp.style.transform = 'translate(calc(-50% + ' + destX.toFixed(1) + 'px), calc(-50% + ' + destY.toFixed(1) + 'px)) scale(0.2)';
@@ -493,26 +480,9 @@
 
           setTimeout(function(){
             if(sp && sp.parentNode) sp.parentNode.removeChild(sp);
-          }, 850);
+          }, 450);
         })(i);
       }
-
-      // 4. Всплывающая инкантация
-      var incantations = [
-        '✨ Revelio!',
-        '🪄 Lumos Maxima!',
-        '✨ Alohomora!',
-        '⚡ Expecto Patronum!',
-        '🪄 Accio Hogwarts!'
-      ];
-      var charm = incantations[Math.floor(Math.random() * incantations.length)];
-      var toast = document.createElement('div');
-      toast.className = 'wz-spell-incantation-toast';
-      toast.textContent = charm;
-      document.body.appendChild(toast);
-      setTimeout(function(){
-        if(toast && toast.parentNode) toast.parentNode.removeChild(toast);
-      }, 1400);
     },
 
     triggerCardFlourish: function(el, event){
@@ -1469,6 +1439,82 @@
     return (WZ.duels || []).find(function(d){ return d.id === id; });
   };
 
+  /* Методы загрузки и сохранения магических навыков */
+  var WZ_SKILL_KINDS = [
+    'Академические дисциплины',
+    'Практическое мастерство',
+    'Высшие магические искусства',
+    'Артефакторика и ремесло',
+    'Быт и знание мира'
+  ];
+
+  var WZ_SKILL_LEVELS = [
+    'Начатки',
+    'Ученик',
+    'Практик',
+    'Мастер'
+  ];
+
+  var WZ_SKILL_ABILS = [
+    'Интеллект',
+    'Мудрость',
+    'Харизма',
+    'Ловкость',
+    'Сила',
+    'Телосложение'
+  ];
+
+  function getWzSkillLevelSlug(lvl){
+    if(!lvl) return 'nachatki';
+    var s = String(lvl).toLowerCase();
+    if(s.indexOf('начат') >= 0) return 'nachatki';
+    if(s.indexOf('учен') >= 0) return 'uchenik';
+    if(s.indexOf('практ') >= 0) return 'praktik';
+    if(s.indexOf('маст') >= 0) return 'master';
+    return 'nachatki';
+  }
+
+  function newWzSkill(){
+    return {
+      id: 'wz_sk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      name: '',
+      kind: 'Академические дисциплины',
+      level: 'Ученик',
+      abil: 'Интеллект',
+      mod: '',
+      source: '',
+      gives: '',
+      desc: ''
+    };
+  }
+
+  WZ.loadSkills = function(){
+    try {
+      var raw = localStorage.getItem(WZ_SKILLS_KEY);
+      if(raw){
+        var arr = JSON.parse(raw);
+        if(Array.isArray(arr)){
+          WZ.skills = arr;
+          return arr;
+        }
+      }
+    } catch(e){}
+    WZ.skills = [];
+    WZ.saveSkills();
+    return WZ.skills;
+  };
+
+  WZ.saveSkills = function(){
+    try {
+      localStorage.setItem(WZ_SKILLS_KEY, JSON.stringify(WZ.skills || []));
+    } catch(e){}
+  };
+
+  WZ.getSkillById = function(id){
+    if(!WZ.skills) WZ.loadSkills();
+    return (WZ.skills || []).find(function(s){ return s.id === id; });
+  };
+
   WZ.loadRoute = function(){
     try {
       var raw = localStorage.getItem(WZ_ROUTE_KEY);
@@ -1873,6 +1919,13 @@
         '</div>' +
         '<div class="wz-card-arrow">→</div>' +
       '</div>' +
+      '<div class="wz-card wz-card-clickable" data-nav="wzSkills" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkills\');" role="button" tabindex="0" title="Открыть Навыки">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="wz-card-title"><span>🧠</span> Навыки</div>' +
+          '<div class="wz-card-desc">Магические дисциплины, окклюменция, древние руны, зельеварение, ремесло и AI Генератор</div>' +
+        '</div>' +
+        '<div class="wz-card-arrow">→</div>' +
+      '</div>' +
       '<div class="wz-card wz-card-clickable" data-nav="wzWand" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzWand\');" role="button" tabindex="0" title="Открыть Палочка">' +
         '<div style="flex:1;min-width:0;">' +
           '<div class="wz-card-title"><span>🪄</span> Палочка</div>' +
@@ -2259,6 +2312,7 @@
           activeProfileId: WZ.activeProfileId,
           spells: WZ.spells || [],
           duels: WZ.duels || [],
+          skills: WZ.skills || [],
           routes: WZ.map ? WZ.map.routes : null
         };
         var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -2297,6 +2351,10 @@
             if(Array.isArray(data.duels)){
               WZ.duels = data.duels;
               WZ.saveDuels();
+            }
+            if(Array.isArray(data.skills)){
+              WZ.skills = data.skills;
+              WZ.saveSkills();
             }
             if(data.meta){
               WZ.meta = data.meta;
@@ -2520,11 +2578,12 @@
     }
   }
 
-  /* Общий переключатель вкладок Заклинания / Дуэли */
+  /* Общий переключатель вкладок Заклинания / Дуэли / Навыки */
   function renderWzAbilitiesTabBar(activeTab){
     return '<div class="wz-nav-tabs">' +
       '<button class="wz-nav-tab ' + (activeTab === 'spells' ? 'active' : '') + '" data-nav="wzSpells" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSpells\');">✨ Заклинания</button>' +
       '<button class="wz-nav-tab ' + (activeTab === 'duels' ? 'active' : '') + '" data-nav="wzDuels" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzDuels\');">⚔️ Дуэльные приёмы</button>' +
+      '<button class="wz-nav-tab ' + (activeTab === 'skills' ? 'active' : '') + '" data-nav="wzSkills" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkills\');">🧠 Навыки</button>' +
     '</div>';
   }
 
@@ -2959,6 +3018,219 @@
         '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">' +
           '<button class="btn btn-ghost" data-nav="wzDuels" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzDuels\');">Отмена</button>' +
           '<button class="btn btn-primary" id="wzEdDuelSaveBtn" data-duel-id="' + escA(d.id) + '">💾 Сохранить приём</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  /* ============================================================
+     ЭКРАН НАВЫКИ И МАГИЧЕСКИЕ ДИСЦИПЛИНЫ (wzSkills)
+     ============================================================ */
+  function wzSkills(){
+    if(!WZ.skills) WZ.loadSkills();
+    var list = WZ.skills || [];
+
+    var curFilter = WZ.skillFilter || 'all';
+    var curSearch = (WZ.skillSearch || '').toLowerCase().trim();
+
+    var filterCategories = ['Все'].concat(WZ_SKILL_KINDS);
+
+    var filterPills = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:12px 0;">' +
+      filterCategories.map(function(cat){
+        var key = (cat === 'Все' ? 'all' : cat);
+        var active = curFilter === key;
+        return '<button class="wz-pill ' + (active ? 'active' : '') + '" data-wz-skill-filter="' + escA(key) + '">' + esc(cat) + '</button>';
+      }).join('') +
+    '</div>';
+
+    var filtered = list.filter(function(s){
+      if(curFilter !== 'all' && s.kind !== curFilter) return false;
+      if(curSearch){
+        var str = ((s.name || '') + ' ' + (s.kind || '') + ' ' + (s.level || '') + ' ' + (s.abil || '') + ' ' + (s.source || '') + ' ' + (s.gives || '') + ' ' + (s.desc || '')).toLowerCase();
+        if(str.indexOf(curSearch) === -1) return false;
+      }
+      return true;
+    });
+
+    // Группировка по дисциплинам
+    var groups = {};
+    filtered.forEach(function(s){
+      var k = s.kind || 'Академические дисциплины';
+      if(!groups[k]) groups[k] = [];
+      groups[k].push(s);
+    });
+
+    var cards = filtered.length ? WZ_SKILL_KINDS.filter(function(k){ return groups[k] && groups[k].length; }).map(function(k){
+      var groupItems = groups[k];
+      return '<div style="grid-column:1/-1;margin-top:10px;margin-bottom:2px;"><div class="section-label" style="font-size:11px;color:var(--wz-gold-light);">' + esc(k) + ' (' + groupItems.length + ')</div></div>' +
+        groupItems.map(function(s){
+          var lvlSlug = getWzSkillLevelSlug(s.level);
+          var line = [(s.abil ? ('🧠 ' + s.abil) : ''), (s.mod ? ('модификатор ' + s.mod) : ''), (s.source ? ('🏛️ ' + s.source) : '')].filter(Boolean).join(' · ');
+          return '<div class="wz-ref-card" style="display:flex;flex-direction:column;justify-content:space-between;gap:8px;">' +
+            '<div>' +
+              '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;">' +
+                '<div class="wz-ref-card-k" style="margin-bottom:0;font-size:15px;">🧠 ' + esc(s.name || 'Безымянный навык') + '</div>' +
+                '<span class="wz-skill-badge lvl-' + escA(lvlSlug) + '">' + esc(s.level || 'Начатки') + '</span>' +
+              '</div>' +
+              '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--wz-text-muted);margin-bottom:6px;">' +
+                (line ? '<span style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:3px;">' + esc(line) + '</span>' : '') +
+              '</div>' +
+              (s.gives ? ('<div class="wz-ref-card-v" style="font-size:12.5px;line-height:1.45;color:#e2e8f0;margin-bottom:4px;"><b>Что даёт:</b> ' + esc(s.gives) + '</div>') : '') +
+              (s.desc ? ('<div class="wz-ref-card-v" style="font-size:12px;line-height:1.4;color:var(--wz-text-muted);">' + esc(s.desc) + '</div>') : '') +
+            '</div>' +
+            '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">' +
+              '<button class="btn btn-ghost" data-nav="wzSkillView:' + escA(s.id) + '" style="font-size:11px;padding:3px 8px;">Подробнее</button>' +
+              '<button class="btn btn-ghost" data-nav="wzSkillEdit:' + escA(s.id) + '" style="font-size:11px;padding:3px 8px;">✏️</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+    }).join('') : '';
+
+    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Навыки' }]) +
+      '<button class="back" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">← Назад</button>' +
+      renderWzAbilitiesTabBar('skills') +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">' +
+        '<div>' +
+          '<h1 style="margin-bottom:4px;">🧠 Навыки и магические дисциплины</h1>' +
+          '<div class="desc" style="margin-bottom:0;">Окклюменция, древние руны, зельеварение, полёты на метле, ремесло и языки магов.</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button class="btn btn-primary" data-nav="wzSkillEdit:new" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkillEdit:new\');">➕ Добавить навык</button>' +
+          '<button class="btn btn-ghost" data-nav="wzSkillGen" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkillGen\');" style="color:var(--wz-gold);border-color:var(--wz-border-strong);">✨ AI Генератор навыков</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="wi-ref-search-wrap" style="margin-top:10px;">' +
+        '<span class="wi-ref-search-icon">🔍</span>' +
+        '<input type="text" id="wzSkillSearch" class="wi-ref-search-input" placeholder="Поиск навыка по названию, дисциплине или характеристике..." value="' + escA(WZ.skillSearch || '') + '">' +
+      '</div>' +
+      filterPills +
+      '<div class="wi-ref-cards-grid" style="margin-top:14px;">' +
+        (cards || ('<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:44px 16px;border:1px dashed var(--wz-border);border-radius:12px;background:rgba(255,255,255,0.02);">' +
+          '<div style="font-size:40px;margin-bottom:8px;">🧠 📜</div>' +
+          '<div style="font-family:Cinzel,serif;font-size:17px;color:var(--wz-gold-light);margin-bottom:6px;">Список навыков волшебника пуст</div>' +
+          '<div style="color:var(--wz-text-muted);font-size:13px;max-width:440px;margin:0 auto 16px;">Добавьте магическую дисциплину, ремесло или знание, либо воспользуйтесь AI Генератором.</div>' +
+          '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
+            '<button class="btn btn-primary" data-nav="wzSkillEdit:new" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkillEdit:new\');">➕ Создать навык</button>' +
+            '<button class="btn btn-ghost" data-nav="wzSkillGen" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkillGen\');" style="color:var(--wz-gold);border-color:var(--wz-border-strong);">✨ AI Генератор навыков</button>' +
+          '</div>' +
+        '</div>')) +
+      '</div>';
+  }
+
+  /* Просмотр навыка (wzSkillView) */
+  function wzSkillView(id){
+    var s = WZ.getSkillById(id);
+    if(!s) return wzSkills();
+
+    var lvlSlug = getWzSkillLevelSlug(s.level);
+
+    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Навыки', nav: 'wzSkills' }, { label: s.name || 'Навык' }]) +
+      '<button class="back" data-nav="wzSkills" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkills\');">← К навыкам</button>' +
+      '<div class="wz-char-sheet-card" style="margin-top:12px;">' +
+        '<div class="wz-char-header">' +
+          '<div style="display:flex;align-items:center;gap:10px;">' +
+            '<span style="font-size:24px;">🧠</span>' +
+            '<div style="font-size:20px;color:var(--wz-gold-light);">' + esc(s.name || 'Навык') + '</div>' +
+            '<span class="wz-skill-badge lvl-' + escA(lvlSlug) + '">' + esc(s.level || 'Начатки') + '</span>' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;">' +
+            '<button class="btn btn-primary" data-nav="wzSkillEdit:' + escA(s.id) + '" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkillEdit:' + escA(s.id) + '\');">✏️ Изменить</button>' +
+            '<button class="btn btn-ghost" id="wzSkillDeleteBtn" data-skill-id="' + escA(s.id) + '" style="color:#ef4444;">🗑️ Удалить</button>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;margin-top:14px;margin-bottom:14px;">' +
+          '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:6px;padding:8px 12px;">' +
+            '<span style="color:var(--wz-text-muted);font-size:11px;display:block;">ДИСЦИПЛИНА / КАТЕГОРИЯ:</span>' +
+            '<b>' + esc(s.kind || 'Академические дисциплины') + '</b>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:6px;padding:8px 12px;">' +
+            '<span style="color:var(--wz-text-muted);font-size:11px;display:block;">ХАРАКТЕРИСТИКА:</span>' +
+            '<b style="color:#fde047;">' + esc(s.abil || 'Интеллект') + (s.mod ? (' (мод: ' + esc(s.mod) + ')') : '') + '</b>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:6px;padding:8px 12px;">' +
+            '<span style="color:var(--wz-text-muted);font-size:11px;display:block;">ИСТОЧНИК / НАСТАВНИК:</span>' +
+            '<b>' + esc(s.source || 'Личный опыт') + '</b>' +
+          '</div>' +
+        '</div>' +
+        (s.gives ? (
+          '<div style="margin-bottom:12px;">' +
+            '<div style="font-size:12px;color:var(--wz-gold-light);font-weight:700;margin-bottom:4px;">ЧТО ДАЁТ ПЕРСОНАЖУ:</div>' +
+            '<div style="font-size:14px;line-height:1.6;color:#e2e8f0;background:rgba(0,0,0,0.3);padding:14px;border-radius:6px;border:1px solid rgba(255,255,255,0.05);">' +
+              esc(s.gives).replace(/\n/g, '<br>') +
+            '</div>' +
+          '</div>'
+        ) : '') +
+        (s.desc ? (
+          '<div>' +
+            '<div style="font-size:12px;color:var(--wz-text-muted);font-weight:700;margin-bottom:4px;">ЗАМЕТКИ И НЮАНСЫ:</div>' +
+            '<div style="font-size:13.5px;line-height:1.55;color:#cbd5e1;background:rgba(0,0,0,0.2);padding:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.03);">' +
+              esc(s.desc).replace(/\n/g, '<br>') +
+            '</div>' +
+          '</div>'
+        ) : '') +
+      '</div>';
+  }
+
+  /* Редактор навыка (wzSkillEdit) */
+  function wzSkillEdit(id){
+    var isNew = (id === 'new' || !id);
+    var s = isNew ? newWzSkill() : (WZ.getSkillById(id) || newWzSkill());
+
+    var kindOpts = WZ_SKILL_KINDS.map(function(k){
+      return '<option value="' + escA(k) + '" ' + (s.kind === k ? 'selected' : '') + '>' + esc(k) + '</option>';
+    }).join('');
+
+    var levelOpts = WZ_SKILL_LEVELS.map(function(lvl){
+      return '<option value="' + escA(lvl) + '" ' + (s.level === lvl ? 'selected' : '') + '>' + esc(lvl) + '</option>';
+    }).join('');
+
+    var abilOpts = WZ_SKILL_ABILS.map(function(ab){
+      return '<option value="' + escA(ab) + '" ' + (s.abil === ab ? 'selected' : '') + '>' + esc(ab) + '</option>';
+    }).join('');
+
+    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Навыки', nav: 'wzSkills' }, { label: isNew ? 'Новый навык' : 'Редактирование' }]) +
+      '<button class="back" data-nav="wzSkills" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkills\');">← К навыкам</button>' +
+      '<div class="wz-char-sheet-card" style="margin-top:12px;">' +
+        '<div class="wz-char-header">' +
+          '<span>' + (isNew ? '🧠 Новый навык' : '✏️ Редактирование: ' + esc(s.name || '')) + '</span>' +
+        '</div>' +
+        '<div class="wz-edit-grid">' +
+          '<div class="wz-edit-item" style="grid-column:1/-1;">' +
+            '<label>Название дисциплины / навыка</label>' +
+            '<input type="text" id="wzEdSkillName" class="wz-input" value="' + escA(s.name || '') + '" placeholder="Например: Окклюменция, Зельеварение, Древние руны">' +
+          '</div>' +
+          '<div class="wz-edit-item">' +
+            '<label>Категория дисциплины</label>' +
+            '<select id="wzEdSkillKind" class="wz-input">' + kindOpts + '</select>' +
+          '</div>' +
+          '<div class="wz-edit-item">' +
+            '<label>Ступень мастерства</label>' +
+            '<select id="wzEdSkillLevel" class="wz-input">' + levelOpts + '</select>' +
+          '</div>' +
+          '<div class="wz-edit-item">' +
+            '<label>Характеристика</label>' +
+            '<select id="wzEdSkillAbil" class="wz-input">' + abilOpts + '</select>' +
+          '</div>' +
+          '<div class="wz-edit-item">' +
+            '<label>Модификатор броска (если требуется)</label>' +
+            '<input type="text" id="wzEdSkillMod" class="wz-input" value="' + escA(s.mod || '') + '" placeholder="Например: +2 или оставьте пустым">' +
+          '</div>' +
+          '<div class="wz-edit-item" style="grid-column:1/-1;">' +
+            '<label>Источник / Где и у кого обучен</label>' +
+            '<input type="text" id="wzEdSkillSource" class="wz-input" value="' + escA(s.source || '') + '" placeholder="Например: Запретная секция библиотеки, Уроки у профессора Снейпа">' +
+          '</div>' +
+          '<div class="wz-edit-item" style="grid-column:1/-1;">' +
+            '<label>Что даёт навык (конкретно и сюжетно)</label>' +
+            '<textarea id="wzEdSkillGives" class="wz-input" rows="3" placeholder="Что персонаж может делать благодаря этому навыку, чего не могут другие...">' + esc(s.gives || '') + '</textarea>' +
+          '</div>' +
+          '<div class="wz-edit-item" style="grid-column:1/-1;">' +
+            '<label>Заметки и особенности применения</label>' +
+            '<textarea id="wzEdSkillDesc" class="wz-input" rows="3" placeholder="Нюансы, ограничения и личные заметки...">' + esc(s.desc || '') + '</textarea>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">' +
+          '<button class="btn btn-ghost" data-nav="wzSkills" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkills\');">Отмена</button>' +
+          (!isNew ? '<button class="btn btn-ghost" id="wzEdSkillDelBtn" data-skill-id="' + escA(s.id) + '" style="color:#ef4444;border-color:rgba(239,68,68,0.4);">🗑️ Удалить</button>' : '') +
+          '<button class="btn btn-primary" id="wzEdSkillSaveBtn" data-skill-id="' + escA(s.id) + '">💾 Сохранить навык</button>' +
         '</div>' +
       '</div>';
   }
@@ -4175,6 +4447,23 @@
     '</div>';
   }
 
+  function renderWzSkillCardPreview(s){
+    var lvlSlug = getWzSkillLevelSlug(s.level);
+    var line = [(s.abil ? ('🧠 ' + s.abil) : ''), (s.mod ? ('модификатор ' + s.mod) : ''), (s.source ? ('🏛️ ' + s.source) : '')].filter(Boolean).join(' · ');
+    return '<div class="wz-ref-card" style="border-color:var(--wz-gold);box-shadow:0 0 16px var(--wz-gold-glow);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
+        '<div class="wz-ref-card-k" style="margin-bottom:0;font-size:16px;">🧠 ' + esc(s.name || 'Безымянный навык') + '</div>' +
+        '<span class="wz-skill-badge lvl-' + escA(lvlSlug) + '">' + esc(s.level || 'Начатки') + '</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--wz-text-muted);margin-bottom:8px;">' +
+        '<span style="background:rgba(212,175,55,0.15);padding:2px 8px;border-radius:3px;color:#fde047;">📚 ' + esc(s.kind || 'Дисциплина') + '</span>' +
+        (line ? '<span style="background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:3px;">' + esc(line) + '</span>' : '') +
+      '</div>' +
+      (s.gives ? ('<div class="wz-ref-card-v" style="font-size:13px;line-height:1.55;color:#f1f5f9;margin-bottom:6px;"><b>Что даёт:</b> ' + esc(s.gives).replace(/\n/g, '<br>') + '</div>') : '') +
+      (s.desc ? ('<div class="wz-ref-card-v" style="font-size:12.5px;line-height:1.45;color:var(--wz-text-muted);">' + esc(s.desc).replace(/\n/g, '<br>') + '</div>') : '') +
+    '</div>';
+  }
+
   function callGeminiWzSpellGenerator(opts, apiKey, callback){
     if(!apiKey){
       callback('API ключ Google Gemini не указан', null);
@@ -4244,6 +4533,152 @@
       '  "action": "Основное действие / Бонусное действие / Реакция",\n' +
       '  "trigger": "Условие применения (например: После парирования щитом / При вражеской атаке)",\n' +
       '  "desc": "Детальное тактическое описание движения кисти, траектории палочки и боевого преимущества (3-4 предложения)"\n' +
+      '}';
+
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + encodeURIComponent(apiKey);
+    var payload = { contents: [{ parts: [{ text: prompt }] }] };
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(res){
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    })
+    .then(function(data){
+      try {
+        var rawText = data.candidates[0].content.parts[0].text;
+        var clean = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+        var parsed = JSON.parse(clean);
+        callback(null, parsed);
+      } catch(e){
+        callback('Ошибка разбора ответа ИИ: ' + e.message, null);
+      }
+    })
+    .catch(function(err){
+      callback('Ошибка сети Gemini API: ' + err.message, null);
+    });
+  }
+
+  function callGeminiWzSkillGenerator(opts, apiKey, callback){
+    if(!apiKey){
+      // Автономные пресеты волшебного мира при отсутствии API-ключа
+      var presets = [
+        {
+          name: 'Окклюменция высшего круга',
+          kind: 'Высшие магические искусства',
+          level: 'Практик',
+          abil: 'Интеллект',
+          mod: '+3',
+          source: 'Тайные рукописи библиотеки рода Блэк',
+          gives: 'Персонаж закрывает свой разум непроницаемой ментальной стеной. Попытки Легилименции требуют преодоления КС 16, а ментальные внушения и сыворотка правды распознаются немедленно.',
+          desc: 'Требует полного эмоционального контроля и очищения сознания от ярких воспоминаний в стрессовых ситуациях.'
+        },
+        {
+          name: 'Полёты на скоростной метле',
+          kind: 'Практическое мастерство',
+          level: 'Практик',
+          abil: 'Ловкость',
+          mod: '+2',
+          source: 'Тренировки в школьной сборной по Квиддичу',
+          gives: 'Возможность выполнять сложнейшие воздушные маневры (бочка, штопор, финт Вронского) без риска сорваться с метлы даже во время бури или под обстрелом бладжеров.',
+          desc: 'Даёт преимущество на проверки равновесия в воздухе и уклонение от летящих снарядов на метле.'
+        },
+        {
+          name: 'Знание древнегерманских и кельтских рун',
+          kind: 'Академические дисциплины',
+          level: 'Ученик',
+          abil: 'Интеллект',
+          mod: '+2',
+          source: 'Углубленный курс Древних Рун профессора Бабблинг',
+          gives: 'Чтение и перевод защитных глифов на старинных гробницах, сундуках и порталах. Способность распознать тип активирующей ловушки до прикосновения.',
+          desc: 'Для сложных составных рунических цепочек требуется сверка со словарем или несколько минут сосредоточенного анализа.'
+        },
+        {
+          name: 'Травология и ядовитые флорокультуры',
+          kind: 'Практическое мастерство',
+          level: 'Практик',
+          abil: 'Мудрость',
+          mod: '+2',
+          source: 'Практика в теплицах профессора Стебль',
+          gives: 'Безопасный сбор кричащей мандрагоры, бубонтюбера, ядовитой тентакулы и дьявольских силков. Персонаж безошибочно определяет свойства соков растений на ощупь и запах.',
+          desc: 'Позволяет избегать урона кислотой и ядами от растительных существ при наличии драконьих перчаток.'
+        },
+        {
+          name: 'Палочковая экспертиза',
+          kind: 'Артефакторика и ремесло',
+          level: 'Ученик',
+          abil: 'Мудрость',
+          mod: '+1',
+          source: 'Наблюдения за работой мастера Олливандера в Косом переулке',
+          gives: 'Взяв чужую палочку в руки, персонаж за несколько секунд определяет породу дерева, сердцевину, характер и степень её сопротивления новому владельцу.',
+          desc: 'Позволяет точнее подбирать трофейные палочки в дуэлях и понимать чужие боевые предрасположенности.'
+        },
+        {
+          name: 'Этикет и родословные чистокровных',
+          kind: 'Быт и знание мира',
+          level: 'Практик',
+          abil: 'Харизма',
+          mod: '+2',
+          source: 'Воспитание в аристократическом волшебном семействе',
+          gives: 'Безукоризненная манера держаться на официальных раутах Министерства Магии, знание родовых связей «Священных двадцати восьми» и скрытых альянсов.',
+          desc: 'Облегчает дипломатические переговоры с консервативными волшебниками и сотрудниками Визенгамота.'
+        },
+        {
+          name: 'Невербальная концентрация',
+          kind: 'Высшие магические искусства',
+          level: 'Ученик',
+          abil: 'Интеллект',
+          mod: '+1',
+          source: 'Самостоятельная практика на 6 курсе',
+          gives: 'Позволяет применять базовые заклинания (Люмос, Алохомора, Протего, Экспеллиармус) совершенно беззвучно, застав противника врасплох.',
+          desc: 'Противник получает помеху на реакцию парирования, если не следит за кончиком палочки.'
+        },
+        {
+          name: 'Уход за редкими тварями',
+          kind: 'Практическое мастерство',
+          level: 'Практик',
+          abil: 'Мудрость',
+          mod: '+2',
+          source: 'Уроки Хагрида на опушке Запретного Леса',
+          gives: 'Умение завоевать доверие фестралов, гиппогрифов, книзлов и нюхлеров. Знание их любимой пищи, слабых зон и привычек.',
+          desc: 'Предотвращает внезапную агрессию диких магических существ при первом контакте.'
+        }
+      ];
+
+      var filteredPresets = presets.filter(function(p){
+        if(opts.kind && p.kind !== opts.kind) return false;
+        if(opts.level && p.level !== opts.level) return false;
+        return true;
+      });
+      var pool = filteredPresets.length ? filteredPresets : presets;
+      var match = pool[Math.floor(Math.random() * pool.length)];
+      var res = JSON.parse(JSON.stringify(match));
+      if(opts.theme && opts.theme.trim()){
+        res.name = opts.theme.trim();
+      }
+      setTimeout(function(){ callback(null, res); }, 300);
+      return;
+    }
+
+    var prompt = 'Ты профессор и наставник в Школе Чародейства и Волшебства Хогвартс (вселенная Гарри Поттера / Wizarding World). ' +
+      'Придумай каноничный, глубокий небоевой навык, магическую дисциплину, ремесло или знание волшебника. ' +
+      'Тема/Идея: ' + (opts.theme || 'Случайный магический навык') + '. ' +
+      'Категория: ' + (opts.kind || 'Академические дисциплины / Практическое мастерство / Высшие магические искусства / Артефакторика и ремесло / Быт и знание мира') + '. ' +
+      'Ступень мастерства: ' + (opts.level || 'Ученик / Практик / Мастер') + '. ' +
+      'Характеристика: ' + (opts.abil || 'Интеллект / Мудрость / Харизма / Ловкость') + '. ' +
+      'Ответь ИСКЛЮЧИТЕЛЬНО валидным JSON-объектом без markdown форматирования (без ```json), с полями:\n' +
+      '{\n' +
+      '  "name": "Название навыка (например: Окклюменция, Травология ядовитых растений, Древние руны, Зачарование часовых механизмов)",\n' +
+      '  "kind": "Категория (строго одно из: Академические дисциплины, Практическое мастерство, Высшие магические искусства, Артефакторика и ремесло, Быт и знание мира)",\n' +
+      '  "level": "Ступень мастерства (строго одно из: Начатки, Ученик, Практик, Мастер)",\n' +
+      '  "abil": "Связанная характеристика (строго одно из: Интеллект, Мудрость, Харизма, Ловкость, Сила, Телосложение)",\n' +
+      '  "mod": "Модификатор броска если нужен (например: +2, +3 или пусто если без броска)",\n' +
+      '  "source": "Где и как получен навык (например: Индивидуальные уроки у Снейпа, Библиотека Блэков, Годы службы в Отделе Тайн)",\n' +
+      '  "gives": "Сюжетно и практически: что конкретно персонаж благодаря навыку умеет делать, чего не умеют другие (2-3 предложения)",\n' +
+      '  "desc": "Тонкости, ограничения и правила применения (2-3 предложения)"\n' +
       '}';
 
     var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + encodeURIComponent(apiKey);
@@ -4365,7 +4800,64 @@
       '</div>';
   }
 
-  /* Привязки событий заклинаний и приёмов */
+  function wzSkillGen(){
+    var kindOpts = '<option value="">Любая (на усмотрение AI)</option>' +
+      WZ_SKILL_KINDS.map(function(k){
+        return '<option value="' + escA(k) + '">' + esc(k) + '</option>';
+      }).join('');
+
+    var levelOpts = '<option value="">Авто (по контексту)</option>' +
+      WZ_SKILL_LEVELS.map(function(lvl){
+        return '<option value="' + escA(lvl) + '">' + esc(lvl) + '</option>';
+      }).join('');
+
+    var abilOpts = '<option value="">Авто (по контексту)</option>' +
+      WZ_SKILL_ABILS.map(function(ab){
+        return '<option value="' + escA(ab) + '">' + esc(ab) + '</option>';
+      }).join('');
+
+    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Навыки', nav: 'wzSkills' }, { label: 'AI Генератор' }]) +
+      '<button class="back" data-nav="wzSkills" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkills\');">← К навыкам</button>' +
+      '<div class="wz-char-sheet-card" style="margin-top:12px;">' +
+        '<div class="wz-char-header">' +
+          '<span>✨ AI Генератор навыков и дисциплин Хогвартса</span>' +
+          '<button class="btn btn-ghost" id="wzSkgChangeKeyBtn" style="font-size:11px;padding:3px 8px;">🔑 API Ключ</button>' +
+        '</div>' +
+        '<div id="wzSkgFormSection" style="margin-top:14px;">' +
+          '<div class="wz-edit-grid">' +
+            '<div class="wz-edit-item" style="grid-column:1/-1;">' +
+              '<label>Тема или идея магического навыка</label>' +
+              '<input type="text" id="wzSkgTheme" class="wz-input" placeholder="Например: Окклюменция, Зачарование артефактов, Парселтанг, Полёты на метле">' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>Категория дисциплины</label>' +
+              '<select id="wzSkgKind" class="wz-input">' + kindOpts + '</select>' +
+            '</div>' +
+            '<div class="wz-edit-item">' +
+              '<label>Ступень мастерства</label>' +
+              '<select id="wzSkgLevel" class="wz-input">' + levelOpts + '</select>' +
+            '</div>' +
+            '<div class="wz-edit-item" style="grid-column:1/-1;">' +
+              '<label>Характеристика</label>' +
+              '<select id="wzSkgAbil" class="wz-input">' + abilOpts + '</select>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;justify-content:flex-end;margin-top:16px;">' +
+            '<button class="btn btn-primary" id="btnWzSkillGen" style="padding:8px 20px;">🧠 Сгенерировать магический навык</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="wzSkgResult" style="display:none;margin-top:16px;">' +
+          '<div id="wzSkgPreview"></div>' +
+          '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">' +
+            '<button class="btn btn-ghost" id="btnWzSkillBack">← Изменить запрос</button>' +
+            '<button class="btn btn-ghost" id="btnWzSkillRegen">🔄 Перегенерировать</button>' +
+            '<button class="btn btn-primary" id="btnWzSkillSave">💾 Добавить в список навыков</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  /* Привязки событий заклинаний, навыков и приёмов */
   function wireWzSpells(){
     var search = document.getElementById('wzSpellSearch');
     if(search){
@@ -4728,6 +5220,185 @@
     wireWzNav();
   }
 
+  function wireWzSkills(){
+    var search = document.getElementById('wzSkillSearch');
+    if(search){
+      search.addEventListener('input', function(){
+        WZ.skillSearch = search.value;
+        if(typeof render === 'function') render();
+      });
+    }
+
+    document.querySelectorAll('[data-wz-skill-filter]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        WZ.skillFilter = btn.getAttribute('data-wz-skill-filter');
+        if(typeof render === 'function') render();
+      });
+    });
+
+    wireWzNav();
+  }
+
+  function wireWzSkillView(){
+    var delBtn = document.getElementById('wzSkillDeleteBtn');
+    if(delBtn){
+      delBtn.addEventListener('click', function(){
+        var id = delBtn.getAttribute('data-skill-id');
+        if(!confirm('Удалить этот магический навык?')) return;
+        WZ.skills = (WZ.skills || []).filter(function(s){ return s.id !== id; });
+        WZ.saveSkills();
+        WZ.toast('✓ Навык удален', 'info');
+        if(typeof window.navigate === 'function') window.navigate('wzSkills');
+      });
+    }
+    wireWzNav();
+  }
+
+  function wireWzSkillEdit(){
+    var delBtn = document.getElementById('wzEdSkillDelBtn');
+    if(delBtn){
+      delBtn.addEventListener('click', function(){
+        var id = delBtn.getAttribute('data-skill-id');
+        if(!confirm('Удалить этот магический навык?')) return;
+        WZ.skills = (WZ.skills || []).filter(function(s){ return s.id !== id; });
+        WZ.saveSkills();
+        WZ.toast('✓ Навык удален', 'info');
+        if(typeof window.navigate === 'function') window.navigate('wzSkills');
+      });
+    }
+
+    var saveBtn = document.getElementById('wzEdSkillSaveBtn');
+    if(saveBtn){
+      saveBtn.addEventListener('click', function(){
+        var id = saveBtn.getAttribute('data-skill-id');
+        var name = (document.getElementById('wzEdSkillName').value || '').trim();
+        if(!name){
+          alert('Введите название дисциплины / навыка');
+          return;
+        }
+
+        var s = WZ.getSkillById(id) || { id: id };
+        s.name = name;
+        s.kind = document.getElementById('wzEdSkillKind').value;
+        s.level = document.getElementById('wzEdSkillLevel').value;
+        s.abil = document.getElementById('wzEdSkillAbil').value;
+        s.mod = (document.getElementById('wzEdSkillMod').value || '').trim();
+        s.source = (document.getElementById('wzEdSkillSource').value || '').trim();
+        s.gives = (document.getElementById('wzEdSkillGives').value || '').trim();
+        s.desc = (document.getElementById('wzEdSkillDesc').value || '').trim();
+
+        var idx = (WZ.skills || []).findIndex(function(x){ return x.id === id; });
+        if(idx !== -1){
+          WZ.skills[idx] = s;
+        } else {
+          WZ.skills.push(s);
+        }
+        WZ.saveSkills();
+        WZ.toast('✓ Навык успешно сохранен!', 'success');
+        if(typeof window.navigate === 'function') window.navigate('wzSkillView:' + id);
+      });
+    }
+    wireWzNav();
+  }
+
+  function wireWzSkillGen(){
+    var keyBtn = document.getElementById('wzSkgChangeKeyBtn');
+    if(keyBtn){
+      keyBtn.addEventListener('click', function(){
+        var curKey = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+        var input = prompt('Введите Google Gemini API ключ (или оставьте пустым для каноничных пресетов Хогвартса):', curKey || '');
+        if(input !== null && typeof window.saveGeminiApiKey === 'function'){
+          window.saveGeminiApiKey(input.trim());
+          if(typeof render === 'function') render();
+        }
+      });
+    }
+
+    var btnGen = document.getElementById('btnWzSkillGen');
+    if(btnGen){
+      btnGen.addEventListener('click', function(){
+        var k = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+        var theme = (document.getElementById('wzSkgTheme').value || '').trim();
+        var kind = document.getElementById('wzSkgKind').value;
+        var level = document.getElementById('wzSkgLevel').value;
+        var abil = document.getElementById('wzSkgAbil').value;
+
+        btnGen.disabled = true;
+        btnGen.textContent = '🧠 Постижение дисциплины (генерация)...';
+
+        callGeminiWzSkillGenerator({ theme: theme, kind: kind, level: level, abil: abil }, k, function(err, result){
+          btnGen.disabled = false;
+          btnGen.textContent = '🧠 Сгенерировать магический навык';
+
+          if(err || !result){
+            alert('Ошибка генерации: ' + (err || 'Пустой ответ'));
+            return;
+          }
+
+          window._lastGenWzSkill = result;
+
+          var form = document.getElementById('wzSkgFormSection');
+          var resDiv = document.getElementById('wzSkgResult');
+          var preview = document.getElementById('wzSkgPreview');
+
+          if(form) form.style.display = 'none';
+          if(resDiv) resDiv.style.display = 'block';
+          if(preview) preview.innerHTML = renderWzSkillCardPreview(result);
+          if(resDiv) resDiv.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    }
+
+    var btnBack = document.getElementById('btnWzSkillBack');
+    if(btnBack){
+      btnBack.addEventListener('click', function(){
+        var form = document.getElementById('wzSkgFormSection');
+        var resDiv = document.getElementById('wzSkgResult');
+        if(resDiv) resDiv.style.display = 'none';
+        if(form) form.style.display = 'block';
+      });
+    }
+
+    var btnRegen = document.getElementById('btnWzSkillRegen');
+    if(btnRegen){
+      btnRegen.addEventListener('click', function(){
+        var form = document.getElementById('wzSkgFormSection');
+        var resDiv = document.getElementById('wzSkgResult');
+        if(resDiv) resDiv.style.display = 'none';
+        if(form) form.style.display = 'block';
+        var btnG = document.getElementById('btnWzSkillGen');
+        if(btnG) btnG.click();
+      });
+    }
+
+    var btnSave = document.getElementById('btnWzSkillSave');
+    if(btnSave){
+      btnSave.addEventListener('click', function(){
+        var s = window._lastGenWzSkill;
+        if(!s) return;
+        var item = {
+          id: 'wz_sk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          name: s.name || 'Магический навык',
+          kind: s.kind || 'Академические дисциплины',
+          level: s.level || 'Ученик',
+          abil: s.abil || 'Интеллект',
+          mod: s.mod || '',
+          source: s.source || '',
+          gives: s.gives || '',
+          desc: s.desc || ''
+        };
+
+        if(!WZ.skills) WZ.skills = [];
+        WZ.skills.unshift(item);
+        WZ.saveSkills();
+        WZ.toast('✓ Навык добавлен в список!', 'success');
+        if(typeof window.navigate === 'function') window.navigate('wzSkillView:' + item.id);
+      });
+    }
+
+    wireWzNav();
+  }
+
   /* Экспорт в глобальный scope */
   window.wzHome = wzHome;
   window.wzData = wzData;
@@ -4742,6 +5413,10 @@
   window.wzDuelView = wzDuelView;
   window.wzDuelEdit = wzDuelEdit;
   window.wzDuelGen = wzDuelGen;
+  window.wzSkills = wzSkills;
+  window.wzSkillView = wzSkillView;
+  window.wzSkillEdit = wzSkillEdit;
+  window.wzSkillGen = wzSkillGen;
   window.wzMap = wzMap;
 
   window.wireWzHome = wireWzHome;
@@ -4757,6 +5432,10 @@
   window.wireWzDuelView = wireWzDuelView;
   window.wireWzDuelEdit = wireWzDuelEdit;
   window.wireWzDuelGen = wireWzDuelGen;
+  window.wireWzSkills = wireWzSkills;
+  window.wireWzSkillView = wireWzSkillView;
+  window.wireWzSkillEdit = wireWzSkillEdit;
+  window.wireWzSkillGen = wireWzSkillGen;
   window.wireWzMap = wireWzMap;
   window.wireWzNav = wireWzNav;
   window.applyWizardTheme = WZ.applyTheme;
@@ -4776,6 +5455,10 @@
   WZ.wzDuelView = wzDuelView;
   WZ.wzDuelEdit = wzDuelEdit;
   WZ.wzDuelGen = wzDuelGen;
+  WZ.wzSkills = wzSkills;
+  WZ.wzSkillView = wzSkillView;
+  WZ.wzSkillEdit = wzSkillEdit;
+  WZ.wzSkillGen = wzSkillGen;
   WZ.wzMap = wzMap;
   WZ.wzMapContent = wzMapContent;
   WZ.wireWzHome = wireWzHome;
@@ -4791,6 +5474,10 @@
   WZ.wireWzDuelView = wireWzDuelView;
   WZ.wireWzDuelEdit = wireWzDuelEdit;
   WZ.wireWzDuelGen = wireWzDuelGen;
+  WZ.wireWzSkills = wireWzSkills;
+  WZ.wireWzSkillView = wireWzSkillView;
+  WZ.wireWzSkillEdit = wireWzSkillEdit;
+  WZ.wireWzSkillGen = wireWzSkillGen;
   WZ.wireWzMap = wireWzMap;
   WZ.wireWzMapContent = wireWzMapContent;
   WZ.wireWzNav = wireWzNav;
