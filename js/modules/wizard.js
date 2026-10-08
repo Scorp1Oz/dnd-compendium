@@ -168,9 +168,10 @@
     createProfile: function(opts){
       var def = defaultWizardProfile();
       def.id = 'wz_prof_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-      def.name = (opts && opts.name) ? opts.name : '';
+      def.firstName = (opts && opts.firstName) ? opts.firstName : '';
+      def.lastName = (opts && opts.lastName) ? opts.lastName : '';
+      def.name = (opts && opts.name) ? opts.name : [def.firstName, def.lastName].filter(Boolean).join(' ');
       def.house = (opts && opts.house !== undefined) ? opts.house : '';
-      def.year = (opts && opts.year !== undefined) ? opts.year : '';
       def.title = (opts && opts.title) ? opts.title : '';
 
       if(!Array.isArray(WZ.profiles)) WZ.profiles = [];
@@ -187,7 +188,9 @@
       if(!src) return null;
       var copy = JSON.parse(JSON.stringify(src));
       copy.id = 'wz_prof_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-      copy.name = (copy.name || 'Волшебник') + ' (Копия)';
+      copy.firstName = (copy.firstName || copy.name || 'Волшебник');
+      copy.lastName = (copy.lastName ? (copy.lastName + ' (Копия)') : '(Копия)');
+      copy.name = [copy.firstName, copy.lastName].filter(Boolean).join(' ');
       WZ.profiles.push(copy);
       WZ.activeProfileId = copy.id;
       WZ.saveProfiles();
@@ -1640,53 +1643,28 @@
       houseBadge = '<span class="wz-house-badge none" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#cbd5e1;">👤 ' + esc(p.house || 'Не распределен') + '</span>';
     }
 
-    var charDisplayName = p.name ? esc(p.name) : 'Новый персонаж';
+    var charDisplayName = (p.firstName || p.lastName) ? [p.firstName, p.lastName].filter(Boolean).join(' ') : (p.name || 'Новый персонаж');
     var charDisplayTitle = p.title ? esc(p.title) : (p.house ? (esc(p.house) + ' • Маг') : 'Волшебник');
 
-    var wandText = p.wand ? esc(p.wand) : ((p.wandWood || p.wandCore || p.wandLength) ? [p.wandWood, p.wandCore, p.wandLength].filter(Boolean).map(esc).join(', ') : 'Палочка не указана');
-
-    var companions = [];
-    if(p.robe) companions.push('🛡️ ' + esc(p.robe));
-    if(p.relic) companions.push('✨ ' + esc(p.relic));
-    if(p.patronus) companions.push('🦌 ' + esc(p.patronus));
-    var companionText = companions.length ? companions.join(' • ') : '';
-
-    var subBarItems = [];
-    subBarItems.push('<span>🪄 <b>Палочка:</b> ' + wandText + '</span>');
-    if(companionText) subBarItems.push('<span>' + companionText + '</span>');
-
-    var coins = [];
-    if(p.galleons || p.sickles || p.knuts){
-      if(p.galleons) coins.push('🪙 ' + p.galleons + ' Гал.');
-      if(p.sickles) coins.push('🥈 ' + p.sickles + ' Сик.');
-      if(p.knuts) coins.push('🥉 ' + p.knuts + ' Кн.');
-    }
-    var coinsHtml = coins.length ? coins.join(' ') : '<span style="color:var(--wz-text-muted);">Кошелёк: 0</span>';
+    var hpVal = p.maxHp != null ? p.maxHp : (p.hp != null ? p.hp : 20);
+    var manaVal = p.maxMana != null ? p.maxMana : (p.mana != null ? p.mana : 50);
 
     // HUD карточка волшебника
     var hud = '<div class="wz-hud ' + houseClass + '">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">' +
         '<div>' +
-          '<div class="wz-title">' + (p.house ? hIcon : '🪄') + ' ' + charDisplayName + '</div>' +
+          '<div class="wz-title">' + (p.house ? hIcon : '🪄') + ' ' + esc(charDisplayName) + '</div>' +
           '<div style="font-family:\'EB Garamond\',serif;font-style:italic;color:var(--wz-gold-light);font-size:14.5px;margin-top:2px;">' +
-            charDisplayTitle + (p.blood ? (' • ' + esc(p.blood)) : '') +
+            charDisplayTitle +
           '</div>' +
         '</div>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
           houseBadge +
           '<span class="wz-stat-badge">Ур. ' + (p.level || 1) + '</span>' +
-          '<span class="wz-stat-badge hp">❤️ ' + (p.hp != null ? p.hp : 20) + '/' + (p.maxHp || 20) + ' HP</span>' +
-          '<span class="wz-stat-badge mana">✨ ' + (p.mana != null ? p.mana : 50) + '/' + (p.maxMana || 50) + ' MP</span>' +
+          '<span class="wz-stat-badge hp">❤️ ' + hpVal + ' HP</span>' +
+          '<span class="wz-stat-badge mana">✨ ' + manaVal + ' MP</span>' +
           '<span class="wz-stat-badge ac">🛡️ КБ ' + (p.ac || 10) + '</span>' +
           '<button class="wz-hud-edit-btn" data-nav="wzData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzData\');" title="Перейти к анкете и списку персонажей">⚙️ Ростер</button>' +
-        '</div>' +
-      '</div>' +
-      '<div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(212,175,55,0.2);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:13px;">' +
-        '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">' +
-          subBarItems.join('') +
-        '</div>' +
-        '<div style="display:flex;gap:8px;align-items:center;font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--wz-gold-light);">' +
-          coinsHtml +
         '</div>' +
       '</div>' +
     '</div>';
@@ -1789,7 +1767,8 @@
     var profOptions = profList.map(function(item){
       var hIcon = getHouseIcon(item.house);
       var hLabel = item.house ? (' • ' + item.house) : ' • Без факультета';
-      var pTitle = hIcon + ' ' + (item.name || 'Безымянный маг') + hLabel + ' (Ур. ' + (item.level || 1) + ')';
+      var itName = (item.firstName || item.lastName) ? [item.firstName, item.lastName].filter(Boolean).join(' ') : (item.name || 'Безымянный маг');
+      var pTitle = hIcon + ' ' + itName + hLabel + ' (Ур. ' + (item.level || 1) + ')';
       return '<option value="' + escA(item.id) + '" ' + (item.id === WZ.activeProfileId ? 'selected' : '') + '>' + esc(pTitle) + '</option>';
     }).join('');
 
@@ -1802,25 +1781,20 @@
 
     var houseIcon = getHouseIcon(p.house);
 
-    // Wand unified string for backward compatibility
-    var wandDisplay = p.wand || '';
-    if(!wandDisplay && (p.wandWood || p.wandCore || p.wandLength)){
-      var wandParts = [];
-      if(p.wandWood) wandParts.push(p.wandWood);
-      if(p.wandCore) wandParts.push(p.wandCore);
-      if(p.wandLength) wandParts.push(p.wandLength);
-      if(p.wandFlex) wandParts.push(p.wandFlex);
-      wandDisplay = wandParts.join(', ');
-    }
+    var fullName = (p.firstName || p.lastName) ? [p.firstName, p.lastName].filter(Boolean).join(' ') : (p.name || 'Новый волшебник');
+    var fName = p.firstName != null ? p.firstName : (p.name ? p.name.split(' ')[0] : '');
+    var lName = p.lastName != null ? p.lastName : (p.name ? p.name.split(' ').slice(1).join(' ') : '');
 
-    // Companions unified string for backward compatibility
-    var companionsDisplay = p.patronus || '';
-    if(p.pet && companionsDisplay.indexOf(p.pet) === -1){
-      companionsDisplay = (companionsDisplay ? (companionsDisplay + ' • ') : '') + 'Питомец: ' + p.pet;
-    }
-    if(p.broom && companionsDisplay.indexOf(p.broom) === -1){
-      companionsDisplay = (companionsDisplay ? (companionsDisplay + ' • ') : '') + 'Метла: ' + p.broom;
-    }
+    var hpVal = p.maxHp != null ? p.maxHp : (p.hp != null ? p.hp : 20);
+    var manaVal = p.maxMana != null ? p.maxMana : (p.mana != null ? p.mana : 50);
+
+    var isCollapsed = false;
+    try { isCollapsed = localStorage.getItem('ttc_wz_char_collapsed') === '1'; } catch(e){}
+    if(typeof WZ.charSheetCollapsed === 'boolean') isCollapsed = WZ.charSheetCollapsed;
+
+    var houseBadgeHtml = p.house
+      ? ('<span class="wz-house-badge ' + getHouseSlug(p.house) + '" style="font-size:11px;">' + houseIcon + ' ' + esc(p.house) + '</span>')
+      : '<span class="wz-house-badge none" style="font-size:11px;">👤 Без факультета</span>';
 
     return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Данные' }]) +
       '<button class="back" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">← На главную</button>' +
@@ -1832,7 +1806,7 @@
           '<span style="font-size:12px;color:var(--wz-text-muted);">Всего профилей: ' + profList.length + '</span>' +
         '</div>' +
         '<div class="desc">' +
-          'Выберите активного волшебника (ученика Хогвартса, профессора, мракоборца или дуэлянта) или создайте нового. Характеристики, палочка, мантия, инвентарь и личные заметки сохраняются индивидуально для каждого мага.' +
+          'Выберите активного волшебника или создайте нового. Характеристики и параметры сохраняются индивидуально для каждого персонажа.' +
         '</div>' +
 
         '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:14px 0 12px 0;">' +
@@ -1848,88 +1822,59 @@
           '</div>' +
         '</div>' +
 
-        '<div class="wz-char-sheet-card">' +
-          '<div class="wz-char-header">' +
-            '<span>Анкета волшебника: <b style="color:var(--wz-gold, #d4af37);">' + houseIcon + ' ' + esc(p.name || 'Новый волшебник') + '</b></span>' +
-            (p.house ? ('<span class="wz-house-badge ' + getHouseSlug(p.house) + '" style="font-size:11px;">' + houseIcon + ' ' + esc(p.house) + '</span>') : '<span class="wz-house-badge none" style="font-size:11px;">👤 Без факультета</span>') +
+        '<div class="wz-char-sheet-card" id="wzCharSheetCard">' +
+          '<div class="wz-char-header" id="wzCharHeaderToggle" style="cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;gap:10px;" title="Нажмите, чтобы свернуть или развернуть анкету">' +
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+              '<span>Анкета волшебника: <b style="color:var(--wz-gold, #d4af37);">' + houseIcon + ' ' + esc(fullName) + '</b></span>' +
+              houseBadgeHtml +
+            '</div>' +
+            '<div style="display:flex;align-items:center;gap:6px;">' +
+              '<span id="wzCharToggleLabel" style="font-size:11.5px;color:var(--wz-text-muted);font-weight:normal;">' + (isCollapsed ? 'Развернуть' : 'Свернуть') + '</span>' +
+              '<span id="wzCharToggleIcon" style="font-size:12px;color:var(--wz-gold);transition:transform 0.2s ease;' + (isCollapsed ? 'transform:rotate(-90deg);' : '') + '">▼</span>' +
+            '</div>' +
           '</div>' +
 
-          '<div class="wz-edit-grid">' +
-            '<div class="wz-edit-item">' +
-              '<label>Имя и фамилия</label>' +
-              '<input type="text" id="wzDataInName" class="wz-input" value="' + escA(p.name || '') + '" placeholder="Имя волшебника">' +
-            '</div>' +
-            '<div class="wz-edit-item">' +
-              '<label>Факультет / Принадлежность</label>' +
-              '<select id="wzDataInHouse" class="wz-input">' + houseOptions + '</select>' +
-            '</div>' +
-            '<div class="wz-edit-item">' +
-              '<label>Титул / Прозвище / Роль</label>' +
-              '<input type="text" id="wzDataInTitle" class="wz-input" value="' + escA(p.title || '') + '" placeholder="Например: Ловец сборной, Мракоборец, Мастер зелий">' +
-            '</div>' +
-            '<div class="wz-edit-item">' +
-              '<label>Уровень волшебника</label>' +
-              '<input type="number" min="1" max="20" id="wzDataInLevel" class="wz-input" value="' + escA(p.level != null ? p.level : '1') + '" placeholder="1">' +
-            '</div>' +
-            '<div class="wz-edit-item">' +
-              '<label>Очки здоровья (HP)</label>' +
-              '<input type="number" id="wzDataInHp" class="wz-input" value="' + escA(p.hp != null ? p.hp : '20') + '" placeholder="20">' +
-            '</div>' +
-            '<div class="wz-edit-item">' +
-              '<label>Максимум HP</label>' +
-              '<input type="number" id="wzDataInMaxHp" class="wz-input" value="' + escA(p.maxHp != null ? p.maxHp : '20') + '" placeholder="20">' +
-            '</div>' +
-            '<div class="wz-edit-item">' +
-              '<label>Класс брони (КБ / Защитные чары)</label>' +
-              '<input type="number" id="wzDataInAc" class="wz-input" value="' + escA(p.ac != null ? p.ac : '10') + '" placeholder="10">' +
-            '</div>' +
-            '<div class="wz-edit-item">' +
-              '<label>Запас Маны / MP</label>' +
-              '<input type="number" id="wzDataInMana" class="wz-input" value="' + escA(p.mana != null ? p.mana : '50') + '" placeholder="50">' +
-            '</div>' +
-            '<div class="wz-edit-item">' +
-              '<label>Максимум Маны</label>' +
-              '<input type="number" id="wzDataInMaxMana" class="wz-input" value="' + escA(p.maxMana != null ? p.maxMana : '50') + '" placeholder="50">' +
-            '</div>' +
-            '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
-              '<label>🪄 Волшебная палочка (Древесина, сердцевина, длина)</label>' +
-              '<input type="text" id="wzDataInWand" class="wz-input" value="' + escA(wandDisplay) + '" placeholder="Например: Остролист и перо феникса, 11 дюймов, упругая">' +
-            '</div>' +
-            '<div class="wz-edit-item">' +
-              '<label>🛡️ Мантия / Защитное облачение</label>' +
-              '<input type="text" id="wzDataInRobe" class="wz-input" value="' + escA(p.robe || '') + '" placeholder="Школьная мантия, Защитный плащ, Шерсть демимаски">' +
-            '</div>' +
-            '<div class="wz-edit-item">' +
-              '<label>✨ Особый артефакт / Реликвия</label>' +
-              '<input type="text" id="wzDataInRelic" class="wz-input" value="' + escA(p.relic || '') + '" placeholder="Мантия-невидимка, Маховик времени, Напоминалка">' +
-            '</div>' +
-            '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
-              '<label>🦌 Патронус / Фамильяр / Метла</label>' +
-              '<input type="text" id="wzDataInPatronus" class="wz-input" value="' + escA(companionsDisplay) + '" placeholder="Например: Патронус Олень • Сова Букля • Метла «Молния»">' +
-            '</div>' +
-            '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
-              '<label>🪙 Сейф Гринготтса (Валюта волшебников)</label>' +
-              '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">' +
-                '<input type="number" min="0" id="wzDataInGalleons" class="wz-input" value="' + escA(p.galleons || 0) + '" placeholder="0" title="Золотые галеоны"> ' +
-                '<input type="number" min="0" id="wzDataInSickles" class="wz-input" value="' + escA(p.sickles || 0) + '" placeholder="0" title="Серебряные сикли"> ' +
-                '<input type="number" min="0" id="wzDataInKnuts" class="wz-input" value="' + escA(p.knuts || 0) + '" placeholder="0" title="Бронзовые кнаты"> ' +
+          '<div id="wzCharSheetContent" style="' + (isCollapsed ? 'display:none;' : '') + 'margin-top:14px;">' +
+            '<div class="wz-edit-grid">' +
+              '<div class="wz-edit-item">' +
+                '<label>Имя</label>' +
+                '<input type="text" id="wzDataInFirstName" class="wz-input" value="' + escA(fName) + '" placeholder="Имя">' +
               '</div>' +
-              '<div style="font-size:11px;color:var(--wz-text-muted);margin-top:4px;">1 Галеон (слева) = 17 Сиклей (в центре) = 493 Кната (справа).</div>' +
+              '<div class="wz-edit-item">' +
+                '<label>Фамилия</label>' +
+                '<input type="text" id="wzDataInLastName" class="wz-input" value="' + escA(lName) + '" placeholder="Фамилия">' +
+              '</div>' +
+              '<div class="wz-edit-item">' +
+                '<label>Факультет / Принадлежность</label>' +
+                '<select id="wzDataInHouse" class="wz-input">' + houseOptions + '</select>' +
+              '</div>' +
+              '<div class="wz-edit-item">' +
+                '<label>Титул / Прозвище / Роль</label>' +
+                '<input type="text" id="wzDataInTitle" class="wz-input" value="' + escA(p.title || '') + '" placeholder="Например: Ловец сборной, Мракоборец">' +
+              '</div>' +
+              '<div class="wz-edit-item">' +
+                '<label>Уровень волшебника</label>' +
+                '<input type="number" min="1" max="20" id="wzDataInLevel" class="wz-input" value="' + escA(p.level != null ? p.level : '1') + '" placeholder="1">' +
+              '</div>' +
+              '<div class="wz-edit-item">' +
+                '<label>Очки здоровья (HP)</label>' +
+                '<input type="number" min="1" id="wzDataInHp" class="wz-input" value="' + escA(hpVal) + '" placeholder="20">' +
+              '</div>' +
+              '<div class="wz-edit-item">' +
+                '<label>Запас маны (MP)</label>' +
+                '<input type="number" min="0" id="wzDataInMana" class="wz-input" value="' + escA(manaVal) + '" placeholder="50">' +
+              '</div>' +
+              '<div class="wz-edit-item">' +
+                '<label>Класс брони (КБ / Защитные чары)</label>' +
+                '<input type="number" id="wzDataInAc" class="wz-input" value="' + escA(p.ac != null ? p.ac : '10') + '" placeholder="10">' +
+              '</div>' +
             '</div>' +
-            '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
-              '<label>🎒 Инвентарь, флаконы с зельями и ингредиенты</label>' +
-              '<textarea id="wzDataInInventory" class="wz-input" rows="3" placeholder="Котёл, флаконы рябинового отвара, корень мандрагоры, пергаменты...">' + esc(p.inventory || '') + '</textarea>' +
-            '</div>' +
-            '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
-              '<label>📜 Заметки, биография и магические цели</label>' +
-              '<textarea id="wzDataInNotes" class="wz-input" rows="3" placeholder="История волшебника, анимагическая форма, союзники, дуэльные рекорды...">' + esc(p.notes || '') + '</textarea>' +
-            '</div>' +
-          '</div>' +
 
-          '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px;">' +
-            '<button class="btn btn-primary" id="wzDataSaveCharBtn">✓ Сохранить анкету</button>' +
-            '<button class="btn" id="wzDataResetProfileBtn" title="Восстановить HP и Ману персонажа">🔄 Сбросить статы</button>' +
-            '<button class="btn" id="wzDataDelProfileBtn" style="color:#ff7675;border-color:rgba(231,76,60,0.4);margin-left:auto;" title="Удалить текущий профиль">🗑️ Удалить профиль</button>' +
+            '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px;">' +
+              '<button class="btn btn-primary" id="wzDataSaveCharBtn">✓ Сохранить анкету</button>' +
+              '<button class="btn" id="wzDataResetProfileBtn" title="Восстановить HP и Ману персонажа">🔄 Восстановить HP/Ману</button>' +
+              '<button class="btn" id="wzDataDelProfileBtn" style="color:#ff7675;border-color:rgba(231,76,60,0.4);margin-left:auto;" title="Удалить текущий профиль">🗑️ Удалить профиль</button>' +
+            '</div>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -1962,7 +1907,7 @@
 
       '<div class="sheet-section wz-data-section">' +
         '<div class="section-label">Экспорт и импорт</div>' +
-        '<div class="desc">Единый файл на весь режим «Волшебник»: все профили волшебников, заклинания, дуэли, инвентарь и хроники Хогвартса. Импорт заменяет текущее содержимое.</div>' +
+        '<div class="desc">Единый файл на весь режим «Волшебник»: все профили волшебников, заклинания, дуэли и хроники Хогвартса. Импорт заменяет текущее содержимое.</div>' +
         '<div class="sheet-actions">' +
           '<button class="btn-primary" id="wzExport">Экспорт в файл</button>' +
           '<button class="btn-ghost" id="wzImportBtn">Импорт из файла</button>' +
@@ -1979,6 +1924,32 @@
     var g = function(id){ return document.getElementById(id); };
     var v = function(id){ var e = g(id); return e ? e.value : ''; };
 
+    // Сворачивание / разворачивание анкеты
+    var toggleHeader = g('wzCharHeaderToggle');
+    if(toggleHeader && !toggleHeader.__wired){
+      toggleHeader.__wired = true;
+      toggleHeader.addEventListener('click', function(){
+        var content = g('wzCharSheetContent');
+        var icon = g('wzCharToggleIcon');
+        var lbl = g('wzCharToggleLabel');
+        if(!content) return;
+        var isHidden = content.style.display === 'none';
+        if(isHidden){
+          content.style.display = 'block';
+          if(icon) icon.style.transform = '';
+          if(lbl) lbl.textContent = 'Свернуть';
+          WZ.charSheetCollapsed = false;
+          try{ localStorage.setItem('ttc_wz_char_collapsed', '0'); }catch(e){}
+        } else {
+          content.style.display = 'none';
+          if(icon) icon.style.transform = 'rotate(-90deg)';
+          if(lbl) lbl.textContent = 'Развернуть';
+          WZ.charSheetCollapsed = true;
+          try{ localStorage.setItem('ttc_wz_char_collapsed', '1'); }catch(e){}
+        }
+      });
+    }
+
     // Выбор активного профиля
     var sel = g('wzDataProfileSelect');
     if(sel){
@@ -1991,10 +1962,18 @@
     var newBtn = g('wzDataNewProfileBtn');
     if(newBtn){
       newBtn.addEventListener('click', function(){
-        var name = prompt('Введите имя нового волшебника (или оставьте пустым):', '');
-        if(name !== null){
-          WZ.createProfile({ name: name.trim() });
-          WZ.toast('✓ Создана новая анкета: ' + (name.trim() || 'Новый волшебник'), 'success');
+        var fullName = prompt('Введите имя и фамилию нового волшебника (или оставьте пустым):', '');
+        if(fullName !== null){
+          fullName = fullName.trim();
+          var parts = fullName ? fullName.split(/\s+/) : [];
+          var fName = parts[0] || '';
+          var lName = parts.slice(1).join(' ') || '';
+          WZ.createProfile({
+            name: fullName,
+            firstName: fName,
+            lastName: lName
+          });
+          WZ.toast('✓ Создана новая анкета: ' + (fullName || 'Новый волшебник'), 'success');
         }
       });
     }
@@ -2008,15 +1987,16 @@
       });
     }
 
-    // Сброс статов
+    // Сброс статов (восстановление HP/Маны)
     var resetBtn = g('wzDataResetProfileBtn');
     if(resetBtn){
       resetBtn.addEventListener('click', function(){
         var p = WZ.getActiveProfile();
-        var name = p && p.name ? ('«' + p.name + '»') : 'текущего волшебника';
-        if(confirm('Восстановить HP и Ману персонажа ' + name + ' до максимума? Снаряжение и заклинания сохранятся.')){
+        var fName = p ? ((p.firstName || p.lastName) ? [p.firstName, p.lastName].filter(Boolean).join(' ') : (p.name || '')) : '';
+        var name = fName ? ('«' + fName + '»') : 'текущего волшебника';
+        if(confirm('Восстановить HP и Ману персонажа ' + name + ' до максимума?')){
           WZ.resetProfile(WZ.activeProfileId);
-          WZ.toast('🔄 HP и Мана восстановлены до максимума', 'success');
+          WZ.toast('🔄 HP и Мана восстановлены', 'success');
         }
       });
     }
@@ -2026,7 +2006,8 @@
     if(delBtn){
       delBtn.addEventListener('click', function(){
         var p = WZ.getActiveProfile();
-        var name = p && p.name ? ('«' + p.name + '»') : 'этого волшебника';
+        var fName = p ? ((p.firstName || p.lastName) ? [p.firstName, p.lastName].filter(Boolean).join(' ') : (p.name || '')) : '';
+        var name = fName ? ('«' + fName + '»') : 'этого волшебника';
         if(!confirm('Удалить анкету ' + name + '? Это действие необратимо.')) return;
         WZ.deleteProfile(WZ.activeProfileId);
         WZ.toast('🗑️ Анкета удалена', 'info');
@@ -2038,27 +2019,22 @@
     if(saveCharBtn){
       saveCharBtn.addEventListener('click', function(){
         var p = WZ.getActiveProfile();
-        p.name = (v('wzDataInName') || '').trim();
+        p.firstName = (v('wzDataInFirstName') || '').trim();
+        p.lastName = (v('wzDataInLastName') || '').trim();
+        p.name = [p.firstName, p.lastName].filter(Boolean).join(' ') || p.firstName || p.lastName || 'Новый волшебник';
         p.house = (v('wzDataInHouse') || '').trim();
         p.title = (v('wzDataInTitle') || '').trim();
         p.level = parseInt(v('wzDataInLevel'), 10) || 1;
-        p.hp = parseInt(v('wzDataInHp'), 10) || 0;
-        p.maxHp = parseInt(v('wzDataInMaxHp'), 10) || 20;
+
+        var hpVal = parseInt(v('wzDataInHp'), 10) || 20;
+        p.maxHp = hpVal;
+        p.hp = hpVal;
+
+        var manaVal = parseInt(v('wzDataInMana'), 10) || 50;
+        p.maxMana = manaVal;
+        p.mana = manaVal;
+
         p.ac = parseInt(v('wzDataInAc'), 10) || 10;
-        p.mana = parseInt(v('wzDataInMana'), 10) || 0;
-        p.maxMana = parseInt(v('wzDataInMaxMana'), 10) || 50;
-
-        p.wand = (v('wzDataInWand') || '').trim();
-        p.robe = (v('wzDataInRobe') || '').trim();
-        p.relic = (v('wzDataInRelic') || '').trim();
-        p.patronus = (v('wzDataInPatronus') || '').trim();
-
-        p.galleons = parseInt(v('wzDataInGalleons'), 10) || 0;
-        p.sickles = parseInt(v('wzDataInSickles'), 10) || 0;
-        p.knuts = parseInt(v('wzDataInKnuts'), 10) || 0;
-
-        p.inventory = (v('wzDataInInventory') || '').trim();
-        p.notes = (v('wzDataInNotes') || '').trim();
 
         WZ.saveProfiles();
         WZ.toast('✓ Анкета успешно сохранена!', 'success');
