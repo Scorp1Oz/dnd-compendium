@@ -124,7 +124,8 @@ function paintShBar(){
   } else if(HB.mode==='wz'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
     var wzP = (typeof WZ !== 'undefined' && WZ.getProfile) ? WZ.getProfile() : null;
-    var wzHouseOrYear = wzP ? ((wzP.house || '') + (wzP.year ? (' • ' + wzP.year) : '')) : '';
+    var wzYear = wzP ? (wzP.year || wzP.course || wzP.profession || '') : '';
+    var wzHouseOrYear = wzP ? [wzP.house, wzYear].filter(Boolean).join(' • ') : '';
     var wzName = (wzP && wzP.name) ? (' • ' + wzP.name + (wzHouseOrYear ? (' (' + wzHouseOrYear + ')') : '')) : '';
     lab.textContent = 'Волшебник' + wzName;
   } else if(HB.mode==='hb'){

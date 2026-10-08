@@ -212,7 +212,9 @@ function paintBar(){
     worldLabel = 'Ведьмак' + wiName;
   } else if(curMode === 'wz'){
     var wzP = (typeof WZ !== 'undefined' && WZ.getProfile) ? WZ.getProfile() : null;
-    var wzName = (wzP && wzP.name) ? (' • ' + wzP.name + (wzP.house ? (' (' + wzP.house + ')') : '')) : '';
+    var wzYear = wzP ? (wzP.year || wzP.course || wzP.profession || '') : '';
+    var wzHouseOrYear = wzP ? [wzP.house, wzYear].filter(Boolean).join(' • ') : '';
+    var wzName = (wzP && wzP.name) ? (' • ' + wzP.name + (wzHouseOrYear ? (' (' + wzHouseOrYear + ')') : '')) : '';
     worldLabel = 'Волшебник' + wzName;
   }
 

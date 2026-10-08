@@ -54,12 +54,10 @@
       name: '',
       title: '',
       house: '',
-      level: 1,
+      year: '1 курс',
       hp: 20,
       maxHp: 20,
       ac: 10,
-      mana: 50,
-      maxMana: 50,
       wand: {
         name: '',
         wood: '',
@@ -252,7 +250,6 @@
       var p = (WZ.profiles || []).find(function(item){ return item.id === id; });
       if(!p) return;
       p.hp = p.maxHp || 20;
-      p.mana = p.maxMana || 50;
       WZ.saveProfiles();
       if(typeof render === 'function') render();
     },
@@ -1864,7 +1861,7 @@
     var charDisplayTitle = p.title ? esc(p.title) : (p.house ? (esc(p.house) + ' • Маг') : 'Волшебник');
 
     var hpVal = p.maxHp != null ? p.maxHp : (p.hp != null ? p.hp : 20);
-    var manaVal = p.maxMana != null ? p.maxMana : (p.mana != null ? p.mana : 50);
+    var yearVal = p.year || p.course || p.profession || '1 курс';
 
     // HUD карточка волшебника
     var hud = '<div class="wz-hud ' + houseClass + '">' +
@@ -1877,9 +1874,8 @@
         '</div>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
           houseBadge +
-          '<span class="wz-stat-badge">Ур. ' + (p.level || 1) + '</span>' +
+          '<span class="wz-stat-badge year" title="Курс Хогвартса или профессия">🎓 ' + esc(yearVal) + '</span>' +
           '<span class="wz-stat-badge hp">❤️ ' + hpVal + ' HP</span>' +
-          '<span class="wz-stat-badge mana">✨ ' + manaVal + ' MP</span>' +
           '<span class="wz-stat-badge ac">🛡️ КБ ' + (p.ac || 10) + '</span>' +
           '<button class="wz-hud-edit-btn" data-nav="wzData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzData\');" title="Перейти к анкете и списку персонажей">⚙️ Ростер</button>' +
         '</div>' +
@@ -1999,7 +1995,8 @@
       var hIcon = getHouseIcon(item.house);
       var hLabel = item.house ? (' • ' + item.house) : ' • Без факультета';
       var itName = (item.firstName || item.lastName) ? [item.firstName, item.lastName].filter(Boolean).join(' ') : (item.name || 'Безымянный маг');
-      var pTitle = hIcon + ' ' + itName + hLabel + ' (Ур. ' + (item.level || 1) + ')';
+      var itYear = item.year || item.course || item.profession || '1 курс';
+      var pTitle = hIcon + ' ' + itName + hLabel + ' (' + itYear + ')';
       return '<option value="' + escA(item.id) + '" ' + (item.id === WZ.activeProfileId ? 'selected' : '') + '>' + esc(pTitle) + '</option>';
     }).join('');
 
@@ -2017,7 +2014,7 @@
     var lName = p.lastName != null ? p.lastName : (p.name ? p.name.split(' ').slice(1).join(' ') : '');
 
     var hpVal = p.maxHp != null ? p.maxHp : (p.hp != null ? p.hp : 20);
-    var manaVal = p.maxMana != null ? p.maxMana : (p.mana != null ? p.mana : 50);
+    var yearVal = p.year || p.course || p.profession || '1 курс';
 
     var isCollapsed = false;
     try { isCollapsed = localStorage.getItem('ttc_wz_char_collapsed') === '1'; } catch(e){}
@@ -2080,20 +2077,37 @@
                 '<select id="wzDataInHouse" class="wz-input">' + houseOptions + '</select>' +
               '</div>' +
               '<div class="wz-edit-item">' +
+                '<label>Курс Хогвартса или профессия</label>' +
+                '<input type="text" id="wzDataInYear" class="wz-input" list="wzDataYearList" value="' + escA(yearVal) + '" placeholder="1-7 курс или введите профессию...">' +
+                '<datalist id="wzDataYearList">' +
+                  '<option value="1 курс">1 курс (Первокурсник)</option>' +
+                  '<option value="2 курс">2 курс</option>' +
+                  '<option value="3 курс">3 курс (Выбор факультативов)</option>' +
+                  '<option value="4 курс">4 курс</option>' +
+                  '<option value="5 курс (С.О.В.)">5 курс (С.О.В.)</option>' +
+                  '<option value="6 курс">6 курс (Углублённая магия)</option>' +
+                  '<option value="7 курс (Ж.А.Б.А.)">7 курс (Ж.А.Б.А. / Выпускной)</option>' +
+                  '<option value="Выпускник Хогвартса">Выпускник Хогвартса</option>' +
+                  '<option value="Мракоборец (Аврор)">Мракоборец (Аврор)</option>' +
+                  '<option value="Преподаватель Хогвартса">Преподаватель Хогвартса</option>' +
+                  '<option value="Мастер зелий">Мастер зелий (Зельевавар)</option>' +
+                  '<option value="Магозоолог">Магозоолог (Исследователь существ)</option>' +
+                  '<option value="Сотрудник Министерства">Сотрудник Министерства Магии</option>' +
+                  '<option value="Невыразимец">Невыразимец (Отдел Тайн)</option>' +
+                  '<option value="Целитель больницы Св. Мунго">Целитель больницы Св. Мунго</option>' +
+                  '<option value="Мастер волшебных палочек">Мастер волшебных палочек</option>' +
+                  '<option value="Игрок в Квиддич">Игрок в Квиддич</option>' +
+                  '<option value="Пожиратель Смерти">Пожиратель Смерти</option>' +
+                  '<option value="Торговец Косого переулка">Торговец Косого переулка</option>' +
+                '</datalist>' +
+              '</div>' +
+              '<div class="wz-edit-item">' +
                 '<label>Титул / Прозвище / Роль</label>' +
                 '<input type="text" id="wzDataInTitle" class="wz-input" value="' + escA(p.title || '') + '" placeholder="Например: Ловец сборной, Мракоборец">' +
               '</div>' +
               '<div class="wz-edit-item">' +
-                '<label>Уровень волшебника</label>' +
-                '<input type="number" min="1" max="20" id="wzDataInLevel" class="wz-input" value="' + escA(p.level != null ? p.level : '1') + '" placeholder="1">' +
-              '</div>' +
-              '<div class="wz-edit-item">' +
                 '<label>Очки здоровья (HP)</label>' +
                 '<input type="number" min="1" id="wzDataInHp" class="wz-input" value="' + escA(hpVal) + '" placeholder="20">' +
-              '</div>' +
-              '<div class="wz-edit-item">' +
-                '<label>Запас маны (MP)</label>' +
-                '<input type="number" min="0" id="wzDataInMana" class="wz-input" value="' + escA(manaVal) + '" placeholder="50">' +
               '</div>' +
               '<div class="wz-edit-item">' +
                 '<label>Класс брони (КБ / Защитные чары)</label>' +
@@ -2103,7 +2117,7 @@
 
             '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px;">' +
               '<button class="btn btn-primary" id="wzDataSaveCharBtn">✓ Сохранить анкету</button>' +
-              '<button class="btn" id="wzDataResetProfileBtn" title="Восстановить HP и Ману персонажа">🔄 Восстановить HP/Ману</button>' +
+              '<button class="btn" id="wzDataResetProfileBtn" title="Восстановить HP персонажа">🔄 Восстановить HP</button>' +
               '<button class="btn" id="wzDataDelProfileBtn" style="color:#ff7675;border-color:rgba(231,76,60,0.4);margin-left:auto;" title="Удалить текущий профиль">🗑️ Удалить профиль</button>' +
             '</div>' +
           '</div>' +
@@ -2225,9 +2239,9 @@
         var p = WZ.getActiveProfile();
         var fName = p ? ((p.firstName || p.lastName) ? [p.firstName, p.lastName].filter(Boolean).join(' ') : (p.name || '')) : '';
         var name = fName ? ('«' + fName + '»') : 'текущего волшебника';
-        if(confirm('Восстановить HP и Ману персонажа ' + name + ' до максимума?')){
+        if(confirm('Восстановить HP персонажа ' + name + ' до максимума?')){
           WZ.resetProfile(WZ.activeProfileId);
-          WZ.toast('🔄 HP и Мана восстановлены', 'success');
+          WZ.toast('🔄 HP персонажа восстановлено', 'success');
         }
       });
     }
@@ -2254,18 +2268,18 @@
         p.lastName = (v('wzDataInLastName') || '').trim();
         p.name = [p.firstName, p.lastName].filter(Boolean).join(' ') || p.firstName || p.lastName || 'Новый волшебник';
         p.house = (v('wzDataInHouse') || '').trim();
+        p.year = (v('wzDataInYear') || '').trim() || '1 курс';
         p.title = (v('wzDataInTitle') || '').trim();
-        p.level = parseInt(v('wzDataInLevel'), 10) || 1;
 
         var hpVal = parseInt(v('wzDataInHp'), 10) || 20;
         p.maxHp = hpVal;
         p.hp = hpVal;
 
-        var manaVal = parseInt(v('wzDataInMana'), 10) || 50;
-        p.maxMana = manaVal;
-        p.mana = manaVal;
-
         p.ac = parseInt(v('wzDataInAc'), 10) || 10;
+
+        delete p.level;
+        delete p.mana;
+        delete p.maxMana;
 
         WZ.saveProfiles();
         WZ.toast('✓ Анкета успешно сохранена!', 'success');
