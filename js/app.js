@@ -77,9 +77,12 @@ function paintShBar(){
   var wzBtn = seg.querySelector('[data-hbmode="wz"]');
   if(wzBtn && !wzBtn.__wzBound){
     wzBtn.__wzBound = true;
-    wzBtn.addEventListener('click', function(){
+    wzBtn.addEventListener('click', function(e){
       HB.mode='wz';
       try{ localStorage.setItem('ttc_mode','wz'); }catch(e){}
+      if(typeof wzTriggerModeSwitchEffect === 'function'){
+        wzTriggerModeSwitchEffect(wzBtn, e);
+      }
       view={screen:'wzHome'}; render(); window.scrollTo(0,0);
     });
   }

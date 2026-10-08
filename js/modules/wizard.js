@@ -402,11 +402,171 @@
       var fx = document.getElementById('wzThemeFx');
       if(typeof HB === 'undefined' || HB.mode !== 'wz'){
         document.body.classList.remove('wz-theme');
+        ['gryffindor', 'slytherin', 'ravenclaw', 'hufflepuff'].forEach(function(h){
+          document.body.classList.remove('wz-house-' + h);
+        });
         if(fx) fx.style.display = 'none';
         return;
       }
       document.body.classList.add('wz-theme');
+      var p = (typeof WZ.getProfile === 'function') ? WZ.getProfile() : null;
+      ['gryffindor', 'slytherin', 'ravenclaw', 'hufflepuff'].forEach(function(h){
+        document.body.classList.remove('wz-house-' + h);
+      });
+      if(p && p.house){
+        var slug = getHouseSlug(p.house);
+        if(slug && slug !== 'neutral') document.body.classList.add('wz-house-' + slug);
+      }
       WZ.initThemeFx();
+    },
+
+    triggerModeSwitchEffect: function(targetElement, event){
+      if(typeof document === 'undefined' || !document.body) return;
+      var x, y;
+      if(event && event.clientX && event.clientY){
+        x = event.clientX;
+        y = event.clientY;
+      } else if(targetElement && typeof targetElement.getBoundingClientRect === 'function'){
+        var r = targetElement.getBoundingClientRect();
+        x = r.left + r.width / 2;
+        y = r.top + r.height / 2;
+      } else {
+        x = window.innerWidth / 2;
+        y = 48;
+      }
+
+      // 1. Вспышка на кнопке
+      if(targetElement && targetElement.classList){
+        targetElement.classList.remove('wz-btn-flare');
+        void targetElement.offsetWidth;
+        targetElement.classList.add('wz-btn-flare');
+        setTimeout(function(){
+          if(targetElement && targetElement.classList) targetElement.classList.remove('wz-btn-flare');
+        }, 600);
+      }
+
+      // 2. Расширяющаяся световая волна заклинания
+      var ripple = document.createElement('div');
+      ripple.className = 'wz-spell-ripple';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      document.body.appendChild(ripple);
+      setTimeout(function(){
+        if(ripple && ripple.parentNode) ripple.parentNode.removeChild(ripple);
+      }, 850);
+
+      // 3. Россыпь магических искр из точки клика
+      var sparkColors = [
+        { bg: 'radial-gradient(circle, #fff 20%, #facc15 65%, rgba(212,175,55,0) 100%)', shadow: '0 0 8px #fde047, 0 0 16px rgba(234, 179, 8, 0.85)' },
+        { bg: 'radial-gradient(circle, #fff 20%, #c084fc 65%, rgba(192,132,252,0) 100%)', shadow: '0 0 8px #d8b4fe, 0 0 16px rgba(192, 132, 252, 0.85)' },
+        { bg: 'radial-gradient(circle, #fff 20%, #38bdf8 65%, rgba(56,189,248,0) 100%)', shadow: '0 0 8px #7dd3fc, 0 0 16px rgba(56, 189, 248, 0.85)' },
+        { bg: 'radial-gradient(circle, #fff 35%, #f1f5f9 70%, rgba(255,255,255,0) 100%)', shadow: '0 0 7px #ffffff, 0 0 14px rgba(255, 255, 255, 0.9)' }
+      ];
+
+      var sparkCount = 18;
+      for(var i = 0; i < sparkCount; i++){
+        (function(idx){
+          var sp = document.createElement('div');
+          sp.className = 'wz-mode-spark';
+          var col = sparkColors[idx % sparkColors.length];
+          var sz = Math.random() * 4 + 3.5;
+          sp.style.width = sz + 'px';
+          sp.style.height = sz + 'px';
+          sp.style.background = col.bg;
+          sp.style.boxShadow = col.shadow;
+          sp.style.left = x + 'px';
+          sp.style.top = y + 'px';
+          sp.style.transform = 'translate(-50%, -50%) scale(1)';
+          sp.style.transition = 'transform 0.75s cubic-bezier(0.1, 0.8, 0.25, 1), opacity 0.75s ease-out';
+          sp.style.opacity = '1';
+          document.body.appendChild(sp);
+
+          var angle = (idx / sparkCount) * 2 * Math.PI + (Math.random() * 0.4 - 0.2);
+          var dist = Math.random() * 75 + 45;
+          var destX = Math.cos(angle) * dist;
+          var destY = Math.sin(angle) * dist + (Math.random() * 18);
+
+          requestAnimationFrame(function(){
+            sp.style.transform = 'translate(calc(-50% + ' + destX.toFixed(1) + 'px), calc(-50% + ' + destY.toFixed(1) + 'px)) scale(0.2)';
+            sp.style.opacity = '0';
+          });
+
+          setTimeout(function(){
+            if(sp && sp.parentNode) sp.parentNode.removeChild(sp);
+          }, 850);
+        })(i);
+      }
+
+      // 4. Всплывающая инкантация
+      var incantations = [
+        '✨ Revelio!',
+        '🪄 Lumos Maxima!',
+        '✨ Alohomora!',
+        '⚡ Expecto Patronum!',
+        '🪄 Accio Hogwarts!'
+      ];
+      var charm = incantations[Math.floor(Math.random() * incantations.length)];
+      var toast = document.createElement('div');
+      toast.className = 'wz-spell-incantation-toast';
+      toast.textContent = charm;
+      document.body.appendChild(toast);
+      setTimeout(function(){
+        if(toast && toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 1400);
+    },
+
+    triggerCardFlourish: function(el, event){
+      if(typeof document === 'undefined' || !document.body) return;
+      var x, y;
+      if(event && event.clientX && event.clientY){
+        x = event.clientX;
+        y = event.clientY;
+      } else if(el && typeof el.getBoundingClientRect === 'function'){
+        var r = el.getBoundingClientRect();
+        x = r.left + Math.min(r.width / 2, 80);
+        y = r.top + r.height / 2;
+      } else {
+        return;
+      }
+
+      var sparkColors = [
+        { bg: 'radial-gradient(circle, #fff 20%, #facc15 65%, rgba(212,175,55,0) 100%)', shadow: '0 0 6px #fde047' },
+        { bg: 'radial-gradient(circle, #fff 20%, #c084fc 65%, rgba(192,132,252,0) 100%)', shadow: '0 0 6px #d8b4fe' },
+        { bg: 'radial-gradient(circle, #fff 30%, #f1f5f9 70%, rgba(255,255,255,0) 100%)', shadow: '0 0 6px #ffffff' }
+      ];
+
+      for(var i = 0; i < 8; i++){
+        (function(idx){
+          var sp = document.createElement('div');
+          sp.className = 'wz-mode-spark';
+          var col = sparkColors[idx % sparkColors.length];
+          var sz = Math.random() * 3 + 3;
+          sp.style.width = sz + 'px';
+          sp.style.height = sz + 'px';
+          sp.style.background = col.bg;
+          sp.style.boxShadow = col.shadow;
+          sp.style.left = x + 'px';
+          sp.style.top = y + 'px';
+          sp.style.transform = 'translate(-50%, -50%) scale(1)';
+          sp.style.transition = 'transform 0.45s ease-out, opacity 0.45s ease-out';
+          sp.style.opacity = '1';
+          document.body.appendChild(sp);
+
+          var angle = (idx / 8) * 2 * Math.PI + (Math.random() * 0.4 - 0.2);
+          var dist = Math.random() * 45 + 25;
+          var dx = Math.cos(angle) * dist;
+          var dy = Math.sin(angle) * dist;
+
+          requestAnimationFrame(function(){
+            sp.style.transform = 'translate(calc(-50% + ' + dx.toFixed(1) + 'px), calc(-50% + ' + dy.toFixed(1) + 'px)) scale(0.2)';
+            sp.style.opacity = '0';
+          });
+
+          setTimeout(function(){
+            if(sp && sp.parentNode) sp.parentNode.removeChild(sp);
+          }, 500);
+        })(i);
+      }
     }
   };
 
@@ -1622,12 +1782,15 @@
      ============================================================ */
 
   function wireWzNav(){
-    document.querySelectorAll('[data-nav]').forEach(function(el){
+    document.querySelectorAll('[data-nav], [data-go="dice"]').forEach(function(el){
       if(el.__wzNavBound) return;
       el.__wzNavBound = true;
       el.addEventListener('click', function(e){
-        var nav = el.getAttribute('data-nav');
+        var nav = el.getAttribute('data-nav') || (el.getAttribute('data-go') === 'dice' ? 'dice' : null);
         if(nav && typeof window.navigate === 'function'){
+          if(typeof WZ.triggerCardFlourish === 'function'){
+            WZ.triggerCardFlourish(el, e);
+          }
           e.preventDefault();
           window.navigate(nav);
         }
@@ -4597,6 +4760,8 @@
   window.wireWzMap = wireWzMap;
   window.wireWzNav = wireWzNav;
   window.applyWizardTheme = WZ.applyTheme;
+  window.wzTriggerModeSwitchEffect = WZ.triggerModeSwitchEffect;
+  window.wzTriggerCardFlourish = WZ.triggerCardFlourish;
 
   WZ.wzHome = wzHome;
   WZ.wzData = wzData;

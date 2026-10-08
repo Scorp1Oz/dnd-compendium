@@ -191,6 +191,7 @@ function paintBar(){
   document.body.classList.toggle('me-theme', curMode === 'me');
   document.body.classList.toggle('el-theme', curMode === 'el');
   document.body.classList.toggle('wi-theme', curMode === 'wi');
+  document.body.classList.toggle('wz-theme', curMode === 'wz');
 
   var worldLabel = '';
   if(curMode === 'hb'){
@@ -209,6 +210,10 @@ function paintBar(){
     var wiP = (typeof WI !== 'undefined' && WI.getProfile) ? WI.getProfile() : null;
     var wiName = wiP ? (' • ' + wiP.name + ' (' + (wiP.school || 'Школа Волка') + ')') : '';
     worldLabel = 'Ведьмак' + wiName;
+  } else if(curMode === 'wz'){
+    var wzP = (typeof WZ !== 'undefined' && WZ.getProfile) ? WZ.getProfile() : null;
+    var wzName = (wzP && wzP.name) ? (' • ' + wzP.name + (wzP.house ? (' (' + wzP.house + ')') : '')) : '';
+    worldLabel = 'Волшебник' + wzName;
   }
 
   bar.innerHTML =
@@ -220,12 +225,13 @@ function paintBar(){
         '<button class="hb-seg-btn ' + (curMode==='me'?'on':'') + '" data-hbmode="me">Космос</button>'+
         '<button class="hb-seg-btn ' + (curMode==='el'?'on':'') + '" data-hbmode="el">Стихия</button>'+
         '<button class="hb-seg-btn ' + (curMode==='wi'?'on':'') + '" data-hbmode="wi">Ведьмак</button>'+
+        '<button class="hb-seg-btn ' + (curMode==='wz'?'on':'') + '" data-hbmode="wz">Волшебник</button>'+
       '</div>'+
       (worldLabel ? '<div class="hb-bar-world">' + worldLabel + '</div>' : '')+
     '</div>';
 
   bar.querySelectorAll('[data-hbmode]').forEach(function(b){
-    b.addEventListener('click', function(){
+    b.addEventListener('click', function(e){
       var m = b.getAttribute('data-hbmode');
       HB.mode = m;
       saveMode();
@@ -241,6 +247,10 @@ function paintBar(){
       } else if(m === 'wi'){
         if(typeof window.navigate === 'function') window.navigate('wiHome');
         else { view = {screen:'wiHome'}; render(); }
+      } else if(m === 'wz'){
+        if(typeof wzTriggerModeSwitchEffect === 'function') wzTriggerModeSwitchEffect(b, e);
+        if(typeof window.navigate === 'function') window.navigate('wzHome');
+        else { view = {screen:'wzHome'}; render(); }
       } else if(m === 'hb'){
         view = {screen:'hbHome'};
         render();
@@ -256,6 +266,7 @@ function paintBar(){
   if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
   if(typeof applyMeTheme === 'function') applyMeTheme();
   if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
+  if(typeof applyWizardTheme === 'function') applyWizardTheme();
 }
 
 /* ---------- экраны ---------- */
