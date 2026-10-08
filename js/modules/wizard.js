@@ -353,28 +353,6 @@
         spark.style.animation = 'wzDustDrift' + animIndex + ' ' + duration + 's ease-in-out ' + delay + 's infinite';
         cont.appendChild(spark);
       }
-
-      // 6. Вспышка искр палочки при клике
-      if(typeof window !== 'undefined' && !window.__wzWandBurstBound){
-        window.__wzWandBurstBound = true;
-        document.addEventListener('click', function(e){
-          if(typeof HB === 'undefined' || HB.mode !== 'wz') return;
-          for(var k = 0; k < 4; k++){
-            var p = document.createElement('div');
-            p.className = 'wz-wand-spark-click';
-            var angle = Math.random() * Math.PI * 2;
-            var dist = Math.random() * 26 + 10;
-            var dx = Math.cos(angle) * dist;
-            var dy = Math.sin(angle) * dist;
-            p.style.setProperty('--dx', dx + 'px');
-            p.style.setProperty('--dy', dy + 'px');
-            p.style.left = e.clientX + 'px';
-            p.style.top = e.clientY + 'px';
-            document.body.appendChild(p);
-            setTimeout((function(el){ return function(){ if(el.parentNode) el.parentNode.removeChild(el); }; })(p), 600);
-          }
-        });
-      }
     },
 
     initThemeFx: function(){

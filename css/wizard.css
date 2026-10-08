@@ -250,31 +250,6 @@ body.wz-theme {
   100% { transform: translate(96px, 32px) scale(0.4); opacity: 0; }
 }
 
-/* Вспышка искр палочки при клике */
-.wz-wand-spark-click {
-  position: fixed;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 8px #fde047, 0 0 16px rgba(212, 175, 55, 0.95);
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  animation: wzWandSparkAnim 0.55s ease-out forwards;
-}
-
-@keyframes wzWandSparkAnim {
-  0% {
-    transform: translate(-50%, -50%) scale(1.4);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(calc(-50% + var(--dx, 15px)), calc(-50% + var(--dy, 15px))) scale(0.2);
-    opacity: 0;
-  }
-}
-
 /* HUD карточка волшебника на главном экране */
 .wz-hud {
   background: linear-gradient(135deg, rgba(16, 18, 29, 0.95) 0%, rgba(22, 26, 41, 0.9) 100%);
