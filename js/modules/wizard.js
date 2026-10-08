@@ -59,7 +59,14 @@
       ac: 10,
       mana: 50,
       maxMana: 50,
-      wand: '',
+      wand: {
+        name: '',
+        wood: '',
+        core: '',
+        length: '',
+        flexibility: '',
+        features: ''
+      },
       robe: '',
       relic: '',
       patronus: '',
@@ -69,6 +76,26 @@
       inventory: '',
       notes: ''
     };
+  }
+
+  function getProfileWand(p){
+    p = p || WZ.getActiveProfile();
+    var defWand = { name: '', wood: '', core: '', length: '', flexibility: '', features: '' };
+    if(!p) return defWand;
+    if(p.wand && typeof p.wand === 'object'){
+      return {
+        name: p.wand.name || '',
+        wood: p.wand.wood || '',
+        core: p.wand.core || '',
+        length: p.wand.length || '',
+        flexibility: p.wand.flexibility || '',
+        features: p.wand.features || ''
+      };
+    }
+    if(typeof p.wand === 'string' && p.wand.trim()){
+      defWand.name = p.wand.trim();
+    }
+    return defWand;
   }
 
   var WZ = window.WZ = {
@@ -1683,6 +1710,13 @@
         '</div>' +
         '<div class="wz-card-arrow">→</div>' +
       '</div>' +
+      '<div class="wz-card wz-card-clickable" data-nav="wzWand" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzWand\');" role="button" tabindex="0" title="Открыть Палочка">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="wz-card-title"><span>🪄</span> Палочка</div>' +
+          '<div class="wz-card-desc">Параметры волшебной палочки: древесина, сердцевина, длина, упругость и свойства</div>' +
+        '</div>' +
+        '<div class="wz-card-arrow">→</div>' +
+      '</div>' +
       '<div class="wz-card wz-card-disabled" id="wzMapBlockedBtn" role="button" aria-disabled="true" tabindex="-1" title="Карта временно заблокирована">' +
         '<div style="flex:1;min-width:0;">' +
           '<div class="wz-card-title" style="color:var(--wz-text-muted);"><span>🗺️</span> Карта мира <span class="wz-stat-badge" style="margin-left:6px;font-size:10px;background:rgba(239,68,68,0.18);border-color:rgba(239,68,68,0.45);color:#fca5a5;padding:1px 6px;">🔒 Заблокировано</span></div>' +
@@ -2117,6 +2151,210 @@
     }
 
     wireWzNav();
+  }
+
+  /* ============================================================
+     ЭКРАН ВОЛШЕБНОЙ ПАЛОЧКИ (wzWand)
+     ============================================================ */
+
+  function wzWand(){
+    var profList = WZ.profiles || [];
+    if(!profList.length){
+      WZ.loadProfiles();
+      profList = WZ.profiles || [];
+    }
+    var p = WZ.getActiveProfile();
+    var w = getProfileWand(p);
+
+    var charDisplayName = (p.firstName || p.lastName) ? [p.firstName, p.lastName].filter(Boolean).join(' ') : (p.name || 'Безымянный маг');
+    var hIcon = getHouseIcon(p.house);
+
+    var profOptions = profList.map(function(item){
+      var hi = getHouseIcon(item.house);
+      var itName = (item.firstName || item.lastName) ? [item.firstName, item.lastName].filter(Boolean).join(' ') : (item.name || 'Безымянный маг');
+      return '<option value="' + escA(item.id) + '" ' + (item.id === WZ.activeProfileId ? 'selected' : '') + '>' + hi + ' ' + esc(itName) + (item.house ? (' (' + esc(item.house) + ')') : '') + '</option>';
+    }).join('');
+
+    var wandTitle = w.name || (w.wood ? ('Палочка: ' + w.wood + (w.core ? (' и ' + w.core) : '')) : 'Волшебная палочка');
+    var wandSub = [w.wood, w.core].filter(Boolean).join(' • ') || 'Параметры палочки не заполнены';
+
+    var showcaseHtml = 
+      '<div class="wz-wand-showcase-card" id="wzWandShowcase">' +
+        '<div class="wz-wand-title-row">' +
+          '<span class="wz-wand-symbol">🪄</span>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div class="wz-wand-display-name">' + esc(wandTitle) + '</div>' +
+            '<div class="wz-wand-display-sub">' + esc(wandSub) + '</div>' +
+          '</div>' +
+          (p.house ? ('<span class="wz-house-badge ' + getHouseSlug(p.house) + '">' + hIcon + ' ' + esc(p.house) + '</span>') : '') +
+        '</div>' +
+        '<div class="wz-wand-chips-row">' +
+          '<span class="wz-stat-badge">🌲 Древесина: <b style="color:var(--wz-gold-light);">' + esc(w.wood || 'Не указана') + '</b></span>' +
+          '<span class="wz-stat-badge">✨ Сердцевина: <b style="color:var(--wz-gold-light);">' + esc(w.core || 'Не указана') + '</b></span>' +
+          '<span class="wz-stat-badge">📏 Длина: <b style="color:var(--wz-gold-light);">' + esc(w.length || 'Не указана') + '</b></span>' +
+          '<span class="wz-stat-badge">🌀 Упругость: <b style="color:var(--wz-gold-light);">' + esc(w.flexibility || 'Не указана') + '</b></span>' +
+        '</div>' +
+        (w.features ? ('<div class="wz-wand-features-box"><b>Особенности:</b> ' + esc(w.features) + '</div>') : '') +
+      '</div>';
+
+    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Палочка' }]) +
+      '<button class="back" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">← Назад</button>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">' +
+        '<div>' +
+          '<h1 style="margin-bottom:4px;">🪄 Палочка</h1>' +
+          '<div class="desc" style="margin-bottom:0;">Параметры волшебной палочки: древесина, сердцевина, длина, упругость и особенности.</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<label style="font-size:12px;color:var(--wz-text-muted);font-weight:600;">Маг:</label>' +
+          '<select id="wzWandProfileSelect" class="wz-input" style="width:auto;min-width:180px;padding:6px 10px;font-size:13px;">' +
+            profOptions +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+
+      showcaseHtml +
+
+      '<div class="wz-char-sheet-card">' +
+        '<div class="wz-char-header">' +
+          '<span>Параметры палочки: <b style="color:var(--wz-gold);">' + esc(charDisplayName) + '</b></span>' +
+        '</div>' +
+
+        '<div class="wz-edit-grid">' +
+          '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+            '<label>Название</label>' +
+            '<input type="text" id="wzWandInName" class="wz-input" value="' + escA(w.name) + '" placeholder="Например: Палочка из остролиста, Бузинная палочка, Палочка Поттера">' +
+          '</div>' +
+
+          '<div class="wz-edit-item">' +
+            '<label>Древесина</label>' +
+            '<input type="text" id="wzWandInWood" class="wz-input" list="wzWoodList" value="' + escA(w.wood) + '" placeholder="Например: Остролист, Тис, Бузина, Дуб...">' +
+            '<datalist id="wzWoodList">' +
+              '<option value="Остролист"><option value="Тис"><option value="Бузина"><option value="Дуб"><option value="Ива">' +
+              '<option value="Ясень"><option value="Виноградная лоза"><option value="Черное дерево"><option value="Терновник">' +
+              '<option value="Вишня"><option value="Боярышник"><option value="Орех"><option value="Кедр"><option value="Клен">' +
+              '<option value="Вяз"><option value="Граб"><option value="Ольха"><option value="Кипарис"><option value="Липа">' +
+              '<option value="Красное дерево"><option value="Рябина"><option value="Каштан">' +
+            '</datalist>' +
+          '</div>' +
+
+          '<div class="wz-edit-item">' +
+            '<label>Сердцевина</label>' +
+            '<input type="text" id="wzWandInCore" class="wz-input" list="wzCoreList" value="' + escA(w.core) + '" placeholder="Например: Перо феникса, Сердечная жила дракона...">' +
+            '<datalist id="wzCoreList">' +
+              '<option value="Перо феникса"><option value="Сердечная жила дракона"><option value="Волос единорога">' +
+              '<option value="Волос вейлы"><option value="Волос фестрала"><option value="Рог рогатого змея">' +
+              '<option value="Ус вампуса"><option value="Перо птицы-гром"><option value="Чешуя василиска">' +
+            '</datalist>' +
+          '</div>' +
+
+          '<div class="wz-edit-item">' +
+            '<label>Длина</label>' +
+            '<input type="text" id="wzWandInLength" class="wz-input" value="' + escA(w.length) + '" placeholder="Например: 11 дюймов (28 см)">' +
+          '</div>' +
+
+          '<div class="wz-edit-item">' +
+            '<label>Упругость</label>' +
+            '<input type="text" id="wzWandInFlex" class="wz-input" list="wzFlexList" value="' + escA(w.flexibility) + '" placeholder="Например: Умеренно упругая, Непреклонная...">' +
+            '<datalist id="wzFlexList">' +
+              '<option value="Умеренно упругая"><option value="Гибкая"><option value="Упругая"><option value="Очень гибкая">' +
+              '<option value="Слегка пружинистая"><option value="Твердая"><option value="Непреклонная"><option value="Жесткая">' +
+              '<option value="Хрупкая"><option value="Податливая">' +
+            '</datalist>' +
+          '</div>' +
+
+          '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+            '<label>Особенности</label>' +
+            '<textarea id="wzWandInFeatures" class="wz-input" rows="4" placeholder="Особые свойства, совместимость с заклинаниями, история приобретения в лавке мистера Олливандера, привязанность к владельцу...">' + esc(w.features) + '</textarea>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px;">' +
+          '<button class="btn btn-primary" id="wzWandSaveBtn">✓ Сохранить палочку</button>' +
+          '<button class="btn" id="wzWandRandomBtn" title="Сгенерировать случайную гармоничную комбинацию Олливандера">🎲 Случайная палочка</button>' +
+          '<button class="btn btn-ghost" data-nav="wzRefView:wands" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRefView:wands\');" style="margin-left:auto;">📚 Справочник: Палочки Олливандера</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function wireWzWand(){
+    wireWzNav();
+    var g = function(id){ return document.getElementById(id); };
+    var v = function(id){ var e = g(id); return e ? e.value : ''; };
+
+    // Переключение профиля прямо на экране палочки
+    var sel = g('wzWandProfileSelect');
+    if(sel && !sel.__wired){
+      sel.__wired = true;
+      sel.addEventListener('change', function(){
+        WZ.switchProfile(this.value);
+        if(typeof render === 'function') render();
+      });
+    }
+
+    // Сохранение параметров палочки
+    var saveBtn = g('wzWandSaveBtn');
+    if(saveBtn && !saveBtn.__wired){
+      saveBtn.__wired = true;
+      saveBtn.addEventListener('click', function(){
+        var p = WZ.getActiveProfile();
+        if(!p.wand || typeof p.wand !== 'object'){
+          p.wand = {};
+        }
+        p.wand.name = (v('wzWandInName') || '').trim();
+        p.wand.wood = (v('wzWandInWood') || '').trim();
+        p.wand.core = (v('wzWandInCore') || '').trim();
+        p.wand.length = (v('wzWandInLength') || '').trim();
+        p.wand.flexibility = (v('wzWandInFlex') || '').trim();
+        p.wand.features = (v('wzWandInFeatures') || '').trim();
+
+        WZ.saveProfiles();
+        WZ.toast('✓ Параметры палочки успешно сохранены!', 'success');
+        if(typeof render === 'function') render();
+      });
+    }
+
+    // Генерация случайной каноничной палочки
+    var randBtn = g('wzWandRandomBtn');
+    if(randBtn && !randBtn.__wired){
+      randBtn.__wired = true;
+      randBtn.addEventListener('click', function(){
+        var woods = ['Остролист', 'Тис', 'Бузина', 'Дуб', 'Ива', 'Ясень', 'Виноградная лоза', 'Черное дерево', 'Терновник', 'Вишня', 'Боярышник', 'Орех', 'Кедр', 'Клен', 'Вяз', 'Граб', 'Ольха', 'Кипарис', 'Липа'];
+        var cores = ['Перо феникса', 'Сердечная жила дракона', 'Волос единорога', 'Волос вейлы', 'Волос фестрала', 'Рог рогатого змея'];
+        var flexes = ['Умеренно упругая', 'Гибкая', 'Упругая', 'Слегка пружинистая', 'Твердая', 'Непреклонная', 'Жесткая', 'Податливая'];
+        var lengths = ['9½ дюймов (24 см)', '10 дюймов (25.4 см)', '10¾ дюймов (27.3 см)', '11 дюймов (28 см)', '11½ дюймов (29.2 см)', '12 дюймов (30.5 см)', '12¼ дюйма (31.1 см)', '13 дюймов (33 см)'];
+        var feats = [
+          'Палочка обладает сильным характером, особенно искусна в дуэльных чарах и защитной магии.',
+          'Приобретена в лавке мистера Олливандера в Косом переулке. Отличается редкой преданностью владельцу.',
+          'Превосходно проводит чары трансфигурации и бытовой магии, отзывается мягким золотистым свечением.',
+          'Склонна к мощным боевым заклинаниям, требует от мага непоколебимой воли и уверенности.',
+          'Чутко реагирует на душевное состояние мага, усиливает защитные чары и заклятие Патронуса.'
+        ];
+
+        var rWood = woods[Math.floor(Math.random() * woods.length)];
+        var rCore = cores[Math.floor(Math.random() * cores.length)];
+        var rFlex = flexes[Math.floor(Math.random() * flexes.length)];
+        var rLen = lengths[Math.floor(Math.random() * lengths.length)];
+        var rFeat = feats[Math.floor(Math.random() * feats.length)];
+
+        var inName = g('wzWandInName');
+        var inWood = g('wzWandInWood');
+        var inCore = g('wzWandInCore');
+        var inLen = g('wzWandInLength');
+        var inFlex = g('wzWandInFlex');
+        var inFeat = g('wzWandInFeatures');
+
+        if(inWood) inWood.value = rWood;
+        if(inCore) inCore.value = rCore;
+        if(inLen) inLen.value = rLen;
+        if(inFlex) inFlex.value = rFlex;
+        if(inFeat) inFeat.value = rFeat;
+        if(inName && (!inName.value || inName.value.startsWith('Палочка из '))){
+          inName.value = 'Палочка из ' + rWood.toLowerCase();
+        }
+
+        WZ.toast('🎲 Подобрана палочка: ' + rWood + ' и ' + rCore + '! Нажмите «Сохранить», чтобы зафиксировать.', 'info');
+      });
+    }
   }
 
   /* Общий переключатель вкладок Заклинания / Дуэли */
@@ -4330,6 +4568,7 @@
   /* Экспорт в глобальный scope */
   window.wzHome = wzHome;
   window.wzData = wzData;
+  window.wzWand = wzWand;
   window.wzRef = wzRef;
   window.wzRefView = wzRefView;
   window.wzSpells = wzSpells;
@@ -4344,6 +4583,7 @@
 
   window.wireWzHome = wireWzHome;
   window.wireWzData = wireWzData;
+  window.wireWzWand = wireWzWand;
   window.wireWzRef = wireWzRef;
   window.wireWzRefView = wireWzRefView;
   window.wireWzSpells = wireWzSpells;
@@ -4360,6 +4600,7 @@
 
   WZ.wzHome = wzHome;
   WZ.wzData = wzData;
+  WZ.wzWand = wzWand;
   WZ.wzRef = wzRef;
   WZ.wzRefView = wzRefView;
   WZ.wzSpells = wzSpells;
@@ -4374,6 +4615,7 @@
   WZ.wzMapContent = wzMapContent;
   WZ.wireWzHome = wireWzHome;
   WZ.wireWzData = wireWzData;
+  WZ.wireWzWand = wireWzWand;
   WZ.wireWzRef = wireWzRef;
   WZ.wireWzRefView = wireWzRefView;
   WZ.wireWzSpells = wireWzSpells;

@@ -158,6 +158,18 @@ window.render=function(){
       paintShBar();
       return;
     }
+    if(s === 'wzWand'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzWand === 'function') ? wzWand() : '<div>Палочка</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzWand === 'function') wireWzWand();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
     if(s === 'wzData'){
       var app = document.getElementById('app');
       app.classList.remove('wide');
@@ -805,6 +817,8 @@ window.navigate=function(val){
       wzHome: 'wzHome',
       wzData: 'wzData',
       data: 'wzData',
+      wzWand: 'wzWand',
+      wand: 'wzWand',
       wzRef: 'wzRef',
       ref: 'wzRef',
       wzSpells: 'wzSpells',
