@@ -236,33 +236,138 @@
       if(!cont) return;
       cont.innerHTML = '';
 
-      var flares = [
-        { color: 'rgba(174, 0, 1, 0.25)', size: 380, top: '5%', left: '10%' },
-        { color: 'rgba(212, 175, 55, 0.22)', size: 420, top: '45%', left: '70%' },
-        { color: 'rgba(14, 26, 64, 0.3)', size: 360, top: '65%', left: '20%' }
-      ];
-      flares.forEach(function(f){
-        var fl = document.createElement('div');
-        fl.className = 'wz-magic-flare';
-        fl.style.width = f.size + 'px';
-        fl.style.height = f.size + 'px';
-        fl.style.background = f.color;
-        fl.style.top = f.top;
-        fl.style.left = f.left;
-        cont.appendChild(fl);
-      });
+      // 1. Центральный священный магический реликт: Дары Смерти и Астролябия рун
+      var relicDiv = document.createElement('div');
+      relicDiv.className = 'wz-bg-relic';
+      relicDiv.innerHTML = 
+        '<svg viewBox="0 0 600 600" width="100%" height="100%" style="display:block;">' +
+          '<defs>' +
+            '<filter id="wzRelicGlow" x="-30%" y="-30%" width="160%" height="160%">' +
+              '<feGaussianBlur stdDeviation="6" result="blur" />' +
+              '<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>' +
+            '</filter>' +
+            '<path id="wzRelicCirclePath" d="M 300,300 m -240,0 a 240,240 0 1,1 480,0 a 240,240 0 1,1 -480,0" />' +
+          '</defs>' +
+          // Внешнее вращающееся кольцо рун и астролябии
+          '<g class="wz-relic-ring-outer">' +
+            '<circle cx="300" cy="300" r="275" fill="none" stroke="#d4af37" stroke-width="1.2" stroke-dasharray="10,6,3,6" opacity="0.65" />' +
+            '<circle cx="300" cy="300" r="248" fill="none" stroke="#fbbf24" stroke-width="0.8" stroke-dasharray="4,8" opacity="0.45" />' +
+            '<circle cx="300" cy="25" r="3.5" fill="#fde047" />' +
+            '<circle cx="300" cy="575" r="3.5" fill="#fde047" />' +
+            '<circle cx="25" cy="300" r="3.5" fill="#fde047" />' +
+            '<circle cx="575" cy="300" r="3.5" fill="#fde047" />' +
+            '<path d="M 300 12 L 300 40 M 300 560 L 300 588 M 12 300 L 40 300 M 560 300 L 588 300" stroke="#fde047" stroke-width="1.5" />' +
+            '<path d="M 105 105 L 125 125 M 475 475 L 495 495 M 105 495 L 125 475 M 475 125 L 495 105" stroke="#d4af37" stroke-width="1.2" />' +
+            '<text font-family="Cinzel, serif" font-size="10.5" fill="#fde047" letter-spacing="3" opacity="0.8">' +
+              '<textPath href="#wzRelicCirclePath">✦ LUMOS • NOX • ALOHOMORA • EXPECTO PATRONUM • ACCIO • EXPELLIARMUS ✦</textPath>' +
+            '</text>' +
+          '</g>' +
+          // Мантия-невидимка (Священный Треугольник)
+          '<polygon points="300,85 500,430 100,430" fill="none" stroke="#d4af37" stroke-width="3" filter="url(#wzRelicGlow)" />' +
+          '<polygon points="300,98 488,422 112,422" fill="none" stroke="#fbbf24" stroke-width="1" stroke-dasharray="6,4" opacity="0.45" />' +
+          // Воскрешающий камень (Священный Круг)
+          '<circle cx="300" cy="315" r="115" fill="none" stroke="#d4af37" stroke-width="2.5" filter="url(#wzRelicGlow)" />' +
+          '<circle cx="300" cy="315" r="108" fill="none" stroke="#fbbf24" stroke-width="1" stroke-dasharray="8,6" opacity="0.5" />' +
+          '<circle cx="300" cy="315" r="65" fill="none" stroke="#38bdf8" stroke-width="1" stroke-dasharray="4,4" opacity="0.35" />' +
+          // Бузинная палочка (Священная Линия с узлами)
+          '<line x1="300" y1="85" x2="300" y2="430" stroke="#d4af37" stroke-width="3" filter="url(#wzRelicGlow)" />' +
+          '<circle cx="300" cy="180" r="5" fill="#fde047" />' +
+          '<circle cx="300" cy="265" r="6" fill="#fde047" />' +
+          '<circle cx="300" cy="315" r="8" fill="#ffffff" filter="url(#wzRelicGlow)" />' +
+          '<circle cx="300" cy="365" r="6" fill="#fde047" />' +
+        '</svg>';
+      cont.appendChild(relicDiv);
 
-      for(var i = 0; i < 28; i++){
+      // 2. Слои магической ауры и дымки
+      var mistTop = document.createElement('div');
+      mistTop.className = 'wz-magic-mist-top';
+      cont.appendChild(mistTop);
+
+      var mistBtm = document.createElement('div');
+      mistBtm.className = 'wz-magic-mist';
+      cont.appendChild(mistBtm);
+
+      // 3. Парящие магические символы и руны
+      var glyphContainer = document.createElement('div');
+      glyphContainer.className = 'wz-bg-glyphs';
+
+      var glyphDefs = [
+        { text: '⚡', cls: 'wz-glyph-gold', top: 16, left: 14, dir: 'up-right', dur: 23, delay: -5, size: 24 },
+        { text: '△⃒⃘', cls: 'wz-glyph-gold', top: 74, left: 82, dir: 'up-left', dur: 26, delay: -12, size: 28 },
+        { text: '✨', cls: 'wz-glyph-blue', top: 22, left: 80, dir: 'down-left', dur: 22, delay: -15, size: 22 },
+        { text: '🗝️', cls: 'wz-glyph-gold', top: 68, left: 20, dir: 'down-right', dur: 24, delay: -8, size: 22 },
+        { text: '🪄', cls: 'wz-glyph-purple', top: 44, left: 86, dir: 'wave', dur: 25, delay: -18, size: 22 },
+        { text: '🔮', cls: 'wz-glyph-purple', top: 78, left: 48, dir: 'cross', dur: 24, delay: -6, size: 22 },
+        { text: 'ᚱ', cls: 'wz-glyph-blue', top: 32, left: 24, dir: 'up-right', dur: 27, delay: -14, size: 24 },
+        { text: 'ᛟ', cls: 'wz-glyph-emerald', top: 82, left: 16, dir: 'up-left', dur: 25, delay: -10, size: 24 },
+        { text: '🜚', cls: 'wz-glyph-gold', top: 14, left: 52, dir: 'down-left', dur: 23, delay: -4, size: 22 },
+        { text: '🜂', cls: 'wz-glyph-crimson', top: 58, left: 76, dir: 'wave', dur: 26, delay: -16, size: 22 }
+      ];
+
+      glyphDefs.forEach(function(g){
+        var el = document.createElement('div');
+        el.className = 'wz-glyph-particle ' + g.cls + ' wz-dir-' + g.dir;
+        el.textContent = g.text;
+        el.style.top = g.top + '%';
+        el.style.left = g.left + '%';
+        el.style.fontSize = g.size + 'px';
+        el.style.animationDuration = g.dur + 's';
+        el.style.animationDelay = g.delay + 's';
+        glyphContainer.appendChild(el);
+      });
+      cont.appendChild(glyphContainer);
+
+      // 4. Зачарованный звёздный потолок (мерцающие звёзды)
+      var starCount = 35;
+      for(var s = 0; s < starCount; s++){
         var star = document.createElement('div');
-        star.className = 'wz-star-particle';
-        var size = (Math.random() * 3.5 + 2).toFixed(1);
-        star.style.width = size + 'px';
-        star.style.height = size + 'px';
+        star.className = 'wz-star-twinkle';
+        var sz = (Math.random() * 2.8 + 1.2).toFixed(1);
+        star.style.width = sz + 'px';
+        star.style.height = sz + 'px';
         star.style.left = (Math.random() * 100).toFixed(1) + '%';
-        star.style.top = (Math.random() * 100).toFixed(1) + '%';
-        star.style.animationDuration = (Math.random() * 5 + 4).toFixed(1) + 's';
-        star.style.animationDelay = (-Math.random() * 8).toFixed(1) + 's';
+        star.style.top = (Math.random() * 60).toFixed(1) + '%';
+        star.style.animationDuration = (Math.random() * 4 + 2.5).toFixed(1) + 's';
+        star.style.animationDelay = (-Math.random() * 6).toFixed(1) + 's';
         cont.appendChild(star);
+      }
+
+      // 5. Парящие искры Lumos / магическая пыльца (32 шт.)
+      var sparkCount = 32;
+      var sparkTypes = ['wz-spark-gold', 'wz-spark-gold', 'wz-spark-blue', 'wz-spark-purple', 'wz-spark-white'];
+      for(var i = 0; i < sparkCount; i++){
+        var spark = document.createElement('div');
+        var type = sparkTypes[i % sparkTypes.length];
+        spark.className = 'wz-spark ' + type;
+        var spSize = (Math.random() * 3.5 + 2).toFixed(1);
+        spark.style.width = spSize + 'px';
+        spark.style.height = spSize + 'px';
+        spark.style.left = (Math.random() * 100).toFixed(1) + '%';
+        spark.style.animationDuration = (Math.random() * 9 + 7).toFixed(1) + 's';
+        spark.style.animationDelay = (-Math.random() * 16).toFixed(1) + 's';
+        cont.appendChild(spark);
+      }
+
+      // 6. Вспышка искр палочки при клике
+      if(typeof window !== 'undefined' && !window.__wzWandBurstBound){
+        window.__wzWandBurstBound = true;
+        document.addEventListener('click', function(e){
+          if(typeof HB === 'undefined' || HB.mode !== 'wz') return;
+          for(var k = 0; k < 4; k++){
+            var p = document.createElement('div');
+            p.className = 'wz-wand-spark-click';
+            var angle = Math.random() * Math.PI * 2;
+            var dist = Math.random() * 26 + 10;
+            var dx = Math.cos(angle) * dist;
+            var dy = Math.sin(angle) * dist;
+            p.style.setProperty('--dx', dx + 'px');
+            p.style.setProperty('--dy', dy + 'px');
+            p.style.left = e.clientX + 'px';
+            p.style.top = e.clientY + 'px';
+            document.body.appendChild(p);
+            setTimeout((function(el){ return function(){ if(el.parentNode) el.parentNode.removeChild(el); }; })(p), 600);
+          }
+        });
       }
     },
 
@@ -275,7 +380,7 @@
         cont.setAttribute('aria-hidden', 'true');
         document.body.insertBefore(cont, document.body.firstChild);
       }
-      if(!cont.children || cont.children.length === 0){
+      if(!cont.children || cont.children.length === 0 || !cont.querySelector('.wz-bg-relic')){
         WZ.buildThemeFx(cont);
       }
       cont.style.display = 'block';
