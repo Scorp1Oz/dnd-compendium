@@ -1,0 +1,572 @@
+/* ============================================================
+   ВОЛШЕБНИК (WIZARDING WORLD / HARRY POTTER) ТЕМА И СТИЛИ
+   ============================================================ */
+
+:root {
+  --wz-bg: #090a10;
+  --wz-surface: #10121d;
+  --wz-surface-alt: #161a29;
+  --wz-border: rgba(212, 175, 55, 0.22);
+  --wz-border-strong: rgba(212, 175, 55, 0.45);
+  --wz-gold: #d4af37;
+  --wz-gold-light: #f3e5ab;
+  --wz-gold-glow: rgba(212, 175, 55, 0.35);
+  --wz-parchment: #f4ecd8;
+  --wz-parchment-muted: #c9bda4;
+  --wz-text: #f8fafc;
+  --wz-text-muted: #94a3b8;
+  --wz-magic-blue: #38bdf8;
+  --wz-magic-purple: #c084fc;
+  --wz-magic-green: #4ade80;
+  --wz-magic-red: #f87171;
+
+  /* Факультеты */
+  --wz-gryf: #ae0001;
+  --wz-gryf-gold: #eeba30;
+  --wz-slyth: #1a472a;
+  --wz-slyth-silver: #aaaaaa;
+  --wz-raven: #0e1a40;
+  --wz-raven-bronze: #946b2d;
+  --wz-huff: #ecb939;
+  --wz-huff-black: #372e29;
+}
+
+body.wz-theme {
+  background-color: var(--wz-bg) !important;
+  color: var(--wz-text);
+  font-family: 'EB Garamond', Georgia, serif;
+}
+
+/* Фоновые парящие магические эффекты */
+#wzThemeFx {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  display: none;
+}
+
+.wz-star-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, rgba(212,175,55,0.8) 50%, rgba(212,175,55,0) 100%);
+  box-shadow: 0 0 10px rgba(212,175,55,0.8), 0 0 20px rgba(243,229,171,0.5);
+  animation: wzStarDrift linear infinite alternate;
+}
+
+.wz-magic-flare {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.15;
+  pointer-events: none;
+  animation: wzFlarePulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes wzStarDrift {
+  0% { transform: translateY(0) scale(0.8); opacity: 0.2; }
+  50% { opacity: 0.9; transform: translateY(-30px) scale(1.2); }
+  100% { transform: translateY(-60px) scale(0.6); opacity: 0.1; }
+}
+
+@keyframes wzFlarePulse {
+  0% { transform: scale(0.9); opacity: 0.10; }
+  50% { transform: scale(1.15); opacity: 0.22; }
+  100% { transform: scale(1.0); opacity: 0.12; }
+}
+
+/* HUD карточка волшебника на главном экране */
+.wz-hud {
+  background: linear-gradient(135deg, rgba(16, 18, 29, 0.95) 0%, rgba(22, 26, 41, 0.9) 100%);
+  border: 1px solid var(--wz-border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 24px rgba(212, 175, 55, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.wz-hud::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--wz-gold), transparent);
+}
+
+.wz-title {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--wz-gold-light);
+  letter-spacing: 0.03em;
+  text-shadow: 0 0 12px var(--wz-gold-glow);
+}
+
+.wz-stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+
+.wz-stat-badge.hp {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+}
+
+.wz-stat-badge.ac {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+}
+
+.wz-stat-badge.mana {
+  border-color: rgba(168, 85, 247, 0.35);
+  background: rgba(168, 85, 247, 0.12);
+  color: #d8b4fe;
+}
+
+.wz-house-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wz-house-badge.gryffindor {
+  background: rgba(174, 0, 1, 0.25);
+  border: 1px solid var(--wz-gryf-gold);
+  color: var(--wz-gryf-gold);
+}
+
+.wz-house-badge.slytherin {
+  background: rgba(26, 71, 42, 0.35);
+  border: 1px solid #4ade80;
+  color: #a7f3d0;
+}
+
+.wz-house-badge.ravenclaw {
+  background: rgba(14, 26, 64, 0.45);
+  border: 1px solid #60a5fa;
+  color: #bfdbfe;
+}
+
+.wz-house-badge.hufflepuff {
+  background: rgba(236, 185, 57, 0.22);
+  border: 1px solid #facc15;
+  color: #fde047;
+}
+
+.wz-house-badge.none {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #cbd5e1;
+}
+
+/* Кнопка редактирования HUD */
+.wz-hud-edit-btn {
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid var(--wz-border);
+  color: var(--wz-gold-light);
+  font-size: 12px;
+  font-family: 'Cinzel', serif;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wz-hud-edit-btn:hover {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: var(--wz-gold);
+  transform: translateY(-1px);
+}
+
+/* Геройский бросок костей */
+.wz-hero-dice {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(22, 26, 41, 0.95) 0%, rgba(16, 18, 29, 0.9) 100%);
+  border: 1px solid var(--wz-border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.wz-hero-dice:hover {
+  border-color: var(--wz-gold);
+  box-shadow: 0 6px 24px var(--wz-gold-glow);
+  transform: translateY(-2px);
+}
+
+.wz-hero-dice-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: var(--wz-gold);
+  filter: drop-shadow(0 0 10px var(--wz-gold-glow));
+}
+
+.wz-hero-dice-title {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.wz-hero-dice-desc {
+  font-size: 13px;
+  color: var(--wz-text-muted);
+  line-height: 1.4;
+}
+
+.wz-hero-dice-arrow {
+  font-size: 20px;
+  color: var(--wz-gold);
+  opacity: 0.7;
+}
+
+/* Карточки разделов */
+.wz-card {
+  background: rgba(16, 18, 29, 0.9);
+  border: 1px solid var(--wz-border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.wz-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--wz-gold);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.wz-card-clickable {
+  cursor: pointer;
+}
+
+.wz-card-clickable:hover {
+  border-color: var(--wz-gold);
+  background: rgba(22, 26, 41, 0.95);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(212, 175, 55, 0.15);
+  transform: translateY(-2px);
+}
+
+.wz-card-clickable:hover::before {
+  opacity: 1;
+}
+
+.wz-card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.wz-card-desc {
+  font-size: 13px;
+  color: var(--wz-text-muted);
+  line-height: 1.45;
+}
+
+.wz-card-arrow {
+  color: var(--wz-gold);
+  font-size: 18px;
+  transition: transform 0.2s ease;
+}
+
+.wz-card-clickable:hover .wz-card-arrow {
+  transform: translateX(4px);
+}
+
+/* Разделитель */
+.wz-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--wz-border), transparent);
+  margin: 18px 0;
+}
+
+/* Формы, карточки персонажа и редакторы */
+.wz-char-sheet-card {
+  background: rgba(16, 18, 29, 0.95);
+  border: 1px solid var(--wz-border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.wz-char-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--wz-gold-light);
+}
+
+.wz-input {
+  width: 100%;
+  background: rgba(9, 10, 16, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 5px;
+  color: #f1f5f9;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 13.5px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.wz-input:focus {
+  outline: none;
+  border-color: var(--wz-gold);
+  box-shadow: 0 0 10px var(--wz-gold-glow);
+}
+
+.wz-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.wz-edit-item label {
+  display: block;
+  font-size: 11px;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  color: var(--wz-gold-light);
+  letter-spacing: 0.05em;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+/* Табы навигации (Заклинания / Дуэли) */
+.wz-nav-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--wz-border);
+  padding-bottom: 10px;
+}
+
+.wz-nav-tab {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--wz-text-muted);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wz-nav-tab:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: #fff;
+  border-color: var(--wz-border);
+}
+
+.wz-nav-tab.active {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--wz-gold);
+  color: var(--wz-gold-light);
+  box-shadow: 0 0 12px var(--wz-gold-glow);
+}
+
+/* Пилюли фильтров */
+.wz-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.wz-pill:hover {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: var(--wz-gold);
+  color: #fff;
+}
+
+.wz-pill.active {
+  background: rgba(212, 175, 55, 0.22);
+  border-color: var(--wz-gold);
+  color: var(--wz-gold-light);
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
+}
+
+/* Карточки заклинаний и справочника */
+.wz-ref-card {
+  background: rgba(16, 18, 29, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+  padding: 14px 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.wz-ref-card:hover {
+  border-color: var(--wz-gold);
+  background: rgba(22, 26, 41, 0.95);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 12px rgba(212, 175, 55, 0.15);
+  transform: translateY(-1px);
+}
+
+.wz-ref-card-k {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--wz-gold-light);
+  margin-bottom: 4px;
+}
+
+.wz-ref-card-v {
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.wz-spell-incantation {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  color: var(--wz-magic-blue);
+  font-size: 14px;
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+
+/* Интерактивная карта Хогвартса и окрестностей */
+.wz-map-container {
+  background: #090a10;
+  border: 1px solid var(--wz-border);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+}
+
+.wz-map-viewport {
+  height: 540px;
+  position: relative;
+  cursor: grab;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, #151928 0%, #080911 100%);
+  user-select: none;
+}
+
+.wz-map-viewport:active {
+  cursor: grabbing;
+}
+
+/* Полный запрет заливки путей маршрута на карте волшебника */
+.wz-route-path-bg,
+.wz-route-path-fg,
+#wzRouteLayer path,
+.wz-map-viewport svg path.wz-route-path-bg,
+.wz-map-viewport svg path.wz-route-path-fg {
+  fill: none !important;
+}
+
+.wz-map-pin {
+  transition: transform 0.2s ease;
+}
+
+.wz-map-pin:hover circle:first-child {
+  fill: rgba(212, 175, 55, 0.4);
+  stroke: var(--wz-gold);
+  stroke-width: 2.5;
+}
+
+.wz-map-pin text {
+  pointer-events: none;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.02em;
+}
+
+/* Кнопки в стиле Гарри Поттера */
+body.wz-theme .btn-primary {
+  background: linear-gradient(135deg, #ae0001 0%, #740001 100%);
+  border: 1px solid var(--wz-gryf-gold);
+  color: #fff;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 10px rgba(174, 0, 1, 0.4);
+}
+
+body.wz-theme .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c70001 0%, #8a0001 100%);
+  border-color: #ffd700;
+  box-shadow: 0 4px 16px rgba(174, 0, 1, 0.6), 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+body.wz-theme .btn-ghost {
+  border-color: rgba(212, 175, 55, 0.3);
+  color: var(--wz-gold-light);
+  font-family: 'Cinzel', serif;
+}
+
+body.wz-theme .btn-ghost:hover:not(:disabled) {
+  border-color: var(--wz-gold);
+  background: rgba(212, 175, 55, 0.12);
+  color: #fff;
+}

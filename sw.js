@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v56';
+const CACHE_NAME = 'compendium-cache-v57';
 const APP_SHELL = [
   './',
   './index.html',
@@ -12,7 +12,9 @@ const APP_SHELL = [
   './css/mass-effect.css',
   './css/avatar.css',
   './css/witcher.css',
-  './css/witcher.css?v=56',
+  './css/witcher.css?v=57',
+  './css/wizard.css',
+  './css/wizard.css?v=57',
   './js/dnd-data.js',
   './js/core.js',
   './js/modules/homebrew.js',
@@ -20,7 +22,9 @@ const APP_SHELL = [
   './js/modules/mass-effect.js',
   './js/modules/avatar.js',
   './js/modules/witcher.js',
-  './js/modules/witcher.js?v=56',
+  './js/modules/witcher.js?v=57',
+  './js/modules/wizard.js',
+  './js/modules/wizard.js?v=57',
   './js/modules/github-sync.js',
   './js/app.js',
   './mass_effect_galaxy_map.jpg',

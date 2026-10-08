@@ -24,6 +24,11 @@ function paintShBar(){
     bWi.className='hb-seg-btn'; bWi.setAttribute('data-hbmode','wi'); bWi.textContent='Ведьмак';
     seg.appendChild(bWi);
   }
+  if(!seg.querySelector('[data-hbmode="wz"]')){
+    var bWz=document.createElement('button');
+    bWz.className='hb-seg-btn'; bWz.setAttribute('data-hbmode','wz'); bWz.textContent='Волшебник';
+    seg.appendChild(bWz);
+  }
 
   seg.querySelectorAll('.hb-seg-btn').forEach(function(b){
     b.classList.toggle('on', b.getAttribute('data-hbmode')===HB.mode);
@@ -69,14 +74,26 @@ function paintShBar(){
     });
   }
 
+  var wzBtn = seg.querySelector('[data-hbmode="wz"]');
+  if(wzBtn && !wzBtn.__wzBound){
+    wzBtn.__wzBound = true;
+    wzBtn.addEventListener('click', function(){
+      HB.mode='wz';
+      try{ localStorage.setItem('ttc_mode','wz'); }catch(e){}
+      view={screen:'wzHome'}; render(); window.scrollTo(0,0);
+    });
+  }
+
   document.body.classList.toggle('sh-theme', HB.mode==='sh');
   document.body.classList.toggle('me-theme', HB.mode==='me');
   document.body.classList.toggle('el-theme', HB.mode==='el');
   document.body.classList.toggle('wi-theme', HB.mode==='wi');
-  if(HB.mode==='sh' || HB.mode==='me' || HB.mode==='el' || HB.mode==='wi') document.body.classList.remove('hb-theme');
+  document.body.classList.toggle('wz-theme', HB.mode==='wz');
+  if(HB.mode==='sh' || HB.mode==='me' || HB.mode==='el' || HB.mode==='wi' || HB.mode==='wz') document.body.classList.remove('hb-theme');
   if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
   if(typeof EL !== 'undefined' && typeof EL.applyTheme === 'function') EL.applyTheme();
   if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
+  if(typeof applyWizardTheme === 'function') applyWizardTheme();
 
   var lab=bar.querySelector('.hb-bar-world');
   if(HB.mode==='sh'){
@@ -101,6 +118,12 @@ function paintShBar(){
     var wiSchoolOrRole = wiP ? (wiP.school || wiP.role || '') : '';
     var wiName = (wiP && wiP.name) ? (' • ' + wiP.name + (wiSchoolOrRole ? (' (' + wiSchoolOrRole + ')') : '')) : '';
     lab.textContent = 'Ведьмак' + wiName;
+  } else if(HB.mode==='wz'){
+    if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
+    var wzP = (typeof WZ !== 'undefined' && WZ.getProfile) ? WZ.getProfile() : null;
+    var wzHouseOrYear = wzP ? ((wzP.house || '') + (wzP.year ? (' • ' + wzP.year) : '')) : '';
+    var wzName = (wzP && wzP.name) ? (' • ' + wzP.name + (wzHouseOrYear ? (' (' + wzHouseOrYear + ')') : '')) : '';
+    lab.textContent = 'Волшебник' + wzName;
   } else if(HB.mode==='hb'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
     lab.textContent = (HB.world && HB.world.name ? HB.world.name : 'Технологии');
@@ -117,8 +140,187 @@ var _r=window.render, _n=window.navigate, _w=window.wireEvents;
 
 window.render=function(){
   window.view = view;
+  if(HB.mode==='wz'){
+    document.body.classList.remove('sh-theme', 'me-theme', 'el-theme', 'wi-theme', 'hb-theme');
+    document.body.classList.add('wz-theme');
+    if(typeof applyWizardTheme === 'function') applyWizardTheme();
+    var pCit = document.getElementById("meCitadelParticles"); if(pCit) pCit.style.display = "none";
+    var pOmni = document.getElementById("meOmniProjections"); if(pOmni) pOmni.style.display = "none";
+    var pN7 = document.getElementById("meN7Background"); if(pN7) pN7.style.display = "none";
+    var pCerb = document.getElementById("meCerberusBackground"); if(pCerb) pCerb.style.display = "none";
+    var oldCrt = document.getElementById("meCerberusCrtOverlay"); if(oldCrt && oldCrt.parentNode) oldCrt.parentNode.removeChild(oldCrt);
+    var elFx = document.getElementById('elThemeFx'); if(elFx) elFx.style.display = 'none';
+    var wiFx = document.getElementById('wiThemeFx'); if(wiFx) wiFx.style.display = 'none';
+
+    var s = view.screen || '';
+    if(s === 'dice'){
+      _r();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzData'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzData === 'function') ? wzData() : '<div>Данные волшебника</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzData === 'function') wireWzData();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzRef'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzRef === 'function') ? wzRef() : '<div>Справочник Магии</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzRef === 'function') wireWzRef();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzRefView'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var refKey = view.refKey || view.wzKey || '';
+      var html = (typeof wzRefView === 'function') ? wzRefView(refKey) : '<div>Статья Справочника</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzRefView === 'function') wireWzRefView(refKey);
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzSpells'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzSpells === 'function') ? wzSpells() : '<div>Заклинания</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzSpells === 'function') wireWzSpells();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzSpellView'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var spellId = view.spellId || view.shId || '';
+      var html = (typeof wzSpellView === 'function') ? wzSpellView(spellId) : '<div>Заклинание</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzSpellView === 'function') wireWzSpellView(spellId);
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzSpellEdit'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var spellId = view.spellId || view.shId || '';
+      var html = (typeof wzSpellEdit === 'function') ? wzSpellEdit(spellId) : '<div>Редактор заклинания</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzSpellEdit === 'function') wireWzSpellEdit(spellId);
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzSpellGen'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzSpellGen === 'function') ? wzSpellGen() : '<div>AI Генератор заклинаний</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzSpellGen === 'function') wireWzSpellGen();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzDuels'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzDuels === 'function') ? wzDuels() : '<div>Дуэльные приёмы</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzDuels === 'function') wireWzDuels();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzDuelView'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var duelId = view.duelId || view.shId || '';
+      var html = (typeof wzDuelView === 'function') ? wzDuelView(duelId) : '<div>Дуэльный приём</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzDuelView === 'function') wireWzDuelView(duelId);
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzDuelEdit'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var duelId = view.duelId || view.shId || '';
+      var html = (typeof wzDuelEdit === 'function') ? wzDuelEdit(duelId) : '<div>Редактор приёма</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzDuelEdit === 'function') wireWzDuelEdit(duelId);
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzDuelGen'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzDuelGen === 'function') ? wzDuelGen() : '<div>AI Генератор приёмов</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzDuelGen === 'function') wireWzDuelGen();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzMap'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzMap === 'function') ? wzMap() : '<div>Карта Мародёров</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzMap === 'function') wireWzMap();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    var app = document.getElementById('app');
+    app.classList.remove('wide');
+    app.classList.add('home-wide');
+    var html = (typeof wzHome === 'function') ? wzHome() : '<div>Волшебник</div>';
+    app.innerHTML = html;
+    _w();
+    if(typeof wireWzHome === 'function') wireWzHome();
+    if(typeof wireWzNav === 'function') wireWzNav();
+    paintShBar();
+    return;
+  }
+
   if(HB.mode==='wi'){
-    document.body.classList.remove('sh-theme', 'me-theme', 'el-theme', 'hb-theme');
+    document.body.classList.remove('sh-theme', 'me-theme', 'el-theme', 'hb-theme', 'wz-theme');
     document.body.classList.add('wi-theme');
     if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
     var pCit = document.getElementById("meCitadelParticles"); if(pCit) pCit.style.display = "none";
@@ -127,6 +329,7 @@ window.render=function(){
     var pCerb = document.getElementById("meCerberusBackground"); if(pCerb) pCerb.style.display = "none";
     var oldCrt = document.getElementById("meCerberusCrtOverlay"); if(oldCrt && oldCrt.parentNode) oldCrt.parentNode.removeChild(oldCrt);
     var elFx = document.getElementById('elThemeFx'); if(elFx) elFx.style.display = 'none';
+    var wzFx = document.getElementById('wzThemeFx'); if(wzFx) wzFx.style.display = 'none';
 
     var s = view.screen || '';
     if(s === 'dice'){
@@ -298,7 +501,7 @@ window.render=function(){
   if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
 
   if(HB.mode==='el'){
-    document.body.classList.remove('sh-theme', 'me-theme', 'hb-theme', 'wi-theme');
+    document.body.classList.remove('sh-theme', 'me-theme', 'hb-theme', 'wi-theme', 'wz-theme');
     document.body.classList.add('el-theme');
     if(typeof EL !== 'undefined' && typeof EL.applyTheme === 'function') EL.applyTheme();
     var pCit = document.getElementById("meCitadelParticles"); if(pCit) pCit.style.display = "none";
@@ -306,6 +509,8 @@ window.render=function(){
     var pN7 = document.getElementById("meN7Background"); if(pN7) pN7.style.display = "none";
     var pCerb = document.getElementById("meCerberusBackground"); if(pCerb) pCerb.style.display = "none";
     var oldCrt = document.getElementById("meCerberusCrtOverlay"); if(oldCrt && oldCrt.parentNode) oldCrt.parentNode.removeChild(oldCrt);
+    var wiFx = document.getElementById('wiThemeFx'); if(wiFx) wiFx.style.display = 'none';
+    var wzFx = document.getElementById('wzThemeFx'); if(wzFx) wzFx.style.display = 'none';
 
     var s = view.screen || '';
     if(s === 'dice'){
@@ -446,10 +651,11 @@ window.render=function(){
   if(typeof EL !== 'undefined' && typeof EL.applyTheme === 'function') EL.applyTheme();
 
   if(HB.mode==='me'){
-    document.body.classList.remove('sh-theme');
-    document.body.classList.remove('hb-theme');
+    document.body.classList.remove('sh-theme', 'hb-theme', 'wi-theme', 'el-theme', 'wz-theme');
     document.body.classList.add('me-theme');
     if(typeof applyMeTheme === 'function') applyMeTheme();
+    var wiFx = document.getElementById('wiThemeFx'); if(wiFx) wiFx.style.display = 'none';
+    var wzFx = document.getElementById('wzThemeFx'); if(wzFx) wzFx.style.display = 'none';
     var s=view.screen||'';
     if(s==='dice'){
       _r();
@@ -593,6 +799,49 @@ window.navigate=function(val){
       return;
     }
   }
+  if(HB.mode==='wz'){
+    var wzScreens = {
+      home: 'wzHome',
+      wzHome: 'wzHome',
+      wzData: 'wzData',
+      data: 'wzData',
+      wzRef: 'wzRef',
+      ref: 'wzRef',
+      wzSpells: 'wzSpells',
+      spells: 'wzSpells',
+      wzDuels: 'wzDuels',
+      duels: 'wzDuels',
+      wzSpellGen: 'wzSpellGen',
+      wzDuelGen: 'wzDuelGen',
+      wzMap: 'wzMap',
+      map: 'wzMap',
+      dice: 'dice'
+    };
+    if(wzScreens[p[0]]){
+      window.view = view = { screen: wzScreens[p[0]] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'wzRefView'){
+      window.view = view = { screen: 'wzRefView', refKey: p[1], wzKey: p[1] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'wzSpellView' || p[0] === 'wzSpellEdit'){
+      window.view = view = { screen: p[0], spellId: p[1], shId: p[1] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'wzDuelView' || p[0] === 'wzDuelEdit'){
+      window.view = view = { screen: p[0], duelId: p[1], shId: p[1] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+  }
   if(HB.mode==='wi'){
     var wiScreens = {
       home: 'wiHome',
@@ -664,6 +913,10 @@ if(HB.mode==='sh'){
   document.body.classList.add('wi-theme');
   if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('wi')!==0)) view={screen:'wiHome'};
   if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
+} else if(HB.mode==='wz'){
+  document.body.classList.add('wz-theme');
+  if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('wz')!==0)) view={screen:'wzHome'};
+  if(typeof applyWizardTheme === 'function') applyWizardTheme();
 }
 render();
   if(typeof GHSync !== "undefined") GHSync.checkStartupSync();
