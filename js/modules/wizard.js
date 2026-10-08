@@ -64,7 +64,8 @@
         core: '',
         length: '',
         flexibility: '',
-        features: ''
+        features: '',
+        saved: false
       },
       robe: '',
       relic: '',
@@ -79,7 +80,7 @@
 
   function getProfileWand(p){
     p = p || WZ.getActiveProfile();
-    var defWand = { name: '', wood: '', core: '', length: '', flexibility: '', features: '' };
+    var defWand = { name: '', wood: '', core: '', length: '', flexibility: '', features: '', saved: false };
     if(!p) return defWand;
     if(p.wand && typeof p.wand === 'object'){
       return {
@@ -88,11 +89,13 @@
         core: p.wand.core || '',
         length: p.wand.length || '',
         flexibility: p.wand.flexibility || '',
-        features: p.wand.features || ''
+        features: p.wand.features || '',
+        saved: !!p.wand.saved
       };
     }
     if(typeof p.wand === 'string' && p.wand.trim()){
       defWand.name = p.wand.trim();
+      defWand.saved = true;
     }
     return defWand;
   }
@@ -2385,6 +2388,8 @@
     }
     var p = WZ.getActiveProfile();
     var w = getProfileWand(p);
+    var hasSaved = !!(w.saved || w.name || w.wood || w.core || w.length || w.flexibility || w.features);
+    var isEditorOpen = (WZ.wandEditOpen === true) || (!hasSaved && WZ.wandEditOpen !== false);
 
     var charDisplayName = (p.firstName || p.lastName) ? [p.firstName, p.lastName].filter(Boolean).join(' ') : (p.name || 'Безымянный маг');
     var hIcon = getHouseIcon(p.house);
@@ -2396,7 +2401,20 @@
     }).join('');
 
     var wandTitle = w.name || (w.wood ? ('Палочка: ' + w.wood + (w.core ? (' и ' + w.core) : '')) : 'Волшебная палочка');
-    var wandSub = [w.wood, w.core].filter(Boolean).join(' • ') || 'Параметры палочки не заполнены';
+    var wandSub = [w.wood, w.core].filter(Boolean).join(' • ') || (hasSaved ? 'Параметры палочки сохранены' : 'Параметры палочки не заполнены');
+
+    var emptyPrompt = !hasSaved ? (
+      '<div style="font-size:13.5px;color:var(--wz-text-muted);font-style:italic;margin-top:10px;padding:8px 12px;background:rgba(212,175,55,0.08);border-left:3px solid var(--wz-gold);border-radius:4px;">' +
+        'Параметры волшебной палочки ещё не сохранены. Заполните форму ниже и сохраните. После первого сохранения эта форма скроется, и её можно будет вызвать кнопкой.' +
+      '</div>'
+    ) : '';
+
+    var showcaseActions = hasSaved ? (
+      '<div id="wzWandOpenRow" style="display:' + (isEditorOpen ? 'none' : 'flex') + ';gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid rgba(212,175,55,0.2);">' +
+        '<button class="btn btn-primary" id="wzWandOpenEditBtn" title="Открыть форму параметров палочки">✏️ Изменить параметры палочки</button>' +
+        '<button class="btn btn-ghost" data-nav="wzRefView:wands" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRefView:wands\');">📚 Справочник: Палочки Олливандера</button>' +
+      '</div>'
+    ) : '';
 
     var showcaseHtml = 
       '<div class="wz-wand-showcase-card" id="wzWandShowcase">' +
@@ -2415,6 +2433,8 @@
           '<span class="wz-stat-badge">🌀 Упругость: <b style="color:var(--wz-gold-light);">' + esc(w.flexibility || 'Не указана') + '</b></span>' +
         '</div>' +
         (w.features ? ('<div class="wz-wand-features-box"><b>Особенности:</b> ' + esc(w.features) + '</div>') : '') +
+        emptyPrompt +
+        showcaseActions +
       '</div>';
 
     return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Палочка' }]) +
@@ -2434,9 +2454,10 @@
 
       showcaseHtml +
 
-      '<div class="wz-char-sheet-card">' +
-        '<div class="wz-char-header">' +
+      '<div class="wz-char-sheet-card" id="wzWandEditorCard" style="display:' + (isEditorOpen ? 'block' : 'none') + ';margin-top:16px;">' +
+        '<div class="wz-char-header" style="display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
           '<span>Параметры палочки: <b style="color:var(--wz-gold);">' + esc(charDisplayName) + '</b></span>' +
+          (hasSaved ? '<button class="btn btn-ghost" id="wzWandCloseEditBtn" style="padding:4px 10px;font-size:12px;" title="Скрыть форму параметров">✕ Скрыть</button>' : '') +
         '</div>' +
 
         '<div class="wz-edit-grid">' +
@@ -2491,6 +2512,7 @@
         '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px;">' +
           '<button class="btn btn-primary" id="wzWandSaveBtn">✓ Сохранить палочку</button>' +
           '<button class="btn" id="wzWandRandomBtn" title="Сгенерировать случайную гармоничную комбинацию Олливандера">🎲 Случайная палочка</button>' +
+          (hasSaved ? '<button class="btn btn-ghost" id="wzWandCancelEditBtn">✕ Скрыть</button>' : '') +
           '<button class="btn btn-ghost" data-nav="wzRefView:wands" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRefView:wands\');" style="margin-left:auto;">📚 Справочник: Палочки Олливандера</button>' +
         '</div>' +
       '</div>';
@@ -2506,12 +2528,57 @@
     if(sel && !sel.__wired){
       sel.__wired = true;
       sel.addEventListener('change', function(){
+        WZ.wandEditOpen = undefined;
         WZ.switchProfile(this.value);
         if(typeof render === 'function') render();
       });
     }
 
-    // Сохранение параметров палочки
+    // Вызов/открытие формы редактирования по кнопке
+    var openEditBtn = g('wzWandOpenEditBtn');
+    if(openEditBtn && !openEditBtn.__wired){
+      openEditBtn.__wired = true;
+      openEditBtn.addEventListener('click', function(){
+        WZ.wandEditOpen = true;
+        var box = g('wzWandEditorCard');
+        var openRow = g('wzWandOpenRow');
+        if(box){
+          box.style.display = 'block';
+          try { box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(e){}
+          var inName = g('wzWandInName');
+          if(inName) inName.focus();
+        }
+        if(openRow){
+          openRow.style.display = 'none';
+        }
+      });
+    }
+
+    // Закрытие/скрытие бокса параметров
+    var closeFn = function(){
+      WZ.wandEditOpen = false;
+      var box = g('wzWandEditorCard');
+      var openRow = g('wzWandOpenRow');
+      if(box) box.style.display = 'none';
+      if(openRow){
+        openRow.style.display = 'flex';
+        try { openRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(e){}
+      }
+    };
+
+    var closeBtn = g('wzWandCloseEditBtn');
+    if(closeBtn && !closeBtn.__wired){
+      closeBtn.__wired = true;
+      closeBtn.addEventListener('click', closeFn);
+    }
+
+    var cancelBtn = g('wzWandCancelEditBtn');
+    if(cancelBtn && !cancelBtn.__wired){
+      cancelBtn.__wired = true;
+      cancelBtn.addEventListener('click', closeFn);
+    }
+
+    // Сохранение параметров палочки (после первого сохранения бокс скрывается)
     var saveBtn = g('wzWandSaveBtn');
     if(saveBtn && !saveBtn.__wired){
       saveBtn.__wired = true;
@@ -2526,7 +2593,9 @@
         p.wand.length = (v('wzWandInLength') || '').trim();
         p.wand.flexibility = (v('wzWandInFlex') || '').trim();
         p.wand.features = (v('wzWandInFeatures') || '').trim();
+        p.wand.saved = true;
 
+        WZ.wandEditOpen = false; // Скрываем бокс параметров после сохранения
         WZ.saveProfiles();
         WZ.toast('✓ Параметры палочки успешно сохранены!', 'success');
         if(typeof render === 'function') render();

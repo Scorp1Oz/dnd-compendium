@@ -992,6 +992,15 @@ body.wz-theme .btn-ghost:hover:not(:disabled) {
   padding: 10px 14px;
 }
 
+#wzWandEditorCard {
+  animation: wzWandFadeIn 0.22s ease-out;
+}
+
+@keyframes wzWandFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @media (max-width: 600px) {
   .wz-hud { margin: 8px 0 18px; }
   .wz-rule { margin-bottom: 24px; }
