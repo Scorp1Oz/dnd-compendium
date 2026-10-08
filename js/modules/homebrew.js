@@ -250,7 +250,6 @@ function paintBar(){
         if(typeof window.navigate === 'function') window.navigate('wiHome');
         else { view = {screen:'wiHome'}; render(); }
       } else if(m === 'wz'){
-        if(typeof wzTriggerModeSwitchEffect === 'function') wzTriggerModeSwitchEffect(b, e);
         if(typeof window.navigate === 'function') window.navigate('wzHome');
         else { view = {screen:'wzHome'}; render(); }
       } else if(m === 'hb'){

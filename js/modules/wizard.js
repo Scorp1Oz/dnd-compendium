@@ -421,123 +421,8 @@
       WZ.initThemeFx();
     },
 
-    triggerModeSwitchEffect: function(targetElement, event){
-      if(typeof document === 'undefined' || !document.body) return;
-      // Вспышка на кнопке
-      if(targetElement && targetElement.classList){
-        targetElement.classList.remove('wz-btn-flare');
-        void targetElement.offsetWidth;
-        targetElement.classList.add('wz-btn-flare');
-        setTimeout(function(){
-          if(targetElement.classList) targetElement.classList.remove('wz-btn-flare');
-        }, 400);
-      }
-
-      // Тонкие золотистые искры возле кнопки (аккуратный ненавязчивый микро-эффект)
-      var x, y;
-      if(event && event.clientX && event.clientY){
-        x = event.clientX;
-        y = event.clientY;
-      } else if(targetElement && typeof targetElement.getBoundingClientRect === 'function'){
-        var r = targetElement.getBoundingClientRect();
-        x = r.left + r.width / 2;
-        y = r.top + r.height / 2;
-      } else {
-        return;
-      }
-
-      var sparkColors = [
-        { bg: 'radial-gradient(circle, #fff 30%, #facc15 70%, rgba(212,175,55,0) 100%)', shadow: '0 0 5px #fde047' },
-        { bg: 'radial-gradient(circle, #fff 30%, #c084fc 70%, rgba(192,132,252,0) 100%)', shadow: '0 0 5px #d8b4fe' }
-      ];
-
-      for(var i = 0; i < 6; i++){
-        (function(idx){
-          var sp = document.createElement('div');
-          sp.className = 'wz-mode-spark';
-          var col = sparkColors[idx % sparkColors.length];
-          var sz = Math.random() * 2.5 + 2.5;
-          sp.style.width = sz + 'px';
-          sp.style.height = sz + 'px';
-          sp.style.background = col.bg;
-          sp.style.boxShadow = col.shadow;
-          sp.style.left = x + 'px';
-          sp.style.top = y + 'px';
-          sp.style.transform = 'translate(-50%, -50%) scale(1)';
-          sp.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
-          sp.style.opacity = '0.9';
-          document.body.appendChild(sp);
-
-          var angle = (idx / 6) * 2 * Math.PI + (Math.random() * 0.4 - 0.2);
-          var dist = Math.random() * 28 + 18;
-          var destX = Math.cos(angle) * dist;
-          var destY = Math.sin(angle) * dist;
-
-          requestAnimationFrame(function(){
-            sp.style.transform = 'translate(calc(-50% + ' + destX.toFixed(1) + 'px), calc(-50% + ' + destY.toFixed(1) + 'px)) scale(0.2)';
-            sp.style.opacity = '0';
-          });
-
-          setTimeout(function(){
-            if(sp && sp.parentNode) sp.parentNode.removeChild(sp);
-          }, 450);
-        })(i);
-      }
-    },
-
-    triggerCardFlourish: function(el, event){
-      if(typeof document === 'undefined' || !document.body) return;
-      var x, y;
-      if(event && event.clientX && event.clientY){
-        x = event.clientX;
-        y = event.clientY;
-      } else if(el && typeof el.getBoundingClientRect === 'function'){
-        var r = el.getBoundingClientRect();
-        x = r.left + Math.min(r.width / 2, 80);
-        y = r.top + r.height / 2;
-      } else {
-        return;
-      }
-
-      var sparkColors = [
-        { bg: 'radial-gradient(circle, #fff 20%, #facc15 65%, rgba(212,175,55,0) 100%)', shadow: '0 0 6px #fde047' },
-        { bg: 'radial-gradient(circle, #fff 20%, #c084fc 65%, rgba(192,132,252,0) 100%)', shadow: '0 0 6px #d8b4fe' },
-        { bg: 'radial-gradient(circle, #fff 30%, #f1f5f9 70%, rgba(255,255,255,0) 100%)', shadow: '0 0 6px #ffffff' }
-      ];
-
-      for(var i = 0; i < 8; i++){
-        (function(idx){
-          var sp = document.createElement('div');
-          sp.className = 'wz-mode-spark';
-          var col = sparkColors[idx % sparkColors.length];
-          var sz = Math.random() * 3 + 3;
-          sp.style.width = sz + 'px';
-          sp.style.height = sz + 'px';
-          sp.style.background = col.bg;
-          sp.style.boxShadow = col.shadow;
-          sp.style.left = x + 'px';
-          sp.style.top = y + 'px';
-          sp.style.transform = 'translate(-50%, -50%) scale(1)';
-          sp.style.transition = 'transform 0.45s ease-out, opacity 0.45s ease-out';
-          sp.style.opacity = '1';
-          document.body.appendChild(sp);
-
-          var angle = (idx / 8) * 2 * Math.PI + (Math.random() * 0.4 - 0.2);
-          var dist = Math.random() * 45 + 25;
-          var dx = Math.cos(angle) * dist;
-          var dy = Math.sin(angle) * dist;
-
-          requestAnimationFrame(function(){
-            sp.style.transform = 'translate(calc(-50% + ' + dx.toFixed(1) + 'px), calc(-50% + ' + dy.toFixed(1) + 'px)) scale(0.2)';
-            sp.style.opacity = '0';
-          });
-
-          setTimeout(function(){
-            if(sp && sp.parentNode) sp.parentNode.removeChild(sp);
-          }, 500);
-        })(i);
-      }
-    }
+    triggerModeSwitchEffect: function(){},
+    triggerCardFlourish: function(){}
   };
 
   function esc(s){ var str = String(s == null ? '' : s); return typeof escapeHtml === 'function' ? escapeHtml(str) : str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1834,9 +1719,6 @@
       el.addEventListener('click', function(e){
         var nav = el.getAttribute('data-nav') || (el.getAttribute('data-go') === 'dice' ? 'dice' : null);
         if(nav && typeof window.navigate === 'function'){
-          if(typeof WZ.triggerCardFlourish === 'function'){
-            WZ.triggerCardFlourish(el, e);
-          }
           e.preventDefault();
           window.navigate(nav);
         }

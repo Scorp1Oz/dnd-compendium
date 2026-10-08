@@ -278,26 +278,6 @@ body.wz-theme .hb-seg-btn.on,
   box-shadow: 0 0 12px rgba(99, 102, 241, 0.45) !important;
 }
 
-/* Легкая аккуратная вспышка на кнопке при выборе */
-.wz-btn-flare {
-  animation: wzBtnFlareAnim 0.3s ease-out;
-}
-
-@keyframes wzBtnFlareAnim {
-  0% { transform: scale(0.96); filter: brightness(1.2); }
-  50% { transform: scale(1.04); filter: brightness(1.35); }
-  100% { transform: scale(1); filter: brightness(1); }
-}
-
-/* Тонкие искры при выборе */
-.wz-mode-spark {
-  position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 100001;
-  will-change: transform, opacity;
-}
-
 /* Бейджи степеней мастерства навыков */
 .wz-skill-badge {
   display: inline-flex;
