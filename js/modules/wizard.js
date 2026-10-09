@@ -3717,18 +3717,18 @@
       var ingPreview = p.ingredients ? (p.ingredients.length > 95 ? (p.ingredients.substr(0, 95) + '...') : p.ingredients) : '';
       var effPreview = p.effect ? (p.effect.length > 115 ? (p.effect.substr(0, 115) + '...') : p.effect) : '';
 
-      return '<div class="wz-ref-card" style="display:flex;flex-direction:column;justify-content:space-between;gap:10px;">' +
-        '<div>' +
-          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
-            '<div class="wz-ref-card-k" style="margin-bottom:0;font-size:16px;">' + (p.icon || '🧪') + ' ' + esc(p.name) + '</div>' +
-            '<span class="wz-potion-tag ' + tierSlug + '">' + esc(p.tier || 'Зелье') + '</span>' +
+      return '<div class="wz-ref-card" style="display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-width:0;overflow:hidden;">' +
+        '<div style="min-width:0;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;min-width:0;">' +
+            '<div class="wz-ref-card-k" style="margin-bottom:0;font-size:16px;min-width:0;word-break:break-word;">' + (p.icon || '🧪') + ' ' + esc(p.name) + '</div>' +
+            '<span class="wz-potion-tag ' + tierSlug + '" style="flex-shrink:0;">' + esc(p.tier || 'Зелье') + '</span>' +
           '</div>' +
-          '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--wz-text-muted);margin-bottom:8px;">' +
-            (p.time ? ('<span class="wz-stat-badge" style="font-size:11px;">⏱️ ' + esc(p.time) + '</span>') : '') +
-            (p.cauldron ? ('<span class="wz-stat-badge" style="font-size:11px;">⚗️ ' + esc(p.cauldron) + '</span>') : '') +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--wz-text-muted);margin-bottom:8px;min-width:0;">' +
+            (p.time ? ('<span class="wz-stat-badge" style="font-size:11px;white-space:normal;word-break:break-word;max-width:100%;line-height:1.35;">⏱️ ' + esc(p.time) + '</span>') : '') +
+            (p.cauldron ? ('<span class="wz-stat-badge" style="font-size:11px;white-space:normal;word-break:break-word;max-width:100%;line-height:1.35;">⚗️ ' + esc(p.cauldron) + '</span>') : '') +
           '</div>' +
-          (ingPreview ? ('<div style="font-size:12px;color:#cbd5e1;margin-bottom:6px;line-height:1.45;"><b style="color:var(--wz-gold-light);">🌿 Ингредиенты:</b> ' + esc(ingPreview) + '</div>') : '') +
-          (effPreview ? ('<div class="wz-ref-card-v" style="font-size:12.5px;line-height:1.45;color:#94a3b8;"><b style="color:#fde047;">✨ Эффект:</b> ' + esc(effPreview) + '</div>') : '') +
+          (ingPreview ? ('<div style="font-size:12px;color:#cbd5e1;margin-bottom:6px;line-height:1.45;word-break:break-word;"><b style="color:var(--wz-gold-light);">🌿 Ингредиенты:</b> ' + esc(ingPreview) + '</div>') : '') +
+          (effPreview ? ('<div class="wz-ref-card-v" style="font-size:12.5px;line-height:1.45;color:#94a3b8;word-break:break-word;"><b style="color:#fde047;">✨ Эффект:</b> ' + esc(effPreview) + '</div>') : '') +
         '</div>' +
         '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">' +
           '<button class="btn btn-ghost" data-nav="wzPotionView:' + escA(p.id) + '" style="font-size:11px;padding:3px 10px;">Рецепт и эффект ›</button>' +
@@ -5169,19 +5169,19 @@
 
   function renderWzPotionCardPreview(p){
     var tierSlug = getPotionTierSlug(p.tier);
-    return '<div class="wz-ref-card" style="border-color:var(--wz-gold);box-shadow:0 0 16px var(--wz-gold-glow);">' +
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
-        '<div class="wz-ref-card-k" style="margin-bottom:0;font-size:16px;">' + (p.icon || '🧪') + ' ' + esc(p.name || 'Магическое зелье') + '</div>' +
-        '<span class="wz-potion-tag ' + tierSlug + '">' + esc(p.tier || 'Зелье') + '</span>' +
+    return '<div class="wz-ref-card" style="border-color:var(--wz-gold);box-shadow:0 0 16px var(--wz-gold-glow);min-width:0;overflow:hidden;box-sizing:border-box;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;min-width:0;">' +
+        '<div class="wz-ref-card-k" style="margin-bottom:0;font-size:16px;min-width:0;word-break:break-word;">' + (p.icon || '🧪') + ' ' + esc(p.name || 'Магическое зелье') + '</div>' +
+        '<span class="wz-potion-tag ' + tierSlug + '" style="flex-shrink:0;">' + esc(p.tier || 'Зелье') + '</span>' +
       '</div>' +
-      '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--wz-text-muted);margin-bottom:8px;">' +
-        (p.time ? ('<span class="wz-stat-badge" style="font-size:11px;">⏱️ ' + esc(p.time) + '</span>') : '') +
-        (p.cauldron ? ('<span class="wz-stat-badge" style="font-size:11px;">⚗️ ' + esc(p.cauldron) + '</span>') : '') +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--wz-text-muted);margin-bottom:8px;min-width:0;">' +
+        (p.time ? ('<span class="wz-stat-badge" style="font-size:11px;white-space:normal;word-break:break-word;max-width:100%;line-height:1.35;">⏱️ ' + esc(p.time) + '</span>') : '') +
+        (p.cauldron ? ('<span class="wz-stat-badge" style="font-size:11px;white-space:normal;word-break:break-word;max-width:100%;line-height:1.35;">⚗️ ' + esc(p.cauldron) + '</span>') : '') +
       '</div>' +
-      (p.ingredients ? ('<div style="font-size:12px;color:#cbd5e1;margin-bottom:6px;line-height:1.45;"><b style="color:var(--wz-gold-light);">🌿 Ингредиенты:</b> ' + esc(p.ingredients) + '</div>') : '') +
-      (p.recipe ? ('<div style="font-size:12px;color:#e2e8f0;margin-bottom:6px;line-height:1.45;"><b style="color:#93c5fd;">⚗️ Варка в котле:</b> ' + esc(p.recipe).replace(/\n/g, '<br>') + '</div>') : '') +
-      (p.effect ? ('<div class="wz-ref-card-v" style="font-size:12.5px;line-height:1.45;color:#fde047;margin-bottom:6px;"><b>✨ Эффект:</b> ' + esc(p.effect).replace(/\n/g, '<br>') + '</div>') : '') +
-      (p.notes ? ('<div style="font-size:11.5px;color:#fca5a5;line-height:1.4;"><b>⚠️ Заметки:</b> ' + esc(p.notes) + '</div>') : '') +
+      (p.ingredients ? ('<div style="font-size:12px;color:#cbd5e1;margin-bottom:6px;line-height:1.45;word-break:break-word;"><b style="color:var(--wz-gold-light);">🌿 Ингредиенты:</b> ' + esc(p.ingredients) + '</div>') : '') +
+      (p.recipe ? ('<div style="font-size:12px;color:#e2e8f0;margin-bottom:6px;line-height:1.45;word-break:break-word;"><b style="color:#93c5fd;">⚗️ Варка в котле:</b> ' + esc(p.recipe).replace(/\n/g, '<br>') + '</div>') : '') +
+      (p.effect ? ('<div class="wz-ref-card-v" style="font-size:12.5px;line-height:1.45;color:#fde047;margin-bottom:6px;word-break:break-word;"><b>✨ Эффект:</b> ' + esc(p.effect).replace(/\n/g, '<br>') + '</div>') : '') +
+      (p.notes ? ('<div style="font-size:11.5px;color:#fca5a5;line-height:1.4;word-break:break-word;"><b>⚠️ Заметки:</b> ' + esc(p.notes) + '</div>') : '') +
     '</div>';
   }
 

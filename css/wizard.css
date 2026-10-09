@@ -374,6 +374,13 @@ body.wz-theme .hb-seg.has-indicator .hb-seg-btn.on {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #e2e8f0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.wz-stat-badge.hp,
+.wz-stat-badge.ac,
+.wz-stat-badge.year {
   white-space: nowrap;
 }
 
@@ -788,6 +795,11 @@ body.wz-theme .section-label {
   padding: 14px 16px;
   transition: all 0.2s ease;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  word-wrap: break-word;
 }
 
 .wz-ref-card:hover {
@@ -797,12 +809,21 @@ body.wz-theme .section-label {
   transform: translateY(-1px);
 }
 
+.wz-ref-card .wz-stat-badge {
+  white-space: normal;
+  word-break: break-word;
+  max-width: 100%;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
 .wz-ref-card-k {
   font-family: 'Cinzel', serif;
   font-size: 15px;
   font-weight: 700;
   color: var(--wz-gold-light);
   margin-bottom: 4px;
+  word-break: break-word;
 }
 
 .wz-ref-card-v {
