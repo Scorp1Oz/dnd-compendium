@@ -142,7 +142,14 @@ function paintShBar(){
     lab.textContent = 'Волшебник' + wzName;
   } else if(HB.mode==='hb'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
-    lab.textContent = (HB.world && HB.world.name ? HB.world.name : 'Технологии');
+    var hbChar = (typeof HB !== 'undefined' && HB.activeChar && typeof byId === 'function') ? byId(HB.activeChar) : ((typeof HB !== 'undefined' && HB.records && HB.records.find) ? HB.records.find(function(r){ return r.id === HB.activeChar; }) : null);
+    var hbCharName = hbChar && hbChar.name ? (' • ' + hbChar.name + (hbChar.f && hbChar.f.job ? (' (' + hbChar.f.job + ')') : '')) : '';
+    lab.textContent = (HB.world && HB.world.name ? HB.world.name : 'Технологии') + hbCharName;
+  } else if(HB.mode==='faerun'){
+    if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
+    var faeChar = (typeof getActiveFaerunCharacter === 'function') ? getActiveFaerunCharacter() : null;
+    var faeCharName = faeChar && faeChar.name ? (' • ' + faeChar.name + (faeChar.className ? (' (' + faeChar.className + ' ' + (faeChar.level||1) + ' ур.)') : '')) : '';
+    lab.textContent = 'Фаэрун' + faeCharName;
   } else {
     if(lab && lab.parentNode) lab.parentNode.removeChild(lab);
   }
