@@ -173,15 +173,131 @@ function linkPicker(name, types, cur){
   return '<select data-hblink="'+escA(name)+'">'+opts.join('')+'</select>'+deadNote;
 }
 
-/* ---------- переключатель режима ---------- */
+/* ---------- переключатель режима со скользящим индикатором ---------- */
+function updateHbSegIndicator(immediate){
+  var bar = document.getElementById('hbModeBar');
+  if(!bar) return;
+  var seg = bar.querySelector('.hb-seg');
+  if(!seg) return;
+  var curMode = (typeof HB !== 'undefined' && HB.mode) ? HB.mode : 'faerun';
+  var activeBtn = seg.querySelector('.hb-seg-btn[data-hbmode="' + curMode + '"]') || seg.querySelector('.hb-seg-btn.on');
+  if(!activeBtn) return;
+
+  var ind = seg.querySelector('.hb-seg-indicator');
+  if(!ind){
+    ind = document.createElement('div');
+    ind.className = 'hb-seg-indicator';
+    ind.id = 'hbSegIndicator';
+    seg.insertBefore(ind, seg.firstChild);
+  }
+  if(!seg.classList.contains('has-indicator')){
+    seg.classList.add('has-indicator');
+  }
+
+  var left = activeBtn.offsetLeft;
+  var top = activeBtn.offsetTop;
+  var width = activeBtn.offsetWidth;
+  var height = activeBtn.offsetHeight;
+
+  if(width === 0 || height === 0){
+    if(!window._hbSegRaf){
+      window._hbSegRaf = requestAnimationFrame(function(){
+        window._hbSegRaf = null;
+        updateHbSegIndicator(immediate);
+      });
+    }
+    return;
+  }
+
+  if(immediate){
+    ind.style.transition = 'none';
+  } else {
+    ind.style.transition = '';
+  }
+
+  ind.setAttribute('data-mode', curMode);
+  ind.style.transform = 'translate3d(' + left + 'px, ' + top + 'px, 0)';
+  ind.style.width = width + 'px';
+  ind.style.height = height + 'px';
+  ind.style.opacity = '1';
+
+  if(immediate){
+    void ind.offsetHeight;
+    ind.style.transition = '';
+  }
+}
+window.updateHbSegIndicator = updateHbSegIndicator;
+
+if(typeof window !== 'undefined'){
+  window.addEventListener('resize', function(){ updateHbSegIndicator(true); });
+  window.addEventListener('orientationchange', function(){
+    setTimeout(function(){ updateHbSegIndicator(true); }, 120);
+  });
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(function(){ updateHbSegIndicator(true); });
+  }
+}
+
+function bindBarButtons(bar){
+  bar.querySelectorAll('[data-hbmode]').forEach(function(b){
+    if(b.__hbBound) return;
+    b.__hbBound = true;
+    b.addEventListener('click', function(e){
+      var m = b.getAttribute('data-hbmode');
+      if(HB.mode === m) return;
+      HB.mode = m;
+      saveMode();
+      try{ localStorage.setItem('ttc_mode', m); }catch(e){}
+
+      var seg = bar.querySelector('.hb-seg');
+      if(seg){
+        seg.querySelectorAll('.hb-seg-btn').forEach(function(btn){
+          btn.classList.toggle('on', btn.getAttribute('data-hbmode') === m);
+        });
+      }
+      updateHbSegIndicator(false);
+
+      if(m === 'sh'){
+        if(typeof window.navigate === 'function') window.navigate('shHome');
+        else { view = {screen:'shHome'}; if(typeof SH !== 'undefined') SH.draft=null; render(); }
+      } else if(m === 'me'){
+        if(typeof window.navigate === 'function') window.navigate('meHome');
+        else { view = {screen:'meHome'}; render(); }
+      } else if(m === 'el'){
+        if(typeof window.navigate === 'function') window.navigate('elHome');
+        else { view = {screen:'elHome'}; render(); }
+      } else if(m === 'wi'){
+        if(typeof window.navigate === 'function') window.navigate('wiHome');
+        else { view = {screen:'wiHome'}; render(); }
+      } else if(m === 'wz'){
+        if(typeof window.navigate === 'function') window.navigate('wzHome');
+        else { view = {screen:'wzHome'}; render(); }
+      } else if(m === 'hb'){
+        if(typeof window.navigate === 'function') window.navigate('hbHome');
+        else { view = {screen:'hbHome'}; render(); }
+      } else {
+        if(typeof window.navigate === 'function') window.navigate('home');
+        else { view = {screen:'home'}; render(); }
+      }
+      paintBar();
+      if(typeof paintShBar === 'function') paintShBar();
+      window.scrollTo(0,0);
+    });
+  });
+}
+
 function mountBar(){
   if(document.getElementById('hbModeBar')) return;
   var bar = document.createElement('div');
   bar.id = 'hbModeBar';
   document.body.appendChild(bar);
   paintBar();
+  setTimeout(function(){
+    updateHbSegIndicator(true);
+  }, 10);
 }
 window.paintBar = paintBar;
+
 function paintBar(){
   var bar = document.getElementById('hbModeBar');
   if(!bar) return;
@@ -218,56 +334,56 @@ function paintBar(){
     worldLabel = 'Волшебник' + wzName;
   }
 
-  bar.innerHTML =
-    '<div class="hb-bar-inner">'+
-      '<div class="hb-seg">'+
-        '<button class="hb-seg-btn ' + (curMode==='faerun'?'on':'') + '" data-hbmode="faerun">Фаэрун</button>'+
-        '<button class="hb-seg-btn ' + (curMode==='hb'?'on':'') + '" data-hbmode="hb">Технологии</button>'+
-        '<button class="hb-seg-btn ' + (curMode==='sh'?'on':'') + '" data-hbmode="sh">Шиноби</button>'+
-        '<button class="hb-seg-btn ' + (curMode==='me'?'on':'') + '" data-hbmode="me">Космос</button>'+
-        '<button class="hb-seg-btn ' + (curMode==='el'?'on':'') + '" data-hbmode="el">Стихия</button>'+
-        '<button class="hb-seg-btn ' + (curMode==='wi'?'on':'') + '" data-hbmode="wi">Ведьмак</button>'+
-        '<button class="hb-seg-btn ' + (curMode==='wz'?'on':'') + '" data-hbmode="wz">Волшебник</button>'+
-      '</div>'+
-      (worldLabel ? '<div class="hb-bar-world">' + worldLabel + '</div>' : '')+
-    '</div>';
-
-  bar.querySelectorAll('[data-hbmode]').forEach(function(b){
-    b.addEventListener('click', function(e){
-      var m = b.getAttribute('data-hbmode');
-      HB.mode = m;
-      saveMode();
-      if(m === 'sh'){
-        if(typeof window.navigate === 'function') window.navigate('shHome');
-        else { view = {screen:'shHome'}; if(typeof SH !== 'undefined') SH.draft=null; render(); }
-      } else if(m === 'me'){
-        if(typeof window.navigate === 'function') window.navigate('meHome');
-        else { view = {screen:'meHome'}; render(); }
-      } else if(m === 'el'){
-        if(typeof window.navigate === 'function') window.navigate('elHome');
-        else { view = {screen:'elHome'}; render(); }
-      } else if(m === 'wi'){
-        if(typeof window.navigate === 'function') window.navigate('wiHome');
-        else { view = {screen:'wiHome'}; render(); }
-      } else if(m === 'wz'){
-        if(typeof window.navigate === 'function') window.navigate('wzHome');
-        else { view = {screen:'wzHome'}; render(); }
-      } else if(m === 'hb'){
-        view = {screen:'hbHome'};
-        render();
-      } else {
-        view = {screen:'home'};
-        render();
-      }
-      paintBar();
-      if(typeof paintShBar === 'function') paintShBar();
-      window.scrollTo(0,0);
+  var seg = bar.querySelector('.hb-seg');
+  if(!seg){
+    bar.innerHTML =
+      '<div class="hb-bar-inner">'+
+        '<div class="hb-seg has-indicator">'+
+          '<div class="hb-seg-indicator" id="hbSegIndicator"></div>'+
+          '<button class="hb-seg-btn ' + (curMode==='faerun'?'on':'') + '" data-hbmode="faerun">Фаэрун</button>'+
+          '<button class="hb-seg-btn ' + (curMode==='hb'?'on':'') + '" data-hbmode="hb">Технологии</button>'+
+          '<button class="hb-seg-btn ' + (curMode==='sh'?'on':'') + '" data-hbmode="sh">Шиноби</button>'+
+          '<button class="hb-seg-btn ' + (curMode==='me'?'on':'') + '" data-hbmode="me">Космос</button>'+
+          '<button class="hb-seg-btn ' + (curMode==='el'?'on':'') + '" data-hbmode="el">Стихия</button>'+
+          '<button class="hb-seg-btn ' + (curMode==='wi'?'on':'') + '" data-hbmode="wi">Ведьмак</button>'+
+          '<button class="hb-seg-btn ' + (curMode==='wz'?'on':'') + '" data-hbmode="wz">Волшебник</button>'+
+        '</div>'+
+        (worldLabel ? '<div class="hb-bar-world">' + worldLabel + '</div>' : '')+
+      '</div>';
+  } else {
+    seg.classList.add('has-indicator');
+    if(!seg.querySelector('.hb-seg-indicator')){
+      var ind = document.createElement('div');
+      ind.className = 'hb-seg-indicator';
+      ind.id = 'hbSegIndicator';
+      seg.insertBefore(ind, seg.firstChild);
+    }
+    seg.querySelectorAll('.hb-seg-btn').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-hbmode') === curMode);
     });
-  });
+
+    var lab = bar.querySelector('.hb-bar-world');
+    if(worldLabel){
+      if(!lab){
+        lab = document.createElement('div');
+        lab.className = 'hb-bar-world';
+        var inner = bar.querySelector('.hb-bar-inner');
+        if(inner) inner.appendChild(lab);
+      }
+      lab.innerHTML = worldLabel;
+    } else if(lab && lab.parentNode){
+      lab.parentNode.removeChild(lab);
+    }
+  }
+
+  bindBarButtons(bar);
+
   if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
   if(typeof applyMeTheme === 'function') applyMeTheme();
   if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
   if(typeof applyWizardTheme === 'function') applyWizardTheme();
+
+  updateHbSegIndicator(false);
 }
 
 /* ---------- экраны ---------- */

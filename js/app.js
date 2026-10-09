@@ -30,9 +30,18 @@ function paintShBar(){
     seg.appendChild(bWz);
   }
 
+  if(!seg.querySelector('.hb-seg-indicator')){
+    var ind = document.createElement('div');
+    ind.className = 'hb-seg-indicator';
+    ind.id = 'hbSegIndicator';
+    seg.insertBefore(ind, seg.firstChild);
+  }
+  seg.classList.add('has-indicator');
+
   seg.querySelectorAll('.hb-seg-btn').forEach(function(b){
     b.classList.toggle('on', b.getAttribute('data-hbmode')===HB.mode);
   });
+  if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
 
   var shBtn = seg.querySelector('[data-hbmode="sh"]');
   if(shBtn && !shBtn.__shBound){
@@ -40,6 +49,7 @@ function paintShBar(){
     shBtn.addEventListener('click', function(){
       HB.mode='sh';
       try{ localStorage.setItem('ttc_mode','sh'); }catch(e){}
+      if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
       view={screen:'shHome'}; SH.draft=null; render(); window.scrollTo(0,0);
     });
   }
@@ -50,6 +60,7 @@ function paintShBar(){
     meBtn.addEventListener('click', function(){
       HB.mode='me';
       try{ localStorage.setItem('ttc_mode','me'); }catch(e){}
+      if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
       view={screen:'meHome'}; render(); window.scrollTo(0,0);
     });
   }
@@ -60,6 +71,7 @@ function paintShBar(){
     elBtn.addEventListener('click', function(){
       HB.mode='el';
       try{ localStorage.setItem('ttc_mode','el'); }catch(e){}
+      if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
       view={screen:'elHome'}; render(); window.scrollTo(0,0);
     });
   }
@@ -70,6 +82,7 @@ function paintShBar(){
     wiBtn.addEventListener('click', function(){
       HB.mode='wi';
       try{ localStorage.setItem('ttc_mode','wi'); }catch(e){}
+      if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
       view={screen:'wiHome'}; render(); window.scrollTo(0,0);
     });
   }
@@ -80,6 +93,7 @@ function paintShBar(){
     wzBtn.addEventListener('click', function(e){
       HB.mode='wz';
       try{ localStorage.setItem('ttc_mode','wz'); }catch(e){}
+      if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
       view={screen:'wzHome'}; render(); window.scrollTo(0,0);
     });
   }
@@ -94,6 +108,7 @@ function paintShBar(){
   if(typeof EL !== 'undefined' && typeof EL.applyTheme === 'function') EL.applyTheme();
   if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
   if(typeof applyWizardTheme === 'function') applyWizardTheme();
+  if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
 
   var lab=bar.querySelector('.hb-bar-world');
   if(HB.mode==='sh'){

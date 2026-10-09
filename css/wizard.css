@@ -263,7 +263,7 @@ body.wz-theme {
 
 .hb-seg-btn[data-hbmode="wz"]:hover:not(.on) {
   color: var(--wz-gold-light, #fef08a) !important;
-  background: rgba(212, 175, 55, 0.12) !important;
+  background: transparent !important;
 }
 
 /* Активное состояние кнопки «Волшебник» — сдержанный благородный индиго-аметист с золотом в стиле других разделов */
@@ -276,6 +276,12 @@ body.wz-theme .hb-seg-btn.on,
   letter-spacing: 0.03em !important;
   border-radius: 999px;
   box-shadow: 0 0 12px rgba(99, 102, 241, 0.45) !important;
+}
+
+.hb-seg.has-indicator .hb-seg-btn[data-hbmode="wz"].on,
+body.wz-theme .hb-seg.has-indicator .hb-seg-btn.on {
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 /* Бейджи степеней мастерства навыков */
