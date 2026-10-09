@@ -899,10 +899,10 @@
   scrollbar-width:none;
   -webkit-overflow-scrolling:touch;
   background:rgba(10,11,13,.88);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
   box-shadow:var(--shadow);
-  padding:2px;
+  padding:0;
   user-select:none;
   -webkit-user-select:none;
 }
@@ -910,7 +910,7 @@
   display:none;
 }
 
-/* Скользящая каретка-индикатор активного раздела с плавной анимацией перемещения и цвета */
+/* Скользящая каретка-индикатор активного раздела: минималистичный стиль без глянца и контуров */
 .hb-seg-indicator{
   position:absolute;
   top:0;
@@ -920,76 +920,69 @@
   z-index:1;
   opacity:0;
   box-sizing:border-box;
-  background-image:linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 50%, rgba(0,0,0,0.18) 100%);
-  background-color:#bfa15f;
-  box-shadow:0 0 16px rgba(191,161,95,0.55), inset 0 1px 0 rgba(255,255,255,0.35);
-  border:1px solid rgba(255,255,255,0.22);
-  transition:transform 0.32s cubic-bezier(0.25, 1, 0.5, 1),
-             width 0.32s cubic-bezier(0.25, 1, 0.5, 1),
-             background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-             box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-             border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+  border:none !important;
+  outline:none !important;
+  background-image:none !important;
+  background-color:var(--brass, #c9a45c);
+  box-shadow:none;
+  transition:transform 0.28s cubic-bezier(0.25, 1, 0.5, 1),
+             width 0.28s cubic-bezier(0.25, 1, 0.5, 1),
+             background-color 0.3s ease,
+             box-shadow 0.3s ease,
              opacity 0.2s ease;
   will-change:transform, width, background-color, box-shadow;
 }
 
-/* Цвета индикатора для каждого раздела */
+/* Натуральные фоновые цвета разделов (как было изначально, без белых рамок и бликов) */
 .hb-seg-indicator[data-mode="faerun"]{
-  background-color:#bfa15f;
-  box-shadow:0 0 16px rgba(191,161,95,0.55), inset 0 1px 0 rgba(255,255,255,0.35);
-  border-color:rgba(255,255,255,0.25);
+  background-color:#c9a45c;
+  box-shadow:none;
 }
 .hb-seg-indicator[data-mode="hb"]{
-  background-color:#8295a5;
-  box-shadow:0 0 16px rgba(130,149,165,0.5), inset 0 1px 0 rgba(255,255,255,0.35);
-  border-color:rgba(255,255,255,0.25);
+  background-color:#9fb2c2;
+  box-shadow:none;
 }
 .hb-seg-indicator[data-mode="sh"]{
-  background-color:#c98e32;
-  box-shadow:0 0 18px rgba(201,142,50,0.6), inset 0 1px 0 rgba(255,255,255,0.35);
-  border-color:rgba(255,255,255,0.25);
+  background-color:#c9a45c;
+  box-shadow:none;
 }
 .hb-seg-indicator[data-mode="me"]{
-  background-color:#00a8e8;
-  box-shadow:0 0 20px rgba(0,168,232,0.75), 0 0 8px rgba(0,210,255,0.9), inset 0 1px 0 rgba(255,255,255,0.45);
-  border-color:rgba(255,255,255,0.4);
+  background-color:#0077cc;
+  box-shadow:0 0 14px rgba(0, 180, 255, 0.45);
 }
 .hb-seg-indicator[data-mode="el"]{
-  background-color:#14b8a6;
-  box-shadow:0 0 18px rgba(20,184,166,0.6), inset 0 1px 0 rgba(255,255,255,0.35);
-  border-color:rgba(255,255,255,0.3);
+  background-color:#0d9488;
+  box-shadow:none;
 }
 .hb-seg-indicator[data-mode="wi"]{
   background-color:#d97706;
-  box-shadow:0 0 20px rgba(217,119,6,0.65), inset 0 1px 0 rgba(255,255,255,0.35);
-  border-color:rgba(255,255,255,0.25);
+  box-shadow:none;
 }
 .hb-seg-indicator[data-mode="wz"]{
-  background-color:#3730a3;
-  box-shadow:0 0 18px rgba(99,102,241,0.7), 0 0 8px rgba(212,175,55,0.4), inset 0 1px 0 rgba(254,240,138,0.4);
-  border-color:rgba(254,240,138,0.35);
+  background-color:#312e81;
+  box-shadow:0 0 12px rgba(99, 102, 241, 0.4);
 }
 
-/* Оверрайды клановых расцветок Шиноби для индикатора */
+/* Кланы Шиноби */
 body.sh-theme.sh-theme-uchiha .hb-seg-indicator[data-mode="sh"]{
-  background-color:#dc2626;
-  box-shadow:0 0 20px rgba(220,38,38,0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+  background-color:#842822;
+  box-shadow:none;
 }
 body.sh-theme.sh-theme-kurayami .hb-seg-indicator[data-mode="sh"]{
-  background-color:#9333ea;
-  box-shadow:0 0 20px rgba(147,51,234,0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+  background-color:#6b21a8;
+  box-shadow:none;
 }
 body.sh-theme.sh-theme-goman .hb-seg-indicator[data-mode="sh"]{
-  background-color:#eab308;
-  box-shadow:0 0 20px rgba(234,179,8,0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+  background-color:#b45309;
+  box-shadow:none;
 }
 body.sh-theme.sh-theme-dzanku .hb-seg-indicator[data-mode="sh"]{
-  background-color:#06b6d4;
-  box-shadow:0 0 20px rgba(6,182,212,0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+  background-color:#0891b2;
+  box-shadow:none;
 }
 body.el-theme.el-theme-dark .hb-seg-indicator[data-mode="el"]{
   background-color:#0f766e;
-  box-shadow:0 0 18px rgba(15,118,110,0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+  box-shadow:none;
 }
 
 .hb-seg-btn{
@@ -1008,7 +1001,7 @@ body.el-theme.el-theme-dark .hb-seg-indicator[data-mode="el"]{
   align-items:center;
   justify-content:center;
   white-space:nowrap;
-  transition:color 0.25s ease, opacity 0.2s ease, text-shadow 0.25s ease;
+  transition:color 0.2s ease;
 }
 .hb-seg-btn:hover:not(.on){
   color:var(--ink);
@@ -1017,7 +1010,7 @@ body.el-theme.el-theme-dark .hb-seg-indicator[data-mode="el"]{
 /* Фолбэк без индикатора */
 .hb-seg-btn.on{ background:var(--brass); color:#101216; font-weight:600; }
 
-/* При наличии скользящего индикатора кнопки становятся прозрачными поверх каретки */
+/* При наличии скользящего индикатора кнопки прозрачны поверх него */
 #hbModeBar .hb-seg.has-indicator .hb-seg-btn,
 #hbModeBar .hb-seg.has-indicator .hb-seg-btn.on,
 body.sh-theme #hbModeBar .hb-seg.has-indicator .hb-seg-btn.on,
@@ -1030,19 +1023,18 @@ body.hb-theme #hbModeBar .hb-seg.has-indicator .hb-seg-btn.on{
   box-shadow:none !important;
 }
 
-/* Цвет текста активных кнопок */
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="faerun"].on{ color:#101216 !important; font-weight:700 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="hb"].on{ color:#0b0d10 !important; font-weight:700 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="sh"].on{ color:#120f0b !important; font-weight:700 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="me"].on{ color:#020914 !important; font-weight:700 !important; text-shadow:0 0 8px rgba(0,210,255,0.4) !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="el"].on{ color:#022c22 !important; font-weight:700 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="wi"].on{ color:#1a0c02 !important; font-weight:700 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="wz"].on{ color:#fef08a !important; font-weight:700 !important; text-shadow:0 1px 3px rgba(0,0,0,0.7) !important; }
+/* Цвет текста активных кнопок в классическом лаконичном стиле */
+.hb-seg.has-indicator .hb-seg-btn[data-hbmode="faerun"].on{ color:#101216 !important; font-weight:600 !important; }
+.hb-seg.has-indicator .hb-seg-btn[data-hbmode="hb"].on{ color:#0b0d10 !important; font-weight:600 !important; }
+.hb-seg.has-indicator .hb-seg-btn[data-hbmode="sh"].on{ color:#120f0b !important; font-weight:600 !important; }
+.hb-seg.has-indicator .hb-seg-btn[data-hbmode="me"].on{ color:#030814 !important; font-weight:700 !important; }
+.hb-seg.has-indicator .hb-seg-btn[data-hbmode="el"].on{ color:#042f2e !important; font-weight:600 !important; }
+.hb-seg.has-indicator .hb-seg-btn[data-hbmode="wi"].on{ color:#180d02 !important; font-weight:600 !important; }
+.hb-seg.has-indicator .hb-seg-btn[data-hbmode="wz"].on{ color:#fef08a !important; font-weight:700 !important; }
 
 body.sh-theme.sh-theme-uchiha .hb-seg.has-indicator .hb-seg-btn[data-hbmode="sh"].on,
 body.sh-theme.sh-theme-kurayami .hb-seg.has-indicator .hb-seg-btn[data-hbmode="sh"].on{
   color:#ffffff !important;
-  text-shadow:0 1px 4px rgba(0,0,0,0.7) !important;
 }
 body.el-theme.el-theme-dark .hb-seg.has-indicator .hb-seg-btn[data-hbmode="el"].on{
   color:#ccfbf1 !important;
