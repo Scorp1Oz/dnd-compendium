@@ -933,17 +933,17 @@
   will-change:transform, width, background-color, box-shadow;
 }
 
-/* Натуральные фоновые цвета разделов (как было изначально, без белых рамок и бликов) */
+/* Натуральные фоновые цвета разделов */
 .hb-seg-indicator[data-mode="faerun"]{
-  background-color:#c9a45c;
+  background-color:#a16207;
   box-shadow:none;
 }
 .hb-seg-indicator[data-mode="hb"]{
-  background-color:#9fb2c2;
+  background-color:#475569;
   box-shadow:none;
 }
 .hb-seg-indicator[data-mode="sh"]{
-  background-color:#c9a45c;
+  background-color:#a16207;
   box-shadow:none;
 }
 .hb-seg-indicator[data-mode="me"]{
@@ -1008,7 +1008,7 @@ body.el-theme.el-theme-dark .hb-seg-indicator[data-mode="el"]{
 }
 
 /* Фолбэк без индикатора */
-.hb-seg-btn.on{ background:var(--brass); color:#101216; font-weight:600; }
+.hb-seg-btn.on{ background:var(--brass); color:#ffffff; font-weight:600; }
 
 /* При наличии скользящего индикатора кнопки прозрачны поверх него */
 #hbModeBar .hb-seg.has-indicator .hb-seg-btn,
@@ -1023,21 +1023,13 @@ body.hb-theme #hbModeBar .hb-seg.has-indicator .hb-seg-btn.on{
   box-shadow:none !important;
 }
 
-/* Цвет текста активных кнопок в классическом лаконичном стиле */
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="faerun"].on{ color:#101216 !important; font-weight:600 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="hb"].on{ color:#0b0d10 !important; font-weight:600 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="sh"].on{ color:#120f0b !important; font-weight:600 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="me"].on{ color:#030814 !important; font-weight:700 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="el"].on{ color:#042f2e !important; font-weight:600 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="wi"].on{ color:#180d02 !important; font-weight:600 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="wz"].on{ color:#ffffff !important; font-weight:600 !important; }
-
-body.sh-theme.sh-theme-uchiha .hb-seg.has-indicator .hb-seg-btn[data-hbmode="sh"].on,
-body.sh-theme.sh-theme-kurayami .hb-seg.has-indicator .hb-seg-btn[data-hbmode="sh"].on{
+/* Белый цвет текста для любого выбранного раздела в навигационной панели */
+#hbModeBar .hb-seg-btn.on,
+#hbModeBar .hb-seg.has-indicator .hb-seg-btn.on,
+.hb-seg.has-indicator .hb-seg-btn.on,
+.hb-seg-btn.on {
   color:#ffffff !important;
-}
-body.el-theme.el-theme-dark .hb-seg.has-indicator .hb-seg-btn[data-hbmode="el"].on{
-  color:#ccfbf1 !important;
+  font-weight:600 !important;
 }
 
 .hb-bar-world{
@@ -1073,7 +1065,7 @@ body.hb-theme{
     repeating-linear-gradient(135deg, rgba(255,255,255,.02) 0px, rgba(255,255,255,.02) 1px, transparent 1px, transparent 22px),
     linear-gradient(180deg, #101318 0%, #070809 60%);
 }
-body.hb-theme .hb-seg-btn.on{ background:var(--brass); color:#0b0d10; }
+body.hb-theme .hb-seg-btn.on{ background:var(--brass); color:#ffffff; }
 
 /* --- тема режима «Шиноби» --- */
 body.sh-theme{
@@ -1092,7 +1084,7 @@ body.sh-theme{
     repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0px, rgba(255,255,255,.012) 1px, transparent 1px, transparent 32px),
     radial-gradient(ellipse at 50% -10%, #221c15 0%, #0c0a08 65%);
 }
-body.sh-theme .hb-seg-btn.on{ background:var(--brass); color:#120f0b; }
+body.sh-theme .hb-seg-btn.on{ background:var(--brass); color:#ffffff; }
 
 /* Стилизация свитков и карточек меню в режиме Шиноби */
 body.sh-theme .menu-item{

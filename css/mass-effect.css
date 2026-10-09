@@ -1875,7 +1875,7 @@ body.sh-theme.sh-theme-goman {
 body.sh-theme.sh-theme-goman .hb-seg-btn.on {
   background: linear-gradient(180deg, rgba(243, 211, 122, 0.15) 0%, rgba(243, 211, 122, 0.0) 100%);
   border-bottom-color: #f3d37a;
-  color: #ffe89e;
+  color: #ffffff;
   box-shadow: 0 -12px 20px -10px rgba(243, 211, 122, 0.35) inset;
 }
 
@@ -2006,7 +2006,7 @@ body.sh-theme.sh-theme-dzanku {
 body.sh-theme.sh-theme-dzanku .hb-seg-btn.on {
   background: linear-gradient(180deg, rgba(229, 169, 60, 0.15) 0%, transparent 100%);
   border-bottom-color: #e5a93c;
-  color: #ffc459;
+  color: #ffffff;
   box-shadow: 0 -12px 20px -10px rgba(229, 169, 60, 0.35) inset;
 }
 

@@ -3154,9 +3154,9 @@ body.me-theme {
 
 body.me-theme .hb-seg-btn.on {
   background: linear-gradient(135deg, #00d2ff 0%, #0077cc 100%);
-  color: #030814;
+  color: #ffffff;
   box-shadow: 0 0 16px rgba(0, 210, 255, 0.55);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 body.me-theme .hb-bar-world {
