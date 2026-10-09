@@ -2261,6 +2261,15 @@
     var hpVal = p.maxHp != null ? p.maxHp : (p.hp != null ? p.hp : 20);
     var yearVal = p.year || p.course || p.profession || '1 курс';
 
+    var w = getProfileWand(p);
+    var hasWand = !!(w.saved || w.name || w.wood || w.core || w.length);
+    var wandDisplay = w.name || (w.wood ? (w.wood + (w.core ? (' • ' + w.core) : '')) : '');
+    var wandFullDetails = [w.wood, w.core, w.length, w.flexibility].filter(Boolean).join(' • ');
+
+    var wandBadgeHtml = hasWand
+      ? ('<span class="wz-stat-badge wand" style="border-color:rgba(212,175,55,0.4);color:var(--wz-gold-light);" title="Параметры палочки: ' + escA(wandFullDetails || wandDisplay) + '">🪄 ' + esc(wandDisplay || 'Палочка настроена') + '</span>')
+      : '<span class="wz-stat-badge wand" style="opacity:0.75;" title="Палочка не настроена. Настроить в Данных">🪄 Без палочки</span>';
+
     // HUD карточка волшебника
     var hud = '<div class="wz-hud ' + houseClass + '">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">' +
@@ -2269,20 +2278,31 @@
           '<div style="font-family:\'EB Garamond\',serif;font-style:italic;color:var(--wz-gold-light);font-size:14.5px;margin-top:2px;">' +
             charDisplayTitle +
           '</div>' +
+          (hasWand ? (
+            '<div class="wz-hud-wand-line" title="Параметры волшебной палочки: ' + escA(wandFullDetails || wandDisplay) + '">' +
+              '<span style="color:var(--wz-gold);">🪄</span>' +
+              '<span>Палочка: <b style="color:var(--wz-gold-light);">' + esc(wandDisplay) + '</b>' + (w.length ? (' (' + esc(w.length) + ')') : '') + (w.flexibility ? (', ' + esc(w.flexibility)) : '') + '</span>' +
+            '</div>'
+          ) : (
+            '<div class="wz-hud-wand-line" style="font-style:italic;color:rgba(212,175,55,0.7);">' +
+              '<span>🪄 Палочка не настроена — <a href="javascript:void(0)" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzData\');" style="color:var(--wz-gold);text-decoration:underline;">настроить в Данных</a></span>' +
+            '</div>'
+          )) +
         '</div>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
           houseBadge +
+          wandBadgeHtml +
           '<span class="wz-stat-badge year" title="Курс Хогвартса или профессия">🎓 ' + esc(yearVal) + '</span>' +
           '<span class="wz-stat-badge hp">❤️ ' + hpVal + ' HP</span>' +
           '<span class="wz-stat-badge ac">🛡️ КБ ' + (p.ac || 10) + '</span>' +
-          '<button class="wz-hud-edit-btn" data-nav="wzData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzData\');" title="Перейти к анкете и списку персонажей">⚙️ Ростер</button>' +
+          '<button class="wz-hud-edit-btn" data-nav="wzData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzData\');" title="Перейти к анкете, настройке палочки и ростеру">⚙️ Данные</button>' +
         '</div>' +
       '</div>' +
     '</div>';
 
     var rule = '<div class="wz-rule"></div>';
 
-    // 1. Бросок кубиков (кликабельный Hero Dice блок точно как в Ведьмаке!)
+    // 1. Бросок кубиков (кликабельный Hero Dice блок)
     var heroDice = '<div class="wz-hero-dice" data-go="dice" onclick="if(typeof window.navigate===\'function\') window.navigate(\'dice\');" role="button" tabindex="0" title="Открыть бросок костей">' +
       '<div class="wz-hero-dice-icon">' +
         (typeof dieShapeSvg === 'function' ? dieShapeSvg(20, 'wzHeroDie', 20) : '🎲') +
@@ -2297,7 +2317,7 @@
     // 2. Заголовок разделов
     var label = '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // ВОЛШЕБНИК</div>';
 
-    // 3. Список разделов в сетке menu-list grid-2 (как в Ведьмаке и Шиноби!)
+    // 3. Список разделов в сетке menu-list grid-2
     var sectionsList = '<div class="menu-list grid-2">' +
       '<div class="wz-card wz-card-clickable" data-nav="wzSpells" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSpells\');" role="button" tabindex="0" title="Открыть Заклинания">' +
         '<div style="flex:1;min-width:0;">' +
@@ -2320,13 +2340,6 @@
         '</div>' +
         '<div class="wz-card-arrow">›</div>' +
       '</div>' +
-      '<div class="wz-card wz-card-clickable" data-nav="wzWand" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzWand\');" role="button" tabindex="0" title="Открыть Палочка">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>🪄</span> Палочка</div>' +
-          '<div class="wz-card-desc">Параметры волшебной палочки: древесина, сердцевина, длина, упругость и свойства</div>' +
-        '</div>' +
-        '<div class="wz-card-arrow">›</div>' +
-      '</div>' +
       '<div class="wz-card wz-card-clickable" data-nav="wzRef" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRef\');" role="button" tabindex="0" title="Открыть Справочник">' +
         '<div style="flex:1;min-width:0;">' +
           '<div class="wz-card-title"><span>📚</span> Справочник Волшебного мира</div>' +
@@ -2334,10 +2347,10 @@
         '</div>' +
         '<div class="wz-card-arrow">›</div>' +
       '</div>' +
-      '<div class="wz-card wz-card-clickable" data-nav="wzData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzData\');" role="button" tabindex="0" title="Открыть Данные">' +
+      '<div class="wz-card wz-card-clickable" data-nav="wzData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzData\');" role="button" tabindex="0" title="Открыть Данные и Палочку">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>💾</span> Данные</div>' +
-          '<div class="wz-card-desc">Анкета волшебника, характеристики, факультет и управление персонажами</div>' +
+          '<div class="wz-card-title"><span>💾</span> Данные и Палочка</div>' +
+          '<div class="wz-card-desc">Анкета волшебника, настройка волшебной палочки, характеристики, факультет и ростер</div>' +
         '</div>' +
         '<div class="wz-card-arrow">›</div>' +
       '</div>' +
@@ -2398,6 +2411,29 @@
 
     var hpVal = p.maxHp != null ? p.maxHp : (p.hp != null ? p.hp : 20);
     var yearVal = p.year || p.course || p.profession || '1 курс';
+
+    var w = getProfileWand(p);
+    var hasWand = !!(w.saved || w.name || w.wood || w.core || w.length || w.flexibility || w.features);
+    var wandTitle = w.name || (w.wood ? ('Палочка: ' + w.wood + (w.core ? (' и ' + w.core) : '')) : 'Волшебная палочка');
+    var wandSub = [w.wood, w.core].filter(Boolean).join(' • ') || (hasWand ? 'Параметры палочки сохранены' : 'Параметры палочки не заполнены');
+
+    var showcaseHtml = 
+      '<div class="wz-wand-showcase-card" id="wzWandShowcase" style="margin-bottom:14px;">' +
+        '<div class="wz-wand-title-row">' +
+          '<span class="wz-wand-symbol">🪄</span>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div class="wz-wand-display-name">' + esc(wandTitle) + '</div>' +
+            '<div class="wz-wand-display-sub">' + esc(wandSub) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="wz-wand-chips-row">' +
+          '<span class="wz-stat-badge">🌲 Древесина: <b style="color:var(--wz-gold-light);">' + esc(w.wood || 'Не указана') + '</b></span>' +
+          '<span class="wz-stat-badge">✨ Сердцевина: <b style="color:var(--wz-gold-light);">' + esc(w.core || 'Не указана') + '</b></span>' +
+          '<span class="wz-stat-badge">📏 Длина: <b style="color:var(--wz-gold-light);">' + esc(w.length || 'Не указана') + '</b></span>' +
+          '<span class="wz-stat-badge">🌀 Упругость: <b style="color:var(--wz-gold-light);">' + esc(w.flexibility || 'Не указана') + '</b></span>' +
+        '</div>' +
+        (w.features ? ('<div class="wz-wand-features-box"><b>Особенности:</b> ' + esc(w.features) + '</div>') : '') +
+      '</div>';
 
     var isCollapsed = false;
     try { isCollapsed = localStorage.getItem('ttc_wz_char_collapsed') === '1'; } catch(e){}
@@ -2498,8 +2534,69 @@
               '</div>' +
             '</div>' +
 
-            '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px;">' +
-              '<button class="btn btn-primary" id="wzDataSaveCharBtn">✓ Сохранить анкету</button>' +
+            '<div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(212,175,55,0.25);">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">' +
+                '<div style="font-size:15px;font-weight:700;color:var(--wz-gold);font-family:\'Cinzel\',serif;display:flex;align-items:center;gap:8px;">' +
+                  '<span>🪄</span> Волшебная палочка персонажа' +
+                '</div>' +
+                '<button class="btn btn-ghost" data-nav="wzRefView:wands" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRefView:wands\');" style="font-size:12px;padding:3px 10px;">' +
+                  '📚 Справочник Олливандера' +
+                '</button>' +
+              '</div>' +
+
+              showcaseHtml +
+
+              '<div class="wz-edit-grid" style="margin-top:10px;">' +
+                '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+                  '<label>Название / Обозначение палочки</label>' +
+                  '<input type="text" id="wzDataInWandName" class="wz-input" value="' + escA(w.name) + '" placeholder="Например: Палочка из остролиста, Бузинная палочка...">' +
+                '</div>' +
+                '<div class="wz-edit-item">' +
+                  '<label>Древесина</label>' +
+                  '<input type="text" id="wzDataInWandWood" class="wz-input" list="wzWoodList" value="' + escA(w.wood) + '" placeholder="Например: Остролист, Тис, Бузина, Дуб...">' +
+                  '<datalist id="wzWoodList">' +
+                    '<option value="Остролист"><option value="Тис"><option value="Бузина"><option value="Дуб"><option value="Ива">' +
+                    '<option value="Ясень"><option value="Виноградная лоза"><option value="Черное дерево"><option value="Терновник">' +
+                    '<option value="Вишня"><option value="Боярышник"><option value="Орех"><option value="Кедр"><option value="Клен">' +
+                    '<option value="Вяз"><option value="Граб"><option value="Ольха"><option value="Кипарис"><option value="Липа">' +
+                    '<option value="Красное дерево"><option value="Рябина"><option value="Каштан">' +
+                  '</datalist>' +
+                '</div>' +
+                '<div class="wz-edit-item">' +
+                  '<label>Сердцевина</label>' +
+                  '<input type="text" id="wzDataInWandCore" class="wz-input" list="wzCoreList" value="' + escA(w.core) + '" placeholder="Например: Перо феникса, Сердечная жила дракона...">' +
+                  '<datalist id="wzCoreList">' +
+                    '<option value="Перо феникса"><option value="Сердечная жила дракона"><option value="Волос единорога">' +
+                    '<option value="Волос вейлы"><option value="Волос фестрала"><option value="Рог рогатого змея">' +
+                    '<option value="Ус вампуса"><option value="Перо птицы-гром"><option value="Чешуя василиска">' +
+                  '</datalist>' +
+                '</div>' +
+                '<div class="wz-edit-item">' +
+                  '<label>Длина</label>' +
+                  '<input type="text" id="wzDataInWandLength" class="wz-input" value="' + escA(w.length) + '" placeholder="Например: 11 дюймов (28 см)">' +
+                '</div>' +
+                '<div class="wz-edit-item">' +
+                  '<label>Упругость</label>' +
+                  '<input type="text" id="wzDataInWandFlex" class="wz-input" list="wzFlexList" value="' + escA(w.flexibility) + '" placeholder="Например: Умеренно упругая, Непреклонная...">' +
+                  '<datalist id="wzFlexList">' +
+                    '<option value="Умеренно упругая"><option value="Гибкая"><option value="Упругая"><option value="Очень гибкая">' +
+                    '<option value="Слегка пружинистая"><option value="Твердая"><option value="Непреклонная"><option value="Жесткая">' +
+                    '<option value="Хрупкая"><option value="Податливая">' +
+                  '</datalist>' +
+                '</div>' +
+                '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+                  '<label>Особые свойства, совместимость и история палочки</label>' +
+                  '<textarea id="wzDataInWandFeatures" class="wz-input" rows="3" placeholder="Особые свойства, совместимость с заклинаниями, история приобретения в лавке мистера Олливандера, привязанность к владельцу...">' + esc(w.features) + '</textarea>' +
+                '</div>' +
+              '</div>' +
+
+              '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;">' +
+                '<button class="btn" id="wzDataWandRandomBtn" title="Сгенерировать случайную гармоничную комбинацию Олливандера">🎲 Случайная палочка</button>' +
+              '</div>' +
+            '</div>' +
+
+            '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);">' +
+              '<button class="btn btn-primary" id="wzDataSaveCharBtn">✓ Сохранить анкету и палочку</button>' +
               '<button class="btn" id="wzDataResetProfileBtn" title="Восстановить HP персонажа">🔄 Восстановить HP</button>' +
               '<button class="btn" id="wzDataDelProfileBtn" style="color:#ff7675;border-color:rgba(231,76,60,0.4);margin-left:auto;" title="Удалить текущий профиль">🗑️ Удалить профиль</button>' +
             '</div>' +
@@ -2642,7 +2739,7 @@
       });
     }
 
-    // Сохранение анкеты
+    // Сохранение анкеты и палочки
     var saveCharBtn = g('wzDataSaveCharBtn');
     if(saveCharBtn){
       saveCharBtn.addEventListener('click', function(){
@@ -2664,9 +2761,63 @@
         delete p.mana;
         delete p.maxMana;
 
+        if(!p.wand || typeof p.wand !== 'object'){
+          p.wand = {};
+        }
+        p.wand.name = (v('wzDataInWandName') || '').trim();
+        p.wand.wood = (v('wzDataInWandWood') || '').trim();
+        p.wand.core = (v('wzDataInWandCore') || '').trim();
+        p.wand.length = (v('wzDataInWandLength') || '').trim();
+        p.wand.flexibility = (v('wzDataInWandFlex') || '').trim();
+        p.wand.features = (v('wzDataInWandFeatures') || '').trim();
+        p.wand.saved = true;
+
         WZ.saveProfiles();
-        WZ.toast('✓ Анкета успешно сохранена!', 'success');
+        WZ.toast('✓ Анкета и волшебная палочка успешно сохранены!', 'success');
         if(typeof render === 'function') render();
+      });
+    }
+
+    // Случайная комбинация палочки Олливандера
+    var dataWandRandBtn = g('wzDataWandRandomBtn');
+    if(dataWandRandBtn && !dataWandRandBtn.__wired){
+      dataWandRandBtn.__wired = true;
+      dataWandRandBtn.addEventListener('click', function(){
+        var woods = ['Остролист', 'Тис', 'Бузина', 'Дуб', 'Ива', 'Ясень', 'Виноградная лоза', 'Черное дерево', 'Терновник', 'Вишня', 'Боярышник', 'Орех', 'Кедр', 'Клен', 'Вяз', 'Граб', 'Ольха', 'Кипарис', 'Липа'];
+        var cores = ['Перо феникса', 'Сердечная жила дракона', 'Волос единорога', 'Волос вейлы', 'Волос фестрала', 'Рог рогатого змея'];
+        var flexes = ['Умеренно упругая', 'Гибкая', 'Упругая', 'Слегка пружинистая', 'Твердая', 'Непреклонная', 'Жесткая', 'Податливая'];
+        var lengths = ['9½ дюймов (24 см)', '10 дюймов (25.4 см)', '10¾ дюймов (27.3 см)', '11 дюймов (28 см)', '11½ дюймов (29.2 см)', '12 дюймов (30.5 см)', '12¼ дюйма (31.1 см)', '13 дюймов (33 см)'];
+        var feats = [
+          'Палочка обладает сильным характером, особенно искусна в дуэльных чарах и защитной магии.',
+          'Приобретена в лавке мистера Олливандера в Косом переулке. Отличается редкой преданностью владельцу.',
+          'Превосходно проводит чары трансфигурации и бытовой магии, отзывается мягким золотистым свечением.',
+          'Склонна к мощным боевым заклинаниям, требует от мага непоколебимой воли и уверенности.',
+          'Чутко реагирует на душевное состояние мага, усиливает защитные чары и заклятие Патронуса.'
+        ];
+
+        var rWood = woods[Math.floor(Math.random() * woods.length)];
+        var rCore = cores[Math.floor(Math.random() * cores.length)];
+        var rFlex = flexes[Math.floor(Math.random() * flexes.length)];
+        var rLen = lengths[Math.floor(Math.random() * lengths.length)];
+        var rFeat = feats[Math.floor(Math.random() * feats.length)];
+
+        var inName = g('wzDataInWandName');
+        var inWood = g('wzDataInWandWood');
+        var inCore = g('wzDataInWandCore');
+        var inLen = g('wzDataInWandLength');
+        var inFlex = g('wzDataInWandFlex');
+        var inFeat = g('wzDataInWandFeatures');
+
+        if(inWood) inWood.value = rWood;
+        if(inCore) inCore.value = rCore;
+        if(inLen) inLen.value = rLen;
+        if(inFlex) inFlex.value = rFlex;
+        if(inFeat) inFeat.value = rFeat;
+        if(inName && (!inName.value || inName.value.startsWith('Палочка из '))){
+          inName.value = 'Палочка из ' + rWood.toLowerCase();
+        }
+
+        WZ.toast('🎲 Подобрана палочка: ' + rWood + ' и ' + rCore + '! Нажмите «Сохранить», чтобы зафиксировать.', 'info');
       });
     }
 
@@ -2772,273 +2923,15 @@
   }
 
   /* ============================================================
-     ЭКРАН ВОЛШЕБНОЙ ПАЛОЧКИ (wzWand)
+     ЭКРАН ВОЛШЕБНОЙ ПАЛОЧКИ (Перенаправлен в Данные)
      ============================================================ */
 
   function wzWand(){
-    var profList = WZ.profiles || [];
-    if(!profList.length){
-      WZ.loadProfiles();
-      profList = WZ.profiles || [];
-    }
-    var p = WZ.getActiveProfile();
-    var w = getProfileWand(p);
-    var hasSaved = !!(w.saved || w.name || w.wood || w.core || w.length || w.flexibility || w.features);
-    var isEditorOpen = (WZ.wandEditOpen === true) || (!hasSaved && WZ.wandEditOpen !== false);
-
-    var charDisplayName = (p.firstName || p.lastName) ? [p.firstName, p.lastName].filter(Boolean).join(' ') : (p.name || 'Безымянный маг');
-    var hIcon = getHouseIcon(p.house);
-
-    var profOptions = profList.map(function(item){
-      var hi = getHouseIcon(item.house);
-      var itName = (item.firstName || item.lastName) ? [item.firstName, item.lastName].filter(Boolean).join(' ') : (item.name || 'Безымянный маг');
-      return '<option value="' + escA(item.id) + '" ' + (item.id === WZ.activeProfileId ? 'selected' : '') + '>' + hi + ' ' + esc(itName) + (item.house ? (' (' + esc(item.house) + ')') : '') + '</option>';
-    }).join('');
-
-    var wandTitle = w.name || (w.wood ? ('Палочка: ' + w.wood + (w.core ? (' и ' + w.core) : '')) : 'Волшебная палочка');
-    var wandSub = [w.wood, w.core].filter(Boolean).join(' • ') || (hasSaved ? 'Параметры палочки сохранены' : 'Параметры палочки не заполнены');
-
-    var emptyPrompt = !hasSaved ? (
-      '<div style="font-size:13.5px;color:var(--wz-text-muted);font-style:italic;margin-top:10px;padding:8px 12px;background:rgba(212,175,55,0.08);border-left:3px solid var(--wz-gold);border-radius:4px;">' +
-        'Параметры волшебной палочки ещё не сохранены. Заполните форму ниже и сохраните. После первого сохранения эта форма скроется, и её можно будет вызвать кнопкой.' +
-      '</div>'
-    ) : '';
-
-    var showcaseActions = hasSaved ? (
-      '<div id="wzWandOpenRow" style="display:' + (isEditorOpen ? 'none' : 'flex') + ';gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid rgba(212,175,55,0.2);">' +
-        '<button class="btn btn-primary" id="wzWandOpenEditBtn" title="Открыть форму параметров палочки">✏️ Изменить параметры палочки</button>' +
-        '<button class="btn btn-ghost" data-nav="wzRefView:wands" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRefView:wands\');">📚 Справочник: Палочки Олливандера</button>' +
-      '</div>'
-    ) : '';
-
-    var showcaseHtml = 
-      '<div class="wz-wand-showcase-card" id="wzWandShowcase">' +
-        '<div class="wz-wand-title-row">' +
-          '<span class="wz-wand-symbol">🪄</span>' +
-          '<div style="flex:1;min-width:0;">' +
-            '<div class="wz-wand-display-name">' + esc(wandTitle) + '</div>' +
-            '<div class="wz-wand-display-sub">' + esc(wandSub) + '</div>' +
-          '</div>' +
-          (p.house ? ('<span class="wz-house-badge ' + getHouseSlug(p.house) + '">' + hIcon + ' ' + esc(p.house) + '</span>') : '') +
-        '</div>' +
-        '<div class="wz-wand-chips-row">' +
-          '<span class="wz-stat-badge">🌲 Древесина: <b style="color:var(--wz-gold-light);">' + esc(w.wood || 'Не указана') + '</b></span>' +
-          '<span class="wz-stat-badge">✨ Сердцевина: <b style="color:var(--wz-gold-light);">' + esc(w.core || 'Не указана') + '</b></span>' +
-          '<span class="wz-stat-badge">📏 Длина: <b style="color:var(--wz-gold-light);">' + esc(w.length || 'Не указана') + '</b></span>' +
-          '<span class="wz-stat-badge">🌀 Упругость: <b style="color:var(--wz-gold-light);">' + esc(w.flexibility || 'Не указана') + '</b></span>' +
-        '</div>' +
-        (w.features ? ('<div class="wz-wand-features-box"><b>Особенности:</b> ' + esc(w.features) + '</div>') : '') +
-        emptyPrompt +
-        showcaseActions +
-      '</div>';
-
-    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Палочка' }]) +
-      '<button class="back" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">← Назад</button>' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">' +
-        '<div>' +
-          '<h1 style="margin-bottom:4px;">🪄 Палочка</h1>' +
-          '<div class="desc" style="margin-bottom:0;">Параметры волшебной палочки: древесина, сердцевина, длина, упругость и особенности.</div>' +
-        '</div>' +
-        '<div style="display:flex;align-items:center;gap:8px;">' +
-          '<label style="font-size:12px;color:var(--wz-text-muted);font-weight:600;">Маг:</label>' +
-          '<select id="wzWandProfileSelect" class="wz-input" style="width:auto;min-width:180px;padding:6px 10px;font-size:13px;">' +
-            profOptions +
-          '</select>' +
-        '</div>' +
-      '</div>' +
-
-      showcaseHtml +
-
-      '<div class="wz-char-sheet-card" id="wzWandEditorCard" style="display:' + (isEditorOpen ? 'block' : 'none') + ';margin-top:16px;">' +
-        '<div class="wz-char-header" style="display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
-          '<span>Параметры палочки: <b style="color:var(--wz-gold);">' + esc(charDisplayName) + '</b></span>' +
-          (hasSaved ? '<button class="btn btn-ghost" id="wzWandCloseEditBtn" style="padding:4px 10px;font-size:12px;" title="Скрыть форму параметров">✕ Скрыть</button>' : '') +
-        '</div>' +
-
-        '<div class="wz-edit-grid">' +
-          '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
-            '<label>Название</label>' +
-            '<input type="text" id="wzWandInName" class="wz-input" value="' + escA(w.name) + '" placeholder="Например: Палочка из остролиста, Бузинная палочка, Палочка Поттера">' +
-          '</div>' +
-
-          '<div class="wz-edit-item">' +
-            '<label>Древесина</label>' +
-            '<input type="text" id="wzWandInWood" class="wz-input" list="wzWoodList" value="' + escA(w.wood) + '" placeholder="Например: Остролист, Тис, Бузина, Дуб...">' +
-            '<datalist id="wzWoodList">' +
-              '<option value="Остролист"><option value="Тис"><option value="Бузина"><option value="Дуб"><option value="Ива">' +
-              '<option value="Ясень"><option value="Виноградная лоза"><option value="Черное дерево"><option value="Терновник">' +
-              '<option value="Вишня"><option value="Боярышник"><option value="Орех"><option value="Кедр"><option value="Клен">' +
-              '<option value="Вяз"><option value="Граб"><option value="Ольха"><option value="Кипарис"><option value="Липа">' +
-              '<option value="Красное дерево"><option value="Рябина"><option value="Каштан">' +
-            '</datalist>' +
-          '</div>' +
-
-          '<div class="wz-edit-item">' +
-            '<label>Сердцевина</label>' +
-            '<input type="text" id="wzWandInCore" class="wz-input" list="wzCoreList" value="' + escA(w.core) + '" placeholder="Например: Перо феникса, Сердечная жила дракона...">' +
-            '<datalist id="wzCoreList">' +
-              '<option value="Перо феникса"><option value="Сердечная жила дракона"><option value="Волос единорога">' +
-              '<option value="Волос вейлы"><option value="Волос фестрала"><option value="Рог рогатого змея">' +
-              '<option value="Ус вампуса"><option value="Перо птицы-гром"><option value="Чешуя василиска">' +
-            '</datalist>' +
-          '</div>' +
-
-          '<div class="wz-edit-item">' +
-            '<label>Длина</label>' +
-            '<input type="text" id="wzWandInLength" class="wz-input" value="' + escA(w.length) + '" placeholder="Например: 11 дюймов (28 см)">' +
-          '</div>' +
-
-          '<div class="wz-edit-item">' +
-            '<label>Упругость</label>' +
-            '<input type="text" id="wzWandInFlex" class="wz-input" list="wzFlexList" value="' + escA(w.flexibility) + '" placeholder="Например: Умеренно упругая, Непреклонная...">' +
-            '<datalist id="wzFlexList">' +
-              '<option value="Умеренно упругая"><option value="Гибкая"><option value="Упругая"><option value="Очень гибкая">' +
-              '<option value="Слегка пружинистая"><option value="Твердая"><option value="Непреклонная"><option value="Жесткая">' +
-              '<option value="Хрупкая"><option value="Податливая">' +
-            '</datalist>' +
-          '</div>' +
-
-          '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
-            '<label>Особенности</label>' +
-            '<textarea id="wzWandInFeatures" class="wz-input" rows="4" placeholder="Особые свойства, совместимость с заклинаниями, история приобретения в лавке мистера Олливандера, привязанность к владельцу...">' + esc(w.features) + '</textarea>' +
-          '</div>' +
-        '</div>' +
-
-        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px;">' +
-          '<button class="btn btn-primary" id="wzWandSaveBtn">✓ Сохранить палочку</button>' +
-          '<button class="btn" id="wzWandRandomBtn" title="Сгенерировать случайную гармоничную комбинацию Олливандера">🎲 Случайная палочка</button>' +
-          (hasSaved ? '<button class="btn btn-ghost" id="wzWandCancelEditBtn">✕ Скрыть</button>' : '') +
-          '<button class="btn btn-ghost" data-nav="wzRefView:wands" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRefView:wands\');" style="margin-left:auto;">📚 Справочник: Палочки Олливандера</button>' +
-        '</div>' +
-      '</div>';
+    return wzData();
   }
 
   function wireWzWand(){
-    wireWzNav();
-    var g = function(id){ return document.getElementById(id); };
-    var v = function(id){ var e = g(id); return e ? e.value : ''; };
-
-    // Переключение профиля прямо на экране палочки
-    var sel = g('wzWandProfileSelect');
-    if(sel && !sel.__wired){
-      sel.__wired = true;
-      sel.addEventListener('change', function(){
-        WZ.wandEditOpen = undefined;
-        WZ.switchProfile(this.value);
-        if(typeof render === 'function') render();
-      });
-    }
-
-    // Вызов/открытие формы редактирования по кнопке
-    var openEditBtn = g('wzWandOpenEditBtn');
-    if(openEditBtn && !openEditBtn.__wired){
-      openEditBtn.__wired = true;
-      openEditBtn.addEventListener('click', function(){
-        WZ.wandEditOpen = true;
-        var box = g('wzWandEditorCard');
-        var openRow = g('wzWandOpenRow');
-        if(box){
-          box.style.display = 'block';
-          try { box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(e){}
-          var inName = g('wzWandInName');
-          if(inName) inName.focus();
-        }
-        if(openRow){
-          openRow.style.display = 'none';
-        }
-      });
-    }
-
-    // Закрытие/скрытие бокса параметров
-    var closeFn = function(){
-      WZ.wandEditOpen = false;
-      var box = g('wzWandEditorCard');
-      var openRow = g('wzWandOpenRow');
-      if(box) box.style.display = 'none';
-      if(openRow){
-        openRow.style.display = 'flex';
-        try { openRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(e){}
-      }
-    };
-
-    var closeBtn = g('wzWandCloseEditBtn');
-    if(closeBtn && !closeBtn.__wired){
-      closeBtn.__wired = true;
-      closeBtn.addEventListener('click', closeFn);
-    }
-
-    var cancelBtn = g('wzWandCancelEditBtn');
-    if(cancelBtn && !cancelBtn.__wired){
-      cancelBtn.__wired = true;
-      cancelBtn.addEventListener('click', closeFn);
-    }
-
-    // Сохранение параметров палочки (после первого сохранения бокс скрывается)
-    var saveBtn = g('wzWandSaveBtn');
-    if(saveBtn && !saveBtn.__wired){
-      saveBtn.__wired = true;
-      saveBtn.addEventListener('click', function(){
-        var p = WZ.getActiveProfile();
-        if(!p.wand || typeof p.wand !== 'object'){
-          p.wand = {};
-        }
-        p.wand.name = (v('wzWandInName') || '').trim();
-        p.wand.wood = (v('wzWandInWood') || '').trim();
-        p.wand.core = (v('wzWandInCore') || '').trim();
-        p.wand.length = (v('wzWandInLength') || '').trim();
-        p.wand.flexibility = (v('wzWandInFlex') || '').trim();
-        p.wand.features = (v('wzWandInFeatures') || '').trim();
-        p.wand.saved = true;
-
-        WZ.wandEditOpen = false; // Скрываем бокс параметров после сохранения
-        WZ.saveProfiles();
-        WZ.toast('✓ Параметры палочки успешно сохранены!', 'success');
-        if(typeof render === 'function') render();
-      });
-    }
-
-    // Генерация случайной каноничной палочки
-    var randBtn = g('wzWandRandomBtn');
-    if(randBtn && !randBtn.__wired){
-      randBtn.__wired = true;
-      randBtn.addEventListener('click', function(){
-        var woods = ['Остролист', 'Тис', 'Бузина', 'Дуб', 'Ива', 'Ясень', 'Виноградная лоза', 'Черное дерево', 'Терновник', 'Вишня', 'Боярышник', 'Орех', 'Кедр', 'Клен', 'Вяз', 'Граб', 'Ольха', 'Кипарис', 'Липа'];
-        var cores = ['Перо феникса', 'Сердечная жила дракона', 'Волос единорога', 'Волос вейлы', 'Волос фестрала', 'Рог рогатого змея'];
-        var flexes = ['Умеренно упругая', 'Гибкая', 'Упругая', 'Слегка пружинистая', 'Твердая', 'Непреклонная', 'Жесткая', 'Податливая'];
-        var lengths = ['9½ дюймов (24 см)', '10 дюймов (25.4 см)', '10¾ дюймов (27.3 см)', '11 дюймов (28 см)', '11½ дюймов (29.2 см)', '12 дюймов (30.5 см)', '12¼ дюйма (31.1 см)', '13 дюймов (33 см)'];
-        var feats = [
-          'Палочка обладает сильным характером, особенно искусна в дуэльных чарах и защитной магии.',
-          'Приобретена в лавке мистера Олливандера в Косом переулке. Отличается редкой преданностью владельцу.',
-          'Превосходно проводит чары трансфигурации и бытовой магии, отзывается мягким золотистым свечением.',
-          'Склонна к мощным боевым заклинаниям, требует от мага непоколебимой воли и уверенности.',
-          'Чутко реагирует на душевное состояние мага, усиливает защитные чары и заклятие Патронуса.'
-        ];
-
-        var rWood = woods[Math.floor(Math.random() * woods.length)];
-        var rCore = cores[Math.floor(Math.random() * cores.length)];
-        var rFlex = flexes[Math.floor(Math.random() * flexes.length)];
-        var rLen = lengths[Math.floor(Math.random() * lengths.length)];
-        var rFeat = feats[Math.floor(Math.random() * feats.length)];
-
-        var inName = g('wzWandInName');
-        var inWood = g('wzWandInWood');
-        var inCore = g('wzWandInCore');
-        var inLen = g('wzWandInLength');
-        var inFlex = g('wzWandInFlex');
-        var inFeat = g('wzWandInFeatures');
-
-        if(inWood) inWood.value = rWood;
-        if(inCore) inCore.value = rCore;
-        if(inLen) inLen.value = rLen;
-        if(inFlex) inFlex.value = rFlex;
-        if(inFeat) inFeat.value = rFeat;
-        if(inName && (!inName.value || inName.value.startsWith('Палочка из '))){
-          inName.value = 'Палочка из ' + rWood.toLowerCase();
-        }
-
-        WZ.toast('🎲 Подобрана палочка: ' + rWood + ' и ' + rCore + '! Нажмите «Сохранить», чтобы зафиксировать.', 'info');
-      });
-    }
+    return wireWzData();
   }
 
   /* Общий переключатель вкладок Заклинания / Дуэли / Навыки */

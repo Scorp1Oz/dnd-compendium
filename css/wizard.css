@@ -372,6 +372,27 @@ body.wz-theme .hb-seg.has-indicator .hb-seg-btn.on {
   color: var(--wz-gold-light, #fef08a);
 }
 
+.wz-stat-badge.wand {
+  border-color: rgba(212, 175, 55, 0.45);
+  background: rgba(212, 175, 55, 0.14);
+  color: var(--wz-gold-light, #fef08a);
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wz-hud-wand-line {
+  font-family: 'EB Garamond', serif;
+  font-size: 13.5px;
+  color: #cbd5e1;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .wz-house-badge {
   display: inline-flex;
   align-items: center;
