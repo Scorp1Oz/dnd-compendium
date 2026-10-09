@@ -429,6 +429,7 @@ function hbHome(){
         '<span class="hb-stat-badge">Ур. ' + lvlVal + '</span>' +
         '<span class="hb-stat-badge hp">❤️ ' + hpCur + ' HP</span>' +
         '<span class="hb-stat-badge cred">💳 ' + creds + '</span>' +
+        (ac ? '<button class="hb-hud-edit-btn" data-go="hbView:' + ac.id + '" title="Досье активного персонажа">👤 Профиль</button>' : '') +
         '<button class="hb-hud-edit-btn" data-go="hbData" title="Данные, ростер и параметры сеттинга">💾 Данные</button>' +
       '</div>' +
     '</div>' +
@@ -447,37 +448,13 @@ function hbHome(){
 
   var charCount = cs.length;
   var arsenalCount = byType('gear').length + byType('item').length;
-  var magicCount = byType('magic').length;
-  var atlasCount = byType('city').length + byType('faction').length;
-
   var cards = [
     {
-      go: 'hbList:char',
-      icon: '👤',
-      title: 'Персонажи и Ростер',
-      count: charCount,
-      desc: 'Операторы, агенты, наемники и союзники: досье, характеристики, репутация и связи'
-    },
-    {
-      go: 'hbList:gear',
-      icon: '🦾',
-      title: 'Арсенал & Импланты',
-      count: arsenalCount,
-      desc: 'Кибернетические аугментации, тактическое оружие, дроны, экзокостюмы и снаряжение'
-    },
-    {
-      go: 'hbList:magic',
-      icon: '🧠',
-      title: 'Псионика & Способности',
-      count: magicCount,
-      desc: 'Псионические таланты, нейромодули, взлом систем, кибер-магия и протоколы разума'
-    },
-    {
-      go: 'hbList:city',
-      icon: '🗺️',
-      title: 'Атлас Мира & Фракции',
-      count: atlasCount,
-      desc: 'Мегаполисы, космические станции, колонии, корпорации, синдикаты и анклавы'
+      go: 'hbRef',
+      icon: '📚',
+      title: 'Справочник Технологий',
+      count: HB.records.length,
+      desc: 'Единый компендиум: Арсенал & Импланты, Псионика, Атлас мира, Фракции, Расы, Бестиарий, Сверх-ИИ, Лор и Языки'
     },
     {
       go: 'hbGen',
@@ -487,18 +464,11 @@ function hbHome(){
       desc: 'Генерация киберимплантов, тактического оружия, псионики и боевых дронов на базе Gemini 3.8 Flash!'
     },
     {
-      go: 'hbRef',
-      icon: '📚',
-      title: 'Справочник Технологий',
-      count: 0,
-      desc: 'Единый компендиум: Расы и виды, Бестиарий и дроны, Сверх-ИИ, Архивы лора, Языки и Заметки'
-    },
-    {
       go: 'hbData',
       icon: '💾',
-      title: 'Данные & Сеттинг',
-      count: 0,
-      desc: 'Параметры мира «' + esc(HB.world && HB.world.name ? HB.world.name : 'Технологии') + '», Gemini API, квота памяти и экспорт/импорт в JSON'
+      title: 'Данные, Ростер & Сеттинг',
+      count: cs.length,
+      desc: 'Выбор активного персонажа, ростер операторов, параметры мира «' + esc(HB.world && HB.world.name ? HB.world.name : 'Технологии') + '», Gemini API и полный экспорт/импорт'
     }
   ];
 
@@ -513,23 +483,8 @@ function hbHome(){
     '</div>';
   }).join('');
 
-  var switcherHtml = '';
-  if(cs.length > 1){
-    var sel = '<select id="hbActiveSel" style="background:#0f172a;border:1px solid #38bdf8;color:#f8fafc;padding:4px 10px;border-radius:6px;font-size:13px;">' +
-      '<option value="">— сменить активного персонажа —</option>' +
-      cs.map(function(c){
-        return '<option value="' + escA(c.id) + '"' + (HB.activeChar===c.id?' selected':'') + '>' + esc(c.name||'Без имени') + '</option>';
-      }).join('') +
-    '</select>';
-    switcherHtml = '<div style="display:flex;align-items:center;gap:10px;margin-top:10px;padding:8px 14px;background:rgba(15,23,42,0.6);border:1px solid rgba(56,189,248,0.2);border-radius:8px;">' +
-      '<span style="font-size:12px;color:#94a3b8;font-family:\'Space Grotesk\',sans-serif;">🔄 Быстрый выбор героя:</span>' +
-      sel +
-    '</div>';
-  }
-
   return crumb([{label:'Технологии'}]) +
     hudHtml +
-    switcherHtml +
     '<div class="hb-rule"></div>' +
     heroDiceHtml +
     '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // ТЕХНОЛОГИИ & КИБЕРНЕТИКА</div>' +
@@ -1072,16 +1027,18 @@ function wireHbGenResultActions(){
 
 function hbRef(){
   var refTypes = [
-    { t:'race',    icon:'🧬', label:'Расы & Модификации',       desc:'Киборги, репликанты, био-модифицированные расы и синты' },
-    { t:'beast',   icon:'👾', label:'Бестиарий & Дроны',         desc:'Боевые дроны, кибер-существа, мутанты и синтетические хищники' },
+    { t:'gear',    icon:'🦾', label:'Арсенал & Импланты',       desc:'Кибернетические аугментации, тактическое оружие, дроны, экзокостюмы и снаряжение' },
+    { t:'magic',   icon:'🧠', label:'Псионика & Способности',    desc:'Псионические таланты, нейромодули, взлом систем, кибер-магия и протоколы разума' },
+    { t:'city',    icon:'🏙️', label:'Атлас: Города & Станции',  desc:'Мегаполисы, орбитальные станции, шахтерские колонии, сектора и биокупола' },
+    { t:'faction', icon:'🏢', label:'Атлас: Фракции & Корпорации', desc:'Мегакорпорации, кибер-синдикаты, уличные банды, повстанцы и военные альянсы' },
+    { t:'item',    icon:'📦', label:'Предметы & Гаджеты',       desc:'Спецоборудование, расходники, кристаллы данных, аптечки и артефакты' },
+    { t:'npc',     icon:'👥', label:'NPC & Сеть контактов',      desc:'Связи, информаторы, торговцы имплантами, фиксеры и заказчики' },
+    { t:'race',    icon:'🧬', label:'Расы & Модификации',       desc:'Киборги, репликанты, андроиды, био-модифицированные расы и синты' },
+    { t:'beast',   icon:'👾', label:'Бестиарий & Дроны',         desc:'Боевые дроны, охранные роботы, мутанты радиоактивных пустошей и синтетики' },
     { t:'god',     icon:'👁️', label:'Сверх-ИИ & Культы',         desc:'Сверхкомпьютеры, цифровые боги, ИИ-монолиты и техномагические культы' },
     { t:'lore',    icon:'📜', label:'Архивы & Хроники лора',    desc:'Хроники мира, события катаклизма, технологические эпохи и законы' },
     { t:'lang',    icon:'📡', label:'Языки & Протоколы связи',   desc:'Сетевые протоколы, языки корпораций, шифрование и машинный код' },
-    { t:'note',    icon:'📝', label:'Заметки & Бортжурнал',      desc:'Полевые записи исследователя, схемы, координаты и заметки' },
-    { t:'item',    icon:'📦', label:'Предметы & Гаджеты',       desc:'Спецоборудование, расходники, кристаллы данных и артефакты' },
-    { t:'npc',     icon:'👥', label:'NPC & Сеть контактов',      desc:'Связи, информаторы, торговцы, фиксеры и заказчики' },
-    { t:'city',    icon:'🏙️', label:'Города & Станции',         desc:'Мегаполисы, орбитальные доки, шахтерские колонии и станции' },
-    { t:'faction', icon:'🏢', label:'Фракции & Корпорации',      desc:'Мегакорпорации, кибер-синдикаты, повстанцы и военные альянсы' }
+    { t:'note',    icon:'📝', label:'Заметки & Бортжурнал',      desc:'Полевые записи исследователя, схемы, координаты и заметки' }
   ];
 
   var cardsHtml = refTypes.map(function(r){
@@ -1099,7 +1056,7 @@ function hbRef(){
   return crumb([{label:'Технологии', nav:'home'}, {label:'Справочник'}]) +
     '<button class="back" data-go="home">← На главную</button>' +
     '<h1>📚 Справочник Технологий</h1>' +
-    '<p class="subtitle">Единая база знаний сеттинга: Расы, Бестиарий дронов, Сверх-ИИ, Архивы лора, Языки и протоколы, Предметы, Локации и Фракции.</p>' +
+    '<p class="subtitle">Единая база знаний сеттинга: Арсенал, Псионика, Атлас городов и фракций, Расы, Бестиарий, Сверх-ИИ, Лор, Языки и Заметки.</p>' +
     '<div class="hb-rule"></div>' +
     '<div class="hb-ref-search-wrap">' +
       '<span class="hb-ref-search-icon">🔍</span>' +
@@ -1190,13 +1147,88 @@ function wireHbRef(){
 
 function hbWorld(){
   var curKey = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+  var cs = chars();
+  var ac = HB.activeChar ? byId(HB.activeChar) : null;
+
+  var activeCharBlock = '';
+  if(ac){
+    var acSub = [ac.f && ac.f.race, ac.f && ac.f.job ? (ac.f.job + (ac.f.level ? (' ' + ac.f.level + ' ур.') : '')) : null].filter(Boolean).join(' • ') || 'Персонаж Технологий';
+    var acHp = (ac.f && ac.f.hp) ? ac.f.hp : '20/20';
+    var acMoney = (ac.f && ac.f.money) ? ac.f.money : '1 000 кр.';
+    activeCharBlock = '<div style="background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.4);border-radius:10px;padding:14px 18px;margin-bottom:16px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+        '<div>' +
+          '<div style="font-size:11px;color:#67e8f9;text-transform:uppercase;letter-spacing:0.12em;font-weight:700;font-family:\'Space Grotesk\',sans-serif;">★ ТЕКУЩИЙ АКТИВНЫЙ ГЕРОЙ</div>' +
+          '<div style="font-size:20px;font-weight:800;color:#fff;margin-top:2px;font-family:\'Space Grotesk\',sans-serif;">🤖 ' + esc(ac.name || 'Без имени') + '</div>' +
+          '<div style="font-size:13px;color:#94a3b8;margin-top:2px;">' + esc(acSub) + ' · ❤️ ' + esc(acHp) + ' HP · 💳 ' + esc(acMoney) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button class="btn-primary sm" data-go="hbView:' + escA(ac.id) + '">👤 Досье</button>' +
+          '<button class="btn-ghost sm" data-go="hbEdit:char:' + escA(ac.id) + '">✏️ Изменить</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  } else {
+    activeCharBlock = '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:14px 18px;margin-bottom:16px;color:#94a3b8;font-size:13.5px;">' +
+      '⚠️ Активный герой не выбран. Выберите персонажа из списка ниже или создайте нового.' +
+    '</div>';
+  }
+
+  var switcherDropdown = '';
+  if(cs.length > 1){
+    switcherDropdown = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">' +
+      '<span style="font-size:13px;color:#94a3b8;white-space:nowrap;">Быстрое переключение:</span>' +
+      '<select id="hbDataActiveCharSel" style="flex:1;background:#0b0f17;border:1px solid rgba(56,189,248,0.4);color:#f8fafc;padding:7px 12px;border-radius:6px;font-size:13px;">' +
+        '<option value="">— сменить активного персонажа —</option>' +
+        cs.map(function(c){
+          return '<option value="' + escA(c.id) + '"' + (HB.activeChar===c.id?' selected':'') + '>' + esc(c.name||'Без имени') + (c.f&&c.f.job ? (' (' + c.f.job + ')') : '') + '</option>';
+        }).join('') +
+      '</select>' +
+    '</div>';
+  }
+
+  var rosterListHtml = '';
+  if(cs.length === 0){
+    rosterListHtml = '<div class="char-empty">В ростере пока нет созданных персонажей. Нажмите кнопку ниже, чтобы создать первого героя!</div>';
+  } else {
+    rosterListHtml = '<div style="display:flex;flex-direction:column;gap:8px;">' +
+      cs.map(function(c){
+        var isAct = (HB.activeChar === c.id);
+        var subStr = [c.f&&c.f.race, c.f&&c.f.job, c.f&&c.f.level?(c.f.level+' ур.'):null].filter(Boolean).join(' • ') || 'Оператор';
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:' + (isAct ? 'rgba(6,182,212,0.09)' : 'rgba(15,23,42,0.6)') + ';border:1px solid ' + (isAct ? 'rgba(6,182,212,0.5)' : 'rgba(71,85,105,0.3)') + ';border-radius:8px;">' +
+          '<div style="cursor:pointer;flex:1;min-width:0;" data-go="hbView:' + escA(c.id) + '">' +
+            '<div style="font-weight:700;color:#f8fafc;font-size:15px;font-family:\'Space Grotesk\',sans-serif;">' +
+              (isAct ? '<span style="color:#06b6d4;">★ </span>' : '') + esc(c.name || 'Без имени') +
+            '</div>' +
+            '<div style="font-size:12.5px;color:#94a3b8;margin-top:2px;">' + esc(subStr) + '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px;align-items:center;margin-left:12px;">' +
+            (!isAct ? '<button class="btn-ghost sm" data-hbsetactive="' + escA(c.id) + '">Выбрать</button>' : '<span class="hb-stat-badge" style="background:rgba(6,182,212,0.2);color:#67e8f9;border:1px solid #06b6d4;font-size:11px;">Активен</span>') +
+            '<button class="btn-ghost sm" data-go="hbView:' + escA(c.id) + '" title="Досье">👤</button>' +
+            '<button class="btn-ghost sm" data-go="hbEdit:char:' + escA(c.id) + '" title="Изменить">✏️</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }
+
   return crumb([{label:'Технологии', nav:'home'},{label:'Данные & Сеттинг'}])+
-    '<button class="back" data-go="home">← Назад</button>'+
-    '<h1>💾 Данные & Сеттинг</h1>'+
-    '<p class="subtitle">Параметры мира «'+esc(HB.world.name||'Технологии')+'», интеграция Gemini AI, квота памяти и экспорт/импорт базы данных.</p>'+
+    '<button class="back" data-go="home">← На главную</button>'+
+    '<h1>💾 Данные, Ростер & Сеттинг</h1>'+
+    '<p class="subtitle">Управление персонажами, параметры мира «'+esc(HB.world.name||'Технологии')+'», интеграция Gemini AI, квота памяти и экспорт/импорт базы данных.</p>'+
     '<div class="hb-rule"></div>'+
 
     '<div class="sheet-section">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">'+
+        '<div class="section-label" style="margin:0;">👤 РОСТЕР И ВЫБОР ПЕРСОНАЖА (' + cs.length + ')</div>'+
+        '<button class="new-char-btn" data-go="hbEdit:char:new" style="margin:0;padding:6px 14px;font-size:12.5px;">+ Новый персонаж</button>'+
+      '</div>'+
+      activeCharBlock +
+      switcherDropdown +
+      rosterListHtml +
+    '</div>'+
+
+    '<div class="sheet-section" style="margin-top:20px;">'+
       '<div class="section-label">🌐 КОНФИГУРАЦИЯ СЕТТИНГА</div>'+
       '<div class="field"><label>Название мира / планеты</label>'+
         '<input type="text" id="hbWorldName" value="'+escA(HB.world.name)+'"></div>'+
@@ -1240,6 +1272,7 @@ function hbWorld(){
 function hbList(){
   var t = view.hbType, cfg = T[t];
   if(!cfg) return hbHome();
+  var isChar = (t === 'char');
   var list = byType(t).slice().sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
   var items = list.map(function(r){
     return '<div class="char-list-item" data-go="hbView:'+r.id+'">'+
@@ -1248,12 +1281,7 @@ function hbList(){
   }).join('');
 
   var subTabs = '';
-  if(t === 'char' || t === 'npc'){
-    subTabs = '<div class="hb-ref-tabs">' +
-      '<button class="hb-ref-tab ' + (t==='char'?'active':'') + '" data-go="hbList:char">👤 Операторы & Герои (' + byType('char').length + ')</button>' +
-      '<button class="hb-ref-tab ' + (t==='npc'?'active':'') + '" data-go="hbList:npc">👥 NPC & Контакты (' + byType('npc').length + ')</button>' +
-    '</div>';
-  } else if(t === 'gear' || t === 'item'){
+  if(t === 'gear' || t === 'item'){
     subTabs = '<div class="hb-ref-tabs">' +
       '<button class="hb-ref-tab ' + (t==='gear'?'active':'') + '" data-go="hbList:gear">🦾 Снаряжение & Оружие (' + byType('gear').length + ')</button>' +
       '<button class="hb-ref-tab ' + (t==='item'?'active':'') + '" data-go="hbList:item">📦 Предметы & Гаджеты (' + byType('item').length + ')</button>' +
@@ -1265,13 +1293,17 @@ function hbList(){
     '</div>';
   }
 
-  var isPureRef = (t==='race'||t==='beast'||t==='god'||t==='lore'||t==='lang'||t==='note');
   var crumbs = [{label:'Технологии', nav:'home'}];
-  if(isPureRef) crumbs.push({label:'Справочник', nav:'hbRef'});
-  crumbs.push({label:cfg.label});
+  if(isChar){
+    crumbs.push({label:'Данные', nav:'hbData'});
+    crumbs.push({label:'Персонажи'});
+  } else {
+    crumbs.push({label:'Справочник', nav:'hbRef'});
+    crumbs.push({label:cfg.label});
+  }
 
   return crumb(crumbs)+
-    '<button class="back" data-go="' + (isPureRef ? 'hbRef' : 'home') + '">← ' + (isPureRef ? 'В справочник' : 'На главную') + '</button>'+
+    '<button class="back" data-go="' + (isChar ? 'hbData' : 'hbRef') + '">← ' + (isChar ? 'В ростер и данные' : 'В справочник') + '</button>'+
     '<h1>'+cfg.icon+' '+esc(cfg.label)+'</h1>'+
     '<p class="subtitle">'+esc(cfg.desc)+'</p><div class="rule"></div>'+
     subTabs+
@@ -1335,14 +1367,21 @@ function hbEdit(){
       '<button class="hb-x" data-hbdelcust="'+i+'">✕</button></div>';
   }).join('');
 
-  var isPureRef = (t==='race'||t==='beast'||t==='god'||t==='lore'||t==='lang'||t==='note');
+  var isChar = (t === 'char');
   var crumbs = [{label:'Технологии', nav:'home'}];
-  if(isPureRef) crumbs.push({label:'Справочник', nav:'hbRef'});
-  crumbs.push({label:cfg.label, nav:'hbList:'+t});
-  crumbs.push({label:isNew?'Новая запись':(d.name||'Запись')});
+  if(isChar){
+    crumbs.push({label:'Данные & Ростер', nav:'hbData'});
+  } else {
+    crumbs.push({label:'Справочник', nav:'hbRef'});
+    crumbs.push({label:cfg.label, nav:'hbList:'+t});
+  }
+  crumbs.push({label:isNew?(isChar?'Новый персонаж':'Новая запись'):(d.name||'Запись')});
+
+  var backNav = isNew ? (isChar ? 'hbData' : ('hbList:'+t)) : ('hbView:'+d.id);
+  var backLabel = isNew ? (isChar ? 'В ростер и данные' : 'Назад в категорию') : 'Назад к записи';
 
   return crumb(crumbs)+
-    '<button class="back" data-go="'+(isNew?('hbList:'+t):('hbView:'+d.id))+'">← Назад</button>'+
+    '<button class="back" data-go="'+backNav+'">← '+backLabel+'</button>'+
     '<h1>'+(isNew?'Новая запись':esc(d.name||'Запись'))+'</h1>'+
     '<p class="subtitle">Изменения сохраняются только по кнопке.</p><div class="rule"></div>'+
     '<div class="sheet-actions">'+
@@ -1399,14 +1438,18 @@ function hbView(){
       '<button class="btn-ghost" id="hbMakeActive">⭐ Сделать активным</button></div>'
     : '';
 
-  var isPureRef = (r.type==='race'||r.type==='beast'||r.type==='god'||r.type==='lore'||r.type==='lang'||r.type==='note');
+  var isChar = (r.type === 'char');
   var crumbs = [{label:'Технологии', nav:'home'}];
-  if(isPureRef) crumbs.push({label:'Справочник', nav:'hbRef'});
-  crumbs.push({label:cfg.label, nav:'hbList:'+r.type});
+  if(isChar){
+    crumbs.push({label:'Данные & Ростер', nav:'hbData'});
+  } else {
+    crumbs.push({label:'Справочник', nav:'hbRef'});
+    crumbs.push({label:cfg.label, nav:'hbList:'+r.type});
+  }
   crumbs.push({label:r.name||'Запись'});
 
   return crumb(crumbs)+
-    '<button class="back" data-go="hbList:'+r.type+'">← Назад</button>'+
+    '<button class="back" data-go="' + (isChar ? 'hbData' : ('hbList:'+r.type)) + '">← ' + (isChar ? 'В ростер и данные' : 'Назад в категорию') + '</button>'+
     '<h1>'+esc(r.name||'Без названия')+'</h1>'+
     (r.subtitle?'<p class="subtitle">'+esc(r.subtitle)+'</p>':'')+
     '<div class="rule"></div>'+
@@ -1438,7 +1481,7 @@ function hbRels(){
     '</div>';
   }).join('');
 
-  return crumb([{label:'Технологии', nav:'home'},{label:'Персонажи', nav:'hbList:char'},{label:c.name||'Персонаж', nav:'hbView:'+c.id},{label:'Отношения'}])+
+  return crumb([{label:'Технологии', nav:'home'},{label:'Данные & Ростер', nav:'hbData'},{label:c.name||'Персонаж', nav:'hbView:'+c.id},{label:'Отношения'}])+
     '<button class="back" data-go="hbView:'+c.id+'">← Назад</button>'+
     '<h1>Отношения: '+esc(c.name||'Персонаж')+'</h1>'+
     '<p class="subtitle">Связи именно этого персонажа. У другого персонажа — свой список.</p>'+
@@ -1456,7 +1499,7 @@ function hbRelEdit(){
   HB.draft = JSON.parse(JSON.stringify(r)); HB.draft.__rel = true;
   var d = HB.draft;
 
-  return crumb([{label:'Технологии', nav:'home'},{label:c.name||'Персонаж', nav:'hbView:'+c.id},{label:'Связь'}])+
+  return crumb([{label:'Технологии', nav:'home'},{label:'Данные & Ростер', nav:'hbData'},{label:c.name||'Персонаж', nav:'hbView:'+c.id},{label:'Связь'}])+
     '<button class="back" data-go="hbRels:'+c.id+'">← Назад</button>'+
     '<h1>'+(isNew?'Новая связь':'Связь')+'</h1><div class="rule"></div>'+
     '<div class="sheet-actions"><button class="btn-primary" id="hbRelSave">💾 Сохранить</button>'+
@@ -1500,6 +1543,21 @@ function wire(){
 
   var sel = document.getElementById('hbActiveSel');
   if(sel) sel.addEventListener('change', function(){ HB.activeChar = sel.value||null; saveActive(); paintBar(); if(typeof paintShBar==='function') paintShBar(); render(); });
+
+  document.querySelectorAll('[data-hbsetactive]').forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      HB.activeChar = b.getAttribute('data-hbsetactive') || null;
+      saveActive(); paintBar(); if(typeof paintShBar==='function') paintShBar(); render();
+    });
+  });
+  var dataSel = document.getElementById('hbDataActiveCharSel');
+  if(dataSel){
+    dataSel.addEventListener('change', function(){
+      HB.activeChar = dataSel.value || null;
+      saveActive(); paintBar(); if(typeof paintShBar==='function') paintShBar(); render();
+    });
+  }
 
   var wn = document.getElementById('hbWorldSave');
   if(wn) wn.addEventListener('click', function(){
@@ -1634,7 +1692,8 @@ function wire(){
     HB.records = HB.records.filter(function(r){ return r.id!==d.id; });
     HB.records = HB.records.filter(function(r){ return !(r.type==='rel' && r.ownerId===d.id); });
     if(HB.activeChar===d.id){ HB.activeChar=null; saveActive(); }
-    saveRecords(); HB.draft=null; navigate('hbList:'+d.type);
+    saveRecords(); HB.draft=null;
+    if(d.type==='char'){ navigate('hbData'); } else { navigate('hbList:'+d.type); }
   });
 
   var mk = document.getElementById('hbMakeActive');
