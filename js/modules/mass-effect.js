@@ -3138,6 +3138,7 @@ function elHome(){
     { nav: 'elTechs', icon: '⚡', t: 'Формы стихий', d: 'Изученные магические формы четырёх стихий, высшие искусства, шкала 0–5 и затраты МВН' },
     { nav: 'elMoves', icon: '🥋', t: 'Боевые приёмы', d: 'Тактические действия, навязывание Окон возможностей (A94/A95), чи-блокинг и атаки оружием' },
     { nav: 'elMap',   icon: '🗺️', t: 'Карта мира', d: 'Интерактивная карта четырёх народов, ключевые локации, калькулятор путешествий и досье' },
+    { nav: 'elTechGen', icon: '🤖', t: 'AI Генератор стихий', d: 'Создание боевых форм и высших искусств на базе Gemini 3.8 Flash!' },
     { nav: 'elRef',   icon: '📚', t: 'Справочник', d: 'Полный свод правил, боевой механики, магии четырёх стихий и законов мира' },
     { nav: 'elData',  icon: '💾', t: 'Данные', d: 'Профиль персонажа, стихия, экспорт и параметры' }
   ];
@@ -3157,17 +3158,13 @@ function elHome(){
   '</div>' +
   '<div class="el-rule"></div>' +
   hero +
-  '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:var(--el-accent);font-weight:700;margin:18px 0 10px;font-family:\'JetBrains Mono\',monospace;">СИСТЕМНЫЕ РАЗДЕЛЫ // СТИХИЯ</div>' +
+  '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // СТИХИЯ</div>' +
   '<div class="menu-list grid-2">' +
     items.map(function(it){
       return '<div class="el-card" data-nav="' + it.nav + '">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div style="font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;margin-bottom:4px;font-family:\'Cinzel\',serif;">' +
-            it.icon + ' ' + it.t +
-          '</div>' +
-          '<div style="font-size:12.5px;color:#94a3b8;line-height:1.45;font-style:italic;font-family:\'EB Garamond\',serif;">' + it.d + '</div>' +
-        '</div>' +
-        '<div style="color:var(--el-accent);font-size:22px;flex-shrink:0;margin-left:8px;">›</div>' +
+        '<div class="name">' + it.icon + ' ' + it.t + '</div>' +
+        '<div class="desc">' + it.d + '</div>' +
+        '<div class="arrow">›</div>' +
       '</div>';
     }).join('') +
   '</div>';

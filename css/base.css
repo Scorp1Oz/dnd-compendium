@@ -2046,7 +2046,7 @@ body.hb-theme .ai-gen-result-card {
 }
 
 /* ==========================================================================
-   Главные экраны разделов: Запрет любого скролла и адаптивная компактность
+   Главные экраны разделов: Запрет любого скролла и стандарт Космоса (1:1)
    ========================================================================== */
 html.is-home-screen,
 body.is-home-screen {
@@ -2061,42 +2061,48 @@ body.is-home-screen {
   touch-action: pan-x pinch-zoom !important;
 }
 
+/* Точный отступ от панели навигации как в Космосе:
+   padding-top: 48px + safe-area, и никакого vertical centering (justify-content: flex-start) */
 body.is-home-screen {
-  padding-top: calc(36px + env(safe-area-inset-top)) !important;
-  padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important;
+  padding-top: calc(48px + env(safe-area-inset-top)) !important;
+  padding-bottom: calc(30px + env(safe-area-inset-bottom)) !important;
   padding-left: calc(20px + env(safe-area-inset-left)) !important;
   padding-right: calc(20px + env(safe-area-inset-right)) !important;
   display: flex !important;
   flex-direction: column !important;
-  justify-content: center !important;
+  justify-content: flex-start !important;
   align-items: center !important;
   box-sizing: border-box !important;
 }
 
 body.is-home-screen #app {
   width: 100% !important;
-  max-height: 100% !important;
+  max-width: 1060px !important;
   display: flex !important;
   flex-direction: column !important;
-  justify-content: center !important;
+  justify-content: flex-start !important;
 }
 
+/* Никаких хлебных крошек на главных экранах */
 body.is-home-screen .crumb {
-  margin-bottom: 8px !important;
-  min-height: 18px !important;
+  display: none !important;
 }
 
+/* Полноразмерный HUD 1:1 по стандарту Космоса */
 body.is-home-screen .fae-hud,
 body.is-home-screen .sh-hud,
-body.is-home-screen .me-hud,
+body.is-home-screen #meHud,
 body.is-home-screen .el-hud,
 body.is-home-screen .wi-hud,
 body.is-home-screen .wz-hud,
 body.is-home-screen .hb-hud {
-  padding: 10px 16px !important;
-  margin-bottom: 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 14px 18px !important;
+  margin: 12px 0 16px !important;
 }
 
+/* Разделитель 1:1 по стандарту Космоса */
 body.is-home-screen .rule,
 body.is-home-screen .fae-rule,
 body.is-home-screen .sh-rule,
@@ -2105,29 +2111,106 @@ body.is-home-screen .el-rule,
 body.is-home-screen .wi-rule,
 body.is-home-screen .wz-rule,
 body.is-home-screen .hb-rule {
-  margin: 8px 0 !important;
+  margin: 0 0 20px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
+/* Полноразмерная плашка броска кубиков 1:1 по стандарту Космоса */
 body.is-home-screen .hero-dice,
 body.is-home-screen .fae-hero-dice,
 body.is-home-screen .sh-hero-dice,
-body.is-home-screen .me-hero-dice,
 body.is-home-screen .el-hero-dice,
 body.is-home-screen .wi-hero-dice,
 body.is-home-screen .wz-hero-dice,
 body.is-home-screen .hb-hero-dice {
-  padding: 10px 16px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 22px 26px !important;
+  gap: 20px !important;
   margin-bottom: 8px !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
+body.is-home-screen .hero-dice-icon,
+body.is-home-screen .fae-hero-dice-icon,
+body.is-home-screen .sh-hero-dice-icon,
+body.is-home-screen .el-hero-dice-icon,
+body.is-home-screen .wi-hero-dice-icon,
+body.is-home-screen .wz-hero-dice-icon,
+body.is-home-screen .hb-hero-dice-icon {
+  width: 60px !important;
+  height: 60px !important;
+  min-width: 60px !important;
+  min-height: 60px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.is-home-screen .hero-dice-icon svg,
+body.is-home-screen .fae-hero-dice-icon svg,
+body.is-home-screen .wi-hero-dice-icon svg,
+body.is-home-screen .wz-hero-dice-icon svg,
+body.is-home-screen .hb-hero-dice-icon svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+body.is-home-screen .hero-dice-name,
+body.is-home-screen .hero-dice-title,
+body.is-home-screen .fae-hero-dice-title,
+body.is-home-screen .wi-hero-dice-title,
+body.is-home-screen .wz-hero-dice-title,
+body.is-home-screen .hb-hero-dice-title {
+  font-family: 'Cinzel', serif !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  margin-bottom: 4px !important;
+  letter-spacing: 0.03em !important;
+}
+
+body.is-home-screen .hero-dice-desc,
+body.is-home-screen .fae-hero-dice-desc,
+body.is-home-screen .wi-hero-dice-desc,
+body.is-home-screen .wz-hero-dice-desc,
+body.is-home-screen .hb-hero-dice-desc {
+  font-family: 'EB Garamond', serif !important;
+  font-size: 14.5px !important;
+  font-style: italic !important;
+}
+
+body.is-home-screen .hero-dice-arrow,
+body.is-home-screen .fae-hero-dice-arrow,
+body.is-home-screen .wi-hero-dice-arrow,
+body.is-home-screen .wz-hero-dice-arrow,
+body.is-home-screen .hb-hero-dice-arrow {
+  font-size: 22px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Заголовок разделов 1:1 по стандарту Космоса */
 body.is-home-screen .section-label {
-  margin: 8px 0 6px !important;
+  margin: 24px 0 12px !important;
+  font-size: 11px !important;
+  letter-spacing: 0.15em !important;
+  font-family: 'JetBrains Mono', monospace !important;
 }
 
+/* Сетка карточек 1:1 по стандарту Космоса (2 колонки с равным заполнением) */
 body.is-home-screen .menu-list.grid-2 {
-  gap: 8px !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
+/* Карточки разделов 1:1 по стандарту Космоса (min-height: 88px, padding: 20px 24px) */
 body.is-home-screen .menu-item,
 body.is-home-screen .fae-card,
 body.is-home-screen .sh-card,
@@ -2136,10 +2219,19 @@ body.is-home-screen .el-card,
 body.is-home-screen .wi-card,
 body.is-home-screen .wz-card,
 body.is-home-screen .hb-card {
-  padding: 10px 14px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 88px !important;
+  box-sizing: border-box !important;
+  padding: 20px 24px !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
   margin-bottom: 0 !important;
 }
 
+/* Название карточки слева */
 body.is-home-screen .menu-item .name,
 body.is-home-screen .fae-card-title,
 body.is-home-screen .sh-card-title,
@@ -2148,9 +2240,19 @@ body.is-home-screen .el-card-title,
 body.is-home-screen .wi-card-title,
 body.is-home-screen .wz-card-title,
 body.is-home-screen .hb-card-title {
-  font-size: 15px !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  white-space: nowrap !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+  margin-bottom: 0 !important;
 }
 
+/* Описание карточки по центру/справа курсивом */
 body.is-home-screen .menu-item .desc,
 body.is-home-screen .fae-card-desc,
 body.is-home-screen .sh-card-desc,
@@ -2159,25 +2261,51 @@ body.is-home-screen .el-card-desc,
 body.is-home-screen .wi-card-desc,
 body.is-home-screen .wz-card-desc,
 body.is-home-screen .hb-card-desc {
-  font-size: 12px !important;
-  margin-top: 2px !important;
-  display: -webkit-box !important;
-  -webkit-line-clamp: 2 !important;
-  -webkit-box-orient: vertical !important;
+  font-family: 'EB Garamond', serif !important;
+  font-size: 15px !important;
+  font-style: italic !important;
+  margin: 0 14px !important;
+  text-align: right !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
   overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Стрелка карточки справа */
+body.is-home-screen .menu-item .arrow,
+body.is-home-screen .fae-card-arrow,
+body.is-home-screen .el-card-arrow,
+body.is-home-screen .wi-card-arrow,
+body.is-home-screen .wz-card-arrow,
+body.is-home-screen .hb-card-arrow {
+  font-size: 22px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Поддержка внутреннего контейнера, если он есть */
+body.is-home-screen .fae-card > div:first-child,
+body.is-home-screen .wi-card > div:first-child,
+body.is-home-screen .wz-card > div:first-child,
+body.is-home-screen .hb-card > div:first-child,
+body.is-home-screen .el-card > div:first-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
 }
 
 @media (max-width: 640px) {
   body.is-home-screen {
-    padding-top: calc(44px + env(safe-area-inset-top)) !important;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+    padding-top: calc(48px + env(safe-area-inset-top)) !important;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
     padding-left: calc(12px + env(safe-area-inset-left)) !important;
     padding-right: calc(12px + env(safe-area-inset-right)) !important;
-    justify-content: flex-start !important;
   }
   body.is-home-screen .menu-list.grid-2 {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 6px !important;
+    grid-template-columns: 1fr !important;
   }
   body.is-home-screen .menu-item,
   body.is-home-screen .fae-card,
@@ -2187,76 +2315,31 @@ body.is-home-screen .hb-card-desc {
   body.is-home-screen .wi-card,
   body.is-home-screen .wz-card,
   body.is-home-screen .hb-card {
-    padding: 8px 10px !important;
+    min-height: 64px !important;
+    padding: 14px 16px !important;
   }
   body.is-home-screen .menu-item .name,
   body.is-home-screen .fae-card-title,
   body.is-home-screen .wi-card-title,
   body.is-home-screen .wz-card-title,
   body.is-home-screen .hb-card-title {
-    font-size: 13px !important;
-  }
-  body.is-home-screen .menu-item .desc,
-  body.is-home-screen .fae-card-desc,
-  body.is-home-screen .wi-card-desc,
-  body.is-home-screen .wz-card-desc,
-  body.is-home-screen .hb-card-desc {
-    -webkit-line-clamp: 1 !important;
-    font-size: 11px !important;
-  }
-  body.is-home-screen .hero-dice-desc,
-  body.is-home-screen .fae-hero-dice-desc,
-  body.is-home-screen .wi-hero-dice-desc,
-  body.is-home-screen .wz-hero-dice-desc,
-  body.is-home-screen .hb-hero-dice-desc {
-    display: none !important;
-  }
-}
-
-@media (max-height: 600px) {
-  body.is-home-screen {
-    padding-top: calc(34px + env(safe-area-inset-top)) !important;
-    padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important;
-    justify-content: flex-start !important;
-  }
-  body.is-home-screen .crumb { margin-bottom: 4px !important; }
-  body.is-home-screen .fae-hud,
-  body.is-home-screen .sh-hud,
-  body.is-home-screen .me-hud,
-  body.is-home-screen .el-hud,
-  body.is-home-screen .wi-hud,
-  body.is-home-screen .wz-hud,
-  body.is-home-screen .hb-hud {
-    padding: 6px 12px !important;
-    margin-bottom: 4px !important;
-  }
-  body.is-home-screen .rule,
-  body.is-home-screen .fae-rule,
-  body.is-home-screen .wi-rule,
-  body.is-home-screen .wz-rule,
-  body.is-home-screen .hb-rule {
-    margin: 4px 0 !important;
+    font-size: 17px !important;
   }
   body.is-home-screen .hero-dice,
   body.is-home-screen .fae-hero-dice,
   body.is-home-screen .wi-hero-dice,
   body.is-home-screen .wz-hero-dice,
   body.is-home-screen .hb-hero-dice {
-    padding: 6px 12px !important;
-    margin-bottom: 4px !important;
+    padding: 16px 18px !important;
   }
-  body.is-home-screen .section-label {
-    margin: 4px 0 !important;
-    font-size: 10px !important;
-  }
-  body.is-home-screen .menu-list.grid-2 {
-    gap: 4px !important;
-  }
-  body.is-home-screen .menu-item,
-  body.is-home-screen .fae-card,
-  body.is-home-screen .wi-card,
-  body.is-home-screen .wz-card,
-  body.is-home-screen .hb-card {
-    padding: 6px 10px !important;
+  body.is-home-screen .hero-dice-icon,
+  body.is-home-screen .fae-hero-dice-icon,
+  body.is-home-screen .wi-hero-dice-icon,
+  body.is-home-screen .wz-hero-dice-icon,
+  body.is-home-screen .hb-hero-dice-icon {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
   }
 }

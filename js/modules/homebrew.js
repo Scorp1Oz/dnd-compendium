@@ -475,16 +475,13 @@ function hbHome(){
   var cardsHtml = cards.map(function(c){
     var countBadge = c.count > 0 ? ('<span class="hb-card-count">' + c.count + '</span>') : '';
     return '<div class="hb-card hb-card-clickable" data-go="' + c.go + '" role="button" tabindex="0">' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div class="hb-card-title"><span>' + c.icon + '</span> ' + esc(c.title) + ' ' + countBadge + '</div>' +
-        '<div class="hb-card-desc">' + esc(c.desc) + '</div>' +
-      '</div>' +
-      '<div class="hb-card-arrow">→</div>' +
+      '<div class="hb-card-title"><span>' + c.icon + '</span> ' + esc(c.title) + ' ' + countBadge + '</div>' +
+      '<div class="hb-card-desc">' + esc(c.desc) + '</div>' +
+      '<div class="hb-card-arrow">›</div>' +
     '</div>';
   }).join('');
 
-  return crumb([{label:'Технологии'}]) +
-    hudHtml +
+  return hudHtml +
     '<div class="hb-rule"></div>' +
     heroDiceHtml +
     '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // ТЕХНОЛОГИИ & КИБЕРНЕТИКА</div>' +

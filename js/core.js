@@ -1211,51 +1211,38 @@ function renderHome(){
 
   var cardsHtml = '<div class="menu-list grid-2">' +
     '<div class="fae-card fae-card-clickable" data-go="characters" role="button" tabindex="0">' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>👤</span> Персонажи и Ростер</div>' +
-        '<div class="fae-card-desc">Карточки героев D&D 5e: создание, лист персонажа, характеристики, инвентарь и экспорт</div>' +
-      '</div>' +
-      '<div class="fae-card-arrow">→</div>' +
+      '<div class="fae-card-title"><span>👤</span> Персонажи и Ростер</div>' +
+      '<div class="fae-card-desc">Карточки героев D&D 5e: создание, лист персонажа, характеристики, инвентарь и экспорт</div>' +
+      '<div class="fae-card-arrow">›</div>' +
     '</div>' +
     '<div class="fae-card fae-card-clickable" data-go="map" role="button" tabindex="0">' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>🗺️</span> Карта Фаэруна</div>' +
-        '<div class="fae-card-desc">Интерактивная карта Королевств, масштаб, Побережье Мечей, Врата Балдура и Невервинтер</div>' +
-      '</div>' +
-      '<div class="fae-card-arrow">→</div>' +
+      '<div class="fae-card-title"><span>🗺️</span> Карта Фаэруна</div>' +
+      '<div class="fae-card-desc">Интерактивная карта Королевств, масштаб, Побережье Мечей, Врата Балдура и Невервинтер</div>' +
+      '<div class="fae-card-arrow">›</div>' +
     '</div>' +
     '<div class="fae-card fae-card-clickable" data-go="commands" role="button" tabindex="0">' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>🎲</span> Общие команды</div>' +
-        '<div class="fae-card-desc">Шаблоны бросков: проверки характеристик, спасброски, инициатива, атака и урон</div>' +
-      '</div>' +
-      '<div class="fae-card-arrow">→</div>' +
+      '<div class="fae-card-title"><span>🎲</span> Общие команды</div>' +
+      '<div class="fae-card-desc">Шаблоны бросков: проверки характеристик, спасброски, инициатива, атака и урон</div>' +
+      '<div class="fae-card-arrow">›</div>' +
     '</div>' +
     '<div class="fae-card fae-card-clickable" data-go="faeGen" role="button" tabindex="0">' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>🤖</span> AI Генератор D&D</div>' +
-        '<div class="fae-card-desc">Генератор заклинаний, магических артефактов и боевых черт на базе Gemini 3.8 Flash!</div>' +
-      '</div>' +
-      '<div class="fae-card-arrow">→</div>' +
+      '<div class="fae-card-title"><span>🤖</span> AI Генератор D&D</div>' +
+      '<div class="fae-card-desc">Генератор заклинаний, магических артефактов и боевых черт на базе Gemini 3.8 Flash!</div>' +
+      '<div class="fae-card-arrow">›</div>' +
     '</div>' +
     '<div class="fae-card fae-card-clickable" data-go="faeRef" role="button" tabindex="0">' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>📚</span> Справочник Фаэруна</div>' +
-        '<div class="fae-card-desc">Классы D&D, Книга заклинаний, Правила 2024, Алхимия и зелья, Оружие и Глоссарий терминов</div>' +
-      '</div>' +
-      '<div class="fae-card-arrow">→</div>' +
+      '<div class="fae-card-title"><span>📚</span> Справочник Фаэруна</div>' +
+      '<div class="fae-card-desc">Классы D&D, Книга заклинаний, Правила 2024, Алхимия и зелья, Оружие и Глоссарий терминов</div>' +
+      '<div class="fae-card-arrow">›</div>' +
     '</div>' +
     '<div class="fae-card fae-card-clickable" data-go="faeData" role="button" tabindex="0">' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>💾</span> Данные & Кампания</div>' +
-        '<div class="fae-card-desc">Управление ростером, заметки приключения, Gemini API, квота хранилища и экспорт/импорт</div>' +
-      '</div>' +
-      '<div class="fae-card-arrow">→</div>' +
+      '<div class="fae-card-title"><span>💾</span> Данные & Кампания</div>' +
+      '<div class="fae-card-desc">Управление ростером, заметки приключения, Gemini API, квота хранилища и экспорт/импорт</div>' +
+      '<div class="fae-card-arrow">›</div>' +
     '</div>' +
   '</div>';
 
-  return renderCrumb([{label:'Фаэрун'}]) +
-    hudHtml +
+  return hudHtml +
     '<div class="fae-rule"></div>' +
     heroDiceHtml +
     '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // ФАЭРУН</div>' +

@@ -465,42 +465,37 @@
     // Разделитель перед разделами
     var label = '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // ВЕДЬМАК</div>';
 
-    // Системные разделы: Способности, Приёмы, Карта мира, Справочник и Данные
-    var sectionsList = '<div class="menu-list grid-2" style="margin-top:10px;">' +
+    // Системные разделы: Способности, Приёмы, Карта мира, Справочник, AI Генератор и Данные
+    var sectionsList = '<div class="menu-list grid-2">' +
       '<div class="wi-card wi-card-clickable" data-nav="wiTechs" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiTechs\');" role="button" tabindex="0" title="Открыть Способности">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wi-card-title"><span>✨</span> Способности</div>' +
-          '<div class="wi-card-desc">Знаки ведьмаков, магия Хаоса, врождённые дары, мутации и чародейство</div>' +
-        '</div>' +
-        '<div class="wi-card-arrow">→</div>' +
+        '<div class="wi-card-title"><span>✨</span> Способности</div>' +
+        '<div class="wi-card-desc">Знаки ведьмаков, магия Хаоса, врождённые дары, мутации и чародейство</div>' +
+        '<div class="wi-card-arrow">›</div>' +
       '</div>' +
       '<div class="wi-card wi-card-clickable" data-nav="wiMoves" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiMoves\');" role="button" tabindex="0" title="Открыть Боевые приёмы">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wi-card-title"><span>⚔️</span> Боевые приёмы</div>' +
-          '<div class="wi-card-desc">Стили фехтования, пируэты, парирование, тактические маневры и рипост</div>' +
-        '</div>' +
-        '<div class="wi-card-arrow">→</div>' +
+        '<div class="wi-card-title"><span>⚔️</span> Боевые приёмы</div>' +
+        '<div class="wi-card-desc">Стили фехтования, пируэты, парирование, тактические маневры и рипост</div>' +
+        '<div class="wi-card-arrow">›</div>' +
       '</div>' +
       '<div class="wi-card wi-card-clickable" data-nav="wiMap" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiMap\');" role="button" tabindex="0" title="Открыть Карту Континента">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wi-card-title"><span>🗺️</span> Карта мира</div>' +
-          '<div class="wi-card-desc">Интерактивный атлас Континента, королевства, маршруты и калькулятор переходов</div>' +
-        '</div>' +
-        '<div class="wi-card-arrow">→</div>' +
+        '<div class="wi-card-title"><span>🗺️</span> Карта мира</div>' +
+        '<div class="wi-card-desc">Интерактивный атлас Континента, королевства, маршруты и калькулятор переходов</div>' +
+        '<div class="wi-card-arrow">›</div>' +
+      '</div>' +
+      '<div class="wi-card wi-card-clickable" data-nav="wiTechGen" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiTechGen\');" role="button" tabindex="0" title="Открыть AI Генератор">' +
+        '<div class="wi-card-title"><span>🤖</span> AI Генератор</div>' +
+        '<div class="wi-card-desc">Генератор знаков, чародейских заклятий и стилей фехтования на Gemini Flash!</div>' +
+        '<div class="wi-card-arrow">›</div>' +
       '</div>' +
       '<div class="wi-card wi-card-clickable" data-nav="wiRef" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiRef\');" role="button" tabindex="0" title="Открыть Справочник Континента">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wi-card-title"><span>📚</span> Справочник Континента</div>' +
-          '<div class="wi-card-desc">Знаки, 7 ведьмачьих школ, алхимия, масла, бестиарий чудовищ, фехтование и лор</div>' +
-        '</div>' +
-        '<div class="wi-card-arrow">→</div>' +
+        '<div class="wi-card-title"><span>📚</span> Справочник Континента</div>' +
+        '<div class="wi-card-desc">Знаки, 7 ведьмачьих школ, алхимия, масла, бестиарий чудовищ, фехтование и лор</div>' +
+        '<div class="wi-card-arrow">›</div>' +
       '</div>' +
       '<div class="wi-card wi-card-clickable" data-nav="wiData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiData\');" role="button" tabindex="0" title="Открыть Данные и Ростер">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wi-card-title"><span>💾</span> Данные и Ростер</div>' +
-          '<div class="wi-card-desc">Профиль персонажа, происхождение/школа, сталь и серебро, экипировка и экспорт</div>' +
-        '</div>' +
-        '<div class="wi-card-arrow">→</div>' +
+        '<div class="wi-card-title"><span>💾</span> Данные и Ростер</div>' +
+        '<div class="wi-card-desc">Профиль персонажа, происхождение/школа, сталь и серебро, экипировка и экспорт</div>' +
+        '<div class="wi-card-arrow">›</div>' +
       '</div>' +
     '</div>';
 

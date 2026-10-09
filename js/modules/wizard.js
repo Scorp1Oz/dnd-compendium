@@ -2300,46 +2300,34 @@
     // 3. Список разделов в сетке menu-list grid-2 (как в Ведьмаке и Шиноби!)
     var sectionsList = '<div class="menu-list grid-2">' +
       '<div class="wz-card wz-card-clickable" data-nav="wzSpells" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSpells\');" role="button" tabindex="0" title="Открыть Заклинания">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>✨</span> Заклинания</div>' +
-          '<div class="wz-card-desc">Книга заклинаний Хогвартса, боевые чары, инкантации и AI Генератор заклинаний</div>' +
-        '</div>' +
-        '<div class="wz-card-arrow">→</div>' +
+        '<div class="wz-card-title"><span>✨</span> Заклинания</div>' +
+        '<div class="wz-card-desc">Книга заклинаний Хогвартса, боевые чары, инкантации и AI Генератор заклинаний</div>' +
+        '<div class="wz-card-arrow">›</div>' +
       '</div>' +
       '<div class="wz-card wz-card-clickable" data-nav="wzDuels" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzDuels\');" role="button" tabindex="0" title="Открыть Дуэльные приёмы">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>⚔️</span> Дуэльные приёмы</div>' +
-          '<div class="wz-card-desc">Палочковые дуэли, парирование Протего, боевая аппарация, финты и AI Генератор</div>' +
-        '</div>' +
-        '<div class="wz-card-arrow">→</div>' +
+        '<div class="wz-card-title"><span>⚔️</span> Дуэльные приёмы</div>' +
+        '<div class="wz-card-desc">Палочковые дуэли, парирование Протего, боевая аппарация, финты и AI Генератор</div>' +
+        '<div class="wz-card-arrow">›</div>' +
       '</div>' +
       '<div class="wz-card wz-card-clickable" data-nav="wzSkills" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkills\');" role="button" tabindex="0" title="Открыть Навыки">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>🧠</span> Навыки</div>' +
-          '<div class="wz-card-desc">Магические дисциплины, окклюменция, древние руны, зельеварение, ремесло и AI Генератор</div>' +
-        '</div>' +
-        '<div class="wz-card-arrow">→</div>' +
+        '<div class="wz-card-title"><span>🧠</span> Навыки</div>' +
+        '<div class="wz-card-desc">Магические дисциплины, окклюменция, древние руны, зельеварение, ремесло и AI Генератор</div>' +
+        '<div class="wz-card-arrow">›</div>' +
       '</div>' +
       '<div class="wz-card wz-card-clickable" data-nav="wzWand" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzWand\');" role="button" tabindex="0" title="Открыть Палочка">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>🪄</span> Палочка</div>' +
-          '<div class="wz-card-desc">Параметры волшебной палочки: древесина, сердцевина, длина, упругость и свойства</div>' +
-        '</div>' +
-        '<div class="wz-card-arrow">→</div>' +
+        '<div class="wz-card-title"><span>🪄</span> Палочка</div>' +
+        '<div class="wz-card-desc">Параметры волшебной палочки: древесина, сердцевина, длина, упругость и свойства</div>' +
+        '<div class="wz-card-arrow">›</div>' +
       '</div>' +
       '<div class="wz-card wz-card-clickable" data-nav="wzRef" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzRef\');" role="button" tabindex="0" title="Открыть Справочник">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>📚</span> Справочник Волшебного мира</div>' +
-          '<div class="wz-card-desc">14 разделов энциклопедии: Школы магии мира, Ордена, Крестражи, Таланты, Зелья, Травология, Бестиарий и Артефакты</div>' +
-        '</div>' +
-        '<div class="wz-card-arrow">→</div>' +
+        '<div class="wz-card-title"><span>📚</span> Справочник Волшебного мира</div>' +
+        '<div class="wz-card-desc">14 разделов энциклопедии: Школы магии мира, Ордена, Крестражи, Таланты, Зелья, Травология, Бестиарий и Артефакты</div>' +
+        '<div class="wz-card-arrow">›</div>' +
       '</div>' +
       '<div class="wz-card wz-card-clickable" data-nav="wzData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzData\');" role="button" tabindex="0" title="Открыть Данные">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wz-card-title"><span>💾</span> Данные</div>' +
-          '<div class="wz-card-desc">Анкета волшебника, характеристики, факультет и управление персонажами</div>' +
-        '</div>' +
-        '<div class="wz-card-arrow">→</div>' +
+        '<div class="wz-card-title"><span>💾</span> Данные</div>' +
+        '<div class="wz-card-desc">Анкета волшебника, характеристики, факультет и управление персонажами</div>' +
+        '<div class="wz-card-arrow">›</div>' +
       '</div>' +
     '</div>';
 
