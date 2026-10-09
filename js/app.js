@@ -434,6 +434,18 @@ window.render=function(){
       paintShBar();
       return;
     }
+    if(s === 'wzPotionGen'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzPotionGen === 'function') ? wzPotionGen() : '<div>AI Генератор зелий</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzPotionGen === 'function') wireWzPotionGen();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
     if(s === 'wzMap'){
       var app = document.getElementById('app');
       app.classList.remove('wide');
@@ -956,6 +968,8 @@ window.navigate=function(val){
       skills: 'wzSkills',
       wzPotions: 'wzPotions',
       potions: 'wzPotions',
+      wzPotionGen: 'wzPotionGen',
+      potionGen: 'wzPotionGen',
       wzSkillGen: 'wzSkillGen',
       wzSpellGen: 'wzSpellGen',
       wzDuelGen: 'wzDuelGen',
