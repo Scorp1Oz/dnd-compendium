@@ -254,6 +254,20 @@ body.wz-theme {
    СТИЛЬ КНОПКИ РАЗДЕЛА ВОЛШЕБНИК В ШАПКЕ (hbModeBar)
    ============================================================ */
 
+/* Фолбэк активного состояния кнопки «Волшебник» без индикатора: индиго с чистым белым текстом */
+body.wz-theme .hb-seg-btn.on,
+.hb-seg-btn[data-hbmode="wz"].on {
+  background: #312e81 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.hb-seg.has-indicator .hb-seg-btn[data-hbmode="wz"].on,
+body.wz-theme .hb-seg.has-indicator .hb-seg-btn.on {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
 
 
 /* Бейджи степеней мастерства навыков */
