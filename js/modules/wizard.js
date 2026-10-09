@@ -11,6 +11,7 @@
   var WZ_SPELLS_KEY = 'ttc_wz_spells';
   var WZ_DUELS_KEY = 'ttc_wz_duels';
   var WZ_SKILLS_KEY = 'ttc_wz_skills';
+  var WZ_POTIONS_KEY = 'ttc_wz_potions';
   var WZ_ROUTE_KEY = 'ttc_wz_route';
   var WZ_MARKERS_KEY = 'ttc_wz_markers';
 
@@ -1913,6 +1914,144 @@
     return (WZ.skills || []).find(function(s){ return s.id === id; });
   };
 
+  /* Каноничные стартовые зелья Хогвартса */
+  function defaultWizardPotions(){
+    return [
+      {
+        id: 'wz_pot_wiggenweld',
+        name: 'Рябиновый отвар',
+        icon: '🍵',
+        tier: 'Простое (1-2 курс)',
+        difficulty: 'Простые',
+        time: '45 минут',
+        cauldron: 'Оловянный котёл №2, средний огонь',
+        ingredients: 'Кора рябины, корень мандрагоры, слизь книзеля, сок мурлокомля, жабьи камни',
+        recipe: '1. Нагреть котёл до умеренного жара и залить ключевую воду.\n2. Добавить растёртый корень мандрагоры, непрерывно помешивая по часовой стрелке.\n3. Влить сок мурлокомля, когда варево станет изумрудно-зелёным.\n4. Добавить слизь книзеля и помешать дважды против часовой стрелки.\n5. Бросить кору рябины перед снятием с огня. Зелье приобретает яркий бирюзовый оттенок.',
+        effect: 'Мгновенно восстанавливает 2d6+4 HP, затягивает раны, нейтрализует слабое магическое истощение и снимает действие простых сонных чар или Напитка живой смерти.',
+        notes: 'Базовое целебное зелье больничного крыла Хогвартса. Должно храниться в тёмном стекле при прохладной температуре.'
+      },
+      {
+        id: 'wz_pot_invisibility',
+        name: 'Зелье невидимости',
+        icon: '🫧',
+        tier: 'Среднее (3-5 курс)',
+        difficulty: 'Средние',
+        time: '2 часа',
+        cauldron: 'Латунный котёл, слабый огонь',
+        ingredients: 'Вишнёвые вишни, чешуя серебрянки, крылья моли, сок привидения, истолчённый лунный камень',
+        recipe: '1. Растопить лунный камень на слабом огне до серебристого блеска.\n2. Медленно ввести крылья моли и помешивать против часовой стрелки до полного растворения.\n3. Влить сок привидения — зелье станет абсолютно прозрачным и начнёт испускать холодный пар.\n4. Добавить чешую серебрянки, сделать 3 круговых движения и дать настояться в течение получаса.',
+        effect: 'Делает выпившего волшебника, его одежду и снаряжение полностью невидимыми для обычного и магического зрения на 10 минут (или до первой боевой атаки / применения заклятия). Обеспечивает скрытность и тактическое преимущество.',
+        notes: 'Не скрывает звуки шагов и запахи. В отличие от мантии-невидимки, действие ограничено по времени.'
+      },
+      {
+        id: 'wz_pot_peace',
+        name: 'Умиротворяющий бальзам',
+        icon: '🟣',
+        tier: 'Среднее (3-5 курс)',
+        difficulty: 'Средние',
+        time: '90 минут',
+        cauldron: 'Медный котёл, мерцающий огонь',
+        ingredients: 'Истолчённый лунный камень, сироп чемерицы, иглы дикобраза, порошок из когтя дракона',
+        recipe: '1. Всыпать порошок лунного камня, помешивать против часовой стрелки, пока зелье не станет фиолетовым, а затем тёмно-бирюзовым.\n2. Добавить сироп чемерицы строго по каплям.\n3. ВНИМАНИЕ: Снять котёл с огня перед добавлением игл дикобраза!\n4. Добавить иглы дикобраза в остывающее варево. Если добавить на огне — котёл расплавится, а брызги вызовут ожоги.',
+        effect: 'Полностью снимает панику, тревогу, ярость и психологический стресс. Даёт преимущество на все спасброски против страха, ошеломления и эффектов помрачения разума на 4 часа.',
+        notes: 'Требует ювелирной точности: избыток чемерицы вызывает необратимый летаргический сон.'
+      },
+      {
+        id: 'wz_pot_polyjuice',
+        name: 'Оборотное зелье',
+        icon: '🧪',
+        tier: 'Сложное (Ж.А.Б.А.)',
+        difficulty: 'Сложные',
+        time: '1 месяц',
+        cauldron: 'Медный котёл №2, медленный огонь',
+        ingredients: 'Златоглазки (настаивать 21 день), пиявки, спорыш, водоросли, тёртый рог двурога, шкура бумсланга, частица того, чей облик принимается (волос)',
+        recipe: '1. Настаивать златоглазки 21 день в тёмном месте.\n2. Варить водоросли и пиявки в течение недели.\n3. Добавить тёртый рог двурога при слабом огне, помешивать 4 раза по часовой стрелке.\n4. Добавить измельчённую шкуру бумсланга и варить ещё 18 часов.\n5. Непосредственно перед употреблением бросить волос или ноготь человека. Зелье закипит и изменит цвет в зависимости от натуры человека.',
+        effect: 'Полностью трансформирует физический облик выпившего в выбранного человека на 1 час (голос, рост, мимика, сетчатка, отпечатки пальцев).',
+        notes: 'Категорически запрещено использовать частицы животных (вызывает частичную необратимую анимализацию и мутации).'
+      },
+      {
+        id: 'wz_pot_skelegro',
+        name: 'Костерост',
+        icon: '🦴',
+        tier: 'Сложное (Ж.А.Б.А.)',
+        difficulty: 'Сложные',
+        time: '8 часов',
+        cauldron: 'Оловянный толстостенный котёл, тлеющие угли',
+        ingredients: 'Толчёные китайские капустные кочерыжки, костная пыль скарабея, яд скакуна, горький корень, яблочный экстракт',
+        recipe: '1. Кипятить костную пыль скарабея до образования густой дымящейся взвеси.\n2. Добавить очищенный горький корень и яд скакуна.\n3. Томить 8 часов на углях, постоянно остужая пар влажной льняной тканью.\n4. При готовности жидкость становится дымчато-серой и начинает пузыриться мелкими белыми искрами.',
+        effect: 'За 8–10 часов заново полностью отращивает удалённые или разрушенные магией кости (например, после заклинания Брахиум Эмендо).',
+        notes: 'Процесс регенерации сопровождается мучительным жжением в растущих костях. Зелье имеет отвратительный едкий вкус.'
+      },
+      {
+        id: 'wz_pot_felix',
+        name: 'Феликс Фелицис (Жидкая удача)',
+        icon: '✨',
+        tier: 'Мастерское (Высшая алхимия)',
+        difficulty: 'Мастерские',
+        time: '6 месяцев',
+        cauldron: 'Чистый золотой котёл, ровное алхимическое пламя',
+        ingredients: 'Яйцо пеплозмея, луковица сквилла, щупальце мурлока, настойка тимьяна, рута, растёртый рог оленя',
+        recipe: '1. Варится строго полгода в золотом котле.\n2. Температура огня должна поддерживаться неизменной день и ночь.\n3. Компоненты добавляются в строго определённые фазы луны (на растущую луну — яйцо пеплозмея, в полнолуние — луковица сквилла).\n4. При готовности зелье имеет цвет расплавленного золота, а его капли подпрыгивают над поверхностью, как золотые рыбки.',
+        effect: 'Дарует абсолютную удачу во всех делах на 6 часов: все проверки бросков кубиков совершаются с автоматическим преимуществом, интуиция безошибочно указывает кратчайший победный путь.',
+        notes: 'Злоупотребление ведёт к опасной самоуверенности, безрассудству и интоксикации. Запрещено на экзаменах С.О.В. и официальных матчах по квиддичу.'
+      },
+      {
+        id: 'wz_pot_amortentia',
+        name: 'Амортенция',
+        icon: '💖',
+        tier: 'Мастерское (Высшая алхимия)',
+        difficulty: 'Мастерские',
+        time: '3 недели',
+        cauldron: 'Серебряный котёл, перламутровый огонь',
+        ingredients: 'Жемчужная пыль, лепестки лунной розы, шипы виверны, сок плодов белладонны, утренняя роса Запретного леса',
+        recipe: '1. Растопить жемчужную пыль в росе Запретного леса при мерцающем огне.\n2. Помешивать серебряным черпаком по траектории восьмёрки.\n3. Добавить лепестки лунной розы и сок белладонны.\n4. Готовое зелье испускает спиральный перламутровый пар и переливается радужными искрами.',
+        effect: 'Вызывает сильнейшее, непреодолимое любовное наваждение и подчинение создателю на 24 часа. Для каждого человека зелье пахнет тем, что привлекает его больше всего.',
+        notes: 'Не способно создать истинную любовь — порождает лишь слепую, опасную одержимость. Контролируется Отделом Магического Правопорядка.'
+      },
+      {
+        id: 'wz_pot_living_death',
+        name: 'Напиток живой смерти',
+        icon: '💀',
+        tier: 'Мастерское (Высшая алхимия)',
+        difficulty: 'Мастерские',
+        time: '4 часа',
+        cauldron: 'Чугунный котёл, ровное синее пламя',
+        ingredients: 'Корень асфоделя, настойка полыни, корень валерианы, сок дремоносных бобов',
+        recipe: '1. Измельчить корень асфоделя и соединить с настойкой полыни.\n2. Раздавить дремоносный боб серебряным кинжалом (секрет Принца-полукровки), чтобы извлечь густой сок.\n3. Мешать 7 раз против часовой стрелки и 1 раз по часовой стрелке.\n4. Зелье должно стать абсолютно прозрачным, чистым, как родниковая вода.',
+        effect: 'Погружает выпившего в глубокий летаргический сон на срок до 7 дней. Пульс и дыхание замедляются настолько, что выпивший кажется мёртвым.',
+        notes: 'Противоядие — Рябиновый отвар или концентрированный раствор безоара.'
+      }
+    ];
+  }
+
+  /* Методы загрузки и сохранения зелий */
+  WZ.loadPotions = function(){
+    try {
+      var raw = localStorage.getItem(WZ_POTIONS_KEY);
+      if(raw){
+        var arr = JSON.parse(raw);
+        if(Array.isArray(arr) && arr.length > 0){
+          WZ.potions = arr;
+          return arr;
+        }
+      }
+    } catch(e){}
+    WZ.potions = defaultWizardPotions();
+    WZ.savePotions();
+    return WZ.potions;
+  };
+
+  WZ.savePotions = function(){
+    try {
+      localStorage.setItem(WZ_POTIONS_KEY, JSON.stringify(WZ.potions || []));
+    } catch(e){}
+  };
+
+  WZ.getPotionById = function(id){
+    if(!WZ.potions) WZ.loadPotions();
+    return (WZ.potions || []).find(function(p){ return p.id === id; });
+  };
+
   WZ.loadRoute = function(){
     try {
       var raw = localStorage.getItem(WZ_ROUTE_KEY);
@@ -2345,6 +2484,13 @@
         '<div style="flex:1;min-width:0;">' +
           '<div class="wz-card-title"><span>🧠</span> Навыки</div>' +
           '<div class="wz-card-desc">Магические дисциплины, окклюменция, древние руны, зельеварение, ремесло и AI Генератор</div>' +
+        '</div>' +
+        '<div class="wz-card-arrow">›</div>' +
+      '</div>' +
+      '<div class="wz-card wz-card-clickable" data-nav="wzPotions" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzPotions\');" role="button" tabindex="0" title="Открыть Зелья">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="wz-card-title"><span>🧪</span> Зелья</div>' +
+          '<div class="wz-card-desc">Зельеварение Хогвартса, рецепты в котле, ингредиенты, способы приготовления и эффекты</div>' +
         '</div>' +
         '<div class="wz-card-arrow">›</div>' +
       '</div>' +
@@ -2869,6 +3015,7 @@
           spells: WZ.spells || [],
           duels: WZ.duels || [],
           skills: WZ.skills || [],
+          potions: WZ.potions || [],
           routes: WZ.map ? WZ.map.routes : null
         };
         var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -2912,6 +3059,10 @@
               WZ.skills = data.skills;
               WZ.saveSkills();
             }
+            if(Array.isArray(data.potions)){
+              WZ.potions = data.potions;
+              WZ.savePotions();
+            }
             if(data.meta){
               WZ.meta = data.meta;
               WZ.saveMeta(data.meta);
@@ -2942,12 +3093,13 @@
     return wireWzData();
   }
 
-  /* Общий переключатель вкладок Заклинания / Дуэли / Навыки */
+  /* Общий переключатель вкладок Заклинания / Дуэли / Навыки / Зелья */
   function renderWzAbilitiesTabBar(activeTab){
     return '<div class="wz-nav-tabs">' +
       '<button class="wz-nav-tab ' + (activeTab === 'spells' ? 'active' : '') + '" data-nav="wzSpells" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSpells\');">✨ Заклинания</button>' +
       '<button class="wz-nav-tab ' + (activeTab === 'duels' ? 'active' : '') + '" data-nav="wzDuels" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzDuels\');">⚔️ Дуэльные приёмы</button>' +
       '<button class="wz-nav-tab ' + (activeTab === 'skills' ? 'active' : '') + '" data-nav="wzSkills" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkills\');">🧠 Навыки</button>' +
+      '<button class="wz-nav-tab ' + (activeTab === 'potions' ? 'active' : '') + '" data-nav="wzPotions" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzPotions\');">🧪 Зелья</button>' +
     '</div>';
   }
 
@@ -3604,6 +3756,271 @@
           '<button class="btn btn-ghost" data-nav="wzSkills" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzSkills\');">Отмена</button>' +
           (!isNew ? '<button class="btn btn-ghost" id="wzEdSkillDelBtn" data-skill-id="' + escA(s.id) + '" style="color:#ef4444;border-color:rgba(239,68,68,0.4);">🗑️ Удалить</button>' : '') +
           '<button class="btn btn-primary" id="wzEdSkillSaveBtn" data-skill-id="' + escA(s.id) + '">💾 Сохранить навык</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  /* ============================================================
+     ЭКРАН ЗЕЛЬЕЙ (wzPotions, wzPotionView, wzPotionEdit)
+     ============================================================ */
+
+  var WZ_POTION_TIERS = [
+    'Простое (1-2 курс)',
+    'Среднее (3-5 курс)',
+    'Сложное (Ж.А.Б.А.)',
+    'Мастерское (Высшая алхимия)'
+  ];
+
+  function getPotionTierSlug(tier){
+    if(!tier) return 'tier-simple';
+    var t = tier.toLowerCase();
+    if(t.indexOf('мастер') !== -1 || t.indexOf('высш') !== -1) return 'tier-master';
+    if(t.indexOf('сложн') !== -1 || t.indexOf('жаба') !== -1 || t.indexOf('ж.а.б.а') !== -1) return 'tier-hard';
+    if(t.indexOf('средн') !== -1) return 'tier-medium';
+    return 'tier-simple';
+  }
+
+  function wzPotions(){
+    if(!WZ.potions) WZ.loadPotions();
+    var list = WZ.potions || [];
+
+    var curFilter = WZ.potionFilter || 'all';
+    var curSearch = (WZ.potionSearch || '').toLowerCase().trim();
+
+    var filterCategories = ['Все', 'Простые', 'Средние', 'Сложные', 'Мастерские'];
+
+    var filterPills = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:12px 0;">' +
+      filterCategories.map(function(cat){
+        var key = (cat === 'Все' ? 'all' : cat);
+        var active = curFilter === key;
+        return '<button class="wz-pill ' + (active ? 'active' : '') + '" data-wz-potion-filter="' + escA(key) + '">' + esc(cat) + '</button>';
+      }).join('') +
+    '</div>';
+
+    var filtered = list.filter(function(p){
+      if(curFilter !== 'all'){
+        var diff = (p.difficulty || p.tier || '');
+        if(diff.toLowerCase().indexOf(curFilter.toLowerCase().substr(0, 4)) === -1) return false;
+      }
+      if(curSearch){
+        var str = ((p.name || '') + ' ' + (p.ingredients || '') + ' ' + (p.effect || '') + ' ' + (p.recipe || '') + ' ' + (p.tier || '')).toLowerCase();
+        if(str.indexOf(curSearch) === -1) return false;
+      }
+      return true;
+    });
+
+    var cards = filtered.map(function(p){
+      var tierSlug = getPotionTierSlug(p.tier);
+      var ingPreview = p.ingredients ? (p.ingredients.length > 95 ? (p.ingredients.substr(0, 95) + '...') : p.ingredients) : '';
+      var effPreview = p.effect ? (p.effect.length > 115 ? (p.effect.substr(0, 115) + '...') : p.effect) : '';
+
+      return '<div class="wz-ref-card" style="display:flex;flex-direction:column;justify-content:space-between;gap:10px;">' +
+        '<div>' +
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
+            '<div class="wz-ref-card-k" style="margin-bottom:0;font-size:16px;">' + (p.icon || '🧪') + ' ' + esc(p.name) + '</div>' +
+            '<span class="wz-potion-tag ' + tierSlug + '">' + esc(p.tier || 'Зелье') + '</span>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--wz-text-muted);margin-bottom:8px;">' +
+            (p.time ? ('<span class="wz-stat-badge" style="font-size:11px;">⏱️ ' + esc(p.time) + '</span>') : '') +
+            (p.cauldron ? ('<span class="wz-stat-badge" style="font-size:11px;">⚗️ ' + esc(p.cauldron) + '</span>') : '') +
+          '</div>' +
+          (ingPreview ? ('<div style="font-size:12px;color:#cbd5e1;margin-bottom:6px;line-height:1.45;"><b style="color:var(--wz-gold-light);">🌿 Ингредиенты:</b> ' + esc(ingPreview) + '</div>') : '') +
+          (effPreview ? ('<div class="wz-ref-card-v" style="font-size:12.5px;line-height:1.45;color:#94a3b8;"><b style="color:#fde047;">✨ Эффект:</b> ' + esc(effPreview) + '</div>') : '') +
+        '</div>' +
+        '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">' +
+          '<button class="btn btn-ghost" data-nav="wzPotionView:' + escA(p.id) + '" style="font-size:11px;padding:3px 10px;">Рецепт и эффект ›</button>' +
+          '<button class="btn btn-ghost" data-nav="wzPotionEdit:' + escA(p.id) + '" style="font-size:11px;padding:3px 8px;" title="Изменить зелье">✏️</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Зелья' }]) +
+      '<button class="back" data-nav="wzHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzHome\');">← Назад</button>' +
+      renderWzAbilitiesTabBar('potions') +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">' +
+        '<div>' +
+          '<h1 style="margin-bottom:4px;">🧪 Зельеварение и рецепты</h1>' +
+          '<div class="desc" style="margin-bottom:0;">Колдовские зелья, отвары, яды и сыворотки. Ингредиенты, фазы варки в котле и магические эффекты.</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button class="btn btn-primary" data-nav="wzPotionEdit:new" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzPotionEdit:new\');">➕ Добавить зелье</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="wi-ref-search-wrap" style="margin-top:10px;">' +
+        '<span class="wi-ref-search-icon">🔍</span>' +
+        '<input type="text" id="wzPotionSearch" class="wi-ref-search-input" placeholder="Поиск зелья по названию, ингредиентам или эффекту..." value="' + escA(WZ.potionSearch || '') + '">' +
+      '</div>' +
+      filterPills +
+      '<div class="wi-ref-cards-grid" style="margin-top:14px;">' +
+        (cards || ('<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:44px 16px;border:1px dashed var(--wz-border);border-radius:12px;background:rgba(255,255,255,0.02);">' +
+          '<div style="font-size:40px;margin-bottom:8px;">🧪 ⚗️</div>' +
+          '<div style="font-family:Cinzel,serif;font-size:17px;color:var(--wz-gold-light);margin-bottom:6px;">Книга зелий пуста</div>' +
+          '<div style="color:var(--wz-text-muted);font-size:13px;max-width:440px;margin:0 auto 16px;">Добавьте рецепт зелья вручную с ингредиентами, шагами варки в котле и магическим эффектом.</div>' +
+          '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
+            '<button class="btn btn-primary" data-nav="wzPotionEdit:new" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzPotionEdit:new\');">➕ Создать зелье</button>' +
+          '</div>' +
+        '</div>')) +
+      '</div>';
+  }
+
+  /* Просмотр зелья (wzPotionView) */
+  function wzPotionView(id){
+    var p = WZ.getPotionById(id);
+    if(!p) return wzPotions();
+
+    var tierSlug = getPotionTierSlug(p.tier);
+
+    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Зелья', nav: 'wzPotions' }, { label: p.name || 'Зелье' }]) +
+      '<button class="back" data-nav="wzPotions" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzPotions\');">← К зельям</button>' +
+      '<div class="wz-char-sheet-card" style="margin-top:12px;">' +
+        '<div class="wz-char-header">' +
+          '<div style="display:flex;align-items:center;gap:10px;">' +
+            '<span style="font-size:28px;">' + (p.icon || '🧪') + '</span>' +
+            '<div>' +
+              '<div style="font-size:21px;color:var(--wz-gold-light);font-family:\'Cinzel\',serif;font-weight:700;">' + esc(p.name) + '</div>' +
+              '<div style="font-size:12px;color:var(--wz-text-muted);margin-top:2px;">Рецепт зельеварения Хогвартса</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">' +
+            '<button class="btn btn-primary" data-nav="wzPotionEdit:' + escA(p.id) + '" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzPotionEdit:' + escA(p.id) + '\');">✏️ Изменить рецепт</button>' +
+            '<button class="btn btn-ghost" id="wzPotionDeleteBtn" data-potion-id="' + escA(p.id) + '" style="color:#ef4444;border-color:rgba(239,68,68,0.3);">🗑️ Удалить</button>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));gap:10px;margin-top:16px;margin-bottom:16px;">' +
+          '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:6px;padding:10px 14px;">' +
+            '<span style="color:var(--wz-text-muted);font-size:11px;display:block;">СЛОЖНОСТЬ / УРОВЕНЬ:</span>' +
+            '<span class="wz-potion-tag ' + tierSlug + '" style="margin-top:4px;">' + esc(p.tier || 'Не указана') + '</span>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:6px;padding:10px 14px;">' +
+            '<span style="color:var(--wz-text-muted);font-size:11px;display:block;">ВРЕМЯ ПРИГОТОВЛЕНИЯ:</span>' +
+            '<b style="color:#93c5fd;display:inline-block;margin-top:4px;">⏱️ ' + esc(p.time || 'Не указано') + '</b>' +
+          '</div>' +
+          '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--wz-border);border-radius:6px;padding:10px 14px;">' +
+            '<span style="color:var(--wz-text-muted);font-size:11px;display:block;">КОТЁЛ И ПЛАМЯ:</span>' +
+            '<b style="color:#fde047;display:inline-block;margin-top:4px;">⚗️ ' + esc(p.cauldron || 'Стандартный котёл') + '</b>' +
+          '</div>' +
+        '</div>' +
+        (p.ingredients ? (
+          '<div style="margin-bottom:16px;">' +
+            '<div style="font-size:13px;font-weight:700;color:var(--wz-gold-light);font-family:\'Cinzel\',serif;margin-bottom:6px;display:flex;align-items:center;gap:6px;">' +
+              '<span>🌿</span> Необходимые ингредиенты:' +
+            '</div>' +
+            '<div class="wz-potion-ingredients-box">' +
+              esc(p.ingredients).replace(/\n/g, '<br>') +
+            '</div>' +
+          '</div>'
+        ) : '') +
+        (p.recipe ? (
+          '<div style="margin-bottom:16px;">' +
+            '<div style="font-size:13px;font-weight:700;color:var(--wz-gold-light);font-family:\'Cinzel\',serif;margin-bottom:6px;display:flex;align-items:center;gap:6px;">' +
+              '<span>⚗️</span> Способ приготовления и варка в котле:' +
+            '</div>' +
+            '<div class="wz-potion-recipe-box">' +
+              esc(p.recipe).replace(/\n/g, '<br>') +
+            '</div>' +
+          '</div>'
+        ) : '') +
+        (p.effect ? (
+          '<div style="margin-bottom:16px;">' +
+            '<div style="font-size:13px;font-weight:700;color:#fde047;font-family:\'Cinzel\',serif;margin-bottom:6px;display:flex;align-items:center;gap:6px;">' +
+              '<span>✨</span> Магический эффект и действие зелья:' +
+            '</div>' +
+            '<div style="font-size:14px;line-height:1.6;color:#e2e8f0;background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:14px 16px;">' +
+              esc(p.effect).replace(/\n/g, '<br>') +
+            '</div>' +
+          '</div>'
+        ) : '') +
+        (p.notes ? (
+          '<div>' +
+            '<div style="font-size:12.5px;font-weight:700;color:#fca5a5;font-family:\'Cinzel\',serif;margin-bottom:6px;display:flex;align-items:center;gap:6px;">' +
+              '<span>⚠️</span> Предостережения, побочные эффекты и хранение:' +
+            '</div>' +
+            '<div style="font-size:13px;line-height:1.55;color:#cbd5e1;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:12px 16px;">' +
+              esc(p.notes).replace(/\n/g, '<br>') +
+            '</div>' +
+          '</div>'
+        ) : '') +
+      '</div>';
+  }
+
+  /* Редактор зелья (wzPotionEdit) */
+  function wzPotionEdit(id){
+    var isNew = (id === 'new' || !id);
+    var p = isNew ? {
+      id: 'wz_pot_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+      name: '',
+      icon: '🧪',
+      tier: 'Простое (1-2 курс)',
+      difficulty: 'Простые',
+      time: '45 минут',
+      cauldron: 'Оловянный котёл №2, средний огонь',
+      ingredients: '',
+      recipe: '',
+      effect: '',
+      notes: ''
+    } : (WZ.getPotionById(id) || { id: id });
+
+    var tierOpts = WZ_POTION_TIERS.map(function(t){
+      return '<option value="' + escA(t) + '" ' + (p.tier === t ? 'selected' : '') + '>' + esc(t) + '</option>';
+    }).join('');
+
+    return crumbWz([{ label: 'Волшебник', nav: 'wzHome' }, { label: 'Зелья', nav: 'wzPotions' }, { label: isNew ? 'Новое зелье' : 'Редактирование' }]) +
+      '<button class="back" data-nav="wzPotions" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzPotions\');">← К зельям</button>' +
+      '<div class="wz-char-sheet-card" style="margin-top:12px;">' +
+        '<div class="wz-char-header">' +
+          '<span>' + (isNew ? '🧪 Составление нового зелья' : '✏️ Редактирование: ' + esc(p.name || '')) + '</span>' +
+        '</div>' +
+        '<div class="wz-edit-grid">' +
+          '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+            '<label>Название зелья</label>' +
+            '<input type="text" id="wzEdPotionName" class="wz-input" value="' + escA(p.name || '') + '" placeholder="Например: Рябиновый отвар, Оборотное зелье, Феликс Фелицис...">' +
+          '</div>' +
+          '<div class="wz-edit-item">' +
+            '<label>Иконка / Символ зелья</label>' +
+            '<div style="display:flex;gap:6px;align-items:center;">' +
+              '<input type="text" id="wzEdPotionIcon" class="wz-input" value="' + escA(p.icon || '🧪') + '" style="width:70px;text-align:center;font-size:18px;">' +
+              '<div id="wzEdPotionIconChoices" style="display:flex;gap:4px;flex-wrap:wrap;">' +
+                ['🧪', '⚗️', '🫙', '🍵', '🟣', '🟢', '🟡', '🔴', '🫧', '✨', '💀', '💖', '🦴'].map(function(ic){
+                  return '<button type="button" class="btn btn-ghost" data-potion-icon="' + ic + '" style="padding:2px 7px;font-size:14px;">' + ic + '</button>';
+                }).join('') +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="wz-edit-item">' +
+            '<label>Сложность / Уровень зельеварения</label>' +
+            '<select id="wzEdPotionTier" class="wz-input">' +
+              tierOpts +
+            '</select>' +
+          '</div>' +
+          '<div class="wz-edit-item">' +
+            '<label>Время приготовления в котле</label>' +
+            '<input type="text" id="wzEdPotionTime" class="wz-input" value="' + escA(p.time || '') + '" placeholder="Например: 45 минут, 2 часа, 1 месяц, 6 месяцев...">' +
+          '</div>' +
+          '<div class="wz-edit-item">' +
+            '<label>Котёл, огонь и температура</label>' +
+            '<input type="text" id="wzEdPotionCauldron" class="wz-input" value="' + escA(p.cauldron || '') + '" placeholder="Например: Оловянный котёл №2, медленный огонь, золотой котёл...">' +
+          '</div>' +
+          '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+            '<label>🌿 Ингредиенты (травы, минералы, части магических существ)</label>' +
+            '<textarea id="wzEdPotionIngredients" class="wz-input" rows="3" placeholder="Перечислите необходимые ингредиенты через запятую или по строкам:\n- Корень асфоделя\n- Настойка полыни\n- Сок дремоносных бобов...">' + esc(p.ingredients || '') + '</textarea>' +
+          '</div>' +
+          '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+            '<label>⚗️ Способ приготовления / Шаги варки в котле</label>' +
+            '<textarea id="wzEdPotionRecipe" class="wz-input" rows="5" placeholder="Подробный процесс варки:\n1. Нагреть котёл до кипения ключевой воды...\n2. Помешивать против часовой стрелки 7 раз...\n3. Добавить ингредиенты и томить на медленном огне...">' + esc(p.recipe || '') + '</textarea>' +
+          '</div>' +
+          '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+            '<label>✨ Магический эффект, действие и длительность</label>' +
+            '<textarea id="wzEdPotionEffect" class="wz-input" rows="3" placeholder="Что происходит при употреблении зелья, сколько действует, какие даёт бонусы к проверкам или восстанавливает HP...">' + esc(p.effect || '') + '</textarea>' +
+          '</div>' +
+          '<div class="wz-edit-item" style="grid-column: 1 / -1;">' +
+            '<label>⚠️ Предостережения, побочные эффекты, антидоты и хранение</label>' +
+            '<textarea id="wzEdPotionNotes" class="wz-input" rows="3" placeholder="Ошибки при варке, побочные эффекты, антидоты (безоар), условия хранения во флаконе...">' + esc(p.notes || '') + '</textarea>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);">' +
+          '<button class="btn btn-ghost" data-nav="wzPotions" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzPotions\');">Отмена</button>' +
+          (!isNew ? '<button class="btn btn-ghost" id="wzEdPotionDelBtn" data-potion-id="' + escA(p.id) + '" style="color:#ef4444;border-color:rgba(239,68,68,0.4);">🗑️ Удалить</button>' : '') +
+          '<button class="btn btn-primary" id="wzEdPotionSaveBtn" data-potion-id="' + escA(p.id) + '">💾 Сохранить зелье</button>' +
         '</div>' +
       '</div>';
   }
@@ -5724,6 +6141,108 @@
     wireWzNav();
   }
 
+  function wireWzPotions(){
+    var search = document.getElementById('wzPotionSearch');
+    if(search){
+      search.addEventListener('input', function(){
+        WZ.potionSearch = search.value;
+        if(typeof render === 'function') render();
+      });
+    }
+
+    document.querySelectorAll('[data-wz-potion-filter]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        WZ.potionFilter = btn.getAttribute('data-wz-potion-filter');
+        if(typeof render === 'function') render();
+      });
+    });
+
+    wireWzNav();
+  }
+
+  function wireWzPotionView(){
+    var delBtn = document.getElementById('wzPotionDeleteBtn');
+    if(delBtn){
+      delBtn.addEventListener('click', function(){
+        var id = delBtn.getAttribute('data-potion-id');
+        var p = WZ.getPotionById(id);
+        var name = p ? ('«' + p.name + '»') : 'это зелье';
+        if(!confirm('Удалить зелье ' + name + ' из книги рецептов?')) return;
+        WZ.potions = (WZ.potions || []).filter(function(x){ return x.id !== id; });
+        WZ.savePotions();
+        WZ.toast('✓ Зелье удалено', 'info');
+        if(typeof window.navigate === 'function') window.navigate('wzPotions');
+      });
+    }
+    wireWzNav();
+  }
+
+  function wireWzPotionEdit(){
+    document.querySelectorAll('#wzEdPotionIconChoices [data-potion-icon]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var ic = btn.getAttribute('data-potion-icon');
+        var inp = document.getElementById('wzEdPotionIcon');
+        if(inp) inp.value = ic;
+      });
+    });
+
+    var delBtn = document.getElementById('wzEdPotionDelBtn');
+    if(delBtn){
+      delBtn.addEventListener('click', function(){
+        var id = delBtn.getAttribute('data-potion-id');
+        var p = WZ.getPotionById(id);
+        var name = p ? ('«' + p.name + '»') : 'это зелье';
+        if(!confirm('Удалить зелье ' + name + '?')) return;
+        WZ.potions = (WZ.potions || []).filter(function(x){ return x.id !== id; });
+        WZ.savePotions();
+        WZ.toast('✓ Зелье удалено', 'info');
+        if(typeof window.navigate === 'function') window.navigate('wzPotions');
+      });
+    }
+
+    var saveBtn = document.getElementById('wzEdPotionSaveBtn');
+    if(saveBtn){
+      saveBtn.addEventListener('click', function(){
+        var id = saveBtn.getAttribute('data-potion-id');
+        var name = (document.getElementById('wzEdPotionName').value || '').trim();
+        if(!name){
+          alert('Введите название зелья');
+          return;
+        }
+
+        var tier = document.getElementById('wzEdPotionTier').value;
+        var diff = 'Простые';
+        if(tier.indexOf('Мастер') !== -1) diff = 'Мастерские';
+        else if(tier.indexOf('Сложн') !== -1) diff = 'Сложные';
+        else if(tier.indexOf('Средн') !== -1) diff = 'Средние';
+
+        var p = WZ.getPotionById(id) || { id: id };
+        p.name = name;
+        p.icon = (document.getElementById('wzEdPotionIcon').value || '🧪').trim();
+        p.tier = tier;
+        p.difficulty = diff;
+        p.time = (document.getElementById('wzEdPotionTime').value || '').trim();
+        p.cauldron = (document.getElementById('wzEdPotionCauldron').value || '').trim();
+        p.ingredients = (document.getElementById('wzEdPotionIngredients').value || '').trim();
+        p.recipe = (document.getElementById('wzEdPotionRecipe').value || '').trim();
+        p.effect = (document.getElementById('wzEdPotionEffect').value || '').trim();
+        p.notes = (document.getElementById('wzEdPotionNotes').value || '').trim();
+
+        if(!WZ.potions) WZ.potions = [];
+        var idx = WZ.potions.findIndex(function(x){ return x.id === id; });
+        if(idx !== -1){
+          WZ.potions[idx] = p;
+        } else {
+          WZ.potions.unshift(p);
+        }
+        WZ.savePotions();
+        WZ.toast('✓ Зелье «' + name + '» успешно сохранено!', 'success');
+        if(typeof window.navigate === 'function') window.navigate('wzPotionView:' + id);
+      });
+    }
+    wireWzNav();
+  }
+
   function wireWzSkillGen(){
     var keyBtn = document.getElementById('wzSkgChangeKeyBtn');
     if(keyBtn){
@@ -5840,6 +6359,9 @@
   window.wzSkillView = wzSkillView;
   window.wzSkillEdit = wzSkillEdit;
   window.wzSkillGen = wzSkillGen;
+  window.wzPotions = wzPotions;
+  window.wzPotionView = wzPotionView;
+  window.wzPotionEdit = wzPotionEdit;
   window.wzMap = wzMap;
 
   window.wireWzHome = wireWzHome;
@@ -5859,6 +6381,9 @@
   window.wireWzSkillView = wireWzSkillView;
   window.wireWzSkillEdit = wireWzSkillEdit;
   window.wireWzSkillGen = wireWzSkillGen;
+  window.wireWzPotions = wireWzPotions;
+  window.wireWzPotionView = wireWzPotionView;
+  window.wireWzPotionEdit = wireWzPotionEdit;
   window.wireWzMap = wireWzMap;
   window.wireWzNav = wireWzNav;
   window.applyWizardTheme = WZ.applyTheme;
@@ -5882,6 +6407,9 @@
   WZ.wzSkillView = wzSkillView;
   WZ.wzSkillEdit = wzSkillEdit;
   WZ.wzSkillGen = wzSkillGen;
+  WZ.wzPotions = wzPotions;
+  WZ.wzPotionView = wzPotionView;
+  WZ.wzPotionEdit = wzPotionEdit;
   WZ.wzMap = wzMap;
   WZ.wzMapContent = wzMapContent;
   WZ.wireWzHome = wireWzHome;
@@ -5901,6 +6429,9 @@
   WZ.wireWzSkillView = wireWzSkillView;
   WZ.wireWzSkillEdit = wireWzSkillEdit;
   WZ.wireWzSkillGen = wireWzSkillGen;
+  WZ.wireWzPotions = wireWzPotions;
+  WZ.wireWzPotionView = wireWzPotionView;
+  WZ.wireWzPotionEdit = wireWzPotionEdit;
   WZ.wireWzMap = wireWzMap;
   WZ.wireWzMapContent = wireWzMapContent;
   WZ.wireWzNav = wireWzNav;

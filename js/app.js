@@ -396,6 +396,44 @@ window.render=function(){
       paintShBar();
       return;
     }
+    if(s === 'wzPotions'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wzPotions === 'function') ? wzPotions() : '<div>Зелья</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzPotions === 'function') wireWzPotions();
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzPotionView'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var potionId = view.potionId || view.shId || '';
+      var html = (typeof wzPotionView === 'function') ? wzPotionView(potionId) : '<div>Зелье</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzPotionView === 'function') wireWzPotionView(potionId);
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
+    if(s === 'wzPotionEdit'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var potionId = view.potionId || view.shId || '';
+      var html = (typeof wzPotionEdit === 'function') ? wzPotionEdit(potionId) : '<div>Редактор зелья</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWzPotionEdit === 'function') wireWzPotionEdit(potionId);
+      if(typeof wireWzNav === 'function') wireWzNav();
+      paintShBar();
+      return;
+    }
     if(s === 'wzMap'){
       var app = document.getElementById('app');
       app.classList.remove('wide');
@@ -916,6 +954,8 @@ window.navigate=function(val){
       duels: 'wzDuels',
       wzSkills: 'wzSkills',
       skills: 'wzSkills',
+      wzPotions: 'wzPotions',
+      potions: 'wzPotions',
       wzSkillGen: 'wzSkillGen',
       wzSpellGen: 'wzSpellGen',
       wzDuelGen: 'wzDuelGen',
@@ -949,6 +989,12 @@ window.navigate=function(val){
     }
     if(p[0] === 'wzSkillView' || p[0] === 'wzSkillEdit'){
       window.view = view = { screen: p[0], skillId: p[1], shId: p[1] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'wzPotionView' || p[0] === 'wzPotionEdit'){
+      window.view = view = { screen: p[0], potionId: p[1], shId: p[1] };
       render();
       window.scrollTo(0,0);
       return;
