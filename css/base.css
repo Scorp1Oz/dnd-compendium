@@ -959,8 +959,8 @@
   box-shadow:none;
 }
 .hb-seg-indicator[data-mode="wz"]{
-  background-color:#312e81;
-  box-shadow:0 0 12px rgba(99, 102, 241, 0.4);
+  background-color:#d4af37;
+  box-shadow:none;
 }
 
 /* Кланы Шиноби */
@@ -1030,7 +1030,7 @@ body.hb-theme #hbModeBar .hb-seg.has-indicator .hb-seg-btn.on{
 .hb-seg.has-indicator .hb-seg-btn[data-hbmode="me"].on{ color:#030814 !important; font-weight:700 !important; }
 .hb-seg.has-indicator .hb-seg-btn[data-hbmode="el"].on{ color:#042f2e !important; font-weight:600 !important; }
 .hb-seg.has-indicator .hb-seg-btn[data-hbmode="wi"].on{ color:#180d02 !important; font-weight:600 !important; }
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="wz"].on{ color:#fef08a !important; font-weight:700 !important; }
+.hb-seg.has-indicator .hb-seg-btn[data-hbmode="wz"].on{ color:#101216 !important; font-weight:600 !important; }
 
 body.sh-theme.sh-theme-uchiha .hb-seg.has-indicator .hb-seg-btn[data-hbmode="sh"].on,
 body.sh-theme.sh-theme-kurayami .hb-seg.has-indicator .hb-seg-btn[data-hbmode="sh"].on{

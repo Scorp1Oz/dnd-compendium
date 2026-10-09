@@ -254,35 +254,7 @@ body.wz-theme {
    СТИЛЬ КНОПКИ РАЗДЕЛА ВОЛШЕБНИК В ШАПКЕ (hbModeBar)
    ============================================================ */
 
-/* Кнопка «Волшебник» в верхней панели переключения миров */
-.hb-seg-btn[data-hbmode="wz"] {
-  font-family: 'Cinzel', serif !important;
-  letter-spacing: 0.03em !important;
-  transition: all 0.2s ease;
-}
 
-.hb-seg-btn[data-hbmode="wz"]:hover:not(.on) {
-  color: var(--wz-gold-light, #fef08a) !important;
-  background: transparent !important;
-}
-
-/* Активное состояние кнопки «Волшебник» — сдержанный благородный индиго-аметист с золотом в стиле других разделов */
-body.wz-theme .hb-seg-btn.on,
-.hb-seg-btn[data-hbmode="wz"].on {
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%) !important;
-  color: #fef08a !important;
-  font-family: 'Cinzel', serif !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.03em !important;
-  border-radius: 999px;
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.45) !important;
-}
-
-.hb-seg.has-indicator .hb-seg-btn[data-hbmode="wz"].on,
-body.wz-theme .hb-seg.has-indicator .hb-seg-btn.on {
-  background: transparent !important;
-  box-shadow: none !important;
-}
 
 /* Бейджи степеней мастерства навыков */
 .wz-skill-badge {
