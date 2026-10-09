@@ -2256,7 +2256,23 @@
     }
 
     var charDisplayName = (p.firstName || p.lastName) ? [p.firstName, p.lastName].filter(Boolean).join(' ') : (p.name || 'Новый персонаж');
-    var charDisplayTitle = p.title ? esc(p.title) : (p.house ? (esc(p.house) + ' • Маг') : 'Волшебник');
+
+    var cleanTitle = (p.title || '').trim();
+    if(p.house){
+      var hLower = p.house.toLowerCase();
+      var tLower = cleanTitle.toLowerCase();
+      if(tLower === hLower || tLower === hLower + ' • маг' || tLower === hLower + ' маг' || tLower === 'волшебник'){
+        cleanTitle = '';
+      }
+    } else if(cleanTitle.toLowerCase() === 'волшебник'){
+      cleanTitle = '';
+    }
+
+    var titleHtml = cleanTitle ? (
+      '<div style="font-family:\'EB Garamond\',serif;font-style:italic;color:var(--wz-gold-light);font-size:14.5px;margin-top:2px;">' +
+        esc(cleanTitle) +
+      '</div>'
+    ) : '';
 
     var hpVal = p.maxHp != null ? p.maxHp : (p.hp != null ? p.hp : 20);
     var yearVal = p.year || p.course || p.profession || '1 курс';
@@ -2266,18 +2282,12 @@
     var wandDisplay = w.name || (w.wood ? (w.wood + (w.core ? (' • ' + w.core) : '')) : '');
     var wandFullDetails = [w.wood, w.core, w.length, w.flexibility].filter(Boolean).join(' • ');
 
-    var wandBadgeHtml = hasWand
-      ? ('<span class="wz-stat-badge wand" style="border-color:rgba(212,175,55,0.4);color:var(--wz-gold-light);" title="Параметры палочки: ' + escA(wandFullDetails || wandDisplay) + '">🪄 ' + esc(wandDisplay || 'Палочка настроена') + '</span>')
-      : '<span class="wz-stat-badge wand" style="opacity:0.75;" title="Палочка не настроена. Настроить в Данных">🪄 Без палочки</span>';
-
     // HUD карточка волшебника
     var hud = '<div class="wz-hud ' + houseClass + '">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">' +
-        '<div>' +
+      '<div class="wz-hud-inner">' +
+        '<div class="wz-hud-left">' +
           '<div class="wz-title">' + (p.house ? hIcon : '🪄') + ' ' + esc(charDisplayName) + '</div>' +
-          '<div style="font-family:\'EB Garamond\',serif;font-style:italic;color:var(--wz-gold-light);font-size:14.5px;margin-top:2px;">' +
-            charDisplayTitle +
-          '</div>' +
+          titleHtml +
           (hasWand ? (
             '<div class="wz-hud-wand-line" title="Параметры волшебной палочки: ' + escA(wandFullDetails || wandDisplay) + '">' +
               '<span style="color:var(--wz-gold);">🪄</span>' +
@@ -2289,13 +2299,11 @@
             '</div>'
           )) +
         '</div>' +
-        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
+        '<div class="wz-hud-right">' +
           houseBadge +
-          wandBadgeHtml +
           '<span class="wz-stat-badge year" title="Курс Хогвартса или профессия">🎓 ' + esc(yearVal) + '</span>' +
           '<span class="wz-stat-badge hp">❤️ ' + hpVal + ' HP</span>' +
           '<span class="wz-stat-badge ac">🛡️ КБ ' + (p.ac || 10) + '</span>' +
-          '<button class="wz-hud-edit-btn" data-nav="wzData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wzData\');" title="Перейти к анкете, настройке палочки и ростеру">⚙️ Данные</button>' +
         '</div>' +
       '</div>' +
     '</div>';
