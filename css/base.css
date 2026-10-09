@@ -2231,15 +2231,8 @@ body.is-home-screen .hb-card {
   margin-bottom: 0 !important;
 }
 
-/* Название карточки слева */
-body.is-home-screen .menu-item .name,
-body.is-home-screen .fae-card-title,
-body.is-home-screen .sh-card-title,
-body.is-home-screen .me-card-title,
-body.is-home-screen .el-card-title,
-body.is-home-screen .wi-card-title,
-body.is-home-screen .wz-card-title,
-body.is-home-screen .hb-card-title {
+/* Название карточки в Космосе и Шиноби (горизонтальная строка) */
+body.is-home-screen .menu-item .name {
   font-family: 'Cinzel', serif !important;
   font-size: 20px !important;
   font-weight: 700 !important;
@@ -2252,15 +2245,8 @@ body.is-home-screen .hb-card-title {
   margin-bottom: 0 !important;
 }
 
-/* Описание карточки по центру/справа курсивом */
-body.is-home-screen .menu-item .desc,
-body.is-home-screen .fae-card-desc,
-body.is-home-screen .sh-card-desc,
-body.is-home-screen .me-card-desc,
-body.is-home-screen .el-card-desc,
-body.is-home-screen .wi-card-desc,
-body.is-home-screen .wz-card-desc,
-body.is-home-screen .hb-card-desc {
+/* Описание карточки в Космосе и Шиноби по центру/справа курсивом */
+body.is-home-screen .menu-item .desc {
   font-family: 'EB Garamond', serif !important;
   font-size: 15px !important;
   font-style: italic !important;
@@ -2282,19 +2268,84 @@ body.is-home-screen .wz-card-arrow,
 body.is-home-screen .hb-card-arrow {
   font-size: 22px !important;
   flex-shrink: 0 !important;
+  margin-left: 12px !important;
+  align-self: center !important;
 }
 
-/* Поддержка внутреннего контейнера, если он есть */
+/* Внутренний контейнер карточек: вертикальный стек (заголовок + описание) */
 body.is-home-screen .fae-card > div:first-child,
 body.is-home-screen .wi-card > div:first-child,
 body.is-home-screen .wz-card > div:first-child,
 body.is-home-screen .hb-card > div:first-child,
 body.is-home-screen .el-card > div:first-child {
   display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
   flex: 1 1 0% !important;
   min-width: 0 !important;
+  width: 100% !important;
+}
+
+/* Названия карточек (Фаэрун, Ведьмак, Волшебник, Стихия) */
+body.is-home-screen .fae-card-title,
+body.is-home-screen .wi-card-title,
+body.is-home-screen .wz-card-title,
+body.is-home-screen .el-card-title {
+  font-family: 'Cinzel', serif !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  color: #f1f5f9 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 0 4px 0 !important;
+  width: 100% !important;
+  flex-shrink: 0 !important;
+}
+
+/* Названия карточек (Технологии) */
+body.is-home-screen .hb-card-title {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  color: #f1f5f9 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 0 4px 0 !important;
+  width: 100% !important;
+  flex-shrink: 0 !important;
+}
+
+/* Описания карточек (Фаэрун, Ведьмак, Волшебник, Технологии, Стихия) */
+body.is-home-screen .fae-card-desc,
+body.is-home-screen .wi-card-desc,
+body.is-home-screen .wz-card-desc,
+body.is-home-screen .hb-card-desc,
+body.is-home-screen .el-card-desc {
+  font-family: 'EB Garamond', serif !important;
+  font-size: 13.5px !important;
+  font-style: italic !important;
+  color: #94a3b8 !important;
+  line-height: 1.35 !important;
+  margin: 0 !important;
+  text-align: left !important;
+  width: 100% !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: normal !important;
 }
 
 @media (max-width: 640px) {
@@ -2318,12 +2369,28 @@ body.is-home-screen .el-card > div:first-child {
     min-height: 64px !important;
     padding: 14px 16px !important;
   }
-  body.is-home-screen .menu-item .name,
+  body.is-home-screen .menu-item .name {
+    font-size: 16px !important;
+  }
+  body.is-home-screen .menu-item .desc {
+    font-size: 12px !important;
+  }
   body.is-home-screen .fae-card-title,
   body.is-home-screen .wi-card-title,
   body.is-home-screen .wz-card-title,
+  body.is-home-screen .el-card-title {
+    font-size: 16px !important;
+  }
   body.is-home-screen .hb-card-title {
-    font-size: 17px !important;
+    font-size: 15px !important;
+  }
+  body.is-home-screen .fae-card-desc,
+  body.is-home-screen .wi-card-desc,
+  body.is-home-screen .wz-card-desc,
+  body.is-home-screen .hb-card-desc,
+  body.is-home-screen .el-card-desc {
+    font-size: 12px !important;
+    -webkit-line-clamp: 2 !important;
   }
   body.is-home-screen .hero-dice,
   body.is-home-screen .fae-hero-dice,

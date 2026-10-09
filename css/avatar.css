@@ -534,6 +534,38 @@ body.el-theme .el-card:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 14px var(--el-accent-dim);
 }
 
+body.el-theme .el-card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+body.el-theme .el-card-desc {
+  font-family: 'EB Garamond', serif;
+  font-size: 13.5px;
+  color: #94a3b8;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+body.el-theme .el-card-arrow {
+  font-size: 22px;
+  color: var(--el-accent, #10b981);
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+body.el-theme .el-card:hover .el-card-arrow {
+  transform: translateX(3px);
+}
+
 body.el-theme .el-rule {
   height: 1px;
   margin: 0 0 20px;

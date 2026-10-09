@@ -3161,10 +3161,12 @@ function elHome(){
   '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // СТИХИЯ</div>' +
   '<div class="menu-list grid-2">' +
     items.map(function(it){
-      return '<div class="el-card" data-nav="' + it.nav + '">' +
-        '<div class="name">' + it.icon + ' ' + it.t + '</div>' +
-        '<div class="desc">' + it.d + '</div>' +
-        '<div class="arrow">›</div>' +
+      return '<div class="el-card el-card-clickable" data-nav="' + it.nav + '" onclick="if(typeof window.navigate===\'function\') window.navigate(\'' + it.nav + '\');" role="button" tabindex="0">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="el-card-title"><span>' + it.icon + '</span> ' + escapeHtml(it.t) + '</div>' +
+          '<div class="el-card-desc">' + escapeHtml(it.d) + '</div>' +
+        '</div>' +
+        '<div class="el-card-arrow">›</div>' +
       '</div>';
     }).join('') +
   '</div>';
