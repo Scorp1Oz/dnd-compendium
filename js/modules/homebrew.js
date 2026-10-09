@@ -1030,15 +1030,51 @@ function wireHbGenResultActions(){
 }
 
 function hbWorld(){
-  return crumb([{label:'Технологии', nav:'home'},{label:'Мир'}])+
+  var curKey = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+  return crumb([{label:'Технологии', nav:'home'},{label:'Мир & Данные'}])+
     '<button class="back" data-go="home">← Назад</button>'+
-    '<h1>Мир</h1><div class="rule"></div>'+
+    '<h1>🌐 Мир & Данные сеттинга</h1>'+
+    '<p class="subtitle">Параметры мира «'+esc(HB.world.name||'Технологии')+'», интеграция Gemini AI, квота памяти и экспорт/импорт базы данных.</p>'+
+    '<div class="rule"></div>'+
+
     '<div class="sheet-section">'+
+      '<div class="section-label">🌐 КОНФИГУРАЦИЯ СЕТТИНГА</div>'+
       '<div class="field"><label>Название мира / планеты</label>'+
         '<input type="text" id="hbWorldName" value="'+escA(HB.world.name)+'"></div>'+
       '<div class="field"><label>Общие заметки о мире</label>'+
-        '<textarea id="hbWorldNote" rows="10">'+esc(HB.world.note)+'</textarea></div>'+
-      '<button class="btn-primary" id="hbWorldSave">💾 Сохранить</button>'+
+        '<textarea id="hbWorldNote" rows="6">'+esc(HB.world.note)+'</textarea></div>'+
+      '<button class="btn-primary" id="hbWorldSave">💾 Сохранить параметры мира</button>'+
+    '</div>'+
+
+    '<div class="sheet-section" id="hbGeminiSection" style="margin-top:20px;">'+
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'+
+        '<span style="font-size:22px;">🤖</span>'+
+        '<div>'+
+          '<div style="font-weight:700;font-size:13.5px;color:#38bdf8;font-family:monospace;">GOOGLE GEMINI AI // СТАНДАРТ GEMINI-3.8-FLASH</div>'+
+          '<div style="font-size:12px;color:#94a3b8;">Генератор киберимплантов, высокотехнологичного оружия и псионики</div>'+
+        '</div>'+
+      '</div>'+
+      '<p style="font-size:12px;color:#94a3b8;line-height:1.45;margin:0 0 12px 0;">'+
+        'Ключ хранится локально в браузере. Бесплатный API-ключ можно получить в <a href="https://aistudio.google.com/" target="_blank" style="color:#38bdf8;text-decoration:underline;">Google AI Studio</a>.'+
+      '</p>'+
+      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">'+
+        '<input type="password" id="hbDataGeminiKey" value="'+escA(curKey)+'" placeholder="Вставьте ключ AIzaSy..." style="flex:1;min-width:220px;box-sizing:border-box;background:#0b0f17;border:1px solid rgba(56,189,248,0.35);color:#fff;padding:9px 12px;border-radius:4px;font-family:monospace;font-size:13px;">'+
+        '<button class="btn-primary" id="hbDataSaveGeminiKey">💾 Сохранить API Ключ</button>'+
+      '</div>'+
+    '</div>'+
+
+    (typeof AppStorage !== 'undefined' ? AppStorage.renderWidget('hb') : '')+
+
+    '<div class="sheet-section" style="margin-top:20px;">'+
+      '<div class="section-label">📦 ПОЛНЫЙ ЭКСПОРТ И ИМПОРТ ТЕХНОЛОГИЙ</div>'+
+      '<div class="desc">'+
+        'Резервная копия сохраняет все записи сеттинга: досье персонажей, импланты, оружие, фракции, города и параметры мира в один JSON-файл.'+
+      '</div>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">'+
+        '<button class="btn-primary" id="hbExportAllBtn">📥 Экспорт в файл JSON</button>'+
+        '<button class="btn-ghost" id="hbImportBtn">📤 Импорт из файла JSON</button>'+
+        '<input type="file" id="hbImportFile" accept="application/json,.json" style="display:none;">'+
+      '</div>'+
     '</div>';
 }
 
@@ -1273,8 +1309,104 @@ function wire(){
   if(wn) wn.addEventListener('click', function(){
     HB.world.name = document.getElementById('hbWorldName').value;
     HB.world.note = document.getElementById('hbWorldNote').value;
-    saveWorld(); paintBar(); navigate('home');
+    saveWorld(); paintBar();
+    alert('✓ Параметры мира сохранены!');
+    navigate('home');
   });
+
+  var saveKeyBtn = document.getElementById('hbDataSaveGeminiKey');
+  if(saveKeyBtn){
+    saveKeyBtn.addEventListener('click', function(){
+      var inp = document.getElementById('hbDataGeminiKey');
+      var key = inp ? inp.value.trim() : '';
+      if(typeof window.saveGeminiApiKey === 'function'){
+        window.saveGeminiApiKey(key);
+      } else {
+        try{
+          if(key){
+            localStorage.setItem('ttc_gemini_api_key', key);
+            localStorage.setItem('gemini_api_key', key);
+          } else {
+            localStorage.removeItem('ttc_gemini_api_key');
+            localStorage.removeItem('gemini_api_key');
+          }
+        }catch(e){}
+      }
+      alert(key ? '✓ API-ключ Gemini успешно сохранён!' : 'API-ключ удалён.');
+    });
+  }
+
+  if(typeof AppStorage !== 'undefined' && AppStorage.wireWidget) AppStorage.wireWidget('hb');
+
+  var expBtn = document.getElementById('hbExportAllBtn');
+  if(expBtn){
+    expBtn.addEventListener('click', function(){
+      try{
+        var payload = {
+          kind: 'homebrew',
+          version: 1,
+          world: HB.world,
+          records: HB.records,
+          activeChar: HB.activeChar,
+          exportedAt: new Date().toISOString()
+        };
+        var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        var dateStr = new Date().toISOString().slice(0,10);
+        a.href = url;
+        a.download = 'tech_world_backup_' + dateStr + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }catch(e){
+        alert('Ошибка экспорта: ' + e.message);
+      }
+    });
+  }
+
+  var impBtn = document.getElementById('hbImportBtn');
+  var impFile = document.getElementById('hbImportFile');
+  if(impBtn && impFile){
+    impBtn.addEventListener('click', function(){
+      impFile.click();
+    });
+    impFile.addEventListener('change', function(){
+      if(this.files && this.files[0]){
+        var reader = new FileReader();
+        reader.onload = function(e){
+          try{
+            var data = JSON.parse(e.target.result);
+            if(!data || typeof data !== 'object'){
+              alert('Ошибка: файл не является корректным JSON.');
+              return;
+            }
+            if(data.world && typeof data.world === 'object'){
+              HB.world = data.world;
+              saveWorld();
+            }
+            if(Array.isArray(data.records)){
+              HB.records = data.records;
+              saveRecords();
+            }
+            if(data.activeChar !== undefined){
+              HB.activeChar = data.activeChar;
+              saveActive();
+            }
+            paintBar();
+            if(typeof paintShBar === 'function') paintShBar();
+            alert('✓ Данные сеттинга «Технологии» успешно импортированы!\n• Записей: ' + (HB.records ? HB.records.length : 0));
+            render();
+          }catch(err){
+            alert('Ошибка чтения файла: ' + err.message);
+          }
+        };
+        reader.readAsText(this.files[0]);
+        this.value = '';
+      }
+    });
+  }
 
   var addC = document.getElementById('hbAddCustom');
   if(addC) addC.addEventListener('click', function(){ collectDraft(); HB.draft.custom.push({k:'',v:''}); render(); });

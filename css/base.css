@@ -1909,3 +1909,63 @@ body.hb-theme .ai-gen-result-card {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ============================================================
+   ФАЭРУН СПРАВОЧНИК И ДАННЫЕ (REF & DATA)
+   ============================================================ */
+.fae-data-section {
+  background: rgba(22, 26, 32, 0.75);
+  border: 1px solid rgba(201, 164, 92, 0.25);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.fae-data-card {
+  background: rgba(14, 17, 22, 0.85);
+  border: 1px solid rgba(201, 164, 92, 0.35);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 14px;
+}
+.fae-ref-search-wrap {
+  position: relative;
+  margin-bottom: 20px;
+}
+.fae-ref-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #c9a45c;
+  pointer-events: none;
+}
+.fae-ref-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px 12px 42px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(201, 164, 92, 0.35);
+  border-radius: 8px;
+  color: #f8fafc;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+.fae-ref-search-input:focus {
+  border-color: #c9a45c;
+  box-shadow: 0 0 12px rgba(201, 164, 92, 0.3);
+}
+.fae-ref-card {
+  background: rgba(22, 26, 32, 0.8);
+  border: 1px solid rgba(201, 164, 92, 0.25);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+}
+.fae-ref-card:hover {
+  border-color: #c9a45c;
+  background: rgba(28, 34, 44, 0.9);
+  transform: translateY(-1px);
+}

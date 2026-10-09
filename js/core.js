@@ -1060,6 +1060,8 @@ function render(){
   else if(view.screen === 'sheet') app.innerHTML = renderSheet();
   else if(view.screen === 'sub') app.innerHTML = renderSub();
   else if(view.screen === 'faeGen') app.innerHTML = renderFaeGen();
+  else if(view.screen === 'faeRef' || view.screen === 'ref') app.innerHTML = renderFaeRef();
+  else if(view.screen === 'faeData' || view.screen === 'data') app.innerHTML = renderFaeData();
   wireEvents();
 }
 
@@ -1113,7 +1115,7 @@ function renderHome(){
         '<span class="fae-stat-badge hp">❤️ ' + hpCur + '/' + hpMax + ' HP</span>' +
         '<span class="fae-stat-badge ac">🛡️ КБ ' + acVal + '</span>' +
         '<span class="fae-stat-badge" title="Скорость передвижения">⚡ ' + spdVal + ' фт</span>' +
-        '<button class="fae-hud-edit-btn" data-go="characters" title="Открыть список персонажей">⚙️ Ростер</button>' +
+        '<button class="fae-hud-edit-btn" data-go="faeData" title="Данные, ростер и настройки">💾 Данные</button>' +
       '</div>' +
     '</div>' +
   '</div>';
@@ -1137,34 +1139,6 @@ function renderHome(){
       '</div>' +
       '<div class="fae-card-arrow">→</div>' +
     '</div>' +
-    '<div class="fae-card fae-card-clickable" data-go="class:fighter" role="button" tabindex="0">' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>⚔️</span> Классы и Архетипы</div>' +
-        '<div class="fae-card-desc">Воин, стили боя, тактики превосходства, правила владения оружием и подклассы</div>' +
-      '</div>' +
-      '<div class="fae-card-arrow">→</div>' +
-    '</div>' +
-    '<div class="fae-card fae-card-clickable" data-go="magic" role="button" tabindex="0">' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>✨</span> Книга заклинаний</div>' +
-        '<div class="fae-card-desc">База заклинаний по 8 школам магии, слоты сотворения, ритуалы и параметры чар</div>' +
-      '</div>' +
-      '<div class="fae-card-arrow">→</div>' +
-    '</div>' +
-    '<div class="fae-card fae-card-clickable" data-go="alchemy" role="button" tabindex="0">' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>🧪</span> Алхимия и Зелья</div>' +
-        '<div class="fae-card-desc">Рецепты зелий, экстракты, запасы трав и реагентов, варка и сложность СЛ</div>' +
-      '</div>' +
-      '<div class="fae-card-arrow">→</div>' +
-    '</div>' +
-    '<div class="fae-card fae-card-clickable" data-go="rules2024" role="button" tabindex="0">' +
-      '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>📜</span> Правила D&D 2024</div>' +
-        '<div class="fae-card-desc">Справочник правил: Мастерство оружия, Состояния, Укрытие, Истощение</div>' +
-      '</div>' +
-      '<div class="fae-card-arrow">→</div>' +
-    '</div>' +
     '<div class="fae-card fae-card-clickable" data-go="map" role="button" tabindex="0">' +
       '<div style="flex:1;min-width:0;">' +
         '<div class="fae-card-title"><span>🗺️</span> Карта Фаэруна</div>' +
@@ -1183,6 +1157,20 @@ function renderHome(){
       '<div style="flex:1;min-width:0;">' +
         '<div class="fae-card-title"><span>🤖</span> AI Генератор D&D</div>' +
         '<div class="fae-card-desc">Генератор заклинаний, магических артефактов и боевых черт на базе Gemini 3.8 Flash!</div>' +
+      '</div>' +
+      '<div class="fae-card-arrow">→</div>' +
+    '</div>' +
+    '<div class="fae-card fae-card-clickable" data-go="faeRef" role="button" tabindex="0">' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="fae-card-title"><span>📚</span> Справочник Фаэруна</div>' +
+        '<div class="fae-card-desc">Классы D&D, Книга заклинаний, Правила 2024, Алхимия и зелья, Оружие и Глоссарий терминов</div>' +
+      '</div>' +
+      '<div class="fae-card-arrow">→</div>' +
+    '</div>' +
+    '<div class="fae-card fae-card-clickable" data-go="faeData" role="button" tabindex="0">' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="fae-card-title"><span>💾</span> Данные & Кампания</div>' +
+        '<div class="fae-card-desc">Управление ростером, заметки приключения, Gemini API, квота хранилища и экспорт/импорт</div>' +
       '</div>' +
       '<div class="fae-card-arrow">→</div>' +
     '</div>' +
@@ -3080,6 +3068,664 @@ function wireFaeGenResultActions(){
   }
 }
 
+/* ============================================================
+   ФАЭРУН: СПРАВОЧНИК И ДАННЫЕ (FAERUN REF & DATA)
+   ============================================================ */
+
+if(typeof window.getGeminiApiKey !== 'function'){
+  window.getGeminiApiKey = function(){
+    try{
+      return localStorage.getItem('ttc_gemini_api_key') || localStorage.getItem('gemini_api_key') || '';
+    }catch(e){ return ''; }
+  };
+}
+
+if(typeof window.saveGeminiApiKey !== 'function'){
+  window.saveGeminiApiKey = function(key){
+    try{
+      var trimmed = (key || '').trim();
+      if(trimmed){
+        localStorage.setItem('ttc_gemini_api_key', trimmed);
+        localStorage.setItem('gemini_api_key', trimmed);
+      } else {
+        localStorage.removeItem('ttc_gemini_api_key');
+        localStorage.removeItem('gemini_api_key');
+      }
+    }catch(e){}
+  };
+}
+
+function loadFaerunCampaign(){
+  try{
+    var raw = localStorage.getItem('ttc_faerun_campaign');
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return {
+    title: 'Хроники Побережья Мечей',
+    location: 'Врата Балдура',
+    notes: 'Приключения в Забытых Королевствах. Заметки мастера и отряда.'
+  };
+}
+
+function saveFaerunCampaign(camp){
+  try{
+    localStorage.setItem('ttc_faerun_campaign', JSON.stringify(camp));
+  }catch(e){}
+}
+
+function renderFaeRef(){
+  var crumbHtml = renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Справочник'}]);
+  return crumbHtml +
+    '<button class="back" data-go="home">← На главную</button>' +
+    '<h1>📚 Справочник Фаэруна</h1>' +
+    '<p class="subtitle">Единый компендиум D&D 5e: Классы и архетипы, Книга заклинаний по школам, Правила 2024, Алхимия, Оружие и Глоссарий терминов.</p>' +
+    '<div class="fae-rule"></div>' +
+
+    '<div class="fae-ref-search-wrap">' +
+      '<span class="fae-ref-search-icon">🔍</span>' +
+      '<input type="text" id="faeRefSearch" class="fae-ref-search-input" placeholder="Быстрый поиск по справочнику (классы, школы магии, заклинания, состояния, оружие, алхимия)..." autocomplete="off">' +
+    '</div>' +
+
+    '<div id="faeRefSearchResults" style="display:none;margin-bottom:20px;"></div>' +
+
+    '<div class="menu-list grid-2" id="faeRefDefaultCards">' +
+      '<div class="fae-card fae-card-clickable" data-go="class:fighter" role="button" tabindex="0">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="fae-card-title"><span>⚔️</span> Классы и Архетипы</div>' +
+          '<div class="fae-card-desc">Воин, стили боя, тактики превосходства, владение оружием и подклассы (Чемпион, Мастер, Пси-воин, Мистический рыцарь)</div>' +
+        '</div>' +
+        '<div class="fae-card-arrow">→</div>' +
+      '</div>' +
+
+      '<div class="fae-card fae-card-clickable" data-go="magic" role="button" tabindex="0">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="fae-card-title"><span>✨</span> Книга заклинаний</div>' +
+          '<div class="fae-card-desc">База заклинаний по 8 школам магии: заговоры, круги 1–9, ритуалы, концентрация и сотворение чар</div>' +
+        '</div>' +
+        '<div class="fae-card-arrow">→</div>' +
+      '</div>' +
+
+      '<div class="fae-card fae-card-clickable" data-go="rules2024" role="button" tabindex="0">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="fae-card-title"><span>📜</span> Правила D&D 2024</div>' +
+          '<div class="fae-card-desc">Мастерство оружия (Cleave, Graze, Vex...), 14 состояний, уровни истощения 1–6, укрытие и отдых</div>' +
+        '</div>' +
+        '<div class="fae-card-arrow">→</div>' +
+      '</div>' +
+
+      '<div class="fae-card fae-card-clickable" data-go="alchemy" role="button" tabindex="0">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="fae-card-title"><span>🧪</span> Алхимия и Зелья</div>' +
+          '<div class="fae-card-desc">Рецепты зелий, экстракты, склад трав и реагентов, сложность варки (СЛ) и наборы мастера</div>' +
+        '</div>' +
+        '<div class="fae-card-arrow">→</div>' +
+      '</div>' +
+
+      '<div class="fae-card fae-card-clickable" data-go="weapons" role="button" tabindex="0">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="fae-card-title"><span>🗡️</span> Оружие и Свойства</div>' +
+          '<div class="fae-card-desc">Таблица оружия: урон, свойства (фехтовальное, тяжелое, универсальное) и свойства мастерства оружия</div>' +
+        '</div>' +
+        '<div class="fae-card-arrow">→</div>' +
+      '</div>' +
+
+      '<div class="fae-card fae-card-clickable" data-go="glossary" role="button" tabindex="0">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="fae-card-title"><span>📖</span> Глоссарий терминов</div>' +
+          '<div class="fae-card-desc">Справочник терминов: Преимущество, Спасброски от смерти, Инициатива, Бонус мастерства и Действия в бою</div>' +
+        '</div>' +
+        '<div class="fae-card-arrow">→</div>' +
+      '</div>' +
+    '</div>';
+}
+
+function wireFaeRef(){
+  var searchInput = document.getElementById('faeRefSearch');
+  var resultsContainer = document.getElementById('faeRefSearchResults');
+  var defaultCards = document.getElementById('faeRefDefaultCards');
+
+  if(searchInput && resultsContainer && defaultCards){
+    searchInput.addEventListener('input', function(){
+      var q = this.value.trim().toLowerCase();
+      if(q.length < 2){
+        resultsContainer.style.display = 'none';
+        resultsContainer.innerHTML = '';
+        defaultCards.style.display = 'grid';
+        return;
+      }
+
+      var matches = [];
+
+      // 1. Spells
+      if(Array.isArray(SPELLS)){
+        SPELLS.forEach(function(sp){
+          var n = (sp.name || '').toLowerCase();
+          var sc = (sp.school || '').toLowerCase();
+          var d = (sp.desc || '').toLowerCase();
+          if(n.indexOf(q) !== -1 || sc.indexOf(q) !== -1 || d.indexOf(q) !== -1){
+            matches.push({
+              badge: '✨ Заклинание',
+              title: sp.name + (sp.level ? (' (' + sp.level + ' круг)') : ' (Заговор)'),
+              desc: (sp.school ? ('Школа: ' + sp.school + ' • ') : '') + (sp.desc ? sp.desc.slice(0, 140) + '...' : ''),
+              go: 'schoolSpells:' + (sp.school || 'evocation')
+            });
+          }
+        });
+      }
+
+      // 2. Weapon Mastery
+      if(typeof WEAPON_MASTERY !== 'undefined' && Array.isArray(WEAPON_MASTERY)){
+        WEAPON_MASTERY.forEach(function(wm){
+          var ru = (wm.ru || '').toLowerCase();
+          var orig = (wm.orig || '').toLowerCase();
+          var desc = (wm.desc || '').toLowerCase();
+          if(ru.indexOf(q) !== -1 || orig.indexOf(q) !== -1 || desc.indexOf(q) !== -1){
+            matches.push({
+              badge: '⚔️ Мастерство оружия',
+              title: wm.ru + (wm.orig ? (' (' + wm.orig + ')') : ''),
+              desc: wm.desc,
+              go: 'rules2024'
+            });
+          }
+        });
+      }
+
+      // 3. Conditions
+      if(typeof CONDITIONS_2024 !== 'undefined' && Array.isArray(CONDITIONS_2024)){
+        CONDITIONS_2024.forEach(function(c){
+          var ru = (c.ru || '').toLowerCase();
+          var orig = (c.orig || '').toLowerCase();
+          var desc = (c.desc || '').toLowerCase();
+          if(ru.indexOf(q) !== -1 || orig.indexOf(q) !== -1 || desc.indexOf(q) !== -1){
+            matches.push({
+              badge: '⚠️ Состояние',
+              title: c.ru + (c.orig ? (' (' + c.orig + ')') : ''),
+              desc: c.desc,
+              go: 'rules2024'
+            });
+          }
+        });
+      }
+
+      // 4. Recipes
+      if(Array.isArray(RECIPES)){
+        RECIPES.forEach(function(rc){
+          var rn = (rc.name || '').toLowerCase();
+          var eff = (rc.effect || '').toLowerCase();
+          if(rn.indexOf(q) !== -1 || eff.indexOf(q) !== -1){
+            matches.push({
+              badge: '🧪 Рецепт алхимии',
+              title: rc.name,
+              desc: rc.effect || 'Алхимическое зелье или масло',
+              go: 'recipes'
+            });
+          }
+        });
+      }
+
+      // 5. Cover & Exhaustion
+      if(typeof COVER_RULES !== 'undefined' && Array.isArray(COVER_RULES)){
+        COVER_RULES.forEach(function(cr){
+          if((cr.ru || '').toLowerCase().indexOf(q) !== -1 || (cr.desc || '').toLowerCase().indexOf(q) !== -1){
+            matches.push({
+              badge: '🛡️ Правило укрытия',
+              title: cr.ru,
+              desc: cr.desc,
+              go: 'rules2024'
+            });
+          }
+        });
+      }
+
+      // 6. Glossary
+      if(typeof GLOSSARY !== 'undefined' && Array.isArray(GLOSSARY)){
+        GLOSSARY.forEach(function(gl){
+          var gru = (gl.ru || '').toLowerCase();
+          var gorig = (gl.orig || '').toLowerCase();
+          var gdesc = (gl.desc || '').toLowerCase();
+          if(gru.indexOf(q) !== -1 || gorig.indexOf(q) !== -1 || gdesc.indexOf(q) !== -1){
+            matches.push({
+              badge: '📖 Глоссарий',
+              title: gl.ru + (gl.orig ? (' (' + gl.orig + ')') : ''),
+              desc: gl.desc,
+              go: 'glossary'
+            });
+          }
+        });
+      }
+
+      defaultCards.style.display = 'none';
+      resultsContainer.style.display = 'block';
+
+      if(matches.length === 0){
+        resultsContainer.innerHTML = '<div style="background:rgba(22,26,32,0.8);border:1px solid rgba(201,164,92,0.25);border-radius:8px;padding:18px;text-align:center;color:#94a3b8;">' +
+          'Ничего не найдено по запросу «' + escapeHtml(q) + '». Попробуйте изменить поисковое слово.' +
+        '</div>';
+      } else {
+        var resHtml = '<div style="margin-bottom:10px;font-size:12px;color:#c9a45c;font-family:\'Cinzel\',serif;">' +
+          'Найдено результатов: <b>' + matches.length + '</b>' +
+        '</div><div class="menu-list">';
+        matches.slice(0, 30).forEach(function(m){
+          resHtml += '<div class="fae-ref-card fae-card-clickable" data-go="' + escapeAttr(m.go) + '" role="button" tabindex="0">' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="font-size:11px;color:#c9a45c;font-weight:700;margin-bottom:2px;letter-spacing:0.05em;">' + escapeHtml(m.badge) + '</div>' +
+              '<div class="fae-card-title" style="margin-bottom:3px;">' + escapeHtml(m.title) + '</div>' +
+              '<div class="fae-card-desc">' + escapeHtml(m.desc) + '</div>' +
+            '</div>' +
+            '<div class="fae-card-arrow">→</div>' +
+          '</div>';
+        });
+        resHtml += '</div>';
+        resultsContainer.innerHTML = resHtml;
+
+        resultsContainer.querySelectorAll('[data-go]').forEach(function(el){
+          el.addEventListener('click', function(){
+            navigate(this.getAttribute('data-go'));
+          });
+        });
+      }
+    });
+  }
+}
+
+function renderFaeData(){
+  var chars = Array.isArray(CHARACTERS) ? CHARACTERS : [];
+  var activeChar = getActiveFaerunCharacter();
+  var camp = loadFaerunCampaign();
+
+  var charOptions = chars.map(function(c){
+    var isSel = activeChar && activeChar.id === c.id;
+    var sub = [c.species, c.className ? (c.className + ' ' + (c.level||1) + ' ур.') : null].filter(Boolean).join(' • ');
+    return '<option value="' + escapeAttr(c.id) + '" ' + (isSel ? 'selected' : '') + '>' +
+      getFaerunClassIcon(c.className) + ' ' + escapeHtml(c.name || 'Безымянный герой') + ' (' + escapeHtml(sub || 'Герой') + ')' +
+    '</option>';
+  }).join('');
+
+  var cName = activeChar ? (activeChar.name || '') : '';
+  var cClass = activeChar ? (activeChar.className || '') : '';
+  var cSubclass = activeChar ? (activeChar.subclass || '') : '';
+  var cLevel = activeChar ? (activeChar.level || 1) : 1;
+  var cSpecies = activeChar ? (activeChar.species || '') : '';
+  var cHpCur = activeChar ? (activeChar.hpCurrent != null ? activeChar.hpCurrent : (activeChar.hp != null ? activeChar.hp : 20)) : 20;
+  var cHpMax = activeChar ? (activeChar.hpMax != null ? activeChar.hpMax : (activeChar.maxHp != null ? activeChar.maxHp : 20)) : 20;
+  var cAc = activeChar ? (activeChar.ac != null ? activeChar.ac : 10) : 10;
+  var cSpeed = activeChar ? (activeChar.speed != null ? activeChar.speed : 30) : 30;
+
+  var heroSectionHtml = '';
+  if(chars.length === 0){
+    heroSectionHtml = '<div class="sheet-section fae-data-section">' +
+      '<div class="section-label">👤 РОСТЕР ПЕРСОНАЖЕЙ D&D</div>' +
+      '<p style="color:#cbd5e1;font-size:13.5px;margin-bottom:12px;">В вашем ростере пока нет искателей приключений. Создайте первого героя!</p>' +
+      '<button class="btn-primary" data-go="sheet:new">➕ Создать нового персонажа</button>' +
+    '</div>';
+  } else {
+    heroSectionHtml = '<div class="sheet-section fae-data-section">' +
+      '<div class="section-label" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+        '<span>👤 УПРАВЛЕНИЕ РОСТЕРОМ & АКТИВНЫЙ ГЕРОЙ</span>' +
+        '<span style="font-size:12px;color:var(--ink-dim);">Всего в ростере: ' + chars.length + '</span>' +
+      '</div>' +
+      '<p class="desc">Переключайтесь между героями отряда на лету. Выбранный герой отображается в шапке Фаэруна и получает найденные предметы.</p>' +
+
+      '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:14px 0 12px 0;">' +
+        '<div style="flex:1;min-width:240px;">' +
+          '<label style="display:block;font-size:12px;color:#c9a45c;margin-bottom:4px;font-weight:600;font-family:\'Cinzel\',serif;">Активный искатель приключений:</label>' +
+          '<select id="faeDataProfileSelect" style="width:100%;font-size:14px;padding:9px 12px;border-radius:4px;background:#0f172a;color:#f8fafc;border:1px solid rgba(201,164,92,0.4);">' +
+            charOptions +
+          '</select>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button class="btn btn-primary" data-go="sheet:new" title="Создать нового персонажа">➕ Новый герой</button>' +
+          '<button class="btn btn-ghost" id="faeDataCloneCharBtn" title="Дублировать текущего персонажа">📋 Копия</button>' +
+          '<button class="btn btn-ghost" id="faeDataOpenSheetBtn" title="Открыть полный лист персонажа">✏️ Лист героя</button>' +
+          '<button class="btn btn-ghost" id="faeDataDelCharBtn" style="color:#f87171;border-color:rgba(239,68,68,0.4);" title="Удалить героя">🗑️ Удалить</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="fae-data-card">' +
+        '<div style="font-size:12px;font-weight:700;color:#c9a45c;letter-spacing:0.1em;font-family:\'Cinzel\',serif;margin-bottom:12px;">' +
+          '⚡ БЫСТРЫЕ ХАРАКТЕРИСТИКИ: ' + escapeHtml(cName || 'Герой') +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;">' +
+          '<div>' +
+            '<label style="display:block;font-size:11px;color:#94a3b8;margin-bottom:3px;">Имя персонажа</label>' +
+            '<input type="text" id="faeDataInName" value="' + escapeAttr(cName) + '" style="width:100%;box-sizing:border-box;padding:8px 10px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#fff;border-radius:4px;">' +
+          '</div>' +
+          '<div>' +
+            '<label style="display:block;font-size:11px;color:#94a3b8;margin-bottom:3px;">Раса / Наследие</label>' +
+            '<input type="text" id="faeDataInSpecies" value="' + escapeAttr(cSpecies) + '" style="width:100%;box-sizing:border-box;padding:8px 10px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#fff;border-radius:4px;">' +
+          '</div>' +
+          '<div>' +
+            '<label style="display:block;font-size:11px;color:#94a3b8;margin-bottom:3px;">Класс</label>' +
+            '<input type="text" id="faeDataInClass" value="' + escapeAttr(cClass) + '" style="width:100%;box-sizing:border-box;padding:8px 10px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#fff;border-radius:4px;">' +
+          '</div>' +
+          '<div>' +
+            '<label style="display:block;font-size:11px;color:#94a3b8;margin-bottom:3px;">Подкласс / Архетип</label>' +
+            '<input type="text" id="faeDataInSubclass" value="' + escapeAttr(cSubclass) + '" style="width:100%;box-sizing:border-box;padding:8px 10px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#fff;border-radius:4px;">' +
+          '</div>' +
+          '<div>' +
+            '<label style="display:block;font-size:11px;color:#94a3b8;margin-bottom:3px;">Уровень</label>' +
+            '<input type="number" id="faeDataInLevel" min="1" max="20" value="' + escapeAttr(cLevel) + '" style="width:100%;box-sizing:border-box;padding:8px 10px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#fff;border-radius:4px;">' +
+          '</div>' +
+          '<div>' +
+            '<label style="display:block;font-size:11px;color:#94a3b8;margin-bottom:3px;">Хиты: Тек / Макс</label>' +
+            '<div style="display:flex;gap:6px;">' +
+              '<input type="number" id="faeDataInHpCur" value="' + escapeAttr(cHpCur) + '" style="width:50%;box-sizing:border-box;padding:8px 10px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#fff;border-radius:4px;" title="Текущие HP">' +
+              '<input type="number" id="faeDataInHpMax" value="' + escapeAttr(cHpMax) + '" style="width:50%;box-sizing:border-box;padding:8px 10px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#fff;border-radius:4px;" title="Максимальные HP">' +
+            '</div>' +
+          '</div>' +
+          '<div>' +
+            '<label style="display:block;font-size:11px;color:#94a3b8;margin-bottom:3px;">КД (Класс Доспеха)</label>' +
+            '<input type="number" id="faeDataInAc" value="' + escapeAttr(cAc) + '" style="width:100%;box-sizing:border-box;padding:8px 10px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#fff;border-radius:4px;">' +
+          '</div>' +
+          '<div>' +
+            '<label style="display:block;font-size:11px;color:#94a3b8;margin-bottom:3px;">Скорость (футы)</label>' +
+            '<input type="number" id="faeDataInSpeed" value="' + escapeAttr(cSpeed) + '" style="width:100%;box-sizing:border-box;padding:8px 10px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#fff;border-radius:4px;">' +
+          '</div>' +
+        '</div>' +
+        '<div style="margin-top:14px;">' +
+          '<button class="btn btn-primary" id="faeDataSaveCharBtn">✓ Сохранить изменения героя</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  var curKey = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Данные & Кампания'}]) +
+    '<button class="back" data-go="home">← На главную</button>' +
+    '<h1>💾 Данные & Кампания</h1>' +
+    '<p class="subtitle">Управление ростером героев, хроники приключения, интеграция Gemini AI, квота памяти и резервные копии.</p>' +
+    '<div class="fae-rule"></div>' +
+
+    heroSectionHtml +
+
+    '<div class="sheet-section fae-data-section">' +
+      '<div class="section-label">📜 ХРОНИКИ КАМПАНИИ & ЗАМЕТКИ МАСТЕРА</div>' +
+      '<div class="desc">Сюжетные события, цели партии, открытые квесты, слухи в тавернах и памятки для ведущего.</div>' +
+      '<div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;">' +
+        '<div>' +
+          '<label style="display:block;font-size:11.5px;color:#c9a45c;margin-bottom:4px;font-family:\'Cinzel\',serif;">Название приключения / модуля:</label>' +
+          '<input type="text" id="faeCampaignTitle" value="' + escapeAttr(camp.title || '') + '" style="width:100%;box-sizing:border-box;padding:9px 12px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#fff;border-radius:4px;">' +
+        '</div>' +
+        '<div>' +
+          '<label style="display:block;font-size:11.5px;color:#c9a45c;margin-bottom:4px;font-family:\'Cinzel\',serif;">Текущая локация / город:</label>' +
+          '<input type="text" id="faeCampaignLocation" value="' + escapeAttr(camp.location || '') + '" style="width:100%;box-sizing:border-box;padding:9px 12px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#fff;border-radius:4px;">' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-top:10px;">' +
+        '<label style="display:block;font-size:11.5px;color:#c9a45c;margin-bottom:4px;font-family:\'Cinzel\',serif;">Заметки партии и журнал событий:</label>' +
+        '<textarea id="faeCampaignNotes" rows="5" style="width:100%;box-sizing:border-box;padding:10px 12px;background:#0b0f17;border:1px solid rgba(201,164,92,0.3);color:#cbd5e1;border-radius:4px;font-family:\'EB Garamond\',serif;font-size:14px;line-height:1.5;">' + escapeHtml(camp.notes || '') + '</textarea>' +
+      '</div>' +
+      '<div style="margin-top:12px;">' +
+        '<button class="btn btn-primary" id="faeSaveCampaignBtn">💾 Сохранить заметки кампании</button>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="sheet-section fae-data-section" id="faeGeminiSection">' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
+        '<span style="font-size:22px;">🤖</span>' +
+        '<div>' +
+          '<div style="font-weight:700;font-size:13.5px;color:#c9a45c;font-family:\'Cinzel\',serif;">GOOGLE GEMINI AI // СТАНДАРТ GEMINI-3.8-FLASH</div>' +
+          '<div style="font-size:12px;color:#94a3b8;">Генератор заклинаний, артефактов и черт Фаэруна на базе нейросети</div>' +
+        '</div>' +
+      '</div>' +
+      '<p style="font-size:12px;color:#cbd5e1;line-height:1.45;margin:0 0 12px 0;">' +
+        'Ключ хранится исключительно локально в браузере. Бесплатный ключ создаётся в <a href="https://aistudio.google.com/" target="_blank" style="color:#f59e0b;text-decoration:underline;">Google AI Studio</a>.' +
+      '</p>' +
+      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">' +
+        '<input type="password" id="faeDataGeminiKey" value="' + escapeAttr(curKey) + '" placeholder="Вставьте ключ AIzaSy..." style="flex:1;min-width:220px;box-sizing:border-box;background:#0b0f17;border:1px solid rgba(201,164,92,0.35);color:#fff;padding:9px 12px;border-radius:4px;font-family:monospace;font-size:13px;">' +
+        '<button class="btn btn-primary" id="faeSaveGeminiKeyBtn">💾 Сохранить API Ключ</button>' +
+      '</div>' +
+    '</div>' +
+
+    (typeof AppStorage !== 'undefined' ? AppStorage.renderWidget('fae') : '') +
+
+    '<div class="sheet-section fae-data-section">' +
+      '<div class="section-label">📦 ПОЛНЫЙ ЭКСПОРТ И ИМПОРТ D&D 5E</div>' +
+      '<div class="desc">' +
+        'Резервная копия сохраняет весь мир Фаэруна: карточки всех героев ростера, базу заклинаний, рецепты алхимии, склад трав и журнал кампании в один JSON-файл.' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">' +
+        '<button class="btn btn-primary" id="faeExportAllBtn">📥 Экспорт в файл JSON</button>' +
+        '<button class="btn btn-ghost" id="faeImportBtn">📤 Импорт из файла JSON</button>' +
+        '<input type="file" id="faeImportFile" accept="application/json,.json" style="display:none;">' +
+      '</div>' +
+    '</div>';
+}
+
+function exportAllFaerunData(){
+  try{
+    var payload = {
+      kind: 'faerun',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      activeCharId: localStorage.getItem('ttc_faerun_active_id') || '',
+      campaign: loadFaerunCampaign(),
+      characters: Array.isArray(CHARACTERS) ? CHARACTERS : [],
+      spells: Array.isArray(SPELLS) ? SPELLS : [],
+      recipes: Array.isArray(RECIPES) ? RECIPES : [],
+      ingredients: Array.isArray(INGREDIENTS) ? INGREDIENTS : []
+    };
+    var jsonStr = JSON.stringify(payload, null, 2);
+    var blob = new Blob([jsonStr], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var dateStr = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = 'faerun_dnd_backup_' + dateStr + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }catch(e){
+    alert('Ошибка экспорта: ' + e.message);
+  }
+}
+
+function importAllFaerunData(file){
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var data = JSON.parse(e.target.result);
+      if(!data || typeof data !== 'object'){
+        alert('Ошибка: файл не является корректным JSON.');
+        return;
+      }
+      var countChars = 0, countSpells = 0, countRecipes = 0;
+      if(Array.isArray(data.characters)){
+        CHARACTERS = data.characters;
+        saveCharactersToStorage();
+        countChars = CHARACTERS.length;
+      }
+      if(Array.isArray(data.spells)){
+        SPELLS = data.spells;
+        saveSpellsToStorage();
+        countSpells = SPELLS.length;
+      }
+      if(Array.isArray(data.recipes)){
+        RECIPES = data.recipes;
+        saveRecipesToStorage();
+        countRecipes = RECIPES.length;
+      }
+      if(Array.isArray(data.ingredients)){
+        INGREDIENTS = data.ingredients;
+        saveIngredientsToStorage();
+      }
+      if(data.campaign && typeof data.campaign === 'object'){
+        saveFaerunCampaign(data.campaign);
+      }
+      if(data.activeCharId){
+        setActiveFaerunCharacter(data.activeCharId);
+      } else if(CHARACTERS.length > 0){
+        setActiveFaerunCharacter(CHARACTERS[0].id);
+      }
+      alert('✓ Данные Фаэруна успешно импортированы!\n' +
+        '• Персонажей: ' + countChars + '\n' +
+        '• Заклинаний: ' + countSpells + '\n' +
+        '• Рецептов: ' + countRecipes);
+      render();
+    }catch(err){
+      alert('Ошибка чтения файла резервной копии: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function wireFaeData(){
+  var g = function(id){ return document.getElementById(id); };
+
+  if(typeof AppStorage !== 'undefined' && AppStorage.wireWidget) AppStorage.wireWidget('fae');
+
+  var sel = g('faeDataProfileSelect');
+  if(sel){
+    sel.addEventListener('change', function(){
+      setActiveFaerunCharacter(this.value);
+      render();
+    });
+  }
+
+  var cloneBtn = g('faeDataCloneCharBtn');
+  if(cloneBtn){
+    cloneBtn.addEventListener('click', function(){
+      var active = getActiveFaerunCharacter();
+      if(!active){
+        alert('Нет активного персонажа для клонирования.');
+        return;
+      }
+      var copy = JSON.parse(JSON.stringify(active));
+      copy.id = genId();
+      copy.name = (copy.name || 'Герой') + ' (Копия)';
+      CHARACTERS.push(copy);
+      saveCharactersToStorage();
+      setActiveFaerunCharacter(copy.id);
+      alert('✓ Создана копия персонажа «' + copy.name + '»!');
+      render();
+    });
+  }
+
+  var openSheetBtn = g('faeDataOpenSheetBtn');
+  if(openSheetBtn){
+    openSheetBtn.addEventListener('click', function(){
+      var active = getActiveFaerunCharacter();
+      if(active && active.id) navigate('sheet:' + active.id);
+      else navigate('characters');
+    });
+  }
+
+  var delBtn = g('faeDataDelCharBtn');
+  if(delBtn){
+    delBtn.addEventListener('click', function(){
+      var active = getActiveFaerunCharacter();
+      if(!active){
+        alert('Нет персонажа для удаления.');
+        return;
+      }
+      if(!confirm('Удалить персонажа «' + (active.name || 'Безымянный') + '» из ростера? Это действие необратимо.')) return;
+      CHARACTERS = CHARACTERS.filter(function(c){ return c.id !== active.id; });
+      saveCharactersToStorage();
+      if(CHARACTERS.length > 0) setActiveFaerunCharacter(CHARACTERS[0].id);
+      else setActiveFaerunCharacter(null);
+      alert('Персонаж удалён.');
+      render();
+    });
+  }
+
+  var saveCharBtn = g('faeDataSaveCharBtn');
+  if(saveCharBtn){
+    saveCharBtn.addEventListener('click', function(){
+      var active = getActiveFaerunCharacter();
+      if(!active){
+        alert('Нет активного персонажа.');
+        return;
+      }
+      var inName = g('faeDataInName');
+      var inSpecies = g('faeDataInSpecies');
+      var inClass = g('faeDataInClass');
+      var inSubclass = g('faeDataInSubclass');
+      var inLevel = g('faeDataInLevel');
+      var inHpCur = g('faeDataInHpCur');
+      var inHpMax = g('faeDataInHpMax');
+      var inAc = g('faeDataInAc');
+      var inSpeed = g('faeDataInSpeed');
+
+      if(inName) active.name = inName.value.trim() || 'Герой';
+      if(inSpecies) active.species = inSpecies.value.trim();
+      if(inClass) active.className = inClass.value.trim();
+      if(inSubclass) active.subclass = inSubclass.value.trim();
+      if(inLevel) active.level = Math.max(1, parseInt(inLevel.value, 10) || 1);
+      if(inHpCur) active.hpCurrent = parseInt(inHpCur.value, 10) || 0;
+      if(inHpMax) active.hpMax = active.maxHp = Math.max(1, parseInt(inHpMax.value, 10) || 1);
+      if(inAc) active.ac = parseInt(inAc.value, 10) || 10;
+      if(inSpeed) active.speed = parseInt(inSpeed.value, 10) || 30;
+
+      saveCharactersToStorage();
+      if(typeof paintShBar === 'function') paintShBar();
+      alert('✓ Данные персонажа «' + active.name + '» успешно сохранены!');
+      render();
+    });
+  }
+
+  var saveCampBtn = g('faeSaveCampaignBtn');
+  if(saveCampBtn){
+    saveCampBtn.addEventListener('click', function(){
+      var titleEl = g('faeCampaignTitle');
+      var locEl = g('faeCampaignLocation');
+      var notesEl = g('faeCampaignNotes');
+      var camp = {
+        title: titleEl ? titleEl.value.trim() : '',
+        location: locEl ? locEl.value.trim() : '',
+        notes: notesEl ? notesEl.value.trim() : ''
+      };
+      saveFaerunCampaign(camp);
+      alert('✓ Заметки кампании сохранены!');
+    });
+  }
+
+  var saveKeyBtn = g('faeSaveGeminiKeyBtn');
+  if(saveKeyBtn){
+    saveKeyBtn.addEventListener('click', function(){
+      var inp = g('faeDataGeminiKey');
+      var key = inp ? inp.value.trim() : '';
+      if(typeof window.saveGeminiApiKey === 'function'){
+        window.saveGeminiApiKey(key);
+      } else {
+        try{
+          if(key){
+            localStorage.setItem('ttc_gemini_api_key', key);
+            localStorage.setItem('gemini_api_key', key);
+          } else {
+            localStorage.removeItem('ttc_gemini_api_key');
+            localStorage.removeItem('gemini_api_key');
+          }
+        }catch(e){}
+      }
+      alert(key ? '✓ API-ключ Gemini успешно сохранён!' : 'API-ключ удалён.');
+    });
+  }
+
+  var expBtn = g('faeExportAllBtn');
+  if(expBtn){
+    expBtn.addEventListener('click', function(){
+      exportAllFaerunData();
+    });
+  }
+
+  var impBtn = g('faeImportBtn');
+  var impFile = g('faeImportFile');
+  if(impBtn && impFile){
+    impBtn.addEventListener('click', function(){
+      impFile.click();
+    });
+    impFile.addEventListener('change', function(){
+      if(this.files && this.files[0]){
+        importAllFaerunData(this.files[0]);
+        this.value = '';
+      }
+    });
+  }
+}
+
 function wireEvents(){
   document.querySelectorAll('[data-go]').forEach(el=>{
     el.addEventListener('click', ()=>{
@@ -3590,6 +4236,8 @@ function wireEvents(){
     });
   });
   if(view.screen === 'faeGen') wireFaeGen();
+  if(view.screen === 'faeRef' || view.screen === 'ref') wireFaeRef();
+  if(view.screen === 'faeData' || view.screen === 'data') wireFaeData();
   enhanceAllCustomSelects();
 }
 
@@ -3617,6 +4265,8 @@ function navigate(val){
   else if(parts[0]==='class') view = {screen:'class', cls:parts[1]};
   else if(parts[0]==='sub') view = {screen:'sub', cls:parts[1], sub:parts[2]};
   else if(parts[0]==='faeGen') view = {screen:'faeGen'};
+  else if(parts[0]==='faeRef' || parts[0]==='ref') view = {screen:'faeRef'};
+  else if(parts[0]==='faeData' || parts[0]==='data') view = {screen:'faeData'};
   render();
   window.scrollTo(0,0);
 }
@@ -3670,7 +4320,7 @@ var AppStorage = window.AppStorage = {
         var size = k.length + val.length;
         totalBytes += size;
 
-        if(k.indexOf('_ai_hist_') !== -1 || k.indexOf('ai_hist') !== -1){
+        if(k.indexOf('_ai_hist_') !== -1 || k.indexOf('ai_hist') !== -1 || k.indexOf('fae_ai_') !== -1 || k.indexOf('hb_ai_') !== -1){
           cats.ai.bytes += size; cats.ai.count++; cats.ai.keys.push(k);
         } else if(k.indexOf('profile') !== -1 || k === 'sh_meta' || k === 'me_character' || k.indexOf('active_profile') !== -1 || k === 'ttc_characters' || k === 'ttc_sh_meta'){
           cats.profiles.bytes += size; cats.profiles.count++; cats.profiles.keys.push(k);
@@ -3709,7 +4359,7 @@ var AppStorage = window.AppStorage = {
       for(var i = 0; i < localStorage.length; i++){
         var k = localStorage.key(i);
         if(!k) continue;
-        var isAi = (k.indexOf('_ai_hist_') !== -1 || k.indexOf('ai_hist') !== -1);
+        var isAi = (k.indexOf('_ai_hist_') !== -1 || k.indexOf('ai_hist') !== -1 || k.indexOf('fae_ai_') !== -1 || k.indexOf('hb_ai_') !== -1);
         if(!isAi) continue;
 
         if(mode === 'sh' && k.indexOf('sh_ai_hist_') === 0) keysToRemove.push(k);
@@ -3717,6 +4367,8 @@ var AppStorage = window.AppStorage = {
         else if(mode === 'me' && k.indexOf('me_ai_hist_') === 0) keysToRemove.push(k);
         else if(mode === 'wi' && k.indexOf('wi_ai_hist_') === 0) keysToRemove.push(k);
         else if(mode === 'wz' && k.indexOf('wz_ai_hist_') === 0) keysToRemove.push(k);
+        else if((mode === 'fae' || mode === 'faerun') && (k.indexOf('fae_ai_') === 0 || k.indexOf('ttc_fae_') === 0)) keysToRemove.push(k);
+        else if((mode === 'hb' || mode === 'homebrew') && (k.indexOf('hb_ai_') === 0 || k.indexOf('ttc_hb_ai_') === 0)) keysToRemove.push(k);
         else if(!mode || mode === 'all') keysToRemove.push(k);
       }
 
@@ -4042,6 +4694,98 @@ var AppStorage = window.AppStorage = {
         '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--wz-border, rgba(212, 175, 55, 0.25));">' +
           '<button class="btn btn-primary" id="wzStorageCleanAiBtn" style="font-size:12px;">🧹 Очистить архив ИИ (' + AppStorage.formatBytes(info.categories.ai.bytes) + ')</button>' +
           '<button class="btn btn-ghost" id="wzStorageIntegrityBtn" style="font-size:12px;border:1px solid var(--wz-border, rgba(212, 175, 55, 0.35));color:#e2e8f0;">🛡️ Проверить целостность</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    if(mode === 'fae' || mode === 'faerun'){
+      return '<div class="sheet-section fae-data-section" id="faeStorageSection" style="background:rgba(22, 26, 32, 0.95);border:1px solid rgba(201, 164, 92, 0.35);border-left:4px solid #c9a45c;border-radius:6px;padding:16px 20px;margin-bottom:20px;box-shadow:0 4px 18px rgba(0,0,0,0.4);">' +
+        '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:#c9a45c;font-weight:700;margin-bottom:12px;font-family:\'Cinzel\',serif;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+          '<span>💾 ХРАНИЛИЩЕ ФАЭРУНА // ЗАЩИТА ДАННЫХ D&D</span>' +
+          statusBadge +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#cbd5e1;margin-bottom:12px;line-height:1.45;font-family:\'EB Garamond\',serif;font-style:italic;">' +
+          'Мониторинг квоты браузера (лимит 5.0 МБ). Все листы персонажей, заклинания, рецепты алхимии и журнал кампании защищены от переполнения.' +
+        '</div>' +
+        warningNotice +
+        '<div style="margin:12px 0 6px;">' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-dim);margin-bottom:5px;font-family:\'Cinzel\',serif;">' +
+            '<span>Занято: <b style="color:#c9a45c;">' + info.totalFormatted + '</b> / ' + info.maxFormatted + '</span>' +
+            '<span style="font-weight:700;color:' + barColor + ';">' + info.percent + '%</span>' +
+          '</div>' +
+          '<div style="width:100%;height:14px;background:rgba(0,0,0,0.5);border:1px solid rgba(201, 164, 92, 0.35);border-radius:4px;overflow:hidden;padding:1px;box-sizing:border-box;">' +
+            '<div style="height:100%;width:' + info.percent + '%;background:linear-gradient(90deg, #c9a45c, #f59e0b);border-radius:2px;transition:width 0.4s ease;box-shadow:0 0 8px ' + barColor + ';"></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;">' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid rgba(201, 164, 92, 0.25);border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">🤖 Буфер ИИ:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#fca5a5;">' + AppStorage.formatBytes(info.categories.ai.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid rgba(201, 164, 92, 0.25);border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">👤 Ростер героев:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#7dd3fc;">' + AppStorage.formatBytes(info.categories.profiles.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid rgba(201, 164, 92, 0.25);border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">✨ Книга заклинаний:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#c084fc;">' + AppStorage.formatBytes(info.categories.powers.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid rgba(201, 164, 92, 0.25);border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">🧪 Алхимия и рецепты:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#86efac;">' + AppStorage.formatBytes(info.categories.maps.bytes) + '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid rgba(201, 164, 92, 0.25);">' +
+          '<button class="btn btn-primary" id="faeStorageCleanAiBtn" style="font-size:12px;">🧹 Очистить архив ИИ (' + AppStorage.formatBytes(info.categories.ai.bytes) + ')</button>' +
+          '<button class="btn btn-ghost" id="faeStorageIntegrityBtn" style="font-size:12px;border:1px solid rgba(201, 164, 92, 0.35);color:#e2e8f0;">🛡️ Проверить целостность</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    if(mode === 'hb' || mode === 'homebrew'){
+      return '<div class="sheet-section" id="hbStorageSection" style="background:rgba(15, 23, 42, 0.95);border:1px solid rgba(56, 189, 248, 0.35);border-left:4px solid #38bdf8;border-radius:6px;padding:16px 20px;margin-bottom:20px;box-shadow:0 4px 18px rgba(0,0,0,0.4);">' +
+        '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:#38bdf8;font-weight:700;margin-bottom:12px;font-family:monospace;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+          '<span>💾 ХРАНИЛИЩЕ ТЕХНОЛОГИЙ // КВОТА LOCALSTORAGE</span>' +
+          statusBadge +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#94a3b8;margin-bottom:12px;line-height:1.45;">' +
+          'Мониторинг квоты браузера (лимит 5.0 МБ). Все киберимпланты, оружие, боевые дроны, досье персонажей и заметки мира защищены.' +
+        '</div>' +
+        warningNotice +
+        '<div style="margin:12px 0 6px;">' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-dim);margin-bottom:5px;font-family:monospace;">' +
+            '<span>Занято: <b style="color:#38bdf8;">' + info.totalFormatted + '</b> / ' + info.maxFormatted + '</span>' +
+            '<span style="font-weight:700;color:' + barColor + ';">' + info.percent + '%</span>' +
+          '</div>' +
+          '<div style="width:100%;height:14px;background:rgba(0,0,0,0.5);border:1px solid rgba(56, 189, 248, 0.35);border-radius:4px;overflow:hidden;padding:1px;box-sizing:border-box;">' +
+            '<div style="height:100%;width:' + info.percent + '%;background:linear-gradient(90deg, #38bdf8, #0ea5e9);border-radius:2px;transition:width 0.4s ease;box-shadow:0 0 8px ' + barColor + ';"></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;">' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid rgba(56, 189, 248, 0.25);border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">🤖 Буфер ИИ:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#fca5a5;">' + AppStorage.formatBytes(info.categories.ai.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid rgba(56, 189, 248, 0.25);border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">👤 Досье персонажей:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#7dd3fc;">' + AppStorage.formatBytes(info.categories.profiles.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid rgba(56, 189, 248, 0.25);border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">⚙️ Технологии & Записи:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#c084fc;">' + AppStorage.formatBytes(info.categories.powers.bytes) + '</div>' +
+          '</div>' +
+          '<div style="background:rgba(0,0,0,0.35);border:1px solid rgba(56, 189, 248, 0.25);border-radius:4px;padding:8px 10px;">' +
+            '<div style="font-size:11px;color:#94a3b8;">🌐 Сеттинг и заметки:</div>' +
+            '<div style="font-size:13px;font-weight:bold;color:#86efac;">' + AppStorage.formatBytes(info.categories.maps.bytes) + '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid rgba(56, 189, 248, 0.25);">' +
+          '<button class="btn btn-primary" id="hbStorageCleanAiBtn" style="font-size:12px;">🧹 Очистить архив ИИ (' + AppStorage.formatBytes(info.categories.ai.bytes) + ')</button>' +
+          '<button class="btn btn-ghost" id="hbStorageIntegrityBtn" style="font-size:12px;border:1px solid rgba(56, 189, 248, 0.35);color:#e2e8f0;">🛡️ Проверить целостность</button>' +
         '</div>' +
       '</div>';
     }
