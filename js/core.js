@@ -662,12 +662,17 @@ function renderDice(){
         return renderCrumb([{label:'Технологии', nav:'hbHome'},{label:'Бросок костей'}]) +
           '<button class="back" data-go="hbHome">← Назад</button>' +
           '<h1>Бросок костей</h1>' +
-          '<p class="subtitle">Виртуальные кости — как за столом, только d4 не теряется под диваном.</p>';
+          '<p class="subtitle">ТЕХНО-ДАЙСЫ // КИБЕРНЕТИКА & ПСИОНИКА</p>';
+      } else if(HB.mode==='wz'){
+        return renderCrumb([{label:'Волшебник', nav:'wzHome'},{label:'Бросок костей'}]) +
+          '<button class="back" data-go="wzHome">← Назад в гостиную</button>' +
+          '<h1>Бросок костей</h1>' +
+          '<p class="subtitle">МАГИЧЕСКИЕ ДАЙСЫ // ХОГВАРТС & ДУЭЛИ</p>';
       }
-      return renderCrumb([{label:'Компендиум', nav:'home'},{label:'Бросок костей'}]) +
+      return renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Бросок костей'}]) +
         '<button class="back" data-go="home">← Назад</button>' +
         '<h1>Бросок костей</h1>' +
-        '<p class="subtitle">Виртуальные кости — как за столом, только d4 не теряется под диваном.</p>';
+        '<p class="subtitle">КОСТИ ФАЭРУНА // D&D 5E БРОСОК КОСТЕЙ</p>';
     })()}
     <div class="rule"></div>
     <div class="dice-tray">${trayContent}</div>
@@ -1207,7 +1212,7 @@ function renderCommands(){
   const rest = CORE_COMMANDS.filter(c=>!c.featured);
 
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Общие команды'}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Общие команды'}])}
     <button class="back" data-go="home">← Назад</button>
     <h1>Общие команды</h1>
     <p class="subtitle">Клик копирует заготовку в буфер — вставьте и впишите итоговое число.</p>
@@ -1229,8 +1234,8 @@ function renderCommands(){
 
 function renderGlossaryHub(){
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Воин', nav:'class:fighter'},{label:'Справочник терминов'}])}
-    <button class="back" data-go="class:fighter">← Назад</button>
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Глоссарий терминов'}])}
+    <button class="back" data-go="faeRef">← В справочник</button>
     <h1>Справочник терминов</h1>
     <p class="subtitle">Понятия и техники, разложенные по темам.</p>
     <div class="rule"></div>
@@ -1295,8 +1300,8 @@ function renderWeapons(){
     : '';
 
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Воин', nav:'class:fighter'},{label:'Справочник терминов', nav:'glossary'},{label:'Бой оружием'}])}
-    <button class="back" data-go="glossary">← Назад</button>
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Глоссарий', nav:'glossary'},{label:'Бой оружием'}])}
+    <button class="back" data-go="glossary">← В глоссарий</button>
     <h1>Бой оружием</h1>
     <p class="subtitle">Выберите оружие — набор стоек, атак и терминов изменится под него.</p>
     <div class="rule"></div>
@@ -1318,7 +1323,7 @@ function renderMap(){
     `<button class="pill map-source-pill ${m.id===view.mapId?'active':''}" data-map-src="${m.id}">${m.label}</button>`
   ).join('');
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Карта Фаэруна'}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Карта Фаэруна'}])}
     <button class="back" data-go="home">← Назад</button>
     <h1>Карта Фаэруна</h1>
     <p class="subtitle">Выбери источник карты — встроена прямо на странице.</p>
@@ -1450,7 +1455,7 @@ function renderSheet(){
   const slotBoxes = Array.from({length:9},(_,i)=>i+1).map(slotBoxHtml).join('');
 
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Персонажи', nav:'characters'},{label: d.name || 'Новый персонаж'}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Персонажи', nav:'characters'},{label: d.name || 'Новый персонаж'}])}
     <button class="back" data-go="${isExisting ? ('charview:'+d.id) : 'characters'}">← Назад</button>
     <h1>${escapeHtml(d.name || 'Новый персонаж')}</h1>
     <p class="subtitle">Изменения применяются сразу, но сохраняются только по кнопке «Сохранить».</p>
@@ -1798,7 +1803,7 @@ function renderCharacterView(){
     </div>` : '';
 
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Персонажи', nav:'characters'},{label: d.name || 'Без имени'}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Персонажи', nav:'characters'},{label: d.name || 'Без имени'}])}
     <button class="back" data-go="characters">← Назад</button>
 
     <div class="char-view-header">
@@ -1895,8 +1900,8 @@ function renderCharacterView(){
 
 function renderRules2024(){
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Правила 2024'}])}
-    <button class="back" data-go="home">← Назад</button>
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Правила 2024'}])}
+    <button class="back" data-go="faeRef">← В справочник</button>
     <h1>Правила 2024</h1>
     <p class="subtitle">Ключевые механики редакции 2024 года. Клик по карточке копирует название в буфер.</p>
     <div class="rule"></div>
@@ -2013,9 +2018,9 @@ function attemptBrew(recipeId){
 
 function renderAlchemyHub(){
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Алхимия'}])}
-    <button class="back" data-go="home">← Назад</button>
-    <h1>Алхимия</h1>
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Алхимия и Зелья'}])}
+    <button class="back" data-go="faeRef">← В справочник</button>
+    <h1>Алхимия и Зелья</h1>
     <p class="subtitle">Рецепты, запасы ингредиентов и справочник по крафту.</p>
     <div class="rule"></div>
     <div class="menu-list">
@@ -2047,7 +2052,7 @@ function renderAlchemyHub(){
 function renderRecipes(){
   const cards = RECIPES.map(recipeCardHtml).join('') || '<div class="char-empty">Пока нет рецептов.</div>';
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Алхимия', nav:'alchemy'},{label:'Рецепты'}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Алхимия', nav:'alchemy'},{label:'Рецепты'}])}
     <button class="back" data-go="alchemy">← Назад</button>
     <h1>Рецепты</h1>
     <p class="subtitle">«Сварить» списывает ингредиенты из запасов, если их хватает. Добавляй новые по мере открытия в игре.</p>
@@ -2059,7 +2064,7 @@ function renderRecipes(){
 
 function renderAlchemyDC(){
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Алхимия', nav:'alchemy'},{label:'Справочник СЛ'}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Алхимия', nav:'alchemy'},{label:'Справочник СЛ'}])}
     <button class="back" data-go="alchemy">← Назад</button>
     <h1>Справочник СЛ и крафта</h1>
     <p class="subtitle">Ориентировочные сложности и правила изготовления — по DMG, на усмотрение мастера.</p>
@@ -2084,7 +2089,7 @@ function ingredientRowHtml(item){
 function renderStock(){
   const rows = INGREDIENTS.map(ingredientRowHtml).join('') || '<div class="char-empty">Пока пусто — добавь то, что реально лежит в рюкзаке.</div>';
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Алхимия', nav:'alchemy'},{label:'Запасы'}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Алхимия', nav:'alchemy'},{label:'Запасы'}])}
     <button class="back" data-go="alchemy">← Назад</button>
     <h1>Запасы ингредиентов</h1>
     <p class="subtitle">То, что реально при себе — чтобы не полагаться на память.</p>
@@ -2122,7 +2127,7 @@ function renderRecipeForm(){
   const ingRows = r.ingredients.map(ingredientFormRowHtml).join('');
 
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Алхимия', nav:'alchemy'},{label:'Рецепты', nav:'recipes'},{label:r.name||'Новый рецепт'}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Алхимия', nav:'alchemy'},{label:'Рецепты', nav:'recipes'},{label:r.name||'Новый рецепт'}])}
     <button class="back" data-go="recipes">← Назад</button>
     <h1>${escapeHtml(r.name || 'Новый рецепт')}</h1>
     <p class="subtitle">Впиши, что узнал в игре — сохранится в общем списке рецептов.</p>
@@ -2196,7 +2201,7 @@ function renderSubclassFeatures(){
   }
   const features = [...sub.features].sort((a,b)=>a.level-b.level);
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:cls.name, nav:'class:'+clsKey},{label:sub.name}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:cls.name, nav:'class:'+clsKey},{label:sub.name}])}
     <button class="back" data-go="class:${clsKey}">← Назад</button>
     <h1>${sub.name}</h1>
     <p class="subtitle">Умения архетипа по уровням получения.</p>
@@ -2237,9 +2242,9 @@ function renderMagicHub(){
       </div>`;
   }).join('');
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Магия'}])}
-    <button class="back" data-go="home">← Назад</button>
-    <h1>Магия</h1>
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Книга заклинаний'}])}
+    <button class="back" data-go="faeRef">← В справочник</button>
+    <h1>Книга заклинаний</h1>
     <p class="subtitle">Общая база заклинаний по школам — сюда ссылаются все заклинатели компендиума.</p>
     <div class="rule"></div>
     <div class="menu-list grid-2">${items}</div>
@@ -2253,7 +2258,7 @@ function renderSchoolSpells(){
   const spells = SPELLS.filter(s=>s.school===key).sort((a,b)=>a.level-b.level || a.name.localeCompare(b.name,'ru'));
   const cards = spells.map(spellCardHtml).join('') || '<div class="char-empty">Пока нет заклинаний этой школы.</div>';
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Магия', nav:'magic'},{label:school.ru}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Книга заклинаний', nav:'magic'},{label:school.ru}])}
     <button class="back" data-go="magic">← Назад</button>
     <h1><span class="h1-icon">${schoolIconSvg(key)}</span>${school.ru}</h1>
     <p class="subtitle">Клик по карточке копирует название заклинания в буфер.</p>
@@ -2280,7 +2285,7 @@ function renderSpellForm(){
   const levelOptions = Array.from({length:10},(_,i)=>i).map(l=>`<option value="${l}" ${s.level===l?'selected':''}>${levelLabel(l)}</option>`).join('');
 
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Магия', nav:'magic'},{label:schoolName(s.school), nav:'schoolSpells:'+s.school},{label:s.name||'Новое заклинание'}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Книга заклинаний', nav:'magic'},{label:schoolName(s.school), nav:'schoolSpells:'+s.school},{label:s.name||'Новое заклинание'}])}
     <button class="back" data-go="schoolSpells:${s.school}">← Назад</button>
     <h1>${escapeHtml(s.name || 'Новое заклинание')}</h1>
     <p class="subtitle">Впиши заклинание, которое открылось в игре — сохранится в общей базе.</p>
@@ -2311,9 +2316,9 @@ function renderSpellForm(){
 
 function renderClass(){
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Воин'}])}
-    <button class="back" data-go="home">← Назад</button>
-    <h1>Воин</h1>
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Классы и Архетипы'}])}
+    <button class="back" data-go="faeRef">← В справочник</button>
+    <h1>Классы и Архетипы</h1>
     <p class="subtitle">Выберите боевой архетип.</p>
     <div class="rule"></div>
     <div class="menu-list grid-2">
@@ -2386,7 +2391,7 @@ function renderSub(){
   };
 
   return `
-    ${renderCrumb([{label:'Компендиум', nav:'home'},{label:'Воин', nav:'class:fighter'},{label:'Мастер боя'}])}
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Воин', nav:'class:fighter'},{label:'Мастер боя'}])}
     <button class="back" data-go="class:fighter">← Назад</button>
     <h1>Мастер боя</h1>
     <p class="subtitle">Клик по карточке копирует название приёма; кнопка ниже — сразу бросает кость превосходства и копирует готовый результат.</p>
@@ -4265,8 +4270,12 @@ function navigate(val){
   else if(parts[0]==='class') view = {screen:'class', cls:parts[1]};
   else if(parts[0]==='sub') view = {screen:'sub', cls:parts[1], sub:parts[2]};
   else if(parts[0]==='faeGen') view = {screen:'faeGen'};
-  else if(parts[0]==='faeRef' || parts[0]==='ref') view = {screen:'faeRef'};
-  else if(parts[0]==='faeData' || parts[0]==='data') view = {screen:'faeData'};
+  else if(parts[0]==='faeRef' || (HB.mode==='faerun' && parts[0]==='ref')) view = {screen:'faeRef'};
+  else if(parts[0]==='faeData' || (HB.mode==='faerun' && parts[0]==='data')) view = {screen:'faeData'};
+  else if(parts[0]==='hbHome') view = {screen:'hbHome'};
+  else if(parts[0]==='hbWorld' || parts[0]==='hbData' || (HB.mode==='hb' && parts[0]==='data')) view = {screen:'hbWorld'};
+  else if(parts[0]==='hbGen') view = {screen:'hbGen'};
+  else if(parts[0]==='hbRef' || (HB.mode==='hb' && parts[0]==='ref')) view = {screen:'hbRef'};
   render();
   window.scrollTo(0,0);
 }

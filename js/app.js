@@ -98,12 +98,34 @@ function paintShBar(){
     });
   }
 
+  var hbBtn = seg.querySelector('[data-hbmode="hb"]');
+  if(hbBtn && !hbBtn.__hbBound){
+    hbBtn.__hbBound = true;
+    hbBtn.addEventListener('click', function(){
+      HB.mode='hb';
+      try{ localStorage.setItem('ttc_mode','hb'); }catch(e){}
+      if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
+      view={screen:'hbHome'}; if(typeof HB !== 'undefined') HB.draft=null; render(); window.scrollTo(0,0);
+    });
+  }
+
+  var faeBtn = seg.querySelector('[data-hbmode="faerun"]');
+  if(faeBtn && !faeBtn.__faeBound){
+    faeBtn.__faeBound = true;
+    faeBtn.addEventListener('click', function(){
+      HB.mode='faerun';
+      try{ localStorage.setItem('ttc_mode','faerun'); }catch(e){}
+      if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
+      view={screen:'home'}; render(); window.scrollTo(0,0);
+    });
+  }
+
   document.body.classList.toggle('sh-theme', HB.mode==='sh');
   document.body.classList.toggle('me-theme', HB.mode==='me');
   document.body.classList.toggle('el-theme', HB.mode==='el');
   document.body.classList.toggle('wi-theme', HB.mode==='wi');
   document.body.classList.toggle('wz-theme', HB.mode==='wz');
-  if(HB.mode==='sh' || HB.mode==='me' || HB.mode==='el' || HB.mode==='wi' || HB.mode==='wz') document.body.classList.remove('hb-theme');
+  document.body.classList.toggle('hb-theme', HB.mode==='hb');
   if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
   if(typeof EL !== 'undefined' && typeof EL.applyTheme === 'function') EL.applyTheme();
   if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
@@ -990,6 +1012,63 @@ window.navigate=function(val){
       window.view = view = {screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;
     }
   }
+  if(HB.mode==='hb'){
+    var hbScreens = {
+      home: 'hbHome',
+      hbHome: 'hbHome',
+      hbWorld: 'hbWorld',
+      world: 'hbWorld',
+      hbData: 'hbWorld',
+      data: 'hbWorld',
+      hbRef: 'hbRef',
+      ref: 'hbRef',
+      hbGen: 'hbGen',
+      gen: 'hbGen',
+      dice: 'dice'
+    };
+    if(hbScreens[p[0]]){
+      window.view = view = { screen: hbScreens[p[0]] };
+      if(typeof HB !== 'undefined') HB.draft = null;
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0]==='hbList'){
+      window.view = view = { screen:'hbList', hbType:p[1] };
+      if(typeof HB !== 'undefined') HB.draft = null;
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0]==='hbEdit'){
+      window.view = view = { screen:'hbEdit', hbType:p[1], hbId:p[2] };
+      if(typeof HB !== 'undefined') HB.draft = null;
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0]==='hbView'){
+      window.view = view = { screen:'hbView', hbId:p[1] };
+      if(typeof HB !== 'undefined') HB.draft = null;
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0]==='hbRels'){
+      window.view = view = { screen:'hbRels', hbId:p[1] };
+      if(typeof HB !== 'undefined') HB.draft = null;
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0]==='hbRelEdit'){
+      window.view = view = { screen:'hbRelEdit', hbOwner:p[1], hbId:p[2] };
+      if(typeof HB !== 'undefined') HB.draft = null;
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+  }
   _n(val);
 };
 
@@ -1013,6 +1092,9 @@ if(HB.mode==='sh'){
   document.body.classList.add('wz-theme');
   if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('wz')!==0)) view={screen:'wzHome'};
   if(typeof applyWizardTheme === 'function') applyWizardTheme();
+} else if(HB.mode==='hb'){
+  document.body.classList.add('hb-theme');
+  if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('hb')!==0)) view={screen:'hbHome'};
 }
 render();
   if(typeof GHSync !== "undefined") GHSync.checkStartupSync();
