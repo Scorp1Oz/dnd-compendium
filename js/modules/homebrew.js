@@ -1777,11 +1777,13 @@ function wire(){
 var _render = window.render, _navigate = window.navigate, _wire = window.wireEvents;
 
 window.render = function(){
+  if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view.screen);
   mountBar();
   var s = view.screen || '';
   if(HB.mode==='hb'){
     if(s === 'dice'){
       _render();
+      if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view.screen);
       return;
     }
     var app = document.getElementById('app');
@@ -1799,26 +1801,29 @@ window.render = function(){
     else html = hbHome();
     app.innerHTML = html;
     _wire(); wire();
+    if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view.screen);
     return;
   }
   _render();
+  if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view.screen);
 };
 
 window.navigate=function(val){
   var p=String(val||'').split(':');
   if (window.view && window.view.screen !== p[0]) window._prevScreen = window.view.screen;
   if(HB.mode==='hb'){
-    if(p[0]==='home' || p[0]==='hbHome'){ view={screen:'hbHome'}; HB.draft=null; render(); window.scrollTo(0,0); return; }
-    if(p[0]==='hbList'){ view={screen:'hbList', hbType:p[1]}; HB.draft=null; render(); window.scrollTo(0,0); return; }
-    if(p[0]==='hbEdit'){ view={screen:'hbEdit', hbType:p[1], hbId:p[2]}; HB.draft=null; render(); window.scrollTo(0,0); return; }
-    if(p[0]==='hbView'){ view={screen:'hbView', hbId:p[1]}; HB.draft=null; render(); window.scrollTo(0,0); return; }
-    if(p[0]==='hbRels'){ view={screen:'hbRels', hbId:p[1]}; HB.draft=null; render(); window.scrollTo(0,0); return; }
-    if(p[0]==='hbRelEdit'){ view={screen:'hbRelEdit', hbOwner:p[1], hbId:p[2]}; HB.draft=null; render(); window.scrollTo(0,0); return; }
-    if(p[0]==='hbWorld' || p[0]==='world' || p[0]==='hbData' || p[0]==='data'){ view={screen:'hbWorld'}; HB.draft=null; render(); window.scrollTo(0,0); return; }
-    if(p[0]==='hbGen' || p[0]==='gen'){ view={screen:'hbGen'}; HB.draft=null; render(); window.scrollTo(0,0); return; }
-    if(p[0]==='hbRef' || p[0]==='ref'){ view={screen:'hbRef'}; HB.draft=null; render(); window.scrollTo(0,0); return; }
+    if(p[0]==='home' || p[0]==='hbHome'){ view={screen:'hbHome'}; HB.draft=null; render(); if(typeof updateHomeScreenLock==='function') updateHomeScreenLock('hbHome'); window.scrollTo(0,0); return; }
+    if(p[0]==='hbList'){ view={screen:'hbList', hbType:p[1]}; HB.draft=null; render(); if(typeof updateHomeScreenLock==='function') updateHomeScreenLock('hbList'); window.scrollTo(0,0); return; }
+    if(p[0]==='hbEdit'){ view={screen:'hbEdit', hbType:p[1], hbId:p[2]}; HB.draft=null; render(); if(typeof updateHomeScreenLock==='function') updateHomeScreenLock('hbEdit'); window.scrollTo(0,0); return; }
+    if(p[0]==='hbView'){ view={screen:'hbView', hbId:p[1]}; HB.draft=null; render(); if(typeof updateHomeScreenLock==='function') updateHomeScreenLock('hbView'); window.scrollTo(0,0); return; }
+    if(p[0]==='hbRels'){ view={screen:'hbRels', hbId:p[1]}; HB.draft=null; render(); if(typeof updateHomeScreenLock==='function') updateHomeScreenLock('hbRels'); window.scrollTo(0,0); return; }
+    if(p[0]==='hbRelEdit'){ view={screen:'hbRelEdit', hbOwner:p[1], hbId:p[2]}; HB.draft=null; render(); if(typeof updateHomeScreenLock==='function') updateHomeScreenLock('hbRelEdit'); window.scrollTo(0,0); return; }
+    if(p[0]==='hbWorld' || p[0]==='world' || p[0]==='hbData' || p[0]==='data'){ view={screen:'hbWorld'}; HB.draft=null; render(); if(typeof updateHomeScreenLock==='function') updateHomeScreenLock('hbWorld'); window.scrollTo(0,0); return; }
+    if(p[0]==='hbGen' || p[0]==='gen'){ view={screen:'hbGen'}; HB.draft=null; render(); if(typeof updateHomeScreenLock==='function') updateHomeScreenLock('hbGen'); window.scrollTo(0,0); return; }
+    if(p[0]==='hbRef' || p[0]==='ref'){ view={screen:'hbRef'}; HB.draft=null; render(); if(typeof updateHomeScreenLock==='function') updateHomeScreenLock('hbRef'); window.scrollTo(0,0); return; }
   }
   _navigate(val);
+  if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view.screen);
 };
 
 /* ---------- запуск ---------- */
@@ -1826,5 +1831,6 @@ load();
 mountBar();
 if(HB.mode==='hb' && (view.screen==='home' || !view.screen)) view = {screen:'hbHome'};
 render();
+if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view.screen);
 
 })();

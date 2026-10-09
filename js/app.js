@@ -131,6 +131,7 @@ function paintShBar(){
   if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
   if(typeof applyWizardTheme === 'function') applyWizardTheme();
   if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
+  if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(window.view ? window.view.screen : '');
 
   var lab=bar.querySelector('.hb-bar-world');
   if(HB.mode==='sh'){
@@ -185,6 +186,7 @@ var _r=window.render, _n=window.navigate, _w=window.wireEvents;
 
 window.render=function(){
   window.view = view;
+  if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view ? view.screen : '');
   if(HB.mode==='wz'){
     document.body.classList.remove('sh-theme', 'me-theme', 'el-theme', 'wi-theme', 'hb-theme');
     document.body.classList.add('wz-theme');
@@ -1097,7 +1099,8 @@ if(HB.mode==='sh'){
   if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('hb')!==0)) view={screen:'hbHome'};
 }
 render();
-  if(typeof GHSync !== "undefined") GHSync.checkStartupSync();
+if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view ? view.screen : '');
+if(typeof GHSync !== "undefined") GHSync.checkStartupSync();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {

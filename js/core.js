@@ -1039,7 +1039,80 @@ let charDraft = null;
 
 var view = window.view = {screen:'home'};
 
+function isHomeScreen(screenName){
+  var s = screenName;
+  if(s === undefined || s === null){
+    s = (window.view && window.view.screen) || '';
+  }
+  s = String(s);
+  return !s || s === 'home' || s === 'shHome' || s === 'meHome' || s === 'elHome' || s === 'wiHome' || s === 'wzHome' || s === 'hbHome';
+}
+
+function updateHomeScreenLock(screenName){
+  try {
+    var isHome = isHomeScreen(screenName);
+    var docEl = document.documentElement;
+    var body = document.body;
+    if(docEl) docEl.classList.toggle('is-home-screen', isHome);
+    if(body) body.classList.toggle('is-home-screen', isHome);
+    if(isHome){
+      window.scrollTo(0,0);
+      if(body) body.scrollTop = 0;
+      if(docEl) docEl.scrollTop = 0;
+    }
+  } catch(e){}
+}
+window.isHomeScreen = isHomeScreen;
+window.updateHomeScreenLock = updateHomeScreenLock;
+
+(function initHomeScreenScrollGuard(){
+  if(window.__homeScrollGuardActive) return;
+  window.__homeScrollGuardActive = true;
+
+  window.addEventListener('wheel', function(e){
+    if(window.isHomeScreen && window.isHomeScreen()){
+      var el = e.target;
+      while(el && el !== document.body && el !== document.documentElement){
+        var style = window.getComputedStyle(el);
+        if((style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight){
+          return;
+        }
+        el = el.parentElement;
+      }
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  window.addEventListener('touchmove', function(e){
+    if(window.isHomeScreen && window.isHomeScreen()){
+      var el = e.target;
+      while(el && el !== document.body && el !== document.documentElement){
+        var style = window.getComputedStyle(el);
+        if((style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight){
+          return;
+        }
+        el = el.parentElement;
+      }
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  window.addEventListener('keydown', function(e){
+    if(window.isHomeScreen && window.isHomeScreen()){
+      var tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
+      if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target && e.target.isContentEditable)){
+        return;
+      }
+      var scrollKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar'];
+      if(scrollKeys.indexOf(e.key) !== -1){
+        e.preventDefault();
+      }
+    }
+  }, { passive: false });
+})();
+
 function render(){
+  updateHomeScreenLock(view.screen);
   const app = document.getElementById('app');
   app.classList.toggle('wide', view.screen === 'map');
   app.classList.toggle('home-wide', view.screen === 'home');
@@ -4277,6 +4350,7 @@ function navigate(val){
   else if(parts[0]==='hbGen') view = {screen:'hbGen'};
   else if(parts[0]==='hbRef' || (HB.mode==='hb' && parts[0]==='ref')) view = {screen:'hbRef'};
   render();
+  updateHomeScreenLock(view.screen);
   window.scrollTo(0,0);
 }
 
