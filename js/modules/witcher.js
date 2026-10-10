@@ -635,9 +635,22 @@
     if(!window._wiGameModalListenerAdded){
       window._wiGameModalListenerAdded = true;
       window.addEventListener('message', function(e){
-        if(e && (e.data === 'closeWiGameModal' || e.data === 'compendium-back')){
+        if(!e || !e.data) return;
+        var action = (typeof e.data === 'string') ? e.data : e.data.action;
+        var targetScreen = (e.data && e.data.screen) ? e.data.screen : null;
+
+        if(action === 'closeWiGameModal' || action === 'compendium-back' || action === 'nav'){
           var m = document.getElementById('wiGameModal');
           if(m && m.parentNode) m.parentNode.removeChild(m);
+
+          if(typeof nav === 'function'){
+            if(typeof HB !== 'undefined') HB.mode = 'wi';
+            if(targetScreen){
+              nav(targetScreen);
+            } else {
+              nav('wiGames');
+            }
+          }
         }
       });
     }

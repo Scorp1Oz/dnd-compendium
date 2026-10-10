@@ -1142,6 +1142,29 @@ window.navigate=function(val){
 
 /* ---------- запуск ---------- */
 load();
+try {
+  var _urlParams = new URLSearchParams(window.location.search);
+  var _urlScreen = _urlParams.get('screen') || _urlParams.get('s');
+  if (_urlScreen) {
+    if (_urlScreen.indexOf('wi') === 0) {
+      if (typeof HB !== 'undefined') HB.mode = 'wi';
+      window.view = view = { screen: _urlScreen };
+    } else if (_urlScreen.indexOf('sh') === 0) {
+      if (typeof HB !== 'undefined') HB.mode = 'sh';
+      window.view = view = { screen: _urlScreen };
+    } else if (_urlScreen.indexOf('me') === 0) {
+      if (typeof HB !== 'undefined') HB.mode = 'me';
+      window.view = view = { screen: _urlScreen };
+    } else if (_urlScreen.indexOf('wz') === 0) {
+      if (typeof HB !== 'undefined') HB.mode = 'wz';
+      window.view = view = { screen: _urlScreen };
+    } else if (_urlScreen.indexOf('el') === 0) {
+      if (typeof HB !== 'undefined') HB.mode = 'el';
+      window.view = view = { screen: _urlScreen };
+    }
+  }
+} catch(e) {}
+
 if(HB.mode==='sh'){
   document.body.classList.add('sh-theme');
   if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('sh')!==0)) view={screen:'shHome'};
@@ -1167,6 +1190,27 @@ if(HB.mode==='sh'){
 render();
 if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view ? view.screen : '');
 if(typeof GHSync !== "undefined") GHSync.checkStartupSync();
+
+// Global modal communication for tavern games
+window.addEventListener('message', function(e) {
+  if (!e || !e.data) return;
+  var action = (typeof e.data === 'string') ? e.data : e.data.action;
+  var targetScreen = (e.data && e.data.screen) ? e.data.screen : null;
+
+  if (action === 'closeWiGameModal' || action === 'compendium-back' || action === 'nav') {
+    var m = document.getElementById('wiGameModal');
+    if (m && m.parentNode) m.parentNode.removeChild(m);
+
+    if (typeof nav === 'function') {
+      if (typeof HB !== 'undefined') HB.mode = 'wi';
+      if (targetScreen) {
+        nav(targetScreen);
+      } else {
+        nav('wiGames');
+      }
+    }
+  }
+});
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {

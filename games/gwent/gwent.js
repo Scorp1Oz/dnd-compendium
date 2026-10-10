@@ -2008,24 +2008,43 @@ class UI {
 			if (nav) nav.style.display = '';
 		});
 
-		// Return to compendium if in modal iframe
-		document.querySelectorAll('#gwent-compendium-nav a, a[href*="index.html"]').forEach(a => {
-			if (a.getAttribute('href') && a.getAttribute('href').includes('../../index.html')) {
-				a.addEventListener('click', (e) => {
-					if (window.parent && window.parent !== window) {
-						e.preventDefault();
-						window.parent.postMessage('closeWiGameModal', '*');
+		// Return to compendium screens (hub or home)
+		const isIframe = (window.parent && window.parent !== window);
+
+		const hubBtn = document.getElementById('nav-btn-hub');
+		if (hubBtn) {
+			hubBtn.addEventListener('click', (e) => {
+				if (isIframe) {
+					e.preventDefault();
+					try {
+						window.parent.postMessage({ action: 'nav', screen: 'wiGames' }, '*');
+					} catch(err) {
+						window.top.location.href = '../../index.html?screen=wiGames';
 					}
-				});
-			}
-		});
+				}
+			});
+		}
+
+		const compBtn = document.getElementById('nav-btn-compendium');
+		if (compBtn) {
+			compBtn.addEventListener('click', (e) => {
+				if (isIframe) {
+					e.preventDefault();
+					try {
+						window.parent.postMessage({ action: 'nav', screen: 'wiHome' }, '*');
+					} catch(err) {
+						window.top.location.href = '../../index.html?screen=wiHome';
+					}
+				}
+			});
+		}
 
 		window.addEventListener('keydown', (e) => {
 			if (e.key === 'Escape') {
 				if (Popup.curr) {
 					Popup.curr.selectYes();
-				} else if (window.parent && window.parent !== window) {
-					window.parent.postMessage('closeWiGameModal', '*');
+				} else if (isIframe) {
+					window.parent.postMessage({ action: 'nav', screen: 'wiGames' }, '*');
 				}
 			}
 		});
