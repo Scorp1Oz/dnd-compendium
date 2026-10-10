@@ -255,6 +255,29 @@ class UnifiedDiceApp {
       document.getElementById("rules-modal").classList.remove("visible");
     });
 
+    // Return to compendium if in modal iframe
+    document.querySelectorAll('a[href*="index.html"]').forEach(a => {
+      if (a.getAttribute('href') && a.getAttribute('href').includes('../../index.html')) {
+        a.addEventListener('click', (e) => {
+          if (window.parent && window.parent !== window) {
+            e.preventDefault();
+            window.parent.postMessage('closeWiGameModal', '*');
+          }
+        });
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const rules = document.getElementById("rules-modal");
+        if (rules && rules.classList.contains("visible")) {
+          rules.classList.remove("visible");
+        } else if (window.parent && window.parent !== window) {
+          window.parent.postMessage('closeWiGameModal', '*');
+        }
+      }
+    });
+
     // Poker Action buttons
     this.btnRoll = document.getElementById("poker-btn-roll");
     this.btnRaise = document.getElementById("poker-btn-raise");

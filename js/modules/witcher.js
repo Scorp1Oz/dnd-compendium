@@ -631,6 +631,16 @@
         }
       });
     });
+
+    if(!window._wiGameModalListenerAdded){
+      window._wiGameModalListenerAdded = true;
+      window.addEventListener('message', function(e){
+        if(e && (e.data === 'closeWiGameModal' || e.data === 'compendium-back')){
+          var m = document.getElementById('wiGameModal');
+          if(m && m.parentNode) m.parentNode.removeChild(m);
+        }
+      });
+    }
   }
 
   function openWiGameModal(url, title){
@@ -640,43 +650,11 @@
     var modal = document.createElement('div');
     modal.id = 'wiGameModal';
     modal.className = 'wi-game-modal-overlay';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(5,4,3,0.96);z-index:100000;display:flex;flex-direction:column;';
+    modal.style.cssText = 'position:fixed;inset:0;background:#000;z-index:100000;display:flex;width:100vw;height:100vh;overflow:hidden;';
     modal.innerHTML = 
-      '<div class="wi-game-modal-header" style="display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:#15100a;border-bottom:1px solid #6b5229;box-shadow:0 4px 12px rgba(0,0,0,0.8);">' +
-        '<div style="display:flex;align-items:center;gap:10px;font-family:\'Cinzel\',serif;font-size:16px;color:#ffd700;font-weight:700;">' +
-          title +
-        '</div>' +
-        '<div style="display:flex;align-items:center;gap:8px;">' +
-          '<button id="wiGameFullscreenBtn" class="btn btn-ghost" style="padding:5px 12px;font-size:12px;color:#d8c39e;border:1px solid #7c6239;cursor:pointer;" title="Развернуть на весь экран">⛶ Во весь экран</button>' +
-          '<a href="' + url + '" target="_blank" class="btn btn-ghost" style="padding:5px 12px;font-size:12px;color:#d8c39e;border:1px solid #7c6239;text-decoration:none;display:inline-block;" title="Открыть в отдельной вкладке">↗ В новой вкладке</a>' +
-          '<button id="wiGameCloseBtn" class="btn btn-primary" style="padding:5px 14px;font-size:13px;background:#781c1c;border:1px solid #d44d4d;color:#fff;font-weight:bold;cursor:pointer;" title="Закрыть игру">✕ Закрыть</button>' +
-        '</div>' +
-      '</div>' +
-      '<iframe src="' + url + '" class="wi-game-modal-iframe" style="flex:1;width:100%;height:100%;border:none;background:#000;" allow="fullscreen; autoplay" allowfullscreen></iframe>';
+      '<iframe src="' + url + '" class="wi-game-modal-iframe" style="width:100%;height:100%;border:none;background:#000;" allow="fullscreen; autoplay" allowfullscreen></iframe>';
 
     document.body.appendChild(modal);
-
-    var closeBtn = document.getElementById('wiGameCloseBtn');
-    if(closeBtn){
-      closeBtn.addEventListener('click', function(){
-        if(modal && modal.parentNode) modal.parentNode.removeChild(modal);
-      });
-    }
-
-    var fsBtn = document.getElementById('wiGameFullscreenBtn');
-    if(fsBtn){
-      fsBtn.addEventListener('click', function(){
-        if(!document.fullscreenElement){
-          if(modal.requestFullscreen){
-            modal.requestFullscreen();
-          } else if(document.documentElement.requestFullscreen){
-            document.documentElement.requestFullscreen();
-          }
-        } else {
-          if(document.exitFullscreen) document.exitFullscreen();
-        }
-      });
-    }
 
     function onEsc(e){
       if(e.key === 'Escape' && !document.fullscreenElement){

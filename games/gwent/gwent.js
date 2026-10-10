@@ -1692,7 +1692,11 @@ class Game {
 	{
 		AudioManager.playSFX('warning');
 		ui.popup(
-			"Resume", ()=>{},
+			"Resume", ()=>{
+				if (this.isPlaying()) {
+					ui.enablePlayer(this.currPlayer === player_me);
+				}
+			},
 			"Exit", ()=>this.returnToCustomization(),
 			"Quit curent game?" , "This will return you to the deck customization menu."
 		); 
@@ -1991,8 +1995,40 @@ class UI {
 		if (!Settings.soundEffects.isEnabled())
 			this.toggleSFX_elem.classList.add("fade");
 
-		EventManager.gameOpened.bind(()=>this.toggleSettings.forEach(e=>e.classList.remove('deck-menu')));
-		EventManager.customizationOpened.bind(()=>this.toggleSettings.forEach(e=>e.classList.add('deck-menu')));
+		EventManager.gameOpened.bind(() => {
+			this.toggleSettings.forEach(e => e.classList.remove('deck-menu'));
+			document.body.classList.add('in-game');
+			const nav = document.getElementById('gwent-compendium-nav');
+			if (nav) nav.style.display = 'none';
+		});
+		EventManager.customizationOpened.bind(() => {
+			this.toggleSettings.forEach(e => e.classList.add('deck-menu'));
+			document.body.classList.remove('in-game');
+			const nav = document.getElementById('gwent-compendium-nav');
+			if (nav) nav.style.display = '';
+		});
+
+		// Return to compendium if in modal iframe
+		document.querySelectorAll('#gwent-compendium-nav a, a[href*="index.html"]').forEach(a => {
+			if (a.getAttribute('href') && a.getAttribute('href').includes('../../index.html')) {
+				a.addEventListener('click', (e) => {
+					if (window.parent && window.parent !== window) {
+						e.preventDefault();
+						window.parent.postMessage('closeWiGameModal', '*');
+					}
+				});
+			}
+		});
+
+		window.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape') {
+				if (Popup.curr) {
+					Popup.curr.selectYes();
+				} else if (window.parent && window.parent !== window) {
+					window.parent.postMessage('closeWiGameModal', '*');
+				}
+			}
+		});
 
 		[	'.settings-button',
 			'.deck-options',
@@ -2637,6 +2673,9 @@ class Popup {
 		const bgColor = new RGBA(10, 10, 10, alpha);
 		this.elem.style.backgroundColor = bgColor.toString();
 		
+		const mainElem = document.getElementsByTagName("main")[0];
+		this.wasNoclick = mainElem ? mainElem.classList.contains("noclick") : false;
+
 		this.elem.classList.remove("hide");
 		Popup.setCurrent(this);
 		ui.enablePlayer(true);
@@ -2648,10 +2687,11 @@ class Popup {
 	// Unsets this as the current popup window
 	static clearCurrent()  { this.curr = null; }
 	
-	// Called when client selects the positive aciton
+	// Called when client selects the positive action
 	selectYes() {
-		this.clear()
+		this.clear();
 		this.yes();
+		this.restorePlayerState();
 		return true;
 	}
 	
@@ -2659,16 +2699,28 @@ class Popup {
 	selectNo() {
 		this.clear();
 		this.no();
+		this.restorePlayerState();
 		return false;
 	}
 	
-	// Clears the popup and diables player interraction
+	// Clears the popup and restores player interaction
 	clear() {
-		ui.enablePlayer(false);
 		this.elem.classList.add("hide");
 		Popup.clearCurrent();
+		this.restorePlayerState();
 	}
-	
+
+	restorePlayerState() {
+		if (typeof game !== 'undefined' && game && game.isPlaying && game.isPlaying()) {
+			if (game.currPlayer && typeof player_me !== 'undefined') {
+				ui.enablePlayer(game.currPlayer === player_me);
+			} else {
+				ui.enablePlayer(!this.wasNoclick);
+			}
+		} else {
+			ui.enablePlayer(!this.wasNoclick);
+		}
+	}
 }
 
 // Screen used to customize, import and export deck contents

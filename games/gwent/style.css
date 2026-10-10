@@ -79,6 +79,16 @@ body::-webkit-scrollbar {
 	box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
 }
 
+/* Hide top navigation bar during active gameplay */
+body.in-game .wi-top-nav,
+body.in-game #gwent-compendium-nav {
+	display: none !important;
+}
+
+#exit-game, .settings-button, #popup {
+	pointer-events: auto !important;
+}
+
 main {
 	position: absolute;
 	top: 50%;
