@@ -350,7 +350,7 @@ window.render=function(){
       var app = document.getElementById('app');
       app.classList.remove('wide');
       app.classList.add('home-wide');
-      var html = (typeof wzSkills === 'function') ? wzSkills() : '<div>Навыки</div>';
+      var html = (typeof wzSkills === 'function') ? wzSkills() : ((typeof WZ !== 'undefined' && typeof WZ.wzSkills === 'function') ? WZ.wzSkills() : '<div>Навыки</div>');
       app.innerHTML = html;
       _w();
       if(typeof wireWzSkills === 'function') wireWzSkills();

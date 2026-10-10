@@ -104,6 +104,10 @@
   var WZ = window.WZ = {
     profiles: [],
     activeProfileId: '',
+    spells: [],
+    duels: [],
+    skills: [],
+    potions: [],
     meta: { name: 'Волшебный мир: Хогвартс', note: 'Книга заклинаний, дуэльный клуб, Карта Мародёров и картотека магов.' },
     map: {
       zoom: 1.0,
@@ -1910,7 +1914,7 @@
   };
 
   WZ.getSkillById = function(id){
-    if(!WZ.skills) WZ.loadSkills();
+    if(!Array.isArray(WZ.skills)) WZ.loadSkills();
     return (WZ.skills || []).find(function(s){ return s.id === id; });
   };
 
@@ -1951,7 +1955,7 @@
   };
 
   WZ.getPotionById = function(id){
-    if(!WZ.potions) WZ.loadPotions();
+    if(!Array.isArray(WZ.potions)) WZ.loadPotions();
     return (WZ.potions || []).find(function(p){ return p.id === id; });
   };
 
@@ -3454,8 +3458,8 @@
      ЭКРАН НАВЫКИ И МАГИЧЕСКИЕ ДИСЦИПЛИНЫ (wzSkills)
      ============================================================ */
   function wzSkills(){
-    if(!WZ.skills) WZ.loadSkills();
-    var list = WZ.skills || [];
+    if(!Array.isArray(WZ.skills)) WZ.loadSkills();
+    var list = Array.isArray(WZ.skills) ? WZ.skills : [];
 
     var curFilter = WZ.skillFilter || 'all';
     var curSearch = (WZ.skillSearch || '').toLowerCase().trim();
@@ -6594,7 +6598,6 @@
   WZ.wzDuelView = wzDuelView;
   WZ.wzDuelEdit = wzDuelEdit;
   WZ.wzDuelGen = wzDuelGen;
-  WZ.skills = wzSkills;
   WZ.wzSkills = wzSkills;
   WZ.wzSkillView = wzSkillView;
   WZ.wzSkillEdit = wzSkillEdit;
@@ -6631,5 +6634,12 @@
   WZ.wireWzMap = wireWzMap;
   WZ.wireWzMapContent = wireWzMapContent;
   WZ.wireWzNav = wireWzNav;
+
+  // Инициализация коллекций данных при загрузке модуля
+  if(typeof WZ.loadProfiles === 'function') WZ.loadProfiles();
+  if(typeof WZ.loadSpells === 'function') WZ.loadSpells();
+  if(typeof WZ.loadDuels === 'function') WZ.loadDuels();
+  if(typeof WZ.loadSkills === 'function') WZ.loadSkills();
+  if(typeof WZ.loadPotions === 'function') WZ.loadPotions();
 
 })();

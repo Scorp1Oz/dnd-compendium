@@ -568,8 +568,10 @@ body.wz-theme .section-label {
 .wz-card {
   background: linear-gradient(135deg, rgba(22, 26, 41, 0.95) 0%, rgba(16, 18, 29, 0.95) 100%);
   border: 1px solid var(--wz-border);
-  border-radius: 12px;
-  padding: 18px 20px;
+  border-radius: 4px;
+  min-height: 88px;
+  padding: 20px 24px;
+  box-sizing: border-box;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
@@ -728,6 +730,7 @@ body.wz-theme .section-label {
 /* Табы навигации (Заклинания / Дуэли) */
 .wz-nav-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 18px;
   border-bottom: 1px solid var(--wz-border);
