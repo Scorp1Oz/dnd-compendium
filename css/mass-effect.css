@@ -253,6 +253,36 @@ body.me-theme #meHud .sh-hud-name {
 body.me-theme #meHud .sh-hud-meta {
   font-size: 12.5px !important;
 }
+body.me-theme #meHud .me-hud-spec {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  padding: 3px 9px !important;
+  border-radius: 4px !important;
+  background: rgba(0, 210, 255, 0.14) !important;
+  border: 1px solid rgba(0, 210, 255, 0.45) !important;
+  color: #00d2ff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  line-height: normal !important;
+}
+body.me-theme.me-theme-n7 #meHud .me-hud-spec {
+  background: rgba(225, 29, 72, 0.16) !important;
+  border-color: rgba(244, 63, 94, 0.5) !important;
+  color: #ff90a0 !important;
+}
+body.me-theme.me-theme-cerberus #meHud .me-hud-spec {
+  background: rgba(245, 158, 11, 0.16) !important;
+  border-color: rgba(245, 158, 11, 0.5) !important;
+  color: #fbbf24 !important;
+}
+body.me-theme.me-theme-omni #meHud .me-hud-spec {
+  background: rgba(255, 170, 51, 0.16) !important;
+  border-color: rgba(255, 170, 51, 0.5) !important;
+  color: #ffaa33 !important;
+}
 body.me-theme #meHud .sh-hud-stats {
   margin-top: 10px !important;
   gap: 8px !important;

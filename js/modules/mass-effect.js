@@ -972,7 +972,9 @@ function renderMeHudHtml(c){
   c = c || ME.getChar();
   var nameDisplay = meEsc(c.name || 'Оперативник Альянса');
   var callsignHtml = c.callsign ? (' <span style="font-size:13px;color:var(--brass);font-weight:normal;">[' + meEsc(c.callsign) + ']</span>') : '';
-  var metaHtml = '<span>' + meEsc(c.race || 'Человек') + '</span> • <span>' + meEsc(c.role || 'Солдат') + '</span>';
+  var metaHtml = '<span>' + meEsc(c.race || 'Человек') + '</span>';
+  var specVal = (c.role || c.spec || c.specialization || '').trim();
+  var specBadgeHtml = specVal ? ('<span class="me-hud-spec" title="Специализация оперативника">' + meEsc(specVal) + '</span>') : '';
 
   return '<div class="sh-hud" id="meHud">' +
     '<div class="sh-hud-top">' +
@@ -981,6 +983,7 @@ function renderMeHudHtml(c){
         '<div class="sh-hud-meta">' + metaHtml + '</div>' +
       '</div>' +
       '<div class="sh-hud-badges">' +
+        specBadgeHtml +
         '<span class="sh-hud-level">Ур. ' + (c.level || 1) + '</span>' +
       '</div>' +
     '</div>' +
