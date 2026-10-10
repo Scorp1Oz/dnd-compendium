@@ -487,13 +487,6 @@
         '</div>' +
         '<div class="wi-card-arrow">›</div>' +
       '</div>' +
-      '<div class="wi-card wi-card-clickable" data-nav="wiTechGen" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiTechGen\');" role="button" tabindex="0" title="Открыть AI Генератор">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="wi-card-title"><span>🤖</span> AI Генератор</div>' +
-          '<div class="wi-card-desc">Генератор знаков, чародейских заклятий и стилей фехтования на Gemini Flash!</div>' +
-        '</div>' +
-        '<div class="wi-card-arrow">›</div>' +
-      '</div>' +
       '<div class="wi-card wi-card-clickable" data-nav="wiRef" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiRef\');" role="button" tabindex="0" title="Открыть Справочник Континента">' +
         '<div style="flex:1;min-width:0;">' +
           '<div class="wi-card-title"><span>📚</span> Справочник Континента</div>' +
