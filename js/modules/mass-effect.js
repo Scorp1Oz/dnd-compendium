@@ -982,7 +982,6 @@ function renderMeHudHtml(c){
       '</div>' +
       '<div class="sh-hud-badges">' +
         '<span class="sh-hud-level">Ур. ' + (c.level || 1) + '</span>' +
-        '<button class="sh-hud-edit-btn" data-nav="meData" title="Настроить досье и темы в Данных">⚙️ Досье</button>' +
       '</div>' +
     '</div>' +
     '<div class="sh-hud-stats">' +

@@ -1193,7 +1193,6 @@ function renderHome(){
         '<span class="fae-stat-badge hp">❤️ ' + hpCur + '/' + hpMax + ' HP</span>' +
         '<span class="fae-stat-badge ac">🛡️ КБ ' + acVal + '</span>' +
         '<span class="fae-stat-badge" title="Скорость передвижения">⚡ ' + spdVal + ' фт</span>' +
-        '<button class="fae-hud-edit-btn" data-go="faeData" title="Данные, ростер и настройки">💾 Данные</button>' +
       '</div>' +
     '</div>' +
   '</div>';

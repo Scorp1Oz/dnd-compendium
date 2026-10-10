@@ -1536,7 +1536,6 @@ function renderShinobiHudHtml(){
         levelBadgeHtml +
         rankBadgeHtml +
         natureBadgeHtml +
-        '<button class="sh-hud-edit-btn" data-nav="shData" title="Перейти к выбору и управлению персонажами на экране Данные">⚙️ Персонажи</button>'+
       '</div>'+
     '</div>'+
     '<div class="sh-hud-stats">'+

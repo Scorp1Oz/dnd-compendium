@@ -429,8 +429,6 @@ function hbHome(){
         '<span class="hb-stat-badge">Ур. ' + lvlVal + '</span>' +
         '<span class="hb-stat-badge hp">❤️ ' + hpCur + ' HP</span>' +
         '<span class="hb-stat-badge cred">💳 ' + creds + '</span>' +
-        (ac ? '<button class="hb-hud-edit-btn" data-go="hbView:' + ac.id + '" title="Досье активного персонажа">👤 Профиль</button>' : '') +
-        '<button class="hb-hud-edit-btn" data-go="hbData" title="Данные, ростер и параметры сеттинга">💾 Данные</button>' +
       '</div>' +
     '</div>' +
   '</div>';

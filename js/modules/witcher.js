@@ -443,7 +443,6 @@
           '<span class="wi-stat-badge">Ур. ' + p.level + '</span>' +
           '<span class="wi-stat-badge hp">❤️ ' + p.hp + '/' + p.maxHp + ' HP</span>' +
           '<span class="wi-stat-badge ac">🛡️ КБ ' + p.ac + '</span>' +
-          '<button class="wi-hud-edit-btn" data-nav="wiData" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiData\');" title="Перейти к анкете и списку персонажей в Данные">⚙️ Ростер</button>' +
         '</div>' +
       '</div>' +
     '</div>';
