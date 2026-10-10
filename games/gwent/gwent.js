@@ -29,21 +29,16 @@ function getCompendiumPlayerName() {
 				if (found && found.name && found.name.trim()) return found.name.trim();
 			}
 		}
+		const rawFallback = localStorage.getItem('dnd_witcher_profiles') || localStorage.getItem('dnd_compendium_profiles');
+		if (rawFallback) {
+			const data = JSON.parse(rawFallback);
+			if (Array.isArray(data) && data.length > 0) {
+				const active = data.find(p => p.isActive || p.active) || data[0];
+				if (active && active.name && active.name.trim()) return active.name.trim();
+			}
+		}
 	} catch(e){}
 	return "Ведьмак";
-}
-
-function getCompendiumOpponentName(factionKey) {
-	const titles = {
-		realms: "Королевский маршал",
-		nilfgaard: "Офицер Нильфгаарда",
-		monsters: "Владыка чащи",
-		scoiatael: "Командир «Белок»",
-		skellige: "Ярл Скеллиге",
-		syndicate: "Главарь Синдиката"
-	};
-	if (factionKey && titles[factionKey]) return titles[factionKey];
-	return "Корчмарь";
 }
 
 class Controller {}
@@ -1720,7 +1715,7 @@ class Game {
 		this.reset();
 		player_me.reset();
 		const op_deck = dm.constructOpponentDeck(false);
-		player_op = new Player('op', getCompendiumOpponentName(op_deck ? op_deck.faction : null), op_deck);
+		player_op = new Player('op', 'Соперник', op_deck);
 		this.endScreen.classList.add("hide");
 		this.startGame();
 	}
@@ -2992,7 +2987,7 @@ class DeckMaker {
 		const op_deck = this.constructOpponentDeck(true);
 		
 		player_me = new Player(0, getCompendiumPlayerName(), me_deck);
-		player_op = new Player(1, getCompendiumOpponentName(op_deck ? op_deck.faction : null), op_deck);
+		player_op = new Player(1, "Соперник", op_deck);
 		
 		this.elem.classList.add("hide");
 		game.startGame();

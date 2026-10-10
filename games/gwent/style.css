@@ -900,21 +900,11 @@ main { background-image: url('img/boardtest8.png'); }
 	height: 80%;
 	margin-bottom: -24%;
 	
-	background-size: cover;
+	background-image: url('img/icons/profile.png');
+	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center;
 	border-radius: 100%;
-	box-shadow: 0 4px 12px rgba(0,0,0,0.8);
-}
-
-#stats-me .profile-img {
-	background-image: url('svg/avatar_witcher.svg');
-	filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.45));
-}
-
-#stats-op .profile-img {
-	background-image: url('svg/avatar_opponent.svg');
-	filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.45));
 }
 
 .profile-img > div {
