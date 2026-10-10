@@ -637,6 +637,18 @@ window.render=function(){
       paintShBar();
       return;
     }
+    if(s === 'wiGames'){
+      var app = document.getElementById('app');
+      app.classList.remove('wide');
+      app.classList.add('home-wide');
+      var html = (typeof wiGames === 'function') ? wiGames() : '<div>Игровой хаб</div>';
+      app.innerHTML = html;
+      _w();
+      if(typeof wireWiGames === 'function') wireWiGames();
+      if(typeof wireWiNav === 'function') wireWiNav();
+      paintShBar();
+      return;
+    }
     var app = document.getElementById('app');
     app.classList.remove('wide');
     app.classList.add('home-wide');
@@ -1032,6 +1044,8 @@ window.navigate=function(val){
       wiMoveGen: 'wiMoveGen',
       wiMap: 'wiMap',
       map: 'wiMap',
+      wiGames: 'wiGames',
+      games: 'wiGames',
       dice: 'dice'
     };
     if(wiScreens[p[0]]){

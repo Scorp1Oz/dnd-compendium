@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игровой хаб — Игры Ведьмака</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #1e150e 0%, #0d0906 100%);
+            font-family: "Bahnschrift", "Segoe UI", sans-serif;
+            color: #d8c39e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #hub-stage {
+            width: 100vw;
+            height: calc(100vw * 1080 / 1920);
+            max-height: 100vh;
+            transform: scale(var(--game-scale, 1));
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4vh 4vw;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        .hub-subtitle {
+            font-size: 1.1vw;
+            color: #9c8461;
+            letter-spacing: 0.25vw;
+            text-transform: uppercase;
+            margin-bottom: 0.5vh;
+        }
+
+        .hub-title {
+            font-family: "Georgia", serif;
+            font-size: 3.2vw;
+            color: #f7d679;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.9), 0 0 20px rgba(247, 214, 121, 0.35);
+            letter-spacing: 0.08vw;
+        }
+
+        .hub-description {
+            font-size: 1.1vw;
+            color: #bfa782;
+            max-width: 48vw;
+            margin: 1.2vh auto 0 auto;
+            line-height: 1.4;
+        }
+
+        /* Two Game Portals */
+        .games-grid {
+            display: flex;
+            gap: 4vw;
+            justify-content: center;
+            align-items: stretch;
+            width: 82vw;
+            margin: 2vh 0;
+        }
+
+        .game-card {
+            flex: 1;
+            background: linear-gradient(180deg, rgba(32, 24, 16, 0.95) 0%, rgba(18, 13, 9, 0.98) 100%);
+            border: 2px solid #6b5229;
+            border-radius: 14px;
+            padding: 3vh 2.5vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            border-color: #ffd700;
+            box-shadow: 0 18px 45px rgba(0,0,0,0.9), 0 0 25px rgba(255, 215, 0, 0.35);
+        }
+
+        .card-icon {
+            font-size: 4.5vw;
+            margin-bottom: 1vh;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.7));
+        }
+
+        .card-title {
+            font-family: "Georgia", serif;
+            font-size: 2vw;
+            color: #ffd700;
+            margin-bottom: 1vh;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+        }
+
+        .card-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4vw;
+            justify-content: center;
+            margin-bottom: 1.5vh;
+        }
+
+        .badge {
+            background: rgba(60, 45, 25, 0.8);
+            border: 1px solid #8f6c34;
+            color: #ecd7a5;
+            font-size: 0.78vw;
+            padding: 0.2vh 0.6vw;
+            border-radius: 12px;
+            letter-spacing: 0.03vw;
+        }
+
+        .badge.highlight {
+            background: rgba(140, 30, 30, 0.8);
+            border-color: #ff5555;
+            color: #fff;
+        }
+
+        .card-desc {
+            font-size: 0.95vw;
+            color: #b5a181;
+            line-height: 1.5;
+            margin-bottom: 2.5vh;
+            flex: 1;
+        }
+
+        .play-btn {
+            background: linear-gradient(180deg, #781c1c 0%, #440c0c 100%);
+            border: 1px solid #d44d4d;
+            color: #fff;
+            font-family: "Georgia", serif;
+            font-size: 1.2vw;
+            padding: 1vh 2.8vw;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            transition: all 0.2s ease;
+            letter-spacing: 0.05vw;
+        }
+
+        .game-card:hover .play-btn {
+            background: linear-gradient(180deg, #992424 0%, #5e1111 100%);
+            border-color: #ff8888;
+            box-shadow: 0 0 18px rgba(255, 60, 60, 0.6);
+            transform: scale(1.04);
+        }
+
+        .hub-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.7vh 1.4vw;
+            background: rgba(35, 25, 16, 0.85);
+            border: 1px solid #7c6239;
+            border-radius: 6px;
+            color: #f7d679;
+            text-decoration: none;
+            font-size: 0.95vw;
+            margin-bottom: 1.5vh;
+            transition: all 0.2s ease;
+        }
+        .hub-back-btn:hover {
+            background: rgba(65, 45, 25, 0.95);
+            border-color: #ffd700;
+            color: #fff;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            font-size: 0.85vw;
+            color: #78664f;
+        }
+
+        footer span {
+            color: #ad946f;
+        }
+    </style>
+</head>
+<body>
+
+<div id="hub-stage">
+    <header>
+        <a href="../index.html" class="hub-back-btn">🐺 Вернуться в Компендиум</a>
+        <div class="hub-subtitle">Ведьмак &bull; Корчмарские забавы</div>
+        <h1 class="hub-title">Игровой хаб</h1>
+        <p class="hub-description">
+            Коллекция корчмарских игр Ведьмака: оригинальный карточный Гвинт со всеми DLC и картами Standalone, а также классический Покер на пяти костях (5d6).
+        </p>
+    </header>
+
+    <main class="games-grid">
+        <!-- Gwent Portal -->
+        <a href="gwent/index.html" class="game-card">
+            <div class="card-icon">⚔️</div>
+            <h2 class="card-title">Гвинт (Gwent)</h2>
+            <div class="card-badges">
+                <span class="badge">TW3: Дикая Охота</span>
+                <span class="badge">Все DLC</span>
+                <span class="badge highlight">+58 Standalone карт</span>
+                <span class="badge">Синдикат</span>
+            </div>
+            <p class="card-desc">
+                Классический Гвинт со всеми карточками Ведьмака 3, расширенный <b>58 картами Standalone Gwent</b>, шестой фракцией «Синдикат» и умным ИИ.
+            </p>
+            <div class="play-btn">Играть в Гвинт →</div>
+        </a>
+
+        <!-- Dice Poker Portal -->
+        <a href="dice_poker/index.html" class="game-card">
+            <div class="card-icon">🎲</div>
+            <h2 class="card-title">Покер на костях (5d6)</h2>
+            <div class="card-badges">
+                <span class="badge">DnD Compendium</span>
+                <span class="badge highlight">Уровни соперника</span>
+                <span class="badge">3 сложности ИИ</span>
+                <span class="badge">Торги на орены</span>
+            </div>
+            <p class="card-desc">
+                Классический покер на пяти костях (5d6). Три уровня достатка соперника, три сложности ИИ, честная вероятность и SVG-визуал.
+            </p>
+            <div class="play-btn">Играть в покер →</div>
+        </a>
+    </main>
+
+    <footer>
+        <p>Игры: <span>Гвинт</span> &bull; <span>Покер на костях</span> &bull; Для комфортной игры разверните на весь экран (F11)</p>
+    </footer>
+</div>
+
+<script>
+    function fitHub() {
+        const W = window.innerWidth;
+        const H = window.innerHeight;
+        const baseH = W * 1080 / 1920;
+        const scale = Math.min(1, H / baseH);
+        document.documentElement.style.setProperty('--game-scale', scale);
+    }
+    window.addEventListener('resize', fitHub);
+    window.addEventListener('DOMContentLoaded', fitHub);
+    fitHub();
+</script>
+
+</body>
+</html>

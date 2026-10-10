@@ -1,0 +1,530 @@
+/* ============================================================
+   Witcher & DnD Compendium Unified Dice System Stylesheet
+   Directly matching: p:\RoninDieOnce\Google Antigravity\DnD Compendium
+   ============================================================ */
+
+:root {
+  --ink: #e9e2d0;
+  --ink-dim: #a89d86;
+  --steel-0: #0e1013;
+  --steel-1: #181b20;
+  --steel-2: #22262d;
+  --steel-3: #2a303a;
+  --line: #3a3f46;
+  --crimson: #8c2f39;
+  --crimson-bright: #b8404c;
+  --brass: #c9a227;
+  --brass-dim: #8a7223;
+  --die: #5b7185;
+  --gold: #f59e0b;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--steel-0);
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 26px),
+    radial-gradient(ellipse at 50% 20%, #1f232b 0%, var(--steel-0) 70%);
+  color: var(--ink);
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 18px;
+}
+
+/* Master 16:9 stage container */
+#dice-stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: calc(100vw * 1080 / 1920);
+  max-height: 100vh;
+  transform: translate(-50%, -50%) scale(var(--game-scale, 1));
+  transform-origin: center center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.2vh 3vw;
+}
+
+/* Top App Header */
+#header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 1.5vh 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 1.2vw;
+}
+
+.brand-title {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 1.6vw;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  text-decoration: none;
+}
+
+.brand-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8vw;
+  color: var(--ink-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.configs-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.2vw;
+}
+
+.config-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35vw;
+  background: var(--steel-1);
+  border: 1px solid var(--line);
+  padding: 0.3vh 0.5vw;
+  border-radius: 4px;
+}
+
+.config-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78vw;
+  font-weight: 700;
+  color: var(--ink-dim);
+  margin-right: 0.25vw;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.config-pill {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--ink-dim);
+  font-family: 'Cinzel', serif;
+  font-size: 0.82vw;
+  font-weight: 700;
+  padding: 0.35vh 0.75vw;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.config-pill:hover {
+  color: var(--ink);
+  background: rgba(255,255,255,0.06);
+}
+
+.config-pill.active {
+  background: var(--steel-2);
+  color: var(--brass);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  border-color: var(--brass-dim);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8vw;
+}
+
+.btn-ghost {
+  background: var(--steel-1);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-family: 'Cinzel', serif;
+  font-size: 0.85vw;
+  padding: 0.5vh 1vw;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4vw;
+  transition: all 0.15s ease;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--brass-dim);
+  color: var(--brass);
+  background: var(--steel-2);
+}
+
+.btn-ghost:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   MODE 1: DICE POKER VIEW
+   ============================================================ */
+#poker-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 1.5vh 0;
+  gap: 1.2vh;
+}
+
+.poker-panel {
+  background: var(--steel-1);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1.2vh 1.8vw;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8vh;
+  box-shadow: var(--shadow);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.player-title-row {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+}
+
+.player-label {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2vw;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.badge-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75vw;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2vh 0.6vw;
+  background: var(--steel-2);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--ink-dim);
+}
+
+.purse-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95vw;
+  color: var(--brass);
+  display: flex;
+  align-items: center;
+  gap: 0.4vw;
+}
+
+.win-gems {
+  display: flex;
+  gap: 0.4vw;
+  align-items: center;
+}
+
+.gem-dot {
+  width: 0.9vw;
+  height: 0.9vw;
+  border-radius: 50%;
+  background: #241315;
+  border: 1px solid #4a2125;
+  transition: all 0.3s ease;
+}
+
+.gem-dot.active {
+  background: radial-gradient(circle at 35% 35%, #ff5555 0%, #aa1111 70%, #550000 100%);
+  border-color: #ff9999;
+  box-shadow: 0 0 10px #ff2222;
+}
+
+.comb-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 1.05vw;
+  font-weight: 700;
+  color: var(--brass);
+  letter-spacing: 0.04em;
+}
+
+/* Middle Poker Pot Area */
+.poker-pot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8vh 2vw;
+  background: var(--steel-0);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.pot-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8vw;
+}
+
+.pot-cap {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8vw;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.pot-val {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6vw;
+  font-weight: 700;
+  color: var(--brass);
+}
+
+.poker-status-txt {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 1.1vw;
+  color: var(--ink);
+  text-align: center;
+  flex: 1;
+}
+
+/* ============================================================
+   DICE TRAY & COMPENDIUM DIE STYLES
+   ============================================================ */
+.dice-tray {
+  min-height: 12vh;
+  background: var(--steel-0);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6vw;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2vh 1.5vw;
+  border-radius: 4px;
+}
+
+.dice-tray.interactive-player {
+  background: radial-gradient(ellipse at 50% 50%, rgba(201, 162, 39, 0.06) 0%, var(--steel-0) 80%);
+  border-color: var(--steel-3);
+}
+
+.die {
+  width: 4.6vw;
+  height: 4.6vw;
+  min-width: 64px;
+  min-height: 64px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.die:hover {
+  transform: scale(1.08);
+  filter: brightness(1.15);
+}
+
+.die svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+}
+
+.die .val {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.5vw;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.65);
+  pointer-events: none;
+}
+
+.die.rolling {
+  animation: diceshake 0.14s linear infinite;
+}
+
+@keyframes diceshake {
+  0% { transform: rotate(-10deg) scale(1.06); }
+  50% { transform: rotate(10deg) scale(0.96); }
+  100% { transform: rotate(-10deg) scale(1.06); }
+}
+
+/* Reroll Selection in Poker */
+.die.reroll-selected {
+  transform: translateY(-12px);
+  filter: drop-shadow(0 0 12px var(--brass));
+}
+
+.die.reroll-selected svg {
+  filter: drop-shadow(0 0 8px var(--brass));
+}
+
+.die .reroll-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--crimson);
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6vw;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  border-radius: 2px;
+  border: 1px solid var(--crimson-bright);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Bottom Action Bar */
+.bottom-controls-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2vw;
+  padding-top: 1.2vh;
+  border-top: 1px solid var(--line);
+}
+
+.btn-primary {
+  background: var(--steel-2);
+  border: 1px solid var(--brass);
+  color: var(--brass);
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1vw;
+  padding: 0.8vh 2vw;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 9vw;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--brass);
+  color: var(--steel-0);
+  box-shadow: 0 0 15px rgba(201, 162, 39, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: var(--line);
+  color: var(--ink-dim);
+}
+
+.btn-crimson {
+  background: var(--steel-1);
+  border: 1px solid var(--crimson);
+  color: var(--crimson-bright);
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1vw;
+  padding: 0.8vh 1.6vw;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-crimson:hover:not(:disabled) {
+  background: var(--crimson);
+  color: #fff;
+}
+
+.btn-crimson:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: var(--line);
+  color: var(--ink-dim);
+}
+
+
+
+/* Modal for Rules */
+#rules-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+#rules-modal.visible {
+  display: flex;
+}
+
+.rules-card {
+  background: var(--steel-1);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  width: 48vw;
+  max-height: 82vh;
+  overflow-y: auto;
+  padding: 3vh 2.5vw;
+  box-shadow: 0 0 40px rgba(0,0,0,0.9);
+}
+
+.rules-card h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6vw;
+  color: var(--brass);
+  text-align: center;
+  margin-bottom: 2vh;
+}
+
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5vh;
+}
+
+.rules-table th, .rules-table td {
+  padding: 0.8vh 1vw;
+  font-size: 0.9vw;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.rules-table th {
+  color: var(--brass);
+  font-family: 'Cinzel', serif;
+}
+
+.rules-table td:first-child {
+  color: #fff;
+  font-weight: 700;
+}
+
+.rules-table td:last-child {
+  color: var(--ink-dim);
+}

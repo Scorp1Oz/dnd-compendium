@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Покер на костях (5d6) — DnD Compendium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="dice-stage">
+  <!-- Top App Navigation Bar -->
+  <header id="header-bar">
+    <div class="brand-section">
+      <a href="../index.html" class="brand-title" title="Вернуться в игровой хаб">🎲 Покер на костях</a>
+      <div class="brand-sub">5d6 System</div>
+    </div>
+
+    <!-- Match Configuration: Opponent Wealth & AI Difficulty -->
+    <div class="configs-bar">
+      <!-- Opponent Wealth / Stakes Tier -->
+      <div class="config-group" id="wealth-selector">
+        <span class="config-label">Соперник:</span>
+        <button class="config-pill" data-wealth="poor" title="Низкие ставки (5 оренов)">Бедный</button>
+        <button class="config-pill active" data-wealth="medium" title="Обычные ставки (20 оренов)">Средний</button>
+        <button class="config-pill" data-wealth="rich" title="Высокие ставки (50 оренов)">Богатый</button>
+      </div>
+
+      <!-- AI Difficulty -->
+      <div class="config-group" id="diff-selector">
+        <span class="config-label">Сложность:</span>
+        <button class="config-pill" data-diff="low" title="ИИ играет небрежно, может скинуть сильные кости">Низкая</button>
+        <button class="config-pill active" data-diff="medium" title="Стандартный расчетливый ИИ">Средняя</button>
+        <button class="config-pill" data-diff="hard" title="Мастер: оценивает открытый стол игрока и ауты на стрит">Сложная</button>
+      </div>
+    </div>
+
+    <!-- Navigation & Utility -->
+    <div class="nav-actions">
+      <button id="btn-sound" class="btn-ghost active">🔊 Звук</button>
+      <button id="btn-rules-open" class="btn-ghost">📜 Правила</button>
+      <a href="../gwent/index.html" class="btn-ghost" style="color:var(--brass);">⚔️ В Гвинт</a>
+      <a href="../index.html" class="btn-ghost">🚪 В хаб</a>
+      <a href="../../index.html" class="btn-ghost" style="color:#f7d679;" title="Вернуться в DnD Compendium">🐺 В Компендиум</a>
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- NEUTRAL POKER MODE (Player vs AI)          -->
+  <!-- ========================================== -->
+  <main id="poker-view">
+    <!-- Opponent Panel -->
+    <section class="poker-panel">
+      <div class="panel-header">
+        <div class="player-title-row">
+          <span class="player-label" id="op-name-label">Соперник (Горожанин)</span>
+          <span class="badge-tag" id="op-tier-badge">Серебряные ставки (20 🪙) &bull; Средняя сложность</span>
+        </div>
+        <div class="win-gems" id="op-gems" title="Победы в раундах (до 2 побед)">
+          <div class="gem-dot"></div>
+          <div class="gem-dot"></div>
+        </div>
+        <div class="comb-tag" id="op-comb-tag">Ожидание первого броска...</div>
+      </div>
+      <div class="dice-tray" id="op-poker-tray"></div>
+    </section>
+
+    <!-- Center Pot and Status -->
+    <div class="poker-pot-row">
+      <div class="pot-item">
+        <span class="pot-cap">Банк раунда</span>
+        <span class="pot-val"><span id="pot-display">40</span> 🪙</span>
+      </div>
+      <div class="poker-status-txt" id="poker-status">
+        Раунд начался. Нажмите «Бросить кости» для первого броска.
+      </div>
+      <div class="pot-cap" id="stake-info" style="color:var(--ink-dim);">
+        Ставка: 20 оренов &bull; До 2 побед
+      </div>
+    </div>
+
+    <!-- Player Panel -->
+    <section class="poker-panel">
+      <div class="panel-header">
+        <div class="player-title-row">
+          <span class="player-label">Игрок (Вы)</span>
+          <span class="badge-tag">Стол #1</span>
+        </div>
+        <div class="win-gems" id="player-gems" title="Победы в раундах (до 2 побед)">
+          <div class="gem-dot"></div>
+          <div class="gem-dot"></div>
+        </div>
+        <div class="comb-tag" id="player-comb-tag">Ожидание первого броска...</div>
+      </div>
+      <div class="dice-tray interactive-player" id="player-poker-tray" title="Кликните по кости для переброса во 2-й фазе"></div>
+    </section>
+  </main>
+
+  <!-- Poker Mode Action Bar -->
+  <footer class="bottom-controls-bar" id="poker-controls">
+    <button id="poker-btn-roll" class="btn-primary">Бросить кости</button>
+    <button id="poker-btn-raise" class="btn-ghost" disabled>Поднять ставку (+20)</button>
+    <button id="poker-btn-call" class="btn-ghost" disabled>Уравнять / Чек</button>
+    <button id="poker-btn-fold" class="btn-crimson" disabled>Сдаться</button>
+  </footer>
+</div>
+
+<!-- Rules Modal -->
+<div id="rules-modal">
+  <div class="rules-card">
+    <h2>📜 Правила и комбинации Покера на костях</h2>
+    <p style="font-size:0.95vw;color:var(--ink-dim);line-height:1.4;margin-bottom:1.5vh;">
+      Партия играется до <b>двух побед в раундах</b>. В каждом раунде оба участника бросают по 5 шестигранных костей (5d6). 
+      После начальных торгов каждый игрок может кликом выбрать любые кости (от 0 до 5) для одного тактического переброса. 
+      Побеждает старшая комбинация при финальном вскрытии.
+    </p>
+
+    <div style="display:flex;gap:1.5vw;margin-bottom:1.5vh;font-size:0.85vw;background:rgba(0,0,0,0.3);padding:1vh 1vw;border-radius:4px;border:1px solid var(--line);">
+      <div style="flex:1;">
+        <b style="color:var(--brass);">Уровни достатка противника:</b><br>
+        &bull; <b>Бедный:</b> ставка 5 🪙, подъем +5 🪙.<br>
+        &bull; <b>Средний:</b> ставка 20 🪙, подъем +20 🪙.<br>
+        &bull; <b>Богатый:</b> ставка 50 🪙, подъем +50 🪙.
+      </div>
+      <div style="flex:1;">
+        <b style="color:var(--brass);">Уровни сложности ИИ:</b><br>
+        &bull; <b>Низкая:</b> ошибки в перебросах, частый пас.<br>
+        &bull; <b>Средняя:</b> надежная тактика Ведьмака.<br>
+        &bull; <b>Сложная:</b> анализ шансов на стрит и открытого стола игрока.
+      </div>
+    </div>
+
+    <table class="rules-table">
+      <thead>
+        <tr>
+          <th>Комбинация</th>
+          <th>Описание</th>
+          <th>Пример</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Покер (Five of a Kind)</td>
+          <td>Все 5 кубиков одного достоинства</td>
+          <td>6 · 6 · 6 · 6 · 6</td>
+        </tr>
+        <tr>
+          <td>Каре (Four of a Kind)</td>
+          <td>4 кубика одного достоинства</td>
+          <td>5 · 5 · 5 · 5 · 2</td>
+        </tr>
+        <tr>
+          <td>Фулл-Хаус (Full House)</td>
+          <td>Тройка одного достоинства + пара другого</td>
+          <td>4 · 4 · 4 · 6 · 6</td>
+        </tr>
+        <tr>
+          <td>Большой стрит (High Straight)</td>
+          <td>Последовательность 2-3-4-5-6</td>
+          <td>2 · 3 · 4 · 5 · 6</td>
+        </tr>
+        <tr>
+          <td>Малый стрит (Low Straight)</td>
+          <td>Последовательность 1-2-3-4-5</td>
+          <td>1 · 2 · 3 · 4 · 5</td>
+        </tr>
+        <tr>
+          <td>Тройка (Three of a Kind)</td>
+          <td>3 кубика одного достоинства</td>
+          <td>6 · 6 · 6 · 1 · 3</td>
+        </tr>
+        <tr>
+          <td>Две пары (Two Pairs)</td>
+          <td>Две разные пары кубиков</td>
+          <td>5 · 5 · 3 · 3 · 6</td>
+        </tr>
+        <tr>
+          <td>Одна пара (One Pair)</td>
+          <td>2 кубика одного достоинства</td>
+          <td>4 · 4 · 2 · 3 · 5</td>
+        </tr>
+        <tr>
+          <td>Старшая кость (High Die)</td>
+          <td>При отсутствии комбинаций — старший кубик</td>
+          <td>6 · 5 · 3 · 2 · 1</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="text-align:center;margin-top:2.2vh;">
+      <button id="btn-rules-close" class="btn-primary">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script src="audio.js"></script>
+<script src="dice_poker.js"></script>
+</body>
+</html>

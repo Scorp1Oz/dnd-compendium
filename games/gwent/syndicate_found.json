@@ -1,0 +1,989 @@
+[
+  {
+    "name": "Courier",
+    "cid": "649",
+    "art": 1909,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Renegade Mage",
+    "cid": "650",
+    "art": 1908,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Caleb Menge",
+    "cid": "651",
+    "art": 1399,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Beggar",
+    "cid": "652",
+    "art": 1907,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Philippa Eilhart",
+    "cid": "653",
+    "art": 1377,
+    "type": "Unit",
+    "power": 2
+  },
+  {
+    "name": "Sigi Reuven",
+    "cid": "654",
+    "art": 1850,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Graden",
+    "cid": "657",
+    "art": 1760,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Kurt",
+    "cid": "659",
+    "art": 1804,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Moreelse",
+    "cid": "660",
+    "art": 1853,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Blindeye Apothecary",
+    "cid": "661",
+    "art": 1905,
+    "type": "Unit",
+    "power": 2
+  },
+  {
+    "name": "Horst Borsodi",
+    "cid": "662",
+    "art": 1737,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Sly Seductress",
+    "cid": "663",
+    "art": 1904,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Ewald Borsodi",
+    "cid": "664",
+    "art": 1753,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Tamara Strenger",
+    "cid": "666",
+    "art": 1400,
+    "type": "Unit",
+    "power": 7
+  },
+  {
+    "name": "Whoreson Senior",
+    "cid": "667",
+    "art": 1842,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Adriano the Mink",
+    "cid": "668",
+    "art": 1902,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Back-Alley Chemist",
+    "cid": "669",
+    "art": 1733,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Adalbertus Kalkstein",
+    "cid": "670",
+    "art": 1901,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Oxenfurt Naturalist",
+    "cid": "671",
+    "art": 1744,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Rico Meiersdorf",
+    "cid": "672",
+    "art": 1900,
+    "type": "Unit",
+    "power": 1
+  },
+  {
+    "name": "Witch Hunter Executioner",
+    "cid": "673",
+    "art": 1436,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Witch Hunter",
+    "cid": "675",
+    "art": 1437,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Madame Luiza",
+    "cid": "676",
+    "art": 1898,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Igor the Hook",
+    "cid": "678",
+    "art": 1841,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Tinboy",
+    "cid": "679",
+    "art": 1897,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Doadrick Leumaerts",
+    "cid": "680",
+    "art": 1896,
+    "type": "Unit",
+    "power": 8
+  },
+  {
+    "name": "Tatterwing",
+    "cid": "681",
+    "art": 1837,
+    "type": "Unit",
+    "power": 1
+  },
+  {
+    "name": "Tidecloak Hideaway",
+    "cid": "685",
+    "art": 1893,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Pugo Boom-Breaker",
+    "cid": "686",
+    "art": 1840,
+    "type": "Unit",
+    "power": 12
+  },
+  {
+    "name": "Boris",
+    "cid": "687",
+    "art": 1838,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Sewer Raiders",
+    "cid": "688",
+    "art": 1892,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Wretched Addict",
+    "cid": "689",
+    "art": 1855,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Whoreson's Freak Show",
+    "cid": "691",
+    "art": 1738,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Townsfolk",
+    "cid": "692",
+    "art": 1856,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Tidecloak Ransackers",
+    "cid": "693",
+    "art": 1890,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Tax Collector",
+    "cid": "694",
+    "art": 1857,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Sea Jackal",
+    "cid": "695",
+    "art": 1755,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Kikimore Warrior",
+    "cid": "696",
+    "art": 1843,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Fence",
+    "cid": "698",
+    "art": 1889,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Fisstech Trafficker",
+    "cid": "699",
+    "art": 1859,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Hvitr and Aelydia",
+    "cid": "700",
+    "art": 1888,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Prophet Lebioda",
+    "cid": "702",
+    "art": 1860,
+    "type": "Unit",
+    "power": 8
+  },
+  {
+    "name": "Grand Inquisitor Helveed",
+    "cid": "704",
+    "art": 1861,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Arena Endrega",
+    "cid": "705",
+    "art": 1844,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Nathaniel Pastodi",
+    "cid": "707",
+    "art": 1791,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Procession of Penance",
+    "cid": "708",
+    "art": 1750,
+    "type": "Unit",
+    "power": 12
+  },
+  {
+    "name": "Sukrus",
+    "cid": "709",
+    "art": 1887,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Arena Ghoul",
+    "cid": "711",
+    "art": 1845,
+    "type": "Unit",
+    "power": 7
+  },
+  {
+    "name": "Firesworn Zealot",
+    "cid": "713",
+    "art": 1910,
+    "type": "Unit",
+    "power": 2
+  },
+  {
+    "name": "Bincy Blumerholdt",
+    "cid": "715",
+    "art": 1885,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Eternal Fire Priest",
+    "cid": "716",
+    "art": 1434,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Cutup Lackey",
+    "cid": "717",
+    "art": 1847,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Hammond",
+    "cid": "718",
+    "art": 1884,
+    "type": "Unit",
+    "power": 7
+  },
+  {
+    "name": "Eternal Fire Inquisitor",
+    "cid": "719",
+    "art": 1431,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Eternal Fire Disciple",
+    "cid": "720",
+    "art": 1749,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "The Flying Redanian",
+    "cid": "721",
+    "art": 1883,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Casino Bouncers",
+    "cid": "722",
+    "art": 1848,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Keeper of the Flame",
+    "cid": "723",
+    "art": 1823,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Imke",
+    "cid": "724",
+    "art": 1882,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Temple Guard",
+    "cid": "726",
+    "art": 1743,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Halfling Safecracker",
+    "cid": "729",
+    "art": 1880,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Firesworn Scribe",
+    "cid": "730",
+    "art": 1865,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Bare-Knuckle Brawler",
+    "cid": "731",
+    "art": 1879,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Coerced Blacksmith",
+    "cid": "733",
+    "art": 1877,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Cleaver's Muscle",
+    "cid": "735",
+    "art": 1875,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Crownsplitter Thug",
+    "cid": "736",
+    "art": 1874,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Harald Gord",
+    "cid": "737",
+    "art": 1873,
+    "type": "Unit",
+    "power": 2
+  },
+  {
+    "name": "Sir Skewertooth",
+    "cid": "739",
+    "art": 1871,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Tunnel Drill",
+    "cid": "740",
+    "art": 1870,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Caesar Bilzen",
+    "cid": "741",
+    "art": 1869,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "The Sausage Maker",
+    "cid": "742",
+    "art": 1868,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Ferko the Sculptor",
+    "cid": "743",
+    "art": 1867,
+    "type": "Unit",
+    "power": 1
+  },
+  {
+    "name": "Walter Veritas",
+    "cid": "745",
+    "art": 1968,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Azar Javed",
+    "cid": "773",
+    "art": 1752,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Professor",
+    "cid": "774",
+    "art": 1816,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Savolla",
+    "cid": "775",
+    "art": 1756,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Dire Mutated Hound",
+    "cid": "776",
+    "art": 1740,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Mutated Hounds",
+    "cid": "777",
+    "art": 1761,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Salamandra Assassin",
+    "cid": "779",
+    "art": 1821,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Mutant Killer",
+    "cid": "780",
+    "art": 1435,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Mutant",
+    "cid": "781",
+    "art": 1967,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Saul de Navarette",
+    "cid": "887",
+    "art": 1975,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Ludovicus Brunenbaum",
+    "cid": "888",
+    "art": 1997,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Bloody Good Friends",
+    "cid": "889",
+    "art": 1980,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Street Urchins",
+    "cid": "890",
+    "art": 2022,
+    "type": "Unit",
+    "power": 2
+  },
+  {
+    "name": "Payroll Specialist",
+    "cid": "891",
+    "art": 2023,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Passiflora Peaches",
+    "cid": "892",
+    "art": 2024,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Scarab",
+    "cid": "893",
+    "art": 1969,
+    "type": "Unit",
+    "power": 1
+  },
+  {
+    "name": "Savolla's Frightener",
+    "cid": "894",
+    "art": 1970,
+    "type": "Unit",
+    "power": 12
+  },
+  {
+    "name": "Greater Brothers",
+    "cid": "895",
+    "art": 1433,
+    "type": "Unit",
+    "power": 11
+  },
+  {
+    "name": "Jacques: Miracle Child",
+    "cid": "941",
+    "art": 2197,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Jacques de Aldersberg",
+    "cid": "942",
+    "art": 1357,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Jacques: Grand Master",
+    "cid": "943",
+    "art": 2198,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Ulrich",
+    "cid": "944",
+    "art": 1780,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Roderick de Wett",
+    "cid": "946",
+    "art": 1793,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Lieutenant von Herst",
+    "cid": "947",
+    "art": 1751,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Cleric of the Flaming Rose",
+    "cid": "949",
+    "art": 1430,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Fallen Knight",
+    "cid": "950",
+    "art": 1758,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Lonely Champion",
+    "cid": "951",
+    "art": 1812,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Mutants Maker",
+    "cid": "952",
+    "art": 2204,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Flaming Rose Footman",
+    "cid": "953",
+    "art": 2231,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Fallen Rayla",
+    "cid": "1066",
+    "art": 2327,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Salamander",
+    "cid": "1067",
+    "art": 2328,
+    "type": "Unit",
+    "power": 1
+  },
+  {
+    "name": "Roland Bleinheim",
+    "cid": "1069",
+    "art": 2325,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Gellert Bleinheim",
+    "cid": "1070",
+    "art": 2326,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Salamandra Lackey",
+    "cid": "1071",
+    "art": 2330,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Salamandra Abomination",
+    "cid": "1072",
+    "art": 2331,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Salamandra Mage",
+    "cid": "1073",
+    "art": 2332,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Failed Experiment",
+    "cid": "1074",
+    "art": 2333,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Cleaver",
+    "cid": "1089",
+    "art": 1866,
+    "type": "Unit",
+    "power": 1
+  },
+  {
+    "name": "Whoreson Junior",
+    "cid": "1090",
+    "art": 1836,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "The Witchfinder",
+    "cid": "1111",
+    "art": 3348,
+    "type": "Unit",
+    "power": 7
+  },
+  {
+    "name": "Fabian Hale",
+    "cid": "1113",
+    "art": 2054,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Vigilantes",
+    "cid": "1115",
+    "art": 2059,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "The Scoundrel",
+    "cid": "1142",
+    "art": 3373,
+    "type": "Unit",
+    "power": 12
+  },
+  {
+    "name": "Ignatius Hale",
+    "cid": "1143",
+    "art": 2055,
+    "type": "Unit",
+    "power": 17
+  },
+  {
+    "name": "Scapegoat",
+    "cid": "1145",
+    "art": 3375,
+    "type": "Unit",
+    "power": 1
+  },
+  {
+    "name": "The Brute",
+    "cid": "1169",
+    "art": 3395,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Octavia Hale",
+    "cid": "1170",
+    "art": 3396,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Savvy Huckster",
+    "cid": "1172",
+    "art": 3398,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Flyndr's Crew",
+    "cid": "1197",
+    "art": 3814,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Treasure Huntress",
+    "cid": "1198",
+    "art": 3815,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Pearl Diver",
+    "cid": "1199",
+    "art": 3816,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "King of Beggars",
+    "cid": "1212",
+    "art": 1895,
+    "type": "Unit",
+    "power": 1
+  },
+  {
+    "name": "Cyrus Engelkind Hemmelfart",
+    "cid": "1213",
+    "art": 1759,
+    "type": "Unit",
+    "power": 2
+  },
+  {
+    "name": "Shady Vendor",
+    "cid": "1233",
+    "art": 3950,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Sigi Reuven: Mastermind",
+    "cid": "1261",
+    "art": 4080,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Bart",
+    "cid": "1262",
+    "art": 4081,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Little Bird",
+    "cid": "1263",
+    "art": 4082,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Gudrun Bjornsdottir",
+    "cid": "1269",
+    "art": 1881,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Saint Gregory: Justicar",
+    "cid": "1297",
+    "art": 4178,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Saint Gregory: Martyr",
+    "cid": "1305",
+    "art": 4178,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Casimir Bassi",
+    "cid": "1326",
+    "art": 5571,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Eveline Gallo",
+    "cid": "1327",
+    "art": 5572,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Oxenfurt Guard",
+    "cid": "1329",
+    "art": 5574,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "The Acherontia",
+    "cid": "1363",
+    "art": 5611,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Captain Yago",
+    "cid": "1364",
+    "art": 5612,
+    "type": "Unit",
+    "power": 3
+  },
+  {
+    "name": "Ixora",
+    "cid": "1365",
+    "art": 5613,
+    "type": "Unit",
+    "power": 6
+  },
+  {
+    "name": "Magpie",
+    "cid": "1367",
+    "art": 5615,
+    "type": "Unit",
+    "power": 5
+  },
+  {
+    "name": "Acherontia Deckhand",
+    "cid": "1368",
+    "art": 5616,
+    "type": "Unit",
+    "power": 4
+  },
+  {
+    "name": "Madam Marquise Serenity",
+    "cid": "1380",
+    "art": 5627,
+    "type": "Unit",
+    "power": 2
+  }
+]

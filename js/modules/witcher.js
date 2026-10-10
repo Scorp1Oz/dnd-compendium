@@ -480,6 +480,13 @@
         '</div>' +
         '<div class="wi-card-arrow">›</div>' +
       '</div>' +
+      '<div class="wi-card wi-card-clickable" data-nav="wiGames" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiGames\');" role="button" tabindex="0" title="Открыть Игровой хаб">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="wi-card-title"><span>🎲</span> Игровой хаб</div>' +
+          '<div class="wi-card-desc">Корчмарские забавы: карточный Гвинт со всеми фракциями и Покер на костях (5d6)</div>' +
+        '</div>' +
+        '<div class="wi-card-arrow">›</div>' +
+      '</div>' +
       '<div class="wi-card wi-card-clickable" data-nav="wiMap" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiMap\');" role="button" tabindex="0" title="Открыть Карту Континента">' +
         '<div style="flex:1;min-width:0;">' +
           '<div class="wi-card-title"><span>🗺️</span> Карта мира</div>' +
@@ -504,6 +511,180 @@
     '</div>';
 
     return hud + rule + heroDice + label + sectionsList;
+  }
+
+  /* ============================================================
+     ИГРОВОЙ ХАБ ВЕДЬМАКА (ГВИНТ И ПОКЕР НА КОСТЯХ)
+     ============================================================ */
+
+  function wiGames(){
+    var crumb = crumbWi([{ label: 'Ведьмак', nav: 'wiHome' }, { label: 'Игровой хаб' }]);
+    var backBtn = '<button class="back" data-nav="wiHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiHome\');">← Назад</button>';
+
+    var header = '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">' +
+      '<div>' +
+        '<h1 style="margin-bottom:4px;">🎲 Игровой хаб корчмы «На распутье»</h1>' +
+        '<div class="desc" style="margin-bottom:0;">Традиционные корчмарские забавы: карточный Гвинт со всеми фракциями и азартный покер на костях (5d6).</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+        '<a href="games/index.html" class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;" target="_blank" title="Открыть отдельный хаб игр в новом окне">' +
+          '<span>🌐</span> Отдельный хаб' +
+        '</a>' +
+      '</div>' +
+    '</div>';
+
+    var tavernAtmosphere = '<div style="background:linear-gradient(135deg, rgba(32, 22, 14, 0.85), rgba(16, 11, 7, 0.95));border:1px solid #7c6239;border-radius:8px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 16px rgba(0,0,0,0.5);">' +
+      '<div style="font-size:32px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.7));">🍺</div>' +
+      '<div style="font-size:13.5px;color:#d8c39e;line-height:1.55;">' +
+        '«Когда монстры повержены, трофеи сданы старосте, а серебряный клинок покоится за спиной — корчма распахивает двери. Садитесь к очагу, закажите кружку махакамского эля и испытайте удачу в Гвинт или бросьте кости на орены!»' +
+      '</div>' +
+    '</div>';
+
+    var gamesGrid = '<div class="wi-games-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:20px;margin-top:16px;">' +
+      // Карточка 1: ГВИНТ
+      '<div class="wi-game-card" style="background:linear-gradient(180deg, rgba(26,20,14,0.9) 0%, rgba(14,11,8,0.95) 100%);border:1px solid var(--wi-border);border-radius:10px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 8px 24px rgba(0,0,0,0.6);">' +
+        '<div>' +
+          '<div class="wi-game-card-header" style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">' +
+            '<div class="wi-game-card-icon" style="font-size:38px;line-height:1;">⚔️</div>' +
+            '<div>' +
+              '<div class="wi-game-card-title" style="font-family:\'Cinzel\',serif;font-size:20px;font-weight:700;color:#ffd700;">Гвинт (Gwent)</div>' +
+              '<div style="font-size:12px;color:var(--wi-steel);">Карточная дуэль армий и лидеров</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="wi-game-badges" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">' +
+            '<span class="wi-game-badge highlight" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#fbbf24;font-size:11px;padding:2px 8px;border-radius:4px;">TW3 + DLC</span>' +
+            '<span class="wi-game-badge highlight" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#fbbf24;font-size:11px;padding:2px 8px;border-radius:4px;">+58 Standalone карт</span>' +
+            '<span class="wi-game-badge" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#cbd5e1;font-size:11px;padding:2px 8px;border-radius:4px;">6 фракций</span>' +
+            '<span class="wi-game-badge" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#cbd5e1;font-size:11px;padding:2px 8px;border-radius:4px;">Синдикат</span>' +
+            '<span class="wi-game-badge" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#cbd5e1;font-size:11px;padding:2px 8px;border-radius:4px;">Умный ИИ</span>' +
+          '</div>' +
+          '<div class="wi-game-desc" style="font-size:13px;color:#cbd5e1;line-height:1.6;margin-bottom:16px;">' +
+            'Полноценная игра в Гвинт со всеми колодами Ведьмака 3 и дополнений («Каменные сердца», «Кровь и вино»), расширенная <b>58 картами Standalone Gwent</b>, шестой фракцией «Синдикат», кастомизацией колод и тактическим ИИ.' +
+          '</div>' +
+          '<ul class="wi-game-feature-list" style="list-style:none;padding:0;margin:0 0 20px 0;font-size:12px;color:var(--wi-steel);">' +
+            '<li style="padding:3px 0;display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--wi-amber);">✦</span> Три ряда боя: Ближний бой, Дальнобойные отряды, Осадные орудия</li>' +
+            '<li style="padding:3px 0;display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--wi-amber);">✦</span> Погодные карты: Мороз, Мгла, Ливень и Шторм со Скеллиге</li>' +
+            '<li style="padding:3px 0;display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--wi-amber);">✦</span> Уникальные способности лидеров и золотые карты героев</li>' +
+            '<li style="padding:3px 0;display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--wi-amber);">✦</span> Случайный соперник или выбор конкретной фракции</li>' +
+          '</ul>' +
+        '</div>' +
+        '<div style="margin-top:auto;">' +
+          '<button class="btn btn-primary wi-launch-game-btn" data-game-url="games/gwent/index.html" data-game-title="⚔️ Гвинт (Gwent: The Witcher Card Game)" style="width:100%;font-size:14px;padding:11px 16px;margin-bottom:8px;background:linear-gradient(180deg,#781c1c,#440c0c);border:1px solid #d44d4d;color:#fff;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer;border-radius:6px;transition:all 0.2s;">' +
+            '⚔️ Запустить Гвинт' +
+          '</button>' +
+          '<a href="games/gwent/index.html" class="btn btn-ghost" target="_blank" style="width:100%;text-align:center;font-size:12px;display:block;color:var(--wi-steel);padding:4px 8px;text-decoration:none;">' +
+            '↗ Открыть в новой вкладке' +
+          '</a>' +
+        '</div>' +
+      '</div>' +
+
+      // Карточка 2: ПОКЕР НА КОСТЯХ
+      '<div class="wi-game-card" style="background:linear-gradient(180deg, rgba(26,20,14,0.9) 0%, rgba(14,11,8,0.95) 100%);border:1px solid var(--wi-border);border-radius:10px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 8px 24px rgba(0,0,0,0.6);">' +
+        '<div>' +
+          '<div class="wi-game-card-header" style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">' +
+            '<div class="wi-game-card-icon" style="font-size:38px;line-height:1;">🎲</div>' +
+            '<div>' +
+              '<div class="wi-game-card-title" style="font-family:\'Cinzel\',serif;font-size:20px;font-weight:700;color:#ffd700;">Покер на костях (5d6)</div>' +
+              '<div style="font-size:12px;color:var(--wi-steel);">Традиционная игра корчмарей и шулеров</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="wi-game-badges" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">' +
+            '<span class="wi-game-badge highlight" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#fbbf24;font-size:11px;padding:2px 8px;border-radius:4px;">Система 5d6</span>' +
+            '<span class="wi-game-badge highlight" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#fbbf24;font-size:11px;padding:2px 8px;border-radius:4px;">Ставки на орены</span>' +
+            '<span class="wi-game-badge" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#cbd5e1;font-size:11px;padding:2px 8px;border-radius:4px;">3 уровня достатка</span>' +
+            '<span class="wi-game-badge" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#cbd5e1;font-size:11px;padding:2px 8px;border-radius:4px;">3 сложности ИИ</span>' +
+            '<span class="wi-game-badge" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#cbd5e1;font-size:11px;padding:2px 8px;border-radius:4px;">Честный рандом</span>' +
+          '</div>' +
+          '<div class="wi-game-desc" style="font-size:13px;color:#cbd5e1;line-height:1.6;margin-bottom:16px;">' +
+            'Традиционный покер на пяти костях из Ведьмака 1 и 2. Бросайте кости, выбирайте какие зафиксировать для переброса, делайте ставки, блефуйте и выбивайте стриты и каре против горожан и богатых купцов.' +
+          '</div>' +
+          '<ul class="wi-game-feature-list" style="list-style:none;padding:0;margin:0 0 20px 0;font-size:12px;color:var(--wi-steel);">' +
+            '<li style="padding:3px 0;display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--wi-amber);">✦</span> Уровни соперника: Бедный (5 оренов), Горожанин (20 оренов), Богатый (50 оренов)</li>' +
+            '<li style="padding:3px 0;display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--wi-amber);">✦</span> Интеллект ИИ: Низкий (ошибается), Средний (стандарт), Мастер (расчёт аутов)</li>' +
+            '<li style="padding:3px 0;display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--wi-amber);">✦</span> Комбинации от Пары до Пяти одинаковых (Покер) с анимацией бросков</li>' +
+            '<li style="padding:3px 0;display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--wi-amber);">✦</span> Аутентичные звуковые эффекты броска и деревянного стаканчика</li>' +
+          '</ul>' +
+        '</div>' +
+        '<div style="margin-top:auto;">' +
+          '<button class="btn btn-primary wi-launch-game-btn" data-game-url="games/dice_poker/index.html" data-game-title="🎲 Покер на костях (5d6 Dice Poker)" style="width:100%;font-size:14px;padding:11px 16px;margin-bottom:8px;background:linear-gradient(180deg,#24482a,#122816);border:1px solid #48a058;color:#fff;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer;border-radius:6px;transition:all 0.2s;">' +
+            '🎲 Запустить покер на костях' +
+          '</button>' +
+          '<a href="games/dice_poker/index.html" class="btn btn-ghost" target="_blank" style="width:100%;text-align:center;font-size:12px;display:block;color:var(--wi-steel);padding:4px 8px;text-decoration:none;">' +
+            '↗ Открыть в новой вкладке' +
+          '</a>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+    return crumb + backBtn + header + tavernAtmosphere + gamesGrid;
+  }
+
+  function wireWiGames(){
+    wireWiNav();
+
+    document.querySelectorAll('.wi-launch-game-btn').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        var url = btn.getAttribute('data-game-url');
+        var title = btn.getAttribute('data-game-title') || 'Игра';
+        if(url){
+          openWiGameModal(url, title);
+        }
+      });
+    });
+  }
+
+  function openWiGameModal(url, title){
+    var old = document.getElementById('wiGameModal');
+    if(old && old.parentNode) old.parentNode.removeChild(old);
+
+    var modal = document.createElement('div');
+    modal.id = 'wiGameModal';
+    modal.className = 'wi-game-modal-overlay';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(5,4,3,0.96);z-index:100000;display:flex;flex-direction:column;';
+    modal.innerHTML = 
+      '<div class="wi-game-modal-header" style="display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:#15100a;border-bottom:1px solid #6b5229;box-shadow:0 4px 12px rgba(0,0,0,0.8);">' +
+        '<div style="display:flex;align-items:center;gap:10px;font-family:\'Cinzel\',serif;font-size:16px;color:#ffd700;font-weight:700;">' +
+          title +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<button id="wiGameFullscreenBtn" class="btn btn-ghost" style="padding:5px 12px;font-size:12px;color:#d8c39e;border:1px solid #7c6239;cursor:pointer;" title="Развернуть на весь экран">⛶ Во весь экран</button>' +
+          '<a href="' + url + '" target="_blank" class="btn btn-ghost" style="padding:5px 12px;font-size:12px;color:#d8c39e;border:1px solid #7c6239;text-decoration:none;display:inline-block;" title="Открыть в отдельной вкладке">↗ В новой вкладке</a>' +
+          '<button id="wiGameCloseBtn" class="btn btn-primary" style="padding:5px 14px;font-size:13px;background:#781c1c;border:1px solid #d44d4d;color:#fff;font-weight:bold;cursor:pointer;" title="Закрыть игру">✕ Закрыть</button>' +
+        '</div>' +
+      '</div>' +
+      '<iframe src="' + url + '" class="wi-game-modal-iframe" style="flex:1;width:100%;height:100%;border:none;background:#000;" allow="fullscreen; autoplay" allowfullscreen></iframe>';
+
+    document.body.appendChild(modal);
+
+    var closeBtn = document.getElementById('wiGameCloseBtn');
+    if(closeBtn){
+      closeBtn.addEventListener('click', function(){
+        if(modal && modal.parentNode) modal.parentNode.removeChild(modal);
+      });
+    }
+
+    var fsBtn = document.getElementById('wiGameFullscreenBtn');
+    if(fsBtn){
+      fsBtn.addEventListener('click', function(){
+        if(!document.fullscreenElement){
+          if(modal.requestFullscreen){
+            modal.requestFullscreen();
+          } else if(document.documentElement.requestFullscreen){
+            document.documentElement.requestFullscreen();
+          }
+        } else {
+          if(document.exitFullscreen) document.exitFullscreen();
+        }
+      });
+    }
+
+    function onEsc(e){
+      if(e.key === 'Escape' && !document.fullscreenElement){
+        if(modal && modal.parentNode) modal.parentNode.removeChild(modal);
+        window.removeEventListener('keydown', onEsc);
+      }
+    }
+    window.addEventListener('keydown', onEsc);
   }
 
   /* Экран Данные и Ростер Ведьмака */
@@ -4420,8 +4601,10 @@
   window.wiMoveEdit = wiMoveEdit;
   window.wiMoveGen = wiMoveGen;
   window.wiMap = wiMap;
+  window.wiGames = wiGames;
   window.wireWiHome = wireWiHome;
   window.wireWiNav = wireWiNav;
+  window.wireWiGames = wireWiGames;
   window.wireWiData = wireWiData;
   window.wireWiRef = wireWiRef;
   window.wireWiRefView = wireWiRefView;
@@ -4458,8 +4641,10 @@
   WI.wiMoveEdit = wiMoveEdit;
   WI.wiMoveGen = wiMoveGen;
   WI.wiMap = wiMap;
+  WI.wiGames = wiGames;
   WI.wireWiHome = wireWiHome;
   WI.wireWiNav = wireWiNav;
+  WI.wireWiGames = wireWiGames;
   WI.wireWiData = wireWiData;
   WI.wireWiRef = wireWiRef;
   WI.wireWiRefView = wireWiRefView;
