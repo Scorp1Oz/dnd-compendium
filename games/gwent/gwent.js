@@ -2040,6 +2040,28 @@ class UI {
 		}
 
 		window.addEventListener('keydown', (e) => {
+			if (Carousel.curr) {
+				if (e.key === 'Escape' && Carousel.curr.bExit) {
+					Carousel.curr.cancel();
+					e.preventDefault();
+					return;
+				}
+				if (e.key === 'ArrowLeft') {
+					Carousel.curr.shift(e, -1);
+					e.preventDefault();
+					return;
+				}
+				if (e.key === 'ArrowRight') {
+					Carousel.curr.shift(e, 1);
+					e.preventDefault();
+					return;
+				}
+				if (e.key === 'Enter') {
+					Carousel.curr.select(e);
+					e.preventDefault();
+					return;
+				}
+			}
 			if (e.key === 'Escape') {
 				if (Popup.curr) {
 					Popup.curr.selectYes();
@@ -2540,7 +2562,12 @@ class Carousel {
 		
 		if (!Carousel.elem) {
 			Carousel.elem = document.getElementById("carousel");
-			Carousel.elem.children[0].addEventListener("click", () => Carousel.curr.cancel(), false);
+			Carousel.elem.children[0].addEventListener("click", () => Carousel.curr?.cancel(), false);
+			Carousel.elem.addEventListener("click", (e) => {
+				if (e.target === Carousel.elem) {
+					Carousel.curr?.cancel();
+				}
+			}, false);
 		}
 		this.elem = Carousel.elem;
 		document.getElementsByTagName("main")[0].classList.remove("noclick");
@@ -2571,6 +2598,14 @@ class Carousel {
 			this.title_elem.classList.remove("hide");
 		} else {
 			this.title_elem.classList.add("hide");
+		}
+		let closeBtn = document.getElementById("carousel-close-btn");
+		if (closeBtn) {
+			if (this.bExit) {
+				closeBtn.classList.remove("hide");
+			} else {
+				closeBtn.classList.add("hide");
+			}
 		}
 		AudioManager.playSFX('open');
 		this.elem.classList.remove("hide");
@@ -2661,6 +2696,8 @@ class Carousel {
 		for (let x of this.previews)
 			x.style.backgroundImage = "";
 		this.elem.classList.add("hide");
+		let closeBtn = document.getElementById("carousel-close-btn");
+		if (closeBtn) closeBtn.classList.add("hide");
 		Carousel.clearCurrent();
 		ui.quitCarousel();
 	}
@@ -2970,16 +3007,19 @@ class DeckMaker {
 			return card;
 		});
 		
-		let index = this.leaders.indexOf(this.leader);
+		let index = this.leaders.findIndex(l => l.index === this.leader?.index);
+		if (index < 0) index = 0;
 		ui.queueCarousel(container, 1, (c,i) => {
 			let data = c.cards[i].data;
 			this.leader = data;
 			this.leader_elem.children[1].style.backgroundImage = largeURL(data.card.deck + "_" + data.card.filename);
 			Settings.getFactionSettings(this.leader.card.deck).setLeader(this.leader);
 			AudioManager.playSFX('ui_card_bank');
-		}, () => true, false, true);
-		Carousel.curr.index = index;
-		Carousel.curr.update();
+		}, () => true, false, true, "Выберите лидера");
+		if (Carousel.curr) {
+			Carousel.curr.index = index;
+			Carousel.curr.update();
+		}
 	}
 	
 	// Opens a Carousel to allow the client to select a faction for their deck
@@ -2991,9 +3031,11 @@ class DeckMaker {
 		let index = container.cards.reduce((a,c,i) => c.filename === this.faction ? i : a, 0);
 		ui.queueCarousel(container, 1, (c,i) => {
 			this.loadFactionDeck(c.cards[i].filename);
-		}, () => true, false, true);
-		Carousel.curr.index = index;
-		Carousel.curr.update();
+		}, () => true, false, true, "Выберите фракцию");
+		if (Carousel.curr) {
+			Carousel.curr.index = index;
+			Carousel.curr.update();
+		}
 	}
 	
 	// Called when client selects s a preview card. Moves it from bank to deck or vice-versa then updates;
@@ -3297,7 +3339,7 @@ class DeckMaker {
 		const container = new CardContainer();
 		//container.cards = [leader, ...Card.this.opponentData.cards];
 		container.cards = Card.getCardsFromIdCounts([leader, ...this.opponentData.cards]);
-		ui.queueCarousel(container, 1, ()=>{}, ()=>true, false, true, "Oponent's deck");
+		ui.queueCarousel(container, 1, ()=>{}, ()=>true, false, true, "Колода противника");
 	}
 }
 

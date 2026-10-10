@@ -166,22 +166,6 @@
 		</div>
 	</section>
 	
-	<section id="carousel" class="hide">
-		<div>
-			<div class="card-lg" onclick="Carousel.curr.shift(event,-2)" onmouseover="Carousel.curr?.nudge(-2)"></div>
-			<div class="card-lg" onclick="Carousel.curr.shift(event,-1)" onmouseover="Carousel.curr?.nudge(-1)"></div>
-			<div class="card-lg" onclick="Carousel.curr.select(event)"   onmouseover="Carousel.curr?.nudge( 0)"></div>
-			<div class="card-lg" onclick="Carousel.curr.shift(event, 1)" onmouseover="Carousel.curr?.nudge( 1)"></div>
-			<div class="card-lg" onclick="Carousel.curr.shift(event, 2)" onmouseover="Carousel.curr?.nudge( 2)"></div>
-		</div>
-		<div class="card-description">
-			<div></div>
-			<h1></h1>
-			<p></p>
-		</div>
-		<div></div>
-	</section>
-	
 	
 	<section id="popup" class="center hide">
 		<div>
@@ -346,6 +330,24 @@
 			<button id="op-preview-clear" class="hide" data-title="Сбросить свою колоду"></button>
 		</div>
 	</div>
+</section>
+
+<section id="carousel" class="hide">
+	<div>
+		<div class="card-lg" onclick="Carousel.curr.shift(event,-2)" onmouseover="Carousel.curr?.nudge(-2)"></div>
+		<div class="card-lg" onclick="Carousel.curr.shift(event,-1)" onmouseover="Carousel.curr?.nudge(-1)"></div>
+		<div class="card-lg" onclick="Carousel.curr.select(event)"   onmouseover="Carousel.curr?.nudge( 0)"></div>
+		<div class="card-lg" onclick="Carousel.curr.shift(event, 1)" onmouseover="Carousel.curr?.nudge( 1)"></div>
+		<div class="card-lg" onclick="Carousel.curr.shift(event, 2)" onmouseover="Carousel.curr?.nudge( 2)"></div>
+	</div>
+	<div class="card-description">
+		<div></div>
+		<h1></h1>
+		<p></p>
+	</div>
+	<div></div>
+	<button id="carousel-close-btn" class="carousel-close-btn" onclick="Carousel.curr?.cancel()" title="Закрыть (Esc)">✕</button>
+	<div id="carousel-hint" class="carousel-hint">Нажмите на карту или Enter для выбора • Esc для отмены</div>
 </section>
 
 <div data-title="Toggle music" id="toggle-music" class="center deck-menu settings-button"><img src="svg/music.svg"></img></div>
