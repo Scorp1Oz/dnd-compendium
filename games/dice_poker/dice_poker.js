@@ -271,14 +271,39 @@ class UnifiedDiceApp {
     const opName = document.getElementById("op-name-label");
     const opBadge = document.getElementById("op-tier-badge");
     const stakeInfo = document.getElementById("stake-info");
+    const playerLabel = document.getElementById("player-name-label");
 
     if (opName) opName.innerText = `Соперник (${this.wealth.name})`;
     if (opBadge) opBadge.innerHTML = `${this.wealth.badge} &bull; ${this.diff.badge}`;
     if (stakeInfo) stakeInfo.innerText = `Ставка: ${this.wealth.baseStake} оренов • До 2 побед`;
+    if (playerLabel) {
+      const pName = this.getPlayerName();
+      playerLabel.innerText = `${pName} (Вы)`;
+    }
 
     if (this.btnRaise) {
       this.btnRaise.innerText = `Поднять ставку (+${this.wealth.raiseStep})`;
     }
+  }
+
+  getPlayerName() {
+    try {
+      const raw = localStorage.getItem('dnd_witcher_profiles') || localStorage.getItem('dnd_compendium_profiles');
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (Array.isArray(data) && data.length > 0) {
+          const active = data.find(p => p.isActive || p.active) || data[0];
+          if (active && active.name && active.name.trim()) return active.name.trim();
+        } else if (data && typeof data === 'object') {
+          const profiles = data.profiles || data.list || [];
+          if (profiles.length > 0) {
+            const active = profiles.find(p => p.isActive || p.active) || profiles[0];
+            if (active && active.name && active.name.trim()) return active.name.trim();
+          }
+        }
+      }
+    } catch (e) {}
+    return "Ведьмак";
   }
 
   /* ============================================================

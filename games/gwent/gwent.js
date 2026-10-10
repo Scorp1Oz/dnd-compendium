@@ -13,6 +13,39 @@ const addMouseEnterSFXBySelector = selector => {
 	e.addEventListener('mouseenter', CLICK_EVENT_SFX));
 };
 
+function getCompendiumPlayerName() {
+	try {
+		const raw = localStorage.getItem('wi_profile');
+		if (raw) {
+			const p = JSON.parse(raw);
+			if (p && p.name && p.name.trim()) return p.name.trim();
+		}
+		const activeId = localStorage.getItem('ttc_wi_active_id');
+		const rawList = localStorage.getItem('ttc_wi_profiles');
+		if (rawList) {
+			const list = JSON.parse(rawList);
+			if (Array.isArray(list)) {
+				const found = list.find(item => item && item.id === activeId) || list[0];
+				if (found && found.name && found.name.trim()) return found.name.trim();
+			}
+		}
+	} catch(e){}
+	return "Ведьмак";
+}
+
+function getCompendiumOpponentName(factionKey) {
+	const titles = {
+		realms: "Королевский маршал",
+		nilfgaard: "Офицер Нильфгаарда",
+		monsters: "Владыка чащи",
+		scoiatael: "Командир «Белок»",
+		skellige: "Ярл Скеллиге",
+		syndicate: "Главарь Синдиката"
+	};
+	if (factionKey && titles[factionKey]) return titles[factionKey];
+	return "Корчмарь";
+}
+
 class Controller {}
 
 // Makes decisions for the AI opponent player
@@ -1686,7 +1719,8 @@ class Game {
 	{
 		this.reset();
 		player_me.reset();
-		player_op = new Player('op', 'Player 2', dm.constructOpponentDeck(false));
+		const op_deck = dm.constructOpponentDeck(false);
+		player_op = new Player('op', getCompendiumOpponentName(op_deck ? op_deck.faction : null), op_deck);
 		this.endScreen.classList.add("hide");
 		this.startGame();
 	}
@@ -2957,8 +2991,8 @@ class DeckMaker {
 		};
 		const op_deck = this.constructOpponentDeck(true);
 		
-		player_me = new Player(0, "Player 1", me_deck);
-		player_op = new Player(1, "Player 2", op_deck);
+		player_me = new Player(0, getCompendiumPlayerName(), me_deck);
+		player_op = new Player(1, getCompendiumOpponentName(op_deck ? op_deck.faction : null), op_deck);
 		
 		this.elem.classList.add("hide");
 		game.startGame();

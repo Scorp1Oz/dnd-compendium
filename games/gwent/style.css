@@ -17,15 +17,66 @@ html,body
 /* remove spacing between html elements */
 body {
 	font-size: 0px;
-	/*font-family: Impact;*/
-	font-family:Arial Narrow, sans-serif;
-	color: goldenrod;
-	background-color: black;
+	font-family: 'Cinzel', 'EB Garamond', 'Bahnschrift', sans-serif;
+	color: #e2e8f0;
+	background-color: #090b0e;
 }
 
 /* disables scroll bar b/c it messes with % units like margins */
 body::-webkit-scrollbar {
 	display: none;
+}
+
+/* ============================================================
+   DnD Compendium Unified Top Navigation Bar
+   ============================================================ */
+
+.wi-top-nav {
+	position: fixed;
+	top: 10px;
+	right: 14px;
+	z-index: 99999;
+	display: flex;
+	gap: 8px;
+	font-family: 'Cinzel', serif;
+}
+
+.wi-nav-btn {
+	background: rgba(14, 18, 24, 0.92);
+	border: 1px solid rgba(180, 150, 100, 0.35);
+	color: #cbd5e1;
+	padding: 6px 12px;
+	border-radius: 6px;
+	font-size: 12.5px;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+	backdrop-filter: blur(8px);
+	transition: all 0.2s ease;
+	letter-spacing: 0.04em;
+}
+
+.wi-nav-btn:hover {
+	border-color: #ffd700;
+	color: #fff;
+	background: rgba(30, 24, 16, 0.95);
+	box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+	transform: translateY(-2px);
+}
+
+.wi-nav-btn.wi-nav-primary {
+	border-color: #f59e0b;
+	color: #ffd700;
+	font-weight: 700;
+	background: linear-gradient(180deg, rgba(35, 26, 16, 0.95) 0%, rgba(18, 13, 9, 0.98) 100%);
+}
+
+.wi-nav-btn.wi-nav-primary:hover {
+	border-color: #ffd700;
+	color: #fff;
+	box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
 }
 
 main {
@@ -83,20 +134,29 @@ html {
 
 #exit-game
 {
-	top: 1.4vw;
-	left: 1vw;
+	top: 1.2vw;
+	left: 1.2vw;
 	position: absolute;
-	width: 2vw;
-	height: 2vw;
+	width: 2.2vw;
+	height: 2.2vw;
+	background-color: rgba(14, 18, 24, 0.88);
 	background-image: url("svg/exit.svg");
 	background-repeat: no-repeat;
-	background-size: contain;
-	opacity: 20%;
-	transition: opacity 0.3s;
+	background-size: 60% 60%;
+	background-position: center;
+	border: 1px solid rgba(180, 150, 100, 0.35);
+	border-radius: 6px;
+	box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+	backdrop-filter: blur(4px);
+	opacity: 0.85;
+	transition: all 0.25s ease;
+	cursor: pointer;
 }
 #exit-game:hover {
-	filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.5));
-	opacity: 100%;
+	border-color: #ef4444;
+	box-shadow: 0 0 12px rgba(239, 68, 68, 0.55);
+	opacity: 1;
+	transform: scale(1.08);
 }
 
 /* ----------- settings & media player ------------------ */
@@ -113,22 +173,39 @@ html {
 	position: absolute;
 	width: 2.5vw;
 	height: 2.5vw;
+	background: rgba(14, 18, 24, 0.88);
+	border: 1px solid rgba(180, 150, 100, 0.35);
+	border-radius: 6px;
+	box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+	cursor: pointer;
 }
 .settings-button>img{
-	width: 2.5vw;
-	height: 2.5vw;
-	filter:drop-shadow(0px 0px 2px black);
+	width: 1.7vw;
+	height: 1.7vw;
+	filter: drop-shadow(0px 0px 2px black);
+	transition: all 0.2s ease;
 }
 
 .settings-button.fade>img {
-	 opacity: 0.2; 
+	 opacity: 0.3; 
 }
 
 .settings-button.fade:hover>img {
-	opacity: 0.3;
+	opacity: 0.6;
+}
+.settings-button:hover {
+	border-color: #ffd700;
+	background: rgba(30, 24, 16, 0.95);
+	box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+	transform: scale(1.08);
 }
 .settings-button:hover>img {
-	filter:drop-shadow(0px 0px 3px rgba(255, 255, 255, 0.5));
+	filter: drop-shadow(0px 0px 4px rgba(245, 158, 11, 0.6));
 }
 
 #toggle-music {
@@ -187,11 +264,15 @@ html {
 /* ----------- notification bar ------------------ */
 
 #notification-bar {
-	position:absolute;
-	width:100%;
+	position: absolute;
+	width: 100%;
 	height: 14%;
 	top: 43%;
-	background-color: rgba(10,10,10,0.95);
+	background: linear-gradient(90deg, transparent 0%, rgba(9, 11, 14, 0.94) 15%, rgba(18, 22, 30, 0.98) 50%, rgba(9, 11, 14, 0.94) 85%, transparent 100%);
+	border-top: 1px solid rgba(245, 158, 11, 0.45);
+	border-bottom: 1px solid rgba(245, 158, 11, 0.45);
+	box-shadow: 0 0 35px rgba(0,0,0,0.9), inset 0 0 25px rgba(0,0,0,0.85);
+	backdrop-filter: blur(6px);
 	opacity: 0;
 	z-index: 100;
 }
@@ -205,6 +286,7 @@ html {
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-position: center;
+	filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.45));
 }
 #notification-bar > div::after {
 	position: absolute;
@@ -212,61 +294,65 @@ html {
 	top: 32.1%;
 	width: 205%;
 	height: 47.25%;
-	color: goldenrod;
-	font-size: 1.6vw;
-	text-align:left;
-	font-weight:bold;
+	color: #ffd700;
+	font-family: 'Cinzel', serif !important;
+	font-size: 1.8vw;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	text-align: left;
+	font-weight: 700;
+	text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 16px rgba(245, 158, 11, 0.6);
 	display: flex;
 	align-items: center;
 }
 
-#notif-me-first::after { content:"You will go first"; }
-#notif-op-first::after { content:"Your opponent will go first"; }
+#notif-me-first::after { content:"Вы ходите первым"; }
+#notif-op-first::after { content:"Соперник ходит первым"; }
 
 #notif-me-coin { background-image: url('img/icons/notif_me_coin.png'); }
-#notif-me-coin::after { content:"You will go first"; }
+#notif-me-coin::after { content:"Вы ходите первым"; }
 
 #notif-op-coin { background-image: url('img/icons/notif_op_coin.png'); }
-#notif-op-coin::after { content:"Your opponent will go first"; }
+#notif-op-coin::after { content:"Соперник ходит первым"; }
 
 #notif-round-start { background-image: url('img/icons/notif_round_start.png'); }
-#notif-round-start::after { content:"Round Start"; }
+#notif-round-start::after { content:"Начало раунда"; }
 
 #notif-me-pass { background-image: url('img/icons/notif_round_passed.png'); }
-#notif-me-pass::after { content:"Round passed"; }
+#notif-me-pass::after { content:"Раунд спасован"; }
 
 #notif-op-pass { background-image: url('img/icons/notif_round_passed.png'); }
-#notif-op-pass::after { content:"Your opponent has passed"; }
+#notif-op-pass::after { content:"Соперник спасовал"; }
 
 #notif-win-round { background-image: url('img/icons/notif_win_round.png'); } 
-#notif-win-round::after { content:"You won the round!"; }
+#notif-win-round::after { content:"Вы выиграли раунд!"; }
 
 #notif-lose-round { background-image: url('img/icons/notif_lose_round.png'); }
-#notif-lose-round::after { content:"Your opponent won the round"; }
+#notif-lose-round::after { content:"Соперник выиграл раунд"; }
 
 #notif-draw-round { background-image: url('img/icons/notif_draw_round.png'); }
-#notif-draw-round::after {content:"The round ended in a draw"; }
+#notif-draw-round::after { content:"Ничья в раунде"; }
 
 #notif-me-turn { background-image: url('img/icons/notif_me_turn.png'); } 
-#notif-me-turn::after { content:"Your turn!"; }
+#notif-me-turn::after { content:"Ваш ход!"; }
 
 #notif-op-turn { background-image: url('img/icons/notif_op_turn.png'); }
-#notif-op-turn::after { content:"Opponent's turn"; }
+#notif-op-turn::after { content:"Ход соперника"; }
 
 #notif-north { background-image: url('img/icons/notif_north.png'); }
-#notif-north::after { content:"Northern Realms faction ability triggered - North draws an additional card."; }
+#notif-north::after { content:"Дар Севера: дополнительная карта из колоды!"; }
 
 #notif-monsters { background-image: url('img/icons/notif_monsters.png'); }
-#notif-monsters::after { content: "Monsters faction ability triggered - one randomly-chosen Monster Unit Card stays on the board"; }
+#notif-monsters::after { content:"Свирепость Чудовищ: отряд остаётся на поле!"; }
 
 #notif-scoiatael { background-image: url('img/icons/notif_scoiatael.png'); }
-#notif-scoiatael::after { content: "Opponent used the Scoia'tael faction perk to go first."; }
+#notif-scoiatael::after { content:"Засада Скоя'таэлей: право первого хода!"; }
 
 #notif-skellige-op{ background-image: url('img/icons/notif_skellige.png'); }
-#notif-skellige-op::after { content: "Opponent Skellige Ability Triggered!"; }
+#notif-skellige-op::after { content:"Ярость Скеллиге: возврат отрядов из сброса!"; }
 
 #notif-skellige-me{ background-image: url('img/icons/notif_skellige.png'); }
-#notif-skellige-me::after { content: "Skellige Ability Triggered!"; }
+#notif-skellige-me::after { content:"Ярость Скеллиге: возврат отрядов из сброса!"; }
 
 /* ------- card preview ------------- */
 
@@ -291,15 +377,16 @@ html {
 }
 .card-description {
 	position: absolute;
-
 	height: 7.87vw;
 	width: 29.12vw;
-	background-color: rgba(20,20,20, 0.95);
-	color: tan;
+	background: linear-gradient(135deg, rgba(14, 18, 24, 0.96) 0%, rgba(9, 11, 14, 0.98) 100%);
+	color: #e2e8f0;
 	text-align: center;
-	pointer-events : none;
-	border: .1vw solid #ffffff57;
-    border-width: .1vw 0;
+	pointer-events: none;
+	border: 1px solid rgba(180, 150, 100, 0.35);
+	border-radius: 6px;
+	box-shadow: 0 8px 24px rgba(0,0,0,0.85), inset 0 0 16px rgba(0,0,0,0.6);
+	backdrop-filter: blur(8px);
 }
 
 .card-description > * { position: relative; }
@@ -310,30 +397,35 @@ html {
 	width: 1.95vw;
 	height: 1.95vw;
 	margin-bottom: -1.9vw;
-	background-size:cover;
-	background-position:center;
+	background-size: cover;
+	background-position: center;
+	filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
 }
 
 .card-description > h1 {
-	font-weight: bold;
-	
+	font-weight: 700;
+	font-family: 'Cinzel', serif;
+	letter-spacing: 0.05em;
 	top: 0.5vw;
 	left: 16%;
 	height: 16%;
 	width: 70%;
 	margin-bottom: -2.1vw;
 	text-transform: capitalize;
-	
-	font-size: 1vw;
+	color: #ffd700;
+	text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+	font-size: 1.05vw;
 }
 
 .card-description > p {
 	top: 37%;
 	left: 5%;
 	width: 90%;
-	height:50%;
-	
-	font-size: 0.9vw;
+	height: 50%;
+	font-family: 'EB Garamond', Georgia, serif;
+	font-size: 0.95vw;
+	color: #cbd5e1;
+	line-height: 1.35;
 }
 
 /* ------- carousel ------------- */
@@ -446,73 +538,104 @@ html {
 	position: absolute;
     width: 100%;
     height: calc(100vw * 1080 / 1920);
-    background-color: rgba(10,10,10,.95);
+    background-color: rgba(6, 8, 11, 0.94);
+    backdrop-filter: blur(8px);
     z-index: 1000;
-    /* background-image: url(img/boardtest10.png); */
-    /* background-size: contain; */
 }
-
 
 #popup > div {
     margin-top: -89px;
-    width: 26.5%;
-    border: .2vw solid rgb(60,60,60);
-    padding: 0 0.5vw;
-    background-color: rgb(20,20,20);
+    width: 28%;
+    border: 1px solid rgba(180, 150, 100, 0.4);
+    border-radius: 8px;
+    padding: 1vw 1.2vw;
+    background: linear-gradient(135deg, rgba(22, 28, 38, 0.98) 0%, rgba(14, 18, 24, 0.99) 100%);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.9), 0 0 20px rgba(245, 158, 11, 0.2);
 }
 
 #popup h3 {
     display: block;
-    font-size: 1.05vw;
+    font-size: 1.15vw;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
     text-transform: uppercase;
-    color: grey;
+    color: #ffd700;
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
     text-align: center;
-    line-height: 100%;
+    line-height: 120%;
+    letter-spacing: 0.06em;
 }
 
 #popup p {
     text-align: center;
-    font-size: 1.23vw;
+    font-size: 1.05vw;
+    font-family: 'EB Garamond', Georgia, serif;
     padding-top: .6vw;
-    color: tan;
+    color: #cbd5e1;
+    line-height: 1.4;
 }
 
 #popup > div > div {
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: .2vw;
+    justify-content: center;
+    gap: 0.8vw;
+    padding: .4vw;
     min-width: 10%;
     width: fit-content;
-    margin: -1.4vw auto 0;
-    border: .2vw solid rgb(25,25,25);
-    background-color: black;
-    top: 1.3vw;
+    margin: 1vw auto 0;
+    border: none;
+    background: transparent;
+    top: 0;
 }
 
 #popup button {
-
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: auto;
-    height: 1.8vw;
-    border: .2vw solid rgb(40,40,40);
-    background-color: rgb(20,20,20);
-    font-size: 1vw;
-    text-shadow: 1vw 1vw 1vw black;
-	text-transform: capitalize;
-	margin: 0 0.3vw;
-	transition: color 0.1s, border-color 0.1s;
+    min-width: 6vw;
+    height: 2.2vw;
+    border: 1px solid rgba(180, 150, 100, 0.35);
+    border-radius: 4px;
+    background: rgba(14, 18, 24, 0.9);
+    font-family: 'Cinzel', serif;
+    font-size: 0.95vw;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #e2e8f0;
+    cursor: pointer;
+    margin: 0 0.3vw;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    transition: all 0.2s ease;
 }
 #popup button:hover {
-	box-shadow: 0 0 1px rgba(255, 255, 255, .5);
-	border-color: rgb(70, 70, 70);
+	box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+	border-color: #ffd700;
+	transform: translateY(-1px);
 }
 
-#popup button:first-child { color: green; }
-#popup button:first-child:hover { color: lightgreen; }
-#popup button:last-child {color: darkred; }
-#popup button:last-child:hover {color: red; }
+#popup button:first-child { 
+	border-color: rgba(72, 160, 88, 0.6); 
+	color: #86efac; 
+	background: linear-gradient(180deg, rgba(20, 50, 26, 0.85) 0%, rgba(10, 28, 14, 0.95) 100%);
+}
+#popup button:first-child:hover { 
+	border-color: #4ade80; 
+	color: #fff; 
+	box-shadow: 0 0 12px rgba(74, 222, 128, 0.5); 
+}
+#popup button:last-child {
+	border-color: rgba(212, 77, 77, 0.6); 
+	color: #fca5a5; 
+	background: linear-gradient(180deg, rgba(70, 20, 18, 0.85) 0%, rgba(35, 10, 8, 0.95) 100%);
+}
+#popup button:last-child:hover {
+	border-color: #ef4444; 
+	color: #fff; 
+	box-shadow: 0 0 12px rgba(239, 68, 68, 0.5); 
+}
 
 /* --------------------- end screen ---------------------------  */
 
@@ -521,7 +644,8 @@ html {
 	height: calc(100vw * 1080 / 1920);
 	position: absolute;
 	z-index: 1000;
-	background-color: rgba(10,10,10,0.95);
+	background: radial-gradient(circle at 50% 50%, rgba(20, 26, 36, 0.96) 0%, rgba(9, 11, 14, 0.98) 100%);
+	backdrop-filter: blur(8px);
 }
 
 #end-screen * {
@@ -550,22 +674,27 @@ html {
 }
 
 #end-screen tbody :first-child th {
-	font-size: .9vw;
+	font-size: 1vw;
+	font-family: 'Cinzel', serif;
+	letter-spacing: 0.05em;
 	text-align: center;
-	color: darkslategrey;
-	color: rgb(100,100,100);
+	color: #94a3b8;
 }
 
 #end-screen td {
-	font-size: 1.7vw;
+	font-size: 1.8vw;
+	font-family: 'JetBrains Mono', monospace;
+	font-weight: 700;
 	text-align: center;
-	color: rgb(180,180,180);
+	color: #f1f5f9;
 }
 
 #end-screen tr :first-child {
-	font-size: 1.2vw;
+	font-size: 1.3vw;
+	font-family: 'Cinzel', serif;
+	font-weight: 700;
 	text-align: right;
-	color:darkorange;
+	color: #ffd700;
 	padding-right: 5%;
 }
 
@@ -574,26 +703,37 @@ html {
 	left: 30.1%;
 	width: 41%;
 	height: 3%;
-	font-size: 1.21vw;
-	color: rgb(180,180,180);
+	font-size: 1.1vw;
+	font-family: 'EB Garamond', Georgia, serif;
+	color: #94a3b8;
+	text-align: center;
 }
 
 #end-screen button {
     position: absolute;
-    height: 3vw;
-    width: 10vw;
+    height: 2.8vw;
+    width: 11vw;
     top: 87%;
-	font-family: Arial Narrow;
-    font-size: 1.5vw;
-    color: goldenrod;
-    background-color: #4c390a66;
-    border: .2vw solid #1d180b;
-    border-radius: 0.1vw;
-    box-shadow: 0 0 .5vw #6d5210;
+	font-family: 'Cinzel', serif;
+    font-size: 1.05vw;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #ffd700;
+    background: linear-gradient(180deg, rgba(35, 26, 16, 0.95) 0%, rgba(18, 13, 9, 0.98) 100%);
+    border: 1px solid rgba(180, 150, 100, 0.45);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 #end-screen button:hover {
-	box-shadow: 0 0 2vw #6d5210;
+	border-color: #ffd700;
+	color: #fff;
+	background: linear-gradient(180deg, #744e23 0%, #3d260a 100%);
+	box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+	transform: translateY(-2px);
 }
 
 #end-screen button:nth-of-type(1) { left: 31%; }
@@ -732,11 +872,17 @@ main { background-image: url('img/boardtest8.png'); }
 	height: 12.5%;
 	width: 88.5%;
 	margin-bottom: -27%;
-	background-color: rgba(20,20,20,0.6);
+	background: linear-gradient(135deg, rgba(22, 28, 38, 0.84) 0%, rgba(12, 16, 22, 0.92) 100%);
+	border: 1px solid rgba(180, 150, 100, 0.28);
+	border-radius: 8px;
+	box-shadow: 0 4px 16px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
+	backdrop-filter: blur(4px);
+	transition: all 0.3s ease;
 }
 
 .current-turn {
-	box-shadow: -3vw 0px 1vw 0.1vw goldenrod;
+	border-color: #f59e0b !important;
+	box-shadow: -1.5vw 0px 1.5vw 0.1vw rgba(245, 158, 11, 0.5), inset 0 0 12px rgba(245, 158, 11, 0.25) !important;
 }
 
 #stats-op {
@@ -754,12 +900,21 @@ main { background-image: url('img/boardtest8.png'); }
 	height: 80%;
 	margin-bottom: -24%;
 	
-	background-image: url('img/icons/profile.png');
-	background-size: contain;
+	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center;
 	border-radius: 100%;
-	/*background-overflow: hidden;*/
+	box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+}
+
+#stats-me .profile-img {
+	background-image: url('svg/avatar_witcher.svg');
+	filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.45));
+}
+
+#stats-op .profile-img {
+	background-image: url('svg/avatar_opponent.svg');
+	filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.45));
 }
 
 .profile-img > div {
@@ -783,6 +938,7 @@ main { background-image: url('img/boardtest8.png'); }
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center;
+	filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
 }
 
 #stats-me > div > div > div {
@@ -790,23 +946,23 @@ main { background-image: url('img/boardtest8.png'); }
 }
 
 .score-total {
-	top: 25%;
 	left: 94.5%;
 	height: 40%;
 	width: 12%;
-	
-	top:31%;
-	
+	top: 31%;
 	margin-bottom: -12%;
 	
-	color: black;
-	text-shadow: 0 0 5px white;
-	font-size: 2.3vw;
-	font-weight: bold;
+	color: #090b0e;
+	font-family: 'JetBrains Mono', 'Cinzel', monospace !important;
+	font-size: 2.1vw;
+	font-weight: 700;
+	text-shadow: 0 0 3px rgba(255, 255, 255, 0.85);
+	letter-spacing: -0.02em;
 	
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center;
+	filter: drop-shadow(0 3px 6px rgba(0,0,0,0.7));
 }
 
 #score-total-me {
@@ -836,18 +992,17 @@ main { background-image: url('img/boardtest8.png'); }
 	width: 17%;
 	margin-bottom: -9%;
 
-	font-size: 1.7vw;
-	font-weight: bold;
+	font-size: 1.45vw;
+	font-weight: 700;
+	font-family: 'JetBrains Mono', monospace !important;
+	color: #f1f5f9;
+	text-shadow: 0 2px 5px rgba(0,0,0,0.9);
 	padding-left: 7%;
-	
-	
 	
 	background-image: url('img/icons/icon_card_count.png');
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: left;
-	
-	
 }
 
 #hand-count-me {
@@ -863,6 +1018,7 @@ main { background-image: url('img/boardtest8.png'); }
 
 .gem-on {
 	background-image: url('img/icons/icon_gem_on.png');
+	filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.85));
 }
 
 #gem2-op {
@@ -893,14 +1049,23 @@ main { background-image: url('img/boardtest8.png'); }
 	margin-bottom: -6%;
 	overflow: hidden;
 	white-space: nowrap;
-	font-size: 1.1vw;
-	font-weight: bold;
-	
-	/*font-family: Arial Narrow, sans-serif;*/
+	font-size: 1.12vw;
+	font-weight: 700;
+	font-family: 'Cinzel', serif !important;
+	letter-spacing: 0.05em;
+	color: #ffd700;
+	text-shadow: 0 2px 4px rgba(0,0,0,0.95);
 }
 
 #name-me {
 	top: 60%;
+	color: #ffd700;
+	text-shadow: 0 0 8px rgba(245, 158, 11, 0.45), 0 2px 4px rgba(0,0,0,0.9);
+}
+
+#name-op {
+	color: #e2e8f0;
+	text-shadow: 0 0 8px rgba(226, 232, 240, 0.3), 0 2px 4px rgba(0,0,0,0.9);
 }
 
 .deck-name {
@@ -910,11 +1075,14 @@ main { background-image: url('img/boardtest8.png'); }
 	height: 20%;
 	margin-bottom: -6%;
 	overflow: hidden;
-	text-transform:capitalize;
+	text-transform: capitalize;
 	
-	color: tan;
-	font-size: .95vw;
-	/*font-family: Arial Narrow, sans-serif;*/
+	color: #94a3b8 !important;
+	font-size: 0.95vw;
+	font-family: 'EB Garamond', Georgia, serif !important;
+	font-style: italic;
+	letter-spacing: 0.03em;
+	text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
 
 #deck-name-me {
@@ -927,28 +1095,45 @@ main { background-image: url('img/boardtest8.png'); }
 	left:90%;
 	top: 87%;
 	
-	color: tan;
-	font-size: 1.5vw;
-	font-weight: bold;
-	text-shadow: 1px 1px 2px black;
+	color: #ef4444;
+	font-family: 'Cinzel', serif !important;
+	font-size: 1.4vw;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	text-shadow: 0 0 10px rgba(239, 68, 68, 0.7), 0 2px 4px rgba(0,0,0,0.9);
 }
 #passed-me{ top: -3%;}
 
 #pass-button {
 	top: 82%;
 	left: 63%;
-	width:20%;
+	width: 20%;
 	height: 4%;
 	
-	font-size: 2vw;
-	font-weight: bold;
+	font-size: 1.2vw;
+	font-weight: 700;
+	font-family: 'Cinzel', serif !important;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 	
-	border: .1vw solid goldenrod;
-	border-radius: .5vw;
-	background-color: rgba(20,20,20,.9);
+	border: 1px solid rgba(212, 77, 77, 0.75);
+	border-radius: 6px;
+	background: linear-gradient(180deg, #781c1c 0%, #440c0c 100%);
+	color: #fff;
+	box-shadow: 0 4px 14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.2);
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 #pass-button:hover {
-	text-shadow: 0px 0px 3px rgba(255, 255, 255, 0.5);
+	background: linear-gradient(180deg, #992424 0%, #5e1111 100%);
+	border-color: #ff8888;
+	box-shadow: 0 0 16px rgba(239, 68, 68, 0.65), inset 0 1px 0 rgba(255,255,255,0.3);
+	text-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+	transform: scale(1.04);
 }
 
 /* ------------- middle pannel ------------------ */
@@ -992,13 +1177,17 @@ main { background-image: url('img/boardtest8.png'); }
 
 .row-score {
 	width: 5.1%;
-	top:7%;
+	top: 7%;
 	height: 95%;
 	margin-bottom: -12.65%;
-	font-size: 1.8vw;
-	
-	color: black;
-	text-shadow: 0 0 5px white;
+	font-family: 'JetBrains Mono', 'Cinzel', monospace !important;
+	font-size: 1.65vw;
+	font-weight: 700;
+	color: #0b0e14;
+	text-shadow: 0 0 3px rgba(255, 255, 255, 0.85);
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .row-special {
@@ -1273,15 +1462,20 @@ main { background-image: url('img/boardtest8.png'); }
 
 .deck-options {
 	position: absolute;
+	font-family: 'Cinzel', serif;
 	font-size: clamp(11px, 0.82vw, 13px);
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
 	color: #d4af37;
 	top: 9.8vh;
 	cursor: pointer;
 	text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+	transition: color 0.2s ease;
 }
 .deck-options:hover {
 	color: #fff;
-	text-decoration: underline;
+	text-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
 }
 
 #upload-deck {
@@ -1301,11 +1495,12 @@ main { background-image: url('img/boardtest8.png'); }
 .card-contianer-title {
 	position: absolute;
 	font-size: clamp(13px, 1.1vw, 16px);
-	color: #bfa882;
-	font-family: "Georgia", serif;
-	letter-spacing: 0.05vw;
+	color: #ffd700;
+	font-family: 'Cinzel', serif;
+	letter-spacing: 0.08em;
 	text-transform: uppercase;
 	margin: 0;
+	text-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
 }
 
 #card-bank-title {
@@ -1335,7 +1530,7 @@ main { background-image: url('img/boardtest8.png'); }
 }
 
 .card-array .card-lg:hover {
-	box-shadow: 0 0 1vw goldenrod;
+	box-shadow: 0 0 1.2vw rgba(245, 158, 11, 0.65);
 }
 
 .card-array .card-lg.empty
@@ -1386,9 +1581,14 @@ main { background-image: url('img/boardtest8.png'); }
 }
 
 #card-leader p {
+	font-family: 'Cinzel', serif;
 	font-size: clamp(10px, 0.8vw, 13px);
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
 	text-align: center;
-	color: #8f6c36;
+	color: #ffd700;
+	text-shadow: 0 0 6px rgba(245, 158, 11, 0.35);
 	margin: 0 0 0.3vh 0;
 	line-height: 1;
 }
@@ -1402,9 +1602,10 @@ main { background-image: url('img/boardtest8.png'); }
 	background-repeat: no-repeat;
 	border-radius: 0.4vw;
 	cursor: pointer;
+	transition: all 0.2s ease;
 }
 #card-leader > div:hover {
-	box-shadow: 0 0 0.75vw goldenrod;
+	box-shadow: 0 0 1vw rgba(245, 158, 11, 0.7);
 }
 
 #deck-stats {
@@ -1417,19 +1618,29 @@ main { background-image: url('img/boardtest8.png'); }
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
+	background: linear-gradient(135deg, rgba(20, 26, 36, 0.85) 0%, rgba(10, 14, 20, 0.92) 100%);
+	border: 1px solid rgba(180, 150, 100, 0.3);
+	border-radius: 8px;
+	padding: 0.6vh 0.8vw;
+	box-shadow: 0 4px 15px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
+	backdrop-filter: blur(4px);
 }
 
 #deck-stats > p:nth-child(odd) {
-	color: #82735f;
-	font-size: clamp(10px, 0.76vw, 13px);
+	color: #94a3b8;
+	font-family: 'Cinzel', serif;
+	font-size: clamp(9px, 0.72vw, 12px);
+	letter-spacing: 0.03em;
 	text-align: center;
 	margin: 0;
 }
 
 #deck-stats > p:nth-child(even) {
+	font-family: 'JetBrains Mono', monospace;
 	font-size: clamp(11px, 0.88vw, 14px);
+	font-weight: 700;
 	text-align: left;
-	color: #9f7d3e;
+	color: #ffd700;
 	padding-left: 2.2vw;
 	margin: 0 0 0 3.8vw;
 	background-repeat: no-repeat;
@@ -1448,18 +1659,20 @@ main { background-image: url('img/boardtest8.png'); }
 	top: 58.5vh;
 	left: 50%;
 	transform: translateX(-50%);
-	width: 8.5vw;
-	min-width: 110px;
-	height: 4.5vh;
-	min-height: 32px;
+	width: 9.5vw;
+	min-width: 120px;
+	height: 4.6vh;
+	min-height: 34px;
 	font-size: clamp(13px, 1vw, 16px);
-	font-family: "Georgia", serif;
-	font-weight: bold;
-	color: #f7eed8;
-	background: linear-gradient(180deg, #5b3e1b 0%, #2f1d07 100%);
-	border: 1px solid #d4af37;
-	border-radius: 4px;
-	box-shadow: 0 2px 8px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15);
+	font-family: 'Cinzel', serif;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #fff;
+	background: linear-gradient(180deg, #781c1c 0%, #440c0c 100%);
+	border: 1px solid #d44d4d;
+	border-radius: 6px;
+	box-shadow: 0 4px 14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.2);
 	cursor: pointer;
 	transition: all 0.2s ease;
 	white-space: nowrap;
@@ -1468,10 +1681,11 @@ main { background-image: url('img/boardtest8.png'); }
 	justify-content: center;
 }
 #start-game:hover {
-	background: linear-gradient(180deg, #744e23 0%, #3d260a 100%);
-	border-color: #ffd700;
-	box-shadow: 0 0 12px rgba(212,175,55,0.6);
+	background: linear-gradient(180deg, #992424 0%, #5e1111 100%);
+	border-color: #ff8888;
+	box-shadow: 0 0 18px rgba(239, 68, 68, 0.65);
 	color: #fff;
+	transform: translateX(-50%) scale(1.04);
 }
 
 #opponent-preview {
@@ -1490,15 +1704,15 @@ main { background-image: url('img/boardtest8.png'); }
 	margin-bottom: 0.2vh;
 }
 .op-title {
-	color: #cbb896;
-	font-family: "Georgia", serif;
+	color: #ffd700;
+	font-family: 'Cinzel', serif;
 	font-size: clamp(11px, 0.8vw, 13px);
-	font-weight: 600;
-	letter-spacing: 0.6px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
 	text-transform: uppercase;
 	text-align: center;
 	margin: 0;
-	text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+	text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
 }
 .op-faction-selector {
 	display: flex;
@@ -1512,8 +1726,8 @@ main { background-image: url('img/boardtest8.png'); }
 	min-width: 25px;
 	min-height: 25px;
 	border-radius: 4px;
-	border: 1px solid rgba(212,175,55,0.35);
-	background: rgba(22, 16, 11, 0.85);
+	border: 1px solid rgba(180, 150, 100, 0.35);
+	background: rgba(14, 18, 24, 0.88);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -1521,17 +1735,18 @@ main { background-image: url('img/boardtest8.png'); }
 	padding: 2px;
 	transition: all 0.2s ease;
 	position: relative;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 .op-faction-btn:hover {
 	border-color: #ffd700;
-	background: rgba(60, 42, 22, 0.95);
+	background: rgba(30, 24, 16, 0.95);
 	transform: translateY(-1px);
-	box-shadow: 0 0 6px rgba(212,175,55,0.6);
+	box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
 }
 .op-faction-btn.active {
 	border-color: #ffd700;
-	background: linear-gradient(180deg, #62431d 0%, #301d0a 100%);
-	box-shadow: 0 0 8px rgba(255,215,0,0.7), inset 0 0 4px rgba(255,215,0,0.3);
+	background: linear-gradient(180deg, rgba(60, 42, 22, 0.95) 0%, rgba(30, 18, 10, 0.98) 100%);
+	box-shadow: 0 0 10px rgba(255, 215, 0, 0.65), inset 0 0 4px rgba(255, 215, 0, 0.3);
 	transform: scale(1.08);
 }
 .op-faction-btn img {
@@ -1546,11 +1761,11 @@ main { background-image: url('img/boardtest8.png'); }
 	pointer-events: none;
 }
 .op-selected-status {
-	color: #f0dfb8;
-	font-family: "Georgia", serif;
+	color: #f7d679;
+	font-family: 'Cinzel', serif;
 	font-size: clamp(10px, 0.72vw, 12px);
-	background: rgba(15, 10, 6, 0.65);
-	border: 1px solid rgba(212,175,55,0.3);
+	background: rgba(14, 18, 24, 0.85);
+	border: 1px solid rgba(180, 150, 100, 0.35);
 	border-radius: 10px;
 	padding: 2px 10px;
 	margin: 0.2vh 0 0.3vh 0;
@@ -1723,18 +1938,20 @@ main { background-image: url('img/boardtest8.png'); }
 
 *[data-title]:hover::after{
 	content: attr(data-title);
-	background-color: rgba(10,10,10,.95);
-	color: goldenrod;
-	font-family: Arial Narrow, sans-serif;
-	font-size: 1.2vw;
+	background: rgba(14, 18, 24, 0.96);
+	color: #ffd700;
+	font-family: 'Cinzel', serif;
+	font-size: 0.9vw;
+	letter-spacing: 0.04em;
 	position: absolute;
-	padding: 1px 5px 2px 5px;
+	padding: 3px 8px;
 	bottom: -2vw;
 	left: var(--title-left);
 	white-space: nowrap;
-	box-shadow: 1px 1px 4px #242424;
+	box-shadow: 0 4px 15px rgba(0,0,0,0.85);
 	text-shadow: none;
-	border: 1px solid #1b1b1b;
+	border: 1px solid rgba(180, 150, 100, 0.4);
+	border-radius: 4px;
 	z-index: 9999999;
 	pointer-events: none;
 }
@@ -1798,35 +2015,38 @@ main { background-image: url('img/boardtest8.png'); }
 }
 
 .mulligan-title {
-	font-family: "Georgia", serif;
+	font-family: 'Cinzel', serif;
 	font-size: 2.2vw;
-	color: #e5c158;
-	text-shadow: 0 2px 10px rgba(0,0,0,0.9), 0 0 15px rgba(229, 193, 88, 0.4);
+	color: #ffd700;
+	text-shadow: 0 2px 10px rgba(0,0,0,0.9), 0 0 16px rgba(245, 158, 11, 0.5);
 	margin: 0;
 	letter-spacing: 0.1vw;
 	text-transform: uppercase;
 }
 
 .mulligan-subtitle {
-	font-size: 1.05vw;
-	color: #ab977c;
+	font-family: 'EB Garamond', Georgia, serif;
+	font-size: 1.1vw;
+	color: #94a3b8;
 	margin-top: 0.3vw;
 	font-style: italic;
 }
 
 .mulligan-counter {
 	display: inline-block;
-	font-size: 1.15vw;
+	font-family: 'Cinzel', serif;
+	font-size: 1.1vw;
 	color: #fff;
-	background: rgba(40, 30, 20, 0.85);
-	border: 1px solid #947948;
+	background: rgba(14, 18, 24, 0.92);
+	border: 1px solid rgba(180, 150, 100, 0.45);
 	padding: 0.25vw 1.2vw;
 	border-radius: 20px;
 	margin-top: 0.5vw;
-	box-shadow: 0 0 10px rgba(0,0,0,0.5);
+	box-shadow: 0 4px 12px rgba(0,0,0,0.7);
 }
 
 .mulligan-counter .swaps-num {
+	font-family: 'JetBrains Mono', monospace;
 	color: #ffd700;
 	font-weight: bold;
 	font-size: 1.35vw;
@@ -1871,6 +2091,7 @@ main { background-image: url('img/boardtest8.png'); }
 
 .mulligan-swap-hint {
 	margin-top: 0.35vw;
+	font-family: 'Cinzel', serif;
 	font-size: 0.8vw;
 	color: #ffd700;
 	font-weight: bold;
@@ -1895,26 +2116,26 @@ main { background-image: url('img/boardtest8.png'); }
 }
 
 .mulligan-btn {
-	background: linear-gradient(180deg, #422b17, #261609);
-	border: 2px solid #bfa886;
-	color: #f0e6d2;
-	font-family: "Georgia", serif;
-	font-size: 1.25vw;
+	background: linear-gradient(180deg, #781c1c 0%, #440c0c 100%);
+	border: 1px solid #d44d4d;
+	color: #fff;
+	font-family: 'Cinzel', serif;
+	font-size: 1.15vw;
 	font-weight: bold;
 	padding: 0.55vw 2.5vw;
-	border-radius: 4px;
+	border-radius: 6px;
 	cursor: pointer;
 	text-transform: uppercase;
-	letter-spacing: 0.1vw;
-	box-shadow: 0 4px 15px rgba(0,0,0,0.8), inset 0 0 10px rgba(0,0,0,0.5);
+	letter-spacing: 0.08em;
+	box-shadow: 0 4px 15px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.2);
 	transition: all 0.2s ease;
 }
 
 .mulligan-btn:hover {
-	background: linear-gradient(180deg, #5c3c1e, #3a220e);
-	border-color: #ffd700;
+	background: linear-gradient(180deg, #992424 0%, #5e1111 100%);
+	border-color: #ff8888;
 	color: #fff;
-	box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(255, 215, 0, 0.3);
+	box-shadow: 0 0 18px rgba(239, 68, 68, 0.65);
 	transform: scale(1.04);
 }
 

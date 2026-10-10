@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Игровой хаб — Игры Ведьмака</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -16,9 +19,12 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            background: radial-gradient(circle at 50% 50%, #1e150e 0%, #0d0906 100%);
-            font-family: "Bahnschrift", "Segoe UI", sans-serif;
-            color: #d8c39e;
+            background-color: #090b0e;
+            background:
+                repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 26px),
+                radial-gradient(ellipse at 50% 30%, #161a22 0%, #090b0e 75%);
+            font-family: 'EB Garamond', Georgia, serif;
+            color: #cbd5e1;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -41,27 +47,31 @@
         }
 
         .hub-subtitle {
-            font-size: 1.1vw;
-            color: #9c8461;
-            letter-spacing: 0.25vw;
+            font-family: 'Cinzel', serif;
+            font-size: 0.95vw;
+            color: #f59e0b;
+            letter-spacing: 0.22vw;
             text-transform: uppercase;
             margin-bottom: 0.5vh;
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
         }
 
         .hub-title {
-            font-family: "Georgia", serif;
+            font-family: 'Cinzel', serif;
             font-size: 3.2vw;
-            color: #f7d679;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.9), 0 0 20px rgba(247, 214, 121, 0.35);
+            font-weight: 700;
+            color: #ffd700;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.95), 0 0 25px rgba(245, 158, 11, 0.45);
             letter-spacing: 0.08vw;
         }
 
         .hub-description {
-            font-size: 1.1vw;
-            color: #bfa782;
-            max-width: 48vw;
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 1.15vw;
+            color: #94a3b8;
+            max-width: 50vw;
             margin: 1.2vh auto 0 auto;
-            line-height: 1.4;
+            line-height: 1.45;
         }
 
         /* Two Game Portals */
@@ -76,16 +86,17 @@
 
         .game-card {
             flex: 1;
-            background: linear-gradient(180deg, rgba(32, 24, 16, 0.95) 0%, rgba(18, 13, 9, 0.98) 100%);
-            border: 2px solid #6b5229;
-            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(20, 26, 36, 0.92) 0%, rgba(10, 14, 20, 0.96) 100%);
+            border: 1px solid rgba(180, 150, 100, 0.35);
+            border-radius: 12px;
             padding: 3vh 2.5vw;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.85), inset 0 0 35px rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
             transition: all 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
             position: relative;
             text-decoration: none;
@@ -95,7 +106,7 @@
         .game-card:hover {
             transform: translateY(-8px);
             border-color: #ffd700;
-            box-shadow: 0 18px 45px rgba(0,0,0,0.9), 0 0 25px rgba(255, 215, 0, 0.35);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.95), 0 0 30px rgba(245, 158, 11, 0.35);
         }
 
         .card-icon {
@@ -105,11 +116,12 @@
         }
 
         .card-title {
-            font-family: "Georgia", serif;
+            font-family: 'Cinzel', serif;
             font-size: 2vw;
+            font-weight: 700;
             color: #ffd700;
             margin-bottom: 1vh;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 0 12px rgba(245, 158, 11, 0.3);
         }
 
         .card-badges {
@@ -121,24 +133,27 @@
         }
 
         .badge {
-            background: rgba(60, 45, 25, 0.8);
-            border: 1px solid #8f6c34;
-            color: #ecd7a5;
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(14, 18, 24, 0.9);
+            border: 1px solid rgba(180, 150, 100, 0.35);
+            color: #cbd5e1;
             font-size: 0.78vw;
-            padding: 0.2vh 0.6vw;
+            padding: 0.25vh 0.65vw;
             border-radius: 12px;
             letter-spacing: 0.03vw;
         }
 
         .badge.highlight {
-            background: rgba(140, 30, 30, 0.8);
-            border-color: #ff5555;
+            background: linear-gradient(180deg, rgba(120, 28, 28, 0.9) 0%, rgba(68, 12, 12, 0.9) 100%);
+            border-color: #d44d4d;
             color: #fff;
+            box-shadow: 0 0 8px rgba(212, 77, 77, 0.4);
         }
 
         .card-desc {
-            font-size: 0.95vw;
-            color: #b5a181;
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 1.05vw;
+            color: #94a3b8;
             line-height: 1.5;
             margin-bottom: 2.5vh;
             flex: 1;
@@ -148,20 +163,22 @@
             background: linear-gradient(180deg, #781c1c 0%, #440c0c 100%);
             border: 1px solid #d44d4d;
             color: #fff;
-            font-family: "Georgia", serif;
-            font-size: 1.2vw;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 1.1vw;
             padding: 1vh 2.8vw;
             border-radius: 6px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.2);
             transition: all 0.2s ease;
-            letter-spacing: 0.05vw;
         }
 
         .game-card:hover .play-btn {
             background: linear-gradient(180deg, #992424 0%, #5e1111 100%);
             border-color: #ff8888;
-            box-shadow: 0 0 18px rgba(255, 60, 60, 0.6);
+            box-shadow: 0 0 18px rgba(239, 68, 68, 0.65);
             transform: scale(1.04);
         }
 
@@ -170,20 +187,23 @@
             align-items: center;
             gap: 8px;
             padding: 0.7vh 1.4vw;
-            background: rgba(35, 25, 16, 0.85);
-            border: 1px solid #7c6239;
+            background: rgba(14, 18, 24, 0.92);
+            border: 1px solid rgba(180, 150, 100, 0.35);
             border-radius: 6px;
             color: #f7d679;
             text-decoration: none;
-            font-size: 0.95vw;
+            font-family: 'Cinzel', serif;
+            font-size: 0.92vw;
+            letter-spacing: 0.04em;
             margin-bottom: 1.5vh;
+            backdrop-filter: blur(8px);
             transition: all 0.2s ease;
         }
         .hub-back-btn:hover {
-            background: rgba(65, 45, 25, 0.95);
+            background: rgba(30, 24, 16, 0.95);
             border-color: #ffd700;
             color: #fff;
-            box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
             transform: translateY(-2px);
         }
 
@@ -191,11 +211,11 @@
         footer {
             text-align: center;
             font-size: 0.85vw;
-            color: #78664f;
+            color: #64748b;
         }
 
         footer span {
-            color: #ad946f;
+            color: #cbd5e1;
         }
     </style>
 </head>

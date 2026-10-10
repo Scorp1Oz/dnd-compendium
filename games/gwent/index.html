@@ -9,15 +9,18 @@
 	<meta name="description" content="Play the original Gwent minigame from The Witcher 3 in your browser! Includes cards from Hearts of Stone and Blood & Wine!" />
 	<meta name="keywords" content="arun, sundaram, programmer, gwent, tw3, witcher, card, game, gamedev, play" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
 <body>
 
-<div id="gwent-compendium-nav" style="position:fixed;top:10px;right:14px;z-index:99999;display:flex;gap:8px;font-family:'Segoe UI',sans-serif;">
-  <a href="../dice_poker/index.html" style="background:rgba(20,15,10,0.85);border:1px solid #7c6239;color:#ecd7a5;padding:6px 12px;border-radius:6px;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 10px rgba(0,0,0,0.5);transition:all 0.2s;" onmouseover="this.style.borderColor='#ffd700';this.style.color='#fff';" onmouseout="this.style.borderColor='#7c6239';this.style.color='#ecd7a5';">🎲 В кости</a>
-  <a href="../index.html" style="background:rgba(20,15,10,0.85);border:1px solid #7c6239;color:#ecd7a5;padding:6px 12px;border-radius:6px;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 10px rgba(0,0,0,0.5);transition:all 0.2s;" onmouseover="this.style.borderColor='#ffd700';this.style.color='#fff';" onmouseout="this.style.borderColor='#7c6239';this.style.color='#ecd7a5';">🚪 В Хаб</a>
-  <a href="../../index.html" style="background:rgba(20,15,10,0.85);border:1px solid #b8860b;color:#ffd700;padding:6px 12px;border-radius:6px;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 10px rgba(0,0,0,0.5);font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='#ffd700';this.style.color='#fff';this.style.boxShadow='0 0 12px rgba(255,215,0,0.4)';" onmouseout="this.style.borderColor='#b8860b';this.style.color='#ffd700';this.style.boxShadow='0 4px 10px rgba(0,0,0,0.5)';">🐺 В Компендиум</a>
+<div id="gwent-compendium-nav" class="wi-top-nav">
+  <a href="../dice_poker/index.html" class="wi-nav-btn" title="Перейти в покер на костях"><span>🎲</span> В кости</a>
+  <a href="../index.html" class="wi-nav-btn" title="Вернуться в Игровой хаб"><span>🚪</span> В Хаб</a>
+  <a href="../../index.html" class="wi-nav-btn wi-nav-primary" title="Вернуться в DnD Compendium"><span>🐺</span> В Компендиум</a>
 </div>
 
 <div id="dimensions" style="position:fixed;width:100vw;height:calc(100vw * 1080 / 1920);"></div>
