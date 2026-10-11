@@ -1737,6 +1737,24 @@
     { id: 'nilfgaard_city', name: 'Город Золотых Башен (Нильфгаард)', x: 1710, y: 3800, icon: '☀️', region: 'Империя Нильфгаард', ruler: 'Император Эмгыр вар Эмрейс', climate: 'Южный континентальный, река Альба', danger: 'Смертельная (Имперская тайная полиция)', desc: 'Сердце Империи Великого Солнца на реке Альба. Императорский дворец Эмгыра вар Эмрейса Белое Пламя.' }
   ];
 
+  /* Поиск ближайшего города или поселения к координатам (x, y) */
+  function findNearestCity(x, y, maxDist){
+    maxDist = maxDist != null ? maxDist : 75;
+    var nearest = null;
+    var minDist = maxDist;
+    if(WI_MAP_LOCATIONS && WI_MAP_LOCATIONS.length){
+      for(var i = 0; i < WI_MAP_LOCATIONS.length; i++){
+        var loc = WI_MAP_LOCATIONS[i];
+        var d = Math.hypot(x - loc.x, y - loc.y);
+        if(d < minDist){
+          minDist = d;
+          nearest = loc;
+        }
+      }
+    }
+    return nearest;
+  }
+
   var WI_MAP_REGIONS = [
     { id: 'temeria', name: 'Темерия (Temeria)', capital: 'Вызима', ruler: 'Король Фольтест', color: '#1d4ed8', desc: 'Одно из могущественнейших королевств Севера под знаменем серебряных лилий. Развитая торговля, река Понтар и прославленный спецотряд Синих Полосок.' },
     { id: 'redania', name: 'Редания (Redania)', capital: 'Третогор', ruler: 'Король Радовид V', color: '#b91c1c', desc: 'Богатейшая хлебная держава со знаком белого орла. Включает торговый порт Новиград и университетский Оксенфурт. Сильнейшая тайная служба.' },
@@ -2827,19 +2845,17 @@
       routeSvg = '<g id="wiRouteLayer">' + linesSvg + waypointsSvg + '</g>';
     }
 
-    // 4. Метки городов и крепостей Континента
-    var pinsSvg = WI_MAP_LOCATIONS.map(function(loc){
-      var isSel = m.selectedLocId === loc.id;
-      var radius = isSel ? 16 : 10;
-      return '<g class="wi-map-pin ' + (isSel ? 'selected' : '') + '" data-loc-id="' + loc.id + '" transform="translate(' + loc.x + ',' + loc.y + ')" style="cursor:pointer;">' +
-        (isSel ? ('<circle r="24" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3">' +
+    // 4. Индикатор активного выбора в режиме Атласа (чистая карта без статических меток)
+    var selectedLocSvg = '';
+    if(m.mode === 'inspect' && selLoc){
+      selectedLocSvg = '<g class="wi-selected-loc-marker" transform="translate(' + selLoc.x + ',' + selLoc.y + ')">' +
+        '<circle r="26" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="6,4">' +
           '<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="10s" repeatCount="indefinite"/>' +
-        '</circle>') : '') +
-        '<circle r="' + radius + '" fill="' + (isSel ? '#f59e0b' : 'rgba(15,23,42,0.85)') + '" stroke="' + (isSel ? '#fff' : '#f59e0b') + '" stroke-width="' + (isSel ? '2.5' : '2') + '" filter="url(#wiPinGlow)"/>' +
-        '<text y="4" text-anchor="middle" font-size="' + (isSel ? '13' : '10') + '" pointer-events="none">' + (loc.icon || '🏰') + '</text>' +
-        (m.showLabels !== false ? ('<text y="' + (radius + 16) + '" fill="' + (isSel ? '#fbbf24' : '#f8fafc') + '" font-size="' + (isSel ? '14' : '12') + '" font-family="Cinzel, serif" font-weight="700" text-anchor="middle" filter="url(#wiLabelShadow)">' + esc(loc.name) + '</text>') : '') +
+        '</circle>' +
+        '<circle r="7" fill="#f59e0b" stroke="#ffffff" stroke-width="2" filter="url(#wiPinGlow)"/>' +
+        (m.showLabels !== false ? ('<text y="34" fill="#fbbf24" font-size="13.5" font-family="Cinzel, serif" font-weight="700" text-anchor="middle" filter="url(#wiLabelShadow)">' + esc(selLoc.name) + '</text>') : '') +
       '</g>';
-    }).join('');
+    }
 
     // 5. Пользовательские тактические метки
     var userPinsSvg = (m.showUserMarkers !== false ? (m.userMarkers || []).map(function(um){
@@ -2851,7 +2867,7 @@
     }).join('') : '');
 
     return '<svg id="wiMapSvg" viewBox="' + minX + ' ' + minY + ' ' + vbW + ' ' + vbH + '" width="100%" height="100%" style="display:block;touch-action:none;user-select:none;">' +
-      defsSvg + mapImg + routeSvg + pinsSvg + userPinsSvg +
+      defsSvg + mapImg + routeSvg + selectedLocSvg + userPinsSvg +
     '</svg>';
   }
 
@@ -3371,40 +3387,6 @@
       });
     });
 
-    // Клик по метке города/пункта
-    document.querySelectorAll('.wi-map-pin').forEach(function(pin){
-      pin.addEventListener('click', function(e){
-        e.stopPropagation();
-        var lid = pin.getAttribute('data-loc-id');
-        if(!lid) return;
-        var loc = WI_MAP_LOCATIONS.find(function(l){ return l.id === lid; });
-        if(!loc) return;
-
-        if(m.mode === 'route'){
-          m.routePoints = m.routePoints || [];
-          var count = m.routePoints.length;
-          m.routePoints.push({
-            id: 'wp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-            name: loc.name,
-            x: loc.x,
-            y: loc.y,
-            stopType: count > 0 ? 'inn' : 'none'
-          });
-          WI.saveRoute();
-          WI.toast('✓ «' + loc.name + '» добавлен в маршрут', 'success');
-          if(typeof render === 'function') render();
-          return;
-        }
-
-        m.selectedLocId = lid;
-        if((m.zoom || 1.1) < 1.5){
-          m.cx = loc.x;
-          m.cy = loc.y;
-        }
-        if(typeof render === 'function') render();
-      });
-    });
-
     // Клик по пользовательской метке
     document.querySelectorAll('.wi-user-marker').forEach(function(pin){
       pin.addEventListener('click', function(e){
@@ -3733,6 +3715,7 @@
           if(found){
             m.selectedLocId = found.id;
             focusOn(found.x, found.y, Math.max(m.zoom || 1.1, 2.2));
+            if(typeof render === 'function') render();
           }
         }
       });
@@ -3882,10 +3865,16 @@
 
           if(didMove){
             if(pt){
-              var ter = getTerrainAt(pt.x, pt.y);
-              if(pt.name && (pt.name.indexOf('Точка') === 0 || pt.name.indexOf('Старт:') === 0)){
-                var isFirst = (m.routePoints && m.routePoints[0] && m.routePoints[0].id === pt.id);
-                var idx = (m.routePoints || []).findIndex(function(p){ return p.id === pt.id; });
+              var nearCity = findNearestCity(pt.x, pt.y, 65);
+              var isFirst = (m.routePoints && m.routePoints[0] && m.routePoints[0].id === pt.id);
+              var idx = (m.routePoints || []).findIndex(function(p){ return p.id === pt.id; });
+              if(nearCity){
+                pt.name = (isFirst ? 'Старт: ' : '') + nearCity.name;
+                pt.x = nearCity.x;
+                pt.y = nearCity.y;
+                if(!isFirst && pt.stopType === 'none') pt.stopType = 'inn';
+              } else {
+                var ter = getTerrainAt(pt.x, pt.y);
                 pt.name = (isFirst ? 'Старт: ' : ('Точка ' + (idx + 1) + ' (')) + ter.name + (isFirst ? '' : ')');
               }
             }
@@ -3963,32 +3952,60 @@
         clickX = Math.max(20, Math.min(2860, clickX));
         clickY = Math.max(20, Math.min(4076, clickY));
 
-        // В режиме 'route' - свободное добавление путевой точки по клику на карте
+        // В режиме 'inspect' (Атлас) - клик примерно в место города выбирает его и показывает инфо
+        if(m.mode === 'inspect'){
+          if(e.target.closest && (e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
+
+          var nearCity = findNearestCity(clickX, clickY, 75);
+          if(nearCity){
+            m.selectedLocId = nearCity.id;
+            WI.toast('🏰 ' + nearCity.name + ' (' + nearCity.region + ')', 'info');
+            if(typeof render === 'function') render();
+          } else {
+            var ter = getTerrainAt(clickX, clickY);
+            WI.toast(ter.icon + ' Местность: ' + ter.name + ' [' + clickX + ', ' + clickY + ']', 'info');
+          }
+          return;
+        }
+
+        // В режиме 'route' - свободное добавление путевой точки с распознаванием города
         if(m.mode === 'route'){
-          if(e.target.closest && (e.target.closest('.wi-route-point') || e.target.closest('.wi-map-pin') || e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
+          if(e.target.closest && (e.target.closest('.wi-route-point') || e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
 
           m.routePoints = m.routePoints || [];
-          var ter = getTerrainAt(clickX, clickY);
           var count = m.routePoints.length;
           var isFirst = count === 0;
-          var defaultName = isFirst ? ('Старт: ' + ter.name) : ('Точка ' + (count + 1) + ' (' + ter.name + ')');
+
+          var nearCity = findNearestCity(clickX, clickY, 75);
+          var ptX = nearCity ? nearCity.x : clickX;
+          var ptY = nearCity ? nearCity.y : clickY;
+          var ptName = '';
+          var ptStop = isFirst ? 'none' : 'camp';
+
+          if(nearCity){
+            ptName = (isFirst ? 'Старт: ' : '') + nearCity.name;
+            ptStop = isFirst ? 'none' : 'inn';
+          } else {
+            var ter = getTerrainAt(clickX, clickY);
+            ptName = isFirst ? ('Старт: ' + ter.name) : ('Точка ' + (count + 1) + ' (' + ter.name + ')');
+          }
 
           m.routePoints.push({
             id: 'wp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-            name: defaultName,
-            x: clickX,
-            y: clickY,
-            stopType: isFirst ? 'none' : 'camp'
+            name: ptName,
+            x: ptX,
+            y: ptY,
+            stopType: ptStop
           });
           WI.saveRoute();
-          WI.toast('✓ Добавлена точка #' + (count + 1) + ' (' + ter.icon + ' ' + ter.name + ')', 'success');
+          WI.toast('✓ ' + (nearCity ? ('Город «' + nearCity.name + '» добавлен в маршрут') : ('Добавлена точка #' + (count + 1))), 'success');
           if(typeof render === 'function') render();
           return;
         }
 
         // В режиме 'markers' - добавление пользовательской тактической метки
         if(m.mode === 'markers'){
-          if(e.target.closest && (e.target.closest('.wi-map-pin') || e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
+          if(e.target.closest && (e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
 
           var title = prompt('Название новой метки (например: Логово архигрифона, Затонувший сундук, Круг стихий):');
           if(!title) return;
@@ -4151,10 +4168,16 @@
 
           if(didMove){
             if(pt){
-              var ter = getTerrainAt(pt.x, pt.y);
-              if(pt.name && (pt.name.indexOf('Точка') === 0 || pt.name.indexOf('Старт:') === 0)){
-                var isFirst = (m.routePoints && m.routePoints[0] && m.routePoints[0].id === pt.id);
-                var idx = (m.routePoints || []).findIndex(function(p){ return p.id === pt.id; });
+              var nearCity = findNearestCity(pt.x, pt.y, 65);
+              var isFirst = (m.routePoints && m.routePoints[0] && m.routePoints[0].id === pt.id);
+              var idx = (m.routePoints || []).findIndex(function(p){ return p.id === pt.id; });
+              if(nearCity){
+                pt.name = (isFirst ? 'Старт: ' : '') + nearCity.name;
+                pt.x = nearCity.x;
+                pt.y = nearCity.y;
+                if(!isFirst && pt.stopType === 'none') pt.stopType = 'inn';
+              } else {
+                var ter = getTerrainAt(pt.x, pt.y);
                 pt.name = (isFirst ? 'Старт: ' : ('Точка ' + (idx + 1) + ' (')) + ter.name + (isFirst ? '' : ')');
               }
             }
