@@ -1856,22 +1856,6 @@
     return m[gy * 288 + gx] === 1;
   }
 
-  /* --- МОСТЫ, ДАМБЫ И РЕЧНЫЕ ПЕРЕПРАВЫ КОНТИНЕНТА --- */
-  var WI_MAP_BRIDGES = [
-    { id: 'bridge_novigrad', name: 'Мост Святого Григора (Новиград)', river: 'pontar', x: 1165, y: 1025, desc: 'Главный мост Вольного Города Новиграда через устье Понтара.' },
-    { id: 'bridge_oxenfurt', name: 'Каменный мост Оксенфурта', river: 'pontar', x: 1265, y: 1045, desc: 'Знаменитый каменный мост через Понтар в университетский город Оксенфурт. Охраняется реданской стражей.' },
-    { id: 'bridge_redlob', name: 'Редлобский мост', river: 'pontar', x: 1420, y: 1060, desc: 'Деревянный мост через Понтар на тракте между Новиградом и Вызимой.' },
-    { id: 'bridge_flotsam', name: 'Флотзамская переправа', river: 'pontar', x: 1925, y: 835, desc: 'Укрепленная речная фактория и паромная переправа на границе Темерии и Аэдирна.' },
-    { id: 'bridge_cintra', name: 'Великий мост Цинтры', river: 'yaruga', x: 1300, y: 1830, desc: 'Монументальный каменный мост через устье Яруги у цитадели Цинтры.' },
-    { id: 'bridge_brugge', name: 'Бруггский наплавной мост', river: 'yaruga', x: 1560, y: 1770, desc: 'Наплавной мост и таможенная застава королевства Бругге через бурную Яругу.' },
-    { id: 'bridge_sodden', name: 'Броды Соддена (Форты Яруги)', river: 'yaruga', x: 1740, y: 1780, desc: 'Стратегические отмели и деревянные мосты Соддена, ключевое место битв войн с Нильфгаардом.' },
-    { id: 'bridge_jaruga_east', name: 'Переправа Ангрена (Яруга)', river: 'yaruga', x: 2050, y: 1780, desc: 'Паромная и понтонная переправа через восточную Яругу на границе Ривии и Ангрена.' },
-    { id: 'bridge_vizima', name: 'Вызимская дамба', river: 'vizima_lake', x: 1615, y: 1130, desc: 'Каменная дамба через Вызимское озеро к главным воротам столицы Темерии.' },
-    { id: 'bridge_thanedd', name: 'Виадук острова Танедд', river: 'sea_channel', x: 1205, y: 1210, desc: 'Древний эльфский виадук, соединяющий дворец Локсия на Танедде с портом Горс Велен.' },
-    { id: 'bridge_blaviken', name: 'Мост через Буину (Блавикен)', river: 'buina', x: 1300, y: 530, desc: 'Деревянный мост через реку Буина на въезде в приморский городок Блавикен.' },
-    { id: 'bridge_ina', name: 'Мост через реку Ина', river: 'ina', x: 1680, y: 1450, desc: 'Мост на тракте Темерии через приток Понтара — реку Ина.' }
-  ];
-
   /* --- РЕКИ КОНТИНЕНТА (ГЕОМЕТРИЯ И ВОДНЫЕ БАРЬЕРЫ) --- */
   var WI_MAP_RIVERS = [
     {
@@ -1879,40 +1863,31 @@
       name: 'Река Понтар',
       crossDelayHours: 10,
       polyline: [
-        {x: 1040, y: 1000}, {x: 1165, y: 1025}, {x: 1265, y: 1045},
+        {x: 1040, y: 1000}, {x: 1170, y: 1025}, {x: 1265, y: 1035},
         {x: 1420, y: 1060}, {x: 1580, y: 1050}, {x: 1750, y: 980},
-        {x: 1925, y: 835}, {x: 2150, y: 780}, {x: 2320, y: 760}
+        {x: 1925, y: 830}, {x: 2150, y: 780}, {x: 2320, y: 760}
       ],
-      bridges: ['bridge_novigrad', 'bridge_oxenfurt', 'bridge_redlob', 'bridge_flotsam']
+      crossingLocIds: ['novigrad', 'oxenfurt', 'flotsam']
     },
     {
       id: 'yaruga',
       name: 'Река Яруга',
       crossDelayHours: 12,
       polyline: [
-        {x: 1200, y: 1860}, {x: 1300, y: 1830}, {x: 1440, y: 1790},
-        {x: 1560, y: 1770}, {x: 1740, y: 1780}, {x: 1890, y: 1775},
+        {x: 1200, y: 1860}, {x: 1290, y: 1815}, {x: 1440, y: 1790},
+        {x: 1605, y: 1575}, {x: 1740, y: 1780}, {x: 1890, y: 1775},
         {x: 2050, y: 1780}, {x: 2250, y: 1760}, {x: 2420, y: 1720}
       ],
-      bridges: ['bridge_cintra', 'bridge_brugge', 'bridge_sodden', 'bridge_jaruga_east']
+      crossingLocIds: ['cintra', 'brugge']
     },
     {
       id: 'buina',
       name: 'Река Буина',
       crossDelayHours: 6,
       polyline: [
-        {x: 1180, y: 560}, {x: 1300, y: 530}, {x: 1420, y: 510}, {x: 1600, y: 490}
+        {x: 1180, y: 560}, {x: 1310, y: 510}, {x: 1420, y: 510}, {x: 1600, y: 490}
       ],
-      bridges: ['bridge_blaviken']
-    },
-    {
-      id: 'ina',
-      name: 'Река Ина',
-      crossDelayHours: 6,
-      polyline: [
-        {x: 1680, y: 1200}, {x: 1680, y: 1450}, {x: 1700, y: 1620}
-      ],
-      bridges: ['bridge_ina']
+      crossingLocIds: ['blaviken']
     }
   ];
 
@@ -1928,7 +1903,7 @@
     return null;
   }
 
-  /* Проверка пересечения речных русел и ближайших мостов для отрезка пути */
+  /* Проверка пересечения речных русел и городов с переправами */
   function checkSegmentRiverCrossings(p1, p2){
     var crossings = [];
     WI_MAP_RIVERS.forEach(function(r){
@@ -1942,20 +1917,23 @@
             return Math.hypot(rc.ix.x - ix.x, rc.ix.y - ix.y) < 2;
           });
           if(!isDuplicate){
-            var relBridges = WI_MAP_BRIDGES.filter(function(b){ return (r.bridges || []).indexOf(b.id) !== -1; });
-            var bestBr = null, minD = 999999;
-            relBridges.forEach(function(b){
-              var dIx = Math.hypot(ix.x - b.x, ix.y - b.y);
-              var dEnds = Math.min(Math.hypot(p1.x - b.x, p1.y - b.y), Math.hypot(p2.x - b.x, p2.y - b.y));
+            var relLocs = (r.crossingLocIds || []).map(function(cid){
+              return WI_MAP_LOCATIONS.find(function(l){ return l.id === cid; });
+            }).filter(Boolean);
+
+            var bestLoc = null, minD = 999999;
+            relLocs.forEach(function(l){
+              var dIx = Math.hypot(ix.x - l.x, ix.y - l.y);
+              var dEnds = Math.min(Math.hypot(p1.x - l.x, p1.y - l.y), Math.hypot(p2.x - l.x, p2.y - l.y));
               var d = Math.min(dIx, dEnds);
-              if(d < minD){ minD = d; bestBr = b; }
+              if(d < minD){ minD = d; bestLoc = l; }
             });
             riverCrossings.push({
               river: r,
               ix: ix,
-              bestBridge: bestBr,
-              distToBridge: minD,
-              isBridge: minD <= 45
+              crossingLoc: bestLoc,
+              distToCrossing: minD,
+              isCrossing: minD <= 60
             });
           }
         }
@@ -1966,17 +1944,11 @@
   }
 
   function getTerrainAt(x, y){
-    // 1. Окрестности городов и мостов (радиус 28px) считаются дорогами и гаванями
+    // 1. Окрестности городов и крепостей (радиус 30px) считаются дорогами и безопасными зонами
     if(WI_MAP_LOCATIONS && WI_MAP_LOCATIONS.length){
       for(var li = 0; li < WI_MAP_LOCATIONS.length; li++){
         var loc = WI_MAP_LOCATIONS[li];
-        if(Math.hypot(x - loc.x, y - loc.y) <= 28) return WI_TERRAINS.road;
-      }
-    }
-    if(WI_MAP_BRIDGES && WI_MAP_BRIDGES.length){
-      for(var bi = 0; bi < WI_MAP_BRIDGES.length; bi++){
-        var br = WI_MAP_BRIDGES[bi];
-        if(Math.hypot(x - br.x, y - br.y) <= 28) return WI_TERRAINS.road;
+        if(Math.hypot(x - loc.x, y - loc.y) <= 30) return WI_TERRAINS.road;
       }
     }
 
@@ -2071,14 +2043,14 @@
       var domTerId = Object.keys(counts).reduce(function(a, b){ return counts[a] >= counts[b] ? a : b; });
       var domTer = WI_TERRAINS[domTerId] || WI_TERRAINS.hills;
 
-      // Проверка пересечения речных русел и мостов
+      // Проверка пересечения речных русел и городов-переправ
       var riverCrossings = checkSegmentRiverCrossings(p1, p2);
-      var usedBridge = null;
+      var usedCrossing = null;
       var wildCrossings = [];
 
       riverCrossings.forEach(function(rc){
-        if(rc.isBridge){
-          if(!usedBridge) usedBridge = rc.bestBridge;
+        if(rc.isCrossing){
+          if(!usedCrossing) usedCrossing = rc.crossingLoc;
         } else {
           wildCrossings.push(rc);
         }
@@ -2088,7 +2060,7 @@
       if(wildCrossings.length > 0 && mode !== 'boat'){
         wildCrossings.forEach(function(wc){
           riverDelayHours += wc.river.crossDelayHours;
-          var warnMsg = '🌊 Водная преграда без моста: «' + wc.river.name + '» (+ ' + wc.river.crossDelayHours + ' ч на переправу вплавь / поиск брода). Ближайший мост: «' + wc.bestBridge.name + '».';
+          var warnMsg = '🌊 Водная преграда без переправы: «' + wc.river.name + '» (+ ' + wc.river.crossDelayHours + ' ч на переправу вплавь / поиск брода). Ближайший город с переправой: «' + (wc.crossingLoc ? wc.crossingLoc.name : 'город') + '».';
           if(warnings.indexOf(warnMsg) === -1) warnings.push(warnMsg);
         });
       }
@@ -2136,7 +2108,7 @@
         days: Math.round(segDays * 10) / 10,
         dominantTerrain: domTer,
         crossesWater: crossesWater,
-        usedBridge: usedBridge,
+        usedCrossing: usedCrossing,
         wildCrossings: wildCrossings,
         riverDelayHours: riverDelayHours,
         stopType: p2.stopType || 'none'
@@ -2855,16 +2827,6 @@
       routeSvg = '<g id="wiRouteLayer">' + linesSvg + waypointsSvg + '</g>';
     }
 
-    // 3.5. Мосты и речные переправы Континента
-    var bridgesSvg = WI_MAP_BRIDGES.map(function(br){
-      return '<g class="wi-map-bridge" data-bridge-id="' + br.id + '" transform="translate(' + br.x + ',' + br.y + ')" style="cursor:pointer;">' +
-        '<title>' + escA('🌉 ' + br.name + '\n' + br.desc + '\n(Клик: добавить переправу в маршрут)') + '</title>' +
-        '<circle r="12" fill="rgba(15,23,42,0.9)" stroke="#38bdf8" stroke-width="2" filter="url(#wiPinGlow)"/>' +
-        '<text y="4" text-anchor="middle" font-size="11" pointer-events="none">🌉</text>' +
-        (m.showLabels !== false ? ('<text y="24" fill="#7dd3fc" font-size="11" font-family="Cinzel, serif" text-anchor="middle" font-weight="700" filter="url(#wiLabelShadow)">' + esc(br.name) + '</text>') : '') +
-      '</g>';
-    }).join('');
-
     // 4. Метки городов и крепостей Континента
     var pinsSvg = WI_MAP_LOCATIONS.map(function(loc){
       var isSel = m.selectedLocId === loc.id;
@@ -2889,7 +2851,7 @@
     }).join('') : '');
 
     return '<svg id="wiMapSvg" viewBox="' + minX + ' ' + minY + ' ' + vbW + ' ' + vbH + '" width="100%" height="100%" style="display:block;touch-action:none;user-select:none;">' +
-      defsSvg + mapImg + routeSvg + bridgesSvg + pinsSvg + userPinsSvg +
+      defsSvg + mapImg + routeSvg + pinsSvg + userPinsSvg +
     '</svg>';
   }
 
@@ -2962,16 +2924,16 @@
         var distToNext = '';
         if(segInfo){
           distToNext = '<div style="font-weight:700;color:#fbbf24;">' + segInfo.dist + ' миль <span style="color:var(--wi-steel);font-size:11px;font-weight:normal;">(~' + segInfo.days + ' дн.)</span></div>';
-          if(segInfo.usedBridge){
-            distToNext += '<div style="margin-top:2px;"><span style="background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);padding:2px 6px;border-radius:3px;font-size:10.5px;display:inline-block;" title="' + escA(segInfo.usedBridge.desc) + '">✓ 🌉 ' + esc(segInfo.usedBridge.name) + '</span></div>';
+          if(segInfo.usedCrossing){
+            distToNext += '<div style="margin-top:2px;"><span style="background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);padding:2px 6px;border-radius:3px;font-size:10.5px;display:inline-block;">✓ 🌉 Переправа: ' + esc(segInfo.usedCrossing.name) + '</span></div>';
           }
           if(segInfo.wildCrossings && segInfo.wildCrossings.length > 0 && rCalc.mode !== 'boat'){
             segInfo.wildCrossings.forEach(function(wc){
               distToNext += '<div style="margin-top:4px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.35);border-radius:4px;padding:4px 6px;font-size:11px;color:#fca5a5;">' +
                 '⚠️ Дикая переправа: <b>' + esc(wc.river.name) + '</b> (+' + wc.river.crossDelayHours + ' ч)' +
-                '<br><button type="button" class="btn btn-xs wi-insert-bridge-btn" data-seg-idx="' + idx + '" data-bridge-id="' + escA(wc.bestBridge.id) + '" style="margin-top:4px;padding:2px 6px;font-size:10.5px;color:#38bdf8;border:1px solid rgba(56,189,248,0.4);border-radius:3px;background:rgba(56,189,248,0.1);cursor:pointer;" title="Добавить мост в маршрут между точками">' +
-                  '🌉 Проложить через «' + esc(wc.bestBridge.name) + '»' +
-                '</button>' +
+                (wc.crossingLoc ? ('<br><button type="button" class="btn btn-xs wi-insert-crossing-btn" data-seg-idx="' + idx + '" data-loc-id="' + escA(wc.crossingLoc.id) + '" style="margin-top:4px;padding:2px 6px;font-size:10.5px;color:#38bdf8;border:1px solid rgba(56,189,248,0.4);border-radius:3px;background:rgba(56,189,248,0.1);cursor:pointer;" title="Добавить город с переправой в маршрут">' +
+                  '🏰 Направить через «' + esc(wc.crossingLoc.name) + '»' +
+                '</button>') : '') +
               '</div>';
             });
           }
@@ -3443,32 +3405,6 @@
       });
     });
 
-    // Клик по мосту/переправе на карте
-    document.querySelectorAll('.wi-map-bridge').forEach(function(pin){
-      pin.addEventListener('click', function(e){
-        e.stopPropagation();
-        var bid = pin.getAttribute('data-bridge-id');
-        var br = WI_MAP_BRIDGES.find(function(b){ return b.id === bid; });
-        if(!br) return;
-
-        if(m.mode === 'route'){
-          m.routePoints = m.routePoints || [];
-          m.routePoints.push({
-            id: 'wp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-            name: '🌉 ' + br.name,
-            x: br.x,
-            y: br.y,
-            stopType: 'none'
-          });
-          WI.saveRoute();
-          WI.toast('✓ «' + br.name + '» добавлен в маршрут', 'success');
-          if(typeof render === 'function') render();
-        } else {
-          WI.toast('🌉 ' + br.name + ': ' + br.desc, 'info');
-        }
-      });
-    });
-
     // Клик по пользовательской метке
     document.querySelectorAll('.wi-user-marker').forEach(function(pin){
       pin.addEventListener('click', function(e){
@@ -3506,24 +3442,24 @@
       });
     }
 
-    // Кнопка быстрого добавления моста в сегмент маршрута
-    document.querySelectorAll('.wi-insert-bridge-btn').forEach(function(btn){
+    // Кнопка быстрого направления маршрута через город с переправой
+    document.querySelectorAll('.wi-insert-crossing-btn').forEach(function(btn){
       btn.addEventListener('click', function(e){
         e.stopPropagation();
         var sIdx = parseInt(btn.getAttribute('data-seg-idx'), 10);
-        var bid = btn.getAttribute('data-bridge-id');
-        var br = WI_MAP_BRIDGES.find(function(b){ return b.id === bid; });
-        if(br && !isNaN(sIdx) && m.routePoints && sIdx >= 0 && sIdx < m.routePoints.length){
+        var locId = btn.getAttribute('data-loc-id');
+        var loc = WI_MAP_LOCATIONS.find(function(l){ return l.id === locId; });
+        if(loc && !isNaN(sIdx) && m.routePoints && sIdx >= 0 && sIdx < m.routePoints.length){
           var newPt = {
             id: 'wp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-            name: '🌉 ' + br.name,
-            x: br.x,
-            y: br.y,
-            stopType: 'none'
+            name: loc.name,
+            x: loc.x,
+            y: loc.y,
+            stopType: 'inn'
           };
           m.routePoints.splice(sIdx + 1, 0, newPt);
           WI.saveRoute();
-          WI.toast('✓ Маршрут направлен через «' + br.name + '»', 'success');
+          WI.toast('✓ Маршрут направлен через «' + loc.name + '»', 'success');
           if(typeof render === 'function') render();
         }
       });
@@ -4029,7 +3965,7 @@
 
         // В режиме 'route' - свободное добавление путевой точки по клику на карте
         if(m.mode === 'route'){
-          if(e.target.closest && (e.target.closest('.wi-route-point') || e.target.closest('.wi-map-pin') || e.target.closest('.wi-map-bridge') || e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
+          if(e.target.closest && (e.target.closest('.wi-route-point') || e.target.closest('.wi-map-pin') || e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
 
           m.routePoints = m.routePoints || [];
           var ter = getTerrainAt(clickX, clickY);
@@ -4052,7 +3988,7 @@
 
         // В режиме 'markers' - добавление пользовательской тактической метки
         if(m.mode === 'markers'){
-          if(e.target.closest && (e.target.closest('.wi-map-pin') || e.target.closest('.wi-map-bridge') || e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
+          if(e.target.closest && (e.target.closest('.wi-map-pin') || e.target.closest('.wi-user-marker') || e.target.closest('.wi-char-sheet-card'))) return;
 
           var title = prompt('Название новой метки (например: Логово архигрифона, Затонувший сундук, Круг стихий):');
           if(!title) return;
