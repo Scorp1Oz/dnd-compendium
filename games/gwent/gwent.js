@@ -3239,17 +3239,63 @@ class DeckMaker {
 		elem.setAttribute('data-title', title);
 		elem.setAttribute('title', title);
 		let count = document.createElement("div");
+		count.classList.add("card-count");
 		elem.appendChild(count);
 		container_elem.appendChild(elem);
 		
 		let bankID = {index: index, count: num, elem: elem};
 		let isBank = cards === this.bank;
-		count.innerHTML = bankID.count;
+		count.innerHTML = "x" + bankID.count;
 		cards.push(bankID);
 		let cardIndex = cards.length-1;
-		elem.addEventListener("click", () => this.select(cardIndex, isBank), false);
+
+		// Long press (touch / mouse hold) or right-click -> inspect card
+		let pressTimer = null, longPressed = false, startX = 0, startY = 0;
+		const cancelPress = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
+		elem.addEventListener("pointerdown", (e) => {
+			if (e.button !== undefined && e.button !== 0) return;
+			longPressed = false;
+			startX = e.clientX; startY = e.clientY;
+			cancelPress();
+			pressTimer = setTimeout(() => {
+				pressTimer = null;
+				longPressed = true;
+				if (navigator.vibrate) { try { navigator.vibrate(15); } catch (_) {} }
+				this.inspectCard(cards, cardIndex);
+			}, 450);
+		});
+		elem.addEventListener("pointermove", (e) => {
+			if (pressTimer && (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10)) cancelPress();
+		});
+		["pointerup", "pointerleave", "pointercancel"].forEach(ev => elem.addEventListener(ev, cancelPress));
+		elem.addEventListener("contextmenu", (e) => {
+			e.preventDefault();
+			cancelPress();
+			if (!longPressed) this.inspectCard(cards, cardIndex);
+		});
+
+		elem.addEventListener("click", (e) => {
+			if (longPressed) { longPressed = false; e.preventDefault(); e.stopPropagation(); return; }
+			this.select(cardIndex, isBank);
+		}, false);
 		elem.addEventListener("mouseenter", CLICK_EVENT_SFX, false);
 		return bankID;
+	}
+
+	// Opens a read-only carousel to inspect a card (browse neighbours with arrows)
+	inspectCard(cards, cardIndex) {
+		if (Carousel.curr) return;
+		const visible = cards.filter(x => x.count > 0);
+		if (!visible.length) return;
+		let start = visible.indexOf(cards[cardIndex]);
+		if (start < 0) start = 0;
+		const container = new CardContainer();
+		container.cards = visible.map(x => new Card(card_dict[x.index], player_me));
+		ui.queueCarousel(container, 1, () => {}, () => true, false, true, "Осмотр карты");
+		if (Carousel.curr) {
+			Carousel.curr.index = start;
+			Carousel.curr.update();
+		}
 	}
 	
 	// Updates the card preview elements when any changes are made to the deck
@@ -3377,13 +3423,13 @@ class DeckMaker {
 	// Adds a card to container (Bank or deck)
 	add(index, cards) {
 		let id = cards[index];
-		id.elem.children[0].innerHTML = ++id.count;
+		id.elem.children[0].innerHTML = "x" + (++id.count);
 	}
 	
 	// Removes a card from container (bank or deck)
 	remove(index, cards) {
 		let id = cards[index];
-		id.elem.children[0].innerHTML = --id.count;
+		id.elem.children[0].innerHTML = "x" + (--id.count);
 	}
 	
 	// Removes all elements in the bank and deck

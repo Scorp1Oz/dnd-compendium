@@ -1672,21 +1672,30 @@ main { background-image: url('img/boardtest8.png'); }
     height: 18.45vw;
     border-radius: 1vw;
 	margin-bottom: 0.75vw;
+	position: relative;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
+	touch-action: manipulation;
 }
 
-.card-array .card-lg > div {
-	position: relative;
-	top: 82.5%;
-	left: 76%;
-	width: 20%;
-	height: 7%;
-	font-size: 1.2vw;
-	color: #5f4923;
-	padding-left: 1.7vw;
-	background-image: url('img/icons/preview_count.png');
-	background-position: left;
-	background-repeat: no-repeat;
-	background-size: contain;
+.card-array .card-lg > .card-count {
+	position: absolute;
+	top: 0.45vw;
+	right: 0.45vw;
+	min-width: 1.6vw;
+	padding: 0.15vw 0.45vw;
+	box-sizing: border-box;
+	font-size: 0.95vw;
+	font-weight: 700;
+	line-height: 1.2;
+	text-align: center;
+	color: #f5d78e;
+	background: rgba(12, 10, 8, 0.85);
+	border: 1px solid rgba(212, 175, 95, 0.75);
+	border-radius: 0.35vw;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+	pointer-events: none;
 }
 
 #card-leader {
