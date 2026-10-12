@@ -600,5 +600,261 @@ var ability_dict = {
 	king_bran: {
 		description: "Units only lose half their Strength in bad weather conditions.",
 		placed: card => board.row.filter((c,i) => card.holder === player_me ^ i<3).forEach(r => r.effects.halfWeather = true)
+	},
+
+	// ================= Gwent standalone leaders (adapted to Witcher 3 rules) =================
+
+	// ---------- Nilfgaard ----------
+	calveit_foresight: {
+		description: "Предвидение: посмотрите 3 верхние карты своей колоды и возьмите одну из них в руку.",
+		activated: async card => {
+			const top = card.holder.deck.cards.slice(0, 3);
+			const pick = await LeaderUtil.pick(card, top, "Предвидение: возьмите карту", cs => LeaderUtil.strongest(cs));
+			if (pick) await board.toHand(pick, card.holder.deck);
+		},
+		weight: card => card.holder.deck.cards.length ? 14 : 0
+	},
+	voorhis_intel: {
+		description: "Разведка: раскройте 4 случайные карты из руки соперника. Он сбрасывает самый сильный отряд (не героя) среди них.",
+		activated: async card => {
+			const op = card.holder.opponent();
+			const revealed = op.hand.findCardsRandom(() => true, 4);
+			if (!revealed.length) return;
+			if (!LeaderUtil.isAI(card)) {
+				LeaderUtil.closeCarousel();
+				const c = new CardContainer(); c.cards = revealed.slice();
+				await ui.viewCardsInContainer(c);
+			}
+			const units = revealed.filter(c => c.isUnit());
+			if (units.length) await board.toGrave(LeaderUtil.strongest(units), op.hand);
+		},
+		weight: card => card.holder.opponent().hand.cards.length ? 16 : 0
+	},
+
+	// ---------- Northern Realms ----------
+	radovid_stern: {
+		description: "Хладнокровие: уничтожьте 2 самых слабых отряда соперника на поле (не героев).",
+		activated: async card => {
+			const t = LeaderUtil.units(LeaderUtil.opRows(card)).sort((a, b) => a.c.power - b.c.power).slice(0, 2);
+			await LeaderUtil.destroy(t);
+		},
+		weight: card => LeaderUtil.units(LeaderUtil.opRows(card)).sort((a, b) => a.c.power - b.c.power).slice(0, 2).reduce((s, p) => s + p.c.power, 0)
+	},
+	henselt_mobilize: {
+		description: "Кэдвенская мобилизация: выставьте из колоды все копии отряда осадного ряда с наибольшей общей силой.",
+		helper: card => {
+			const groups = {};
+			card.holder.deck.cards.filter(c => c.isUnit() && c.row === "siege" && !c.abilities.includes("spy"))
+				.forEach(c => { (groups[c.name] = groups[c.name] || []).push(c); });
+			let best = [], bestSum = 0;
+			for (const g of Object.values(groups)) {
+				const s = g.reduce((a, c) => a + c.basePower, 0);
+				if (s > bestSum) { best = g; bestSum = s; }
+			}
+			return { cards: best, sum: bestSum };
+		},
+		activated: async card => {
+			const { cards } = ability_dict["henselt_mobilize"].helper(card);
+			for (const c of cards) await c.autoplay(card.holder.deck);
+		},
+		weight: card => ability_dict["henselt_mobilize"].helper(card).sum
+	},
+	demavend_dignity: {
+		description: "Королевское достоинство: возьмите 2 карты из колоды, затем сбросьте 1 карту из руки на выбор.",
+		activated: async card => {
+			for (let i = 0; i < 2 && card.holder.deck.cards.length; i++)
+				await card.holder.deck.draw(card.holder.hand);
+			const hand = card.holder.hand.cards.slice();
+			if (!hand.length) return;
+			const pick = await LeaderUtil.pick(card, hand, "Сбросьте 1 карту",
+				() => card.holder.controller.discardOrder(card)[0] || hand[0]);
+			if (pick) await board.toGrave(pick, card.holder.hand);
+		},
+		weight: card => card.holder.deck.cards.length >= 2 ? 15 : 0
+	},
+	meve_inspiration: {
+		description: "Лирийский клич: все ваши отряды на поле (не герои) получают +1 к силе до конца раунда.",
+		activated: async card => {
+			const rows = LeaderUtil.myRows(card);
+			rows.forEach(r => { r.effects.morale += 1; r.updateScore(); });
+			await Promise.all(LeaderUtil.units(rows).map(p => p.c.animate("morale")));
+			game.roundEnd.push(() => { rows.forEach(r => { r.effects.morale = Math.max(0, r.effects.morale - 1); }); return true; });
+		},
+		weight: card => LeaderUtil.units(LeaderUtil.myRows(card)).length
+	},
+
+	// ---------- Scoia'tael ----------
+	eithne_wrath: {
+		description: "Гнев Брокилона: возьмите в руку из колоды особую карту или карту погоды на выбор.",
+		pool: card => LeaderUtil.uniqueByName(card.holder.deck.cards.filter(c => c.faction === "special" || c.faction === "weather")),
+		activated: async card => {
+			const pool = ability_dict["eithne_wrath"].pool(card);
+			const prio = ["Scorch", "Commander's Horn", "Decoy", "Mardroeme"];
+			const pick = await LeaderUtil.pick(card, pool, "Гнев Брокилона: возьмите карту",
+				cs => cs.slice().sort((a, b) => (prio.indexOf(a.name) + 1 || 99) - (prio.indexOf(b.name) + 1 || 99))[0]);
+			if (pick) await board.toHand(pick, card.holder.deck);
+		},
+		weight: card => ability_dict["eithne_wrath"].pool(card).length ? 13 : 0
+	},
+	filavandrel_gift: {
+		description: "Дар Старшего народа: выберите 1 из 3 случайных отрядов (сила 4–8, не герои) вашей фракции или нейтральных — он создаётся у вас в руке.",
+		activated: async card => {
+			const opts = LeaderUtil.sample(LeaderUtil.createPool([card.holder.deck.faction, "neutral"], 4, 8), 3)
+				.map(d => new Card(d, card.holder));
+			const pick = await LeaderUtil.pick(card, opts, "Дар Старшего народа", cs => LeaderUtil.strongest(cs));
+			if (pick) card.holder.hand.addCard(pick);
+		},
+		weight: () => 14
+	},
+	brouver_mahakam: {
+		description: "Махакамский вождь: выставьте из колоды самого сильного краснолюда (не героя).",
+		helper: card => LeaderUtil.strongest(card.holder.deck.cards.filter(c => c.isUnit() && !c.abilities.includes("spy") && LeaderUtil.DWARF.test(c.name))),
+		activated: async card => {
+			const c = ability_dict["brouver_mahakam"].helper(card);
+			if (c) await c.autoplay(card.holder.deck);
+		},
+		weight: card => { const c = ability_dict["brouver_mahakam"].helper(card); return c ? c.basePower + 2 : 0; }
+	},
+
+	// ---------- Monsters ----------
+	unseen_elder_thirst: {
+		description: "Жажда крови: уничтожьте 2 своих самых слабых отряда на поле (не героев) и возьмите 3 карты из колоды.",
+		activated: async card => {
+			const t = LeaderUtil.units(LeaderUtil.myRows(card)).sort((a, b) => a.c.power - b.c.power).slice(0, 2);
+			await LeaderUtil.destroy(t);
+			for (let i = 0; i < 3 && card.holder.deck.cards.length; i++)
+				await card.holder.deck.draw(card.holder.hand);
+		},
+		weight: card => {
+			if (card.holder.deck.cards.length < 2) return 0;
+			const lost = LeaderUtil.units(LeaderUtil.myRows(card)).sort((a, b) => a.c.power - b.c.power).slice(0, 2).reduce((s, p) => s + p.c.power, 0);
+			return Math.max(0, 18 - lost * 2);
+		}
+	},
+	dagon_depths: {
+		description: "Зов глубин: призовите Непроглядный туман или Проливной дождь на выбор (карта создаётся, а не берётся из колоды).",
+		activated: async card => {
+			const opts = ["Impenetrable Fog", "Torrential Rain"].map(n => new Card(card_dict.find(d => d.name === n), card.holder));
+			const pick = await LeaderUtil.pick(card, opts, "Зов глубин: выберите погоду",
+				cs => cs.slice().sort((a, b) => card.holder.controller.weightWeather(b) - card.holder.controller.weightWeather(a))[0]);
+			if (pick) await board.toWeather(pick, null);
+		},
+		weight: (card, ai) => Math.max(0, ...["fog", "rain"].map(w => ai.weightWeather({ name: w, abilities: [w] })))
+	},
+	woodland_spirit_force: {
+		description: "Сила природы: призовите 3 «Волчьи стаи» в ряд ближнего боя и Непроглядный туман.",
+		activated: async card => {
+			const wolf = card_dict.find(d => d.name === "Wolf Pack");
+			const fog = card_dict.find(d => d.name === "Impenetrable Fog");
+			for (let i = 0; i < 3; i++)
+				await board.addCardToRow(new Card(wolf, card.holder), "close", card.holder);
+			if (fog) await board.toWeather(new Card(fog, card.holder), null);
+		},
+		weight: (card, ai) => 3 + Math.max(-3, ai.weightWeather({ name: "fog", abilities: ["fog"] }))
+	},
+	arachas_queen_brood: {
+		description: "Королева роя: выставьте из колоды всех главоглазов (Arachas, не героев).",
+		helper: card => card.holder.deck.cards.filter(c => c.isUnit() && c.name.startsWith("Arachas")),
+		activated: async card => {
+			for (const c of ability_dict["arachas_queen_brood"].helper(card))
+				if (card.holder.deck.cards.includes(c)) await c.autoplay(card.holder.deck);
+		},
+		weight: card => ability_dict["arachas_queen_brood"].helper(card).reduce((s, c) => s + c.basePower, 0)
+	},
+
+	// ---------- Skellige ----------
+	eist_clan: {
+		description: "Зов кланов: создайте и выставьте на поле случайный отряд Скеллиге (сила 4–8, не герой).",
+		activated: async card => {
+			const d = LeaderUtil.sample(LeaderUtil.createPool(["skellige"], 4, 8), 1)[0];
+			if (!d) return;
+			const c = new Card(d, card.holder);
+			await board.addCardToRow(c, c.row === "agile" ? "close" : c.row, card.holder);
+		},
+		weight: () => 6
+	},
+	harald_fury: {
+		description: "Ярость Хромого: уничтожьте в одном ряду соперника случайные отряды (не героев) общей силой не больше 9.",
+		helper: card => {
+			let best = [], bestSum = 0;
+			for (const row of LeaderUtil.opRows(card)) {
+				const pool = LeaderUtil.sample(LeaderUtil.units([row]), 99);
+				let sum = 0; const chosen = [];
+				for (const p of pool) if (sum + p.c.power <= 9) { chosen.push(p); sum += p.c.power; }
+				if (sum > bestSum) { best = chosen; bestSum = sum; }
+			}
+			return { targets: best, sum: bestSum };
+		},
+		activated: async card => await LeaderUtil.destroy(ability_dict["harald_fury"].helper(card).targets),
+		weight: card => ability_dict["harald_fury"].helper(card).sum
+	},
+
+	// ---------- Syndicate ----------
+	gudrun_plunder: {
+		description: "Пиратский налёт: заберите случайный отряд (не героя) из колоды соперника себе в руку.",
+		activated: async card => {
+			const op = card.holder.opponent();
+			const c = op.deck.findCardsRandom(c => c.isUnit(), 1)[0];
+			if (!c) return;
+			c.holder = card.holder;
+			await board.toHand(c, op.deck);
+		},
+		weight: card => card.holder.opponent().deck.findCards(c => c.isUnit()).length ? 13 : 0
+	},
+	cleaver_cudgel: {
+		description: "Дубина Тесака: уничтожьте самый сильный отряд соперника (не героя) с силой не больше 7.",
+		helper: card => {
+			const t = LeaderUtil.units(LeaderUtil.opRows(card)).filter(p => p.c.power <= 7).sort((a, b) => b.c.power - a.c.power);
+			return t.length ? [t[0]] : [];
+		},
+		activated: async card => await LeaderUtil.destroy(ability_dict["cleaver_cudgel"].helper(card)),
+		weight: card => { const t = ability_dict["cleaver_cudgel"].helper(card); return t.length ? t[0].c.power : 0; }
+	},
+	sigi_mastermind: {
+		description: "Теневой кукловод: возьмите в руку до 2 карт-шпионов из своей колоды.",
+		helper: card => card.holder.deck.cards.filter(c => c.abilities.includes("spy")).slice(0, 2),
+		activated: async card => {
+			for (const c of ability_dict["sigi_mastermind"].helper(card))
+				await board.toHand(c, card.holder.deck);
+		},
+		weight: card => ability_dict["sigi_mastermind"].helper(card).length * 12
+	}
+};
+
+// Shared helpers for leader abilities
+var LeaderUtil = {
+	DWARF: /Dwarv|Dwarf|Mahakam|Barclay|Dennis Cranmer|Paulie|Havekar|Yarpen|Zoltan|Harald Gord/i,
+	isAI: card => card.holder.controller instanceof ControllerAI,
+	closeCarousel: () => { if (Carousel.curr) Carousel.curr.exit(); },
+	myRows: card => ["close", "ranged", "siege"].map(r => board.getRow(card, r, card.holder)),
+	opRows: card => ["close", "ranged", "siege"].map(r => board.getRow(card, r, card.holder.opponent())),
+	// non-hero units on given rows as {c, row}
+	units: rows => rows.flatMap(row => row.cards.filter(c => c.isUnit() && !c.noRemove).map(c => ({ c, row }))),
+	strongest: cards => cards.length ? cards.reduce((a, c) => (c.basePower > a.basePower ? c : a), cards[0]) : null,
+	uniqueByName: cards => cards.filter((c, i) => cards.findIndex(x => x.name === c.name) === i),
+	sample: (arr, n) => {
+		const a = arr.slice();
+		for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+		return a.slice(0, n);
+	},
+	createPool: (decks, min, max) => card_dict.filter(d => decks.includes(d.deck)
+		&& ["close", "ranged", "siege", "agile"].includes(d.row)
+		&& !/\b(hero|spy)\b/.test(d.ability) && !/avenger|berserker/.test(d.ability)
+		&& Number(d.strength) >= min && Number(d.strength) <= max),
+	destroy: async pairs => {
+		if (!pairs.length) return;
+		await Promise.all(pairs.map(p => p.c.animate("scorch", true, false)));
+		await Promise.all(pairs.map(p => board.toGrave(p.c, p.row)));
+	},
+	// Human: forced carousel choice. AI: aiPick(cards).
+	pick: async (card, cards, title, aiPick) => {
+		if (!cards.length) return null;
+		if (LeaderUtil.isAI(card)) return aiPick(cards);
+		LeaderUtil.closeCarousel();
+		const cont = new CardContainer();
+		cont.cards = cards.slice();
+		let chosen = null;
+		await ui.queueCarousel(cont, 1, (c, i) => { chosen = c.cards[i]; }, () => true, false, false, title);
+		return chosen;
 	}
 };
