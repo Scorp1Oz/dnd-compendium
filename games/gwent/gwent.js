@@ -4080,7 +4080,7 @@ function smallURL(name, ext="jpg"){
 	return imgURL("sm/" + name, ext);
 }
 function imgURL(path, ext) {
-	return "url('img/" + path + "." + ext + "?v=6')";
+	return "url('img/" + path + "." + ext + "?v=7')";
 }
 
 // get sound effect path
