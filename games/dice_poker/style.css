@@ -598,3 +598,159 @@ html, body {
   color: #fff;
   box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
 }
+
+/* ============================================================
+   End Match Modal, Copy for DM Button & Feedback Toast
+   ============================================================ */
+.poker-end-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at 50% 50%, rgba(20, 26, 36, 0.95) 0%, rgba(9, 11, 14, 0.98) 100%);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.poker-end-modal.visible {
+  display: flex;
+}
+
+.poker-end-card {
+  background: linear-gradient(180deg, #1b2029 0%, #101318 100%);
+  border: 1px solid var(--line);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(201, 162, 39, 0.2);
+  border-radius: 6px;
+  width: 46vw;
+  max-width: 680px;
+  padding: 3.5vh 2.5vw;
+  text-align: center;
+  position: relative;
+  animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.poker-end-banner {
+  font-family: 'Cinzel', serif;
+  font-size: 2.1vw;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.6vh;
+}
+
+.poker-end-banner.win {
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.poker-end-banner.lose {
+  color: #e05252;
+  text-shadow: 0 0 20px rgba(224, 82, 82, 0.5);
+}
+
+.poker-end-subtitle {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.15vw;
+  color: var(--ink-dim);
+  margin-bottom: 2vh;
+}
+
+.poker-end-stats {
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 1.6vh 1.6vw;
+  margin-bottom: 2.5vh;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9vw;
+  color: var(--ink);
+  line-height: 1.7;
+  text-align: left;
+}
+
+.poker-end-stats .stat-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+  padding: 0.3vh 0;
+}
+
+.poker-end-stats .stat-row:last-child {
+  border-bottom: none;
+}
+
+.poker-end-stats .stat-label {
+  color: var(--ink-dim);
+}
+
+.poker-end-stats .stat-val {
+  color: #ffd700;
+  font-weight: 700;
+}
+
+.poker-end-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1vw;
+  flex-wrap: wrap;
+}
+
+/* Copy for DM button theme */
+.btn-copy-dm {
+  background: linear-gradient(180deg, #3d2c14 0%, #1c1509 100%) !important;
+  border: 1px solid #ffd700 !important;
+  color: #fff4cc !important;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.25) !important;
+  font-family: 'Cinzel', serif !important;
+  letter-spacing: 0.04em !important;
+}
+
+.btn-copy-dm:hover {
+  background: linear-gradient(180deg, #744e23 0%, #3d260a 100%) !important;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.55) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+}
+
+.btn-copy-dm.copied {
+  background: linear-gradient(180deg, #1b3d22 0%, #0d1e11 100%) !important;
+  border-color: #4ade80 !important;
+  color: #86efac !important;
+  box-shadow: 0 0 18px rgba(74, 222, 128, 0.4) !important;
+}
+
+/* Floating copy toast */
+.game-copy-toast {
+  position: fixed;
+  bottom: 6vh;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(180deg, #2a2012 0%, #151009 100%);
+  border: 1px solid #ffd700;
+  color: #ffd700;
+  font-family: 'Cinzel', serif;
+  font-size: 1vw;
+  font-weight: 700;
+  padding: 1.1vh 2.2vw;
+  border-radius: 4px;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 9999;
+  letter-spacing: 0.04em;
+}
+
+.game-copy-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+

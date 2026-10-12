@@ -108,7 +108,24 @@
     <button id="poker-btn-raise" class="btn-ghost" disabled>Поднять ставку (+20)</button>
     <button id="poker-btn-call" class="btn-ghost" disabled>Уравнять / Чек</button>
     <button id="poker-btn-fold" class="btn-crimson" disabled>Сдаться</button>
+    <button id="poker-btn-copy-dm" class="btn-ghost btn-copy-dm" style="display:none;margin-left:auto;" title="Скопировать подробную историю всех раундов для ДМа">📋 Скопировать для ДМа</button>
   </footer>
+</div>
+
+<!-- End Match Modal -->
+<div id="poker-end-modal" class="poker-end-modal">
+  <div class="poker-end-card">
+    <div id="poker-end-banner" class="poker-end-banner">🏆 ПОБЕДА В ПАРТИИ!</div>
+    <div id="poker-end-subtitle" class="poker-end-subtitle">Вы одержали победу в костях над соперником</div>
+    <div class="poker-end-stats" id="poker-end-stats">
+      <!-- Generated match round summary -->
+    </div>
+    <div class="poker-end-actions">
+      <button id="poker-modal-btn-copy-dm" class="btn-primary btn-copy-dm">📋 Скопировать для ДМа</button>
+      <button id="poker-modal-btn-rematch" class="btn-ghost">Сыграть реванш</button>
+      <button id="poker-modal-btn-close" class="btn-ghost">Посмотреть стол</button>
+    </div>
+  </div>
 </div>
 
 <!-- Rules Modal -->

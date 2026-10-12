@@ -173,12 +173,61 @@ const DIFFICULTY_CONFIG = {
 };
 
 /* ============================================================
+   Clipboard and Toast Helpers
+   ============================================================ */
+async function copyTextToClipboard(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (err) {}
+
+  try {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    textArea.style.opacity = "0";
+    textArea.style.pointerEvents = "none";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    const successful = document.execCommand('copy');
+    document.body.removeChild(textArea);
+    if (successful) return true;
+  } catch (err) {}
+
+  return false;
+}
+
+function showCopyToast(msg = "✓ Скопировано в буфер обмена для ДМа!") {
+  let toast = document.getElementById("game-copy-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "game-copy-toast";
+    toast.className = "game-copy-toast";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add("visible");
+  setTimeout(() => {
+    toast.classList.remove("visible");
+  }, 2600);
+}
+
+/* ============================================================
    Application Controller
    ============================================================ */
 class UnifiedDiceApp {
   constructor() {
     this.wealthKey = "medium";
     this.diffKey = "medium";
+
+    // Match history for DM
+    this.matchLog = null;
+    this.currentRoundLog = null;
 
     // Poker State
     this.poker = {
@@ -302,11 +351,36 @@ class UnifiedDiceApp {
     this.btnRaise = document.getElementById("poker-btn-raise");
     this.btnCall = document.getElementById("poker-btn-call");
     this.btnFold = document.getElementById("poker-btn-fold");
+    this.btnCopyDm = document.getElementById("poker-btn-copy-dm");
 
     this.btnRoll.addEventListener("click", () => this.handlePokerRoll());
     this.btnRaise.addEventListener("click", () => this.handlePokerRaise());
     this.btnCall.addEventListener("click", () => this.handlePokerCall());
     this.btnFold.addEventListener("click", () => this.handlePokerFold());
+    if (this.btnCopyDm) {
+      this.btnCopyDm.addEventListener("click", () => this.copyDmHistory(this.btnCopyDm));
+    }
+
+    // End match modal controls
+    this.endModal = document.getElementById("poker-end-modal");
+    this.modalBtnCopy = document.getElementById("poker-modal-btn-copy-dm");
+    this.modalBtnRematch = document.getElementById("poker-modal-btn-rematch");
+    this.modalBtnClose = document.getElementById("poker-modal-btn-close");
+
+    if (this.modalBtnCopy) {
+      this.modalBtnCopy.addEventListener("click", () => this.copyDmHistory(this.modalBtnCopy));
+    }
+    if (this.modalBtnRematch) {
+      this.modalBtnRematch.addEventListener("click", () => {
+        this.hidePokerEndModal();
+        this.startPokerMatch();
+      });
+    }
+    if (this.modalBtnClose) {
+      this.modalBtnClose.addEventListener("click", () => {
+        this.hidePokerEndModal();
+      });
+    }
   }
 
   applySettingsUI() {
@@ -355,6 +429,29 @@ class UnifiedDiceApp {
     this.poker.playerGems = 0;
     this.poker.opGems = 0;
     this.updatePokerGems();
+
+    // Match history tracking for DM
+    this.matchLog = {
+      startTime: new Date(),
+      playerName: this.getPlayerName(),
+      opName: this.wealth.name,
+      wealthKey: this.wealthKey,
+      wealth: { ...this.wealth },
+      difficulty: this.diff.name,
+      diffKey: this.diffKey,
+      rounds: [],
+      finalResult: null,
+      playerGems: 0,
+      opGems: 0,
+      playerNetCoins: 0
+    };
+    this.currentRoundLog = null;
+
+    if (this.btnCopyDm) {
+      this.btnCopyDm.style.display = "none";
+    }
+    this.hidePokerEndModal();
+
     this.startPokerRound();
   }
 
@@ -370,6 +467,27 @@ class UnifiedDiceApp {
     document.getElementById("player-comb-tag").innerText = "Ожидание первого броска...";
     document.getElementById("op-comb-tag").innerText = "Ожидание первого броска...";
     document.getElementById("poker-status").innerText = "Раунд начался. Нажмите «Бросить кости» для первого броска.";
+
+    // Start round log
+    if (this.matchLog) {
+      const rNum = this.matchLog.rounds.length + 1;
+      this.currentRoundLog = {
+        roundNumber: rNum,
+        initialPot: this.poker.pot,
+        pot: this.poker.pot,
+        playerInvested: this.wealth.baseStake,
+        opInvested: this.wealth.baseStake,
+        initialRoll: null,
+        bet1Actions: [],
+        rerolls: null,
+        bet2Actions: [],
+        showdown: null,
+        winner: null,
+        winnerReason: "",
+        gemsAfter: { player: this.poker.playerGems, op: this.poker.opGems }
+      };
+      this.matchLog.rounds.push(this.currentRoundLog);
+    }
 
     this.renderPokerDice(true);
     this.updatePokerButtons({
@@ -424,6 +542,15 @@ class UnifiedDiceApp {
     document.getElementById("player-comb-tag").innerText = pEval.title;
     document.getElementById("op-comb-tag").innerText = oEval.title;
 
+    if (this.currentRoundLog) {
+      this.currentRoundLog.initialRoll = {
+        playerDice: [...this.poker.playerDice],
+        playerComb: pEval.title,
+        opDice: [...this.poker.opDice],
+        opComb: oEval.title
+      };
+    }
+
     this.poker.isRolling = false;
     this.poker.state = "BET1";
 
@@ -433,6 +560,17 @@ class UnifiedDiceApp {
       if (cmp > 0 || oEval.rank >= POKER_RANKS.THREE_OF_A_KIND) {
         this.poker.aiRaised = true;
         this.poker.pot += this.wealth.raiseStep;
+        if (this.currentRoundLog) {
+          this.currentRoundLog.opInvested += this.wealth.raiseStep;
+          this.currentRoundLog.pot = this.poker.pot;
+          this.currentRoundLog.bet1Actions.push({
+            actor: "op",
+            action: "raise",
+            amount: this.wealth.raiseStep,
+            pot: this.poker.pot,
+            note: `Соперник поднял ставку (+${this.wealth.raiseStep} 🪙)`
+          });
+        }
         document.getElementById("pot-display").innerText = this.poker.pot;
         document.getElementById("poker-status").innerText = `Соперник уверен в комбинации (${oEval.title}) и поднял ставку (+${this.wealth.raiseStep} 🪙)! Уравняйте ставку или сдайтесь.`;
         this.updatePokerButtons({
@@ -466,14 +604,61 @@ class UnifiedDiceApp {
     const oEval = PokerEvaluator.evaluate(this.poker.opDice);
     const shouldCall = this.aiShouldCallRaise(pEval, oEval);
 
+    const betList = (this.poker.state === "BET2" && this.currentRoundLog) 
+      ? this.currentRoundLog.bet2Actions 
+      : (this.currentRoundLog ? this.currentRoundLog.bet1Actions : null);
+
+    if (this.currentRoundLog) {
+      this.currentRoundLog.playerInvested += raiseVal;
+    }
+
     if (shouldCall) {
       // Both match the raise: pot grows by 2 * raiseVal
       this.poker.pot += raiseVal * 2;
+      if (this.currentRoundLog) {
+        this.currentRoundLog.opInvested += raiseVal;
+        this.currentRoundLog.pot = this.poker.pot;
+        if (betList) {
+          betList.push({
+            actor: "player",
+            action: "raise",
+            amount: raiseVal,
+            pot: this.poker.pot,
+            note: `Игрок поднял ставку (+${raiseVal} 🪙)`
+          });
+          betList.push({
+            actor: "op",
+            action: "call",
+            amount: raiseVal,
+            pot: this.poker.pot,
+            note: `Соперник уравнял повышение (+${raiseVal} 🪙)`
+          });
+        }
+      }
       document.getElementById("pot-display").innerText = this.poker.pot;
       document.getElementById("poker-status").innerText = `Соперник уравнял ваше повышение (+${raiseVal * 2} 🪙 в банк). Переход к перебросу.`;
       this.proceedToReroll();
     } else {
       // AI Folds
+      if (betList) {
+        betList.push({
+          actor: "player",
+          action: "raise",
+          amount: raiseVal,
+          pot: this.poker.pot,
+          note: `Игрок поднял ставку (+${raiseVal} 🪙)`
+        });
+        betList.push({
+          actor: "op",
+          action: "fold",
+          note: `Соперник сбросил кости (пас)`
+        });
+      }
+      if (this.currentRoundLog) {
+        this.currentRoundLog.winner = "player";
+        this.currentRoundLog.winnerReason = "Соперник сбросил кости (пас)";
+        this.currentRoundLog.finalPot = this.poker.pot;
+      }
       document.getElementById("poker-status").innerText = "Соперник сбросил кости! Вы забираете банк раунда.";
       this.playerWinsRound();
     }
@@ -499,12 +684,60 @@ class UnifiedDiceApp {
   handlePokerCall() {
     if (this.poker.isRolling) return;
     if (window.diceAudio) window.diceAudio.playClick();
+
+    const betList = (this.poker.state === "BET2" && this.currentRoundLog) 
+      ? this.currentRoundLog.bet2Actions 
+      : (this.currentRoundLog ? this.currentRoundLog.bet1Actions : null);
+
+    if (this.poker.aiRaised) {
+      this.poker.pot += this.wealth.raiseStep;
+      if (this.currentRoundLog) {
+        this.currentRoundLog.playerInvested += this.wealth.raiseStep;
+        this.currentRoundLog.pot = this.poker.pot;
+        if (betList) {
+          betList.push({
+            actor: "player",
+            action: "call",
+            amount: this.wealth.raiseStep,
+            pot: this.poker.pot,
+            note: `Игрок уравнял ставку соперника (+${this.wealth.raiseStep} 🪙)`
+          });
+        }
+      }
+      document.getElementById("pot-display").innerText = this.poker.pot;
+      this.poker.aiRaised = false;
+    } else {
+      if (betList) {
+        betList.push({
+          actor: "player",
+          action: "check",
+          pot: this.poker.pot,
+          note: "Игрок сыграл чек (продолжить без повышения)"
+        });
+      }
+    }
+
     this.proceedToReroll();
   }
 
   handlePokerFold() {
     if (this.poker.isRolling) return;
     if (window.diceAudio) window.diceAudio.playLose();
+    const betList = (this.poker.state === "BET2" && this.currentRoundLog) 
+      ? this.currentRoundLog.bet2Actions 
+      : (this.currentRoundLog ? this.currentRoundLog.bet1Actions : null);
+    if (betList) {
+      betList.push({
+        actor: "player",
+        action: "fold",
+        note: "Игрок сбросил кости (сдался)"
+      });
+    }
+    if (this.currentRoundLog) {
+      this.currentRoundLog.winner = "op";
+      this.currentRoundLog.winnerReason = "Игрок сбросил кости (сдался)";
+      this.currentRoundLog.finalPot = this.poker.pot;
+    }
     document.getElementById("poker-status").innerText = "Вы сбросили кости. Раунд достаётся сопернику.";
     this.opWinsRound();
   }
@@ -627,6 +860,8 @@ class UnifiedDiceApp {
 
     this.poker.opSelected = this.chooseOpponentRerolls();
 
+    const pPrevDice = [...this.poker.playerDice];
+    const oPrevDice = [...this.poker.opDice];
     const pRerollIndices = [];
     const oRerollIndices = [];
     for (let i = 0; i < 5; i++) {
@@ -662,6 +897,19 @@ class UnifiedDiceApp {
     document.getElementById("player-comb-tag").innerText = pEval.title;
     document.getElementById("op-comb-tag").innerText = oEval.title;
 
+    if (this.currentRoundLog) {
+      this.currentRoundLog.rerolls = {
+        playerRerolledIndices: pRerollIndices,
+        playerPrevDice: pPrevDice,
+        playerNewDice: [...this.poker.playerDice],
+        playerComb: pEval.title,
+        opRerolledIndices: oRerollIndices,
+        opPrevDice: oPrevDice,
+        opNewDice: [...this.poker.opDice],
+        opComb: oEval.title
+      };
+    }
+
     this.poker.isRolling = false;
     this.poker.state = "BET2";
 
@@ -669,7 +917,19 @@ class UnifiedDiceApp {
     if (this.diffKey === "hard") {
       const cmp = PokerEvaluator.compare(oEval, pEval);
       if (cmp > 0 && oEval.rank >= POKER_RANKS.TWO_PAIRS) {
+        this.poker.aiRaised = true;
         this.poker.pot += this.wealth.raiseStep;
+        if (this.currentRoundLog) {
+          this.currentRoundLog.opInvested += this.wealth.raiseStep;
+          this.currentRoundLog.pot = this.poker.pot;
+          this.currentRoundLog.bet2Actions.push({
+            actor: "op",
+            action: "raise",
+            amount: this.wealth.raiseStep,
+            pot: this.poker.pot,
+            note: `Соперник видит стол и поднимает ставку перед вскрытием (+${this.wealth.raiseStep} 🪙)`
+          });
+        }
         document.getElementById("pot-display").innerText = this.poker.pot;
         document.getElementById("poker-status").innerText = `Соперник видит стол, уверен в перевесе и поднимает ставку (+${this.wealth.raiseStep} 🪙)! Вскрыть кости или сдаться?`;
         this.updatePokerButtons({
@@ -698,18 +958,42 @@ class UnifiedDiceApp {
     const pEval = PokerEvaluator.evaluate(this.poker.playerDice);
     const oEval = PokerEvaluator.evaluate(this.poker.opDice);
     const cmp = PokerEvaluator.compare(pEval, oEval);
+    const potAtShowdown = this.poker.pot;
+
+    if (this.currentRoundLog) {
+      this.currentRoundLog.showdown = {
+        playerComb: pEval.title,
+        opComb: oEval.title,
+        cmp: cmp,
+        pot: potAtShowdown
+      };
+      this.currentRoundLog.finalPot = potAtShowdown;
+    }
 
     if (cmp > 0) {
       if (window.diceAudio) window.diceAudio.playWin();
       document.getElementById("poker-status").innerText = `Победа в раунде! Ваш ${pEval.title} побеждает ${oEval.title}. Банк раунда ваш!`;
+      if (this.currentRoundLog) {
+        this.currentRoundLog.winner = "player";
+        this.currentRoundLog.winnerReason = `${pEval.title} бьёт ${oEval.title}`;
+      }
       this.playerWinsRound();
     } else if (cmp < 0) {
       if (window.diceAudio) window.diceAudio.playLose();
       document.getElementById("poker-status").innerText = `Поражение в раунде. ${oEval.title} соперника сильнее вашего ${pEval.title}. Банк уходит сопернику.`;
+      if (this.currentRoundLog) {
+        this.currentRoundLog.winner = "op";
+        this.currentRoundLog.winnerReason = `${oEval.title} бьёт ${pEval.title}`;
+      }
       this.opWinsRound();
     } else {
       if (window.diceAudio) window.diceAudio.playCoin();
       document.getElementById("poker-status").innerText = `Ничья! Комбинации равны (${pEval.title}). Банк поделён.`;
+      if (this.currentRoundLog) {
+        this.currentRoundLog.winner = "draw";
+        this.currentRoundLog.winnerReason = `Равные комбинации (${pEval.title})`;
+        this.currentRoundLog.gemsAfter = { player: this.poker.playerGems, op: this.poker.opGems };
+      }
       this.poker.pot = 0;
       document.getElementById("pot-display").innerText = 0;
       this.checkRoundEnd();
@@ -717,18 +1001,44 @@ class UnifiedDiceApp {
   }
 
   playerWinsRound() {
+    const potWon = (this.currentRoundLog && this.currentRoundLog.finalPot) ? this.currentRoundLog.finalPot : this.poker.pot;
     this.poker.playerGems++;
     this.poker.pot = 0;
     document.getElementById("pot-display").innerText = 0;
     this.updatePokerGems();
+
+    if (this.currentRoundLog) {
+      this.currentRoundLog.winner = "player";
+      this.currentRoundLog.gemsAfter = { player: this.poker.playerGems, op: this.poker.opGems };
+      if (!this.currentRoundLog.finalPot) this.currentRoundLog.finalPot = potWon;
+    }
+
+    if (this.matchLog) {
+      const invested = this.currentRoundLog ? this.currentRoundLog.playerInvested : this.wealth.baseStake;
+      this.matchLog.playerNetCoins += (potWon - invested);
+    }
+
     this.checkMatchStatus();
   }
 
   opWinsRound() {
+    const potLost = (this.currentRoundLog && this.currentRoundLog.finalPot) ? this.currentRoundLog.finalPot : this.poker.pot;
     this.poker.opGems++;
     this.poker.pot = 0;
     document.getElementById("pot-display").innerText = 0;
     this.updatePokerGems();
+
+    if (this.currentRoundLog) {
+      this.currentRoundLog.winner = "op";
+      this.currentRoundLog.gemsAfter = { player: this.poker.playerGems, op: this.poker.opGems };
+      if (!this.currentRoundLog.finalPot) this.currentRoundLog.finalPot = potLost;
+    }
+
+    if (this.matchLog) {
+      const invested = this.currentRoundLog ? this.currentRoundLog.playerInvested : this.wealth.baseStake;
+      this.matchLog.playerNetCoins -= invested;
+    }
+
     this.checkMatchStatus();
   }
 
@@ -737,15 +1047,166 @@ class UnifiedDiceApp {
       if (window.diceAudio) window.diceAudio.playWin();
       document.getElementById("poker-status").innerText = "🏆 ПОБЕДА В ПАРТИИ! Вы выиграли со счётом 2 победы. Поздравляем!";
       this.poker.state = "MATCH_OVER";
+      if (this.matchLog) {
+        this.matchLog.finalResult = "win";
+        this.matchLog.playerGems = this.poker.playerGems;
+        this.matchLog.opGems = this.poker.opGems;
+      }
       this.updatePokerButtons({ rollText: "Начать новую партию", canRoll: true });
+      if (this.btnCopyDm) this.btnCopyDm.style.display = "inline-flex";
+      this.showPokerEndModal();
     } else if (this.poker.opGems >= 2) {
       if (window.diceAudio) window.diceAudio.playLose();
       document.getElementById("poker-status").innerText = "💀 ПОРАЖЕНИЕ В ПАРТИИ. Соперник одержал 2 победы.";
       this.poker.state = "MATCH_OVER";
+      if (this.matchLog) {
+        this.matchLog.finalResult = "lose";
+        this.matchLog.playerGems = this.poker.playerGems;
+        this.matchLog.opGems = this.poker.opGems;
+      }
       this.updatePokerButtons({ rollText: "Сыграть реванш", canRoll: true });
+      if (this.btnCopyDm) this.btnCopyDm.style.display = "inline-flex";
+      this.showPokerEndModal();
     } else {
       this.checkRoundEnd();
     }
+  }
+
+  showPokerEndModal() {
+    if (!this.endModal || !this.matchLog) return;
+    const isWin = this.matchLog.finalResult === "win";
+    const banner = document.getElementById("poker-end-banner");
+    const sub = document.getElementById("poker-end-subtitle");
+    const stats = document.getElementById("poker-end-stats");
+
+    if (banner) {
+      banner.className = `poker-end-banner ${isWin ? 'win' : 'lose'}`;
+      banner.innerText = isWin ? "🏆 ПОБЕДА В ПАРТИИ!" : "💀 ПОРАЖЕНИЕ В ПАРТИИ";
+    }
+    if (sub) {
+      sub.innerText = isWin 
+        ? `Вы обыграли противника (${this.matchLog.opName}) со счётом ${this.matchLog.playerGems} : ${this.matchLog.opGems}!`
+        : `Соперник (${this.matchLog.opName}) одержал победу со счётом ${this.matchLog.opGems} : ${this.matchLog.playerGems}.`;
+    }
+    if (stats) {
+      let roundsHtml = this.matchLog.rounds.map(r => {
+        const wTxt = r.winner === "player" 
+          ? `<span style="color:#4ade80;">Победа</span>` 
+          : (r.winner === "op" ? `<span style="color:#f87171;">Поражение</span>` : `<span style="color:#ffd700;">Ничья</span>`);
+        const pComb = r.showdown ? r.showdown.playerComb : (r.rerolls ? r.rerolls.playerComb : (r.initialRoll ? r.initialRoll.playerComb : "—"));
+        const oComb = r.showdown ? r.showdown.opComb : (r.rerolls ? r.rerolls.opComb : (r.initialRoll ? r.initialRoll.opComb : "—"));
+        return `<div class="stat-row">
+          <span class="stat-label">Раунд ${r.roundNumber}: ${pComb} vs ${oComb}</span>
+          <span class="stat-val">${wTxt}</span>
+        </div>`;
+      }).join('');
+
+      const profitTxt = this.matchLog.playerNetCoins >= 0 
+        ? `+${this.matchLog.playerNetCoins} 🪙 (выигрыш)` 
+        : `${this.matchLog.playerNetCoins} 🪙 (проигрыш)`;
+
+      stats.innerHTML = `
+        <div class="stat-row">
+          <span class="stat-label">Счёт раундов:</span>
+          <span class="stat-val">${this.matchLog.playerGems} 💎 : ${this.matchLog.opGems} 💎</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Соперник:</span>
+          <span class="stat-val">${this.matchLog.opName} (${this.matchLog.difficulty})</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Баланс оренов:</span>
+          <span class="stat-val" style="color:${this.matchLog.playerNetCoins >= 0 ? '#ffd700' : '#f87171'}">${profitTxt}</span>
+        </div>
+        ${roundsHtml}
+      `;
+    }
+
+    this.endModal.classList.add("visible");
+  }
+
+  hidePokerEndModal() {
+    if (this.endModal) {
+      this.endModal.classList.remove("visible");
+    }
+  }
+
+  copyDmHistory(btnElement) {
+    const text = this.formatDicePokerLogForDM();
+    copyTextToClipboard(text).then(ok => {
+      showCopyToast(ok ? "✓ История покера на костях скопирована для ДМа!" : "⚠️ Скопируйте текст вручную");
+      if (btnElement) {
+        const oldText = btnElement.innerText;
+        btnElement.innerText = "✓ Скопировано!";
+        btnElement.classList.add("copied");
+        setTimeout(() => {
+          btnElement.innerText = oldText;
+          btnElement.classList.remove("copied");
+        }, 2500);
+      }
+    });
+  }
+
+  formatDicePokerLogForDM() {
+    if (!this.matchLog) return "История партии в кости отсутствует.";
+    const log = this.matchLog;
+    const d = log.startTime instanceof Date ? log.startTime : new Date();
+    const dateStr = d.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const diceEmoji = (arr) => (arr || []).map(v => ['⚀','⚁','⚂','⚃','⚄','⚅'][v - 1] || v).join(' ');
+
+    let md = `### 🎲 ПОКЕР НА КОСТЯХ (5d6) — ХРОНИКА ДЛЯ ДИАЛОГА / ДМ\n`;
+    md += `**Дата партии:** ${dateStr}\n`;
+    md += `**Игрок:** ${log.playerName}\n`;
+    md += `**Соперник:** ${log.opName} (Уровень: ${log.wealth.badge} | Сложность: ${log.difficulty})\n`;
+    md += `**Ставки стола:** Базовая ставка: ${log.wealth.baseStake} 🪙 | Шаг подъёма: ${log.wealth.raiseStep} 🪙\n`;
+    md += `**Итог партии:** ${log.finalResult === 'win' ? '🏆 ПОБЕДА ИГРОКА' : '💀 ПОРАЖЕНИЕ ИГРОКА'} (Счёт: ${log.playerGems} : ${log.opGems})\n`;
+    const balanceSign = log.playerNetCoins >= 0 ? `+${log.playerNetCoins}` : `${log.playerNetCoins}`;
+    md += `**Итоговый баланс оренов:** ${balanceSign} 🪙\n\n`;
+    md += `---\n`;
+
+    log.rounds.forEach((r) => {
+      md += `\n#### ⚔️ Раунд ${r.roundNumber} (Начальный банк: ${r.initialPot} 🪙)\n`;
+      if (r.initialRoll) {
+        md += `- **1-й бросок (исходные кости):**\n`;
+        md += `  - **${log.playerName}:** [ ${diceEmoji(r.initialRoll.playerDice)} ] (${r.initialRoll.playerDice.join(', ')}) ➔ **${r.initialRoll.playerComb}**\n`;
+        md += `  - **${log.opName}:** [ ${diceEmoji(r.initialRoll.opDice)} ] (${r.initialRoll.opDice.join(', ')}) ➔ **${r.initialRoll.opComb}**\n`;
+      }
+
+      if (r.bet1Actions && r.bet1Actions.length > 0) {
+        md += `- **Торги 1-й фазы:**\n`;
+        r.bet1Actions.forEach(a => {
+          const actorName = a.actor === 'player' ? log.playerName : log.opName;
+          md += `  - *${actorName}:* ${a.note || a.action} (Банк: ${a.pot || r.pot} 🪙)\n`;
+        });
+      }
+
+      if (r.rerolls) {
+        const pRerollCount = r.rerolls.playerRerolledIndices.length;
+        const oRerollCount = r.rerolls.opRerolledIndices.length;
+        const pDiceList = r.rerolls.playerRerolledIndices.map(i => `#${i + 1}`).join(', ') || 'нет';
+        const oDiceList = r.rerolls.opRerolledIndices.map(i => `#${i + 1}`).join(', ') || 'нет';
+
+        md += `- **Переброс костей (2-я фаза):**\n`;
+        md += `  - **${log.playerName}:** выбрал для переброса ${pRerollCount} кост. (${pDiceList}) ➔ [ ${diceEmoji(r.rerolls.playerNewDice)} ] (${r.rerolls.playerNewDice.join(', ')}) ➔ **${r.rerolls.playerComb}**\n`;
+        md += `  - **${log.opName}:** выбрал для переброса ${oRerollCount} кост. (${oDiceList}) ➔ [ ${diceEmoji(r.rerolls.opNewDice)} ] (${r.rerolls.opNewDice.join(', ')}) ➔ **${r.rerolls.opComb}**\n`;
+      }
+
+      if (r.bet2Actions && r.bet2Actions.length > 0) {
+        md += `- **Финальные торги (перед вскрытием):**\n`;
+        r.bet2Actions.forEach(a => {
+          const actorName = a.actor === 'player' ? log.playerName : log.opName;
+          md += `  - *${actorName}:* ${a.note || a.action} (Банк: ${a.pot || r.pot} 🪙)\n`;
+        });
+      }
+
+      const winnerText = r.winner === 'player' ? `🏆 Победа игрока (${log.playerName})` : (r.winner === 'op' ? `💀 Победа соперника (${log.opName})` : '🤝 Ничья');
+      const reasonText = r.winnerReason ? ` [${r.winnerReason}]` : '';
+      md += `- **Вскрытие и итог раунда:** ${winnerText}${reasonText} | Выигранный банк: ${r.finalPot || r.pot} 🪙\n`;
+      md += `- **Счёт по кристаллам:** ${log.playerName} [${'💎'.repeat(r.gemsAfter.player)}${'⚪'.repeat(Math.max(0, 2 - r.gemsAfter.player))}] : ${log.opName} [${'💎'.repeat(r.gemsAfter.op)}${'⚪'.repeat(Math.max(0, 2 - r.gemsAfter.op))}]\n`;
+    });
+
+    md += `\n---\n*Хроника сформирована DnD Compendium для мастера настольной игры.*\n`;
+    return md;
   }
 
   checkRoundEnd() {

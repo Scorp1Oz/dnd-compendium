@@ -41,6 +41,104 @@ function getCompendiumPlayerName() {
 	return "Ведьмак";
 }
 
+/* ============================================================
+   Clipboard, Toast & Localization Helpers for DM Chronicle
+   ============================================================ */
+async function copyTextToClipboard(text) {
+	try {
+		if (navigator.clipboard && navigator.clipboard.writeText) {
+			await navigator.clipboard.writeText(text);
+			return true;
+		}
+	} catch (err) {}
+
+	try {
+		const textArea = document.createElement("textarea");
+		textArea.value = text;
+		textArea.style.top = "0";
+		textArea.style.left = "0";
+		textArea.style.position = "fixed";
+		textArea.style.opacity = "0";
+		textArea.style.pointerEvents = "none";
+		document.body.appendChild(textArea);
+		textArea.focus();
+		textArea.select();
+		const successful = document.execCommand('copy');
+		document.body.removeChild(textArea);
+		if (successful) return true;
+	} catch (err) {}
+
+	return false;
+}
+
+function showCopyToast(msg = "✓ Скопировано в буфер обмена для ДМа!") {
+	let toast = document.getElementById("game-copy-toast");
+	if (!toast) {
+		toast = document.createElement("div");
+		toast.id = "game-copy-toast";
+		toast.className = "game-copy-toast";
+		document.body.appendChild(toast);
+	}
+	toast.textContent = msg;
+	toast.classList.add("visible");
+	setTimeout(() => {
+		toast.classList.remove("visible");
+	}, 2600);
+}
+
+function formatRowRu(row) {
+	switch (row) {
+		case "close": return "Рукопашный ряд";
+		case "ranged": return "Дальнобойный ряд";
+		case "siege": return "Осадный ряд";
+		case "weather": return "Погода";
+		case "agile": return "Гибкий ряд";
+		case "special": return "Специальный ряд";
+		default: return row || "Поле";
+	}
+}
+
+function formatAbilitiesRu(abilities) {
+	if (!abilities || abilities.length === 0) return "";
+	const map = {
+		hero: "Герой",
+		spy: "Шпион",
+		medic: "Медик",
+		horn: "Командный рог",
+		scorch: "Казнь",
+		scorch_c: "Казнь (рукопашный)",
+		scorch_r: "Казнь (дальнобойный)",
+		scorch_s: "Казнь (осадный)",
+		muster: "Призыв",
+		bond: "Прочная связь",
+		morale: "Боевой дух",
+		decoy: "Чучело",
+		frost: "Мороз",
+		fog: "Туман",
+		rain: "Ливень",
+		clear: "Чистое небо",
+		avenger: "Мститель",
+		mardroeme: "Мардрем"
+	};
+	const mapped = abilities.map(a => map[a] || a);
+	return `[${mapped.join(', ')}]`;
+}
+
+function formatFactionRu(faction) {
+	const map = {
+		realms: "Королевства Севера",
+		nilfgaard: "Нильфгаард",
+		monsters: "Чудовища",
+		scoiatael: "Скоя'таэли",
+		skellige: "Скеллиге",
+		syndicate: "Синдикат",
+		neutral: "Нейтральные карты",
+		special: "Специальные карты",
+		weather: "Погода"
+	};
+	return map[faction] || faction || "Колода";
+}
+
 class Controller {}
 
 // Makes decisions for the AI opponent player
@@ -578,6 +676,13 @@ class Player {
 	passRound(){
 		this.setPassed(true);
 		EventManager.roundPassed.dispatch(this, game.roundCount);
+		if (game && game.recordAction) {
+			game.recordAction({
+				player: this.name,
+				type: 'pass',
+				note: 'Пас'
+			});
+		}
 		this.endTurn();
 	}
 	
@@ -598,6 +703,14 @@ class Player {
 	
 	// Shows a preview of the card being played, plays it to the board and ends the turn
 	async playCardAction(card, action){
+		if (game && game.recordAction) {
+			game.recordAction({
+				player: this.name,
+				type: 'card',
+				card: card,
+				targetRow: card.row
+			});
+		}
 		ui.showPreviewVisuals(card);
 		await sleep(1000);
 		ui.hidePreview(card);
@@ -636,6 +749,14 @@ class Player {
 	
 	// Use a leader's Activate ability, then disable the leader
 	async activateLeader() {
+		if (game && game.recordAction) {
+			game.recordAction({
+				player: this.name,
+				type: 'leader',
+				card: this.leader,
+				note: 'Использована способность лидера'
+			});
+		}
 		ui.showPreviewVisuals(this.leader);
 		await sleep(1500);
 		ui.hidePreview(this.leader);
@@ -1446,9 +1567,13 @@ class Game {
 		this.customize_elem = buttons[0];
 		this.rematch_elem = buttons[1];
 		this.newGame_elem = buttons[2];
+		this.copyDm_elem = document.getElementById("end-btn-copy-dm") || buttons[3];
 		this.customize_elem.addEventListener("click", () => this.returnToCustomization(), false);
 		this.rematch_elem.addEventListener("click", () => this.rematchGame(), false);
 		this.newGame_elem.addEventListener("click", () => this.newOpponentGame(), false);
+		if (this.copyDm_elem) {
+			this.copyDm_elem.addEventListener("click", () => this.copyMatchHistoryForDM(), false);
+		}
 		this.state = GameState.CUSTOMIZE;
 		this.reset();
 	}
@@ -1465,6 +1590,22 @@ class Game {
 		
 		this.roundCount = 0;
 		this.roundHistory = [];
+
+		this.matchLog = {
+			date: new Date(),
+			playerMeName: getCompendiumPlayerName(),
+			playerOpName: "Opponent",
+			playerMeFaction: "",
+			playerOpFaction: "",
+			playerMeLeader: "",
+			playerOpLeader: "",
+			coinTossWinner: null,
+			rounds: [],
+			finalWinner: null,
+			outcome: null
+		};
+		this.currentRoundLog = null;
+		this.lastAction = null;
 		
 		this.randomRespawn = false;
 		this.doubleSpyPower = false;
@@ -1523,6 +1664,20 @@ class Game {
 		this.initPlayers(player_me, player_op);
 		this.setState(GameState.PLAYING);
 		AudioManager.playSFX('game_opening');
+
+		if (this.matchLog) {
+			this.matchLog.date = new Date();
+			this.matchLog.playerMeName = player_me.name;
+			this.matchLog.playerOpName = player_op.name;
+			this.matchLog.playerMeFaction = player_me.deck.faction;
+			this.matchLog.playerOpFaction = player_op.deck.faction;
+			this.matchLog.playerMeLeader = player_me.leader.name;
+			this.matchLog.playerOpLeader = player_op.leader.name;
+			this.matchLog.rounds = [];
+			this.matchLog.finalWinner = null;
+			this.matchLog.outcome = null;
+		}
+
 		await this.runEffects(this.gameStart);
 		await this.coinToss();
 		AudioManager.playSFX('redraw');
@@ -1541,6 +1696,9 @@ class Game {
 		if (this.firstPlayer)
 			return;
 		this.firstPlayer = (Math.random() < 0.5) ? player_me : player_op;
+		if (this.matchLog) {
+			this.matchLog.coinTossWinner = (this.firstPlayer === player_me) ? player_me.name : player_op.name;
+		}
 		await ui.notification(this.firstPlayer.tag + "-coin", 1200);
 	}
 	
@@ -1559,6 +1717,21 @@ class Game {
 		EventManager.roundStarted.dispatch(this.roundCount, this.currPlayer);
 		if (this.roundCount === 1)
 			AudioManager.playSFX("round1_start");
+
+		if (this.matchLog) {
+			this.currentRoundLog = {
+				roundNumber: this.roundCount,
+				startingPlayer: this.currPlayer.name,
+				turns: [],
+				scoreMe: 0,
+				scoreOp: 0,
+				winner: null,
+				gemsMeAfter: player_me.health,
+				gemsOpAfter: player_op.health
+			};
+			this.matchLog.rounds.push(this.currentRoundLog);
+		}
+
 		await this.runEffects(this.roundStart);
 		
 		if ( !player_me.canPlay() )
@@ -1578,6 +1751,27 @@ class Game {
 		this.startTurn();
 	}
 	
+	// Records a game action (card played, leader activated, pass, or decoy)
+	recordAction(entry) {
+		if (!this.currentRoundLog) return;
+		const turnNum = this.currentRoundLog.turns.length + 1;
+		const record = {
+			turnNumber: turnNum,
+			player: entry.player,
+			type: entry.type, // 'card', 'leader', 'pass', 'decoy'
+			cardName: entry.card ? entry.card.name : (entry.cardName || ""),
+			power: entry.card ? (entry.card.power !== undefined ? entry.card.power : entry.card.basePower) : null,
+			row: entry.targetRow || (entry.card ? entry.card.row : null),
+			abilities: entry.card && entry.card.abilities ? [...entry.card.abilities] : [],
+			isHero: entry.card ? (entry.card.hero || (entry.card.isHero && entry.card.isHero())) : false,
+			note: entry.note || "",
+			scoreMe: player_me.total,
+			scoreOp: player_op.total
+		};
+		this.currentRoundLog.turns.push(record);
+		this.lastAction = record;
+	}
+
 	// Starts a new turn. Enables client interraction in client's turn.
 	async startTurn() {
 		await this.runEffects(this.turnStart);
@@ -1590,6 +1784,13 @@ class Game {
 		if (this.currPlayer === player_me)
 			ui.enablePlayer(false);
 		await this.runEffects(this.turnEnd);
+
+		if (this.lastAction) {
+			this.lastAction.scoreMe = player_me.total;
+			this.lastAction.scoreOp = player_op.total;
+			this.lastAction = null;
+		}
+
 		if (this.currPlayer.passed)
 			await ui.notification(this.currPlayer.tag + "-pass", 1200);
 		if (player_op.passed && player_me.passed)
@@ -1617,6 +1818,14 @@ class Game {
 		let verdict = {winner: winner, score_me: player_me.total, score_op: player_op.total}
 		this.roundHistory.push(verdict);
 		
+		if (this.currentRoundLog) {
+			this.currentRoundLog.scoreMe = player_me.total;
+			this.currentRoundLog.scoreOp = player_op.total;
+			this.currentRoundLog.winner = winner ? winner.name : "Ничья";
+			this.currentRoundLog.gemsMeAfter = player_me.health - (dif < 0 ? 1 : 0);
+			this.currentRoundLog.gemsOpAfter = player_op.health - (dif > 0 ? 1 : 0);
+		}
+
 		await this.runEffects(this.roundEnd);
 		
 		player_me.endRound( dif > 0);
@@ -1671,21 +1880,99 @@ class Game {
 		}
 		
 		endScreen.children[0].className = "";
+		let outcome = "lose";
 		if (player_op.health <= 0 && player_me.health <= 0) {
+			outcome = "draw";
 			endScreen.getElementsByTagName("p")[0].classList.remove("hide");
 			AudioManager.playSFX("game_lose");
 			endScreen.children[0].classList.add("end-draw");
 		} else if (player_op.health === 0){
+			outcome = "win";
 			AudioManager.playSFX("game_win");
 			endScreen.children[0].classList.add("end-win");
 		} else {
+			outcome = "lose";
 			AudioManager.playSFX("game_lose");
 			endScreen.children[0].classList.add("end-lose");
+		}
+
+		if (this.matchLog) {
+			this.matchLog.outcome = outcome;
+			this.matchLog.finalWinner = (outcome === "win" ? player_me.name : (outcome === "lose" ? player_op.name : "Ничья"));
 		}
 		
 		fadeIn(endScreen, 300);
 		ui.enablePlayer(true);
 		this.setState(GameState.END_SCREEN);
+	}
+
+	copyMatchHistoryForDM() {
+		const text = this.generateGwentDmReport();
+		copyTextToClipboard(text).then(ok => {
+			showCopyToast(ok ? "✓ История партии в Гвинт скопирована для ДМа!" : "⚠️ Скопируйте текст вручную");
+			if (this.copyDm_elem) {
+				const oldText = this.copyDm_elem.innerText;
+				this.copyDm_elem.innerText = "✓ Скопировано!";
+				this.copyDm_elem.classList.add("copied");
+				setTimeout(() => {
+					this.copyDm_elem.innerText = oldText;
+					this.copyDm_elem.classList.remove("copied");
+				}, 2500);
+			}
+		});
+	}
+
+	generateGwentDmReport() {
+		if (!this.matchLog) return "История партии в Гвинт отсутствует.";
+		const log = this.matchLog;
+		const d = log.date instanceof Date ? log.date : new Date();
+		const dateStr = d.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+		let outcomeTitle = "🏆 ПОБЕДА ИГРОКА";
+		if (log.outcome === "lose") outcomeTitle = `💀 ПОБЕДА СОПЕРНИКА (${log.playerOpName})`;
+		else if (log.outcome === "draw") outcomeTitle = "🤝 БОЕВАЯ НИЧЬЯ";
+
+		let md = `### ⚔️ ГВИНТ — ХРОНИКА БИТВЫ ДЛЯ ДИАЛОГА / ДМ\n`;
+		md += `**Дата партии:** ${dateStr}\n`;
+		md += `**Игрок:** ${log.playerMeName} | Фракция: ${formatFactionRu(log.playerMeFaction)} | Лидер: «${log.playerMeLeader}»\n`;
+		md += `**Соперник:** ${log.playerOpName} | Фракция: ${formatFactionRu(log.playerOpFaction)} | Лидер: «${log.playerOpLeader}»\n`;
+		if (log.coinTossWinner) {
+			md += `**Право первого хода (монета):** ${log.coinTossWinner}\n`;
+		}
+		md += `**Итог битвы:** ${outcomeTitle}\n\n`;
+		md += `---\n`;
+
+		log.rounds.forEach((r) => {
+			md += `\n#### 🛡️ Раунд ${r.roundNumber} (Первый ходит: ${r.startingPlayer})\n`;
+			if (r.turns && r.turns.length > 0) {
+				r.turns.forEach((t) => {
+					let actionDesc = "";
+					if (t.type === 'pass') {
+						actionDesc = `**Пас (завершил раунд)**`;
+					} else if (t.type === 'leader') {
+						actionDesc = `активировал способность лидера **«${t.cardName}»**`;
+					} else if (t.type === 'decoy') {
+						actionDesc = `сыграл **Чучело** (${t.note})`;
+					} else {
+						// card
+						const powerStr = (t.power !== null && t.power !== undefined) ? `Сила: ${t.power}` : "";
+						const rowStr = t.row ? formatRowRu(t.row) : "";
+						const abStr = t.abilities && t.abilities.length > 0 ? formatAbilitiesRu(t.abilities) : "";
+						const heroStr = t.isHero ? "★ Герой" : "";
+						const details = [powerStr, rowStr, abStr, heroStr].filter(Boolean).join(', ');
+						actionDesc = `сыграл карту **«${t.cardName}»**${details ? ` (${details})` : ""}`;
+					}
+					md += `- **Ход ${t.turnNumber} [${t.player}]:** ${actionDesc} ➔ *Счёт: ${log.playerMeName} ${t.scoreMe} : ${t.scoreOp} ${log.playerOpName}*\n`;
+				});
+			} else {
+				md += `- Нет записанных ходов.\n`;
+			}
+			md += `- **Итог раунда ${r.roundNumber}:** ${r.winner ? 'Победа: ' + r.winner : 'Завершён'} (Финальный счёт: ${r.scoreMe} : ${r.scoreOp})\n`;
+			md += `- **Кристаллы:** ${log.playerMeName} [${'💎'.repeat(Math.max(0, r.gemsMeAfter))}${'⚪'.repeat(Math.max(0, 2 - r.gemsMeAfter))}] | ${log.playerOpName} [${'💎'.repeat(Math.max(0, r.gemsOpAfter))}${'⚪'.repeat(Math.max(0, 2 - r.gemsOpAfter))}]\n`;
+		});
+
+		md += `\n---\n*Хроника сформирована DnD Compendium для мастера настольной игры.*\n`;
+		return md;
 	}
 
 	exitGame()
@@ -2176,6 +2463,15 @@ class UI {
 		} else if (pCard.name === "Decoy") {
 			this.hidePreview(card);
 			this.enablePlayer(false);
+			if (game && game.recordAction) {
+				game.recordAction({
+					player: pCard.holder.name,
+					type: 'decoy',
+					card: pCard,
+					note: `Чучело вернуло в руку карту «${card.name}» (сила ${card.power})`,
+					targetRow: (row && row.type) ? row.type : card.row
+				});
+			}
 			board.toHand(card, row);
 			await board.moveTo(pCard, row, pCard.holder.hand);
 			pCard.holder.endTurn();
@@ -2200,6 +2496,17 @@ class UI {
 		let holder = card.holder;
 		this.hidePreview();
 		this.enablePlayer(false);
+
+		if (game && game.recordAction) {
+			const targetRowName = (row && row.type) ? row.type : ((typeof row === 'string') ? row : card.row);
+			game.recordAction({
+				player: holder.name,
+				type: 'card',
+				card: card,
+				targetRow: targetRowName
+			});
+		}
+
 		if (card.name === "Scorch"){
 			this.hidePreview();
 			await ability_dict["scorch"].activated(card);

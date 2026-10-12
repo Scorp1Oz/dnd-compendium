@@ -817,9 +817,59 @@ html {
 	transform: translateY(-2px);
 }
 
-#end-screen button:nth-of-type(1) { left: 31%; }
-#end-screen button:nth-of-type(2) { left: 45%; }
-#end-screen button:nth-of-type(3) { left: 59%; }
+#end-screen button:nth-of-type(1) { left: 17%; width: 13vw; }
+#end-screen button:nth-of-type(2) { left: 32%; width: 13vw; }
+#end-screen button:nth-of-type(3) { left: 47%; width: 13vw; }
+#end-screen button:nth-of-type(4) { left: 62%; width: 21vw; }
+
+#end-screen button#end-btn-copy-dm {
+	background: linear-gradient(180deg, #3d2c14 0%, #1c1509 100%);
+	border: 1px solid #ffd700;
+	color: #fff4cc;
+	box-shadow: 0 0 14px rgba(255, 215, 0, 0.25);
+	font-size: 0.92vw;
+}
+
+#end-screen button#end-btn-copy-dm:hover {
+	background: linear-gradient(180deg, #744e23 0%, #3d260a 100%);
+	box-shadow: 0 0 22px rgba(255, 215, 0, 0.6);
+	color: #fff;
+	transform: translateY(-2px);
+}
+
+#end-screen button#end-btn-copy-dm.copied {
+	background: linear-gradient(180deg, #1b3d22 0%, #0d1e11 100%) !important;
+	border-color: #4ade80 !important;
+	color: #86efac !important;
+	box-shadow: 0 0 18px rgba(74, 222, 128, 0.5) !important;
+}
+
+/* Floating copy feedback toast */
+.game-copy-toast {
+	position: fixed;
+	bottom: 5vh;
+	left: 50%;
+	transform: translateX(-50%) translateY(20px);
+	background: linear-gradient(180deg, #2a2012 0%, #151009 100%);
+	border: 1px solid #ffd700;
+	color: #ffd700;
+	font-family: 'Cinzel', serif;
+	font-size: 1vw;
+	font-weight: 700;
+	padding: 1.1vh 2.2vw;
+	border-radius: 4px;
+	box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.85);
+	opacity: 0;
+	pointer-events: none;
+	transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	z-index: 9999;
+	letter-spacing: 0.04em;
+}
+
+.game-copy-toast.visible {
+	opacity: 1;
+	transform: translateX(-50%) translateY(0);
+}
 
 /* --------------------- panels ---------------------------  */
 
