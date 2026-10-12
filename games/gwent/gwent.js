@@ -1755,11 +1755,14 @@ class Game {
 	recordAction(entry) {
 		if (!this.currentRoundLog) return;
 		const turnNum = this.currentRoundLog.turns.length + 1;
+		const cName = entry.card ? entry.card.name : (entry.cardName || "");
+		const cNameRu = entry.card ? (entry.card.nameRu || (entry.card.raw_data && entry.card.raw_data.nameRu) || "") : (entry.cardNameRu || "");
 		const record = {
 			turnNumber: turnNum,
 			player: entry.player,
 			type: entry.type, // 'card', 'leader', 'pass', 'decoy'
-			cardName: entry.card ? entry.card.name : (entry.cardName || ""),
+			cardName: cName,
+			cardNameRu: cNameRu,
 			power: entry.card ? (entry.card.power !== undefined ? entry.card.power : entry.card.basePower) : null,
 			row: entry.targetRow || (entry.card ? entry.card.row : null),
 			abilities: entry.card && entry.card.abilities ? [...entry.card.abilities] : [],
@@ -1947,10 +1950,11 @@ class Game {
 			if (r.turns && r.turns.length > 0) {
 				r.turns.forEach((t) => {
 					let actionDesc = "";
+					const nameDisplay = (t.cardNameRu && t.cardNameRu !== t.cardName) ? `**«${t.cardNameRu}»** (*${t.cardName}*)` : `**«${t.cardName}»**`;
 					if (t.type === 'pass') {
 						actionDesc = `**Пас (завершил раунд)**`;
 					} else if (t.type === 'leader') {
-						actionDesc = `активировал способность лидера **«${t.cardName}»**`;
+						actionDesc = `активировал способность лидера ${nameDisplay}`;
 					} else if (t.type === 'decoy') {
 						actionDesc = `сыграл **Чучело** (${t.note})`;
 					} else {
@@ -1960,7 +1964,7 @@ class Game {
 						const abStr = t.abilities && t.abilities.length > 0 ? formatAbilitiesRu(t.abilities) : "";
 						const heroStr = t.isHero ? "★ Герой" : "";
 						const details = [powerStr, rowStr, abStr, heroStr].filter(Boolean).join(', ');
-						actionDesc = `сыграл карту **«${t.cardName}»**${details ? ` (${details})` : ""}`;
+						actionDesc = `сыграл карту ${nameDisplay}${details ? ` (${details})` : ""}`;
 					}
 					md += `- **Ход ${t.turnNumber} [${t.player}]:** ${actionDesc} ➔ *Счёт: ${log.playerMeName} ${t.scoreMe} : ${t.scoreOp} ${log.playerOpName}*\n`;
 				});
@@ -2036,6 +2040,8 @@ class Card {
 
 	constructor(card_data, player) {
 		this.name = card_data.name;
+		this.nameRu = card_data.nameRu || "";
+		this.raw_data = card_data;
 		this.basePower = this.power = Number(card_data.strength);
 		this.faction = card_data.deck;
 		this.abilities = (card_data.ability === "") ? [] : card_data.ability.split(" ");
@@ -2184,7 +2190,9 @@ class Card {
 		let elem = document.createElement("div");
 		elem.style.backgroundImage = smallURL(card.faction + "_" + card.filename);
 		elem.classList.add("card");
-		elem.setAttribute('data-title', card.name);
+		const title = (card.nameRu && card.nameRu !== card.name) ? `${card.nameRu} (${card.name})` : card.name;
+		elem.setAttribute('data-title', title);
+		elem.setAttribute('title', title);
 		elem.addEventListener("click", () => ui.selectCard(card), false);
 		
 		if (card.row === "leader")
@@ -3227,6 +3235,9 @@ class DeckMaker {
 		let elem = document.createElement("div");
 		elem.style.backgroundImage = largeURL(card_data.deck + "_" + card_data.filename);
 		elem.classList.add("card-lg");
+		const title = (card_data.nameRu && card_data.nameRu !== card_data.name) ? `${card_data.nameRu} (${card_data.name})` : card_data.name;
+		elem.setAttribute('data-title', title);
+		elem.setAttribute('title', title);
 		let count = document.createElement("div");
 		elem.appendChild(count);
 		container_elem.appendChild(elem);

@@ -89,6 +89,14 @@ function draftOpponentDeck(factionChoice = "random") {
     const heroCountToPick = Math.min(shuffledHeroes.length, 3 + Math.floor(Math.random() * 4));
     shuffledHeroes.slice(0, heroCountToPick).forEach(h => addCard(h, 1));
 
+    // Frontline infantry and soldier units (1-2 soldier units for authentic army ranks)
+    const lowPowerUnits = others.filter(c => (parseInt(c.strength) || 0) <= 4);
+    if (lowPowerUnits.length > 0) {
+        const shuffledSoldiers = [...lowPowerUnits].sort(() => Math.random() - 0.5);
+        const soldierPicks = shuffledSoldiers.slice(0, Math.min(2, shuffledSoldiers.length));
+        soldierPicks.forEach(sc => addCard(sc, parseInt(sc.count) || 1));
+    }
+
     // Other high power / synergistic faction units
     const shuffledOthers = [...others].sort((a, b) => (parseInt(b.strength) || 0) - (parseInt(a.strength) || 0));
     for (let c of shuffledOthers) {
