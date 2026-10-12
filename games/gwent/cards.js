@@ -366,5 +366,6 @@ var card_dict = JSON.parse(
 + ', {"name": "Wolf Pack", "nameRu": "Волчья стая", "id": "", "deck": "neutral", "row": "close", "strength": "1", "ability": "muster", "filename": "wolf_pack", "count": "3"}'
 + ', {"name": "King of Beggars", "nameRu": "Король Нищих", "id": "", "deck": "neutral", "row": "close", "strength": "5", "ability": "spy", "filename": "king_of_beggars", "count": "1"}'
 + ', {"name": "Whoreson Junior", "nameRu": "Ублюдок Младший", "id": "", "deck": "neutral", "row": "ranged", "strength": "6", "ability": "scorch_r", "filename": "whoreson_junior", "count": "1"}'
++ ', {"name": "The Usurper", "nameRu": "Узурпатор", "id": "", "deck": "nilfgaard", "row": "leader", "strength": "", "ability": "usurper_coronation", "filename": "usurper_leader", "count": "1"}'
 + ']'
 );

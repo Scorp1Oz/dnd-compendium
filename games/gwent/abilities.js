@@ -384,6 +384,43 @@ var ability_dict = {
 		description: "Abilities that restore a unit to the battlefield restore a randomly-chosen unit. Affects both players.",
 		gameStart: () => game.randomRespawn = true
 	},
+	usurper_coronation: {
+		name: "Кровавая коронация",
+		description: "Кровавая коронация: уничтожьте свой самый слабый отряд на поле (не героя), затем выставьте самый сильный отряд (не героя и не шпиона) из своей колоды.",
+		usurperTargets: card => {
+			const rows = ["close", "ranged", "siege"].map(r => board.getRow(card, r, card.holder));
+			let weakest = null, weakestRow = null;
+			for (const row of rows) {
+				for (const c of row.cards) {
+					if (!c.isUnit() || c.noRemove) continue;
+					if (!weakest || c.power < weakest.power) { weakest = c; weakestRow = row; }
+				}
+			}
+			const pool = card.holder.deck.findCards(c => c.isUnit() && !c.abilities.includes("spy"));
+			let best = null;
+			if (pool.length) {
+				const maxP = Math.max(...pool.map(c => c.basePower));
+				const top = pool.filter(c => c.basePower === maxP);
+				best = top[randomInt(top.length)];
+			}
+			return { weakest, weakestRow, best };
+		},
+		activated: async card => {
+			const t = ability_dict["usurper_coronation"].usurperTargets(card);
+			if (t.weakest) {
+				await t.weakest.animate("scorch", true, false);
+				await board.toGrave(t.weakest, t.weakestRow);
+			}
+			if (t.best)
+				await t.best.autoplay(card.holder.deck);
+		},
+		weight: card => {
+			const t = ability_dict["usurper_coronation"].usurperTargets(card);
+			if (!t.best) return 0;
+			const loss = t.weakest ? t.weakest.power : 0;
+			return Math.max(0, t.best.basePower - loss);
+		}
+	},
 	eredin_commander: {
 		description: "Double the strength of all your Close Combat units (unless a Commander's horn is 	also present on that row).",
 		activated: async card => await board.getRow(card, "close", card.holder).leaderHorn(),
