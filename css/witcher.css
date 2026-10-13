@@ -1024,55 +1024,267 @@ body.wi-theme .btn-ghost:hover:not(:disabled) {
 }
 
 /* ============================================================
-   ИГРОВОЙ ХАБ ВЕДЬМАКА (TAVERN GAMES HUB)
+   ИГРОВОЙ ХАБ ВЕДЬМАКА (TAVERN GAMES HUB — COMPENDIUM STYLE)
    ============================================================ */
+
+.wi-tavern-hud {
+  background: linear-gradient(135deg, rgba(16, 22, 32, 0.94) 0%, rgba(10, 14, 20, 0.96) 100%);
+  border: 1px solid var(--wi-border);
+  padding: 20px 22px;
+  margin-bottom: 18px;
+}
+
+.wi-tavern-hud-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.wi-tavern-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.wi-tavern-emblem {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 50% 35%, rgba(245, 158, 11, 0.2), rgba(14, 18, 24, 0.92));
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(245, 158, 11, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wi-tavern-emblem svg {
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.4));
+}
+
+.wi-tavern-sub {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--wi-steel);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.wi-tavern-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.wi-hub-ext-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(30, 38, 52, 0.9) 0%, rgba(15, 20, 28, 0.96) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.42);
+  color: #fbbf24;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition: all 0.2s ease;
+}
+
+.wi-hub-ext-btn svg {
+  color: #f59e0b;
+  transition: transform 0.2s ease;
+}
+
+.wi-hub-ext-btn:hover {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.28) 0%, rgba(146, 64, 14, 0.36) 100%);
+  border-color: #fbbf24;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);
+  transform: translateY(-1px);
+}
+
+.wi-hub-ext-btn:hover svg {
+  transform: translate(1px, -1px);
+  color: #fde68a;
+}
+
+.wi-tavern-quote {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, rgba(14, 18, 24, 0.65) 100%);
+  border: 1px solid rgba(180, 150, 100, 0.24);
+  border-left: 3px solid var(--wi-amber);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wi-tavern-quote-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wi-tavern-quote-icon svg {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+}
+
+.wi-tavern-quote-text {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 14.5px;
+  color: #e2d5be;
+  line-height: 1.5;
+}
 
 .wi-games-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 20px;
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .wi-game-card {
-  background: linear-gradient(180deg, rgba(26, 20, 14, 0.9) 0%, rgba(14, 11, 8, 0.95) 100%);
+  background: linear-gradient(165deg, rgba(20, 26, 36, 0.94) 0%, rgba(10, 14, 20, 0.98) 100%);
   border: 1px solid var(--wi-border);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-  transition: all 0.25s ease;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
   position: relative;
   overflow: hidden;
 }
 
+.wi-game-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--wi-amber), transparent);
+  opacity: 0.85;
+}
+
+.wi-game-card.wi-game-gwent::before {
+  background: linear-gradient(90deg, transparent, #ef4444, #f59e0b, transparent);
+}
+
+.wi-game-card.wi-game-poker::before {
+  background: linear-gradient(90deg, transparent, #10b981, #f59e0b, transparent);
+}
+
 .wi-game-card:hover {
-  border-color: var(--wi-amber);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.8), 0 0 20px rgba(245, 158, 11, 0.25);
+  border-color: rgba(245, 158, 11, 0.65);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.82), 0 0 24px rgba(245, 158, 11, 0.2);
   transform: translateY(-3px);
 }
 
 .wi-game-card-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: 15px;
+  margin-bottom: 16px;
 }
 
-.wi-game-card-icon {
-  font-size: 38px;
-  line-height: 1;
-  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8));
+.wi-game-emblem {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  background: radial-gradient(circle at 50% 35%, rgba(245, 158, 11, 0.16), rgba(10, 14, 20, 0.95));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(245, 158, 11, 0.12);
+}
+
+.wi-game-emblem.gwent-emblem {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: radial-gradient(circle at 50% 35%, rgba(239, 68, 68, 0.18), rgba(12, 15, 22, 0.95));
+}
+
+.wi-game-emblem.poker-emblem {
+  border-color: rgba(16, 185, 129, 0.45);
+  background: radial-gradient(circle at 50% 35%, rgba(16, 185, 129, 0.18), rgba(12, 15, 22, 0.95));
+}
+
+.wi-game-emblem svg {
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+}
+
+.wi-game-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .wi-game-card-title {
   font-family: 'Cinzel', serif;
   font-size: 20px;
-  font-weight: 700;
-  color: #ffd700;
+  font-weight: 800;
+  color: #f8fafc;
   letter-spacing: 0.03em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+}
+
+.wi-game-card-sub {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--wi-steel);
+  margin-top: 2px;
+}
+
+.wi-game-tier-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.14);
+  color: #fbbf24;
+}
+
+.wi-game-tier-pill.gwent-pill {
+  border-color: rgba(248, 113, 113, 0.45);
+  background: rgba(185, 28, 28, 0.22);
+  color: #fca5a5;
+}
+
+.wi-game-tier-pill.poker-pill {
+  border-color: rgba(52, 211, 153, 0.45);
+  background: rgba(6, 95, 70, 0.28);
+  color: #6ee7b7;
 }
 
 .wi-game-badges {
@@ -1083,48 +1295,130 @@ body.wi-theme .btn-ghost:hover:not(:disabled) {
 }
 
 .wi-game-badge {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--wi-border-subtle);
   color: #cbd5e1;
   font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
 }
 
 .wi-game-badge.highlight {
-  background: rgba(245, 158, 11, 0.15);
+  background: var(--wi-amber-dim);
   border-color: rgba(245, 158, 11, 0.4);
   color: #fbbf24;
+  font-weight: 600;
 }
 
 .wi-game-desc {
-  font-size: 13px;
+  font-size: 13.5px;
   color: #cbd5e1;
   line-height: 1.6;
   margin-bottom: 16px;
-  flex: 1;
 }
 
 .wi-game-feature-list {
   list-style: none;
-  padding: 0;
+  padding: 12px 14px;
   margin: 0 0 20px 0;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--wi-steel);
+  background: rgba(9, 11, 14, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
 }
 
 .wi-game-feature-list li {
-  padding: 3px 0;
+  padding: 4px 0;
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 9px;
+  line-height: 1.45;
 }
 
 .wi-game-feature-list li::before {
   content: '✦';
   color: var(--wi-amber);
-  font-size: 10px;
-  line-height: 1.8;
+  font-size: 11px;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+.wi-game-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wi-launch-game-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 18px;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.wi-launch-game-btn.gwent-btn {
+  background: linear-gradient(135deg, #991b1b 0%, #581111 55%, #3b0a0a 100%);
+  border: 1px solid rgba(248, 113, 113, 0.55);
+  box-shadow: 0 4px 16px rgba(153, 27, 27, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.wi-launch-game-btn.gwent-btn:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 60%, #450a0a 100%);
+  border-color: #fbbf24;
+  box-shadow: 0 6px 22px rgba(239, 68, 68, 0.55), 0 0 14px rgba(245, 158, 11, 0.35);
+  transform: translateY(-1px);
+}
+
+.wi-launch-game-btn.poker-btn {
+  background: linear-gradient(135deg, #065f46 0%, #064e3b 55%, #022c22 100%);
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  box-shadow: 0 4px 16px rgba(6, 95, 70, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.wi-launch-game-btn.poker-btn:hover {
+  background: linear-gradient(135deg, #047857 0%, #065f46 60%, #064e3b 100%);
+  border-color: #fbbf24;
+  box-shadow: 0 6px 22px rgba(16, 185, 129, 0.5), 0 0 14px rgba(245, 158, 11, 0.35);
+  transform: translateY(-1px);
+}
+
+.wi-open-tab-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(14, 18, 24, 0.75);
+  border: 1px solid var(--wi-border);
+  border-radius: 7px;
+  color: var(--wi-steel);
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: all 0.18s ease;
+}
+
+.wi-open-tab-btn:hover {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
 }
 
 .wi-game-modal-overlay {
@@ -1185,6 +1479,7 @@ body.wi-theme .btn-ghost:hover:not(:disabled) {
     -webkit-overflow-scrolling: touch;
   }
 }
+
 
 
 

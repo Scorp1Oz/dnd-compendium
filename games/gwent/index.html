@@ -17,10 +17,21 @@
 
 <body>
 
-<div id="gwent-compendium-nav" class="wi-top-nav">
-  <a href="../dice_poker/index.html" class="wi-nav-btn" id="nav-btn-dice" title="Перейти в покер на костях"><span>🎲</span> В кости</a>
-  <a href="../../index.html?screen=wiGames" class="wi-nav-btn" id="nav-btn-hub" title="Вернуться в Игровой хаб компендиума"><span>🚪</span> В Хаб</a>
-  <a href="../../index.html?screen=wiHome" class="wi-nav-btn wi-nav-primary" id="nav-btn-compendium" title="Вернуться на главный экран Ведьмака"><span>🐺</span> В Компендиум</a>
+<div id="gwent-compendium-nav" class="wi-top-nav" aria-label="Навигация компендиума">
+  <a href="../dice_poker/index.html" class="wi-nav-btn" id="nav-btn-dice" title="Перейти в Покер на костях (5d6)">
+    <svg class="wi-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3.5"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/></svg>
+    <span>В кости</span>
+  </a>
+  <span class="wi-nav-sep" aria-hidden="true"></span>
+  <a href="../../index.html?screen=wiGames" class="wi-nav-btn" id="nav-btn-hub" title="Вернуться в Игровой хаб корчмы">
+    <svg class="wi-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l7-7 7 7"/><path d="M7 10v9a1 1 0 001 1h8a1 1 0 001-1v-9"/><path d="M10 20v-5h4v5"/></svg>
+    <span>В Хаб</span>
+  </a>
+  <span class="wi-nav-sep" aria-hidden="true"></span>
+  <a href="../../index.html?screen=wiHome" class="wi-nav-btn wi-nav-primary" id="nav-btn-compendium" title="Вернуться на главный экран раздела Ведьмак">
+    <svg class="wi-nav-svg wi-wolf-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3l4.5 5L12 5.5 15.5 8 20 3l-1.5 8.5L21 15l-4.5 2-4.5 4-4.5-4L3 15l2.5-3.5L4 3z"/><path d="M9 12.5l2 1.5m4-1.5l-2 1.5"/><path d="M10.5 16.5h3"/></svg>
+    <span>Ведьмак</span>
+  </a>
 </div>
 
 <div id="dimensions" style="position:fixed;width:100vw;height:calc(100vw * 1080 / 1920);"></div>

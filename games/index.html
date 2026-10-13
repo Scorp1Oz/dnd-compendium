@@ -86,42 +86,73 @@
 
         .game-card {
             flex: 1;
-            background: linear-gradient(180deg, rgba(20, 26, 36, 0.92) 0%, rgba(10, 14, 20, 0.96) 100%);
-            border: 1px solid rgba(180, 150, 100, 0.35);
-            border-radius: 12px;
+            background:
+                radial-gradient(ellipse at 0% 0%, rgba(212, 162, 76, 0.08) 0%, transparent 60%),
+                linear-gradient(155deg, rgba(24, 21, 18, 0.96) 0%, rgba(13, 12, 10, 0.98) 100%);
+            border: 1px solid rgba(212, 162, 76, 0.28);
+            border-radius: 14px;
             padding: 3vh 2.5vw;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.85), inset 0 0 35px rgba(0,0,0,0.6);
+            box-shadow: 0 12px 34px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.05);
             backdrop-filter: blur(8px);
             transition: all 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
             position: relative;
+            overflow: hidden;
             text-decoration: none;
             color: inherit;
         }
 
-        .game-card:hover {
-            transform: translateY(-8px);
-            border-color: #ffd700;
-            box-shadow: 0 18px 45px rgba(0,0,0,0.95), 0 0 30px rgba(245, 158, 11, 0.35);
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%; height: 2px;
+            background: linear-gradient(90deg, transparent, #d4a24c, #f0c978, #d4a24c, transparent);
+            opacity: 0.85;
         }
 
-        .card-icon {
-            font-size: 4.5vw;
-            margin-bottom: 1vh;
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.7));
+        .game-card.poker-card::before {
+            background: linear-gradient(90deg, transparent, #c0392b, #d4a24c, #c0392b, transparent);
+        }
+
+        .game-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(240, 201, 120, 0.65);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.95), 0 0 30px rgba(212, 162, 76, 0.25);
+        }
+
+        .card-emblem {
+            width: 4.2vw;
+            height: 4.2vw;
+            min-width: 52px;
+            min-height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 30% 30%, rgba(212, 162, 76, 0.2), rgba(14, 12, 10, 0.92));
+            border: 1px solid rgba(212, 162, 76, 0.45);
+            color: #f0c978;
+            margin-bottom: 1.2vh;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255, 220, 150, 0.18);
+        }
+
+        .card-emblem svg {
+            width: 60%;
+            height: 60%;
+            filter: drop-shadow(0 2px 6px rgba(212, 162, 76, 0.35));
         }
 
         .card-title {
             font-family: 'Cinzel', serif;
             font-size: 2vw;
             font-weight: 700;
-            color: #ffd700;
+            color: #f0c978;
             margin-bottom: 1vh;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 0 12px rgba(245, 158, 11, 0.3);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 0 12px rgba(212, 162, 76, 0.28);
         }
 
         .card-badges {
@@ -134,76 +165,84 @@
 
         .badge {
             font-family: 'JetBrains Mono', monospace;
-            background: rgba(14, 18, 24, 0.9);
-            border: 1px solid rgba(180, 150, 100, 0.35);
-            color: #cbd5e1;
+            background: rgba(14, 12, 10, 0.85);
+            border: 1px solid rgba(212, 162, 76, 0.28);
+            color: #e8e2d6;
             font-size: 0.78vw;
             padding: 0.25vh 0.65vw;
-            border-radius: 12px;
+            border-radius: 999px;
             letter-spacing: 0.03vw;
         }
 
         .badge.highlight {
-            background: linear-gradient(180deg, rgba(120, 28, 28, 0.9) 0%, rgba(68, 12, 12, 0.9) 100%);
-            border-color: #d44d4d;
-            color: #fff;
-            box-shadow: 0 0 8px rgba(212, 77, 77, 0.4);
+            background: linear-gradient(180deg, rgba(160, 42, 32, 0.32) 0%, rgba(88, 18, 14, 0.48) 100%);
+            border-color: rgba(231, 76, 60, 0.55);
+            color: #ffd6d0;
+            box-shadow: 0 0 10px rgba(192, 57, 43, 0.22);
         }
 
         .card-desc {
             font-family: 'EB Garamond', Georgia, serif;
-            font-size: 1.05vw;
-            color: #94a3b8;
+            font-size: 1.08vw;
+            color: #b5ad9e;
             line-height: 1.5;
             margin-bottom: 2.5vh;
             flex: 1;
         }
 
         .play-btn {
-            background: linear-gradient(180deg, #781c1c 0%, #440c0c 100%);
-            border: 1px solid #d44d4d;
-            color: #fff;
+            background: linear-gradient(180deg, rgba(212, 162, 76, 0.24) 0%, rgba(138, 101, 38, 0.36) 100%);
+            border: 1px solid rgba(240, 201, 120, 0.6);
+            color: #f7e2b0;
             font-family: 'Cinzel', serif;
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            font-size: 1.1vw;
+            font-size: 1.05vw;
             padding: 1vh 2.8vw;
-            border-radius: 6px;
+            border-radius: 9px;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,235,180,0.22);
             transition: all 0.2s ease;
         }
 
         .game-card:hover .play-btn {
-            background: linear-gradient(180deg, #992424 0%, #5e1111 100%);
-            border-color: #ff8888;
-            box-shadow: 0 0 18px rgba(239, 68, 68, 0.65);
-            transform: scale(1.04);
+            background: linear-gradient(180deg, rgba(230, 180, 90, 0.36) 0%, rgba(165, 120, 44, 0.5) 100%);
+            border-color: #ffd700;
+            color: #fff8e6;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.75), 0 0 18px rgba(212, 162, 76, 0.4);
+            transform: scale(1.03);
         }
 
         .hub-back-btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 0.7vh 1.4vw;
-            background: rgba(14, 18, 24, 0.92);
-            border: 1px solid rgba(180, 150, 100, 0.35);
-            border-radius: 6px;
-            color: #f7d679;
+            padding: 0.75vh 1.5vw;
+            background: linear-gradient(180deg, rgba(212, 162, 76, 0.2) 0%, rgba(130, 92, 34, 0.3) 100%);
+            border: 1px solid rgba(240, 201, 120, 0.5);
+            border-radius: 999px;
+            color: #f6dfab;
             text-decoration: none;
             font-family: 'Cinzel', serif;
-            font-size: 0.92vw;
-            letter-spacing: 0.04em;
+            font-weight: 700;
+            font-size: 0.88vw;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
             margin-bottom: 1.5vh;
             backdrop-filter: blur(8px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255, 230, 170, 0.2);
             transition: all 0.2s ease;
         }
+        .hub-back-btn svg {
+            width: 16px;
+            height: 16px;
+        }
         .hub-back-btn:hover {
-            background: rgba(30, 24, 16, 0.95);
+            background: linear-gradient(180deg, rgba(230, 180, 90, 0.34) 0%, rgba(160, 114, 42, 0.44) 100%);
             border-color: #ffd700;
-            color: #fff;
-            box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+            color: #fff8e6;
+            box-shadow: 0 0 16px rgba(212, 162, 76, 0.4);
             transform: translateY(-2px);
         }
 
@@ -211,11 +250,11 @@
         footer {
             text-align: center;
             font-size: 0.85vw;
-            color: #64748b;
+            color: #7d7567;
         }
 
         footer span {
-            color: #cbd5e1;
+            color: #e8e2d6;
         }
 
         @media (max-width: 768px) {
@@ -234,8 +273,8 @@
                 gap: 20px;
             }
             .hub-back-btn {
-                font-size: 13px;
-                padding: 8px 14px;
+                font-size: 12px;
+                padding: 8px 16px;
                 margin-bottom: 12px;
             }
             .hub-subtitle {
@@ -259,9 +298,10 @@
             .game-card {
                 padding: 20px 18px;
             }
-            .card-icon {
-                font-size: 40px;
-                margin-bottom: 8px;
+            .card-emblem {
+                width: 52px;
+                height: 52px;
+                margin-bottom: 10px;
             }
             .card-title {
                 font-size: 20px;
@@ -294,7 +334,10 @@
 
 <div id="hub-stage">
     <header>
-        <a href="../index.html?screen=wiHome" class="hub-back-btn">🐺 Вернуться в Компендиум</a>
+        <a href="../index.html?screen=wiGames" class="hub-back-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l3.5 7L5 15l7 5 7-5-2.5-4L20 4l-5 3.5L12 5 9 7.5 4 4z"/><circle cx="9.5" cy="12" r="1" fill="currentColor"/><circle cx="14.5" cy="12" r="1" fill="currentColor"/><path d="M10.5 16.5L12 18l1.5-1.5"/></svg>
+            Вернуться в Компендиум
+        </a>
         <div class="hub-subtitle">Ведьмак &bull; Корчмарские забавы</div>
         <h1 class="hub-title">Игровой хаб</h1>
         <p class="hub-description">
@@ -305,34 +348,48 @@
     <main class="games-grid">
         <!-- Gwent Portal -->
         <a href="gwent/index.html" class="game-card">
-            <div class="card-icon">⚔️</div>
+            <div class="card-emblem">
+                <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="5" width="16" height="23" rx="2.5" transform="rotate(-8 6 5)" fill="rgba(212,162,76,0.1)"/>
+                    <rect x="14" y="6" width="16" height="23" rx="2.5" transform="rotate(8 14 6)" fill="rgba(18,16,13,0.92)"/>
+                    <path d="M22 12l3 5-3 5-3-5 3-5z" fill="currentColor"/>
+                </svg>
+            </div>
             <h2 class="card-title">Гвинт (Gwent)</h2>
             <div class="card-badges">
-                <span class="badge">TW3: Дикая Охота</span>
-                <span class="badge">Все DLC</span>
-                <span class="badge highlight">474 карты</span>
+                <span class="badge">TW3 + DLC + Standalone</span>
+                <span class="badge highlight">522 карты</span>
+                <span class="badge">100% RU локализация</span>
                 <span class="badge">6 фракций + Синдикат</span>
             </div>
             <p class="card-desc">
-                Классический Гвинт со всеми карточками Ведьмака 3, расширенный <b>полной коллекцией из 474 карт</b>, шестой фракцией «Синдикат» и тактическим ИИ.
+                Классический Гвинт со всеми карточками Ведьмака 3, расширенный <b>полной коллекцией из 522 карт</b>, 27 лидерами, шестой фракцией «Синдикат», фильтрами и автосбором колоды.
             </p>
-            <div class="play-btn">Играть в Гвинт →</div>
+            <div class="play-btn">Сесть за партию в Гвинт →</div>
         </a>
 
         <!-- Dice Poker Portal -->
-        <a href="dice_poker/index.html" class="game-card">
-            <div class="card-icon">🎲</div>
+        <a href="dice_poker/index.html" class="game-card poker-card">
+            <div class="card-emblem">
+                <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="11" width="15" height="15" rx="3" transform="rotate(-10 5 11)" fill="rgba(212,162,76,0.1)"/>
+                    <rect x="16" y="9" width="15" height="15" rx="3" transform="rotate(12 16 9)" fill="rgba(18,16,13,0.92)"/>
+                    <circle cx="21" cy="14" r="1.3" fill="currentColor"/>
+                    <circle cx="26" cy="19" r="1.3" fill="currentColor"/>
+                    <circle cx="23.5" cy="16.5" r="1.3" fill="currentColor"/>
+                </svg>
+            </div>
             <h2 class="card-title">Покер на костях (5d6)</h2>
             <div class="card-badges">
-                <span class="badge">DnD Compendium</span>
-                <span class="badge highlight">Уровни соперника</span>
+                <span class="badge">Ведьмак 1–2</span>
+                <span class="badge highlight">Торги на орены</span>
                 <span class="badge">3 сложности ИИ</span>
-                <span class="badge">Торги на орены</span>
+                <span class="badge">Хроника для ДМа</span>
             </div>
             <p class="card-desc">
-                Классический покер на пяти костях (5d6). Три уровня достатка соперника, три сложности ИИ, честная вероятность и SVG-визуал.
+                Классический покер на пяти костях (5d6). Три уровня достатка соперника, три сложности ИИ, честная вероятность и готовая сводка результатов для Мастера.
             </p>
-            <div class="play-btn">Играть в покер →</div>
+            <div class="play-btn">Бросить кости на стол →</div>
         </a>
     </main>
 
