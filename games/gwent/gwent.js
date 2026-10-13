@@ -499,7 +499,7 @@ class ControllerAI {
 			if (!row.effects.mardroeme)
 				n = row.cards.filter(c => c.name === "Young Berserker").length;
 			else
-				n = row.cards.filter(c => "Transformed Young Vildkaarl").length;
+				n = row.cards.filter(c => c.name === "Transformed Young Vildkaarl").length;
 			score = 8*((n+1)*(n+1) - n*n) + n*score;
 		}
 		return Math.max(1, score);
@@ -775,7 +775,7 @@ class Player {
 		this.elem_leader.children[1].classList.add("hide");
 		this.elem_leader.addEventListener("click", async () => await ui.viewCard(this.leader), false);
 		this.elem_leader.addEventListener('mouseenter', CLICK_EVENT_SFX);
-		this.elem_leader.children[0].setAttribute('data-title', "View leader");
+		this.elem_leader.children[0].setAttribute('data-title', "Осмотреть лидера");
 	}
 	
 	// Enable access to leader ability and toggles leader visuals to on state
@@ -793,9 +793,10 @@ class Player {
 					AudioManager.playSFX('open');
 					await this.activateLeader();
 		}	), false);
-			this.elem_leader.children[0].setAttribute('data-title', "Play leader");
+			this.elem_leader.children[0].setAttribute('data-title', "Способность лидера");
 		} else {
 			this.elem_leader.addEventListener("click", async () => await ui.viewCard(this.leader), false);
+			this.elem_leader.children[0].setAttribute('data-title', "Осмотреть лидера");
 		}
 		this.elem_leader.addEventListener('mouseenter', CLICK_EVENT_SFX);
 		
@@ -942,7 +943,7 @@ class CardContainer {
 	// Disallows teh row to be clicked
 	clearSelectable() {
 		this.elem.classList.remove("row-selectable");
-		for (card in this.cards)
+		for (let card of this.cards)
 			card.elem.classList.add("noclick");
 	}
 	
@@ -1983,13 +1984,13 @@ class Game {
 	{
 		AudioManager.playSFX('warning');
 		ui.popup(
-			"Resume", ()=>{
+			"Продолжить", ()=>{
 				if (this.isPlaying()) {
 					ui.enablePlayer(this.currPlayer === player_me);
 				}
 			},
-			"Exit", ()=>this.returnToCustomization(),
-			"Quit curent game?" , "This will return you to the deck customization menu."
+			"Выйти", ()=>this.returnToCustomization(),
+			"Прервать текущую партию?" , "Вы вернётесь в меню настройки колоды."
 		); 
 	}
 	
@@ -2071,23 +2072,30 @@ class Card {
 			}
 		}
 		
+		const ruTitle = this.nameRu || this.name;
+		let abilityTitle = "";
 		if (this.row === "leader")
-			this.desc_name = "Leader Ability";
-		else if (this.abilities.length > 0)
-			this.desc_name = ability_dict[this.abilities[this.abilities.length-1]].name;
-		else if (this.row==="agile")
-			this.desc_name = "agile";
+			abilityTitle = "Способность лидера";
+		else if (this.abilities.length > 0 && ability_dict[this.abilities[this.abilities.length-1]])
+			abilityTitle = ability_dict[this.abilities[this.abilities.length-1]].name;
+		else if (this.row === "agile")
+			abilityTitle = ability_dict["agile"].name;
 		else if (this.hero)
-			this.desc_name = "hero";
-		else
-			this.desc_name = "";
+			abilityTitle = ability_dict["hero"].name;
 		
-		this.desc = this.row ==="agile" ? ability_dict["agile"].description : "";
+		this.desc_name = abilityTitle ? `${ruTitle} — ${abilityTitle}` : ruTitle;
+		
+		this.desc = this.row === "agile" ? ability_dict["agile"].description : "";
 		for (let i=this.abilities.length-1; i>=0; --i) {
-			this.desc += ability_dict[this.abilities[i]].description;
+			if (ability_dict[this.abilities[i]])
+				this.desc += ability_dict[this.abilities[i]].description;
 		}
 		if (this.hero)
 			this.desc += ability_dict["hero"].description;
+		if (!this.desc) {
+			const rowLabel = this.row === "close" ? "Рукопашный отряд" : this.row === "ranged" ? "Дальнобойный отряд" : this.row === "siege" ? "Осадный отряд" : "Отряд";
+			this.desc = `${rowLabel} (сила ${this.basePower}). Не имеет особых способностей.`;
+		}
 		
 		this.elem = this.createCardElem(this);
 	}
@@ -2575,30 +2583,27 @@ class UI {
 	setDescription(card, desc){
 		if (!card)
 		{
-			desc.children[1].innerHTML = "NULL";
+			desc.children[1].innerHTML = "";
 			desc.children[2].innerHTML = "";
+			desc.classList.add("hide");
 			return;
 		}
-		if (card.hero || card.row === "agile" || card.abilities.length > 0 || card.faction === "faction") {
-			desc.classList.remove("hide");
-			let str = card.row === "agile" ? "agile" : "";
-			if (card.abilities.length)
-				str = card.abilities[card.abilities.length-1];
-			if (str === "cerys")
-				str = "muster";
-			if (str.startsWith("avenger"))
-				str = "avenger";
-			if (str === "scorch_c" || str == "scorch_r" || str === "scorch_s")
-				str = "scorch";
-			if (card.row === "leader" || card.faction === "faction" || card.abilities.length === 0 && card.row !== "agile")
-				desc.children[0].style.backgroundImage = "";
-			else
-				desc.children[0].style.backgroundImage = iconURL("card_ability_" + str);
-			desc.children[1].innerHTML = card.desc_name;
-			desc.children[2].innerHTML = card.desc;
-		} else {
-			desc.classList.add("hide");
-		}
+		desc.classList.remove("hide");
+		let str = card.row === "agile" ? "agile" : "";
+		if (card.abilities && card.abilities.length)
+			str = card.abilities[card.abilities.length-1];
+		if (str === "cerys")
+			str = "muster";
+		if (str.startsWith("avenger"))
+			str = "avenger";
+		if (str === "scorch_c" || str == "scorch_r" || str === "scorch_s")
+			str = "scorch";
+		if (card.row === "leader" || card.faction === "faction" || ((!card.abilities || card.abilities.length === 0) && card.row !== "agile"))
+			desc.children[0].style.backgroundImage = "";
+		else
+			desc.children[0].style.backgroundImage = iconURL("card_ability_" + str);
+		desc.children[1].innerHTML = card.desc_name || card.nameRu || card.name || "";
+		desc.children[2].innerHTML = card.desc || "";
 	}
 	
 	// Displayed a timed notification to the client
@@ -3038,8 +3043,8 @@ class Popup {
 		let main = this.elem.children[0];
 		main.children[0].innerHTML = header ? header : "";
 		main.children[1].innerHTML = description ? description : "";
-		main.children[2].children[0].innerHTML = (yesName) ? yesName : "Yes";
-		main.children[2].children[1].innerHTML = (noName) ? noName : "No";
+		main.children[2].children[0].innerHTML = (yesName) ? yesName : "Да";
+		main.children[2].children[1].innerHTML = (noName) ? noName : "Нет";
 
 		const bgColor = new RGBA(10, 10, 10, alpha);
 		this.elem.style.backgroundColor = bgColor.toString();
@@ -3101,6 +3106,8 @@ class DeckMaker {
 		this.bank_elem = document.getElementById("card-bank");
 		this.deck_elem = document.getElementById("card-deck");
 		this.leader_elem = document.getElementById("card-leader");
+		this.bankFilter = "all";
+		this.bankSearch = "";
 		this.leader_elem.children[1].addEventListener("click", () => this.selectLeader(), false);
 		this.leader_elem.children[1].addEventListener('mouseenter', CLICK_EVENT_SFX);
 		this.loadFactionDeck(Settings.lastFaction.get(), true);
@@ -3140,11 +3147,110 @@ class DeckMaker {
 				AudioManager.playSFX('ui_card_bank');
 			});
 		});
+
+		document.querySelectorAll(".bank-filter-pill").forEach(pill => {
+			pill.addEventListener("mouseenter", CLICK_EVENT_SFX);
+			pill.addEventListener("click", () => {
+				document.querySelectorAll(".bank-filter-pill").forEach(p => p.classList.remove("active"));
+				pill.classList.add("active");
+				this.bankFilter = pill.getAttribute("data-filter") || "all";
+				AudioManager.playSFX('ui_card');
+				this.update();
+			});
+		});
+
+		const searchInput = document.getElementById("bank-search-input");
+		if (searchInput) {
+			searchInput.addEventListener("input", () => {
+				this.bankSearch = (searchInput.value || "").trim();
+				this.update();
+			});
+		}
+
+		const autoBtn = document.getElementById("auto-deck");
+		if (autoBtn) {
+			autoBtn.addEventListener("mouseenter", CLICK_EVENT_SFX);
+			autoBtn.addEventListener("click", () => this.autoBuildDeck());
+		}
+		const resetBtn = document.getElementById("reset-deck");
+		if (resetBtn) {
+			resetBtn.addEventListener("mouseenter", CLICK_EVENT_SFX);
+			resetBtn.addEventListener("click", () => this.resetToDefaultDeck());
+		}
+		const clearBtn = document.getElementById("clear-deck");
+		if (clearBtn) {
+			clearBtn.addEventListener("mouseenter", CLICK_EVENT_SFX);
+			clearBtn.addEventListener("click", () => this.clearDeckCards());
+		}
 		
 		document.getElementById("download-deck").addEventListener("click", () => this.downloadDeck(), false);
 		document.getElementById("add-file").addEventListener("change", () => this.uploadPlayerDeck(), false);
 		document.getElementById("start-game").addEventListener("click", () => this.startNewGame(), false);
 		document.getElementById("start-game").addEventListener("mouseenter", CLICK_EVENT_SFX, false);
+	}
+
+	matchesBankFilter(card_data) {
+		if (!card_data) return false;
+		const f = this.bankFilter || "all";
+		if (f === "close" && card_data.row !== "close" && card_data.row !== "agile") return false;
+		if (f === "ranged" && card_data.row !== "ranged" && card_data.row !== "agile") return false;
+		if (f === "siege" && card_data.row !== "siege") return false;
+		if (f === "hero" && !(card_data.ability || "").split(" ").includes("hero")) return false;
+		if (f === "special" && card_data.deck !== "special" && card_data.deck !== "weather") return false;
+
+		if (this.bankSearch) {
+			const q = this.bankSearch.toLowerCase();
+			const nameEn = (card_data.name || "").toLowerCase();
+			const nameRu = (card_data.nameRu || "").toLowerCase();
+			const ab = (card_data.ability || "").toLowerCase();
+			if (!nameEn.includes(q) && !nameRu.includes(q) && !ab.includes(q)) return false;
+		}
+		return true;
+	}
+
+	autoBuildDeck() {
+		if (typeof draftOpponentDeck !== "function") return;
+		const drafted = draftOpponentDeck(this.faction);
+		if (!drafted || !drafted.cards) return;
+		if (drafted.leader) {
+			const leaderEntry = this.leaders.find(l => l.card === drafted.leader || l.card.filename === drafted.leader.filename);
+			if (leaderEntry) {
+				this.leader = leaderEntry;
+				this.leader_elem.children[1].style.backgroundImage = largeURL(leaderEntry.card.deck + "_" + leaderEntry.card.filename);
+				Settings.getFactionSettings(this.faction).setLeader(leaderEntry);
+			}
+		}
+		this.makeBank(this.faction, drafted.cards);
+		Settings.getFactionSettings(this.faction).setCards(this.deck.filter(x => x.count > 0));
+		this.update();
+		AudioManager.playSFX('ui_card_bank');
+		showCopyToast("⚡ Сбалансированная колода собрана автоматически!");
+	}
+
+	resetToDefaultDeck() {
+		const defaultIdxMap = { realms: 0, nilfgaard: 2, monsters: 4, scoiatael: 6, skellige: 8, syndicate: 10 };
+		const idx = defaultIdxMap[this.faction] ?? 0;
+		const raw = premade_deck[idx];
+		if (!raw) return;
+		const def = JSON.parse(raw);
+		const cards = (def.cards || []).map(c => ({ index: c[0], count: c[1] }));
+		this.setLeader(def.leader);
+		if (this.leader) {
+			Settings.getFactionSettings(this.faction).setLeader(this.leader);
+		}
+		this.makeBank(this.faction, cards);
+		Settings.getFactionSettings(this.faction).setCards(this.deck.filter(x => x.count > 0));
+		this.update();
+		AudioManager.playSFX('ui_card_bank');
+		showCopyToast("↺ Восстановлена стартовая колода фракции");
+	}
+
+	clearDeckCards() {
+		this.makeBank(this.faction, []);
+		Settings.getFactionSettings(this.faction).setCards([]);
+		this.update();
+		AudioManager.playSFX('discard');
+		showCopyToast("✕ Колода очищена");
 	}
 
 	loadFactionDeck(faction, force = false)
@@ -3198,8 +3304,9 @@ class DeckMaker {
 	
 	// Sets current leader and updates UI
 	setLeader(index){
-		this.leader = this.leaders.filter( l => l.index == index)[0];
-		this.leader_elem.children[1].style.backgroundImage = largeURL(this.leader.card.deck + "_" + this.leader.card.filename);
+		this.leader = this.leaders.filter( l => l.index == index)[0] || this.leaders[0];
+		if (this.leader)
+			this.leader_elem.children[1].style.backgroundImage = largeURL(this.leader.card.deck + "_" + this.leader.card.filename);
 	}
 	
 	// Constructs a bank of cards that can be used by the faction's deck.
@@ -3285,7 +3392,8 @@ class DeckMaker {
 	// Opens a read-only carousel to inspect a card (browse neighbours with arrows)
 	inspectCard(cards, cardIndex) {
 		if (Carousel.curr) return;
-		const visible = cards.filter(x => x.count > 0);
+		const isBank = cards === this.bank;
+		const visible = cards.filter(x => x.count > 0 && (!isBank || this.matchesBankFilter(card_dict[x.index])));
 		if (!visible.length) return;
 		let start = visible.indexOf(cards[cardIndex]);
 		if (start < 0) start = 0;
@@ -3301,7 +3409,8 @@ class DeckMaker {
 	// Updates the card preview elements when any changes are made to the deck
 	update(){
 		for (let x of this.bank) {
-			if (x.count)
+			let card_data = card_dict[x.index];
+			if (x.count && this.matchesBankFilter(card_data))
 				x.elem.classList.remove("hide");
 			else
 				x.elem.classList.add("hide");
@@ -3447,12 +3556,13 @@ class DeckMaker {
 	startNewGame(){
 		let warning = "";
 		if (this.stats.units < 22)
-			warning += "Your deck must have at least 22 unit cards. \n";
+			warning += "В колоде должно быть не менее 22 карт отрядов.\n";
 		if (this.stats.special > 10)
-			warning += "Your deck must have no more than 10 special cards. \n";
-		if (warning != "")
+			warning += "В колоде может быть не более 10 специальных карт.\n";
+		if (warning !== "")
 		{
 			AudioManager.playSFX("warning");
+			showCopyToast("⚠️ " + warning.trim().replace(/\n/g, " "));
 			return alert(warning);
 		}
 		
@@ -3528,7 +3638,7 @@ class DeckMaker {
 					callback(deck);
 				
 			} catch (e) {
-				alert("Uploaded deck is not formatted correctly!");
+				alert("Загруженный файл колоды имеет неверный формат!");
 			}
 			finally
 			{
@@ -3557,34 +3667,34 @@ class DeckMaker {
 			return deck;
 		} catch (e) {
 			AudioManager.playSFX('warning');
-			alert("Uploaded deck is not parsable!");
+			alert("Не удалось прочитать JSON-файл колоды!");
 			return;
 		}
 	}
 
-	loadDeck(deck, siilent = true)
+	loadDeck(deck, silent = true)
 	{
 		if (!deck)
 			return null;
 		let warning = "";
 		// verify that leader card is actually a leader and that it's faction matches the deck faction
-		if (card_dict[deck.leader].row !== "leader")
-			warning += "'" + card_dict[deck.leader].name + "' is cannot be used as a leader\n";
-		if (deck.faction != card_dict[deck.leader].deck)
-			warning += "Leader '" + card_dict[deck.leader].name + "' doesn't match deck faction '" + deck.faction + "'.\n";
+		if (!card_dict[deck.leader] || card_dict[deck.leader].row !== "leader")
+			warning += "Карта лидера некорректна.\n";
+		else if (deck.faction != card_dict[deck.leader].deck)
+			warning += "Лидер «" + (card_dict[deck.leader].nameRu || card_dict[deck.leader].name) + "» не соответствует фракции «" + deck.faction + "».\n";
 		// check if cards exist and have correct faction & count
 		const cards = deck.cards.filter( c => {
 			const card = card_dict[c[0]];
 			if (!card) {
-				warning += "ID " + c[0] + " does not correspond to a card.\n";
+				warning += "ID карты " + c[0] + " не найден.\n";
 				return false
 			}
 			if (![deck.faction, "neutral", "special", "weather"].includes(card.deck)) {
-				warning += "'" + card.name + "' cannot be used in a deck of faction type '" + deck.faction +"'\n";
+				warning += "Карта «" + (card.nameRu || card.name) + "» недоступна для фракции «" + deck.faction +"».\n";
 				return false;
 			}
 			if (card.count < c[1]) {
-				warning += "Deck contains " + c[1] + "/" + card.count + " available " + card_dict[c.index].name + " cards\n";
+				warning += "В колоде превышен лимит копий (" + c[1] + "/" + card.count + ") для карты «" + (card.nameRu || card.name) + "».\n";
 				c[1] = card.count;
 				return true;
 			}
@@ -3599,7 +3709,7 @@ class DeckMaker {
 				return null;
 			}
 			AudioManager.playSFX('warning');
-			if (confirm(warning + "\n\n\Continue importing deck?"))
+			if (!confirm(warning + "\nПродолжить импорт колоды?"))
 			{
 				return null;
 			}
@@ -4126,7 +4236,7 @@ function smallURL(name, ext="jpg"){
 	return imgURL("sm/" + name, ext);
 }
 function imgURL(path, ext) {
-	return "url('img/" + path + "." + ext + "?v=7')";
+	return "url('img/" + path + "." + ext + "?v=8')";
 }
 
 // get sound effect path

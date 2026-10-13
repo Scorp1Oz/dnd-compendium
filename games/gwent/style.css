@@ -364,6 +364,9 @@ html {
 #notif-skellige-me{ background-image: url('img/icons/notif_skellige.png'); }
 #notif-skellige-me::after { content:"Ярость Скеллиге: возврат отрядов из сброса!"; }
 
+#notif-syndicate { background-image: url('img/icons/notif_syndicate.png'); }
+#notif-syndicate::after { content:"Теневая казна Синдиката: дополнительная карта!"; }
+
 /* ------- card preview ------------- */
 
 .card-preview { position: relative; z-index: 80;}
@@ -387,8 +390,10 @@ html {
 }
 .card-description {
 	position: absolute;
-	height: 7.87vw;
+	min-height: 7.87vw;
+	height: auto;
 	width: 29.12vw;
+	padding-bottom: 0.55vw;
 	background: linear-gradient(135deg, rgba(14, 18, 24, 0.96) 0%, rgba(9, 11, 14, 0.98) 100%);
 	color: #e2e8f0;
 	text-align: center;
@@ -402,12 +407,13 @@ html {
 .card-description > * { position: relative; }
 
 .card-description > div {
-	top: 1.0vw;
+	top: 0.85vw;
 	left: 0.9vw;
 	width: 1.95vw;
 	height: 1.95vw;
-	margin-bottom: -1.9vw;
-	background-size: cover;
+	margin-bottom: -1.95vw;
+	background-size: contain;
+	background-repeat: no-repeat;
 	background-position: center;
 	filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
 }
@@ -415,25 +421,20 @@ html {
 .card-description > h1 {
 	font-weight: 700;
 	font-family: 'Cinzel', serif;
-	letter-spacing: 0.05em;
-	top: 0.5vw;
-	left: 16%;
-	height: 16%;
-	width: 70%;
-	margin-bottom: -2.1vw;
-	text-transform: capitalize;
+	letter-spacing: 0.04em;
+	margin: 0.55vw auto 0.25vw;
+	width: 78%;
 	color: #ffd700;
 	text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
-	font-size: 1.05vw;
+	font-size: clamp(11px, 1.02vw, 17px);
+	line-height: 1.25;
 }
 
 .card-description > p {
-	top: 37%;
-	left: 5%;
+	margin: 0 auto;
 	width: 90%;
-	height: 50%;
 	font-family: 'EB Garamond', Georgia, serif;
-	font-size: 0.95vw;
+	font-size: clamp(10px, 0.94vw, 15px);
 	color: #cbd5e1;
 	line-height: 1.35;
 }
@@ -1582,31 +1583,130 @@ main { background-image: url('img/boardtest8.png'); }
 }
 
 .deck-options {
+	display: none;
+}
+
+#deck-actions-bar {
 	position: absolute;
+	top: 12.1vh;
+	left: 58.7%;
+	width: 36.5%;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 0.45vw;
+	flex-wrap: nowrap;
+	z-index: 20;
+}
+
+.deck-action-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.25vw;
+	padding: 0.35vh 0.65vw;
+	min-height: 24px;
 	font-family: 'Cinzel', serif;
-	font-size: clamp(11px, 0.82vw, 13px);
+	font-size: clamp(9px, 0.72vw, 12px);
 	font-weight: 700;
-	letter-spacing: 0.05em;
+	letter-spacing: 0.04em;
 	text-transform: uppercase;
-	color: #d4af37;
-	top: 9.8vh;
+	color: #f5d78e;
+	background: linear-gradient(180deg, rgba(32, 26, 18, 0.92) 0%, rgba(16, 13, 9, 0.96) 100%);
+	border: 1px solid rgba(212, 175, 95, 0.45);
+	border-radius: 5px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.65);
 	cursor: pointer;
-	text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-	transition: color 0.2s ease;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: all 0.18s ease;
+	user-select: none;
 }
-.deck-options:hover {
+
+.deck-action-btn:hover {
 	color: #fff;
-	text-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+	border-color: #ffd700;
+	background: linear-gradient(180deg, rgba(58, 44, 24, 0.96) 0%, rgba(28, 20, 12, 0.98) 100%);
+	box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+	transform: translateY(-1px);
 }
 
-#upload-deck {
-	left: 48%;
-	transform: translateX(-100%);
-	margin-right: 0.8vw;
+#clear-deck:hover {
+	border-color: #ef4444;
+	box-shadow: 0 0 10px rgba(239, 68, 68, 0.45);
 }
 
-#download-deck {
-	left: 52%;
+#bank-filter-bar {
+	position: absolute;
+	top: 12.1vh;
+	left: 4.8%;
+	width: 36.5%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.45vw;
+	z-index: 20;
+}
+
+.bank-filter-pills {
+	display: flex;
+	align-items: center;
+	gap: 0.28vw;
+	flex-wrap: nowrap;
+}
+
+.bank-filter-pill {
+	padding: 0.32vh 0.5vw;
+	min-height: 24px;
+	font-family: 'Cinzel', serif;
+	font-size: clamp(8.5px, 0.66vw, 11.5px);
+	font-weight: 700;
+	letter-spacing: 0.03em;
+	color: #cbd5e1;
+	background: rgba(14, 18, 24, 0.88);
+	border: 1px solid rgba(180, 150, 100, 0.32);
+	border-radius: 5px;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: all 0.16s ease;
+}
+
+.bank-filter-pill:hover {
+	color: #ffd700;
+	border-color: rgba(255, 215, 0, 0.65);
+	background: rgba(28, 22, 14, 0.92);
+}
+
+.bank-filter-pill.active {
+	color: #ffd700;
+	background: linear-gradient(180deg, rgba(64, 46, 20, 0.95) 0%, rgba(30, 21, 10, 0.98) 100%);
+	border-color: #ffd700;
+	box-shadow: 0 0 8px rgba(245, 158, 11, 0.45);
+}
+
+#bank-search-input {
+	flex: 1 1 auto;
+	min-width: 6.5vw;
+	max-width: 11vw;
+	height: 24px;
+	padding: 0 0.55vw;
+	font-family: 'EB Garamond', Georgia, serif;
+	font-size: clamp(10px, 0.8vw, 13px);
+	color: #f8fafc;
+	background: rgba(10, 13, 18, 0.92);
+	border: 1px solid rgba(180, 150, 100, 0.38);
+	border-radius: 5px;
+	outline: none;
+	transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+#bank-search-input::placeholder {
+	color: #94a3b8;
+}
+
+#bank-search-input:focus {
+	border-color: #ffd700;
+	box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
 }
 
 #change-faction {
@@ -1615,7 +1715,7 @@ main { background-image: url('img/boardtest8.png'); }
 
 .card-contianer-title {
 	position: absolute;
-	font-size: clamp(13px, 1.1vw, 16px);
+	font-size: clamp(12px, 1.02vw, 15px);
 	color: #ffd700;
 	font-family: 'Cinzel', serif;
 	letter-spacing: 0.08em;
@@ -1624,20 +1724,30 @@ main { background-image: url('img/boardtest8.png'); }
 	text-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
 }
 
+.card-contianer-title .inspect-tip {
+	font-family: 'EB Garamond', Georgia, serif;
+	font-size: clamp(9.5px, 0.76vw, 12px);
+	font-weight: 400;
+	letter-spacing: 0.02em;
+	text-transform: none;
+	color: #94a3b8;
+	margin-left: 0.4vw;
+}
+
 #card-bank-title {
-	top: 9.6vh;
+	top: 9.3vh;
 	left: 4.8%;
 }
 
 #card-deck-title {
-	top: 9.6vh;
+	top: 9.3vh;
 	left: 58.7%;
 }
 
 .card-array {
 	position: absolute;
 	width: 36.5%;
-	top: 13.2vh;
+	top: 15.8vh;
 	bottom: 1.5vh;
 	height: auto;
 	overflow-y: scroll;
@@ -1646,6 +1756,7 @@ main { background-image: url('img/boardtest8.png'); }
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
+	align-content: flex-start;
 	scrollbar-width: thin;
 	scrollbar-color: #5559 #131313;
 }
@@ -1981,7 +2092,7 @@ main { background-image: url('img/boardtest8.png'); }
 	
 	transition: margin-bottom 0.05s, margin-left .25s, margin-right .25s, transform 0.5s;
 	
-	z-index = 1;
+	z-index: 1;
 }
 
 .deck-card .card { position : absolute; }
@@ -2007,7 +2118,7 @@ main { background-image: url('img/boardtest8.png'); }
 	top: 13%;
 	left: 7%;
 	width: 50%;
-	heighth:  50%;
+	height: 50%;
 	font-size: 1vw;
 	font-weight: bold;
 	color: black;

@@ -1,18 +1,18 @@
 <!doctype html>
 
-<html lang="en-US">
+<html lang="ru">
 
 <head>
-	<title>Gwent Classic from The Witcher 3: Wild Hunt</title>
+	<title>Гвинт — Ведьмак 3: Дикая Охота</title>
 	<meta charset="utf-8" />
 	<meta name="author" content="Arun Sundaram" />
-	<meta name="description" content="Play the original Gwent minigame from The Witcher 3 in your browser! Includes cards from Hearts of Stone and Blood & Wine!" />
-	<meta name="keywords" content="arun, sundaram, programmer, gwent, tw3, witcher, card, game, gamedev, play" />
+	<meta name="description" content="Сыграйте в классический Гвинт из «Ведьмак 3: Дикая Охота» со всеми дополнениями и картами Gwent Standalone!" />
+	<meta name="keywords" content="gwent, tw3, witcher, гвинт, ведьмак, карты" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="style.css?v=118" />
+	<link rel="stylesheet" type="text/css" href="style.css?v=124" />
 </head>
 
 <body>
@@ -33,10 +33,10 @@
 
 	<section id="panel-left" class="panel">
 
-		<div id="exit-game" data-title="Exit game"></div>
+		<div id="exit-game" data-title="Выйти в меню колоды"></div>
 	
 		<div id="leader-op" class="leader-box">
-			<div class="leader-container center" data-title="View leader"> 
+			<div class="leader-container center" data-title="Осмотреть лидера"> 
 			</div>
 			<div class="leader-active">
 				<div></div>
@@ -48,7 +48,7 @@
 				<div><div></div></div>
 			</div>
 			
-			<div id="name-op" class="name">Opponent</div>
+			<div id="name-op" class="name">Соперник</div>
 			<div id="deck-name-op" class="deck-name"></div>
 			
 			<div id="hand-count-op" class="hand-count">6</div>
@@ -58,7 +58,7 @@
 			
 			<div id="score-total-op" class="score-total"><div class="center">0</div></div>
 			
-			<div id="passed-op">Passed</div>
+			<div id="passed-op">Пас</div>
 			
 		</section>
 		
@@ -69,7 +69,7 @@
 			<div class="profile-img">
 				<div><div></div></div>
 			</div>
-			<div id="passed-me">Passed</div>
+			<div id="passed-me">Пас</div>
 			<div id="hand-count-me" class="hand-count">5</div>
 			
 			<div id="gem1-me" class="gem gem-on bg-contain"></div>
@@ -84,13 +84,13 @@
 		</section>
 		
 		<div id="leader-me" class="leader-box">
-			<div class="leader-container center" data-title="Play leader"></div>
+			<div class="leader-container center" data-title="Способность лидера"></div>
 			<div class="leader-active">
 				<div></div>
 			</div>
 		</div>
 		
-		<div id="pass-button" class="center" data-title="Pass round">Pass</div>
+		<div id="pass-button" class="center" data-title="Спасовать в раунде">Пас</div>
 		
 	</section>
 	
@@ -144,12 +144,12 @@
 	</section>
 	
 	<section id="panel-right" class="panel">
-		<div id="grave-op" class="grave cardpile" data-title="View discards">
+		<div id="grave-op" class="grave cardpile" data-title="Осмотреть сброс">
 		</div>
 		<div id="deck-op" class="cardpile">
 		
 		</div>
-		<div id="grave-me" class="grave cardpile" data-title="View discards">
+		<div id="grave-me" class="grave cardpile" data-title="Осмотреть сброс">
 		</div>
 		<div id="deck-me" class="cardpile">
 		</div>
@@ -195,18 +195,18 @@
 			<tbody>
 				<tr>
 					<th colspan="2"></th>
-					<th>Round 1</th>
-					<th>Round 2</th>
-					<th>Round 3</th>
+					<th>Раунд 1</th>
+					<th>Раунд 2</th>
+					<th>Раунд 3</th>
 				</tr>
 				<tr>
-					<th colspan="2">Geralt</th>
+					<th colspan="2">Ведьмак</th>
 					<td>0</td>
 					<td>0</td>
 					<td>0</td>
 				</tr>
 				<tr>
-					<th colspan="2">Opponent</th>
+					<th colspan="2">Соперник</th>
 					<td>0</td>
 					<td>0</td>
 					<td>0</td>
@@ -260,39 +260,54 @@
 	</div>
 	<p id="faction-description"></p>
 	
-	<label id="upload-deck" class="deck-options">
-		<input type="file" id="add-file" value="Import" style="display:none;"/>
-		Upload Deck
-	</label>
+	<div id="deck-actions-bar">
+		<label id="upload-deck" class="deck-action-btn" title="Загрузить колоду из файла JSON">
+			<input type="file" id="add-file" value="Import" style="display:none;"/>
+			📂 Импорт
+		</label>
+		<a id="download-deck" class="deck-action-btn" title="Сохранить текущую колоду в JSON">💾 Экспорт</a>
+		<button type="button" id="auto-deck" class="deck-action-btn" title="Автоматически собрать сбалансированную колоду выбранной фракции">⚡ Автосбор</button>
+		<button type="button" id="reset-deck" class="deck-action-btn" title="Вернуть базовую стартовую колоду фракции">↺ Базовая</button>
+		<button type="button" id="clear-deck" class="deck-action-btn" title="Убрать все карты из колоды обратно в коллекцию">✕ Очистить</button>
+	</div>
 	
-	<a id="change-faction" class="deck-options" style="display:none;">Change Faction</a>
-	
-	<a id="download-deck" class="deck-options">Download Deck</a>
+	<a id="change-faction" class="deck-options" style="display:none;">Сменить фракцию</a>
 	<a id="download-json" style="display:none;"></a>
 	
-	<h2 id="card-bank-title" class="card-contianer-title">Card Collection</h2>
-	<h2 id="card-deck-title" class="card-contianer-title">Cards in Deck</h2>
+	<h2 id="card-bank-title" class="card-contianer-title">Коллекция карт</h2>
+	<div id="bank-filter-bar">
+		<div class="bank-filter-pills">
+			<button type="button" class="bank-filter-pill active" data-filter="all" title="Все карты">Все</button>
+			<button type="button" class="bank-filter-pill" data-filter="close" title="Рукопашный и маневренный ряд">⚔ Ближний</button>
+			<button type="button" class="bank-filter-pill" data-filter="ranged" title="Дальнобойный и маневренный ряд">🏹 Дальний</button>
+			<button type="button" class="bank-filter-pill" data-filter="siege" title="Осадный ряд">☄ Осадный</button>
+			<button type="button" class="bank-filter-pill" data-filter="hero" title="Только карты героев">👑 Герои</button>
+			<button type="button" class="bank-filter-pill" data-filter="special" title="Погода и специальные карты">✦ Спец.</button>
+		</div>
+		<input type="search" id="bank-search-input" placeholder="🔍 Поиск карты..." autocomplete="off" />
+	</div>
+	<h2 id="card-deck-title" class="card-contianer-title">Карты в колоде <span class="inspect-tip">(ПКМ / удержание — осмотр)</span></h2>
 	<div id="card-bank" class="card-array">
 	</div>
 	<div id="card-deck" class="card-array">
 	</div>
 	<div id="card-leader">
-		<p>Leader</p>
-		<div></div>
+		<p>Лидер</p>
+		<div title="Нажмите, чтобы выбрать лидера"></div>
 	</div>
 	<div id="deck-stats">
-		<p>Total cards in deck</p>
+		<p>Всего карт в колоде</p>
 		<p>0</p>
-		<p>Number of Unit Cards</p>
+		<p>Карт отрядов</p>
 		<p>0</p>
-		<p>Special Cards</p>
+		<p>Специальные карты</p>
 		<p>0/10</p>
-		<p>Total Unit Card Strength</p>
+		<p>Общая сила отрядов</p>
 		<p>0</p>
-		<p>Hero Cards</p>
+		<p>Карты героев</p>
 		<p>0</p>
 	</div>
-	<button id="start-game">Start game</button>
+	<button id="start-game">В бой!</button>
 	<div id="opponent-preview" class="center">
 		<div class="op-header">
 			<p class="op-title">Фракция противника</p>
@@ -351,17 +366,17 @@
 	<div id="carousel-hint" class="carousel-hint">Нажмите на карту или Enter для выбора • Esc для отмены</div>
 </section>
 
-<div data-title="Toggle music" id="toggle-music" class="center deck-menu settings-button"><img src="svg/music.svg"></img></div>
-<div data-title="Toggle sound effects" id="toggle-sfx" class="center deck-menu settings-button"><img src="svg/sfx.svg"></img></div>
-<div data-title="Toggle game messages" id="toggle-notifications" class="center deck-menu settings-button"><img src="svg/notification.svg"></img></div>
+<div data-title="Музыка" id="toggle-music" class="center deck-menu settings-button"><img src="svg/music.svg"></img></div>
+<div data-title="Звуковые эффекты" id="toggle-sfx" class="center deck-menu settings-button"><img src="svg/sfx.svg"></img></div>
+<div data-title="Уведомления" id="toggle-notifications" class="center deck-menu settings-button"><img src="svg/notification.svg"></img></div>
 
-<script type="text/javascript" src="common.js?v=122"></script>
-<script type="text/javascript" src="cards.js?v=122"></script>
-<script type="text/javascript" src="decks.js?v=122"></script>
-<script type="text/javascript" src="abilities.js?v=122"></script>
-<script type="text/javascript" src="factions.js?v=122"></script>
+<script type="text/javascript" src="common.js?v=124"></script>
+<script type="text/javascript" src="cards.js?v=124"></script>
+<script type="text/javascript" src="decks.js?v=124"></script>
+<script type="text/javascript" src="abilities.js?v=124"></script>
+<script type="text/javascript" src="factions.js?v=124"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
-<script type="text/javascript" src="gwent.js?v=122"></script>
+<script type="text/javascript" src="gwent.js?v=124"></script>
 </body>
 
 </html>

@@ -2,7 +2,7 @@
 
 var factions = {
 	realms: {
-		name: "Northern Realms",
+		name: "Королевства Севера",
 		factionAbility: player => game.roundStart.push( async () => {
 			if (game.roundCount > 1 && game.roundHistory[game.roundCount-2].winner === player) {
 				player.deck.draw(player.hand);
@@ -10,14 +10,14 @@ var factions = {
 			}
 			return false;
 		}),
-		description: "Draw a card from your deck whenever you win a round."
+		description: "Дар Севера: вы берёте дополнительную карту из колоды после каждого выигранного раунда."
 	},
 	nilfgaard: {
-		name: "Nilfgaardian Empire",
-		description: "Wins any round that ends in a draw."
+		name: "Империя Нильфгаард",
+		description: "Имперская мощь: Нильфгаард побеждает в любом раунде, завершившемся вничью."
 	},
 	monsters: {
-		name: "Monsters",
+		name: "Чудовища",
 		factionAbility: player => game.roundEnd.push(() => {
 			const units = board.row.filter( (r,i) => player === player_me ^ i < 3)
 				.reduce((a,r) => r.cards.filter(c => c.isUnit()).concat(a), []);
@@ -32,14 +32,14 @@ var factions = {
 			});
 			return false;
 		}),
-		description: "Keeps a random Unit Card out after each round."
+		description: "Свирепость Чудовищ: в конце каждого раунда на поле боя остаётся один случайный отряд (не герой)."
 	},
 	scoiatael: {
-		name: "Scoia'tael",
+		name: "Скоя'таэли",
 		factionAbility: player => game.gameStart.push( async () => {
 			let notif = "";
 			if (player === player_me) {
-				await ui.popup("Go First", () => game.firstPlayer = player, "Let Opponent Start", () => game.firstPlayer = player.opponent(), "Would you like to go first?", "The Scoia'tael faction perk allows you to decide who will get to go first.", 0.55);
+				await ui.popup("Ходить первым", () => game.firstPlayer = player, "Уступить ход", () => game.firstPlayer = player.opponent(), "Право первого хода", "Способность фракции Скоя'таэлей позволяет вам выбрать, кто начнёт партию первым.", 0.55);
 				notif = game.firstPlayer.tag + "-first";
 			} else if (player.hand instanceof HandAI) {
 				if (Math.random() < 0.5) {
@@ -55,10 +55,10 @@ var factions = {
 			await ui.notification(notif,1200);
 			return true;
 		}),
-		description: "Decides who takes first turn."
+		description: "Партизанская засада: вы сами выбираете, кто будет ходить первым в начале партии."
 	},
 	skellige: {
-		name: "Skellige",
+		name: "Скеллиге",
 		factionAbility: player => game.roundStart.push( async () => {
 			if (game.roundCount != 3)
 				return false;
@@ -95,10 +95,10 @@ var factions = {
 				await board.toRow(card, player.grave);
 			}
 		},
-		description: "2 random cards from the graveyard are placed on the battlefield at the start of the third round."
+		description: "Ярость Скеллиге: в начале третьего раунда 2 случайных отряда из вашего сброса возвращаются на поле боя."
 	},
 	syndicate: {
-		name: "Syndicate",
+		name: "Синдикат",
 		factionAbility: player => game.roundStart.push( async () => {
 			if (game.roundCount === 2) {
 				player.deck.draw(player.hand);
@@ -106,6 +106,6 @@ var factions = {
 			}
 			return false;
 		}),
-		description: "Underworld Coffers: Draw 1 card from your deck at the start of the second round."
+		description: "Теневая казна: в начале второго раунда вы берёте 1 дополнительную карту из своей колоды."
 	}
 }
