@@ -63,45 +63,91 @@ var GHSync = window.GHSync = {
     el._t = setTimeout(function(){ el.classList.remove('show'); }, 4000);
   },
 
-  // Collect full save bundle
+  // Helper to safely parse JSON from localStorage with fallback keys
+  _readJson: function(keys, fallback){
+    var arr = Array.isArray(keys) ? keys : [keys];
+    for(var i = 0; i < arr.length; i++){
+      try {
+        var raw = localStorage.getItem(arr[i]);
+        if(raw != null && raw !== '') return JSON.parse(raw);
+      } catch(e){}
+    }
+    return fallback;
+  },
+
+  // Collect full save bundle across all 7 modes
   collectData: function(){
     var dev = (navigator.userAgent && navigator.userAgent.indexOf('Mobi') !== -1) ? 'Mobile' : 'Desktop';
     var activeMode = (typeof HB !== 'undefined' && HB.mode) ? HB.mode : 'sh';
+    if(typeof syncActiveProfileFromState === 'function') {
+      try { syncActiveProfileFromState(); } catch(e){}
+    }
     return {
-      version: 2,
+      version: 3,
       savedAt: new Date().toISOString(),
       savedAtHuman: new Date().toLocaleString('ru-RU'),
       device: dev,
       activeMode: activeMode,
       shinobi: {
-        profiles: (typeof SH !== 'undefined' && SH.profiles) ? SH.profiles : (function(){ try{ return JSON.parse(localStorage.getItem('sh_profiles')); }catch(e){ return []; } })(),
-        activeProfileId: (typeof SH !== 'undefined' && SH.activeProfileId) ? SH.activeProfileId : localStorage.getItem('sh_active_profile_id'),
-        userMarkers: (function(){ try{ return JSON.parse(localStorage.getItem('sh_user_markers')); }catch(e){ return []; } })(),
-        missions: (function(){ try{ return JSON.parse(localStorage.getItem('sh_missions')); }catch(e){ return []; } })(),
-        meta: (typeof SH !== 'undefined' && SH.meta) ? SH.meta : {}
+        profiles: (typeof SH !== 'undefined' && Array.isArray(SH.profiles) && SH.profiles.length) ? SH.profiles : GHSync._readJson(['ttc_sh_profiles', 'sh_profiles'], []),
+        activeProfileId: (typeof SH !== 'undefined' && SH.activeProfileId) ? SH.activeProfileId : (localStorage.getItem('ttc_sh_active_profile') || localStorage.getItem('sh_active_profile_id') || ''),
+        techs: (typeof SH !== 'undefined' && Array.isArray(SH.techs)) ? SH.techs : GHSync._readJson('ttc_sh_techs', []),
+        moves: (typeof SH !== 'undefined' && Array.isArray(SH.moves)) ? SH.moves : GHSync._readJson('ttc_sh_moves', []),
+        skills: (typeof SH !== 'undefined' && Array.isArray(SH.skills)) ? SH.skills : GHSync._readJson('ttc_sh_skills', []),
+        userMarkers: GHSync._readJson(['ttc_sh_user_markers', 'sh_user_markers'], []),
+        missions: GHSync._readJson(['ttc_sh_missions', 'sh_missions'], []),
+        meta: (typeof SH !== 'undefined' && SH.meta) ? SH.meta : GHSync._readJson(['ttc_sh_meta', 'sh_meta'], {})
       },
       massEffect: {
-        profiles: (typeof ME !== 'undefined' && ME.getProfiles) ? ME.getProfiles() : [],
-        activeProfileId: (typeof ME !== 'undefined' && ME.activeProfileId) ? ME.activeProfileId : localStorage.getItem('me_active_profile_id'),
-        powers: (typeof ME !== 'undefined' && ME.getPowers) ? ME.getPowers() : [],
-        arsenal: (typeof ME !== 'undefined' && ME.getArsenal) ? ME.getArsenal() : [],
-        ship: (typeof ME !== 'undefined' && ME.getShip) ? ME.getShip() : {},
-        char: (typeof ME !== 'undefined' && ME.getChar) ? ME.getChar() : {}
+        profiles: (typeof ME !== 'undefined' && ME.getProfiles) ? ME.getProfiles() : GHSync._readJson('me_profiles', []),
+        activeProfileId: (typeof ME !== 'undefined' && ME.activeProfileId) ? ME.activeProfileId : (localStorage.getItem('me_active_profile_id') || ''),
+        powers: (typeof ME !== 'undefined' && ME.getPowers) ? ME.getPowers() : GHSync._readJson('me_powers', []),
+        arsenal: (typeof ME !== 'undefined' && ME.getArsenal) ? ME.getArsenal() : GHSync._readJson('me_arsenal', []),
+        ship: (typeof ME !== 'undefined' && ME.getShip) ? ME.getShip() : GHSync._readJson('me_ship_data', {}),
+        char: (typeof ME !== 'undefined' && ME.getChar) ? ME.getChar() : GHSync._readJson('me_character', {}),
+        theme: localStorage.getItem('me_theme') || 'citadel'
+      },
+      avatar: {
+        profile: (typeof EL !== 'undefined' && EL.getProfile) ? EL.getProfile() : GHSync._readJson('el_profile', {}),
+        theme: (typeof EL !== 'undefined' && EL.getTheme) ? EL.getTheme() : (localStorage.getItem('el_theme') || 'earth'),
+        techs: GHSync._readJson('el_techs', []),
+        moves: GHSync._readJson('el_moves', []),
+        userMarkers: GHSync._readJson('el_user_markers', []),
+        warPaths: GHSync._readJson('ttc_el_war_paths', []),
+        mapState: GHSync._readJson('el_map_state', null)
       },
       witcher: {
-        profiles: (typeof WI !== 'undefined' && WI.profiles) ? WI.profiles : (function(){ try{ return JSON.parse(localStorage.getItem('ttc_wi_profiles')); }catch(e){ return []; } })(),
-        activeProfileId: (typeof WI !== 'undefined' && WI.activeProfileId) ? WI.activeProfileId : localStorage.getItem('ttc_wi_active_id'),
-        meta: (typeof WI !== 'undefined' && WI.meta) ? WI.meta : {}
+        profiles: (typeof WI !== 'undefined' && Array.isArray(WI.profiles) && WI.profiles.length) ? WI.profiles : GHSync._readJson('ttc_wi_profiles', []),
+        activeProfileId: (typeof WI !== 'undefined' && WI.activeProfileId) ? WI.activeProfileId : (localStorage.getItem('ttc_wi_active_id') || ''),
+        techs: GHSync._readJson('ttc_wi_techs', []),
+        moves: GHSync._readJson('ttc_wi_moves', []),
+        markers: GHSync._readJson('ttc_wi_markers', []),
+        route: GHSync._readJson('ttc_wi_route_v2', null),
+        meta: (typeof WI !== 'undefined' && WI.meta) ? WI.meta : GHSync._readJson('ttc_wi_meta', {})
       },
       wizard: {
-        profiles: (typeof WZ !== 'undefined' && WZ.profiles) ? WZ.profiles : (function(){ try{ return JSON.parse(localStorage.getItem('ttc_wz_profiles')); }catch(e){ return []; } })(),
-        activeProfileId: (typeof WZ !== 'undefined' && WZ.activeProfileId) ? WZ.activeProfileId : localStorage.getItem('ttc_wz_active_id'),
-        spells: (typeof WZ !== 'undefined' && WZ.spells) ? WZ.spells : (function(){ try{ return JSON.parse(localStorage.getItem('ttc_wz_spells')); }catch(e){ return []; } })(),
-        duels: (typeof WZ !== 'undefined' && WZ.duels) ? WZ.duels : (function(){ try{ return JSON.parse(localStorage.getItem('ttc_wz_duels')); }catch(e){ return []; } })(),
-        meta: (typeof WZ !== 'undefined' && WZ.meta) ? WZ.meta : {}
+        profiles: (typeof WZ !== 'undefined' && Array.isArray(WZ.profiles) && WZ.profiles.length) ? WZ.profiles : GHSync._readJson('ttc_wz_profiles', []),
+        activeProfileId: (typeof WZ !== 'undefined' && WZ.activeProfileId) ? WZ.activeProfileId : (localStorage.getItem('ttc_wz_active_id') || ''),
+        spells: (typeof WZ !== 'undefined' && Array.isArray(WZ.spells)) ? WZ.spells : GHSync._readJson('ttc_wz_spells', []),
+        duels: (typeof WZ !== 'undefined' && Array.isArray(WZ.duels)) ? WZ.duels : GHSync._readJson('ttc_wz_duels', []),
+        skills: (typeof WZ !== 'undefined' && Array.isArray(WZ.skills)) ? WZ.skills : GHSync._readJson('ttc_wz_skills', []),
+        potions: (typeof WZ !== 'undefined' && Array.isArray(WZ.potions)) ? WZ.potions : GHSync._readJson('ttc_wz_potions', []),
+        markers: GHSync._readJson('ttc_wz_markers', []),
+        route: GHSync._readJson('ttc_wz_route', null),
+        meta: (typeof WZ !== 'undefined' && WZ.meta) ? WZ.meta : GHSync._readJson('ttc_wz_meta', {})
+      },
+      homebrew: {
+        world: (typeof HB !== 'undefined' && HB.world) ? HB.world : GHSync._readJson('ttc_hb_world', {}),
+        records: (typeof HB !== 'undefined' && Array.isArray(HB.records)) ? HB.records : GHSync._readJson('ttc_hb_records', []),
+        activeChar: (typeof HB !== 'undefined' && HB.activeChar) ? HB.activeChar : (localStorage.getItem('ttc_hb_active') || '')
       },
       dnd: {
-        characters: (typeof CHARACTERS !== 'undefined') ? CHARACTERS : (function(){ try{ return JSON.parse(localStorage.getItem('ttc_characters')); }catch(e){ return []; } })()
+        characters: (typeof CHARACTERS !== 'undefined') ? CHARACTERS : GHSync._readJson('ttc_characters', []),
+        activeId: localStorage.getItem('ttc_faerun_active_id') || '',
+        spells: (typeof SPELLS !== 'undefined') ? SPELLS : GHSync._readJson('ttc_spells', []),
+        recipes: GHSync._readJson('ttc_recipes', []),
+        ingredients: GHSync._readJson('ttc_ingredients', []),
+        campaign: GHSync._readJson('ttc_faerun_campaign', null)
       }
     };
   },
@@ -113,23 +159,45 @@ var GHSync = window.GHSync = {
       if(bundle.shinobi){
         if(bundle.shinobi.profiles && Array.isArray(bundle.shinobi.profiles)){
           if(typeof SH !== 'undefined') SH.profiles = bundle.shinobi.profiles;
+          localStorage.setItem('ttc_sh_profiles', JSON.stringify(bundle.shinobi.profiles));
           localStorage.setItem('sh_profiles', JSON.stringify(bundle.shinobi.profiles));
         }
         if(bundle.shinobi.activeProfileId){
           if(typeof SH !== 'undefined') SH.activeProfileId = bundle.shinobi.activeProfileId;
+          localStorage.setItem('ttc_sh_active_profile', bundle.shinobi.activeProfileId);
           localStorage.setItem('sh_active_profile_id', bundle.shinobi.activeProfileId);
         }
+        if(Array.isArray(bundle.shinobi.techs)){
+          if(typeof SH !== 'undefined') SH.techs = bundle.shinobi.techs;
+          localStorage.setItem('ttc_sh_techs', JSON.stringify(bundle.shinobi.techs));
+        }
+        if(Array.isArray(bundle.shinobi.moves)){
+          if(typeof SH !== 'undefined') SH.moves = bundle.shinobi.moves;
+          localStorage.setItem('ttc_sh_moves', JSON.stringify(bundle.shinobi.moves));
+        }
+        if(Array.isArray(bundle.shinobi.skills)){
+          if(typeof SH !== 'undefined') SH.skills = bundle.shinobi.skills;
+          localStorage.setItem('ttc_sh_skills', JSON.stringify(bundle.shinobi.skills));
+        }
         if(bundle.shinobi.userMarkers){
+          localStorage.setItem('ttc_sh_user_markers', JSON.stringify(bundle.shinobi.userMarkers));
           localStorage.setItem('sh_user_markers', JSON.stringify(bundle.shinobi.userMarkers));
         }
         if(bundle.shinobi.missions){
+          localStorage.setItem('ttc_sh_missions', JSON.stringify(bundle.shinobi.missions));
           localStorage.setItem('sh_missions', JSON.stringify(bundle.shinobi.missions));
         }
         if(bundle.shinobi.meta){
           if(typeof SH !== 'undefined') SH.meta = bundle.shinobi.meta;
-          try{ localStorage.setItem('sh_meta', JSON.stringify(bundle.shinobi.meta)); }catch(e){}
+          try{
+            localStorage.setItem('ttc_sh_meta', JSON.stringify(bundle.shinobi.meta));
+            localStorage.setItem('sh_meta', JSON.stringify(bundle.shinobi.meta));
+          }catch(e){}
         }
-        if(typeof syncActiveProfileFromState === 'function') syncActiveProfileFromState();
+        if(typeof getActiveProfile === 'function' && typeof applyProfileToState === 'function'){
+          var actProf = getActiveProfile();
+          if(actProf) applyProfileToState(actProf);
+        }
         if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
       }
 
@@ -144,6 +212,23 @@ var GHSync = window.GHSync = {
         if(bundle.massEffect.arsenal) ME.saveArsenal(bundle.massEffect.arsenal);
         if(bundle.massEffect.ship) ME.saveShip(bundle.massEffect.ship);
         if(bundle.massEffect.char) ME.saveChar(bundle.massEffect.char);
+        if(bundle.massEffect.theme) localStorage.setItem('me_theme', bundle.massEffect.theme);
+      }
+
+      if(bundle.avatar){
+        if(bundle.avatar.profile){
+          if(typeof EL !== 'undefined' && EL.saveProfile) EL.saveProfile(bundle.avatar.profile);
+          else localStorage.setItem('el_profile', JSON.stringify(bundle.avatar.profile));
+        }
+        if(bundle.avatar.theme){
+          if(typeof EL !== 'undefined' && EL.setTheme) EL.setTheme(bundle.avatar.theme);
+          else localStorage.setItem('el_theme', bundle.avatar.theme);
+        }
+        if(Array.isArray(bundle.avatar.techs)) localStorage.setItem('el_techs', JSON.stringify(bundle.avatar.techs));
+        if(Array.isArray(bundle.avatar.moves)) localStorage.setItem('el_moves', JSON.stringify(bundle.avatar.moves));
+        if(Array.isArray(bundle.avatar.userMarkers)) localStorage.setItem('el_user_markers', JSON.stringify(bundle.avatar.userMarkers));
+        if(Array.isArray(bundle.avatar.warPaths)) localStorage.setItem('ttc_el_war_paths', JSON.stringify(bundle.avatar.warPaths));
+        if(bundle.avatar.mapState) localStorage.setItem('el_map_state', JSON.stringify(bundle.avatar.mapState));
       }
 
       if(bundle.witcher){
@@ -155,6 +240,10 @@ var GHSync = window.GHSync = {
           if(typeof WI !== 'undefined') WI.activeProfileId = bundle.witcher.activeProfileId;
           localStorage.setItem('ttc_wi_active_id', bundle.witcher.activeProfileId);
         }
+        if(Array.isArray(bundle.witcher.techs)) localStorage.setItem('ttc_wi_techs', JSON.stringify(bundle.witcher.techs));
+        if(Array.isArray(bundle.witcher.moves)) localStorage.setItem('ttc_wi_moves', JSON.stringify(bundle.witcher.moves));
+        if(Array.isArray(bundle.witcher.markers)) localStorage.setItem('ttc_wi_markers', JSON.stringify(bundle.witcher.markers));
+        if(bundle.witcher.route) localStorage.setItem('ttc_wi_route_v2', JSON.stringify(bundle.witcher.route));
         if(bundle.witcher.meta){
           if(typeof WI !== 'undefined') WI.meta = bundle.witcher.meta;
           try{ localStorage.setItem('ttc_wi_meta', JSON.stringify(bundle.witcher.meta)); }catch(e){}
@@ -178,15 +267,56 @@ var GHSync = window.GHSync = {
           if(typeof WZ !== 'undefined') WZ.duels = bundle.wizard.duels;
           localStorage.setItem('ttc_wz_duels', JSON.stringify(bundle.wizard.duels));
         }
+        if(bundle.wizard.skills && Array.isArray(bundle.wizard.skills)){
+          if(typeof WZ !== 'undefined') WZ.skills = bundle.wizard.skills;
+          localStorage.setItem('ttc_wz_skills', JSON.stringify(bundle.wizard.skills));
+        }
+        if(bundle.wizard.potions && Array.isArray(bundle.wizard.potions)){
+          if(typeof WZ !== 'undefined') WZ.potions = bundle.wizard.potions;
+          localStorage.setItem('ttc_wz_potions', JSON.stringify(bundle.wizard.potions));
+        }
+        if(Array.isArray(bundle.wizard.markers)) localStorage.setItem('ttc_wz_markers', JSON.stringify(bundle.wizard.markers));
+        if(bundle.wizard.route) localStorage.setItem('ttc_wz_route', JSON.stringify(bundle.wizard.route));
         if(bundle.wizard.meta){
           if(typeof WZ !== 'undefined') WZ.meta = bundle.wizard.meta;
           try{ localStorage.setItem('ttc_wz_meta', JSON.stringify(bundle.wizard.meta)); }catch(e){}
         }
       }
 
-      if(bundle.dnd && bundle.dnd.characters){
-        if(typeof CHARACTERS !== 'undefined') CHARACTERS = bundle.dnd.characters;
-        try{ localStorage.setItem('ttc_characters', JSON.stringify(bundle.dnd.characters)); }catch(e){}
+      if(bundle.homebrew){
+        if(bundle.homebrew.world){
+          if(typeof HB !== 'undefined') HB.world = bundle.homebrew.world;
+          localStorage.setItem('ttc_hb_world', JSON.stringify(bundle.homebrew.world));
+        }
+        if(Array.isArray(bundle.homebrew.records)){
+          if(typeof HB !== 'undefined') HB.records = bundle.homebrew.records;
+          localStorage.setItem('ttc_hb_records', JSON.stringify(bundle.homebrew.records));
+        }
+        if(bundle.homebrew.activeChar != null){
+          if(typeof HB !== 'undefined') HB.activeChar = bundle.homebrew.activeChar;
+          localStorage.setItem('ttc_hb_active', bundle.homebrew.activeChar);
+        }
+      }
+
+      if(bundle.dnd){
+        if(bundle.dnd.characters){
+          if(typeof CHARACTERS !== 'undefined') CHARACTERS = bundle.dnd.characters;
+          try{ localStorage.setItem('ttc_characters', JSON.stringify(bundle.dnd.characters)); }catch(e){}
+        }
+        if(bundle.dnd.activeId) localStorage.setItem('ttc_faerun_active_id', bundle.dnd.activeId);
+        if(Array.isArray(bundle.dnd.spells) && bundle.dnd.spells.length){
+          if(typeof SPELLS !== 'undefined') SPELLS = bundle.dnd.spells;
+          localStorage.setItem('ttc_spells', JSON.stringify(bundle.dnd.spells));
+        }
+        if(Array.isArray(bundle.dnd.recipes) && bundle.dnd.recipes.length){
+          localStorage.setItem('ttc_recipes', JSON.stringify(bundle.dnd.recipes));
+        }
+        if(Array.isArray(bundle.dnd.ingredients) && bundle.dnd.ingredients.length){
+          localStorage.setItem('ttc_ingredients', JSON.stringify(bundle.dnd.ingredients));
+        }
+        if(bundle.dnd.campaign){
+          localStorage.setItem('ttc_faerun_campaign', JSON.stringify(bundle.dnd.campaign));
+        }
       }
       return true;
     } catch(err){
@@ -472,19 +602,3 @@ var GHSync = window.GHSync = {
     }
   }
 };
-
-window.meHome = meHome;
-window.meChar = meChar;
-window.mePowers = mePowers;
-window.meArsenal = meArsenal;
-window.meShip = meShip;
-window.meCodex = meCodex;
-window.meCodexView = meCodexView;
-window.meMap = meMap;
-window.wireMeMap = wireMeMap;
-window.meData = meData;
-window.wireMe = wireMe;
-window.ME_CANON_POWERS_PRESETS = ME_CANON_POWERS_PRESETS;
-window.ME_CANON_WEAPONS_PRESETS = ME_CANON_WEAPONS_PRESETS;
-window.ME_CANON_NORMANDY_PRESET = ME_CANON_NORMANDY_PRESET;
-window.meShowModal = meShowModal;

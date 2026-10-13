@@ -1069,8 +1069,16 @@ window.updateHomeScreenLock = updateHomeScreenLock;
   if(window.__homeScrollGuardActive) return;
   window.__homeScrollGuardActive = true;
 
+  function shouldLockHomeScroll(){
+    if(!window.isHomeScreen || !window.isHomeScreen()) return false;
+    if(window.innerWidth <= 768) return false;
+    var docEl = document.documentElement;
+    if(docEl && docEl.scrollHeight > window.innerHeight + 4) return false;
+    return true;
+  }
+
   window.addEventListener('wheel', function(e){
-    if(window.isHomeScreen && window.isHomeScreen()){
+    if(shouldLockHomeScroll()){
       var el = e.target;
       while(el && el !== document.body && el !== document.documentElement){
         var style = window.getComputedStyle(el);
@@ -1084,7 +1092,7 @@ window.updateHomeScreenLock = updateHomeScreenLock;
   }, { passive: false });
 
   window.addEventListener('touchmove', function(e){
-    if(window.isHomeScreen && window.isHomeScreen()){
+    if(shouldLockHomeScroll()){
       var el = e.target;
       while(el && el !== document.body && el !== document.documentElement){
         var style = window.getComputedStyle(el);
@@ -1098,7 +1106,7 @@ window.updateHomeScreenLock = updateHomeScreenLock;
   }, { passive: false });
 
   window.addEventListener('keydown', function(e){
-    if(window.isHomeScreen && window.isHomeScreen()){
+    if(shouldLockHomeScroll()){
       var tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
       if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target && e.target.isContentEditable)){
         return;
@@ -1109,6 +1117,12 @@ window.updateHomeScreenLock = updateHomeScreenLock;
       }
     }
   }, { passive: false });
+
+  document.addEventListener('visibilitychange', function(){
+    if(document.body){
+      document.body.classList.toggle('tab-paused', document.hidden);
+    }
+  });
 })();
 
 function render(){

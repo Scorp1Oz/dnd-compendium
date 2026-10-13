@@ -754,3 +754,38 @@ html, body {
   transform: translateX(-50%) translateY(0);
 }
 
+@media (max-width: 768px) {
+  .wi-top-nav {
+    top: 6px;
+    right: 6px;
+    gap: 6px;
+  }
+  .wi-nav-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .rules-card,
+  .poker-end-card {
+    width: 92vw;
+    padding: 18px 16px;
+  }
+  .rules-card h2,
+  .poker-end-banner {
+    font-size: 18px;
+  }
+  .poker-end-subtitle {
+    font-size: 14px;
+  }
+  .rules-table th,
+  .rules-table td,
+  .poker-end-stats {
+    font-size: 12px;
+  }
+  .game-copy-toast {
+    font-size: 13px;
+    padding: 8px 16px;
+    width: max-content;
+    max-width: 90vw;
+  }
+}
+

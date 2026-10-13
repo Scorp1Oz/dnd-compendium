@@ -1,3 +1,669 @@
+// ============================================================
+// РАЗДЕЛ СТИХИЯ (ELEMENTS MODE)
+// ============================================================
+var EL = window.EL = window.EL || {
+  getProfile: function(){
+    try {
+      var raw = localStorage.getItem('el_profile');
+      if(raw){
+        var p = JSON.parse(raw);
+        if(!p.firstName && p.name){
+          var parts = String(p.name).trim().split(' ');
+          p.firstName = parts[0] || 'Новый';
+          p.lastName = parts.slice(1).join(' ') || '';
+        }
+        if(!p.firstName) p.firstName = 'Новый';
+        if(typeof p.lastName === 'undefined') p.lastName = '';
+        if(!p.element) p.element = 'Земля';
+        if(typeof p.level === 'undefined') p.level = 1;
+        if(typeof p.hp === 'undefined') p.hp = 12;
+        if(typeof p.ac === 'undefined') p.ac = 10;
+        if(typeof p.note === 'undefined') p.note = '';
+        return p;
+      }
+    } catch(e){}
+    return {
+      firstName: 'Новый',
+      lastName: '',
+      element: 'Земля',
+      level: 1,
+      hp: 12,
+      ac: 10,
+      note: ''
+    };
+  },
+  saveProfile: function(p){
+    try {
+      localStorage.setItem('el_profile', JSON.stringify(p));
+    } catch(e){}
+  },
+  elementToTheme: function(elem){
+    if(elem === 'Ветер') return 'wind';
+    if(elem === 'Вода') return 'water';
+    if(elem === 'Огонь') return 'fire';
+    if(elem === 'Земля') return 'earth';
+    if(elem === 'Тьма') return 'dark';
+    // Аватар и Без стихии: темы пока не делаем -> используем базовую earth
+    return 'earth';
+  },
+  getTheme: function(){
+    var p = EL.getProfile();
+    return EL.elementToTheme(p.element);
+  },
+  setTheme: function(t){
+    try { localStorage.setItem('el_theme', t); } catch(e){}
+    EL.applyTheme();
+  },
+  applyTheme: function(){
+    if(typeof document === 'undefined' || !document.body) return;
+    var fx = document.getElementById('elThemeFx');
+    if(typeof HB === 'undefined' || HB.mode !== 'el'){
+      document.body.classList.remove('el-theme', 'el-theme-wind', 'el-theme-water', 'el-theme-fire', 'el-theme-earth', 'el-theme-dark');
+      if(fx) fx.style.display = 'none';
+      return;
+    }
+    var t = EL.getTheme();
+    document.body.classList.remove('el-theme-wind', 'el-theme-water', 'el-theme-fire', 'el-theme-earth', 'el-theme-dark');
+    document.body.classList.add('el-theme-' + t);
+    EL.updateThemeFx(t);
+  },
+  updateThemeFx: function(theme){
+    if(typeof document === 'undefined' || !document.body) return;
+    var cont = document.getElementById('elThemeFx');
+    if(!cont){
+      cont = document.createElement('div');
+      cont.id = 'elThemeFx';
+      cont.className = 'el-theme-fx';
+      cont.setAttribute('aria-hidden', 'true');
+      document.body.insertBefore(cont, document.body.firstChild);
+    }
+    cont.style.display = 'block';
+    if(cont.getAttribute('data-theme') === theme && cont.children.length > 0) return;
+    cont.setAttribute('data-theme', theme);
+    cont.innerHTML = '';
+    EL.buildThemeFx(cont, theme);
+  },
+  buildThemeFx: function(cont, theme){
+    // Священный знак стихии на фоне темы
+    if(theme === 'wind' || theme === 'water' || theme === 'fire' || theme === 'earth'){
+      var crest = document.createElement('div');
+      crest.className = 'el-theme-crest el-crest-' + theme;
+      crest.setAttribute('aria-hidden', 'true');
+      cont.appendChild(crest);
+    }
+    if(theme === 'wind'){
+      // 3 плавных ветровых потока / воздушных порыва
+      for(var g = 0; g < 3; g++){
+        var gust = document.createElement('div');
+        gust.className = 'el-wind-gust';
+        var gw = Math.floor(400 + Math.random() * 250);
+        var gh = Math.floor(130 + Math.random() * 90);
+        gust.style.width = gw + 'px';
+        gust.style.height = gh + 'px';
+        gust.style.top = (15 + g * 28 + (Math.random() * 10 - 5)) + '%';
+        gust.style.left = (-25 + Math.random() * 15) + 'vw';
+        var gdur = (16 + Math.random() * 8).toFixed(1);
+        var gdel = (-Math.random() * 20).toFixed(1);
+        gust.style.animation = 'elWindGustWave ' + gdur + 's cubic-bezier(0.4, 0, 0.2, 1) ' + gdel + 's infinite';
+        cont.appendChild(gust);
+      }
+      // 22 парящих золотых/янтарных листа духа
+      for(var i = 0; i < 22; i++){
+        var leaf = document.createElement('div');
+        leaf.className = 'el-wind-leaf';
+        var lw = Math.floor(12 + Math.random() * 14);
+        var lh = Math.floor(7 + Math.random() * 8);
+        leaf.style.width = lw + 'px';
+        leaf.style.height = lh + 'px';
+        leaf.style.left = (Math.random() * 110 - 10).toFixed(2) + '%';
+        leaf.style.top = (Math.random() * 110 - 10).toFixed(2) + '%';
+        var driftX = Math.floor(180 + Math.random() * 240);
+        var driftY = Math.floor(240 + Math.random() * 320);
+        var ldur = (10 + Math.random() * 9).toFixed(1);
+        var ldel = (-Math.random() * 20).toFixed(1);
+        var lop = (0.55 + Math.random() * 0.40).toFixed(2);
+        leaf.style.setProperty('--w-drift-x', driftX + 'px');
+        leaf.style.setProperty('--w-drift-y', driftY + 'px');
+        leaf.style.setProperty('--w-op', lop);
+        leaf.style.animation = 'elWindDrift ' + ldur + 's ease-in-out ' + ldel + 's infinite';
+        cont.appendChild(leaf);
+      }
+      // 16 золотых воздушных пылинок
+      for(var m = 0; m < 16; m++){
+        var mote = document.createElement('div');
+        mote.className = 'el-wind-mote';
+        var msize = Math.floor(2 + Math.random() * 4);
+        mote.style.width = msize + 'px';
+        mote.style.height = msize + 'px';
+        mote.style.left = (Math.random() * 100).toFixed(2) + '%';
+        mote.style.top = (Math.random() * 100).toFixed(2) + '%';
+        var mdriftX = Math.floor(220 + Math.random() * 280);
+        var mdriftY = Math.floor(150 + Math.random() * 220);
+        var mdur = (7 + Math.random() * 8).toFixed(1);
+        var mdel = (-Math.random() * 15).toFixed(1);
+        var mop = (0.60 + Math.random() * 0.35).toFixed(2);
+        mote.style.setProperty('--w-drift-x', mdriftX + 'px');
+        mote.style.setProperty('--w-drift-y', mdriftY + 'px');
+        mote.style.setProperty('--w-op', mop);
+        mote.style.animation = 'elWindDrift ' + mdur + 's ease-in-out ' + mdel + 's infinite';
+        cont.appendChild(mote);
+      }
+    } else if(theme === 'water'){
+      // 3 каустических подводных световых луча
+      for(var c = 0; c < 3; c++){
+        var cBeam = document.createElement('div');
+        cBeam.className = 'el-water-caustic';
+        var cw = Math.floor(220 + Math.random() * 180);
+        cBeam.style.width = cw + 'px';
+        cBeam.style.height = '100vh';
+        cBeam.style.top = '0';
+        cBeam.style.left = (12 + c * 34 + (Math.random() * 8 - 4)) + '%';
+        var cdur = (14 + Math.random() * 10).toFixed(1);
+        var cdel = (-Math.random() * 20).toFixed(1);
+        cBeam.style.animation = 'elWaterCausticSway ' + cdur + 's ease-in-out ' + cdel + 's infinite';
+        cont.appendChild(cBeam);
+      }
+      // 24 светящихся лазурных пузырька
+      for(var b = 0; b < 24; b++){
+        var bub = document.createElement('div');
+        bub.className = 'el-water-bubble';
+        var bsize = Math.floor(8 + Math.random() * 18);
+        bub.style.width = bsize + 'px';
+        bub.style.height = bsize + 'px';
+        bub.style.left = (Math.random() * 96 + 2).toFixed(2) + '%';
+        bub.style.bottom = '-40px';
+        var bdist = -Math.floor(750 + Math.random() * 550);
+        var bsway = Math.floor((Math.random() * 60) - 30);
+        var bdur = (13 + Math.random() * 13).toFixed(1);
+        var bdel = (-Math.random() * 26).toFixed(1);
+        var bop = (0.55 + Math.random() * 0.40).toFixed(2);
+        bub.style.setProperty('--wb-dist', bdist + 'px');
+        bub.style.setProperty('--wb-sway', bsway + 'px');
+        bub.style.setProperty('--wb-op', bop);
+        bub.style.animation = 'elWaterFloatUp ' + bdur + 's ease-in-out ' + bdel + 's infinite';
+        cont.appendChild(bub);
+      }
+      // 14 мерцающих водяных капель
+      for(var d = 0; d < 14; d++){
+        var drop = document.createElement('div');
+        drop.className = 'el-water-droplet';
+        var dsize = Math.floor(2 + Math.random() * 4);
+        drop.style.width = dsize + 'px';
+        drop.style.height = dsize + 'px';
+        drop.style.left = (Math.random() * 96 + 2).toFixed(2) + '%';
+        drop.style.bottom = '-30px';
+        var ddist = -Math.floor(650 + Math.random() * 500);
+        var dsway = Math.floor((Math.random() * 40) - 20);
+        var ddur = (9 + Math.random() * 9).toFixed(1);
+        var ddel = (-Math.random() * 18).toFixed(1);
+        var dop = (0.65 + Math.random() * 0.35).toFixed(2);
+        drop.style.setProperty('--wb-dist', ddist + 'px');
+        drop.style.setProperty('--wb-sway', dsway + 'px');
+        drop.style.setProperty('--wb-op', dop);
+        drop.style.animation = 'elWaterFloatUp ' + ddur + 's ease-in-out ' + ddel + 's infinite';
+        cont.appendChild(drop);
+      }
+    } else if(theme === 'fire'){
+      // 2 пульсирующих пятна жара кальдеры
+      for(var fg = 0; fg < 2; fg++){
+        var glow = document.createElement('div');
+        glow.className = 'el-fire-glow-spot';
+        var gw = Math.floor(400 + Math.random() * 220);
+        var gh = Math.floor(280 + Math.random() * 140);
+        glow.style.width = gw + 'px';
+        glow.style.height = gh + 'px';
+        glow.style.bottom = '-90px';
+        glow.style.left = (fg === 0 ? '10%' : '58%');
+        var fdur = (7 + Math.random() * 5).toFixed(1);
+        glow.style.animation = 'elFireCalderaPulse ' + fdur + 's ease-in-out infinite alternate';
+        cont.appendChild(glow);
+      }
+      // 34 раскаленные восходящие искры
+      for(var e = 0; e < 34; e++){
+        var ember = document.createElement('div');
+        ember.className = 'el-fire-ember';
+        var esize = Math.floor(3 + Math.random() * 5);
+        ember.style.width = esize + 'px';
+        ember.style.height = esize + 'px';
+        ember.style.left = (Math.random() * 98 + 1).toFixed(2) + '%';
+        ember.style.bottom = '-20px';
+        var eh = -Math.floor(550 + Math.random() * 650);
+        var edrift = Math.floor((Math.random() * 90) - 45);
+        var edur = (5 + Math.random() * 8).toFixed(1);
+        var edel = (-Math.random() * 14).toFixed(1);
+        var eop = (0.70 + Math.random() * 0.30).toFixed(2);
+        ember.style.setProperty('--fe-h', eh + 'px');
+        ember.style.setProperty('--fe-drift', edrift + 'px');
+        ember.style.setProperty('--fe-op', eop);
+        ember.style.animation = 'elFireEmberRise ' + edur + 's cubic-bezier(0.25, 0.46, 0.45, 0.94) ' + edel + 's infinite';
+        cont.appendChild(ember);
+      }
+      // 12 темных пепельных хлопьев
+      for(var a = 0; a < 12; a++){
+        var ash = document.createElement('div');
+        ash.className = 'el-fire-ash';
+        var asize = Math.floor(2 + Math.random() * 4);
+        ash.style.width = asize + 'px';
+        ash.style.height = asize + 'px';
+        ash.style.left = (Math.random() * 98 + 1).toFixed(2) + '%';
+        ash.style.bottom = '-20px';
+        var ah = -Math.floor(400 + Math.random() * 550);
+        var adrift = Math.floor((Math.random() * 120) - 60);
+        var adur = (8 + Math.random() * 9).toFixed(1);
+        var adel = (-Math.random() * 17).toFixed(1);
+        ash.style.setProperty('--fe-h', ah + 'px');
+        ash.style.setProperty('--fe-drift', adrift + 'px');
+        ash.style.setProperty('--fe-op', '0.45');
+        ash.style.animation = 'elFireEmberRise ' + adur + 's ease-in-out ' + adel + 's infinite';
+        cont.appendChild(ash);
+      }
+    } else if(theme === 'dark'){
+      // ТЬМА (DARK / KURAYAMI VOID) — На основе темы Кураями из раздела Шиноби
+      // 28 левитирующих частиц-плюсиков Тьмы
+      var particleCount = 28;
+      var colors = ['#cfcfcf', '#9e9e9e', '#b8b8b8', '#787878', '#e5e5e5'];
+      for(var i = 0; i < particleCount; i++){
+        var p = document.createElement('div');
+        p.className = 'sh-kurayami-plus-particle';
+        var size = Math.floor(7 + ((i * 5 + 3) % 9));
+        var left = Math.floor((i * 13 + (i % 5) * 7) % 94 + 2);
+        var top = Math.floor((i * 19 + (i % 4) * 8) % 92 + 3);
+        var duration = (9 + ((i * 3 + 2) % 11)).toFixed(1);
+        var delay = (-1 * ((i * 2.9 + 1.1) % 16)).toFixed(1);
+        var animIndex = (i % 5) + 1;
+        var maxOp = (0.16 + ((i % 5) * 0.04)).toFixed(2);
+        var col = colors[i % colors.length];
+        var thickness = (size > 11 ? '1.5px' : '1.2px');
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left = left + '%';
+        p.style.top = top + '%';
+        p.style.setProperty('--p-op', maxOp);
+        p.style.setProperty('--p-col', col);
+        p.style.setProperty('--p-th', thickness);
+        p.style.animation = 'kurayamiDrift' + animIndex + ' ' + duration + 's ease-in-out ' + delay + 's infinite';
+        cont.appendChild(p);
+      }
+      // 14 медленно дрейфующих графитовых дымных искр
+      for(var dk = 0; dk < 14; dk++){
+        var dmote = document.createElement('div');
+        dmote.className = 'el-dark-shadow-mote';
+        var dsize = Math.floor(2 + Math.random() * 5);
+        dmote.style.width = dsize + 'px';
+        dmote.style.height = dsize + 'px';
+        dmote.style.left = (Math.random() * 96 + 2).toFixed(2) + '%';
+        dmote.style.top = (Math.random() * 94 + 2).toFixed(2) + '%';
+        var ddriftX = Math.floor((Math.random() * 60) - 30);
+        var ddriftY = Math.floor((Math.random() * 80) - 40);
+        var ddur = (7 + Math.random() * 9).toFixed(1);
+        var ddel = (-Math.random() * 15).toFixed(1);
+        var dop = (0.45 + Math.random() * 0.35).toFixed(2);
+        dmote.style.setProperty('--dk-drift-x', ddriftX + 'px');
+        dmote.style.setProperty('--dk-drift-y', ddriftY + 'px');
+        dmote.style.setProperty('--dk-op', dop);
+        dmote.style.animation = 'elDarkMoteDrift ' + ddur + 's ease-in-out ' + ddel + 's infinite';
+        cont.appendChild(dmote);
+      }
+    } else {
+      // Earth (Земля - default/fallback)
+      // 2 изумрудных резонансных свечения
+      for(var eg = 0; eg < 2; eg++){
+        var eglow = document.createElement('div');
+        eglow.className = 'el-earth-resonance';
+        var ew = Math.floor(450 + Math.random() * 200);
+        var eh2 = Math.floor(320 + Math.random() * 150);
+        eglow.style.width = ew + 'px';
+        eglow.style.height = eh2 + 'px';
+        eglow.style.top = (eg === 0 ? '15%' : '60%');
+        eglow.style.left = (eg === 0 ? '-10%' : '65%');
+        var edur2 = (9 + Math.random() * 6).toFixed(1);
+        eglow.style.animation = 'elEarthPulse ' + edur2 + 's ease-in-out infinite alternate';
+        cont.appendChild(eglow);
+      }
+      // 20 парящих кристаллов нефрита в левитации
+      for(var k = 0; k < 20; k++){
+        var cryst = document.createElement('div');
+        cryst.className = 'el-earth-crystal';
+        var csize = Math.floor(9 + Math.random() * 15);
+        cryst.style.width = csize + 'px';
+        cryst.style.height = csize + 'px';
+        cryst.style.left = (Math.random() * 92 + 4).toFixed(2) + '%';
+        cryst.style.top = (Math.random() * 88 + 6).toFixed(2) + '%';
+        var cdriftX = Math.floor((Math.random() * 50) - 25);
+        var cdriftY = Math.floor((Math.random() * 70) - 35);
+        var cdurt = (8 + Math.random() * 10).toFixed(1);
+        var cdelt = (-Math.random() * 18).toFixed(1);
+        var cop2 = (0.50 + Math.random() * 0.40).toFixed(2);
+        cryst.style.setProperty('--ec-drift-x', cdriftX + 'px');
+        cryst.style.setProperty('--ec-drift-y', cdriftY + 'px');
+        cryst.style.setProperty('--ec-op', cop2);
+        cryst.style.animation = 'elEarthLevitate ' + cdurt + 's ease-in-out ' + cdelt + 's infinite';
+        cont.appendChild(cryst);
+      }
+      // 16 светящихся нефритовых песчинок
+      for(var m2 = 0; m2 < 16; m2++){
+        var emote = document.createElement('div');
+        emote.className = 'el-earth-mote';
+        var emsize = Math.floor(2 + Math.random() * 4);
+        emote.style.width = emsize + 'px';
+        emote.style.height = emsize + 'px';
+        emote.style.left = (Math.random() * 94 + 3).toFixed(2) + '%';
+        emote.style.top = (Math.random() * 90 + 5).toFixed(2) + '%';
+        var edriftX2 = Math.floor((Math.random() * 40) - 20);
+        var edriftY2 = Math.floor((Math.random() * 60) - 30);
+        var edur3 = (6 + Math.random() * 8).toFixed(1);
+        var edel2 = (-Math.random() * 14).toFixed(1);
+        var eop2 = (0.60 + Math.random() * 0.35).toFixed(2);
+        emote.style.setProperty('--ec-drift-x', edriftX2 + 'px');
+        emote.style.setProperty('--ec-drift-y', edriftY2 + 'px');
+        emote.style.setProperty('--ec-op', eop2);
+        emote.style.animation = 'elEarthLevitate ' + edur3 + 's ease-in-out ' + edel2 + 's infinite';
+        cont.appendChild(emote);
+      }
+    }
+  }
+};
+
+function elHome(){
+  var p = EL.getProfile();
+  var fullName = (p.firstName + (p.lastName ? (' ' + p.lastName) : '')).trim() || 'Персонаж';
+  var elemIcons = {
+    'Ветер': '🌪️',
+    'Вода': '🌊',
+    'Огонь': '🔥',
+    'Земля': '⛰️',
+    'Тьма': '🌑',
+    'Аватар': '☸️',
+    'Без стихии': '⚔️'
+  };
+  var elemIcon = elemIcons[p.element] || '🌀';
+
+  var hero = '<div class="el-hero-dice" data-go="dice">' +
+    '<div class="hero-dice-icon">' + (typeof dieShapeSvg === 'function' ? dieShapeSvg(20, 'elHeroDie', 20) : '🎲') + '</div>' +
+    '<div class="hero-dice-text" style="flex:1;min-width:0;">' +
+      '<div class="hero-dice-name" style="font-size:24px;font-weight:700;letter-spacing:0.03em;color:#fff;margin-bottom:4px;font-family:\'Cinzel\',serif;">Бросок костей</div>' +
+      '<div class="hero-dice-desc" style="font-size:14.5px;color:#94a3b8;font-style:italic;font-family:\'EB Garamond\',serif;">Кубики d4–d20, стихийные резонансы, модификаторы и проверки</div>' +
+    '</div>' +
+    '<div class="hero-dice-arrow" style="font-size:22px;color:var(--el-accent);font-weight:700;flex-shrink:0;">→</div>' +
+  '</div>';
+
+  var items = [
+    { nav: 'elTechs', icon: '⚡', t: 'Формы стихий', d: 'Изученные магические формы четырёх стихий, высшие искусства, шкала 0–5 и затраты МВН' },
+    { nav: 'elMoves', icon: '🥋', t: 'Боевые приёмы', d: 'Тактические действия, навязывание Окон возможностей (A94/A95), чи-блокинг и атаки оружием' },
+    { nav: 'elMap',   icon: '🗺️', t: 'Карта мира', d: 'Интерактивная карта четырёх народов, ключевые локации, калькулятор путешествий и досье' },
+    { nav: 'elTechGen', icon: '🤖', t: 'AI Генератор стихий', d: 'Создание боевых форм и высших искусств на базе Gemini 3.8 Flash!' },
+    { nav: 'elRef',   icon: '📚', t: 'Справочник', d: 'Полный свод правил, боевой механики, магии четырёх стихий и законов мира' },
+    { nav: 'elData',  icon: '💾', t: 'Данные', d: 'Профиль персонажа, стихия, экспорт и параметры' }
+  ];
+
+  return '<div class="el-hud">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">' +
+      '<div>' +
+        '<div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:0.02em;font-family:\'Cinzel\',serif;">' + escapeHtml(fullName) + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
+        '<span style="background:var(--el-accent-dim);color:var(--el-tag-text);border:1px solid var(--el-accent-border);padding:4px 11px;border-radius:999px;font-size:12.5px;font-weight:700;font-family:\'JetBrains Mono\',monospace;">' + elemIcon + ' ' + escapeHtml(p.element || 'Стихия') + '</span>' +
+        '<span style="background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(255,255,255,0.12);padding:4px 10px;border-radius:999px;font-size:12px;font-family:\'JetBrains Mono\',monospace;">Ур. ' + (p.level || 1) + '</span>' +
+        '<span style="background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);padding:4px 10px;border-radius:999px;font-size:12px;font-family:\'JetBrains Mono\',monospace;">❤️ ' + (p.hp || 10) + ' HP</span>' +
+        '<span style="background:rgba(56,189,248,0.12);color:#7dd3fc;border:1px solid rgba(56,189,248,0.25);padding:4px 10px;border-radius:999px;font-size:12px;font-family:\'JetBrains Mono\',monospace;">🛡️ КБ ' + (p.ac || 10) + '</span>' +
+      '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="el-rule"></div>' +
+  hero +
+  '<div class="section-label">СИСТЕМНЫЕ РАЗДЕЛЫ // СТИХИЯ</div>' +
+  '<div class="menu-list grid-2">' +
+    items.map(function(it){
+      return '<div class="el-card el-card-clickable" data-nav="' + it.nav + '" onclick="if(typeof window.navigate===\'function\') window.navigate(\'' + it.nav + '\');" role="button" tabindex="0">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="el-card-title"><span>' + it.icon + '</span> ' + escapeHtml(it.t) + '</div>' +
+          '<div class="el-card-desc">' + escapeHtml(it.d) + '</div>' +
+        '</div>' +
+        '<div class="el-card-arrow">›</div>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+}
+window.elHome = elHome;
+
+function elData(){
+  var prof = EL.getProfile();
+
+  var elements = [
+    { val: 'Ветер', label: '🌪️ Ветер' },
+    { val: 'Вода', label: '🌊 Вода' },
+    { val: 'Огонь', label: '🔥 Огонь' },
+    { val: 'Земля', label: '⛰️ Земля' },
+    { val: 'Тьма', label: '🌑 Тьма' },
+    { val: 'Аватар', label: '☸️ Аватар' },
+    { val: 'Без стихии', label: '⚔️ Без стихии' }
+  ];
+
+  var elementOpts = elements.map(function(el){
+    return '<option value="' + escapeAttr(el.val) + '" ' + (prof.element === el.val ? 'selected' : '') + '>' + el.label + '</option>';
+  }).join('');
+
+  return renderCrumb([{label:'Стихия', nav:'elHome'},{label:'Данные'}]) +
+    '<button class="back" data-go="elHome">← Назад в Стихию</button>' +
+    '<h1>Данные</h1>' +
+    '<div class="subtitle">Управление профилем персонажа, стихией, резервными копиями и синхронизацией</div>' +
+    '<div class="rule"></div>' +
+
+    // ПРОФИЛЬ ПЕРСОНАЖА
+    '<div class="sheet-section" style="background:var(--el-card-bg);border:1px solid var(--el-accent-border);border-left:4px solid var(--el-accent);border-radius:4px;padding:16px 20px;margin-bottom:20px;">' +
+      '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:var(--el-accent);font-weight:700;margin-bottom:12px;font-family:\'JetBrains Mono\',monospace;">👤 ПРОФИЛЬ ПЕРСОНАЖА</div>' +
+      
+      // Имя и Фамилия
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px;">' +
+        '<div>' +
+          '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">Имя:</label>' +
+          '<input type="text" id="elProfFirstName" value="' + escapeAttr(prof.firstName || '') + '" placeholder="Имя персонажа" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.4);border:1px solid var(--el-accent-border);color:#fff;padding:8px 12px;border-radius:4px;font-size:14px;">' +
+        '</div>' +
+        '<div>' +
+          '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">Фамилия / Род:</label>' +
+          '<input type="text" id="elProfLastName" value="' + escapeAttr(prof.lastName || '') + '" placeholder="Фамилия или клан" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.4);border:1px solid var(--el-accent-border);color:#fff;padding:8px 12px;border-radius:4px;font-size:14px;">' +
+        '</div>' +
+      '</div>' +
+
+      // Стихия и Уровень
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px;">' +
+        '<div>' +
+          '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">Стихия:</label>' +
+          '<select id="elProfElement" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.4);border:1px solid var(--el-accent-border);color:#fff;padding:8px 12px;border-radius:4px;font-size:14px;cursor:pointer;">' +
+            elementOpts +
+          '</select>' +
+        '</div>' +
+        '<div>' +
+          '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">Уровень (1–20):</label>' +
+          '<input type="number" min="1" max="20" id="elProfLevel" value="' + (prof.level || 1) + '" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.4);border:1px solid var(--el-accent-border);color:#fff;padding:8px 12px;border-radius:4px;font-size:14px;">' +
+        '</div>' +
+      '</div>' +
+
+      // Здоровье и КБ
+      '<div class="grid-2" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px;">' +
+        '<div>' +
+          '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">❤️ Здоровье (HP):</label>' +
+          '<input type="number" min="1" id="elProfHp" value="' + (prof.hp || 12) + '" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.4);border:1px solid var(--el-accent-border);color:#fff;padding:8px 12px;border-radius:4px;font-size:14px;">' +
+        '</div>' +
+        '<div>' +
+          '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">🛡️ КБ (Класс Брони / КД):</label>' +
+          '<input type="number" min="1" id="elProfAc" value="' + (prof.ac || 10) + '" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.4);border:1px solid var(--el-accent-border);color:#fff;padding:8px 12px;border-radius:4px;font-size:14px;">' +
+        '</div>' +
+      '</div>' +
+
+      // Заметки
+      '<div style="margin-bottom:14px;">' +
+        '<label style="display:block;font-size:12px;color:var(--ink-dim);margin-bottom:4px;font-weight:600;">Хроники и заметки персонажа:</label>' +
+        '<textarea id="elProfNote" rows="3" placeholder="Биография, эпоха, школа, наставник..." style="width:100%;box-sizing:border-box;background:rgba(0,0,0,0.4);border:1px solid var(--el-accent-border);color:#fff;padding:8px 12px;border-radius:4px;font-size:13px;resize:vertical;">' + escapeHtml(prof.note || '') + '</textarea>' +
+      '</div>' +
+
+      '<button class="btn btn-primary" id="elSaveProfBtn" style="background:var(--el-gradient);border:none;color:#fff;padding:9px 20px;border-radius:4px;font-weight:700;cursor:pointer;box-shadow:0 0 12px var(--el-accent-glow);">✓ Сохранить профиль</button>' +
+    '</div>' +
+
+    // Облако GHSync
+    (typeof GHSync !== 'undefined' ? GHSync.renderUI() : '') +
+
+    // Gemini API
+    '<div class="gh-sync-card" id="elGeminiApiSection" style="margin-top:20px; margin-bottom:20px;background:var(--el-card-bg);border:1px solid var(--el-accent-border);border-radius:4px;padding:16px 20px;">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">' +
+        '<span style="font-size:20px;">✨</span>' +
+        '<div>' +
+          '<div style="font-weight:700;font-size:14px;color:#fff;font-family:\'Cinzel\',serif;">Google Gemini AI (Интеграция ИИ)</div>' +
+          '<div style="font-size:12px;color:#94a3b8;">Генерация стихийных явлений, испытаний и свитков</div>' +
+        '</div>' +
+      '</div>' +
+      '<p style="font-size:12px;color:#94a3b8;margin:0 0 12px 0;">Ключ хранится локально на этом устройстве. Получить бесплатный API-ключ можно в <a href="https://aistudio.google.com/" target="_blank" style="color:var(--el-tag-text);text-decoration:underline;">Google AI Studio</a>.</p>' +
+      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">' +
+        '<input type="password" id="elDataGeminiKey" value="' + escapeAttr(typeof getGeminiApiKey === 'function' ? getGeminiApiKey() : '') + '" placeholder="Вставьте ключ AIzaSy..." style="flex:1; min-width:200px; box-sizing:border-box; background:rgba(0,0,0,0.4); border:1px solid var(--el-accent-border); color:#fff; padding:8px 12px; border-radius:4px; font-family:monospace; font-size:13px;">' +
+        '<button class="btn btn-primary" id="elDataSaveGeminiKey" style="background:var(--el-gradient); border:none; padding:8px 16px; border-radius:4px; color:#fff; font-weight:bold; cursor:pointer;">💾 Сохранить API Ключ</button>' +
+      '</div>' +
+    '</div>' +
+
+    // ХРАНИЛИЩЕ И ЗАЩИТА ДАННЫХ
+    (typeof AppStorage !== 'undefined' ? AppStorage.renderWidget('el') : '') +
+
+    // РЕЗЕРВНАЯ КОПИЯ И ЭКСПОРТ СТИХИЙ
+    '<div class="sheet-section" style="background:var(--el-card-bg);border:1px solid var(--el-accent-border);border-left:4px solid var(--el-accent);border-radius:4px;padding:16px 20px;margin-bottom:20px;">' +
+      '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:var(--el-accent);font-weight:700;margin-bottom:12px;font-family:\'JetBrains Mono\',monospace;">💾 РЕЗЕРВНАЯ КОПИЯ СТИХИИ</div>' +
+      '<div style="font-size:12.5px;color:#94a3b8;margin-bottom:12px;line-height:1.45;">' +
+        'Экспорт всех данных Стихии в единый файл JSON: профиль мага, изученные формы четырёх стихий, боевые приёмы и метки интерактивной карты.' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">' +
+        '<button class="btn btn-primary" id="elExportBtn" style="background:var(--el-gradient);border:none;color:#fff;padding:8px 16px;border-radius:4px;font-weight:700;cursor:pointer;">📥 Экспорт в файл JSON</button>' +
+        '<button class="btn btn-ghost" id="elImportBtn" style="border:1px solid var(--el-accent-border);color:var(--el-tag-text);padding:8px 16px;border-radius:4px;cursor:pointer;">📤 Импорт из файла...</button>' +
+        '<input type="file" id="elImportFile" accept=".json,application/json" style="display:none;">' +
+      '</div>' +
+    '</div>';
+}
+window.elData = elData;
+
+function wireElData(){
+  var elemSel = document.getElementById('elProfElement');
+  if(elemSel){
+    elemSel.onchange = function(){
+      var elem = this.value;
+      var th = EL.elementToTheme(elem);
+      EL.setTheme(th);
+      paintShBar();
+    };
+  }
+
+  var saveBtn = document.getElementById('elSaveProfBtn');
+  if(saveBtn){
+    saveBtn.onclick = function(){
+      var firstName = (document.getElementById('elProfFirstName').value || '').trim() || 'Персонаж';
+      var lastName = (document.getElementById('elProfLastName').value || '').trim();
+      var element = (document.getElementById('elProfElement').value || 'Земля');
+      var level = parseInt(document.getElementById('elProfLevel').value, 10) || 1;
+      var hp = parseInt(document.getElementById('elProfHp').value, 10) || 12;
+      var ac = parseInt(document.getElementById('elProfAc').value, 10) || 10;
+      var note = (document.getElementById('elProfNote').value || '').trim();
+
+      var prof = {
+        firstName: firstName,
+        lastName: lastName,
+        element: element,
+        level: level,
+        hp: hp,
+        ac: ac,
+        note: note
+      };
+
+      EL.saveProfile(prof);
+      EL.setTheme(EL.elementToTheme(element));
+
+      saveBtn.textContent = 'Сохранено ✓';
+      setTimeout(function(){ saveBtn.textContent = '✓ Сохранить профиль'; }, 1200);
+      paintShBar();
+    };
+  }
+
+  var saveKeyBtn = document.getElementById('elDataSaveGeminiKey');
+  if(saveKeyBtn){
+    saveKeyBtn.onclick = function(){
+      var key = (document.getElementById('elDataGeminiKey').value || '').trim();
+      if(typeof saveGeminiApiKey === 'function'){
+        saveGeminiApiKey(key);
+      } else {
+        try { localStorage.setItem('gemini_api_key', key); } catch(e){}
+      }
+      saveKeyBtn.textContent = 'Сохранено ✓';
+      setTimeout(function(){ saveKeyBtn.textContent = '💾 Сохранить API Ключ'; }, 1200);
+    };
+  }
+
+  // Storage monitor widget
+  if(typeof AppStorage !== 'undefined' && AppStorage.wireWidget){
+    AppStorage.wireWidget('el');
+  }
+
+  // Экспорт данных Стихии
+  var expBtn = document.getElementById('elExportBtn');
+  if(expBtn && !expBtn.__wired){
+    expBtn.__wired = true;
+    expBtn.onclick = function(){
+      var data = {
+        kind: 'avatar_elements',
+        version: 1,
+        savedAt: new Date().toISOString(),
+        profile: EL.getProfile(),
+        theme: localStorage.getItem('el_theme') || 'earth',
+        techs: (function(){ try { return JSON.parse(localStorage.getItem('el_techs') || '[]'); } catch(e){ return []; } })(),
+        moves: (function(){ try { return JSON.parse(localStorage.getItem('el_moves') || '[]'); } catch(e){ return []; } })(),
+        markers: (function(){ try { return JSON.parse(localStorage.getItem('el_user_markers') || '[]'); } catch(e){ return []; } })(),
+        warPaths: (function(){ try { return JSON.parse(localStorage.getItem('ttc_el_war_paths') || '[]'); } catch(e){ return []; } })()
+      };
+      var str = JSON.stringify(data, null, 2);
+      var blob = new Blob([str], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      var prof = EL.getProfile();
+      var charName = ((prof.firstName || '') + (prof.lastName ? ('_' + prof.lastName) : '')).trim() || 'avatar';
+      a.download = 'elements_' + charName.replace(/[^\wа-яА-ЯёЁ\-]/g, '_') + '_' + Date.now() + '.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 600);
+    };
+  }
+
+  // Импорт данных Стихии
+  var impBtn = document.getElementById('elImportBtn');
+  var impFile = document.getElementById('elImportFile');
+  if(impBtn && impFile && !impBtn.__wired){
+    impBtn.__wired = true;
+    impBtn.onclick = function(){ impFile.click(); };
+    impFile.onchange = function(){
+      var f = impFile.files && impFile.files[0];
+      if(!f) return;
+      var fr = new FileReader();
+      fr.onload = function(){
+        try {
+          var obj = JSON.parse(fr.result);
+          if(!obj || (obj.kind !== 'avatar_elements' && !obj.profile)){
+            alert('Ошибка: выбранный файл не содержит распознанных данных Стихии.');
+            return;
+          }
+          if(obj.profile) EL.saveProfile(obj.profile);
+          if(obj.theme) EL.setTheme(obj.theme);
+          if(Array.isArray(obj.techs)) localStorage.setItem('el_techs', JSON.stringify(obj.techs));
+          if(Array.isArray(obj.moves)) localStorage.setItem('el_moves', JSON.stringify(obj.moves));
+          if(Array.isArray(obj.markers)) localStorage.setItem('el_user_markers', JSON.stringify(obj.markers));
+          if(Array.isArray(obj.warPaths)) localStorage.setItem('ttc_el_war_paths', JSON.stringify(obj.warPaths));
+          alert('✓ Данные Стихии успешно импортированы!');
+          if(typeof render === 'function') render();
+        } catch(err){
+          alert('Ошибка чтения файла: ' + (err.message || err));
+        }
+      };
+      fr.readAsText(f);
+      impFile.value = '';
+    };
+  }
+}
+window.wireElData = wireElData;
+
 /* ============================================================
    СТИХИЯ: СПРАВОЧНИК И БАЗА ЗНАНИЙ (EL-REF)
    ============================================================ */

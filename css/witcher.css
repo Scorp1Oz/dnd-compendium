@@ -1154,6 +1154,38 @@ body.wi-theme .btn-ghost:hover:not(:disabled) {
   background: #000;
 }
 
+@media (max-width: 640px) {
+  body.wi-theme .wi-hud {
+    padding: 14px 16px;
+  }
+  body.wi-theme .wi-hud-left {
+    min-width: 100%;
+  }
+  body.wi-theme .wi-hud-right {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
+  .wi-games-grid {
+    grid-template-columns: 1fr;
+  }
+  .wi-game-card {
+    padding: 16px;
+  }
+  .wi-game-modal-header {
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  body.wi-theme .wi-ref-table,
+  body.wi-theme table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 
 
 

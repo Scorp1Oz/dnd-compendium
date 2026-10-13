@@ -3215,3 +3215,23 @@ body.me-theme .die-coin-btn:hover {
   border-color: #ff8800;
   box-shadow: 0 0 18px rgba(255, 136, 0, 0.5);
 }
+
+@media (max-width: 640px) {
+  .sh-hud-profile-sel {
+    max-width: 150px;
+  }
+  .sh-hud-stats {
+    gap: 6px;
+  }
+  .sh-hud-stat-pill {
+    padding: 4px 9px;
+    font-size: 12px;
+  }
+  .sh-arsenal-card {
+    padding: 12px 14px;
+  }
+  .sh-map-toolbar {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+}

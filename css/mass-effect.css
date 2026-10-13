@@ -2568,3 +2568,30 @@ body.me-theme.me-theme-cerberus .btn-primary {
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
 }
+
+@media (max-width: 640px) {
+  .me-galaxy-viewport-box {
+    height: 340px !important;
+    min-height: 300px !important;
+    touch-action: none;
+  }
+  .me-map-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .me-filter-group {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .me-filter-btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .me-supplies-row {
+    gap: 8px;
+    padding: 8px 10px;
+  }
+}

@@ -2348,10 +2348,42 @@ body.is-home-screen .el-card-desc {
   white-space: normal !important;
 }
 
+@media (max-width: 768px) {
+  html.is-home-screen,
+  body.is-home-screen {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overscroll-behavior-y: auto !important;
+    touch-action: pan-x pan-y pinch-zoom !important;
+  }
+  body {
+    padding-top: calc(52px + env(safe-area-inset-top));
+    overflow-x: hidden;
+  }
+  #hbModeBar {
+    top: calc(6px + env(safe-area-inset-top));
+    left: 8px;
+    right: 8px;
+    max-width: calc(100vw - 16px);
+    display: flex;
+    justify-content: center;
+  }
+  #hbModeBar .hb-bar-inner {
+    max-width: 100%;
+  }
+  #hbModeBar .hb-seg {
+    max-width: 100%;
+    scroll-behavior: smooth;
+  }
+}
+
 @media (max-width: 640px) {
   body.is-home-screen {
-    padding-top: calc(48px + env(safe-area-inset-top)) !important;
-    padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+    padding-top: calc(52px + env(safe-area-inset-top)) !important;
+    padding-bottom: calc(28px + env(safe-area-inset-bottom)) !important;
     padding-left: calc(12px + env(safe-area-inset-left)) !important;
     padding-right: calc(12px + env(safe-area-inset-right)) !important;
   }
@@ -2394,13 +2426,18 @@ body.is-home-screen .el-card-desc {
   }
   body.is-home-screen .hero-dice,
   body.is-home-screen .fae-hero-dice,
+  body.is-home-screen .sh-hero-dice,
+  body.is-home-screen .el-hero-dice,
   body.is-home-screen .wi-hero-dice,
   body.is-home-screen .wz-hero-dice,
   body.is-home-screen .hb-hero-dice {
     padding: 16px 18px !important;
+    gap: 14px !important;
   }
   body.is-home-screen .hero-dice-icon,
   body.is-home-screen .fae-hero-dice-icon,
+  body.is-home-screen .sh-hero-dice-icon,
+  body.is-home-screen .el-hero-dice-icon,
   body.is-home-screen .wi-hero-dice-icon,
   body.is-home-screen .wz-hero-dice-icon,
   body.is-home-screen .hb-hero-dice-icon {
@@ -2409,4 +2446,70 @@ body.is-home-screen .el-card-desc {
     min-width: 48px !important;
     min-height: 48px !important;
   }
+  body.is-home-screen .hero-dice-name,
+  body.is-home-screen .hero-dice-title,
+  body.is-home-screen .fae-hero-dice-title,
+  body.is-home-screen .wi-hero-dice-title,
+  body.is-home-screen .wz-hero-dice-title,
+  body.is-home-screen .hb-hero-dice-title {
+    font-size: 19px !important;
+  }
+
+  /* Responsive forms, tables, and inline 2-col grids on mobile phones */
+  .attack-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+  }
+  .attack-row input:first-child {
+    grid-column: 1 / -1;
+  }
+  .currency-row {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .ttc-select-menu {
+    min-width: 100% !important;
+    max-width: calc(100vw - 28px) !important;
+  }
+  #app div[style*="grid-template-columns:1fr 1fr"],
+  #app div[style*="grid-template-columns: 1fr 1fr"],
+  #app div[style*="grid-template-columns:repeat(2,1fr)"],
+  #app div[style*="grid-template-columns: repeat(2, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+  .fae-hud > div:first-child,
+  .hb-hud > div:first-child {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+  .fae-data-section,
+  .fae-data-card,
+  .ai-gen-card {
+    padding: 14px !important;
+  }
+}
+
+/* ==========================================================================
+   Оптимизация производительности фоновых эффектов (GPU / Paint Isolation)
+   ========================================================================== */
+#wiThemeFx,
+#wzThemeFx,
+#elThemeFx,
+.el-theme-fx,
+#meCitadelParticles,
+#meOmniProjections,
+#meN7Background,
+#meCerberusBackground,
+#shUchihaParticles,
+#shKurayamiParticles,
+#shGomanParticles,
+#shDzankuParticles {
+  contain: layout style paint;
+  pointer-events: none;
+}
+
+body.tab-paused *,
+body.tab-paused *::before,
+body.tab-paused *::after {
+  animation-play-state: paused !important;
 }

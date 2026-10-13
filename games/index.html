@@ -217,6 +217,77 @@
         footer span {
             color: #cbd5e1;
         }
+
+        @media (max-width: 768px) {
+            body {
+                height: auto;
+                min-height: 100dvh;
+                overflow-y: auto;
+                overflow-x: hidden;
+                align-items: flex-start;
+            }
+            #hub-stage {
+                height: auto;
+                max-height: none;
+                transform: none !important;
+                padding: 24px 16px 32px;
+                gap: 20px;
+            }
+            .hub-back-btn {
+                font-size: 13px;
+                padding: 8px 14px;
+                margin-bottom: 12px;
+            }
+            .hub-subtitle {
+                font-size: 11px;
+                letter-spacing: 0.14em;
+            }
+            .hub-title {
+                font-size: 28px;
+            }
+            .hub-description {
+                font-size: 15px;
+                max-width: 100%;
+                margin-top: 8px;
+            }
+            .games-grid {
+                flex-direction: column;
+                width: 100%;
+                gap: 16px;
+                margin: 10px 0;
+            }
+            .game-card {
+                padding: 20px 18px;
+            }
+            .card-icon {
+                font-size: 40px;
+                margin-bottom: 8px;
+            }
+            .card-title {
+                font-size: 20px;
+                margin-bottom: 8px;
+            }
+            .card-badges {
+                gap: 6px;
+                margin-bottom: 12px;
+            }
+            .badge {
+                font-size: 11px;
+                padding: 3px 8px;
+            }
+            .card-desc {
+                font-size: 14.5px;
+                margin-bottom: 16px;
+            }
+            .play-btn {
+                font-size: 14px;
+                padding: 10px 22px;
+                width: 100%;
+            }
+            footer {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -239,11 +310,11 @@
             <div class="card-badges">
                 <span class="badge">TW3: Дикая Охота</span>
                 <span class="badge">Все DLC</span>
-                <span class="badge highlight">+58 Standalone карт</span>
-                <span class="badge">Синдикат</span>
+                <span class="badge highlight">474 карты</span>
+                <span class="badge">6 фракций + Синдикат</span>
             </div>
             <p class="card-desc">
-                Классический Гвинт со всеми карточками Ведьмака 3, расширенный <b>58 картами Standalone Gwent</b>, шестой фракцией «Синдикат» и умным ИИ.
+                Классический Гвинт со всеми карточками Ведьмака 3, расширенный <b>полной коллекцией из 474 карт</b>, шестой фракцией «Синдикат» и тактическим ИИ.
             </p>
             <div class="play-btn">Играть в Гвинт →</div>
         </a>
@@ -273,6 +344,10 @@
 <script>
     function fitHub() {
         const W = window.innerWidth;
+        if (W <= 768) {
+            document.documentElement.style.setProperty('--game-scale', 1);
+            return;
+        }
         const H = window.innerHeight;
         const baseH = W * 1080 / 1920;
         const scale = Math.min(1, H / baseH);

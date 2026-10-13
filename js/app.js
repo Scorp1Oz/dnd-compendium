@@ -133,6 +133,15 @@ function paintShBar(){
   if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
   if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(window.view ? window.view.screen : '');
 
+  // Auto-scroll active mode tab into view on mobile screens
+  if(window.innerWidth <= 768){
+    var activeBtn = seg.querySelector('.hb-seg-btn.on');
+    if(activeBtn && seg.scrollWidth > seg.clientWidth){
+      var targetScroll = activeBtn.offsetLeft - (seg.clientWidth / 2) + (activeBtn.offsetWidth / 2);
+      seg.scrollLeft = Math.max(0, targetScroll);
+    }
+  }
+
   var lab=bar.querySelector('.hb-bar-world');
   if(HB.mode==='sh'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
@@ -184,20 +193,43 @@ window.paintShBar = paintShBar;
 /* ---------- перехват ---------- */
 var _r=window.render, _n=window.navigate, _w=window.wireEvents;
 
+function hideInactiveModeFx(activeMode){
+  if(activeMode !== 'sh'){
+    ['shUchihaParticles','shKurayamiParticles','shGomanParticles','shDzankuParticles'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.style.display = 'none';
+    });
+  }
+  if(activeMode !== 'me'){
+    ['meCitadelParticles','meOmniProjections','meN7Background','meCerberusBackground'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.style.display = 'none';
+    });
+    var oldCrt = document.getElementById('meCerberusCrtOverlay');
+    if(oldCrt && oldCrt.parentNode) oldCrt.parentNode.removeChild(oldCrt);
+  }
+  if(activeMode !== 'el'){
+    var elFx = document.getElementById('elThemeFx');
+    if(elFx) elFx.style.display = 'none';
+  }
+  if(activeMode !== 'wi'){
+    var wiFx = document.getElementById('wiThemeFx');
+    if(wiFx) wiFx.style.display = 'none';
+  }
+  if(activeMode !== 'wz'){
+    var wzFx = document.getElementById('wzThemeFx');
+    if(wzFx) wzFx.style.display = 'none';
+  }
+}
+
 window.render=function(){
   window.view = view;
   if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view ? view.screen : '');
+  hideInactiveModeFx(HB.mode);
   if(HB.mode==='wz'){
     document.body.classList.remove('sh-theme', 'me-theme', 'el-theme', 'wi-theme', 'hb-theme');
     document.body.classList.add('wz-theme');
     if(typeof applyWizardTheme === 'function') applyWizardTheme();
-    var pCit = document.getElementById("meCitadelParticles"); if(pCit) pCit.style.display = "none";
-    var pOmni = document.getElementById("meOmniProjections"); if(pOmni) pOmni.style.display = "none";
-    var pN7 = document.getElementById("meN7Background"); if(pN7) pN7.style.display = "none";
-    var pCerb = document.getElementById("meCerberusBackground"); if(pCerb) pCerb.style.display = "none";
-    var oldCrt = document.getElementById("meCerberusCrtOverlay"); if(oldCrt && oldCrt.parentNode) oldCrt.parentNode.removeChild(oldCrt);
-    var elFx = document.getElementById('elThemeFx'); if(elFx) elFx.style.display = 'none';
-    var wiFx = document.getElementById('wiThemeFx'); if(wiFx) wiFx.style.display = 'none';
 
     var s = view.screen || '';
     if(s === 'dice'){

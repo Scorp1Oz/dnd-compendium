@@ -1089,7 +1089,7 @@ body.wz-theme .btn-ghost:hover:not(:disabled) {
   color: #cbd5e1;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .wz-hud { margin: 8px 0 18px; padding: 14px 16px; }
   .wz-hud-left { min-width: 100%; }
   .wz-hud-right {
@@ -1100,5 +1100,12 @@ body.wz-theme .btn-ghost:hover:not(:disabled) {
   }
   .wz-rule { margin-bottom: 24px; }
   body.wz-theme .section-label { margin: 24px 0 12px; }
+  .wz-wand-showcase { padding: 14px; }
+  .wz-wand-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  body.wz-theme table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
