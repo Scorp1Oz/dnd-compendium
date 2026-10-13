@@ -5199,7 +5199,7 @@
       callback(new Error('API ключ Google Gemini не указан'), null);
       return;
     }
-    var model = 'gemini-3.8-flash';
+    var model = 'gemini-4-argon';
     var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey);
     fetch(url, {
       method: 'POST',

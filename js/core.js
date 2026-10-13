@@ -1247,7 +1247,7 @@ function renderHome(){
     '<div class="fae-card fae-card-clickable" data-go="faeGen" role="button" tabindex="0">' +
       '<div style="flex:1;min-width:0;">' +
         '<div class="fae-card-title"><span>🤖</span> AI Генератор D&D</div>' +
-        '<div class="fae-card-desc">Генератор заклинаний, магических артефактов и боевых черт на базе Gemini 3.8 Flash!</div>' +
+        '<div class="fae-card-desc">Генератор заклинаний, магических артефактов и боевых черт на базе Gemini 4 Argon!</div>' +
       '</div>' +
       '<div class="fae-card-arrow">›</div>' +
     '</div>' +
@@ -2756,7 +2756,7 @@ function callGeminiFaeGenerator(opts, apiKey, callback){
       handleData(data);
     });
   } else {
-    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(apiKey), {
+    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-4-argon:generateContent?key=' + encodeURIComponent(apiKey), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -2910,7 +2910,7 @@ function renderFaeGen(){
   return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'AI Генератор'}]) +
     '<button class="back" data-go="home">← В меню Фаэруна</button>' +
     '<h1><span class="h1-icon">🤖</span> AI Генератор D&D 5e / 2024</h1>' +
-    '<p class="subtitle">Генерация заклинаний, магических артефактов и боевых черт на базе Gemini 3.8 Flash.</p>' +
+    '<p class="subtitle">Генерация заклинаний, магических артефактов и боевых черт на базе Gemini 4 Argon.</p>' +
     '<div class="fae-rule"></div>' +
 
     '<div id="faeGenFormSection" class="ai-gen-card">' +
@@ -2976,7 +2976,7 @@ function wireFaeGen(){
   if(keyBtn){
     keyBtn.addEventListener('click', function(){
       var curKey = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
-      var input = prompt('Введите Google Gemini API ключ (gemini-3.8-flash):', curKey || '');
+      var input = prompt('Введите Google Gemini API ключ (gemini-4-argon):', curKey || '');
       if(input !== null && typeof window.saveGeminiApiKey === 'function'){
         window.saveGeminiApiKey(input.trim());
         if(typeof render === 'function') render();
@@ -3555,7 +3555,7 @@ function renderFaeData(){
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
         '<span style="font-size:22px;">🤖</span>' +
         '<div>' +
-          '<div style="font-weight:700;font-size:13.5px;color:#c9a45c;font-family:\'Cinzel\',serif;">GOOGLE GEMINI AI // СТАНДАРТ GEMINI-3.8-FLASH</div>' +
+          '<div style="font-weight:700;font-size:13.5px;color:#c9a45c;font-family:\'Cinzel\',serif;">GOOGLE GEMINI AI // СТАНДАРТ GEMINI-4-ARGON</div>' +
           '<div style="font-size:12px;color:#94a3b8;">Генератор заклинаний, артефактов и черт Фаэруна на базе нейросети</div>' +
         '</div>' +
       '</div>' +

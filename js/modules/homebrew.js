@@ -459,7 +459,7 @@ function hbHome(){
       icon: '🤖',
       title: 'AI Генератор Технологий',
       count: 0,
-      desc: 'Генерация киберимплантов, тактического оружия, псионики и боевых дронов на базе Gemini 3.8 Flash!'
+      desc: 'Генерация киберимплантов, тактического оружия, псионики и боевых дронов на базе Gemini 4 Argon!'
     },
     {
       go: 'hbData',
@@ -581,7 +581,7 @@ function callGeminiHbGenerator(opts, apiKey, callback){
       handleData(data);
     });
   } else {
-    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(apiKey), {
+    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-4-argon:generateContent?key=' + encodeURIComponent(apiKey), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -767,7 +767,7 @@ function hbGen(){
   return crumb([{label:'Технологии', nav:'home'}, {label:'AI Генератор'}]) +
     '<button class="back" data-go="home">← В меню Технологий</button>' +
     '<h1><span class="h1-icon">🤖</span> AI Генератор Технологий</h1>' +
-    '<p class="subtitle">Генерация киберимплантов, оружия будущего, псионики и боевых дронов на базе Gemini 3.8 Flash.</p>' +
+    '<p class="subtitle">Генерация киберимплантов, оружия будущего, псионики и боевых дронов на базе Gemini 4 Argon.</p>' +
     '<div class="hb-rule"></div>' +
 
     '<div id="hbGenFormSection" class="ai-gen-card">' +
@@ -837,7 +837,7 @@ function wireHbGen(){
   if(keyBtn){
     keyBtn.addEventListener('click', function(){
       var curKey = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
-      var input = prompt('Введите Google Gemini API ключ (gemini-3.8-flash):', curKey || '');
+      var input = prompt('Введите Google Gemini API ключ (gemini-4-argon):', curKey || '');
       if(input !== null && typeof window.saveGeminiApiKey === 'function'){
         window.saveGeminiApiKey(input.trim());
         if(typeof render === 'function') render();
@@ -1238,7 +1238,7 @@ function hbWorld(){
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'+
         '<span style="font-size:22px;">🤖</span>'+
         '<div>'+
-          '<div style="font-weight:700;font-size:13.5px;color:#38bdf8;font-family:monospace;">GOOGLE GEMINI AI // СТАНДАРТ GEMINI-3.8-FLASH</div>'+
+          '<div style="font-weight:700;font-size:13.5px;color:#38bdf8;font-family:monospace;">GOOGLE GEMINI AI // СТАНДАРТ GEMINI-4-ARGON</div>'+
           '<div style="font-size:12px;color:#94a3b8;">Генератор киберимплантов, высокотехнологичного оружия и псионики</div>'+
         '</div>'+
       '</div>'+
