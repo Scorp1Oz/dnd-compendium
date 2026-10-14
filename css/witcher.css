@@ -1480,6 +1480,142 @@ body.wi-theme .btn-ghost:hover:not(:disabled) {
   }
 }
 
+/* ============================================================
+   ТАКТИЧЕСКИЙ ШТАБ, ПИН-МАРКЕРЫ И HUD КАРТЫ КОНТИНЕНТА
+   ============================================================ */
+
+body.wi-theme .wi-war-palette {
+  background: linear-gradient(145deg, rgba(16, 20, 28, 0.96) 0%, rgba(9, 11, 16, 0.98) 100%);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--wi-border);
+  border-left: 4px solid var(--wi-amber);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: inset 0 -4px 12px rgba(0, 0, 0, 0.45);
+}
+
+body.wi-theme .wi-war-tool {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #cbd5e1;
+  border-radius: 6px;
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+body.wi-theme .wi-war-tool:hover {
+  background: rgba(245, 158, 11, 0.14);
+  color: #ffffff;
+  border-color: var(--wi-amber);
+  transform: translateY(-1px);
+}
+
+body.wi-theme .wi-war-tool.active {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #090b0e;
+  font-weight: 800;
+  border-color: #fde68a;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.45);
+}
+
+body.wi-theme .wi-tactics-scenario-card {
+  background: rgba(15, 20, 30, 0.78);
+  border: 1px solid var(--wi-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+body.wi-theme .wi-tactics-scenario-card:hover {
+  border-color: var(--wi-amber) !important;
+  background: rgba(28, 36, 52, 0.92) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 12px rgba(245, 158, 11, 0.2);
+}
+
+body.wi-theme .wi-tactical-unit {
+  transition: filter 0.18s ease;
+}
+
+body.wi-theme .wi-tactical-unit:hover {
+  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.9));
+}
+
+body.wi-theme .wi-map-pin {
+  cursor: pointer;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+body.wi-theme .wi-map-pin:hover {
+  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.95));
+}
+
+body.wi-theme .wi-territory {
+  cursor: pointer;
+  transition: fill-opacity 0.2s ease, stroke-width 0.2s ease;
+}
+
+body.wi-theme .wi-territory:hover {
+  fill-opacity: 0.42 !important;
+  stroke-width: 6px !important;
+}
+
+body.wi-theme .wi-map-container.wi-fullscreen {
+  position: fixed !important;
+  inset: 12px !important;
+  z-index: 99990 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: #05080e !important;
+  border: 2px solid var(--wi-amber) !important;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.95) !important;
+}
+
+body.wi-theme .wi-map-container.wi-fullscreen .wi-map-viewport {
+  flex: 1 !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+body.wi-theme .wi-map-hud {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  background: rgba(9, 12, 18, 0.88);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #e2e8f0;
+  pointer-events: none;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65);
+}
+
+@keyframes wiPinPulseAnim {
+  0% { r: 16px; opacity: 0.95; stroke-width: 3px; }
+  100% { r: 38px; opacity: 0; stroke-width: 1px; }
+}
+
+.wi-pin-pulse {
+  animation: wiPinPulseAnim 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  pointer-events: none;
+}
+
+
 
 
 
