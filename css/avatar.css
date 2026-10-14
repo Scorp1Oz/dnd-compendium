@@ -1236,6 +1236,66 @@ body.el-theme .el-calc-result-box {
   margin-top: 14px;
 }
 
+/* Тактическая панель и военный штаб карты Стихий */
+body.el-theme .el-war-palette {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.92) 0%, rgba(8, 12, 22, 0.96) 100%);
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--el-accent-border);
+  border-left: 4px solid var(--el-accent);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 14px 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+}
+
+body.el-theme .el-war-tool {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #cbd5e1;
+  border-radius: 6px;
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+body.el-theme .el-war-tool:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: var(--el-accent);
+  transform: translateY(-1px);
+}
+
+body.el-theme .el-war-tool.active {
+  background: var(--el-accent);
+  color: #060a10;
+  font-weight: 800;
+  border-color: #ffffff;
+  box-shadow: 0 0 12px var(--el-accent-glow);
+}
+
+body.el-theme .el-tactics-scenario-card:hover {
+  border-color: var(--el-accent) !important;
+  background: rgba(30, 41, 59, 0.9) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 0 12px var(--el-accent-dim);
+}
+
+body.el-theme .el-tactical-unit {
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+body.el-theme .el-tactical-unit:hover {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.85));
+}
+
 @media (max-width: 640px) {
   body.el-theme .el-hud {
     padding: 14px 16px;
