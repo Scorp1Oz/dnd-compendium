@@ -10,8 +10,10 @@ function paintShBar(){
   }
   if(!seg.querySelector('[data-hbmode="me"]')){
     var bMe=document.createElement('button');
-    bMe.className='hb-seg-btn'; bMe.setAttribute('data-hbmode','me'); bMe.textContent='Космос';
+    bMe.className='hb-seg-btn'; bMe.setAttribute('data-hbmode','me'); bMe.textContent='Эффект Массы';
     seg.appendChild(bMe);
+  } else {
+    seg.querySelector('[data-hbmode="me"]').textContent = 'Эффект Массы';
   }
 
   if(!seg.querySelector('[data-hbmode="el"]')){
@@ -28,6 +30,11 @@ function paintShBar(){
     var bWz=document.createElement('button');
     bWz.className='hb-seg-btn'; bWz.setAttribute('data-hbmode','wz'); bWz.textContent='Волшебник';
     seg.appendChild(bWz);
+  }
+  if(!seg.querySelector('[data-hbmode="sw"]')){
+    var bSw=document.createElement('button');
+    bSw.className='hb-seg-btn'; bSw.setAttribute('data-hbmode','sw'); bSw.textContent='Звездные войны';
+    seg.appendChild(bSw);
   }
 
   if(!seg.querySelector('.hb-seg-indicator')){
@@ -98,6 +105,17 @@ function paintShBar(){
     });
   }
 
+  var swBtn = seg.querySelector('[data-hbmode="sw"]');
+  if(swBtn && !swBtn.__swBound){
+    swBtn.__swBound = true;
+    swBtn.addEventListener('click', function(){
+      HB.mode='sw';
+      try{ localStorage.setItem('ttc_mode','sw'); }catch(e){}
+      if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
+      view={screen:'swHome'}; render(); window.scrollTo(0,0);
+    });
+  }
+
   var hbBtn = seg.querySelector('[data-hbmode="hb"]');
   if(hbBtn && !hbBtn.__hbBound){
     hbBtn.__hbBound = true;
@@ -125,11 +143,13 @@ function paintShBar(){
   document.body.classList.toggle('el-theme', HB.mode==='el');
   document.body.classList.toggle('wi-theme', HB.mode==='wi');
   document.body.classList.toggle('wz-theme', HB.mode==='wz');
+  document.body.classList.toggle('sw-theme', HB.mode==='sw');
   document.body.classList.toggle('hb-theme', HB.mode==='hb');
   if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
   if(typeof EL !== 'undefined' && typeof EL.applyTheme === 'function') EL.applyTheme();
   if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
   if(typeof applyWizardTheme === 'function') applyWizardTheme();
+  if(typeof applyStarWarsTheme === 'function') applyStarWarsTheme();
   if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
   if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(window.view ? window.view.screen : '');
 
@@ -152,7 +172,7 @@ function paintShBar(){
     var meC = (typeof ME !== 'undefined' && ME.getChar) ? ME.getChar() : null;
     var meName = meC ? (' • ' + (meC.callsign ? ('[' + meC.callsign + '] ') : '') + meC.name) : '';
     var meShieldHp = meC ? (' • 🛡️ ' + (meC.currentShield!=null?meC.currentShield:meC.baseShield) + ' | ❤️ ' + (meC.currentHp!=null?meC.currentHp:meC.maxHp)) : '';
-    lab.textContent = 'Космос' + meName + meShieldHp;
+    lab.textContent = 'Эффект Массы' + meName + meShieldHp;
   } else if(HB.mode==='el'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
     var elP = (typeof EL !== 'undefined' && EL.getProfile) ? EL.getProfile() : null;
@@ -172,6 +192,11 @@ function paintShBar(){
     var wzHouseOrYear = wzP ? [wzP.house, wzYear].filter(Boolean).join(' • ') : '';
     var wzName = (wzP && wzP.name) ? (' • ' + wzP.name + (wzHouseOrYear ? (' (' + wzHouseOrYear + ')') : '')) : '';
     lab.textContent = 'Волшебник' + wzName;
+  } else if(HB.mode==='sw'){
+    if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
+    var swP = (typeof SW !== 'undefined' && SW.getActiveProfile) ? SW.getActiveProfile() : null;
+    var swName = (swP && swP.name) ? (' • ' + swP.name + (swP.path ? (' (' + swP.path + ')') : '')) : '';
+    lab.textContent = 'Звездные войны' + swName;
   } else if(HB.mode==='hb'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
     var hbChar = (typeof HB !== 'undefined' && HB.activeChar && typeof byId === 'function') ? byId(HB.activeChar) : ((typeof HB !== 'undefined' && HB.records && HB.records.find) ? HB.records.find(function(r){ return r.id === HB.activeChar; }) : null);
@@ -220,14 +245,45 @@ function hideInactiveModeFx(activeMode){
     var wzFx = document.getElementById('wzThemeFx');
     if(wzFx) wzFx.style.display = 'none';
   }
+  if(activeMode !== 'sw'){
+    var swFx = document.getElementById('swThemeFx');
+    if(swFx) swFx.style.display = 'none';
+  }
 }
 
 window.render=function(){
   window.view = view;
   if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view ? view.screen : '');
   hideInactiveModeFx(HB.mode);
+  if(HB.mode==='sw'){
+    document.body.classList.remove('sh-theme', 'me-theme', 'el-theme', 'wi-theme', 'wz-theme', 'hb-theme');
+    document.body.classList.add('sw-theme');
+    if(typeof applyStarWarsTheme === 'function') applyStarWarsTheme();
+    var s = view.screen || 'swHome';
+    if(s === 'dice'){
+      _r();
+      paintShBar();
+      return;
+    }
+    if(s === 'swTechs' && typeof swTechs === 'function'){ swTechs(); return; }
+    if(s === 'swTechView' && typeof swTechView === 'function'){ swTechView(view.id || view.techId || view.shId); return; }
+    if(s === 'swTechEdit' && typeof swTechEdit === 'function'){ swTechEdit(view.id || view.techId || view.shId); return; }
+    if(s === 'swTechGen' && typeof swTechGen === 'function'){ swTechGen(); return; }
+    if(s === 'swMoves' && typeof swMoves === 'function'){ swMoves(); return; }
+    if(s === 'swMoveView' && typeof swMoveView === 'function'){ swMoveView(view.id || view.moveId || view.shId); return; }
+    if(s === 'swMoveEdit' && typeof swMoveEdit === 'function'){ swMoveEdit(view.id || view.moveId || view.shId); return; }
+    if(s === 'swMoveGen' && typeof swMoveGen === 'function'){ swMoveGen(); return; }
+    if(s === 'swSkills' && typeof swSkills === 'function'){ swSkills(); return; }
+    if(s === 'swSkillEdit' && typeof swSkillEdit === 'function'){ swSkillEdit(view.id || view.skillId || view.shId); return; }
+    if(s === 'swSkillGen' && typeof swSkillGen === 'function'){ swSkillGen(); return; }
+    if(s === 'swRef' && typeof swRef === 'function'){ swRef(); return; }
+    if(s === 'swRefView' && typeof swRefView === 'function'){ swRefView(view.id || view.refKey || view.shKey); return; }
+    if(s === 'swMap' && typeof swMap === 'function'){ swMap(); return; }
+    if(s === 'swData' && typeof swData === 'function'){ swData(); return; }
+    if(typeof swHome === 'function'){ swHome(); return; }
+  }
   if(HB.mode==='wz'){
-    document.body.classList.remove('sh-theme', 'me-theme', 'el-theme', 'wi-theme', 'hb-theme');
+    document.body.classList.remove('sh-theme', 'me-theme', 'el-theme', 'wi-theme', 'hb-theme', 'sw-theme');
     document.body.classList.add('wz-theme');
     if(typeof applyWizardTheme === 'function') applyWizardTheme();
 
@@ -1105,6 +1161,37 @@ window.navigate=function(val){
       return;
     }
   }
+  if(HB.mode==='sw'){
+    var swScreens = {
+      home: 'swHome',
+      swHome: 'swHome',
+      swData: 'swData',
+      data: 'swData',
+      swRef: 'swRef',
+      ref: 'swRef',
+      swTechs: 'swTechs',
+      techs: 'swTechs',
+      swMoves: 'swMoves',
+      moves: 'swMoves',
+      swSkills: 'swSkills',
+      skills: 'swSkills',
+      swMap: 'swMap',
+      map: 'swMap',
+      dice: 'dice'
+    };
+    if(swScreens[p[0]]){
+      window.view = view = { screen: swScreens[p[0]] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'swRefView' || p[0] === 'swTechView' || p[0] === 'swTechEdit' || p[0] === 'swMoveView' || p[0] === 'swMoveEdit' || p[0] === 'swSkillEdit'){
+      window.view = view = { screen: p[0], id: p[1], shId: p[1], refKey: p[1] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+  }
   if(HB.mode==='sh'){
     var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shJutsuGen:'shJutsuGen',shMoveGen:'shMoveGen',shMoves:'shMoves',shSkillGen:'shSkillGen',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData',dice:'dice'};
     if(map[p[0]]){ window.view = view = {screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
@@ -1190,6 +1277,9 @@ try {
     } else if (_urlScreen.indexOf('wz') === 0) {
       if (typeof HB !== 'undefined') HB.mode = 'wz';
       window.view = view = { screen: _urlScreen };
+    } else if (_urlScreen.indexOf('sw') === 0) {
+      if (typeof HB !== 'undefined') HB.mode = 'sw';
+      window.view = view = { screen: _urlScreen };
     } else if (_urlScreen.indexOf('el') === 0) {
       if (typeof HB !== 'undefined') HB.mode = 'el';
       window.view = view = { screen: _urlScreen };
@@ -1215,6 +1305,10 @@ if(HB.mode==='sh'){
   document.body.classList.add('wz-theme');
   if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('wz')!==0)) view={screen:'wzHome'};
   if(typeof applyWizardTheme === 'function') applyWizardTheme();
+} else if(HB.mode==='sw'){
+  document.body.classList.add('sw-theme');
+  if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('sw')!==0)) view={screen:'swHome'};
+  if(typeof applyStarWarsTheme === 'function') applyStarWarsTheme();
 } else if(HB.mode==='hb'){
   document.body.classList.add('hb-theme');
   if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('hb')!==0)) view={screen:'hbHome'};

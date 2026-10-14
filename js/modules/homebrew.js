@@ -272,6 +272,9 @@ function bindBarButtons(bar){
       } else if(m === 'wz'){
         if(typeof window.navigate === 'function') window.navigate('wzHome');
         else { view = {screen:'wzHome'}; render(); }
+      } else if(m === 'sw'){
+        if(typeof window.navigate === 'function') window.navigate('swHome');
+        else { view = {screen:'swHome'}; render(); }
       } else if(m === 'hb'){
         view = {screen:'hbHome'};
         if(typeof HB !== 'undefined') HB.draft=null;
@@ -311,6 +314,7 @@ function paintBar(){
   document.body.classList.toggle('el-theme', curMode === 'el');
   document.body.classList.toggle('wi-theme', curMode === 'wi');
   document.body.classList.toggle('wz-theme', curMode === 'wz');
+  document.body.classList.toggle('sw-theme', curMode === 'sw');
 
   var worldLabel = '';
   if(curMode === 'hb'){
@@ -328,7 +332,7 @@ function paintBar(){
     var meC = (typeof ME !== 'undefined' && ME.getChar) ? ME.getChar() : null;
     var meName = meC ? (' • ' + (meC.callsign ? ('[' + meC.callsign + '] ') : '') + meC.name) : '';
     var meShieldHp = meC ? (' • 🛡️ ' + (meC.currentShield!=null?meC.currentShield:meC.baseShield) + ' | ❤️ ' + (meC.currentHp!=null?meC.currentHp:meC.maxHp)) : '';
-    worldLabel = 'Космос' + meName + meShieldHp;
+    worldLabel = 'Эффект Массы' + meName + meShieldHp;
   } else if(curMode === 'el'){
     worldLabel = 'Стихия';
   } else if(curMode === 'wi'){
@@ -341,6 +345,10 @@ function paintBar(){
     var wzHouseOrYear = wzP ? [wzP.house, wzYear].filter(Boolean).join(' • ') : '';
     var wzName = (wzP && wzP.name) ? (' • ' + wzP.name + (wzHouseOrYear ? (' (' + wzHouseOrYear + ')') : '')) : '';
     worldLabel = 'Волшебник' + wzName;
+  } else if(curMode === 'sw'){
+    var swP = (typeof SW !== 'undefined' && SW.getActiveProfile) ? SW.getActiveProfile() : null;
+    var swName = (swP && swP.name) ? (' • ' + swP.name + (swP.path ? (' (' + swP.path + ')') : '')) : '';
+    worldLabel = 'Звездные войны' + swName;
   }
 
   var seg = bar.querySelector('.hb-seg');
@@ -352,10 +360,11 @@ function paintBar(){
           '<button class="hb-seg-btn ' + (curMode==='faerun'?'on':'') + '" data-hbmode="faerun">Фаэрун</button>'+
           '<button class="hb-seg-btn ' + (curMode==='hb'?'on':'') + '" data-hbmode="hb">Технологии</button>'+
           '<button class="hb-seg-btn ' + (curMode==='sh'?'on':'') + '" data-hbmode="sh">Шиноби</button>'+
-          '<button class="hb-seg-btn ' + (curMode==='me'?'on':'') + '" data-hbmode="me">Космос</button>'+
+          '<button class="hb-seg-btn ' + (curMode==='me'?'on':'') + '" data-hbmode="me">Эффект Массы</button>'+
           '<button class="hb-seg-btn ' + (curMode==='el'?'on':'') + '" data-hbmode="el">Стихия</button>'+
           '<button class="hb-seg-btn ' + (curMode==='wi'?'on':'') + '" data-hbmode="wi">Ведьмак</button>'+
           '<button class="hb-seg-btn ' + (curMode==='wz'?'on':'') + '" data-hbmode="wz">Волшебник</button>'+
+          '<button class="hb-seg-btn ' + (curMode==='sw'?'on':'') + '" data-hbmode="sw">Звездные войны</button>'+
         '</div>'+
         (worldLabel ? '<div class="hb-bar-world">' + worldLabel + '</div>' : '')+
       '</div>';

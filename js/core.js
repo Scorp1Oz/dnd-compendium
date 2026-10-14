@@ -526,7 +526,7 @@ const DICE_LABEL_CATEGORIES = window.DICE_LABEL_CATEGORIES = [
     {icon:'📡', ru:'Сенсорика и поиск', std:20},
     {icon:'💥', ru:'Урон техники / приёма', std:null}
   ]},
-  {key:'space', mode:'me', icon:'🪐', ru:'Космос (Mass Effect)', items:[
+  {key:'space', mode:'me', icon:'🪐', ru:'Эффект Массы (Mass Effect)', items:[
     {icon:'🎯', ru:'Атака стрелковым оружием (по AC)', std:20},
     {icon:'🛡️', ru:'Активная защита (перекат / укрытие)', std:20},
     {icon:'💥', ru:'Урон оружия / боеприпаса', std:null},
@@ -539,6 +539,15 @@ const DICE_LABEL_CATEGORIES = window.DICE_LABEL_CATEGORIES = [
     {icon:'🎲', ru:'d100: Таблица крит. попадания', std:100},
     {icon:'🌌', ru:'d100: Событие космического перелёта', std:100},
     {icon:'⚠️', ru:'d100: Осложнение взлома терминала', std:100}
+  ]},
+  {key:'starwars', mode:'sw', icon:'⚔️', ru:'Звездные войны', items:[
+    {icon:'⚔️', ru:'Атака световым мечом', std:20},
+    {icon:'🔫', ru:'Атака бластером', std:20},
+    {icon:'✨', ru:'Проверка Силы (Светлая / Тёмная)', std:20},
+    {icon:'🛡️', ru:'Отражение бластерного выстрела (Соресу / Шиен)', std:20},
+    {icon:'💥', ru:'Урон светового меча / Силы', std:null},
+    {icon:'🚀', ru:'Пилотирование и манёвр уклонения', std:20},
+    {icon:'💻', ru:'Слайсинг терминала / ремонт дроида', std:20}
   ]},
     {key:'element', mode:'el', icon:'🔥', ru:'Стихия', items:[
       {icon:'🌀', ru:'Исполнение стихии', std:20},
@@ -639,7 +648,7 @@ function renderDice(){
   return `
     ${(function(){
       if(HB.mode==='me'){
-        return renderCrumb([{label:'Космос', nav:'meHome'},{label:'Бросок костей'}]) +
+        return renderCrumb([{label:'Эффект Массы', nav:'meHome'},{label:'Бросок костей'}]) +
           '<button class="back" data-go="meHome">← Назад в Терминал</button>' +
           '<h1>Бросок костей</h1>' +
           '<p class="subtitle">СИСТЕМЫ АЛЬЯНСА // СИМУЛЯТОР БРОСКОВ MASS EFFECT</p>';
@@ -668,6 +677,11 @@ function renderDice(){
           '<button class="back" data-go="wzHome">← Назад в гостиную</button>' +
           '<h1>Бросок костей</h1>' +
           '<p class="subtitle">МАГИЧЕСКИЕ ДАЙСЫ // ХОГВАРТС & ДУЭЛИ</p>';
+      } else if(HB.mode==='sw'){
+        return renderCrumb([{label:'Звездные войны', nav:'swHome'},{label:'Бросок костей'}]) +
+          '<button class="back" data-go="swHome">← Назад в Голокрон</button>' +
+          '<h1>Бросок костей</h1>' +
+          '<p class="subtitle">ГОЛОКРОН СУДЬБЫ // СИЛА И СВЕТОВЫЕ МЕЧИ</p>';
       }
       return renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Бросок костей'}]) +
         '<button class="back" data-go="home">← Назад</button>' +
@@ -4793,6 +4807,32 @@ var AppStorage = window.AppStorage = {
       '</div>';
     }
 
+    if(mode === 'sw'){
+      return '<div class="sheet-section sw-data-section" id="swStorageSection" style="background:rgba(10, 20, 38, 0.94);border:1px solid rgba(56, 189, 248, 0.35);border-left:4px solid #38bdf8;border-radius:10px;padding:16px 20px;margin-bottom:16px;box-shadow:0 4px 18px rgba(0,0,0,0.5);">' +
+        '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:#38bdf8;font-weight:700;margin-bottom:12px;font-family:\'Cinzel\',serif;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+          '<span>💾 АРХИВ ГОЛОКРОНА // ПАМЯТЬ УСТРОЙСТВА</span>' +
+          statusBadge +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#bae6fd;margin-bottom:12px;line-height:1.45;">' +
+          'Мониторинг квоты браузера (лимит 5.0 МБ). Профили персонажей Галактики, способности Силы, формы фехтования и навыки защищены.' +
+        '</div>' +
+        warningNotice +
+        '<div style="margin:12px 0 6px;">' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px;color:#93c5fd;margin-bottom:5px;font-family:\'Cinzel\',serif;">' +
+            '<span>Занято: <b style="color:#38bdf8;">' + info.totalFormatted + '</b> / ' + info.maxFormatted + '</span>' +
+            '<span style="font-weight:700;color:' + barColor + ';">' + info.percent + '%</span>' +
+          '</div>' +
+          '<div style="width:100%;height:14px;background:rgba(0,0,0,0.5);border:1px solid rgba(56, 189, 248, 0.35);border-radius:4px;overflow:hidden;padding:1px;box-sizing:border-box;">' +
+            '<div style="height:100%;width:' + info.percent + '%;background:linear-gradient(90deg, #0284c7, #38bdf8);border-radius:2px;transition:width 0.4s ease;box-shadow:0 0 8px ' + barColor + ';"></div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid rgba(56, 189, 248, 0.25);">' +
+          '<button class="btn primary small" id="swStorageCleanAiBtn">🧹 Очистить архив ИИ (' + AppStorage.formatBytes(info.categories.ai.bytes) + ')</button>' +
+          '<button class="btn small" id="swStorageIntegrityBtn">🛡️ Проверить целостность</button>' +
+        '</div>' +
+      '</div>';
+    }
+
     if(mode === 'fae' || mode === 'faerun'){
       return '<div class="sheet-section fae-data-section" id="faeStorageSection" style="background:rgba(22, 26, 32, 0.95);border:1px solid rgba(201, 164, 92, 0.35);border-left:4px solid #c9a45c;border-radius:6px;padding:16px 20px;margin-bottom:20px;box-shadow:0 4px 18px rgba(0,0,0,0.4);">' +
         '<div class="section-label" style="font-size:11px;letter-spacing:0.15em;color:#c9a45c;font-weight:700;margin-bottom:12px;font-family:\'Cinzel\',serif;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
@@ -4929,6 +4969,10 @@ var AppStorage = window.AppStorage = {
         '<button class="btn" id="shStorageIntegrityBtn">🛡️ Проверить целостность</button>' +
       '</div>' +
     '</div>';
+  },
+
+  bindEvents: function(mode, onUpdate){
+    return AppStorage.wireWidget(mode, onUpdate);
   },
 
   wireWidget: function(mode, onUpdate){

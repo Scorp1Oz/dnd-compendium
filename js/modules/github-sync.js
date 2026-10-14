@@ -136,6 +136,11 @@ var GHSync = window.GHSync = {
         route: GHSync._readJson('ttc_wz_route', null),
         meta: (typeof WZ !== 'undefined' && WZ.meta) ? WZ.meta : GHSync._readJson('ttc_wz_meta', {})
       },
+      starWars: {
+        profiles: (typeof SW !== 'undefined' && Array.isArray(SW.profiles) && SW.profiles.length) ? SW.profiles : GHSync._readJson('ttc_sw_profiles', []),
+        activeProfileId: (typeof SW !== 'undefined' && SW.activeProfileId) ? SW.activeProfileId : (localStorage.getItem('ttc_sw_active_id') || ''),
+        meta: (typeof SW !== 'undefined' && SW.meta) ? SW.meta : GHSync._readJson('ttc_sw_meta', {})
+      },
       homebrew: {
         world: (typeof HB !== 'undefined' && HB.world) ? HB.world : GHSync._readJson('ttc_hb_world', {}),
         records: (typeof HB !== 'undefined' && Array.isArray(HB.records)) ? HB.records : GHSync._readJson('ttc_hb_records', []),
@@ -288,6 +293,21 @@ var GHSync = window.GHSync = {
         if(bundle.wizard.meta){
           if(typeof WZ !== 'undefined') WZ.meta = bundle.wizard.meta;
           try{ localStorage.setItem('ttc_wz_meta', JSON.stringify(bundle.wizard.meta)); }catch(e){}
+        }
+      }
+
+      if(bundle.starWars){
+        if(Array.isArray(bundle.starWars.profiles) && bundle.starWars.profiles.length){
+          localStorage.setItem('ttc_sw_profiles', JSON.stringify(bundle.starWars.profiles));
+        }
+        if(bundle.starWars.activeProfileId){
+          localStorage.setItem('ttc_sw_active_id', bundle.starWars.activeProfileId);
+        }
+        if(bundle.starWars.meta){
+          localStorage.setItem('ttc_sw_meta', JSON.stringify(bundle.starWars.meta));
+        }
+        if(typeof SW !== 'undefined' && typeof SW.loadAll === 'function'){
+          SW.loadAll();
         }
       }
 
@@ -531,6 +551,9 @@ var GHSync = window.GHSync = {
   },
 
   // Attach event handlers for the sync UI
+  bindUI: function(){
+    return GHSync.wireUI();
+  },
   wireUI: function(){
     var saveBtn = document.getElementById('ghSyncSaveTokenBtn');
     if(saveBtn && !saveBtn.__wired){
