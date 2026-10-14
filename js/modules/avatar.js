@@ -4815,7 +4815,7 @@ function getElTerritoriesList(){
       defaultFaction: 'water_north',
       icon: '🌊',
       color: '#38bdf8',
-      fillAlpha: 0.18,
+      fillAlpha: 0.34,
       labelX: 760, labelY: 48,
       labelText: '🌊 СЕВЕРНОЕ ПЛЕМЯ ВОДЫ',
       d: EL_TERRITORIES_PATH_DATA.water_north
@@ -4828,7 +4828,7 @@ function getElTerritoriesList(){
       defaultFaction: 'water_north',
       icon: '🌊',
       color: '#38bdf8',
-      fillAlpha: 0.18,
+      fillAlpha: 0.34,
       labelX: 760, labelY: 1145,
       labelText: '🌊 ЮЖНОЕ ПЛЕМЯ ВОДЫ',
       d: EL_TERRITORIES_PATH_DATA.water_south
@@ -4841,7 +4841,7 @@ function getElTerritoriesList(){
       defaultFaction: 'fire_nation',
       icon: '🔥',
       color: '#ef4444',
-      fillAlpha: 0.18,
+      fillAlpha: 0.34,
       labelX: 215, labelY: 635,
       labelText: '🔥 НАРОД ОГНЯ',
       d: EL_TERRITORIES_PATH_DATA.fire_nation
@@ -4854,7 +4854,7 @@ function getElTerritoriesList(){
       defaultFaction: 'air_west',
       icon: '🌪️',
       color: '#f59e0b',
-      fillAlpha: 0.22,
+      fillAlpha: 0.36,
       labelX: 310, labelY: 235,
       labelText: '🌪️ ЗАПАДНЫЙ ХРАМ',
       d: EL_TERRITORIES_PATH_DATA.air_west
@@ -4867,7 +4867,7 @@ function getElTerritoriesList(){
       defaultFaction: 'air_west',
       icon: '🌪️',
       color: '#f59e0b',
-      fillAlpha: 0.22,
+      fillAlpha: 0.36,
       labelX: 965, labelY: 152,
       labelText: '🌪️ СЕВЕРНЫЙ ХРАМ',
       d: EL_TERRITORIES_PATH_DATA.air_north
@@ -4880,7 +4880,7 @@ function getElTerritoriesList(){
       defaultFaction: 'air_west',
       icon: '🌪️',
       color: '#f59e0b',
-      fillAlpha: 0.22,
+      fillAlpha: 0.36,
       labelX: 610, labelY: 915,
       labelText: '🌪️ ЮЖНЫЙ ХРАМ',
       d: EL_TERRITORIES_PATH_DATA.air_south
@@ -4893,7 +4893,7 @@ function getElTerritoriesList(){
       defaultFaction: 'air_west',
       icon: '🌪️',
       color: '#f59e0b',
-      fillAlpha: 0.22,
+      fillAlpha: 0.36,
       labelX: 1475, labelY: 618,
       labelText: '🌪️ ВОСТОЧНЫЙ ХРАМ',
       d: EL_TERRITORIES_PATH_DATA.air_east
@@ -4906,7 +4906,7 @@ function getElTerritoriesList(){
       defaultFaction: 'earth_kingdom',
       icon: '⛰️',
       color: '#22c55e',
-      fillAlpha: 0.15,
+      fillAlpha: 0.30,
       labelX: 1140, labelY: 485,
       labelText: '⛰️ ЦАРСТВО ЗЕМЛИ',
       d: showRep ? EL_TERRITORIES_PATH_DATA.earth_kingdom_republic : EL_TERRITORIES_PATH_DATA.earth_kingdom_classic
@@ -4922,7 +4922,7 @@ function getElTerritoriesList(){
       defaultFaction: 'united_republic',
       icon: '🏙️',
       color: '#a855f7',
-      fillAlpha: 0.22,
+      fillAlpha: 0.36,
       labelX: 655, labelY: 325,
       labelText: '🏙️ ОБЪЕДИНЁННАЯ РЕСПУБЛИКА',
       d: EL_TERRITORIES_PATH_DATA.united_republic
@@ -5001,7 +5001,7 @@ function updateElWarLayerOnly(){
 }
 
 /* ============================================================
-   РЕНДЕР SVG КАРТЫ С КАРТИНКОЙ АВАТАРА 1600x1200
+   РЕНДЕР ВЕКТОРНОЙ SVG КАРТЫ МИРА АВАТАРА 1600x1200
    ============================================================ */
 
 function renderAvatarMapSvg(){
@@ -5017,14 +5017,19 @@ function renderAvatarMapSvg(){
 
   var territoriesList = getElTerritoriesList();
 
+  // Базовая подложка континентов и островов (всегда видна, даже если границы отключены)
+  var baseLandmassSvg = territoriesList.map(function(t){
+    return '<path d="' + t.d + '" fill="#111c2d" stroke="#1e3a5f" stroke-width="3.5" stroke-linejoin="round" opacity="0.95"/>';
+  }).join('');
+
   var territoriesSvg = '';
   if(st.showTerritories !== false){
     territoriesSvg = territoriesList.map(function(t){
       var isNationMatch = (filterNation === 'all' || t.nation === filterNation);
       var isSel = (st.selectedId === t.locId || st.selectedTerritoryId === t.id);
-      var strokeW = isSel ? '3.5' : (isNationMatch ? '2.2' : '1.2');
-      var fillOp = isSel ? (t.fillAlpha + 0.14) : (isNationMatch ? t.fillAlpha : '0.03');
-      var op = isNationMatch ? '0.96' : '0.30';
+      var strokeW = isSel ? '3.2' : (isNationMatch ? '2.0' : '1.2');
+      var fillOp = isSel ? (t.fillAlpha + 0.16) : (isNationMatch ? t.fillAlpha : '0.08');
+      var op = isNationMatch ? '0.98' : '0.38';
 
       var labelHtml = '';
       if(st.showLabels !== false && isNationMatch){
@@ -5043,6 +5048,32 @@ function renderAvatarMapSvg(){
   var clipPathSvg = '<clipPath id="el-landmass-clip">' +
     territoriesList.map(function(t){ return '<path d="' + t.d + '" />'; }).join('') +
   '</clipPath>';
+
+  // Картографическая сетка параллелей и меридианов
+  var gridLines = [];
+  for(var gx = 200; gx < 1600; gx += 200){
+    gridLines.push('<line x1="' + gx + '" y1="0" x2="' + gx + '" y2="1200" stroke="rgba(56,189,248,0.07)" stroke-width="1" stroke-dasharray="4,8"/>');
+  }
+  for(var gy = 150; gy < 1200; gy += 150){
+    var isEquator = (gy === 600);
+    var isPolar = (gy === 150 || gy === 1050);
+    gridLines.push('<line x1="0" y1="' + gy + '" x2="1600" y2="' + gy + '" stroke="' + (isEquator ? 'rgba(245,158,11,0.16)' : isPolar ? 'rgba(56,189,248,0.18)' : 'rgba(56,189,248,0.07)') + '" stroke-width="' + (isEquator || isPolar ? '1.3' : '1') + '" stroke-dasharray="' + (isEquator ? '10,6' : '4,8') + '"/>');
+  }
+  var oceanGridSvg = '<g class="el-ocean-grid" pointer-events="none">' +
+    gridLines.join('') +
+    '<g transform="translate(95, 1085)" opacity="0.45">' +
+      '<circle cx="0" cy="0" r="42" fill="rgba(7,13,25,0.7)" stroke="#38bdf8" stroke-width="1.2"/>' +
+      '<circle cx="0" cy="0" r="34" fill="none" stroke="rgba(245,158,11,0.5)" stroke-width="0.8" stroke-dasharray="3,3"/>' +
+      '<polygon points="0,-38 6,-8 0,-14 -6,-8" fill="#f59e0b"/>' +
+      '<polygon points="0,38 5,8 0,14 -5,8" fill="#38bdf8"/>' +
+      '<polygon points="-38,0 -8,-5 -14,0 -8,5" fill="#94a3b8"/>' +
+      '<polygon points="38,0 8,-5 14,0 8,5" fill="#94a3b8"/>' +
+      '<text x="0" y="-44" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="900" font-family="Cinzel,serif">N</text>' +
+      '<text x="0" y="53" text-anchor="middle" fill="#38bdf8" font-size="10" font-weight="700" font-family="Cinzel,serif">S</text>' +
+      '<text x="-48" y="4" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700" font-family="Cinzel,serif">W</text>' +
+      '<text x="48" y="4" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700" font-family="Cinzel,serif">E</text>' +
+    '</g>' +
+  '</g>';
 
   // 2. Линия маршрута
   var routeSvg = '';
@@ -5167,16 +5198,23 @@ function renderAvatarMapSvg(){
     }).join('');
   }
 
-  // 6. Сборка SVG
+  // 6. Сборка чисто векторной SVG карты (без растровой подложки)
   return '<svg id="elMapSvg" class="sh-map-svg" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">' +
     '<defs>' +
+      '<radialGradient id="elOceanGrad" cx="50%" cy="50%" r="65%">' +
+        '<stop offset="0%" stop-color="#0d1b2e"/>' +
+        '<stop offset="60%" stop-color="#081220"/>' +
+        '<stop offset="100%" stop-color="#040912"/>' +
+      '</radialGradient>' +
       '<filter id="elGlow" x="-20%" y="-20%" width="140%" height="140%">' +
         '<feGaussianBlur stdDeviation="3.5" result="blur" />' +
         '<feComposite in="SourceGraphic" in2="blur" operator="over" />' +
       '</filter>' +
       clipPathSvg +
     '</defs>' +
-    '<image href="v4-1600px-Avatar-the-Last-Airbender-Map-Summary-Version-2.jpg.webp" x="0" y="0" width="1600" height="1200" preserveAspectRatio="xMidYMid meet"/>' +
+    '<rect x="0" y="0" width="1600" height="1200" fill="url(#elOceanGrad)"/>' +
+    oceanGridSvg +
+    '<g id="elBaseLandmass" pointer-events="none">' + baseLandmassSvg + '</g>' +
     '<g id="elMapTerritories">' + territoriesSvg + '</g>' +
     '<g id="elMapWarGroup">' + renderElWarLayerInner() + '</g>' +
     '<g id="elMapRouteGroup">' + routeSvg + waypointsSvg + '</g>' +
