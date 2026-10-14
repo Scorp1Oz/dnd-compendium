@@ -6,12 +6,18 @@
 html,body
 {
 	/* eliminate whitespace and window scrolling */
-    width: 100vw;
-    height: 100vh;
-    margin: 0px;
-    padding: 0px;
-    overflow: hidden !important;
-	scrollbar-width: none; /* disable scrollbar for firefox */
+	position: fixed;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	max-width: 100vw;
+	max-height: 100vh;
+	margin: 0px;
+	padding: 0px;
+	overflow: hidden !important;
+	overscroll-behavior: none;
+	scrollbar-width: none !important; /* disable scrollbar for firefox */
+	-ms-overflow-style: none !important;
 }
 
 /* remove spacing between html elements */
@@ -23,8 +29,11 @@ body {
 }
 
 /* disables scroll bar b/c it messes with % units like margins */
+html::-webkit-scrollbar,
 body::-webkit-scrollbar {
-	display: none;
+	display: none !important;
+	width: 0 !important;
+	height: 0 !important;
 }
 
 /* ============================================================
@@ -135,7 +144,7 @@ body.in-game #gwent-compendium-nav {
 }
 
 main {
-	position: absolute;
+	position: fixed;
 	top: 50%;
 	left: 50%;
 	width: 100vw;
@@ -152,20 +161,13 @@ main {
 ::-moz-selection { background: transparent; }	/* Gecko Browsers */
 
 ::-webkit-scrollbar {
-  width: 1.5vw;
-}
-::-webkit-scrollbar-thumb {
-  background: #5559;
-  border-radius: .5vw;
-  height: 3vw;
-  border: .35vw double black;
-}
-::-webkit-scrollbar-track {
-  background: #131313;
+  width: 0px;
+  height: 0px;
+  display: none;
 }
 
 html {
-	scrollbar-color: #5559 #131313; /* mozilla */
+	scrollbar-width: none;
 }
 
 #click-background {
@@ -225,41 +227,85 @@ html {
 }
 
 .settings-button {
-	position: absolute;
+	position: fixed;
+	z-index: 950;
 	width: 2.5vw;
 	height: 2.5vw;
-	background: rgba(14, 18, 24, 0.88);
-	border: 1px solid rgba(180, 150, 100, 0.35);
+	background: linear-gradient(180deg, rgba(16, 20, 28, 0.94) 0%, rgba(9, 11, 16, 0.98) 100%);
+	border: 1px solid rgba(180, 150, 100, 0.42);
 	border-radius: 6px;
-	box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-	backdrop-filter: blur(4px);
+	box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+	backdrop-filter: blur(6px);
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	gap: 6px;
 	transition: all 0.2s ease;
 	cursor: pointer;
+	user-select: none;
 }
-.settings-button>img{
-	width: 1.7vw;
-	height: 1.7vw;
+.settings-button > img {
+	width: 1.5vw;
+	height: 1.5vw;
+	min-width: 15px;
+	min-height: 15px;
 	filter: drop-shadow(0px 0px 2px black);
 	transition: all 0.2s ease;
+	flex-shrink: 0;
 }
 
-.settings-button.fade>img {
-	 opacity: 0.3; 
+.settings-btn-label {
+	display: none;
+	font-family: 'Cinzel', serif;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: #e2e8f0;
+	letter-spacing: 0.04em;
+	white-space: nowrap;
 }
 
-.settings-button.fade:hover>img {
-	opacity: 0.6;
+.settings-button.deck-menu .settings-btn-label {
+	display: inline-block;
+}
+
+.settings-button.fade {
+	border-color: rgba(239, 68, 68, 0.45);
+	background: linear-gradient(180deg, rgba(28, 14, 16, 0.92) 0%, rgba(14, 9, 10, 0.96) 100%);
+}
+
+.settings-button.fade > img {
+	opacity: 0.35;
+	filter: grayscale(1);
+}
+
+.settings-button.fade .settings-btn-label {
+	color: #94a3b8;
+	text-decoration: line-through;
+	text-decoration-color: rgba(239, 68, 68, 0.85);
+}
+
+.settings-button.fade:not(.deck-menu)::before {
+	content: '';
+	position: absolute;
+	width: 72%;
+	height: 2px;
+	background: #ef4444;
+	transform: rotate(-45deg);
+	box-shadow: 0 0 4px rgba(0,0,0,0.9);
+	pointer-events: none;
+	z-index: 2;
+}
+
+.settings-button.fade:hover > img {
+	opacity: 0.65;
 }
 .settings-button:hover {
 	border-color: #ffd700;
 	background: rgba(30, 24, 16, 0.95);
-	box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
-	transform: scale(1.08);
+	box-shadow: 0 0 12px rgba(245, 158, 11, 0.45);
+	transform: scale(1.05);
 }
-.settings-button:hover>img {
+.settings-button:hover > img {
 	filter: drop-shadow(0px 0px 4px rgba(245, 158, 11, 0.6));
 }
 
@@ -270,15 +316,19 @@ html {
     transform-origin: top left;
 }
 #toggle-music.deck-menu { 
-	top: 1.5vh;
-	right: 4.8vw;
-	left: auto;
+	top: 10px;
+	left: 20px;
+	right: auto;
 	transform: none;
-	z-index: 120;
-	width: 1.8vw;
-	height: 1.8vw;
-	min-width: 26px;
-	min-height: 26px;
+	z-index: 99999;
+	width: auto;
+	height: 30px;
+	padding: 0 12px;
+	border-radius: 999px;
+}
+#toggle-music.deck-menu > img {
+	width: 15px;
+	height: 15px;
 }
 
 #toggle-sfx {
@@ -288,25 +338,34 @@ html {
     transform-origin: top left;
 }
 #toggle-sfx.deck-menu {
-	top: 1.5vh;
-	right: 1.8vw;
-	left: auto;
+	top: 10px;
+	left: 130px;
+	right: auto;
 	transform: none;
-	z-index: 120;
-	width: 1.8vw;
-	height: 1.8vw;
-	min-width: 26px;
-	min-height: 26px;
+	z-index: 99999;
+	width: auto;
+	height: 30px;
+	padding: 0 12px;
+	border-radius: 999px;
+}
+#toggle-sfx.deck-menu > img {
+	width: 15px;
+	height: 15px;
 }
 
 #toggle-notifications {
 	top: calc(var(--game-offset-y, 0px) + 48.9vw * var(--game-scale, 1));
-    left: calc(var(--game-offset-x, 0px) + 20vw * var(--game-scale, 1));
+    left: calc(var(--game-offset-x, 0px) + 20.4vw * var(--game-scale, 1));
     transform: scale(var(--game-scale, 1));
     transform-origin: top left;
 }
 #toggle-notifications.deck-menu {
 	display: none !important;
+}
+.settings-button.deck-menu[data-title]:hover::after {
+	bottom: -28px;
+	left: 0;
+	font-size: 11px;
 }
 
 #pass-button[data-title]:hover::after
@@ -1795,15 +1854,21 @@ main { background-image: url('img/boardtest8.png'); }
 	top: 15.8vh;
 	bottom: 1.5vh;
 	height: auto;
-	overflow-y: scroll;
+	overflow-y: auto;
 	overflow-x: hidden;
+	overscroll-behavior: contain;
 	padding: 0.5vh 0.8vw;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
 	align-content: flex-start;
-	scrollbar-width: thin;
-	scrollbar-color: #5559 #131313;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.card-array::-webkit-scrollbar {
+	display: none !important;
+	width: 0 !important;
+	height: 0 !important;
 }
 
 .card-array .card-lg:hover {

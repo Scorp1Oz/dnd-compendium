@@ -139,6 +139,34 @@ function formatFactionRu(faction) {
 	return map[faction] || faction || "Колода";
 }
 
+const GERALT_FORM_INDICES = [8, 317, 318, 437, 435, 436, 438];
+const GERALT_SUBFORM_INDICES = [317, 318, 435, 436, 437, 438];
+
+function sanitizeGeraltDeckPairs(pairs) {
+	if (!Array.isArray(pairs)) return [];
+	const merged = new Map();
+	for (const entry of pairs) {
+		const isObj = entry && typeof entry === 'object' && !Array.isArray(entry);
+		let idx = Number(isObj ? entry.index : entry[0]);
+		let cnt = Number(isObj ? entry.count : entry[1]) || 0;
+		if (cnt <= 0) continue;
+		if (GERALT_SUBFORM_INDICES.includes(idx)) {
+			idx = 8;
+		}
+		const prev = merged.get(idx) || 0;
+		const maxAllowed = (typeof card_dict !== 'undefined' && card_dict[idx]) ? (parseInt(card_dict[idx].count) || 1) : 1;
+		merged.set(idx, Math.min(maxAllowed, prev + cnt));
+	}
+	const sampleObj = pairs.length > 0 && pairs[0] && typeof pairs[0] === 'object' && !Array.isArray(pairs[0]);
+	const out = [];
+	merged.forEach((count, index) => {
+		if (count > 0) {
+			out.push(sampleObj ? { index, count } : [index, count]);
+		}
+	});
+	return out;
+}
+
 class Controller {}
 
 // Makes decisions for the AI opponent player
@@ -279,6 +307,10 @@ class ControllerAI {
 	
 	// Tells the Player that this object controls to play a card
 	async playCard(c, max, data){
+		if (c && c.isGeraltSelector) {
+			const chosenIdx = c._aiBestGeraltIdx || 8;
+			c.morphToData(card_dict[chosenIdx], false);
+		}
 		if (c.name === "Commander's Horn")
 			await this.horn(c);
 		else if (c.name === "Mardroeme")
@@ -514,6 +546,47 @@ class ControllerAI {
 	
 	// Assigns a weights for how likely the controller with play a card from its hand
 	weightCard(card, max, data){
+		if (card && card.isGeraltSelector && max && data) {
+			let bestIdx = 8;
+			let bestWeight = 18;
+			for (const idx of GERALT_FORM_INDICES) {
+				const temp = new Card(card_dict[idx], this.player);
+				temp.isGeraltSelector = false;
+				let w = 0;
+				if (idx === 8) {
+					w = 18;
+				} else if (idx === 317) {
+					const sc = this.weightScorchRow(temp, max, "close");
+					w = sc > 0 ? 11 + sc : 11;
+				} else if (idx === 318) {
+					const sc = this.weightScorchRow(temp, max, "ranged");
+					w = sc > 0 ? 10 + sc : 10;
+				} else if (idx === 437) {
+					const sc = this.weightScorchRow(temp, max, "siege");
+					w = sc > 0 ? 10 + sc : 10;
+				} else if (idx === 435) {
+					const r = this.determineAgileRow(temp);
+					const unitsInRow = r.cards.filter(u => u.isUnit()).length;
+					w = 9 + unitsInRow * 2;
+				} else if (idx === 436) {
+					w = (game.roundCount === 1 || this.player.hand.cards.length <= 4) ? 22 : 8;
+				} else if (idx === 438) {
+					const unitsInGrave = this.player.grave.findCards(u => u.isUnit());
+					if (unitsInGrave.length > 0) {
+						const maxGrave = Math.max(...unitsInGrave.map(u => u.basePower || 0));
+						w = 11 + Math.max(6, maxGrave);
+					} else {
+						w = 11;
+					}
+				}
+				if (w > bestWeight) {
+					bestWeight = w;
+					bestIdx = idx;
+				}
+			}
+			card._aiBestGeraltIdx = bestIdx;
+			return bestWeight;
+		}
 		if (card.name === "Decoy")
 			return data.spy.length ? 50 : data.medic.length ? 15 : data.scorch.length  ? 10 : max.me.length ? 1 : 0;
 		if (card.name === "Commander's Horn") {
@@ -2040,6 +2113,12 @@ class Game {
 class Card {
 
 	constructor(card_data, player) {
+		this.holder = player;
+		this.initFromData(card_data, true);
+		this.elem = this.createCardElem(this);
+	}
+
+	initFromData(card_data, isSelectorDefault = false) {
 		this.name = card_data.name;
 		this.nameRu = card_data.nameRu || "";
 		this.raw_data = card_data;
@@ -2048,16 +2127,13 @@ class Card {
 		this.abilities = (card_data.ability === "") ? [] : card_data.ability.split(" ");
 		this.row = (card_data.deck === "weather") ? card_data.deck : card_data.row;
 		this.filename = card_data.filename;
-		if (card_data.muster)
-		{
-			this.muster = card_data.muster;
-		}
+		this.muster = card_data.muster || undefined;
 		this.placed = [];
 		this.removed = [];
 		this.activated = [];
-		this.holder = player;
 		
 		this.hero = false;
+		this.audio = undefined;
 		if (this.abilities.length > 0) {
 			this.audio = this.abilities[this.abilities.length-1];
 			if (this.abilities[0] === "hero") {
@@ -2096,8 +2172,27 @@ class Card {
 			const rowLabel = this.row === "close" ? "Рукопашный отряд" : this.row === "ranged" ? "Дальнобойный отряд" : this.row === "siege" ? "Осадный отряд" : "Отряд";
 			this.desc = `${rowLabel} (сила ${this.basePower}). Не имеет особых способностей.`;
 		}
-		
-		this.elem = this.createCardElem(this);
+		if (isSelectorDefault && this.filename === "geralt") {
+			this.isGeraltSelector = true;
+			this.desc = "<b>Мастер ведьмачьих Знаков (выбор облика):</b> при розыгрыше позволяет выбрать один из 7 вариантов Геральта для ближнего, дальнего или осадного ряда (Сила 15 + Плотва, Игни, Аард, Ирден, Квен, Аксий или Профессионал-медик). " + this.desc;
+		} else {
+			this.isGeraltSelector = false;
+		}
+	}
+
+	morphToData(card_data, isSelectorDefault = false) {
+		this.initFromData(card_data, isSelectorDefault);
+		const oldElem = this.elem;
+		const newElem = this.createCardElem(this);
+		if (oldElem) {
+			newElem.style.marginLeft = oldElem.style.marginLeft;
+			newElem.style.marginRight = oldElem.style.marginRight;
+			newElem.style.left = oldElem.style.left;
+			if (oldElem.parentNode) {
+				oldElem.parentNode.replaceChild(newElem, oldElem);
+			}
+		}
+		this.elem = newElem;
 	}
 	
 	// Returns the identifier for this type of card
@@ -2283,32 +2378,41 @@ class UI {
 		document.getElementById("click-background").addEventListener("click", () => ui.cancel(), false);
 		this.youtube;
 		this.ytActive;
+		this._ytTimer = null;
 		this.toggleMusic_elem = document.getElementById("toggle-music");
 		this.toggleSettings.push(this.toggleMusic_elem);
-		this.toggleMusic_elem.classList.add("fade");
 		this.toggleMusic_elem.addEventListener("click", () => this.toggleMusic(), false);
 		this.toggleNotifications_elem = document.getElementById("toggle-notifications");
 		this.toggleSettings.push(this.toggleNotifications_elem);
 		this.toggleNotifications_elem.addEventListener("click", () => this.toggleNotifications(), false);
-		if (!Settings.notifications.isEnabled())
-			this.toggleNotifications_elem.classList.add("fade");
 		this.toggleSFX_elem = document.getElementById("toggle-sfx");
 		this.toggleSettings.push(this.toggleSFX_elem);
-		this.toggleSFX_elem.addEventListener('click', () => this.toggleSFX())
-		if (!Settings.soundEffects.isEnabled())
-			this.toggleSFX_elem.classList.add("fade");
+		this.toggleSFX_elem.addEventListener('click', () => this.toggleSFX());
+		this.updateAudioButtonsUI();
+
+		// Prevent window/page scroll on the card selection screen outside scrollable card lists
+		const deckCustomElem = document.getElementById("deck-customization");
+		if (deckCustomElem) {
+			deckCustomElem.addEventListener("wheel", (e) => {
+				if (!e.target.closest(".card-array")) {
+					e.preventDefault();
+				}
+			}, { passive: false });
+		}
 
 		EventManager.gameOpened.bind(() => {
 			this.toggleSettings.forEach(e => e.classList.remove('deck-menu'));
 			document.body.classList.add('in-game');
 			const nav = document.getElementById('gwent-compendium-nav');
 			if (nav) nav.style.display = 'none';
+			this.updateAudioButtonsUI();
 		});
 		EventManager.customizationOpened.bind(() => {
 			this.toggleSettings.forEach(e => e.classList.add('deck-menu'));
 			document.body.classList.remove('in-game');
 			const nav = document.getElementById('gwent-compendium-nav');
 			if (nav) nav.style.display = '';
+			this.updateAudioButtonsUI();
 		});
 
 		// Return to compendium screens (hub or home)
@@ -2388,30 +2492,82 @@ class UI {
 		let main = document.getElementsByTagName("main")[0].classList;
 		if (enable) main.remove("noclick"); else main.add("noclick");
 	}
+
+	updateAudioButtonsUI() {
+		const musicOn = Settings.music.isEnabled();
+		if (this.toggleMusic_elem) {
+			this.toggleMusic_elem.classList.toggle("fade", !musicOn);
+			this.toggleMusic_elem.setAttribute("data-title", musicOn ? "Музыка: Вкл (нажмите, чтобы выключить)" : "Музыка: Выкл (нажмите, чтобы включить)");
+		}
+		const sfxOn = Settings.soundEffects.isEnabled();
+		if (this.toggleSFX_elem) {
+			this.toggleSFX_elem.classList.toggle("fade", !sfxOn);
+			this.toggleSFX_elem.setAttribute("data-title", sfxOn ? "Звуки: Вкл (нажмите, чтобы выключить)" : "Звуки: Выкл (нажмите, чтобы включить)");
+		}
+		const notifOn = Settings.notifications.isEnabled();
+		if (this.toggleNotifications_elem) {
+			this.toggleNotifications_elem.classList.toggle("fade", !notifOn);
+			this.toggleNotifications_elem.setAttribute("data-title", notifOn ? "Уведомления: Вкл" : "Уведомления: Выкл");
+		}
+	}
 	
 	// Initializes the youtube background music object
 	initYouTube(){
 		this.youtube = new YT.Player('youtube', {
 			videoId: "UE9fPWy1_o4",
-			playerVars:  { "autoplay" : 1, "controls" : 0, "loop" : 1, "playlist" : "UE9fPWy1_o4", "rel" : 0, "version" : 3, "modestbranding" : 1 },
-			events: { 'onStateChange': initButton }
+			playerVars:  { "autoplay" : Settings.music.isEnabled() ? 1 : 0, "controls" : 0, "loop" : 1, "playlist" : "UE9fPWy1_o4", "rel" : 0, "version" : 3, "modestbranding" : 1 },
+			events: { 'onReady': onPlayerReady, 'onStateChange': initButton }
 		});
+
+		function onPlayerReady() {
+			if (!Settings.music.isEnabled()) {
+				try {
+					ui.youtube?.mute?.();
+					ui.youtube?.pauseVideo?.();
+				} catch(e) {}
+			}
+		}
 		
 		function initButton(){
+			if (!Settings.music.isEnabled()) {
+				if (ui._ytTimer) {
+					clearInterval(ui._ytTimer);
+					ui._ytTimer = null;
+				}
+				try {
+					ui.youtube?.pauseVideo?.();
+					ui.youtube?.mute?.();
+				} catch(e) {}
+				ui.updateAudioButtonsUI();
+				return;
+			}
 			if (ui.ytActive !== undefined)
 				return;
 			ui.ytActive = true;
-			ui.youtube.playVideo();
-			let timer = setInterval( () => {
-				if (ui.youtube.getPlayerState() !== YT.PlayerState.PLAYING)
-					ui.youtube.playVideo();
-				else {
-					clearInterval(timer);
-					ui.toggleMusic_elem.classList.remove("fade");
-					if (!Settings.music.isEnabled())
-					{
-						setTimeout(()=>ui.toggleMusic(), 10);
-					}
+			try {
+				ui.youtube?.unMute?.();
+				ui.youtube?.playVideo?.();
+			} catch(e) {}
+			ui._ytTimer = setInterval( () => {
+				if (!Settings.music.isEnabled()) {
+					clearInterval(ui._ytTimer);
+					ui._ytTimer = null;
+					try {
+						ui.youtube?.pauseVideo?.();
+						ui.youtube?.mute?.();
+					} catch(e) {}
+					ui.updateAudioButtonsUI();
+					return;
+				}
+				if (ui.youtube?.getPlayerState?.() !== YT.PlayerState.PLAYING) {
+					try {
+						ui.youtube?.unMute?.();
+						ui.youtube?.playVideo?.();
+					} catch(e) {}
+				} else {
+					clearInterval(ui._ytTimer);
+					ui._ytTimer = null;
+					ui.updateAudioButtonsUI();
 				}
 			}, 500);
 		}
@@ -2419,53 +2575,58 @@ class UI {
 	
 	// Called when client toggles the music
 	toggleMusic(){
-		const isPlaying = this.youtube?.getPlayerState() === YT.PlayerState.PLAYING;
-		if (isPlaying) {
-			this.youtube?.pauseVideo();
-			this.toggleMusic_elem.classList.add("fade");
+		Settings.music.toggle();
+		const enable = Settings.music.isEnabled();
+		if (enable) {
+			try {
+				this.youtube?.unMute?.();
+				this.youtube?.playVideo?.();
+			} catch(e) {}
 		} else {
-			this.youtube?.playVideo();
-			this.toggleMusic_elem.classList.remove("fade");
+			if (this._ytTimer) {
+				clearInterval(this._ytTimer);
+				this._ytTimer = null;
+			}
+			try {
+				this.youtube?.pauseVideo?.();
+				this.youtube?.mute?.();
+			} catch(e) {}
 		}
-		Settings.music.setEnabled(!isPlaying);
+		this.updateAudioButtonsUI();
 	}
 
 	toggleNotifications() {
 		Settings.notifications.toggle();
-		const useNotificaitons = Settings.notifications.isEnabled();
-		if (useNotificaitons)
-		{
-			this.toggleNotifications_elem.classList.remove("fade");
-		}
-		else
-		{
-			this.toggleNotifications_elem.classList.add("fade");
-		}
+		this.updateAudioButtonsUI();
 	}
 
 	toggleSFX() {
 		Settings.soundEffects.toggle();
 		const useSFX = Settings.soundEffects.isEnabled();
-		if (useSFX)
-		{
-			this.toggleSFX_elem.classList.remove("fade");
+		if (!useSFX) {
+			AudioManager.stopAll();
+		} else {
+			AudioManager.playSFX('ui_card');
 		}
-		else
-		{
-			this.toggleSFX_elem.classList.add("fade");
-		}
+		this.updateAudioButtonsUI();
 	}
 	
 	// Enables or disables backgorund music 
 	setYouTubeEnabled(enable){
 		if (this.ytActive === enable)
 			return;
-		if (enable && !this.mute)
-			ui.youtube.playVideo();
-		else
-			ui.youtube.pauseVideo();
+		if (enable && Settings.music.isEnabled() && !this.mute) {
+			try {
+				ui.youtube?.unMute?.();
+				ui.youtube?.playVideo?.();
+			} catch(e) {}
+		} else {
+			try {
+				ui.youtube?.pauseVideo?.();
+			} catch(e) {}
+		}
 		this.ytActive = enable;
-}
+	}
 	
 	// Called when the player selects a selectable card
 	async selectCard(card) {
@@ -2474,6 +2635,16 @@ class UI {
 		if (card === pCard)
 			return;
 		if (pCard === null || card.holder.hand.cards.includes(card)) {
+			if (pCard && pCard._wasGeraltSelector && pCard !== card && pCard.holder && pCard.holder.hand.cards.includes(pCard)) {
+				pCard._wasGeraltSelector = false;
+				pCard.morphToData(card_dict[8], true);
+			}
+			if (card.holder === player_me && card.holder.hand.cards.includes(card) && card.isGeraltSelector) {
+				this.setSelectable(null, false);
+				this.hidePreview();
+				await this.openGeraltSelector(card);
+				return;
+			}
 			this.setSelectable(null, false);
 			this.showPreview(card);
 		} else if (pCard.name === "Decoy") {
@@ -2492,6 +2663,54 @@ class UI {
 			await board.moveTo(pCard, row, pCard.holder.hand);
 			pCard.holder.endTurn();
 		}
+	}
+
+	async openGeraltSelector(card) {
+		const container = new CardContainer();
+		container.cards = GERALT_FORM_INDICES.map(idx => {
+			const formCard = new Card(card_dict[idx], card.holder);
+			formCard.initFromData(card_dict[idx], false);
+			formCard._geraltFormIdx = idx;
+			return formCard;
+		});
+		let chosenIdx = null;
+		await this.queueCarousel(
+			container,
+			1,
+			(c, i) => {
+				chosenIdx = c.cards[i]._geraltFormIdx;
+			},
+			() => true,
+			false,
+			true,
+			"Выберите облик и тактику Геральта"
+		);
+		if (chosenIdx === null || chosenIdx === undefined) {
+			this.enablePlayer(true);
+			return;
+		}
+		card.morphToData(card_dict[chosenIdx], false);
+		card._wasGeraltSelector = true;
+		if (card.row === "agile") {
+			this.enablePlayer(true);
+			this.showPreview(card);
+			return;
+		}
+		const holder = card.holder;
+		const targetRow = board.getRow(card, card.row, holder);
+		this.hidePreview();
+		this.enablePlayer(false);
+		if (game && game.recordAction) {
+			const targetRowName = (targetRow && targetRow.type) ? targetRow.type : card.row;
+			game.recordAction({
+				player: holder.name,
+				type: 'card',
+				card: card,
+				targetRow: targetRowName
+			});
+		}
+		await board.moveTo(card, targetRow, holder.hand);
+		holder.endTurn();
 	}
 	
 	// Called when the player selects a selectable CardContainer
@@ -2536,6 +2755,11 @@ class UI {
 	
 	// Called when the client cancels out of a card-preview
 	cancel(){
+		if (this.previewCard && this.previewCard._wasGeraltSelector && this.previewCard.holder && this.previewCard.holder.hand.cards.includes(this.previewCard)) {
+			const c = this.previewCard;
+			c._wasGeraltSelector = false;
+			c.morphToData(card_dict[8], true);
+		}
 		this.hidePreview();
 		EventManager.previewCancelled.dispatch();
 	}
@@ -3326,11 +3550,16 @@ class DeckMaker {
 		
 		let deckMap = {};
 		if (deck){
-			for (let i of Object.keys(deck)) deckMap[deck[i].index] = deck[i].count;
+			const cleanDeck = sanitizeGeraltDeckPairs(Object.values(deck));
+			for (const entry of cleanDeck) {
+				deckMap[entry.index] = entry.count;
+			}
 		}
 		cards.forEach( p => {
+			let maxCount = Number.parseInt(p.card.count) || 0;
 			let count = deckMap[p.index] !== undefined ? Number(deckMap[p.index]) : 0;
-			this.makePreview(p.index, Number.parseInt(p.card.count) - count, this.bank_elem, this.bank,);
+			if (maxCount <= 0 && count <= 0) return;
+			this.makePreview(p.index, Math.max(0, maxCount - count), this.bank_elem, this.bank,);
 			this.makePreview(p.index, count, this.deck_elem, this.deck);
 		});
 	}
@@ -3683,7 +3912,8 @@ class DeckMaker {
 		else if (deck.faction != card_dict[deck.leader].deck)
 			warning += "Лидер «" + (card_dict[deck.leader].nameRu || card_dict[deck.leader].name) + "» не соответствует фракции «" + deck.faction + "».\n";
 		// check if cards exist and have correct faction & count
-		const cards = deck.cards.filter( c => {
+		const cleanedPairs = sanitizeGeraltDeckPairs(deck.cards || []);
+		const cards = cleanedPairs.filter( c => {
 			const card = card_dict[c[0]];
 			if (!card) {
 				warning += "ID карты " + c[0] + " не найден.\n";
@@ -3820,6 +4050,7 @@ class DeckMaker {
 class AudioManager
 {
 	static source = {};
+	static activeAudios = new Set();
 
 	static init()
 	{
@@ -3831,8 +4062,33 @@ class AudioManager
 		].forEach(s => AudioManager.source[s] = getAudio(s));
 	}
 
+	static stopAll()
+	{
+		Object.values(AudioManager.source).forEach(audio => {
+			if (audio instanceof Audio) {
+				try {
+					audio.pause();
+					audio.currentTime = 0;
+				} catch(e) {}
+			}
+		});
+		AudioManager.activeAudios.forEach(audio => {
+			if (audio instanceof Audio) {
+				try {
+					audio.pause();
+					audio.currentTime = 0;
+				} catch(e) {}
+			}
+		});
+		AudioManager.activeAudios.clear();
+	}
+
 	static async play(key, waitTime = -1, forceWait = false)
 	{
+		if (!Settings.soundEffects.isEnabled()) {
+			if (waitTime > 0) return await sleep(waitTime);
+			return;
+		}
 		if (AudioManager.source[key])
 		{
 			const audio = AudioManager.source[key];
@@ -3850,7 +4106,8 @@ class AudioManager
 					return await asyncAudio(audio);
 				else
 				{
-					audio.play();
+					AudioManager.activeAudios.add(audio);
+					audio.play().catch(()=>{});
 					return await sleep(waitTime);
 				}
 			}
@@ -3866,6 +4123,10 @@ class AudioManager
 		if (Settings.soundEffects.isEnabled())
 		{
 			return await AudioManager.play(key, waitTime, forceWait);
+		}
+		if (waitTime > 0)
+		{
+			return await sleep(waitTime);
 		}
 	}
 }
@@ -3972,7 +4233,8 @@ class SavedDeck extends SavedObject
 		const temp_deck = {...super.get()};
 		if (temp_deck.cards)
 		{
-			temp_deck.cards = temp_deck.cards.map(c => ({index: c[0], count: c[1]}) );
+			const mapped = temp_deck.cards.map(c => ({index: c[0], count: c[1]}) );
+			temp_deck.cards = sanitizeGeraltDeckPairs(mapped);
 		}
 		return temp_deck;
 	}
@@ -4236,7 +4498,7 @@ function smallURL(name, ext="jpg"){
 	return imgURL("sm/" + name, ext);
 }
 function imgURL(path, ext) {
-	return "url('img/" + path + "." + ext + "?v=8')";
+	return "url('img/" + path + "." + ext + "?v=133')";
 }
 
 // get sound effect path
@@ -4272,11 +4534,18 @@ async function playAudio(name, ext = "mp3")
 
 function asyncAudio(audio)
 {
-	if (!userInteracted || !audio)
-		return
+	if (!userInteracted || !audio || !Settings.soundEffects.isEnabled())
+		return;
+	AudioManager.activeAudios.add(audio);
 	return new Promise(r => {
-		audio.play();
-		audio.onended = r;
+		const done = () => {
+			AudioManager.activeAudios.delete(audio);
+			r();
+		};
+		audio.onended = done;
+		audio.onpause = done;
+		audio.onerror = done;
+		audio.play().catch(done);
 	});
 }
 

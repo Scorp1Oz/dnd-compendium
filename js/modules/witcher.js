@@ -597,7 +597,6 @@
           '</div>' +
           '<div class="wi-game-badges">' +
             '<span class="wi-game-badge highlight">TW3 + DLC + Standalone</span>' +
-            '<span class="wi-game-badge highlight">100% RU локализация</span>' +
             '<span class="wi-game-badge">6 фракций + Синдикат</span>' +
             '<span class="wi-game-badge">27 лидеров</span>' +
             '<span class="wi-game-badge">Автосбор и фильтры</span>' +
@@ -695,6 +694,8 @@
         if(action === 'closeWiGameModal' || action === 'compendium-back' || action === 'nav'){
           var m = document.getElementById('wiGameModal');
           if(m && m.parentNode) m.parentNode.removeChild(m);
+          document.documentElement.style.overflow = '';
+          document.body.style.overflow = '';
 
           if(typeof nav === 'function'){
             if(typeof HB !== 'undefined') HB.mode = 'wi';
@@ -713,18 +714,23 @@
     var old = document.getElementById('wiGameModal');
     if(old && old.parentNode) old.parentNode.removeChild(old);
 
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
     var modal = document.createElement('div');
     modal.id = 'wiGameModal';
     modal.className = 'wi-game-modal-overlay';
-    modal.style.cssText = 'position:fixed;inset:0;background:#000;z-index:100000;display:flex;width:100vw;height:100vh;overflow:hidden;';
+    modal.style.cssText = 'position:fixed;inset:0;background:#000;z-index:100000;display:flex;width:100%;height:100%;overflow:hidden;';
     modal.innerHTML = 
-      '<iframe src="' + url + '" class="wi-game-modal-iframe" style="width:100%;height:100%;border:none;background:#000;" allow="fullscreen; autoplay" allowfullscreen></iframe>';
+      '<iframe src="' + url + '" class="wi-game-modal-iframe" scrolling="no" style="width:100%;height:100%;border:none;background:#000;overflow:hidden;" allow="fullscreen; autoplay" allowfullscreen></iframe>';
 
     document.body.appendChild(modal);
 
     function onEsc(e){
       if(e.key === 'Escape' && !document.fullscreenElement){
         if(modal && modal.parentNode) modal.parentNode.removeChild(modal);
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
         window.removeEventListener('keydown', onEsc);
       }
     }
