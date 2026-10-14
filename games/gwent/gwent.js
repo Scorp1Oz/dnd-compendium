@@ -13,32 +13,63 @@ const addMouseEnterSFXBySelector = selector => {
 	e.addEventListener('mouseenter', CLICK_EVENT_SFX));
 };
 
-function getCompendiumPlayerName() {
+const DARIAN_ALLOWED_NAMES = new Set([
+	"дариан",
+	"дариан (алдуирн)",
+	"алдуирн"
+]);
+
+function getActiveWitcherCharacterName() {
 	try {
-		const raw = localStorage.getItem('wi_profile');
-		if (raw) {
-			const p = JSON.parse(raw);
-			if (p && p.name && p.name.trim()) return p.name.trim();
-		}
 		const activeId = localStorage.getItem('ttc_wi_active_id');
 		const rawList = localStorage.getItem('ttc_wi_profiles');
 		if (rawList) {
 			const list = JSON.parse(rawList);
-			if (Array.isArray(list)) {
+			if (Array.isArray(list) && list.length > 0) {
 				const found = list.find(item => item && item.id === activeId) || list[0];
-				if (found && found.name && found.name.trim()) return found.name.trim();
+				if (found && typeof found.name === 'string') {
+					return found.name.trim();
+				}
 			}
+		}
+		const raw = localStorage.getItem('wi_profile');
+		if (raw) {
+			const p = JSON.parse(raw);
+			if (p && typeof p.name === 'string' && p.name.trim()) return p.name.trim();
 		}
 		const rawFallback = localStorage.getItem('dnd_witcher_profiles') || localStorage.getItem('dnd_compendium_profiles');
 		if (rawFallback) {
 			const data = JSON.parse(rawFallback);
 			if (Array.isArray(data) && data.length > 0) {
 				const active = data.find(p => p.isActive || p.active) || data[0];
-				if (active && active.name && active.name.trim()) return active.name.trim();
+				if (active && typeof active.name === 'string' && active.name.trim()) return active.name.trim();
 			}
 		}
 	} catch(e){}
-	return "Ведьмак";
+	return "";
+}
+
+function getCompendiumPlayerName() {
+	const name = getActiveWitcherCharacterName();
+	return name || "Ведьмак";
+}
+
+function isDarianUnlocked() {
+	const rawName = getActiveWitcherCharacterName();
+	if (!rawName) return false;
+	const normalized = rawName
+		.toLowerCase()
+		.replace(/ё/g, 'е')
+		.replace(/\s*\(\s*/g, ' (')
+		.replace(/\s*\)\s*/g, ')')
+		.replace(/\s+/g, ' ')
+		.trim();
+	return DARIAN_ALLOWED_NAMES.has(normalized);
+}
+
+function isDarianCard(card) {
+	if (!card) return false;
+	return Boolean(card.filename && String(card.filename).includes('darian'));
 }
 
 /* ============================================================
@@ -3537,8 +3568,10 @@ class DeckMaker {
 	// If a deck is provided, will not add cards to bank that are already in the deck.
 	makeBank(faction, deck) {
 		this.clear();
+		const darianAllowed = isDarianUnlocked();
+		this._darianState = darianAllowed;
 		let cards = card_dict.map((c,i) => ({card:c, index:i})).filter(
-		p => [faction, "neutral", "weather", "special"].includes(p.card.deck) && p.card.row !== "leader");
+		p => [faction, "neutral", "weather", "special"].includes(p.card.deck) && p.card.row !== "leader" && (darianAllowed || !isDarianCard(p.card)));
 		
 		cards.sort( function(id1, id2) {
 			let a = card_dict[id1.index], b = card_dict[id2.index];
@@ -3552,6 +3585,7 @@ class DeckMaker {
 		if (deck){
 			const cleanDeck = sanitizeGeraltDeckPairs(Object.values(deck));
 			for (const entry of cleanDeck) {
+				if (!darianAllowed && isDarianCard(card_dict[entry.index])) continue;
 				deckMap[entry.index] = entry.count;
 			}
 		}
@@ -3562,6 +3596,13 @@ class DeckMaker {
 			this.makePreview(p.index, Math.max(0, maxCount - count), this.bank_elem, this.bank,);
 			this.makePreview(p.index, count, this.deck_elem, this.deck);
 		});
+	}
+
+	syncDarianAvailability() {
+		const allowed = isDarianUnlocked();
+		if (this._darianState !== allowed && this.faction) {
+			this.loadFactionDeck(this.faction, true);
+		}
 	}
 	
 	// Creates HTML elements for the card previews
@@ -3783,6 +3824,7 @@ class DeckMaker {
 	
 	// Verifies current deck, creates the players and their decks, then starts a new game
 	startNewGame(){
+		this.syncDarianAvailability();
 		let warning = "";
 		if (this.stats.units < 22)
 			warning += "В колоде должно быть не менее 22 карт отрядов.\n";
@@ -3795,10 +3837,11 @@ class DeckMaker {
 			return alert(warning);
 		}
 		
+		const darianAllowed = isDarianUnlocked();
 		const me_deck = { 
 			faction: this.faction,
 			leader: card_dict[this.leader.index], 
-			cards: this.deck.filter(x => x.count > 0)
+			cards: this.deck.filter(x => x.count > 0 && (darianAllowed || !isDarianCard(card_dict[x.index])))
 		};
 		const op_deck = this.constructOpponentDeck(true);
 		
@@ -3811,6 +3854,7 @@ class DeckMaker {
 
 	constructOpponentDeck(useCustom = true)
 	{
+		const darianAllowed = isDarianUnlocked();
 		let op_deck;
 		if (!useCustom || isEmpty(dm.opponentData))
 		{
@@ -3827,9 +3871,12 @@ class DeckMaker {
 		else
 		{
 			op_deck = {};
-			op_deck.cards = dm.opponentData.cards;
+			op_deck.cards = (dm.opponentData.cards || []).filter(c => darianAllowed || !isDarianCard(card_dict[c.index]));
 			op_deck.leader = card_dict[dm.opponentData.leader];
 			op_deck.faction = op_deck.leader.deck;
+		}
+		if (op_deck && Array.isArray(op_deck.cards) && !darianAllowed) {
+			op_deck.cards = op_deck.cards.filter(c => !isDarianCard(card_dict[c.index]));
 		}
 		return op_deck;
 	}
@@ -3905,6 +3952,7 @@ class DeckMaker {
 	{
 		if (!deck)
 			return null;
+		const darianAllowed = isDarianUnlocked();
 		let warning = "";
 		// verify that leader card is actually a leader and that it's faction matches the deck faction
 		if (!card_dict[deck.leader] || card_dict[deck.leader].row !== "leader")
@@ -3918,6 +3966,9 @@ class DeckMaker {
 			if (!card) {
 				warning += "ID карты " + c[0] + " не найден.\n";
 				return false
+			}
+			if (!darianAllowed && isDarianCard(card)) {
+				return false;
 			}
 			if (![deck.faction, "neutral", "special", "weather"].includes(card.deck)) {
 				warning += "Карта «" + (card.nameRu || card.name) + "» недоступна для фракции «" + deck.faction +"».\n";
@@ -4038,11 +4089,11 @@ class DeckMaker {
 	{
 		if (isEmpty(this.opponentData))
 			return;
-		// const leader = card_dict[this.opponentData.leader];
+		const darianAllowed = isDarianUnlocked();
 		const leader = {index: this.opponentData.leader, count:1};
 		const container = new CardContainer();
-		//container.cards = [leader, ...Card.this.opponentData.cards];
-		container.cards = Card.getCardsFromIdCounts([leader, ...this.opponentData.cards]);
+		const filteredCards = (this.opponentData.cards || []).filter(c => darianAllowed || !isDarianCard(card_dict[c.index]));
+		container.cards = Card.getCardsFromIdCounts([leader, ...filteredCards]);
 		ui.queueCarousel(container, 1, ()=>{}, ()=>true, false, true, "Колода противника");
 	}
 }
@@ -4587,5 +4638,10 @@ AudioManager.init();
 ui.enablePlayer(false);
 let dm = new DeckMaker();
 
+if (EventManager.customizationOpened) {
+	EventManager.customizationOpened.bind(() => dm.syncDarianAvailability());
+}
+window.addEventListener('storage', () => dm.syncDarianAvailability());
+window.addEventListener('focus', () => dm.syncDarianAvailability());
 
 document.addEventListener('click', () => userInteracted = true, { once: true });

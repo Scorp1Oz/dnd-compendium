@@ -232,16 +232,24 @@ var GHSync = window.GHSync = {
       }
 
       if(bundle.witcher){
+        if(Array.isArray(bundle.witcher.techs)) localStorage.setItem('ttc_wi_techs', JSON.stringify(bundle.witcher.techs));
+        if(Array.isArray(bundle.witcher.moves)) localStorage.setItem('ttc_wi_moves', JSON.stringify(bundle.witcher.moves));
         if(bundle.witcher.profiles && Array.isArray(bundle.witcher.profiles)){
-          if(typeof WI !== 'undefined') WI.profiles = bundle.witcher.profiles;
-          localStorage.setItem('ttc_wi_profiles', JSON.stringify(bundle.witcher.profiles));
+          var wActId = bundle.witcher.activeProfileId || (typeof WI !== 'undefined' && WI.activeProfileId) || localStorage.getItem('ttc_wi_active_id') || '';
+          if(typeof WI !== 'undefined'){
+            WI.profiles = WI._migrateAndNormalizeProfiles ? WI._migrateAndNormalizeProfiles(bundle.witcher.profiles, wActId) : bundle.witcher.profiles;
+          }
+          localStorage.setItem('ttc_wi_profiles', JSON.stringify(typeof WI !== 'undefined' ? WI.profiles : bundle.witcher.profiles));
         }
         if(bundle.witcher.activeProfileId){
           if(typeof WI !== 'undefined') WI.activeProfileId = bundle.witcher.activeProfileId;
           localStorage.setItem('ttc_wi_active_id', bundle.witcher.activeProfileId);
         }
-        if(Array.isArray(bundle.witcher.techs)) localStorage.setItem('ttc_wi_techs', JSON.stringify(bundle.witcher.techs));
-        if(Array.isArray(bundle.witcher.moves)) localStorage.setItem('ttc_wi_moves', JSON.stringify(bundle.witcher.moves));
+        if(typeof WI !== 'undefined'){
+          if(typeof WI.saveProfiles === 'function') WI.saveProfiles();
+          if(typeof WI.loadTechs === 'function') WI.loadTechs();
+          if(typeof WI.loadMoves === 'function') WI.loadMoves();
+        }
         if(Array.isArray(bundle.witcher.markers)) localStorage.setItem('ttc_wi_markers', JSON.stringify(bundle.witcher.markers));
         if(bundle.witcher.route) localStorage.setItem('ttc_wi_route_v2', JSON.stringify(bundle.witcher.route));
         if(bundle.witcher.meta){

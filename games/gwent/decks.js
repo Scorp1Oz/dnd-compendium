@@ -108,11 +108,12 @@ function draftOpponentDeck(factionChoice = "random") {
 
     // Neutral Legends & Custom Darian Cards
     const neutralUnits = indexed.filter(c => c.deck === 'neutral' && c.row !== 'leader' && c.strength !== '' && parseInt(c.count) > 0);
-    const darianCards = neutralUnits.filter(c => c.filename && c.filename.includes('darian'));
+    const darianAllowed = typeof isDarianUnlocked === 'function' && isDarianUnlocked();
+    const darianCards = darianAllowed ? neutralUnits.filter(c => c.filename && c.filename.includes('darian')) : [];
     const legendNeutrals = neutralUnits.filter(c => !c.filename || !c.filename.includes('darian'));
 
-    // Inject Darian cards with 5-10% chance (~8% probability)
-    if (Math.random() < 0.08 && darianCards.length > 0) {
+    // Inject Darian cards with 5-10% chance (~8% probability) only when Darian character is active
+    if (darianAllowed && Math.random() < 0.08 && darianCards.length > 0) {
         const shuffledDarian = [...darianCards].sort(() => Math.random() - 0.5);
         addCard(shuffledDarian[0], 1);
         if (Math.random() < 0.1 && shuffledDarian.length > 1) {

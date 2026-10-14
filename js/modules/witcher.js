@@ -24,7 +24,9 @@
       silverSword: '',
       steelSword: '',
       armor: '',
-      notes: ''
+      notes: '',
+      techs: [],
+      moves: []
     };
   }
 
@@ -32,6 +34,50 @@
     profiles: [],
     activeProfileId: '',
     meta: { name: 'Хроники Континента: Неверлэнд', note: 'Контракты, заказчики, награды и бестиарий.' },
+
+    _migrateAndNormalizeProfiles: function(arr, activeId){
+      var hasAnyTechsField = arr.some(function(p){ return p && Array.isArray(p.techs); });
+      var hasAnyMovesField = arr.some(function(p){ return p && Array.isArray(p.moves); });
+
+      var legacyTechs = [];
+      var legacyMoves = [];
+      if(!hasAnyTechsField){
+        try {
+          var rawT = localStorage.getItem('ttc_wi_techs');
+          if(rawT){
+            var parsedT = JSON.parse(rawT);
+            if(Array.isArray(parsedT)){
+              legacyTechs = parsedT.filter(function(t){ return t && (!OLD_DEFAULT_TECH_IDS || OLD_DEFAULT_TECH_IDS.indexOf(t.id) === -1); });
+            }
+          }
+        } catch(e){}
+      }
+      if(!hasAnyMovesField){
+        try {
+          var rawM = localStorage.getItem('ttc_wi_moves');
+          if(rawM){
+            var parsedM = JSON.parse(rawM);
+            if(Array.isArray(parsedM)){
+              legacyMoves = parsedM.filter(function(m){ return m && (!OLD_DEFAULT_MOVE_IDS || OLD_DEFAULT_MOVE_IDS.indexOf(m.id) === -1); });
+            }
+          }
+        } catch(e){}
+      }
+
+      arr.forEach(function(p){
+        if(!p) return;
+        if(!Array.isArray(p.techs)){
+          p.techs = (p.id === activeId && legacyTechs.length) ? JSON.parse(JSON.stringify(legacyTechs)) : [];
+        } else {
+          p.techs = p.techs.filter(function(t){ return t && (!OLD_DEFAULT_TECH_IDS || OLD_DEFAULT_TECH_IDS.indexOf(t.id) === -1); });
+        }
+        if(!Array.isArray(p.moves)){
+          p.moves = (p.id === activeId && legacyMoves.length) ? JSON.parse(JSON.stringify(legacyMoves)) : [];
+        } else {
+          p.moves = p.moves.filter(function(m){ return m && (!OLD_DEFAULT_MOVE_IDS || OLD_DEFAULT_MOVE_IDS.indexOf(m.id) === -1); });
+        }
+      });
+    },
 
     loadProfiles: function(){
       try {
@@ -47,9 +93,15 @@
               return true;
             });
             if(arr.length > 0){
-              WI.profiles = arr;
               var savedActive = localStorage.getItem(WI_ACTIVE_ID_KEY);
-              WI.activeProfileId = (savedActive && arr.some(function(p){ return p.id === savedActive; })) ? savedActive : arr[0].id;
+              var resolvedId = (savedActive && arr.some(function(p){ return p.id === savedActive; })) ? savedActive : arr[0].id;
+              WI._migrateAndNormalizeProfiles(arr, resolvedId);
+              WI.profiles = arr;
+              WI.activeProfileId = resolvedId;
+              var actProf = WI.profiles.find(function(p){ return p.id === WI.activeProfileId; }) || WI.profiles[0];
+              WI.techs = actProf && Array.isArray(actProf.techs) ? actProf.techs : [];
+              WI.moves = actProf && Array.isArray(actProf.moves) ? actProf.moves : [];
+              WI.saveProfiles();
               return WI.profiles;
             }
           }
@@ -65,8 +117,11 @@
             if(!legacy.silverSword) legacy.silverSword = '';
             if(!legacy.steelSword) legacy.steelSword = '';
             if(!legacy.armor) legacy.armor = '';
+            WI._migrateAndNormalizeProfiles([legacy], legacy.id);
             WI.profiles = [legacy];
             WI.activeProfileId = legacy.id;
+            WI.techs = legacy.techs;
+            WI.moves = legacy.moves;
             WI.saveProfiles();
             return WI.profiles;
           }
@@ -74,20 +129,27 @@
       } catch(e){}
 
       var def = defaultWitcherProfile();
+      WI._migrateAndNormalizeProfiles([def], def.id);
       WI.profiles = [def];
       WI.activeProfileId = def.id;
+      WI.techs = def.techs;
+      WI.moves = def.moves;
       WI.saveProfiles();
       return WI.profiles;
     },
 
     saveProfiles: function(){
       try {
+        var act = (WI.profiles || []).find(function(p){ return p && p.id === WI.activeProfileId; }) || (WI.profiles && WI.profiles[0]);
+        if(act){
+          if(!Array.isArray(act.techs)) act.techs = Array.isArray(WI.techs) ? WI.techs : [];
+          if(!Array.isArray(act.moves)) act.moves = Array.isArray(WI.moves) ? WI.moves : [];
+          localStorage.setItem('wi_profile', JSON.stringify(act));
+          localStorage.setItem('ttc_wi_techs', JSON.stringify(act.techs));
+          localStorage.setItem('ttc_wi_moves', JSON.stringify(act.moves));
+        }
         localStorage.setItem(WI_PROFILES_KEY, JSON.stringify(WI.profiles));
         localStorage.setItem(WI_ACTIVE_ID_KEY, WI.activeProfileId);
-        var act = WI.getActiveProfile();
-        if(act){
-          localStorage.setItem('wi_profile', JSON.stringify(act));
-        }
       } catch(e){}
     },
 
@@ -100,6 +162,8 @@
         act = WI.profiles[0] || defaultWitcherProfile();
         WI.activeProfileId = act.id;
       }
+      if(!Array.isArray(act.techs)) act.techs = [];
+      if(!Array.isArray(act.moves)) act.moves = [];
       return act;
     },
 
@@ -111,24 +175,47 @@
       if(!p || !p.id) return;
       var idx = (WI.profiles || []).findIndex(function(item){ return item.id === p.id; });
       if(idx !== -1){
+        if(!Array.isArray(p.techs)) p.techs = Array.isArray(WI.profiles[idx].techs) ? WI.profiles[idx].techs : [];
+        if(!Array.isArray(p.moves)) p.moves = Array.isArray(WI.profiles[idx].moves) ? WI.profiles[idx].moves : [];
         WI.profiles[idx] = p;
       } else {
+        if(!Array.isArray(p.techs)) p.techs = [];
+        if(!Array.isArray(p.moves)) p.moves = [];
         WI.profiles.push(p);
+      }
+      if(p.id === WI.activeProfileId){
+        WI.techs = p.techs;
+        WI.moves = p.moves;
       }
       WI.saveProfiles();
     },
 
     switchProfile: function(newId){
       if(!newId || newId === WI.activeProfileId) return;
+      var cur = (WI.profiles || []).find(function(p){ return p.id === WI.activeProfileId; });
+      if(cur){
+        if(Array.isArray(WI.techs)) cur.techs = WI.techs;
+        if(Array.isArray(WI.moves)) cur.moves = WI.moves;
+      }
       var next = (WI.profiles || []).find(function(p){ return p.id === newId; });
       if(next){
+        if(!Array.isArray(next.techs)) next.techs = [];
+        if(!Array.isArray(next.moves)) next.moves = [];
         WI.activeProfileId = newId;
+        WI.techs = next.techs;
+        WI.moves = next.moves;
         WI.saveProfiles();
+        if(typeof paintShBar === 'function') paintShBar();
         if(typeof render === 'function') render();
       }
     },
 
     createProfile: function(opts){
+      var cur = (WI.profiles || []).find(function(p){ return p.id === WI.activeProfileId; });
+      if(cur){
+        if(Array.isArray(WI.techs)) cur.techs = WI.techs;
+        if(Array.isArray(WI.moves)) cur.moves = WI.moves;
+      }
       var def = defaultWitcherProfile();
       def.id = 'wi_prof_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       def.name = (opts && opts.name) ? opts.name : '';
@@ -144,25 +231,40 @@
       def.steelSword = '';
       def.armor = '';
       def.notes = '';
+      def.techs = [];
+      def.moves = [];
 
       if(!Array.isArray(WI.profiles)) WI.profiles = [];
       WI.profiles.push(def);
       WI.activeProfileId = def.id;
+      WI.techs = def.techs;
+      WI.moves = def.moves;
       WI.saveProfiles();
+      if(typeof paintShBar === 'function') paintShBar();
       if(typeof render === 'function') render();
       return def;
     },
 
     cloneProfile: function(id){
       id = id || WI.activeProfileId;
+      var cur = (WI.profiles || []).find(function(p){ return p.id === WI.activeProfileId; });
+      if(cur){
+        if(Array.isArray(WI.techs)) cur.techs = WI.techs;
+        if(Array.isArray(WI.moves)) cur.moves = WI.moves;
+      }
       var src = (WI.profiles || []).find(function(p){ return p.id === id; }) || WI.getActiveProfile();
       if(!src) return null;
       var copy = JSON.parse(JSON.stringify(src));
       copy.id = 'wi_prof_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       copy.name = (copy.name || 'Персонаж') + ' (Копия)';
+      if(!Array.isArray(copy.techs)) copy.techs = [];
+      if(!Array.isArray(copy.moves)) copy.moves = [];
       WI.profiles.push(copy);
       WI.activeProfileId = copy.id;
+      WI.techs = copy.techs;
+      WI.moves = copy.moves;
       WI.saveProfiles();
+      if(typeof paintShBar === 'function') paintShBar();
       if(typeof render === 'function') render();
       return copy;
     },
@@ -174,7 +276,10 @@
         var fresh = defaultWitcherProfile();
         WI.profiles = [fresh];
         WI.activeProfileId = fresh.id;
+        WI.techs = fresh.techs;
+        WI.moves = fresh.moves;
         WI.saveProfiles();
+        if(typeof paintShBar === 'function') paintShBar();
         if(typeof render === 'function') render();
         return;
       }
@@ -184,7 +289,11 @@
       if(WI.activeProfileId === id){
         WI.activeProfileId = WI.profiles[Math.max(0, idx - 1)].id;
       }
+      var nextAct = WI.getActiveProfile();
+      WI.techs = nextAct.techs;
+      WI.moves = nextAct.moves;
       WI.saveProfiles();
+      if(typeof paintShBar === 'function') paintShBar();
       if(typeof render === 'function') render();
     },
 
@@ -198,6 +307,7 @@
       p.ac = 10;
       p.energy = 50;
       WI.saveProfiles();
+      if(typeof paintShBar === 'function') paintShBar();
       if(typeof render === 'function') render();
     },
 
@@ -1031,9 +1141,14 @@
     var ex = g('wiExport');
     if(ex){
       ex.addEventListener('click', function(){
+        var act = WI.getActiveProfile();
+        if(act){
+          if(Array.isArray(WI.techs)) act.techs = WI.techs;
+          if(Array.isArray(WI.moves)) act.moves = WI.moves;
+        }
         var payload = {
           kind: 'witcher',
-          version: 1,
+          version: 2,
           meta: WI.meta,
           profiles: WI.profiles,
           activeProfileId: WI.activeProfileId
@@ -1063,8 +1178,20 @@
             if(!data || (!Array.isArray(data.profiles) && !data.meta)) throw 0;
             if(!confirm('Заменить текущие данные режима «Ведьмак» данными из файла?')) return;
             if(Array.isArray(data.profiles) && data.profiles.length > 0){
+              var targetActiveId = data.activeProfileId || data.profiles[0].id;
+              if(Array.isArray(data.techs) || Array.isArray(data.moves)){
+                var actInFile = data.profiles.find(function(p){ return p && p.id === targetActiveId; }) || data.profiles[0];
+                if(actInFile){
+                  if(!Array.isArray(actInFile.techs) && Array.isArray(data.techs)) actInFile.techs = data.techs;
+                  if(!Array.isArray(actInFile.moves) && Array.isArray(data.moves)) actInFile.moves = data.moves;
+                }
+              }
+              WI._migrateAndNormalizeProfiles(data.profiles, targetActiveId);
               WI.profiles = data.profiles;
-              WI.activeProfileId = data.activeProfileId || data.profiles[0].id;
+              WI.activeProfileId = targetActiveId;
+              var actNow = WI.getActiveProfile();
+              WI.techs = actNow.techs;
+              WI.moves = actNow.moves;
               WI.saveProfiles();
             }
             if(data.meta){
@@ -1102,6 +1229,16 @@
         var target = el.getAttribute('data-go');
         if(target && typeof window.navigate === 'function'){
           window.navigate(target);
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-wi-quick-profile-select]').forEach(function(sel){
+      if(sel.__wiProfBound) return;
+      sel.__wiProfBound = true;
+      sel.addEventListener('change', function(){
+        if(this.value && this.value !== WI.activeProfileId){
+          WI.switchProfile(this.value);
         }
       });
     });
@@ -1755,7 +1892,7 @@
   var WI_MOVES_KEY = 'ttc_wi_moves';
   var WI_MARKERS_KEY = 'ttc_wi_markers';
   var WI_ROUTE_KEY = 'ttc_wi_route_v2';
-  var WI_TACTICAL_KEY = 'ttc_wi_tactics_v2';
+  var WI_TACTICAL_KEY = 'ttc_wi_tactics_v3';
 
   var DEFAULT_WI_TECHS = [];
   var DEFAULT_WI_MOVES = [];
@@ -1804,6 +1941,15 @@
     { id: 'brugge', name: 'Бругге', x: 1605, y: 1575, icon: '🏰', type: 'city', regionKey: 'temeria', region: 'Королевство Бругге', ruler: 'Король Венцлав', climate: 'Лесостепь у реки Вроница', danger: 'Средняя', desc: 'Крепость и перекрёсток военных трактов между Брокилоном, Содденом и долиной реки Яруга.' },
     { id: 'stygga_castle', name: 'Замок Стигга (Цитадель Вильгефорца)', x: 1390, y: 2980, icon: '💀', type: 'magic', regionKey: 'nilfgaard', region: 'Эббинг (Мыс Сорочий)', ruler: 'Чародей Вильгефорц из Роггевеена', climate: 'Штормовой скалистый утёс в Эббинге', danger: 'Смертельная (Лаборатории Вильгефорца, наёмники Бонарта)', desc: 'Мрачный замок на неприступном морском утёсе в Эббинге, где разыгралась финальная битва ганзы Геральта с Вильгефорцем и Лео Бонартом.' },
     { id: 'korath_desert', name: 'Пустыня Корат («Сковорода»)', x: 2580, y: 2920, icon: '🏜️', type: 'nature', regionKey: 'nilfgaard', region: 'Восток Империи (За горами Тир Тохар)', ruler: 'Песчаные чудовища (Гogловоры)', climate: 'Испепеляющий зной, безводные дюны', danger: 'Экстремальная (Обезвоживание, песчаные бестии)', desc: 'Беспощадная раскалённая пустыня за хребтом Тир Тохар, куда портал Башни Чайки забросил Цири.' },
+    { id: 'hengfors_city', name: 'Хенгфорс (Столица Лиги)', x: 1515, y: 390, icon: '🦅', type: 'capital', regionKey: 'kovir', region: 'Лига Хенгфорса (Каингорн)', ruler: 'Король Недамир из Каингорна', climate: 'Предгорья Драконьих и Пустельских гор', danger: 'Низкая', desc: 'Столица Лиги Хенгфорса на реке Браа — богатого союза северных княжеств (Каингорн, Маллеора, Крейден, Арксия и Ямурлак).' },
+    { id: 'verden_city', name: 'Настрог и Хамм (Вердэн)', x: 1190, y: 1685, icon: '🌲', type: 'capital', regionKey: 'temeria', region: 'Королевство Вердэн', ruler: 'Король Эрвилл / Принц Кистрин', climate: 'Лесное побережье у устья Яруги', danger: 'Высокая (Рейды дриад Брокилона)', desc: 'Королевство Вердэн между лесом Брокилон и северным берегом устья Яруги, охраняемое крепостями Настрог, Розрог и Бодрог.' },
+    { id: 'nazair_city', name: 'Ассенгард и Рис-Рун (Назаир)', x: 1685, y: 2135, icon: '⚔️', type: 'capital', regionKey: 'nilfgaard', region: 'Королевство Назаир', ruler: 'Короли Назаира / Наместник', climate: 'Скалистые склоны Марнадаля и озеро Муредах', danger: 'Высокая', desc: 'Древнее южное королевство к югу от ступеней Марнадаля и гор Амелл, славящееся замком Рис-Рун и бездонным озером Тарн Мира.' },
+    { id: 'metinna_city', name: 'Метинна', x: 1675, y: 2565, icon: '🐎', type: 'capital', regionKey: 'nilfgaard', region: 'Королевство Метинна', ruler: 'Короли Метинны', climate: 'Степные равнины реки Сильте', danger: 'Средняя', desc: 'Столица королевства Метинна на реке Сильте, прославленного своими коневодами и лучшей лёгкой кавалерией Юга.' },
+    { id: 'geso_city', name: 'Глисвен и Амарилло (Гесо)', x: 2365, y: 2745, icon: '🏜️', type: 'capital', regionKey: 'nilfgaard', region: 'Королевство Гесо', ruler: 'Правители Гесо', climate: 'Засушливые предгорья Тир Тохар', danger: 'Высокая (Банды Крыс, наёмники)', desc: 'Восточное южное королевство у подножия хребта Тир Тохар на границе с раскалённой пустыней Корат.' },
+    { id: 'maecht_city', name: 'Маэхт', x: 1995, y: 3015, icon: '👑', type: 'capital', regionKey: 'nilfgaard', region: 'Королевство Маэхт', ruler: 'Король Хотспорн / Короли Маэхта', climate: 'Долина рек Вельда и Им Лебар', danger: 'Средняя', desc: 'Богатое южное королевство между Метинной, Эббингом и Геммерой, сохраняющее собственную корону и привилегии.' },
+    { id: 'gemmera_city', name: 'Геммера', x: 1955, y: 3255, icon: '🐻', type: 'capital', regionKey: 'nilfgaard', region: 'Геммера', ruler: 'Правители Геммеры', climate: 'Суровые нагорья у хребта Тир Тохар', danger: 'Высокая (Пацификаторы, горные бестии)', desc: 'Воинственная горная страна к югу от реки Им Лебар, известная своими суровыми наёмниками и рудниками.' },
+    { id: 'etolia_city', name: 'Башня Ветров и Эйддон (Этолия)', x: 1395, y: 3495, icon: '🌊', type: 'capital', regionKey: 'nilfgaard', region: 'Королевство Этолия', ruler: 'Правители Этолии', climate: 'Приморские утёсы и виноградники Баккалы', danger: 'Средняя', desc: 'Прибрежное южное королевство между Даэрланом и устьем Альбы, славящееся портами Эйддон, Баккала и древней Башней Ветров.' },
+    { id: 'vicovaro_city', name: 'Виковаро', x: 2295, y: 3480, icon: '🔮', type: 'capital', regionKey: 'nilfgaard', region: 'Виковаро', ruler: 'Князья и ректоры Виковаро', climate: 'Тёплая долина верхней Альбы', danger: 'Средняя', desc: 'Древняя столица Виковаро со знаменитой академией медицины и магии, откуда родом чародейка Фрингилья Виго и Кагыр.' },
     { id: 'nilfgaard_city', name: 'Город Золотых Башен (Нильфгаард)', x: 1710, y: 3800, icon: '☀️', type: 'capital', regionKey: 'nilfgaard', region: 'Империя Нильфгаард', ruler: 'Император Эмгыр вар Эмрейс', climate: 'Южный субтропический, река Альба', danger: 'Смертельная (Имперская гвардия «Импера», Ватье де Ридо)', desc: 'Сердце Империи Великого Солнца на реке Альба. Императорский дворец Белого Пламени и купола из чистого золота.' }
   ];
 
@@ -1843,14 +1989,18 @@
      ============================================================ */
 
   var WI_TACTICAL_FACTIONS = {
-    nilfgaard:      { id: 'nilfgaard',      name: 'Империя Нильфгаард',          short: '☀️ Нильфгаард',     icon: '☀️', color: '#eab308' },
-    redania:        { id: 'redania',        name: 'Редания и Северный Союз',     short: '🦅 Редания',        icon: '🦅', color: '#ef4444' },
-    temeria:        { id: 'temeria',        name: 'Темерия и Синие Полоски',     short: '⚜️ Темерия',        icon: '⚜️', color: '#3b82f6' },
-    kaedwen_aedirn: { id: 'kaedwen_aedirn', name: 'Каэдвен, Аэдирн и Лирия',     short: '🦄 Восток Севера',  icon: '🦄', color: '#f97316' },
-    skellige:       { id: 'skellige',       name: 'Кланы Скеллиге',              short: '⛵ Скеллиге',       icon: '⛵', color: '#06b6d4' },
-    scoiatael:      { id: 'scoiatael',      name: 'Скоя\'таэли и Брокилон',      short: '🏹 Скоя\'таэли',    icon: '🏹', color: '#22c55e' },
-    wild_hunt:      { id: 'wild_hunt',      name: 'Дикая Охота и Чудовища',      short: '💀 Дикая Охота',    icon: '💀', color: '#a855f7' },
-    kovir_witchers: { id: 'kovir_witchers', name: 'Цех Ведьмаков / Ковир',       short: '🐺 Ведьмаки/Ковир', icon: '🐺', color: '#38bdf8' }
+    independent: { id: 'independent', name: 'Суверенитет (Родной цвет страны)', short: '🕊️ Суверенитет', icon: '🕊️', color: '#94a3b8' },
+    nilfgaard:   { id: 'nilfgaard',   name: 'Империя Нильфгаард',               short: '☀️ Нильфгаард',  icon: '☀️', color: '#facc15' },
+    redania:     { id: 'redania',     name: 'Королевство Редания',              short: '🦅 Редания',     icon: '🦅', color: '#ef4444' },
+    temeria:     { id: 'temeria',     name: 'Королевство Темерия',              short: '⚜️ Темерия',     icon: '⚜️', color: '#3b82f6' },
+    kaedwen:     { id: 'kaedwen',     name: 'Королевство Каэдвен',              short: '🦄 Каэдвен',     icon: '🦄', color: '#eab308' },
+    aedirn:      { id: 'aedirn',      name: 'Королевство Аэдирн',               short: '🔥 Аэдирн',      icon: '🔥', color: '#f97316' },
+    lyria:       { id: 'lyria',       name: 'Лирия и Ривия',                    short: '🛡️ Лирия',       icon: '🛡️', color: '#f59e0b' },
+    cintra:      { id: 'cintra',      name: 'Королевство Цинтра',               short: '🦁 Цинтра',      icon: '🦁', color: '#10b981' },
+    kovir:       { id: 'kovir',       name: 'Ковир и Повисс',                   short: '💎 Ковир',       icon: '💎', color: '#38bdf8' },
+    skellige:    { id: 'skellige',    name: 'Кланы Скеллиге',                   short: '⛵ Скеллиге',    icon: '⛵', color: '#06b6d4' },
+    scoiatael:   { id: 'scoiatael',   name: 'Брокилон и Скоя\'таэли',           short: '🏹 Брокилон',    icon: '🏹', color: '#16a34a' },
+    wild_hunt:   { id: 'wild_hunt',   name: 'Дикая Охота',                      short: '💀 Дикая Охота', icon: '💀', color: '#a855f7' }
   };
 
   var WI_TACTICAL_UNIT_TYPES = {
@@ -1867,141 +2017,313 @@
       id: "kovir",
       locId: "pont_vannis",
       name: "Ковир и Повисс",
-      defaultFaction: "kovir_witchers",
-      labelX: 760, labelY: 230,
-      d: "M 340 0 L 339 18 L 330 24 L 329 58 L 291 92 L 289 108 L 280 114 L 279 138 L 270 144 L 269 168 L 258 179 L 242 181 L 238 189 L 221 192 L 220 226 L 210 234 L 212 249 L 226 250 L 232 241 L 246 240 L 270 264 L 269 278 L 260 284 L 259 308 L 251 312 L 249 328 L 240 334 L 240 376 L 259 382 L 260 426 L 251 432 L 249 448 L 231 462 L 229 478 L 221 482 L 220 506 L 210 514 L 210 536 L 222 549 L 246 550 L 269 528 L 272 511 L 299 512 L 299 528 L 290 534 L 290 566 L 280 576 L 289 582 L 291 608 L 339 652 L 342 669 L 358 671 L 364 680 L 380 676 L 380 654 L 370 646 L 370 594 L 361 588 L 350 554 L 358 551 L 366 560 L 379 548 L 380 524 L 390 516 L 390 464 L 402 451 L 446 450 L 454 440 L 476 440 L 482 449 L 496 450 L 501 432 L 506 430 L 532 459 L 538 459 L 542 451 L 559 448 L 561 422 L 569 418 L 571 402 L 592 381 L 608 379 L 614 370 L 648 369 L 652 361 L 668 359 L 674 350 L 708 349 L 734 320 L 772 359 L 796 360 L 802 351 L 816 350 L 840 374 L 840 426 L 830 434 L 829 468 L 811 482 L 809 498 L 790 514 L 791 528 L 800 534 L 801 568 L 822 589 L 828 589 L 832 581 L 848 579 L 879 548 L 881 532 L 892 521 L 908 519 L 922 501 L 978 499 L 981 482 L 999 468 L 1001 452 L 1009 448 L 1011 432 L 1022 421 L 1048 419 L 1059 408 L 1061 392 L 1074 380 L 1080 323 L 1089 274 L 1103 244 L 1138 202 L 1164 158 L 1173 127 L 1175 72 L 892 70 L 536 53 L 463 41 L 340 0 Z"
+      icon: "💎",
+      baseColor: "#38bdf8",
+      defaultFaction: "kovir",
+      labelX: 820, labelY: 240,
+      d: "M 336 16 L 335 25 L 333 43 L 319 67 L 293 97 L 277 127 L 271 157 L 255 178 L 229 190 L 215 209 L 213 235 L 222 245 L 242 239 L 256 241 L 264 251 L 266 269 L 262 295 L 255 317 L 245 335 L 240 350 L 240 362 L 246 373 L 258 383 L 264 393 L 264 403 L 254 427 L 234 465 L 222 497 L 218 523 L 222 538 L 234 542 L 249 534 L 267 514 L 280 504 L 288 504 L 294 510 L 298 522 L 296 540 L 288 564 L 285 580 L 287 588 L 303 611 L 333 649 L 356 669 L 372 671 L 372 643 L 356 585 L 353 554 L 363 550 L 373 526 L 383 482 L 392 456 L 400 448 L 412 445 L 428 447 L 446 445 L 466 439 L 480 439 L 488 445 L 494 445 L 498 439 L 504 436 L 512 436 L 522 440 L 534 448 L 545 447 L 555 437 L 565 419 L 575 393 L 605 370 L 655 350 L 688 340 L 704 340 L 715 335 L 721 325 L 728 320 L 736 320 L 748 328 L 764 344 L 784 350 L 808 346 L 825 351 L 835 365 L 839 394 L 837 438 L 824 475 L 800 505 L 795 535 L 809 565 L 828 575 L 852 565 L 871 548 L 885 524 L 901 508 L 919 500 L 939 496 L 961 496 L 981 480 L 999 448 L 1012 428 L 1020 420 L 1028 416 L 1036 416 L 1047 407 L 1061 389 L 1081 378 L 1107 374 L 1120 372 L 1132 356 L 1156 326 L 1170 296 L 1173 269 L 1178 238 L 1182 202 L 1180 168 L 1170 132 L 1165 115 L 1119 112 L 1026 108 L 930 102 L 830 98 L 722 90 L 608 80 L 496 60 L 390 31 L 336 16 Z"
     },
     {
       id: "hengfors",
       locId: "blaviken",
-      name: "Лига Хенгфорса и Каингорн",
-      defaultFaction: "kovir_witchers",
-      labelX: 1480, labelY: 320,
-      d: "M 1175 72 L 1173 127 L 1164 158 L 1138 202 L 1103 244 L 1089 274 L 1080 323 L 1074 380 L 1136 380 L 1152 399 L 1168 401 L 1182 419 L 1198 421 L 1202 429 L 1238 431 L 1249 442 L 1251 458 L 1259 462 L 1261 478 L 1269 482 L 1270 506 L 1279 512 L 1281 538 L 1309 562 L 1350 546 L 1413 514 L 1562 483 L 1674 446 L 1701 440 L 1726 440 L 1753 447 L 1855 490 L 1899 399 L 1916 346 L 1926 294 L 1922 259 L 1889 154 L 1875 75 L 1774 72 L 1623 79 L 1429 70 L 1259 75 L 1175 72 Z"
+      name: "Лига Хенгфорса",
+      icon: "🦅",
+      baseColor: "#818cf8",
+      defaultFaction: "hengfors",
+      labelX: 1540, labelY: 340,
+      d: "M 1165 115 L 1219 114 L 1326 111 L 1440 106 L 1560 99 L 1681 99 L 1804 106 L 1865 110 L 1872 135 L 1888 185 L 1889 236 L 1876 289 L 1864 341 L 1851 394 L 1849 446 L 1856 499 L 1859 550 L 1856 600 L 1855 625 L 1832 624 L 1788 621 L 1745 616 L 1705 609 L 1665 592 L 1625 568 L 1588 540 L 1552 510 L 1512 502 L 1468 518 L 1422 524 L 1378 521 L 1338 526 L 1305 538 L 1288 544 L 1283 526 L 1273 490 L 1264 466 L 1256 454 L 1246 442 L 1234 430 L 1220 423 L 1204 421 L 1189 413 L 1175 399 L 1156 387 L 1132 377 L 1120 372 L 1132 356 L 1156 326 L 1170 296 L 1173 269 L 1178 238 L 1182 202 L 1180 168 L 1170 132 L 1165 115 Z"
     },
     {
       id: "kaedwen",
       locId: "ard_carraigh",
-      name: "Королевство Каэдвен",
-      defaultFaction: "kaedwen_aedirn",
-      labelX: 2240, labelY: 490,
-      d: "M 1875 75 L 1889 154 L 1922 259 L 1926 294 L 1916 346 L 1899 399 L 1855 490 L 1852 538 L 1861 598 L 1860 612 L 1850 658 L 1851 688 L 1859 716 L 1871 737 L 1895 759 L 1925 775 L 1969 762 L 2004 758 L 2109 771 L 2163 772 L 2360 742 L 2467 750 L 2582 752 L 2755 775 L 2766 700 L 2756 611 L 2758 589 L 2777 521 L 2779 499 L 2771 431 L 2772 407 L 2788 332 L 2790 308 L 2786 258 L 2767 186 L 2758 164 L 2746 144 L 2731 127 L 2713 113 L 2692 102 L 2667 93 L 2608 82 L 2397 74 L 2249 78 L 2101 72 L 1959 77 L 1875 75 Z"
+      name: "Каэдвен",
+      icon: "🦄",
+      baseColor: "#eab308",
+      defaultFaction: "kaedwen",
+      labelX: 2260, labelY: 440,
+      d: "M 1865 110 L 1936 111 L 2079 114 L 2225 112 L 2375 108 L 2510 102 L 2630 98 L 2690 95 L 2698 141 L 2712 234 L 2724 340 L 2731 460 L 2729 584 L 2716 711 L 2710 775 L 2679 778 L 2616 782 L 2555 790 L 2495 800 L 2438 809 L 2382 816 L 2355 820 L 2328 815 L 2272 805 L 2218 809 L 2162 826 L 2105 830 L 2045 820 L 1990 811 L 1940 804 L 1915 800 L 1908 789 L 1892 766 L 1880 742 L 1870 718 L 1862 685 L 1858 645 L 1855 625 L 1856 600 L 1859 550 L 1856 499 L 1849 446 L 1851 394 L 1864 341 L 1876 289 L 1889 236 L 1888 185 L 1872 135 L 1865 110 Z"
     },
     {
       id: "redania",
       locId: "tretogor",
-      name: "Королевство Редания и Новиград",
+      name: "Редания",
+      icon: "🦅",
+      baseColor: "#ef4444",
       defaultFaction: "redania",
-      labelX: 1480, labelY: 740,
-      d: "M 1309 562 L 1308 569 L 1292 571 L 1268 599 L 1252 601 L 1246 610 L 1232 609 L 1228 601 L 1222 601 L 1211 612 L 1208 629 L 1142 651 L 1130 664 L 1131 678 L 1140 684 L 1139 718 L 1122 721 L 1108 739 L 1091 742 L 1089 758 L 1080 764 L 1079 788 L 1060 804 L 1061 818 L 1072 829 L 1088 831 L 1109 852 L 1111 868 L 1120 874 L 1120 906 L 1129 912 L 1130 936 L 1140 944 L 1140 996 L 1130 1004 L 1130 1046 L 1140 1054 L 1256 1047 L 1318 1049 L 1348 1042 L 1458 998 L 1506 974 L 1609 888 L 1762 796 L 1811 782 L 1925 775 L 1895 759 L 1871 737 L 1859 716 L 1851 688 L 1850 658 L 1860 612 L 1861 598 L 1852 538 L 1855 490 L 1753 447 L 1726 440 L 1701 440 L 1674 446 L 1562 483 L 1413 514 L 1350 546 L 1309 562 Z"
-    },
-    {
-      id: "mahakam",
-      locId: "mahakam",
-      name: "Горная твердыня Махакам",
-      defaultFaction: "scoiatael",
-      labelX: 2035, labelY: 1210,
-      d: "M 1960 935 L 1994 951 L 2020 969 L 2042 996 L 2069 1045 L 2083 1082 L 2094 1122 L 2128 1285 L 2135 1338 L 2128 1386 L 2114 1414 L 2075 1455 L 2023 1435 L 1997 1414 L 1975 1385 L 1967 1368 L 1954 1330 L 1948 1268 L 1958 1162 L 1959 1121 L 1941 995 L 1946 966 L 1960 935 Z"
-    },
-    {
-      id: "brokilon",
-      locId: "brokilon",
-      name: "Заповедный Лес Брокилон",
-      defaultFaction: "scoiatael",
-      labelX: 1360, labelY: 1525,
-      d: "M 1227 1439 L 1238 1428 L 1251 1419 L 1264 1412 L 1279 1406 L 1296 1401 L 1312 1399 L 1328 1398 L 1344 1400 L 1361 1403 L 1377 1408 L 1392 1415 L 1408 1423 L 1422 1433 L 1437 1444 L 1450 1455 L 1463 1467 L 1474 1479 L 1485 1492 L 1493 1504 L 1501 1517 L 1506 1529 L 1510 1542 L 1511 1554 L 1509 1567 L 1506 1579 L 1500 1590 L 1492 1600 L 1483 1609 L 1472 1617 L 1459 1624 L 1445 1630 L 1429 1635 L 1411 1639 L 1394 1642 L 1376 1644 L 1359 1644 L 1341 1642 L 1325 1639 L 1309 1635 L 1294 1630 L 1279 1622 L 1266 1614 L 1254 1605 L 1243 1594 L 1233 1583 L 1224 1570 L 1218 1558 L 1212 1544 L 1208 1531 L 1206 1517 L 1204 1503 L 1205 1489 L 1207 1476 L 1211 1463 L 1218 1450 Z"
+      labelX: 1440, labelY: 760,
+      d: "M 1288 544 L 1290 550 L 1294 562 L 1290 575 L 1278 589 L 1259 598 L 1233 602 L 1215 611 L 1205 625 L 1184 638 L 1152 650 L 1137 670 L 1139 698 L 1127 721 L 1101 739 L 1085 759 L 1079 781 L 1072 796 L 1064 804 L 1074 822 L 1102 850 L 1116 870 L 1116 882 L 1122 902 L 1134 930 L 1137 966 L 1131 1010 L 1132 1037 L 1140 1047 L 1144 1052 L 1162 1050 L 1197 1044 L 1232 1040 L 1268 1037 L 1310 1035 L 1360 1035 L 1408 1028 L 1452 1012 L 1495 985 L 1535 945 L 1580 922 L 1630 918 L 1672 898 L 1708 862 L 1748 840 L 1792 830 L 1840 819 L 1890 806 L 1915 800 L 1908 789 L 1892 766 L 1880 742 L 1870 718 L 1862 685 L 1858 645 L 1855 625 L 1832 624 L 1788 621 L 1745 616 L 1705 609 L 1665 592 L 1625 568 L 1588 540 L 1552 510 L 1512 502 L 1468 518 L 1422 524 L 1378 521 L 1338 526 L 1305 538 L 1288 544 Z"
     },
     {
       id: "temeria",
       locId: "vizima",
-      name: "Королевство Темерия, Велен и Побережье",
+      name: "Темерия",
+      icon: "⚜️",
+      baseColor: "#3b82f6",
       defaultFaction: "temeria",
-      labelX: 1615, labelY: 1260,
-      d: "M 1140 1054 L 1141 1088 L 1210 1094 L 1206 1100 L 1144 1100 L 1130 1114 L 1130 1146 L 1159 1172 L 1161 1208 L 1168 1209 L 1174 1200 L 1190 1204 L 1171 1222 L 1169 1248 L 1144 1250 L 1136 1240 L 1094 1240 L 1086 1230 L 1044 1230 L 1038 1221 L 1022 1219 L 1018 1211 L 1012 1211 L 978 1249 L 961 1252 L 960 1266 L 969 1272 L 970 1286 L 961 1292 L 958 1309 L 942 1311 L 938 1319 L 922 1321 L 916 1330 L 842 1331 L 838 1339 L 821 1342 L 820 1376 L 834 1390 L 886 1390 L 894 1380 L 916 1380 L 924 1390 L 1006 1390 L 1012 1399 L 1028 1401 L 1034 1410 L 1086 1410 L 1092 1419 L 1119 1422 L 1118 1439 L 1102 1441 L 1096 1450 L 1071 1452 L 1069 1468 L 1060 1474 L 1060 1516 L 1069 1522 L 1071 1538 L 1100 1564 L 1100 1626 L 1091 1632 L 1091 1638 L 1102 1649 L 1118 1651 L 1159 1692 L 1161 1728 L 1172 1739 L 1188 1741 L 1209 1762 L 1276 1764 L 1418 1750 L 1497 1752 L 1530 1750 L 1544 1746 L 1568 1732 L 1607 1688 L 1618 1680 L 1631 1673 L 1658 1666 L 1684 1666 L 1760 1678 L 1827 1680 L 1885 1695 L 1925 1700 L 1965 1696 L 2055 1675 L 2051 1572 L 2068 1503 L 2075 1455 L 2023 1435 L 1997 1414 L 1975 1385 L 1967 1368 L 1954 1330 L 1948 1268 L 1958 1162 L 1959 1121 L 1941 995 L 1946 966 L 1960 935 L 1925 775 L 1811 782 L 1762 796 L 1609 888 L 1506 974 L 1458 998 L 1348 1042 L 1318 1049 L 1256 1047 L 1140 1054 Z M 1218 1450 L 1211 1463 L 1207 1476 L 1205 1489 L 1204 1503 L 1206 1517 L 1208 1531 L 1212 1544 L 1218 1558 L 1224 1570 L 1233 1583 L 1243 1594 L 1254 1605 L 1266 1614 L 1279 1622 L 1294 1630 L 1309 1635 L 1325 1639 L 1341 1642 L 1359 1644 L 1376 1644 L 1394 1642 L 1411 1639 L 1429 1635 L 1445 1630 L 1459 1624 L 1472 1617 L 1483 1609 L 1492 1600 L 1500 1590 L 1506 1579 L 1509 1567 L 1511 1554 L 1510 1542 L 1506 1529 L 1501 1517 L 1493 1504 L 1485 1492 L 1474 1479 L 1463 1467 L 1450 1455 L 1437 1444 L 1422 1433 L 1408 1423 L 1392 1415 L 1377 1408 L 1361 1403 L 1344 1400 L 1328 1398 L 1312 1399 L 1296 1401 L 1279 1406 L 1264 1412 L 1251 1419 L 1238 1428 L 1227 1439 Z"
+      labelX: 1560, labelY: 1220,
+      d: "M 1144 1052 L 1161 1054 L 1195 1058 L 1209 1069 L 1203 1087 L 1185 1098 L 1155 1102 L 1137 1107 L 1131 1113 L 1129 1124 L 1131 1140 L 1139 1154 L 1153 1166 L 1164 1172 L 1172 1172 L 1180 1178 L 1188 1190 L 1192 1200 L 1192 1208 L 1187 1215 L 1177 1221 L 1172 1224 L 1174 1232 L 1180 1247 L 1184 1269 L 1186 1296 L 1195 1321 L 1208 1344 L 1215 1355 L 1255 1375 L 1272 1376 L 1308 1379 L 1340 1389 L 1370 1406 L 1400 1425 L 1430 1445 L 1458 1465 L 1482 1485 L 1495 1495 L 1508 1492 L 1532 1488 L 1558 1482 L 1582 1478 L 1605 1478 L 1625 1482 L 1635 1485 L 1648 1492 L 1672 1508 L 1700 1515 L 1730 1515 L 1758 1508 L 1782 1492 L 1802 1478 L 1818 1462 L 1825 1455 L 1840 1445 L 1870 1425 L 1900 1402 L 1930 1378 L 1945 1365 L 1942 1345 L 1938 1305 L 1932 1258 L 1928 1202 L 1930 1142 L 1940 1078 L 1955 1018 L 1975 962 L 1985 935 L 1978 918 L 1962 882 L 1945 849 L 1925 816 L 1915 800 L 1890 806 L 1840 819 L 1792 830 L 1748 840 L 1708 862 L 1672 898 L 1630 918 L 1580 922 L 1535 945 L 1495 985 L 1452 1012 L 1408 1028 L 1360 1035 L 1310 1035 L 1268 1037 L 1232 1040 L 1197 1044 L 1162 1050 L 1144 1052 Z"
+    },
+    {
+      id: "cidaris",
+      locId: "cidaris",
+      name: "Сидарис",
+      icon: "⚓",
+      baseColor: "#0ea5e9",
+      defaultFaction: "cidaris",
+      labelX: 1045, labelY: 1295,
+      d: "M 1172 1224 L 1172 1230 L 1172 1242 L 1166 1249 L 1154 1251 L 1140 1248 L 1124 1240 L 1104 1233 L 1080 1227 L 1061 1226 L 1047 1230 L 1038 1229 L 1034 1223 L 1026 1219 L 1014 1217 L 997 1225 L 975 1243 L 963 1266 L 961 1294 L 948 1313 L 924 1323 L 891 1330 L 849 1334 L 825 1339 L 819 1345 L 817 1354 L 819 1366 L 823 1374 L 829 1378 L 843 1381 L 865 1383 L 881 1381 L 891 1375 L 903 1375 L 917 1381 L 943 1383 L 981 1381 L 1006 1385 L 1018 1395 L 1037 1401 L 1063 1403 L 1076 1404 L 1088 1399 L 1113 1390 L 1138 1380 L 1162 1370 L 1185 1362 L 1205 1358 L 1215 1355 L 1208 1344 L 1195 1321 L 1186 1296 L 1184 1269 L 1180 1247 L 1174 1232 L 1172 1224 Z"
+    },
+    {
+      id: "kerack",
+      locId: "kerack",
+      name: "Керак",
+      icon: "⛵",
+      baseColor: "#14b8a6",
+      defaultFaction: "kerack",
+      labelX: 1125, labelY: 1445,
+      d: "M 1076 1404 L 1085 1407 L 1103 1413 L 1113 1421 L 1115 1431 L 1107 1439 L 1089 1445 L 1074 1455 L 1062 1469 L 1058 1483 L 1062 1497 L 1064 1504 L 1077 1504 L 1102 1502 L 1130 1501 L 1160 1499 L 1188 1497 L 1212 1496 L 1225 1495 L 1224 1485 L 1221 1465 L 1222 1445 L 1228 1425 L 1236 1405 L 1249 1385 L 1255 1375 L 1215 1355 L 1205 1358 L 1185 1362 L 1162 1370 L 1138 1380 L 1113 1390 L 1088 1399 L 1076 1404 Z"
+    },
+    {
+      id: "verden",
+      locId: "cintra",
+      name: "Вердэн",
+      icon: "🌲",
+      baseColor: "#84cc16",
+      defaultFaction: "verden",
+      labelX: 1185, labelY: 1615,
+      d: "M 1064 1504 L 1066 1512 L 1070 1528 L 1080 1543 L 1096 1557 L 1101 1582 L 1095 1618 L 1108 1648 L 1140 1672 L 1158 1694 L 1162 1714 L 1171 1727 L 1185 1733 L 1198 1744 L 1210 1760 L 1224 1766 L 1240 1762 L 1248 1760 L 1260 1749 L 1283 1726 L 1310 1712 L 1340 1708 L 1355 1705 L 1359 1698 L 1368 1682 L 1377 1668 L 1387 1652 L 1395 1635 L 1402 1615 L 1405 1605 L 1385 1608 L 1345 1612 L 1308 1610 L 1272 1600 L 1248 1582 L 1235 1558 L 1227 1532 L 1226 1508 L 1225 1495 L 1212 1496 L 1188 1497 L 1160 1499 L 1130 1501 L 1102 1502 L 1077 1504 L 1064 1504 Z"
+    },
+    {
+      id: "brokilon",
+      locId: "brokilon",
+      name: "Брокилон",
+      icon: "🏹",
+      baseColor: "#16a34a",
+      defaultFaction: "brokilon",
+      labelX: 1355, labelY: 1500,
+      d: "M 1255 1375 L 1249 1385 L 1236 1405 L 1228 1425 L 1222 1445 L 1221 1465 L 1224 1485 L 1225 1495 L 1226 1508 L 1227 1532 L 1235 1558 L 1248 1582 L 1272 1600 L 1308 1610 L 1345 1612 L 1385 1608 L 1405 1605 L 1418 1600 L 1442 1590 L 1460 1575 L 1470 1555 L 1480 1532 L 1490 1508 L 1495 1495 L 1482 1485 L 1458 1465 L 1430 1445 L 1400 1425 L 1370 1406 L 1340 1389 L 1308 1379 L 1272 1376 L 1255 1375 Z"
+    },
+    {
+      id: "brugge",
+      locId: "brugge",
+      name: "Бругге",
+      icon: "🏰",
+      baseColor: "#60a5fa",
+      defaultFaction: "brugge",
+      labelX: 1535, labelY: 1600,
+      d: "M 1405 1605 L 1402 1615 L 1395 1635 L 1387 1652 L 1377 1668 L 1368 1682 L 1359 1698 L 1355 1705 L 1375 1704 L 1415 1703 L 1455 1700 L 1495 1697 L 1530 1692 L 1560 1688 L 1575 1685 L 1585 1682 L 1605 1675 L 1622 1670 L 1638 1667 L 1645 1665 L 1650 1650 L 1660 1620 L 1662 1590 L 1658 1560 L 1650 1530 L 1640 1500 L 1635 1485 L 1625 1482 L 1605 1478 L 1582 1478 L 1558 1482 L 1532 1488 L 1508 1492 L 1495 1495 L 1490 1508 L 1480 1532 L 1470 1555 L 1460 1575 L 1442 1590 L 1418 1600 L 1405 1605 Z"
+    },
+    {
+      id: "sodden",
+      locId: "sodden_hill",
+      name: "Содден",
+      icon: "🔥",
+      baseColor: "#fb7185",
+      defaultFaction: "sodden",
+      labelX: 1820, labelY: 1760,
+      d: "M 1635 1485 L 1640 1500 L 1650 1530 L 1658 1560 L 1662 1590 L 1660 1620 L 1650 1650 L 1645 1665 L 1638 1667 L 1622 1670 L 1605 1675 L 1585 1682 L 1575 1685 L 1582 1700 L 1598 1730 L 1608 1765 L 1612 1805 L 1620 1848 L 1630 1892 L 1642 1932 L 1658 1968 L 1668 1998 L 1672 2022 L 1675 2035 L 1745 2045 L 1772 2040 L 1828 2030 L 1885 2028 L 1945 2032 L 2000 2032 L 2050 2028 L 2092 2022 L 2128 2018 L 2145 2015 L 2170 2000 L 2220 1970 L 2262 1942 L 2298 1918 L 2322 1885 L 2338 1845 L 2345 1825 L 2455 1795 L 2428 1802 L 2372 1818 L 2320 1810 L 2270 1780 L 2220 1750 L 2170 1720 L 2120 1698 L 2070 1682 L 2022 1660 L 1978 1630 L 1955 1615 L 1945 1620 L 1925 1630 L 1902 1628 L 1878 1612 L 1860 1588 L 1850 1552 L 1840 1515 L 1830 1475 L 1825 1455 L 1818 1462 L 1802 1478 L 1782 1492 L 1758 1508 L 1730 1515 L 1700 1515 L 1672 1508 L 1648 1492 L 1635 1485 Z"
+    },
+    {
+      id: "angren",
+      locId: "brenna",
+      name: "Ангрен",
+      icon: "🌫️",
+      baseColor: "#a3e635",
+      defaultFaction: "angren",
+      labelX: 2035, labelY: 1515,
+      d: "M 1825 1455 L 1830 1475 L 1840 1515 L 1850 1552 L 1860 1588 L 1878 1612 L 1902 1628 L 1925 1630 L 1945 1620 L 1955 1615 L 1982 1630 L 2038 1660 L 2092 1668 L 2148 1652 L 2188 1618 L 2212 1562 L 2222 1512 L 2218 1468 L 2210 1425 L 2200 1385 L 2195 1365 L 2175 1375 L 2135 1395 L 2092 1408 L 2048 1412 L 2005 1402 L 1965 1378 L 1945 1365 L 1930 1378 L 1900 1402 L 1870 1425 L 1840 1445 L 1825 1455 Z"
+    },
+    {
+      id: "mahakam",
+      locId: "mahakam",
+      name: "Махакам",
+      icon: "🪓",
+      baseColor: "#94a3b8",
+      defaultFaction: "mahakam",
+      labelX: 2045, labelY: 1185,
+      d: "M 1985 935 L 1975 962 L 1955 1018 L 1940 1078 L 1930 1142 L 1928 1202 L 1932 1258 L 1938 1305 L 1942 1345 L 1945 1365 L 1965 1378 L 2005 1402 L 2048 1412 L 2092 1408 L 2135 1395 L 2175 1375 L 2195 1365 L 2175 1295 L 2172 1280 L 2168 1250 L 2155 1208 L 2135 1152 L 2110 1095 L 2080 1035 L 2045 988 L 2005 952 L 1985 935 Z"
     },
     {
       id: "aedirn",
       locId: "vengerberg",
-      name: "Королевство Аэдирн и Дол Блатанна",
-      defaultFaction: "kaedwen_aedirn",
-      labelX: 2360, labelY: 1090,
-      d: "M 1925 775 L 1960 935 L 1994 951 L 2020 969 L 2042 996 L 2069 1045 L 2083 1082 L 2094 1122 L 2128 1285 L 2176 1282 L 2215 1283 L 2275 1294 L 2356 1315 L 2399 1318 L 2421 1317 L 2466 1306 L 2533 1274 L 2575 1261 L 2636 1256 L 2710 1255 L 2757 1133 L 2771 1082 L 2773 1058 L 2769 1011 L 2757 966 L 2757 944 L 2769 876 L 2770 854 L 2755 775 L 2582 752 L 2467 750 L 2360 742 L 2163 772 L 2109 771 L 2004 758 L 1969 762 L 1925 775 Z"
+      name: "Аэдирн",
+      icon: "🔥",
+      baseColor: "#f97316",
+      defaultFaction: "aedirn",
+      labelX: 2335, labelY: 1125,
+      d: "M 1915 800 L 1925 816 L 1945 849 L 1962 882 L 1978 918 L 1985 935 L 2005 952 L 2045 988 L 2080 1035 L 2110 1095 L 2135 1152 L 2155 1208 L 2168 1250 L 2172 1280 L 2175 1295 L 2198 1299 L 2242 1306 L 2292 1311 L 2348 1314 L 2405 1308 L 2465 1292 L 2525 1282 L 2585 1278 L 2635 1278 L 2675 1282 L 2695 1285 L 2699 1258 L 2706 1202 L 2711 1145 L 2714 1085 L 2715 1055 L 2660 1055 L 2550 1055 L 2462 1045 L 2398 1025 L 2358 992 L 2342 948 L 2340 899 L 2350 846 L 2355 820 L 2328 815 L 2272 805 L 2218 809 L 2162 826 L 2105 830 L 2045 820 L 1990 811 L 1940 804 L 1915 800 Z"
+    },
+    {
+      id: "dol_blathanna",
+      locId: "dol_blathanna",
+      name: "Дол Блатанна",
+      icon: "🌺",
+      baseColor: "#ec4899",
+      defaultFaction: "dol_blathanna",
+      labelX: 2535, labelY: 945,
+      d: "M 2355 820 L 2350 846 L 2340 899 L 2342 948 L 2358 992 L 2398 1025 L 2462 1045 L 2550 1055 L 2660 1055 L 2715 1055 L 2716 1020 L 2719 950 L 2718 880 L 2712 810 L 2710 775 L 2679 778 L 2616 782 L 2555 790 L 2495 800 L 2438 809 L 2382 816 L 2355 820 Z"
     },
     {
       id: "lyria",
       locId: "rivia",
       name: "Лирия и Ривия",
-      defaultFaction: "kaedwen_aedirn",
-      labelX: 2430, labelY: 1410,
-      d: "M 2128 1285 L 2135 1338 L 2128 1386 L 2114 1414 L 2075 1455 L 2068 1503 L 2051 1572 L 2055 1675 L 2124 1665 L 2158 1652 L 2201 1622 L 2255 1572 L 2289 1552 L 2347 1528 L 2412 1510 L 2483 1498 L 2655 1485 L 2688 1373 L 2710 1255 L 2636 1256 L 2575 1261 L 2533 1274 L 2466 1306 L 2421 1317 L 2399 1318 L 2356 1315 L 2275 1294 L 2215 1283 L 2176 1282 L 2128 1285 Z"
+      icon: "🛡️",
+      baseColor: "#f59e0b",
+      defaultFaction: "lyria",
+      labelX: 2440, labelY: 1460,
+      d: "M 2175 1295 L 2195 1365 L 2200 1385 L 2210 1425 L 2218 1468 L 2222 1512 L 2212 1562 L 2188 1618 L 2148 1652 L 2092 1668 L 2038 1660 L 1982 1630 L 1955 1615 L 1978 1630 L 2022 1660 L 2070 1682 L 2120 1698 L 2170 1720 L 2220 1750 L 2270 1780 L 2320 1810 L 2372 1818 L 2428 1802 L 2455 1795 L 2488 1788 L 2552 1772 L 2608 1730 L 2652 1660 L 2684 1582 L 2701 1498 L 2706 1412 L 2699 1328 L 2695 1285 L 2675 1282 L 2635 1278 L 2585 1278 L 2525 1282 L 2465 1292 L 2405 1308 L 2348 1314 L 2292 1311 L 2242 1306 L 2198 1299 L 2175 1295 Z"
     },
     {
       id: "skellige",
       locId: "kaer_trolde",
-      name: "Архипелаг Островов Скеллиге",
+      name: "Скеллиге",
+      icon: "⛵",
+      baseColor: "#06b6d4",
       defaultFaction: "skellige",
-      labelX: 605, labelY: 1635,
-      d: "M 598 1480 L 602 1476 L 623 1476 L 630 1468 L 640 1473 L 640 1494 L 648 1506 L 648 1526 L 656 1534 L 651 1540 L 634 1540 L 631 1536 L 622 1536 L 616 1531 L 616 1514 L 612 1511 L 612 1501 L 596 1487 L 597 1480 Z M 522 1532 L 528 1517 L 541 1504 L 548 1505 L 548 1518 L 544 1522 L 552 1525 L 552 1538 L 548 1542 L 548 1563 L 539 1572 L 524 1563 L 524 1554 L 520 1550 L 521 1532 Z M 718 1564 L 722 1556 L 740 1557 L 740 1563 L 728 1573 L 727 1580 L 721 1580 L 716 1575 L 717 1564 Z M 538 1656 L 572 1639 L 572 1626 L 568 1623 L 568 1614 L 564 1610 L 573 1600 L 587 1596 L 584 1602 L 590 1608 L 600 1594 L 597 1588 L 603 1588 L 606 1592 L 609 1588 L 618 1588 L 622 1592 L 626 1588 L 630 1592 L 646 1580 L 666 1580 L 668 1587 L 672 1589 L 672 1595 L 656 1609 L 656 1619 L 651 1624 L 641 1624 L 636 1629 L 636 1635 L 628 1641 L 632 1655 L 640 1657 L 640 1663 L 631 1672 L 625 1672 L 619 1680 L 588 1681 L 592 1691 L 580 1698 L 580 1703 L 584 1706 L 584 1726 L 577 1728 L 575 1732 L 566 1732 L 560 1727 L 552 1705 L 544 1699 L 544 1682 L 540 1679 L 540 1670 L 536 1666 L 537 1656 Z M 674 1620 L 684 1611 L 688 1597 L 697 1588 L 711 1588 L 720 1597 L 720 1611 L 715 1616 L 705 1616 L 692 1629 L 692 1635 L 685 1636 L 682 1640 L 676 1639 L 673 1620 Z M 386 1700 L 390 1696 L 408 1697 L 407 1724 L 394 1724 L 388 1719 L 388 1713 L 384 1710 L 385 1700 Z M 522 1784 L 524 1777 L 531 1776 L 537 1768 L 566 1768 L 569 1772 L 575 1772 L 581 1780 L 588 1781 L 587 1796 L 574 1796 L 562 1788 L 542 1788 L 531 1796 L 522 1796 L 521 1784 Z"
+      labelX: 585, labelY: 1605,
+      d: "M 522 1528 L 534 1522 L 556 1508 L 580 1505 L 606 1512 L 626 1526 L 644 1547 L 650 1575 L 647 1608 L 637 1641 L 620 1672 L 600 1692 L 577 1701 L 556 1695 L 537 1675 L 523 1650 L 513 1620 L 512 1586 L 518 1547 L 522 1528 Z M 562 1392 L 575 1390 L 602 1387 L 622 1398 L 635 1422 L 638 1443 L 629 1460 L 612 1465 L 585 1458 L 570 1439 L 564 1408 L 562 1392 Z M 455 1452 L 466 1448 L 487 1439 L 502 1448 L 508 1472 L 505 1499 L 492 1528 L 476 1538 L 457 1529 L 450 1507 L 453 1470 L 455 1452 Z M 702 1512 L 714 1510 L 736 1507 L 750 1515 L 756 1535 L 747 1549 L 726 1558 L 712 1550 L 705 1524 L 702 1512 Z M 662 1582 L 676 1580 L 704 1574 L 722 1584 L 731 1606 L 725 1626 L 705 1644 L 686 1647 L 667 1637 L 659 1620 L 661 1594 L 662 1582 Z M 505 1742 L 521 1743 L 552 1744 L 572 1753 L 578 1770 L 566 1779 L 534 1781 L 515 1772 L 508 1752 L 505 1742 Z M 368 1692 L 378 1692 L 398 1692 L 409 1702 L 411 1722 L 402 1732 L 382 1732 L 371 1722 L 369 1702 L 368 1692 Z"
     },
     {
       id: "cintra",
       locId: "cintra",
-      name: "Цинтра, Содден и Речное Междуречье",
-      defaultFaction: "temeria",
-      labelX: 1580, labelY: 1850,
-      d: "M 1209 1762 L 1211 1798 L 1240 1804 L 1230 1814 L 1230 1876 L 1248 1881 L 1259 1892 L 1260 1956 L 1270 1966 L 1251 1982 L 1383 1982 L 1445 1987 L 1505 1999 L 1650 2043 L 1719 2048 L 1818 2042 L 1914 2028 L 2145 1975 L 2333 1912 L 2376 1906 L 2450 1915 L 2500 1823 L 2571 1666 L 2618 1577 L 2655 1485 L 2483 1498 L 2412 1510 L 2347 1528 L 2289 1552 L 2255 1572 L 2201 1622 L 2158 1652 L 2124 1665 L 2055 1675 L 1965 1696 L 1925 1700 L 1885 1695 L 1827 1680 L 1760 1678 L 1684 1666 L 1658 1666 L 1631 1673 L 1618 1680 L 1607 1688 L 1568 1732 L 1544 1746 L 1530 1750 L 1497 1752 L 1418 1750 L 1276 1764 L 1209 1762 Z"
+      name: "Цинтра",
+      icon: "🦁",
+      baseColor: "#10b981",
+      defaultFaction: "cintra",
+      labelX: 1435, labelY: 1885,
+      d: "M 1248 1760 L 1262 1759 L 1290 1757 L 1305 1761 L 1307 1771 L 1302 1777 L 1290 1779 L 1270 1789 L 1242 1807 L 1229 1829 L 1231 1855 L 1240 1876 L 1256 1892 L 1264 1907 L 1264 1921 L 1261 1951 L 1255 1997 L 1246 2023 L 1234 2029 L 1226 2036 L 1222 2044 L 1226 2051 L 1238 2057 L 1252 2058 L 1268 2054 L 1296 2064 L 1336 2088 L 1356 2100 L 1371 2091 L 1400 2074 L 1432 2070 L 1468 2080 L 1500 2088 L 1530 2092 L 1562 2088 L 1598 2072 L 1630 2058 L 1660 2042 L 1675 2035 L 1672 2022 L 1668 1998 L 1658 1968 L 1642 1932 L 1630 1892 L 1620 1848 L 1612 1805 L 1608 1765 L 1598 1730 L 1582 1700 L 1575 1685 L 1560 1688 L 1530 1692 L 1495 1697 L 1455 1700 L 1415 1703 L 1375 1704 L 1355 1705 L 1340 1708 L 1310 1712 L 1283 1726 L 1260 1749 L 1248 1760 Z"
+    },
+    {
+      id: "nazair",
+      locId: "stygga_castle",
+      name: "Назаир",
+      icon: "⚔️",
+      baseColor: "#d97706",
+      defaultFaction: "nazair",
+      labelX: 1520, labelY: 2250,
+      d: "M 1356 2100 L 1360 2114 L 1368 2142 L 1361 2166 L 1339 2186 L 1332 2206 L 1340 2226 L 1340 2262 L 1332 2314 L 1330 2345 L 1334 2355 L 1341 2363 L 1351 2369 L 1356 2372 L 1383 2370 L 1438 2367 L 1490 2372 L 1540 2388 L 1592 2395 L 1648 2395 L 1695 2390 L 1735 2380 L 1755 2375 L 1755 2340 L 1755 2270 L 1745 2210 L 1725 2160 L 1722 2112 L 1738 2068 L 1745 2045 L 1675 2035 L 1660 2042 L 1630 2058 L 1598 2072 L 1562 2088 L 1530 2092 L 1500 2088 L 1468 2080 L 1432 2070 L 1400 2074 L 1371 2091 L 1356 2100 Z"
+    },
+    {
+      id: "mag_turga",
+      locId: "haern_caduch",
+      name: "Маг Турге",
+      icon: "⛰️",
+      baseColor: "#c084fc",
+      defaultFaction: "mag_turga",
+      labelX: 1955, labelY: 2215,
+      d: "M 1745 2045 L 1738 2068 L 1722 2112 L 1725 2160 L 1745 2210 L 1755 2270 L 1755 2340 L 1755 2375 L 1782 2385 L 1838 2405 L 1890 2425 L 1940 2445 L 1990 2462 L 2040 2478 L 2065 2485 L 2078 2460 L 2102 2410 L 2128 2358 L 2152 2302 L 2165 2275 L 2165 2242 L 2165 2178 L 2160 2112 L 2150 2048 L 2145 2015 L 2128 2018 L 2092 2022 L 2050 2028 L 2000 2032 L 1945 2032 L 1885 2028 L 1828 2030 L 1772 2040 L 1745 2045 Z"
     },
     {
       id: "toussaint",
       locId: "beauclair",
-      name: "Княжество Туссент",
-      defaultFaction: "nilfgaard",
-      labelX: 2390, labelY: 2190,
-      d: "M 2145 1975 L 2135 2089 L 2136 2134 L 2141 2179 L 2152 2224 L 2168 2269 L 2179 2291 L 2207 2332 L 2245 2367 L 2267 2381 L 2291 2393 L 2344 2411 L 2401 2417 L 2430 2416 L 2505 2405 L 2561 2349 L 2580 2325 L 2594 2300 L 2604 2274 L 2611 2246 L 2612 2219 L 2610 2191 L 2603 2164 L 2592 2136 L 2552 2058 L 2507 1986 L 2450 1915 L 2376 1906 L 2333 1912 L 2145 1975 Z"
+      name: "Туссент",
+      icon: "🍇",
+      baseColor: "#a855f7",
+      defaultFaction: "toussaint",
+      labelX: 2385, labelY: 2165,
+      d: "M 2145 2015 L 2150 2048 L 2160 2112 L 2165 2178 L 2165 2242 L 2165 2275 L 2190 2290 L 2240 2320 L 2295 2338 L 2355 2342 L 2418 2332 L 2482 2308 L 2540 2282 L 2590 2258 L 2615 2245 L 2602 2205 L 2578 2125 L 2552 2048 L 2528 1972 L 2500 1900 L 2470 1830 L 2428 1802 L 2372 1818 L 2345 1825 L 2338 1845 L 2322 1885 L 2298 1918 L 2262 1942 L 2220 1970 L 2170 2000 L 2145 2015 Z"
     },
     {
-      id: "nilfgaard_provinces",
+      id: "metinna",
       locId: "stygga_castle",
-      name: "Назаир, Метинна и Гесо (Север Империи)",
-      defaultFaction: "nilfgaard",
-      labelX: 1820, labelY: 2520,
-      d: "M 1251 1982 L 1249 2028 L 1232 2031 L 1221 2048 L 1234 2060 L 1276 2060 L 1282 2069 L 1298 2071 L 1302 2079 L 1328 2081 L 1342 2099 L 1359 2102 L 1361 2118 L 1370 2124 L 1369 2168 L 1348 2189 L 1330 2194 L 1330 2226 L 1340 2234 L 1340 2286 L 1330 2294 L 1330 2356 L 1342 2369 L 1358 2371 L 1369 2388 L 1352 2391 L 1348 2399 L 1332 2401 L 1328 2409 L 1312 2411 L 1296 2430 L 1230 2434 L 1231 2448 L 1270 2484 L 1241 2512 L 1241 2518 L 1249 2522 L 1251 2538 L 1272 2559 L 1298 2561 L 1301 2588 L 1350 2636 L 1324 2640 L 1318 2649 L 1302 2651 L 1268 2689 L 1242 2691 L 1221 2712 L 1221 2718 L 1229 2722 L 1230 2736 L 1221 2742 L 1219 2768 L 1202 2771 L 1191 2782 L 1189 2808 L 1181 2812 L 1179 2828 L 1170 2834 L 1170 2896 L 1179 2902 L 1181 2918 L 1198 2921 L 1344 2923 L 1563 2900 L 1754 2891 L 1832 2876 L 1951 2830 L 1998 2822 L 2126 2842 L 2270 2852 L 2364 2866 L 2463 2892 L 2585 2935 L 2610 2838 L 2621 2782 L 2626 2724 L 2622 2667 L 2603 2582 L 2582 2529 L 2557 2481 L 2505 2405 L 2430 2416 L 2401 2417 L 2344 2411 L 2291 2393 L 2267 2381 L 2245 2367 L 2207 2332 L 2179 2291 L 2168 2269 L 2152 2224 L 2141 2179 L 2136 2134 L 2135 2089 L 2145 1975 L 1914 2028 L 1818 2042 L 1719 2048 L 1650 2043 L 1505 1999 L 1445 1987 L 1383 1982 L 1251 1982 Z"
+      name: "Метинна",
+      icon: "🐎",
+      baseColor: "#e879f9",
+      defaultFaction: "metinna",
+      labelX: 1685, labelY: 2615,
+      d: "M 1356 2372 L 1354 2378 L 1350 2390 L 1343 2397 L 1333 2399 L 1320 2407 L 1304 2421 L 1280 2429 L 1248 2431 L 1240 2441 L 1256 2459 L 1264 2473 L 1264 2483 L 1259 2492 L 1249 2500 L 1245 2510 L 1247 2522 L 1252 2533 L 1260 2543 L 1272 2549 L 1288 2551 L 1298 2561 L 1302 2579 L 1308 2589 L 1316 2591 L 1325 2598 L 1335 2610 L 1339 2621 L 1337 2631 L 1322 2645 L 1294 2663 L 1280 2672 L 1314 2695 L 1381 2742 L 1445 2765 L 1505 2765 L 1565 2770 L 1625 2780 L 1680 2790 L 1730 2800 L 1772 2810 L 1808 2820 L 1825 2825 L 1848 2818 L 1892 2802 L 1935 2792 L 1975 2788 L 2015 2788 L 2055 2792 L 2075 2795 L 2068 2780 L 2052 2750 L 2050 2715 L 2060 2675 L 2078 2632 L 2102 2588 L 2102 2545 L 2078 2505 L 2065 2485 L 2040 2478 L 1990 2462 L 1940 2445 L 1890 2425 L 1838 2405 L 1782 2385 L 1755 2375 L 1735 2380 L 1695 2390 L 1648 2395 L 1592 2395 L 1540 2388 L 1490 2372 L 1438 2367 L 1383 2370 L 1356 2372 Z"
     },
     {
-      id: "ebbing_gemmera",
+      id: "geso",
+      locId: "korath_desert",
+      name: "Гесо",
+      icon: "🏜️",
+      baseColor: "#fb923c",
+      defaultFaction: "geso",
+      labelX: 2285, labelY: 2615,
+      d: "M 2065 2485 L 2078 2505 L 2102 2545 L 2102 2588 L 2078 2632 L 2060 2675 L 2050 2715 L 2052 2750 L 2068 2780 L 2075 2795 L 2102 2802 L 2158 2818 L 2218 2830 L 2282 2840 L 2340 2842 L 2390 2838 L 2432 2832 L 2468 2828 L 2485 2825 L 2492 2798 L 2508 2742 L 2522 2675 L 2538 2595 L 2552 2515 L 2568 2435 L 2585 2358 L 2605 2282 L 2615 2245 L 2590 2258 L 2540 2282 L 2482 2308 L 2418 2332 L 2355 2342 L 2295 2338 L 2240 2320 L 2190 2290 L 2165 2275 L 2152 2302 L 2128 2358 L 2102 2410 L 2078 2460 L 2065 2485 Z"
+    },
+    {
+      id: "ebbing",
       locId: "stygga_castle",
-      name: "Эббинг, Маэхт и Геммера",
-      defaultFaction: "nilfgaard",
-      labelX: 1980, labelY: 3150,
-      d: "M 1198 2921 L 1202 2929 L 1246 2930 L 1252 2939 L 1278 2941 L 1281 2958 L 1292 2969 L 1338 2971 L 1340 2986 L 1331 2992 L 1330 3016 L 1349 3032 L 1351 3048 L 1359 3052 L 1361 3078 L 1382 3099 L 1398 3101 L 1412 3119 L 1428 3121 L 1431 3138 L 1439 3142 L 1441 3158 L 1449 3162 L 1449 3198 L 1420 3224 L 1430 3256 L 1421 3262 L 1419 3278 L 1410 3284 L 1410 3326 L 1429 3342 L 1432 3359 L 1448 3361 L 1459 3372 L 1606 3404 L 1659 3408 L 1686 3406 L 1741 3395 L 1842 3355 L 1892 3349 L 2081 3375 L 2266 3385 L 2532 3413 L 2725 3425 L 2699 3303 L 2676 3172 L 2660 3110 L 2628 3024 L 2585 2935 L 2463 2892 L 2364 2866 L 2270 2852 L 2126 2842 L 1998 2822 L 1951 2830 L 1832 2876 L 1754 2891 L 1563 2900 L 1344 2923 L 1198 2921 Z"
+      name: "Эббинг",
+      icon: "💀",
+      baseColor: "#2dd4bf",
+      defaultFaction: "ebbing",
+      labelX: 1615, labelY: 3025,
+      d: "M 1280 2672 L 1267 2680 L 1241 2696 L 1227 2717 L 1225 2743 L 1216 2762 L 1200 2774 L 1191 2787 L 1189 2801 L 1184 2813 L 1176 2823 L 1172 2843 L 1172 2873 L 1177 2895 L 1187 2909 L 1206 2918 L 1234 2922 L 1255 2927 L 1269 2933 L 1280 2942 L 1288 2954 L 1302 2961 L 1322 2963 L 1331 2972 L 1329 2988 L 1337 3015 L 1355 3053 L 1378 3082 L 1406 3102 L 1425 3119 L 1435 3133 L 1443 3153 L 1449 3179 L 1448 3197 L 1440 3207 L 1431 3213 L 1421 3215 L 1419 3226 L 1425 3246 L 1424 3262 L 1416 3274 L 1412 3289 L 1412 3307 L 1423 3329 L 1445 3355 L 1456 3368 L 1483 3370 L 1538 3373 L 1595 3370 L 1655 3360 L 1710 3345 L 1760 3325 L 1802 3302 L 1838 3278 L 1855 3265 L 1865 3240 L 1885 3190 L 1905 3142 L 1925 3098 L 1935 3075 L 1918 3055 L 1882 3015 L 1852 2975 L 1828 2935 L 1818 2892 L 1822 2848 L 1825 2825 L 1808 2820 L 1772 2810 L 1730 2800 L 1680 2790 L 1625 2780 L 1565 2770 L 1505 2765 L 1445 2765 L 1381 2742 L 1314 2695 L 1280 2672 Z"
+    },
+    {
+      id: "maecht",
+      locId: "stygga_castle",
+      name: "Маэхт",
+      icon: "👑",
+      baseColor: "#f472b6",
+      defaultFaction: "maecht",
+      labelX: 2085, labelY: 2935,
+      d: "M 1825 2825 L 1822 2848 L 1818 2892 L 1828 2935 L 1852 2975 L 1882 3015 L 1918 3055 L 1935 3075 L 1965 3075 L 2025 3075 L 2085 3070 L 2145 3060 L 2210 3048 L 2280 3032 L 2352 3025 L 2428 3025 L 2465 3025 L 2468 3000 L 2472 2950 L 2478 2900 L 2482 2850 L 2485 2825 L 2468 2828 L 2432 2832 L 2390 2838 L 2340 2842 L 2282 2840 L 2218 2830 L 2158 2818 L 2102 2802 L 2075 2795 L 2055 2792 L 2015 2788 L 1975 2788 L 1935 2792 L 1892 2802 L 1848 2818 L 1825 2825 Z"
+    },
+    {
+      id: "gemmera",
+      locId: "haern_caduch",
+      name: "Геммера",
+      icon: "🐻",
+      baseColor: "#a78bfa",
+      defaultFaction: "gemmera",
+      labelX: 2185, labelY: 3215,
+      d: "M 1935 3075 L 1925 3098 L 1905 3142 L 1885 3190 L 1865 3240 L 1855 3265 L 1870 3282 L 1900 3318 L 1940 3342 L 1990 3358 L 2015 3365 L 2052 3365 L 2128 3365 L 2208 3368 L 2292 3372 L 2388 3378 L 2492 3382 L 2545 3385 L 2538 3338 L 2522 3242 L 2502 3152 L 2478 3068 L 2465 3025 L 2428 3025 L 2352 3025 L 2280 3032 L 2210 3048 L 2145 3060 L 2085 3070 L 2025 3075 L 1965 3075 L 1935 3075 Z"
+    },
+    {
+      id: "etolia",
+      locId: "nilfgaard_city",
+      name: "Этолия",
+      icon: "🌊",
+      baseColor: "#34d399",
+      defaultFaction: "etolia",
+      labelX: 1715, labelY: 3495,
+      d: "M 1456 3368 L 1458 3378 L 1462 3398 L 1446 3422 L 1410 3450 L 1392 3468 L 1392 3476 L 1385 3490 L 1371 3510 L 1365 3526 L 1367 3538 L 1364 3553 L 1356 3571 L 1356 3583 L 1364 3589 L 1381 3594 L 1407 3598 L 1425 3610 L 1435 3630 L 1444 3641 L 1452 3643 L 1462 3651 L 1474 3665 L 1483 3683 L 1489 3705 L 1512 3711 L 1552 3701 L 1575 3710 L 1581 3738 L 1599 3756 L 1629 3764 L 1644 3768 L 1667 3742 L 1712 3691 L 1755 3645 L 1795 3605 L 1842 3582 L 1898 3578 L 1925 3575 L 1940 3562 L 1970 3538 L 1995 3508 L 2015 3472 L 2022 3432 L 2018 3388 L 2015 3365 L 1990 3358 L 1940 3342 L 1900 3318 L 1870 3282 L 1855 3265 L 1838 3278 L 1802 3302 L 1760 3325 L 1710 3345 L 1655 3360 L 1595 3370 L 1538 3373 L 1483 3370 L 1456 3368 Z"
+    },
+    {
+      id: "vicovaro",
+      locId: "nilfgaard_city",
+      name: "Виковаро",
+      icon: "🔮",
+      baseColor: "#6366f1",
+      defaultFaction: "vicovaro",
+      labelX: 2265, labelY: 3555,
+      d: "M 2015 3365 L 2018 3388 L 2022 3432 L 2015 3472 L 1995 3508 L 1970 3538 L 1940 3562 L 1925 3575 L 1952 3592 L 2008 3628 L 2068 3662 L 2132 3698 L 2210 3722 L 2300 3738 L 2402 3748 L 2518 3752 L 2575 3755 L 2572 3708 L 2568 3612 L 2560 3520 L 2550 3430 L 2545 3385 L 2492 3382 L 2388 3378 L 2292 3372 L 2208 3368 L 2128 3365 L 2052 3365 L 2015 3365 Z"
     },
     {
       id: "nilfgaard_core",
       locId: "nilfgaard_city",
-      name: "Сердце Империи Нильфгаард (Альба и Этолия)",
+      name: "Нильфгаард",
+      icon: "☀️",
+      baseColor: "#facc15",
       defaultFaction: "nilfgaard",
-      labelX: 1980, labelY: 3780,
-      d: "M 1459 3372 L 1460 3416 L 1428 3449 L 1414 3450 L 1408 3459 L 1391 3462 L 1389 3488 L 1381 3492 L 1379 3508 L 1360 3524 L 1369 3532 L 1370 3546 L 1361 3552 L 1350 3586 L 1364 3600 L 1396 3600 L 1402 3609 L 1428 3611 L 1431 3628 L 1439 3632 L 1441 3648 L 1458 3651 L 1479 3672 L 1480 3706 L 1492 3719 L 1546 3720 L 1566 3700 L 1580 3714 L 1582 3759 L 1606 3760 L 1614 3770 L 1659 3772 L 1659 3778 L 1650 3784 L 1650 3826 L 1659 3832 L 1660 3856 L 1648 3869 L 1630 3874 L 1630 3916 L 1640 3924 L 1640 3976 L 1631 3982 L 1630 4006 L 1648 4011 L 1662 4029 L 1678 4031 L 1699 4052 L 1701 4068 L 1710 4074 L 1710 4100 L 2562 4092 L 2657 4085 L 2722 4072 L 2756 4054 L 2762 4005 L 2761 3946 L 2739 3734 L 2741 3548 L 2725 3425 L 2532 3413 L 2266 3385 L 2081 3375 L 1892 3349 L 1842 3355 L 1741 3395 L 1686 3406 L 1659 3408 L 1606 3404 L 1459 3372 Z"
+      labelX: 2055, labelY: 3915,
+      d: "M 1644 3768 L 1648 3788 L 1656 3828 L 1652 3857 L 1636 3875 L 1631 3891 L 1637 3905 L 1638 3933 L 1634 3975 L 1647 4006 L 1677 4026 L 1697 4048 L 1707 4072 L 1712 4084 L 1948 4084 L 2419 4084 L 2645 4044 L 2625 3965 L 2605 3882 L 2585 3798 L 2575 3755 L 2518 3752 L 2402 3748 L 2300 3738 L 2210 3722 L 2132 3698 L 2068 3662 L 2008 3628 L 1952 3592 L 1925 3575 L 1898 3578 L 1842 3582 L 1795 3605 L 1755 3645 L 1712 3691 L 1667 3742 L 1644 3768 Z"
     }
   ];
 
   function getWiTerritoriesList(){
     var owners = (WI.map && WI.map.territoryOwners) || {};
     return WI_TACTICAL_TERRITORIES_BASE.map(function(tb){
-      var ownerKey = owners[tb.id] || tb.defaultFaction;
-      var fac = WI_TACTICAL_FACTIONS[ownerKey] || WI_TACTICAL_FACTIONS[tb.defaultFaction] || WI_TACTICAL_FACTIONS.temeria;
-      var isChanged = (ownerKey !== tb.defaultFaction);
+      var rawOwner = owners[tb.id];
+      var isCaptured = !!(rawOwner && rawOwner !== 'independent' && rawOwner !== tb.defaultFaction && WI_TACTICAL_FACTIONS[rawOwner]);
+      var fac = isCaptured ? WI_TACTICAL_FACTIONS[rawOwner] : null;
+      var color = fac ? fac.color : (tb.baseColor || '#3b82f6');
+      var icon = fac ? fac.icon : (tb.icon || '🏴');
       return {
         id: tb.id,
         locId: tb.locId,
         name: tb.name,
         defaultFaction: tb.defaultFaction,
-        ownerFaction: fac.id,
-        color: fac.color,
-        icon: fac.icon,
+        ownerFaction: fac ? fac.id : tb.defaultFaction,
+        color: color,
+        icon: icon,
         labelX: tb.labelX,
         labelY: tb.labelY,
-        labelText: fac.icon + ' ' + tb.name.toUpperCase() + (isChanged ? ' [' + fac.short.replace(/^[^\s]+\s*/, '') + ']' : ''),
+        labelText: icon + ' ' + tb.name.toUpperCase() + (fac ? ' [' + fac.short.replace(/^[^\s]+\s*/, '') + ']' : ''),
         d: tb.d
       };
     });
@@ -2715,56 +3037,52 @@
   };
 
   WI.loadTechs = function(){
-    try {
-      var raw = localStorage.getItem(WI_TECHS_KEY);
-      if(raw){
-        var arr = JSON.parse(raw);
-        if(Array.isArray(arr)){
-          WI.techs = arr.filter(function(t){ return t && OLD_DEFAULT_TECH_IDS.indexOf(t.id) === -1; });
-          WI.saveTechs();
-          return WI.techs;
-        }
-      }
-    } catch(e){}
+    var act = WI.getActiveProfile();
+    if(act){
+      if(!Array.isArray(act.techs)) act.techs = [];
+      act.techs = act.techs.filter(function(t){ return t && OLD_DEFAULT_TECH_IDS.indexOf(t.id) === -1; });
+      WI.techs = act.techs;
+      return WI.techs;
+    }
     WI.techs = [];
     return WI.techs;
   };
 
   WI.saveTechs = function(){
-    try {
-      localStorage.setItem(WI_TECHS_KEY, JSON.stringify(WI.techs || []));
-    } catch(e){}
+    var act = WI.getActiveProfile();
+    if(act){
+      act.techs = Array.isArray(WI.techs) ? WI.techs : [];
+    }
+    WI.saveProfiles();
   };
 
   WI.getTechById = function(id){
-    if(!WI.techs) WI.loadTechs();
+    WI.loadTechs();
     return (WI.techs || []).find(function(t){ return t.id === id; });
   };
 
   WI.loadMoves = function(){
-    try {
-      var raw = localStorage.getItem(WI_MOVES_KEY);
-      if(raw){
-        var arr = JSON.parse(raw);
-        if(Array.isArray(arr)){
-          WI.moves = arr.filter(function(m){ return m && OLD_DEFAULT_MOVE_IDS.indexOf(m.id) === -1; });
-          WI.saveMoves();
-          return WI.moves;
-        }
-      }
-    } catch(e){}
+    var act = WI.getActiveProfile();
+    if(act){
+      if(!Array.isArray(act.moves)) act.moves = [];
+      act.moves = act.moves.filter(function(m){ return m && OLD_DEFAULT_MOVE_IDS.indexOf(m.id) === -1; });
+      WI.moves = act.moves;
+      return WI.moves;
+    }
     WI.moves = [];
     return WI.moves;
   };
 
   WI.saveMoves = function(){
-    try {
-      localStorage.setItem(WI_MOVES_KEY, JSON.stringify(WI.moves || []));
-    } catch(e){}
+    var act = WI.getActiveProfile();
+    if(act){
+      act.moves = Array.isArray(WI.moves) ? WI.moves : [];
+    }
+    WI.saveProfiles();
   };
 
   WI.getMoveById = function(id){
-    if(!WI.moves) WI.loadMoves();
+    WI.loadMoves();
     return (WI.moves || []).find(function(m){ return m.id === id; });
   };
 
@@ -2824,17 +3142,31 @@
     } catch(e){}
   };
 
-  /* Общий переключатель вкладок Способности / Приёмы */
+  /* Общий переключатель вкладок Способности / Приёмы + быстрый выбор профиля */
   function renderWiAbilitiesTabBar(activeTab){
-    return '<div class="wi-nav-tabs" style="display:flex;gap:8px;margin-bottom:18px;border-bottom:1px solid var(--wi-border);padding-bottom:10px;">' +
-      '<button class="wi-nav-tab ' + (activeTab === 'techs' ? 'active' : '') + '" data-nav="wiTechs" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiTechs\');">✨ Способности и Магия</button>' +
-      '<button class="wi-nav-tab ' + (activeTab === 'moves' ? 'active' : '') + '" data-nav="wiMoves" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiMoves\');">⚔️ Боевые приёмы</button>' +
+    var act = WI.getActiveProfile() || {};
+    var profOpts = (WI.profiles || []).map(function(prof){
+      var sel = (prof.id === WI.activeProfileId) ? 'selected' : '';
+      return '<option value="' + escA(prof.id) + '" ' + sel + '>👤 ' + esc(prof.name || 'Безымянный') + (prof.class ? (' (' + esc(prof.class) + ')') : '') + '</option>';
+    }).join('');
+
+    return '<div class="wi-nav-tabs" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px;border-bottom:1px solid var(--wi-border);padding-bottom:10px;">' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+        '<button class="wi-nav-tab ' + (activeTab === 'techs' ? 'active' : '') + '" data-nav="wiTechs" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiTechs\');">✨ Способности и Магия (' + ((act.techs && act.techs.length) || 0) + ')</button>' +
+        '<button class="wi-nav-tab ' + (activeTab === 'moves' ? 'active' : '') + '" data-nav="wiMoves" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiMoves\');">⚔️ Боевые приёмы (' + ((act.moves && act.moves.length) || 0) + ')</button>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;">' +
+        '<span style="font-size:11.5px;color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;">Профиль:</span>' +
+        '<select class="wi-input" data-wi-quick-profile-select style="width:auto;min-width:180px;padding:5px 10px;font-size:12.5px;border-color:rgba(245,158,11,0.35);color:#fbbf24;font-weight:600;">' +
+          profOpts +
+        '</select>' +
+      '</div>' +
     '</div>';
   }
 
   /* Экран СПОСОБНОСТИ (wiTechs) */
   function wiTechs(){
-    if(!WI.techs || !WI.techs.length) WI.loadTechs();
+    WI.loadTechs();
     var list = WI.techs || [];
 
     var curFilter = WI.techFilter || 'all';
@@ -3009,7 +3341,7 @@
 
   /* Экран БОЕВЫЕ ПРИЁМЫ (wiMoves) */
   function wiMoves(){
-    if(!WI.moves || !WI.moves.length) WI.loadMoves();
+    WI.loadMoves();
     var list = WI.moves || [];
 
     var curFilter = WI.moveFilter || 'all';
@@ -3271,7 +3603,7 @@
         var strokeW = isSel ? '4.2' : '2.6';
         var labelHtml = '';
         if(m.showLabels !== false){
-          labelHtml = '<text x="' + t.labelX + '" y="' + t.labelY + '" text-anchor="middle" fill="' + t.color + '" font-size="' + (isSel ? '20' : '16.5') + '" font-weight="900" font-family="Cinzel, serif" filter="url(#wiLabelShadow)" pointer-events="none" opacity="0.95">' +
+          labelHtml = '<text x="' + t.labelX + '" y="' + t.labelY + '" text-anchor="middle" fill="' + t.color + '" font-size="' + (isSel ? '15.5' : '13') + '" font-weight="900" font-family="Cinzel, serif" filter="url(#wiLabelShadow)" pointer-events="none" opacity="0.95">' +
             esc(t.labelText) +
           '</text>';
         }
@@ -3437,73 +3769,7 @@
   }
 
   function renderWiTacticsInspector(){
-    var m = WI.map;
-    var territories = getWiTerritoriesList();
-    var units = m.tacticalUnits || [];
-    var pathsCount = (m.warPaths || []).length;
-
-    var scenariosHtml = WI_TACTICAL_SCENARIOS.map(function(sc){
-      return '<div class="wi-tactics-scenario-card" data-wi-scenario="' + escA(sc.id) + '">' +
-        '<div style="font-size:13px;font-weight:700;color:#fbbf24;font-family:\'Cinzel\',serif;margin-bottom:4px;">' + esc(sc.name) + '</div>' +
-        '<div style="font-size:11.5px;color:#cbd5e1;line-height:1.4;">' + esc(sc.desc) + '</div>' +
-      '</div>';
-    }).join('');
-
-    var regionsHtml = territories.map(function(t){
-      var curOwner = t.ownerFaction || t.defaultFaction;
-      var facOptions = Object.keys(WI_TACTICAL_FACTIONS).map(function(fk){
-        var f = WI_TACTICAL_FACTIONS[fk];
-        return '<option value="' + escA(fk) + '" ' + (curOwner === fk ? 'selected' : '') + '>' + f.icon + ' ' + esc(f.name) + '</option>';
-      }).join('');
-      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;background:rgba(0,0,0,0.42);border:1px solid rgba(255,255,255,0.08);border-left:3px solid ' + t.color + ';border-radius:4px;">' +
-        '<div style="font-size:12px;font-weight:700;color:#f1f5f9;">' + esc(t.name) + '</div>' +
-        '<select class="wi-input wi-territory-owner-sel" data-tid="' + escA(t.id) + '" style="width:auto;min-width:170px;padding:4px 8px;font-size:11.5px;">' +
-          facOptions +
-        '</select>' +
-      '</div>';
-    }).join('');
-
-    var unitsListHtml = units.length ? units.map(function(u, idx){
-      var facKey = u.nation_override || u.nation;
-      var fac = WI_TACTICAL_FACTIONS[facKey] || WI_TACTICAL_FACTIONS.nilfgaard;
-      var ut = WI_TACTICAL_UNIT_TYPES[u.type] || WI_TACTICAL_UNIT_TYPES.army;
-      var titleText = u.label || (ut.label + ' — ' + fac.name);
-      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-left:3px solid ' + fac.color + ';border-radius:4px;font-size:12.5px;">' +
-        '<div><span>' + ut.icon + ' ' + fac.icon + '</span> <b style="color:#fff;">' + esc(titleText) + '</b> <span style="color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;font-size:11px;">[' + u.x + ', ' + u.y + ']</span></div>' +
-        '<div style="display:flex;gap:6px;">' +
-          '<button class="btn btn-ghost" data-wi-focus-unit="' + idx + '" title="Приблизить к отряду" style="font-size:11px;padding:2px 6px;">🎯</button>' +
-          '<button class="btn btn-ghost" data-wi-edit-unit="' + idx + '" title="Переименовать отряд" style="font-size:11px;padding:2px 6px;">✏️</button>' +
-          '<button class="btn btn-ghost" data-wi-del-unit="' + idx + '" title="Удалить отряд" style="font-size:11px;padding:2px 6px;color:#ef4444;">✕</button>' +
-        '</div>' +
-      '</div>';
-    }).join('') : '<div class="char-empty" style="padding:14px;text-align:center;">На карте нет размещённых армий или флотов. Выберите инструмент «♟️ Отряд / Флот» на панели выше и кликните по карте либо загрузите один из сценариев Северных войн.</div>';
-
-    return '<div class="wi-char-sheet-card" style="margin-top:14px;">' +
-      '<div class="wi-char-header">' +
-        '<div>' +
-          '<span>⚔️ <b>Военно-тактический штаб Континента</b></span>' +
-          '<div style="font-size:11px;color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;margin-top:2px;">ЛИНИЙ ФРОНТА: ' + pathsCount + ' // БОЕВЫХ СОЕДИНЕНИЙ: ' + units.length + '</div>' +
-        '</div>' +
-        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-          '<button class="btn btn-ghost" id="wiWarUndoInspectorBtn" style="font-size:11.5px;padding:4px 10px;">↩️ Отменить линию</button>' +
-          '<button class="btn btn-ghost" id="wiWarClearInspectorBtn" style="font-size:11.5px;padding:4px 10px;color:#ef4444;">🗑️ Сбросить тактику</button>' +
-        '</div>' +
-      '</div>' +
-      '<div style="margin-top:12px;">' +
-        '<div style="font-size:11.5px;color:var(--wi-steel);margin-bottom:8px;font-family:\'JetBrains Mono\',monospace;font-weight:700;">📜 ИСТОРИЧЕСКИЕ СЦЕНАРИИ СЕВЕРНЫХ ВОЙН (КЛИКНИТЕ ДЛЯ ЗАГРУЗКИ):</div>' +
-        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin-bottom:16px;">' +
-          scenariosHtml +
-        '</div>' +
-        '<div style="font-size:11.5px;color:var(--wi-steel);margin-bottom:8px;font-family:\'JetBrains Mono\',monospace;font-weight:700;">🏴 КОНТРОЛЬ СТРАТЕГИЧЕСКИХ РЕГИОНОВ И КОРОЛЕВСТВ:</div>' +
-        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px;margin-bottom:16px;">' +
-          regionsHtml +
-        '</div>' +
-        '<div style="font-size:11.5px;color:var(--wi-steel);margin-bottom:8px;font-family:\'JetBrains Mono\',monospace;font-weight:700;">♟️ РАЗВЁРНУТЫЕ АРМИИ, ФЛОТЫ И ОСАДЫ (' + units.length + '):</div>' +
-        '<div style="display:flex;flex-direction:column;gap:6px;">' +
-          unitsListHtml +
-        '</div>' +
-      '</div>' +
-    '</div>';
+    return '';
   }
 
   /* Экран КАРТА МИРА (wiMap) */
@@ -5357,14 +5623,21 @@
               var terObj = WI_TACTICAL_TERRITORIES_BASE.find(function(t){ return t.id === tid; });
               if(tid && terObj){
                 m.territoryOwners = m.territoryOwners || {};
-                m.territoryOwners[tid] = m.warNation || 'nilfgaard';
-                WI.saveTacticalState();
-                var fac = WI_TACTICAL_FACTIONS[m.warNation || 'nilfgaard'];
-                WI.toast('🏴 «' + terObj.name + '» захвачен фракцией ' + (fac ? fac.name : m.warNation), 'success');
+                var chosenFac = m.warNation || 'nilfgaard';
+                if(chosenFac === 'independent' || chosenFac === terObj.defaultFaction){
+                  delete m.territoryOwners[tid];
+                  WI.saveTacticalState();
+                  WI.toast('🕊️ «' + terObj.name + '»: восстановлен суверенитет', 'info');
+                } else {
+                  m.territoryOwners[tid] = chosenFac;
+                  WI.saveTacticalState();
+                  var fac = WI_TACTICAL_FACTIONS[chosenFac];
+                  WI.toast('🏴 «' + terObj.name + '» под контролем: ' + (fac ? fac.name : chosenFac), 'success');
+                }
                 if(typeof render === 'function') render();
               }
             } else {
-              WI.toast('💡 Кликните внутри границ одного из королевств для смены контроля', 'info');
+              WI.toast('💡 Кликните внутри границ любой страны на карте для смены контроля', 'info');
             }
             return;
           }
@@ -6032,10 +6305,11 @@
           desc: t.desc || ''
         };
 
+        WI.loadTechs();
         if(!WI.techs) WI.techs = [];
         WI.techs.unshift(item);
         WI.saveTechs();
-        WI.toast('✓ Способность сохранена в ростер!', 'success');
+        WI.toast('✓ Способность сохранена в профиль!', 'success');
         if(typeof window.navigate === 'function') window.navigate('wiTechView:' + item.id);
       });
     }
@@ -6197,10 +6471,11 @@
           desc: m.desc || ''
         };
 
+        WI.loadMoves();
         if(!WI.moves) WI.moves = [];
         WI.moves.unshift(item);
         WI.saveMoves();
-        WI.toast('✓ Боевой приём сохранен в ростер!', 'success');
+        WI.toast('✓ Боевой приём сохранен в профиль!', 'success');
         if(typeof window.navigate === 'function') window.navigate('wiMoveView:' + item.id);
       });
     }
