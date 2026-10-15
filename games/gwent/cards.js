@@ -522,4 +522,5 @@ var card_dict = JSON.parse(
 + ', {"name": "Milton de Peyrac-Peyran", "nameRu": "Мильтон де Пейрак-Пейран", "id": "", "deck": "neutral", "row": "close", "strength": "6", "ability": "bond", "filename": "milton_de_peyrac", "count": "1"}'
 + ', {"name": "Aguara", "nameRu": "Агуара", "id": "", "deck": "neutral", "row": "agile", "strength": "7", "ability": "medic", "filename": "aguara", "count": "1"}'
 + ', {"name": "Vivienne de Tabris", "nameRu": "Вивиенна де Табрис", "id": "", "deck": "neutral", "row": "ranged", "strength": "6", "ability": "morale", "filename": "vivienne_de_tabris", "count": "1"}'
++ ', {"name": "Flaming Rose Knight", "nameRu": "Рыцарь Пылающей Розы", "id": "", "deck": "syndicate", "row": "close", "strength": "6", "ability": "bond", "filename": "flaming_rose_knight", "count": "2"}'
 + ']');
