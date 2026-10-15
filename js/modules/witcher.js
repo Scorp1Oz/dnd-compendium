@@ -1999,27 +1999,49 @@
      ============================================================ */
 
   var WI_TACTICAL_FACTIONS = {
-    independent: { id: 'independent', name: 'Суверенитет (Родной цвет страны)', short: '🕊️ Суверенитет', icon: '🕊️', color: '#94a3b8' },
-    nilfgaard:   { id: 'nilfgaard',   name: 'Империя Нильфгаард',               short: '☀️ Нильфгаард',  icon: '☀️', color: '#facc15' },
-    redania:     { id: 'redania',     name: 'Королевство Редания',              short: '🦅 Редания',     icon: '🦅', color: '#ef4444' },
-    temeria:     { id: 'temeria',     name: 'Королевство Темерия',              short: '⚜️ Темерия',     icon: '⚜️', color: '#3b82f6' },
-    kaedwen:     { id: 'kaedwen',     name: 'Королевство Каэдвен',              short: '🦄 Каэдвен',     icon: '🦄', color: '#eab308' },
-    aedirn:      { id: 'aedirn',      name: 'Королевство Аэдирн',               short: '🔥 Аэдирн',      icon: '🔥', color: '#f97316' },
-    lyria:       { id: 'lyria',       name: 'Лирия и Ривия',                    short: '🛡️ Лирия',       icon: '🛡️', color: '#f59e0b' },
-    cintra:      { id: 'cintra',      name: 'Королевство Цинтра',               short: '🦁 Цинтра',      icon: '🦁', color: '#10b981' },
-    kovir:       { id: 'kovir',       name: 'Ковир и Повисс',                   short: '💎 Ковир',       icon: '💎', color: '#38bdf8' },
-    skellige:    { id: 'skellige',    name: 'Кланы Скеллиге',                   short: '⛵ Скеллиге',    icon: '⛵', color: '#06b6d4' },
-    scoiatael:   { id: 'scoiatael',   name: 'Брокилон и Скоя\'таэли',           short: '🏹 Брокилон',    icon: '🏹', color: '#16a34a' },
-    wild_hunt:   { id: 'wild_hunt',   name: 'Дикая Охота',                      short: '💀 Дикая Охота', icon: '💀', color: '#a855f7' }
+    independent:     { id: 'independent',     name: 'Суверенитет (Родной цвет страны)', short: '🕊️ Суверенитет',  icon: '🕊️', color: '#94a3b8' },
+    nilfgaard:       { id: 'nilfgaard',       name: 'Империя Нильфгаард',               short: '☀️ Нильфгаард',   icon: '☀️', color: '#facc15' },
+    redania:         { id: 'redania',         name: 'Королевство Редания',              short: '🦅 Редания',      icon: '🦅', color: '#ef4444' },
+    temeria:         { id: 'temeria',         name: 'Королевство Темерия',              short: '⚜️ Темерия',      icon: '⚜️', color: '#3b82f6' },
+    kaedwen:         { id: 'kaedwen',         name: 'Королевство Каэдвен',              short: '🦄 Каэдвен',      icon: '🦄', color: '#eab308' },
+    aedirn:          { id: 'aedirn',          name: 'Королевство Аэдирн',               short: '🔥 Аэдирн',       icon: '🔥', color: '#f97316' },
+    lyria:           { id: 'lyria',           name: 'Лирия и Ривия',                    short: '🛡️ Лирия',        icon: '🛡️', color: '#f59e0b' },
+    cintra:          { id: 'cintra',          name: 'Королевство Цинтра',               short: '🦁 Цинтра',       icon: '🦁', color: '#10b981' },
+    kovir:           { id: 'kovir',           name: 'Ковир и Повисс',                   short: '💎 Ковир',        icon: '💎', color: '#38bdf8' },
+    skellige:        { id: 'skellige',        name: 'Кланы Скеллиге',                   short: '⛵ Скеллиге',     icon: '⛵', color: '#06b6d4' },
+    scoiatael:       { id: 'scoiatael',       name: 'Брокилон и Скоя\'таэли',           short: '🏹 Скоя\'таэли',  icon: '🏹', color: '#16a34a' },
+    wild_hunt:       { id: 'wild_hunt',       name: 'Дикая Охота (Aen Elle)',           short: '💀 Дикая Охота',  icon: '💀', color: '#a855f7' },
+    kovir_witchers:  { id: 'kovir_witchers',  name: 'Ведьмачьи Школы (Братство)',       short: '🐺 Ведьмаки',     icon: '🐺', color: '#f59e0b' },
+    mages:           { id: 'mages',           name: 'Капитул и Ложа Чародеек',          short: '🔮 Чародеи',      icon: '🔮', color: '#c084fc' },
+    monsters:        { id: 'monsters',        name: 'Бестии и Чудовища Континента',     short: '🐉 Чудовища',     icon: '🐉', color: '#dc2626' }
   };
 
   var WI_TACTICAL_UNIT_TYPES = {
-    army:    { id: 'army',    icon: '🛡️', label: 'Пехота / Бригада' },
-    cavalry: { id: 'cavalry', icon: '🐎', label: 'Тяжёлая кавалерия' },
-    fleet:   { id: 'fleet',   icon: '⛵', label: 'Флот / Драккары' },
-    siege:   { id: 'siege',   icon: '💥', label: 'Осада / Сражение' },
-    mages:   { id: 'mages',   icon: '🔮', label: 'Чародеи / Врата' },
-    fort:    { id: 'fort',    icon: '🏰', label: 'Гарнизон / Цитадель' }
+    army:         { id: 'army',         cat: 'Войска и Флот',           icon: '🛡️', label: 'Пехота / Бригада',          basePow: 5, defaultStr: '5 000 мечников' },
+    cavalry:      { id: 'cavalry',      cat: 'Войска и Флот',           icon: '🐎', label: 'Тяжёлая кавалерия',         basePow: 7, defaultStr: '2 500 латников' },
+    archers:      { id: 'archers',      cat: 'Войска и Флот',           icon: '🏹', label: 'Стрелки / Арбалетчики',     basePow: 5, defaultStr: '2 000 стрелков' },
+    pikemen:      { id: 'pikemen',      cat: 'Войска и Флот',           icon: '🔱', label: 'Копейщики / Алебардщики',   basePow: 6, defaultStr: '4 000 пикинёров' },
+    fleet:        { id: 'fleet',        cat: 'Войска и Флот',           icon: '⛵', label: 'Военный флот / Драккары',   basePow: 7, defaultStr: '25 кораблей' },
+    siege_engine: { id: 'siege_engine', cat: 'Войска и Флот',           icon: '🎯', label: 'Осадные орудия / Требушеты', basePow: 6, defaultStr: '18 требушетов' },
+    witcher:      { id: 'witcher',      cat: 'Герои и Спецотряды',      icon: '🐺', label: 'Ведьмак / Ганза героев',    basePow: 8, defaultStr: 'Ганза (6 героев)' },
+    mages:        { id: 'mages',        cat: 'Герои и Спецотряды',      icon: '🔮', label: 'Чародеи / Капитул',         basePow: 9, defaultStr: 'Ложа / 14 Магов' },
+    guerrilla:    { id: 'guerrilla',    cat: 'Герои и Спецотряды',      icon: '🌲', label: 'Скоя\'таэли / Партизаны',   basePow: 6, defaultStr: 'Командо (800 бойцов)' },
+    spies:        { id: 'spies',        cat: 'Герои и Спецотряды',      icon: '🕵️', label: 'Разведка / Шпионская сеть', basePow: 4, defaultStr: 'Агентурная сеть' },
+    monster:      { id: 'monster',      cat: 'Герои и Спецотряды',      icon: '🐉', label: 'Чудовище / Стая бестий',    basePow: 8, defaultStr: 'Древний Архигрифон' },
+    fort:         { id: 'fort',         cat: 'Укрепления и События',    icon: '🏰', label: 'Гарнизон / Цитадель',       basePow: 8, defaultStr: 'Гарнизон 6 000' },
+    camp:         { id: 'camp',         cat: 'Укрепления и События',    icon: '⛺', label: 'Военный лагерь / Обоз',     basePow: 4, defaultStr: 'Полевой лагерь' },
+    siege:        { id: 'siege',        cat: 'Укрепления и События',    icon: '💥', label: 'Осада крепости',            basePow: 7, defaultStr: 'Штурм стен' },
+    battle:       { id: 'battle',       cat: 'Укрепления и События',    icon: '⚔️', label: 'Генеральное сражение',      basePow: 8, defaultStr: 'Поле битвы' },
+    raze:         { id: 'raze',         cat: 'Укрепления и События',    icon: '🔥', label: 'Пожарище / Разорение',      basePow: 5, defaultStr: 'Выжженная земля' }
+  };
+
+  var WI_TACTICAL_UNIT_STATUSES = {
+    ready:   { id: 'ready',   icon: '🛡️', label: 'В строю / Оборона', color: '#10b981' },
+    march:   { id: 'march',   icon: '🏃', label: 'На марше',          color: '#38bdf8' },
+    battle:  { id: 'battle',  icon: '⚔️', label: 'В бою!',            color: '#ef4444' },
+    siege:   { id: 'siege',   icon: '💥', label: 'Осада / Штурм',     color: '#f97316' },
+    camp:    { id: 'camp',    icon: '⛺', label: 'На привале',        color: '#a3e635' },
+    damaged: { id: 'damaged', icon: '🩸', label: 'Потрёпан / Отход',  color: '#f43f5e' }
   };
 
   var WI_TACTICAL_TERRITORIES_BASE = [
@@ -2344,57 +2366,63 @@
       id: 'canon_peace',
       name: '🕊️ Классический баланс Континента (До Северных войн)',
       desc: 'Традиционные границы королевств Севера, вольного Брокилона, Скеллиге и Южной Империи.',
+      cam: { cx: 1550, cy: 1380, zoom: 1.05 },
       owners: {},
       warPaths: [],
       units: [
-        { id: 'cp1', nation: 'kovir_witchers', type: 'fort', x: 2595, y: 245, label: 'Цитадель Каэр Морхен' },
-        { id: 'cp2', nation: 'temeria', type: 'fort', x: 1615, y: 1125, label: 'Королевская Вызима' },
-        { id: 'cp3', nation: 'redania', type: 'fleet', x: 1150, y: 1025, label: 'Флот Вольного Новиграда' },
-        { id: 'cp4', nation: 'skellige', type: 'fleet', x: 595, y: 1590, label: 'Драккары клана ан Крайт' },
-        { id: 'cp5', nation: 'nilfgaard', type: 'fort', x: 1710, y: 3800, label: 'Город Золотых Башен' }
+        { id: 'cp1', nation: 'kovir_witchers', type: 'witcher', status: 'ready', strength: 'Школа Волка (Весемир)', hp: 100, x: 2595, y: 245, label: 'Цитадель Каэр Морхен' },
+        { id: 'cp2', nation: 'temeria', type: 'fort', status: 'ready', strength: '8 000 гвардейцев', hp: 100, x: 1615, y: 1125, label: 'Королевская Вызима (Фольтест)' },
+        { id: 'cp3', nation: 'redania', type: 'fleet', status: 'ready', strength: '35 галер и коггов', hp: 100, x: 1150, y: 1025, label: 'Флот Вольного Новиграда' },
+        { id: 'cp4', nation: 'skellige', type: 'fleet', status: 'march', strength: '40 драккаров', hp: 100, x: 595, y: 1590, marchPath: [{x:780,y:1520},{x:940,y:1440}], label: 'Драккары клана ан Крайт' },
+        { id: 'cp5', nation: 'nilfgaard', type: 'fort', status: 'ready', strength: 'Легион «Импера»', hp: 100, x: 1710, y: 3800, label: 'Город Золотых Башен (Эмгыр)' },
+        { id: 'cp6', nation: 'scoiatael', type: 'archers', status: 'ready', strength: 'Дриады Дуэн Канэлль', hp: 100, x: 1210, y: 1585, label: 'Стражи Брокилона (Эитнэ)' }
       ]
     },
     {
       id: 'first_war_sodden',
       name: '🔥 Первая Северная война: Содденский Холм (1263 г.)',
       desc: 'Резня в Цинтре, форсирование Яруги легионами Нильфгаарда и легендарная битва Четырнадцати Чародеев на Содденском Холме.',
+      cam: { cx: 1480, cy: 1720, zoom: 1.85 },
       owners: { cintra: 'nilfgaard', nilfgaard_provinces: 'nilfgaard', ebbing_gemmera: 'nilfgaard', nilfgaard_core: 'nilfgaard' },
       warPaths: [
-        { nation: 'nilfgaard', size: 48, points: [{x:1520,y:2020},{x:1380,y:1890},{x:1290,y:1815}] },
-        { nation: 'nilfgaard', size: 48, points: [{x:1350,y:1815},{x:1460,y:1750},{x:1530,y:1695}] },
-        { nation: 'temeria', size: 38, points: [{x:1615,y:1250},{x:1605,y:1520},{x:1550,y:1650}] }
+        { nation: 'nilfgaard', style: 'arrow', size: 48, points: [{x:1520,y:2020},{x:1380,y:1890},{x:1290,y:1815}] },
+        { nation: 'nilfgaard', style: 'arrow', size: 48, points: [{x:1350,y:1815},{x:1460,y:1750},{x:1530,y:1695}] },
+        { nation: 'temeria', style: 'front', size: 38, points: [{x:1380,y:1660},{x:1530,y:1680},{x:1690,y:1645}] }
       ],
       units: [
-        { id: 'fw1', nation: 'nilfgaard', type: 'siege', x: 1290, y: 1815, label: 'Сожжение Цинтры (Калантэ)' },
-        { id: 'fw2', nation: 'mages', nation_override: 'temeria', type: 'mages', x: 1530, y: 1695, label: 'Капитул: 14 Чародеев (Вильгефорц)' },
-        { id: 'fw3', nation: 'nilfgaard', type: 'army', x: 1545, y: 1765, label: 'Штурмовой корпус Нильфгаарда' },
-        { id: 'fw4', nation: 'temeria', type: 'army', x: 1605, y: 1575, label: 'Союзная рать Фольтеста и Визимира' },
-        { id: 'fw5', nation: 'skellige', type: 'fleet', x: 960, y: 1790, label: 'Драккары ярла Эйста Тиршаха' }
+        { id: 'fw1', nation: 'nilfgaard', type: 'raze', status: 'siege', strength: 'Армия Узурпатора', hp: 90, x: 1290, y: 1815, label: 'Сожжение Цинтры (Падение Калантэ)' },
+        { id: 'fw2', nation: 'mages', nation_override: 'mages', type: 'mages', status: 'battle', strength: '22 Чародея Капитула', hp: 80, x: 1530, y: 1695, label: 'Капитул: 14 Чародеев (Вильгефорц)' },
+        { id: 'fw3', nation: 'nilfgaard', type: 'cavalry', status: 'battle', strength: '40 000 легионеров', hp: 75, x: 1545, y: 1748, marchPath: [{x:1530,y:1695}], label: 'Штурмовой корпус Нильфгаарда' },
+        { id: 'fw4', nation: 'temeria', type: 'pikemen', status: 'march', strength: '55 000 ратников Севера', hp: 95, x: 1605, y: 1575, marchPath: [{x:1565,y:1645},{x:1535,y:1690}], label: 'Союзная рать Фольтеста и Визимира' },
+        { id: 'fw5', nation: 'skellige', type: 'fleet', status: 'ready', strength: '30 боевых драккаров', hp: 85, x: 960, y: 1790, label: 'Драккары ярла Эйста Тиршаха' }
       ]
     },
     {
       id: 'second_war_brenna',
       name: '⚔️ Вторая Северная война: Битва под Бренной (1268 г.)',
       desc: 'Трёхсоттысячное вторжение маршала Менно Коегоорна, бунт на Танедде, рейд королевы Мэвы и генеральное сражение под Бренной.',
+      cam: { cx: 1690, cy: 1430, zoom: 1.75 },
       owners: { cintra: 'nilfgaard', lyria: 'nilfgaard', aedirn: 'nilfgaard', nilfgaard_provinces: 'nilfgaard', ebbing_gemmera: 'nilfgaard', nilfgaard_core: 'nilfgaard' },
       warPaths: [
-        { nation: 'nilfgaard', size: 65, points: [{x:1560,y:1820},{x:1605,y:1620},{x:1665,y:1440}] },
-        { nation: 'nilfgaard', size: 48, points: [{x:2050,y:1780},{x:2255,y:1415},{x:2335,y:1175}] },
-        { nation: 'temeria', size: 48, points: [{x:1615,y:1145},{x:1650,y:1290},{x:1665,y:1400}] }
+        { nation: 'nilfgaard', style: 'arrow', size: 65, points: [{x:1560,y:1820},{x:1605,y:1620},{x:1665,y:1460}] },
+        { nation: 'nilfgaard', style: 'arrow', size: 48, points: [{x:2050,y:1780},{x:2255,y:1415},{x:2335,y:1175}] },
+        { nation: 'temeria', style: 'front', size: 48, points: [{x:1480,y:1395},{x:1665,y:1410},{x:1860,y:1390}] }
       ],
       units: [
-        { id: 'sw1', nation: 'nilfgaard', type: 'cavalry', x: 1665, y: 1485, label: 'Группа армий «Центр» (Коегоорн)' },
-        { id: 'sw2', nation: 'temeria', type: 'siege', x: 1665, y: 1420, label: 'Рать Яна Наталиса (Бренна)' },
-        { id: 'sw3', nation: 'redania', type: 'cavalry', x: 1540, y: 1360, label: 'Конница Адама Пангратта и Редании' },
-        { id: 'sw4', nation: 'kaedwen_aedirn', type: 'army', x: 2255, y: 1415, label: 'Партизаны королевы Мэвы' },
-        { id: 'sw5', nation: 'scoiatael', type: 'army', x: 1850, y: 1460, label: 'Бригада «Врихедд» (Исенгрим)' },
-        { id: 'sw6', nation: 'mages', nation_override: 'nilfgaard', type: 'mages', x: 1175, y: 1185, label: 'Бунт на острове Танедд' }
+        { id: 'sw1', nation: 'nilfgaard', type: 'cavalry', status: 'battle', strength: '46 000 (Дивизия «Ард Феаинн»)', hp: 85, x: 1665, y: 1475, label: 'Группа армий «Центр» (Менно Коегоорн)' },
+        { id: 'sw2', nation: 'temeria', type: 'battle', status: 'battle', strength: '45 000 (Пехота и Пикинёры)', hp: 80, x: 1665, y: 1420, label: 'Рать Яна Наталиса (Бренна)' },
+        { id: 'sw3', nation: 'redania', type: 'cavalry', status: 'march', strength: '12 000 (Вольная Кондотьерия)', hp: 100, x: 1520, y: 1350, marchPath: [{x:1600,y:1395},{x:1660,y:1445}], label: 'Конница Адама Пангратта и Редании' },
+        { id: 'sw4', nation: 'lyria', type: 'guerrilla', status: 'march', strength: '5 000 ветеранов Лирии', hp: 90, x: 2255, y: 1415, marchPath: [{x:2120,y:1490},{x:1980,y:1560}], label: 'Партизаны королевы Мэвы' },
+        { id: 'sw5', nation: 'scoiatael', type: 'guerrilla', status: 'battle', strength: '3 500 эльфийских всадников', hp: 70, x: 1850, y: 1460, label: 'Бригада «Врихедд» (Исенгрим Фаоильтиарна)' },
+        { id: 'sw6', nation: 'mages', type: 'mages', status: 'battle', strength: 'Раскол Капитула', hp: 65, x: 1175, y: 1185, label: 'Бунт на острове Танедд' },
+        { id: 'sw7', nation: 'kovir_witchers', type: 'witcher', status: 'march', strength: 'Геральт, Кагыр, Мильва, Регис, Ангулема', hp: 95, x: 1760, y: 1680, marchPath: [{x:1820,y:1860},{x:1895,y:2040}], label: 'Ганза Геральта (Путь к замку Стигга)' }
       ]
     },
     {
       id: 'third_war_1272',
       name: '🦅 Третья Северная война: Линия Понтара (1272 г. / Ведьмак 3)',
       desc: 'Темерия и Аэдирн пали, Каэдвен поглощён Реданией. Армии Радовида V и Эмгыра вар Эмрейса стоят друг против друга вдоль реки Понтар.',
+      cam: { cx: 1380, cy: 1120, zoom: 1.85 },
       owners: {
         temeria: 'nilfgaard',
         cintra: 'nilfgaard',
@@ -2405,33 +2433,34 @@
         redania: 'redania'
       },
       warPaths: [
-        { nation: 'nilfgaard', size: 65, points: [{x:1120,y:1110},{x:1320,y:1120},{x:1615,y:1125},{x:1925,y:1060}] },
-        { nation: 'redania', size: 65, points: [{x:1140,y:995},{x:1320,y:1005},{x:1580,y:1000},{x:1920,y:940}] }
+        { nation: 'nilfgaard', style: 'front', size: 65, points: [{x:1120,y:1110},{x:1320,y:1120},{x:1615,y:1125},{x:1925,y:1060}] },
+        { nation: 'redania', style: 'front', size: 65, points: [{x:1140,y:995},{x:1320,y:1005},{x:1580,y:1000},{x:1920,y:940}] }
       ],
       units: [
-        { id: 'tw1', nation: 'nilfgaard', type: 'fort', x: 1615, y: 1125, label: 'Ставка Эмгыра в Вызиме' },
-        { id: 'tw2', nation: 'nilfgaard', type: 'army', x: 1320, y: 1160, label: 'Лагерь группы армий «Центр» (Велен)' },
-        { id: 'tw3', nation: 'redania', type: 'fort', x: 1265, y: 1035, label: 'Ставка Радовида V в Оксенфурте' },
-        { id: 'tw4', nation: 'temeria', type: 'army', x: 1220, y: 1065, label: 'Подполье Синих Полосок (В. Роше)' },
-        { id: 'tw5', nation: 'nilfgaard', type: 'fleet', x: 760, y: 1740, label: 'Армада Нильфгаарда у Скеллиге' },
-        { id: 'tw6', nation: 'skellige', type: 'fleet', x: 595, y: 1590, label: 'Флот кланов Скеллиге' }
+        { id: 'tw1', nation: 'nilfgaard', type: 'fort', status: 'ready', strength: 'Гвардия Императора', hp: 100, x: 1615, y: 1125, label: 'Ставка Эмгыра в Вызиме' },
+        { id: 'tw2', nation: 'nilfgaard', type: 'camp', status: 'camp', strength: '65 000 легионеров', hp: 90, x: 1320, y: 1160, marchPath: [{x:1285,y:1085}], label: 'Лагерь группы армий «Центр» (Велен)' },
+        { id: 'tw3', nation: 'redania', type: 'fort', status: 'ready', strength: '50 000 + Охотники за колдуньями', hp: 95, x: 1265, y: 1035, label: 'Ставка Радовида V в Оксенфурте' },
+        { id: 'tw4', nation: 'temeria', type: 'spies', status: 'ready', strength: 'Отряд Вернона Роше и Бьянки', hp: 85, x: 1220, y: 1065, label: 'Подполье Синих Полосок (В. Роше)' },
+        { id: 'tw5', nation: 'nilfgaard', type: 'fleet', status: 'march', strength: '80 боевых кораблей', hp: 90, x: 760, y: 1740, marchPath: [{x:660,y:1640}], label: 'Армада Нильфгаарда у Скеллиге' },
+        { id: 'tw6', nation: 'skellige', type: 'fleet', status: 'battle', strength: 'Флот ярлов Скеллиге', hp: 95, x: 595, y: 1590, label: 'Флот кланов Скеллиге (Хьялмар / Керис)' }
       ]
     },
     {
       id: 'wild_hunt_invasion',
       name: '💀 Вторжение Дикой Охоты: Осада Каэр Морхена и Ундвик',
       desc: 'Корабль Нагльфар и Красные Всадники Эредина прорываются сквозь Белый Хлад в Синих Горах, Велене и на острове Ундвик.',
+      cam: { cx: 2540, cy: 270, zoom: 2.3 },
       owners: { kaedwen: 'wild_hunt' },
       warPaths: [
-        { nation: 'wild_hunt', size: 48, points: [{x:2420,y:180},{x:2520,y:215},{x:2595,y:245}] },
-        { nation: 'wild_hunt', size: 48, points: [{x:810,y:1670},{x:745,y:1640},{x:692,y:1612}] }
+        { nation: 'wild_hunt', style: 'arrow', size: 48, points: [{x:2420,y:180},{x:2520,y:215},{x:2585,y:240}] },
+        { nation: 'wild_hunt', style: 'arrow', size: 48, points: [{x:810,y:1670},{x:745,y:1640},{x:692,y:1612}] }
       ],
       units: [
-        { id: 'wh1', nation: 'wild_hunt', type: 'siege', x: 2595, y: 245, label: 'Осада Каэр Морхена (Эредин и Имлерих)' },
-        { id: 'wh2', nation: 'kovir_witchers', type: 'fort', x: 2560, y: 280, label: 'Братство Волка (Геральт, Весемир, Йеннифэр)' },
-        { id: 'wh3', nation: 'wild_hunt', type: 'mages', x: 1295, y: 1215, label: 'Шабаш на Лысой Горе (Имлерих и Ведьмы)' },
-        { id: 'wh4', nation: 'wild_hunt', type: 'fleet', x: 692, y: 1612, label: 'Нагльфар у острова Ундвик (Карантир)' },
-        { id: 'wh5', nation: 'skellige', type: 'fleet', x: 635, y: 1585, label: 'Союзный флот Скеллиге и Ложи Чародеек' }
+        { id: 'wh1', nation: 'wild_hunt', type: 'siege', status: 'siege', strength: 'Всадники Морхогга и Гончие', hp: 90, x: 2595, y: 245, label: 'Осада Каэр Морхена (Эредин и Имлерих)' },
+        { id: 'wh2', nation: 'kovir_witchers', type: 'witcher', status: 'battle', strength: 'Геральт, Цири, Весемир, Ламберт, Эскель, Лето', hp: 85, x: 2560, y: 275, label: 'Братство Волка (Оборона Каэр Морхена)' },
+        { id: 'wh3', nation: 'wild_hunt', type: 'monster', status: 'battle', strength: 'Имлерих и Хозяйки Леса', hp: 80, x: 1295, y: 1215, label: 'Шабаш на Лысой Горе (Кривоуховы топи)' },
+        { id: 'wh4', nation: 'wild_hunt', type: 'fleet', status: 'battle', strength: 'Корабль «Нагльфар» и навигаторы', hp: 85, x: 692, y: 1612, label: 'Нагльфар у острова Ундвик (Карантир)' },
+        { id: 'wh5', nation: 'skellige', type: 'mages', status: 'battle', strength: 'Флот Скеллиге + Ложа Чародеек + Фрингилья', hp: 90, x: 640, y: 1585, label: 'Союзный флот Скеллиге и Ложи Чародеек' }
       ]
     }
   ];
@@ -3001,8 +3030,9 @@
     routeFrom: 'novigrad',
     routeTo: 'vizima',
     showLabels: true,
-    showPins: true,
+    showPins: false,
     showTerritories: false,
+    showRivers: false,
     showUserMarkers: true,
     regionFilter: 'all',
     typeFilter: 'all',
@@ -3011,7 +3041,16 @@
     activeContract: null,
     search: '',
     tacticsLoaded: false,
-    tacticsTool: 'paint',
+    tacticsTool: 'pan',
+    tacticsTab: 'units',
+    selectedUnitIdx: -1,
+    unitFactionFilter: 'all',
+    regionSearch: '',
+    battleAttackerIdx: 0,
+    battleDefenderIdx: 1,
+    battleLog: [],
+    aiWarReport: '',
+    isAnimatingMarch: false,
     warNation: 'nilfgaard',
     brushSize: 48,
     unitType: 'army',
@@ -3026,9 +3065,19 @@
       if(raw){
         var d = JSON.parse(raw);
         if(d && typeof d === 'object'){
-          if(Array.isArray(d.warPaths)) WI.map.warPaths = d.warPaths;
-          if(Array.isArray(d.tacticalUnits)) WI.map.tacticalUnits = d.tacticalUnits;
-          if(d.territoryOwners && typeof d.territoryOwners === 'object') WI.map.territoryOwners = d.territoryOwners;
+          var hasAutoBrenna = Array.isArray(d.tacticalUnits) && d.tacticalUnits.some(function(u){ return u && u.id === 'sw1'; }) && !d.explicitUserSave;
+          if(hasAutoBrenna){
+            localStorage.removeItem(WI_TACTICAL_KEY);
+            WI.map.warPaths = [];
+            WI.map.tacticalUnits = [];
+            WI.map.territoryOwners = {};
+            WI.map.battleLog = [];
+          } else {
+            if(Array.isArray(d.warPaths)) WI.map.warPaths = d.warPaths;
+            if(Array.isArray(d.tacticalUnits)) WI.map.tacticalUnits = d.tacticalUnits;
+            if(d.territoryOwners && typeof d.territoryOwners === 'object') WI.map.territoryOwners = d.territoryOwners;
+            if(Array.isArray(d.battleLog)) WI.map.battleLog = d.battleLog;
+          }
         }
       }
     } catch(e){}
@@ -3038,9 +3087,11 @@
   WI.saveTacticalState = function(){
     try {
       var d = {
+        explicitUserSave: true,
         warPaths: WI.map.warPaths || [],
         tacticalUnits: WI.map.tacticalUnits || [],
-        territoryOwners: WI.map.territoryOwners || {}
+        territoryOwners: WI.map.territoryOwners || {},
+        battleLog: (WI.map.battleLog || []).slice(0, 25)
       };
       localStorage.setItem(WI_TACTICAL_KEY, JSON.stringify(d));
     } catch(e){}
@@ -3542,51 +3593,197 @@
      ИНТЕРАКТИВНАЯ КАРТА КОНТИНЕНТА (WITCHER MAP)
      ============================================================ */
 
+  function detectWiTacticalClashes(units){
+    var clashes = [];
+    var list = units || [];
+    for(var i = 0; i < list.length; i++){
+      var uA = list[i];
+      if(!uA) continue;
+      var facA = uA.nation_override || uA.nation || 'nilfgaard';
+      for(var j = i + 1; j < list.length; j++){
+        var uB = list[j];
+        if(!uB) continue;
+        var facB = uB.nation_override || uB.nation || 'nilfgaard';
+        if(facA === facB) continue;
+        var dist = Math.hypot((uA.x || 0) - (uB.x || 0), (uA.y || 0) - (uB.y || 0));
+        if(dist <= 115){
+          clashes.push({
+            idxA: i,
+            idxB: j,
+            uA: uA,
+            uB: uB,
+            mx: Math.round(((uA.x || 0) + (uB.x || 0)) / 2),
+            my: Math.round(((uA.y || 0) + (uB.y || 0)) / 2),
+            dist: Math.round(dist)
+          });
+        }
+      }
+    }
+    return clashes;
+  }
+
   function renderWiWarLayerInner(){
     var m = WI.map || {};
     var isTactics = (m.mode === 'tactics');
     var hasWarData = (m.warPaths && m.warPaths.length > 0) || (m.tacticalUnits && m.tacticalUnits.length > 0);
     if(!isTactics && !hasWarData) return '';
 
-    var pathsHtml = (m.warPaths || []).map(function(wp){
+    var isEraser = (isTactics && m.tacticsTool === 'eraser');
+
+    // 1. Линии фронта и наступательные стрелы ударов
+    var pathsHtml = (m.warPaths || []).map(function(wp, wpIdx){
       if(!wp) return '';
       var fac = WI_TACTICAL_FACTIONS[wp.nation] || WI_TACTICAL_FACTIONS.nilfgaard;
       var color = fac.color;
       var sw = wp.size || 48;
-      if(wp.d){
-        return '<path d="' + wp.d + '" fill="none" stroke="' + color + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round" opacity="0.52" />' +
-               '<path d="' + wp.d + '" fill="none" stroke="#ffffff" stroke-width="3" stroke-dasharray="10,10" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" />';
+      var isArrow = (wp.style === 'arrow');
+      var hitAttrs = ' class="' + (isEraser ? 'wi-war-path-hit' : '') + '" data-wi-warpath-idx="' + wpIdx + '"';
+
+      var ptsArr = [];
+      var dStr = '';
+      if(wp.points && wp.points.length > 0){
+        ptsArr = wp.points;
+        if(ptsArr.length === 1){
+          var p0 = ptsArr[0];
+          return '<g' + hitAttrs + '><circle cx="' + p0.x.toFixed(1) + '" cy="' + p0.y.toFixed(1) + '" r="' + (sw / 2).toFixed(1) + '" fill="' + color + '" fill-opacity="0.52" /></g>';
+        }
+        dStr = 'M ' + ptsArr.map(function(p){ return p.x.toFixed(1) + ' ' + p.y.toFixed(1); }).join(' L ');
+      } else if(wp.d){
+        dStr = wp.d;
+        var nums = String(wp.d).match(/-?\d+(\.\d+)?/g);
+        if(nums && nums.length >= 4){
+          for(var ni = 0; ni < nums.length - 1; ni += 2){
+            ptsArr.push({ x: parseFloat(nums[ni]), y: parseFloat(nums[ni + 1]) });
+          }
+        }
       }
-      if(!wp.points || wp.points.length === 0) return '';
-      if(wp.points.length === 1){
-        var p0 = wp.points[0];
-        return '<circle cx="' + p0.x.toFixed(1) + '" cy="' + p0.y.toFixed(1) + '" r="' + (sw / 2).toFixed(1) + '" fill="' + color + '" fill-opacity="0.52" />';
+      if(!dStr) return '';
+
+      var arrowHeadSvg = '';
+      if(isArrow && ptsArr.length >= 2){
+        var pLast = ptsArr[ptsArr.length - 1];
+        var pPrev = ptsArr[Math.max(0, ptsArr.length - 3)] || ptsArr[ptsArr.length - 2];
+        var ang = Math.atan2(pLast.y - pPrev.y, pLast.x - pPrev.x) * 180 / Math.PI;
+        var headLen = Math.max(28, sw * 0.85);
+        var headW = Math.max(22, sw * 0.68);
+        arrowHeadSvg = '<g transform="translate(' + pLast.x.toFixed(1) + ',' + pLast.y.toFixed(1) + ') rotate(' + ang.toFixed(1) + ')" pointer-events="none">' +
+          '<polygon points="' + (headLen * 0.45).toFixed(1) + ',0 ' + (-headLen * 0.55).toFixed(1) + ',' + (-headW).toFixed(1) + ' ' + (-headLen * 0.25).toFixed(1) + ',0 ' + (-headLen * 0.55).toFixed(1) + ',' + headW.toFixed(1) + '" fill="' + color + '" stroke="#ffffff" stroke-width="2.5" filter="url(#wiPinGlow)" opacity="0.95"/>' +
+        '</g>';
       }
-      var pts = wp.points.map(function(p){ return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' L ');
-      return '<path d="M ' + pts + '" fill="none" stroke="' + color + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round" opacity="0.52" />' +
-             '<path d="M ' + pts + '" fill="none" stroke="#ffffff" stroke-width="3" stroke-dasharray="10,10" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" />';
+
+      return '<g' + hitAttrs + '>' +
+        (isEraser ? '<title>🧹 Кликните, чтобы стереть эту линию/стрелу</title>' : '') +
+        '<path d="' + dStr + '" fill="none" stroke="' + color + '" stroke-width="' + (isArrow ? Math.max(18, sw * 0.55) : sw) + '" stroke-linecap="round" stroke-linejoin="round" opacity="' + (isArrow ? '0.68' : '0.48') + '" />' +
+        '<path d="' + dStr + '" fill="none" stroke="#ffffff" stroke-width="' + (isArrow ? '4' : '3') + '" stroke-dasharray="' + (isArrow ? '16,10' : '10,10') + '" stroke-linecap="round" stroke-linejoin="round" opacity="0.88">' +
+          (isArrow ? '<animate attributeName="stroke-dashoffset" values="52;0" dur="1.1s" repeatCount="indefinite"/>' : '') +
+        '</path>' +
+        arrowHeadSvg +
+      '</g>';
     }).join('');
 
+    // 2. Маршруты выдвижения отрядов (marchPath) с анимацией потока
+    var marchPathsHtml = (m.tacticalUnits || []).map(function(u, idx){
+      if(!u || !Array.isArray(u.marchPath) || u.marchPath.length === 0) return '';
+      var facKey = u.nation_override || u.nation;
+      var fac = WI_TACTICAL_FACTIONS[facKey] || WI_TACTICAL_FACTIONS.nilfgaard;
+      var allPts = [{ x: u.x, y: u.y }].concat(u.marchPath);
+      var dMarch = 'M ' + allPts.map(function(p){ return Math.round(p.x) + ' ' + Math.round(p.y); }).join(' L ');
+      var totalPx = 0;
+      for(var k = 1; k < allPts.length; k++){
+        totalPx += Math.hypot(allPts[k].x - allPts[k - 1].x, allPts[k].y - allPts[k - 1].y);
+      }
+      var miles = Math.max(5, Math.round(totalPx * 0.62));
+      var lastPt = u.marchPath[u.marchPath.length - 1];
+      var prevPt = allPts[allPts.length - 2];
+      var ang = Math.atan2(lastPt.y - prevPt.y, lastPt.x - prevPt.x) * 180 / Math.PI;
+
+      var wpDots = u.marchPath.map(function(wp, wIdx){
+        var isFinal = (wIdx === u.marchPath.length - 1);
+        return '<circle cx="' + wp.x + '" cy="' + wp.y + '" r="' + (isFinal ? 9 : 5) + '" fill="' + (isFinal ? fac.color : '#090d16') + '" stroke="#ffffff" stroke-width="2" />' +
+          (isFinal ? (
+            '<g transform="translate(' + wp.x + ',' + wp.y + ') rotate(' + ang.toFixed(1) + ')">' +
+              '<polygon points="14,0 -10,-10 -5,0 -10,10" fill="' + fac.color + '" stroke="#ffffff" stroke-width="1.8" />' +
+            '</g>' +
+            '<rect x="' + (wp.x - 46) + '" y="' + (wp.y - 30) + '" width="92" height="18" rx="4" fill="rgba(9,13,22,0.92)" stroke="' + fac.color + '" stroke-width="1.2" />' +
+            '<text x="' + wp.x + '" y="' + (wp.y - 17) + '" text-anchor="middle" fill="#fde68a" font-size="10.5" font-weight="800" font-family="\'JetBrains Mono\',monospace">🏃 ' + miles + ' миль</text>'
+          ) : '');
+      }).join('');
+
+      return '<g class="wi-unit-march-layer" data-wi-march-unit="' + idx + '" pointer-events="none">' +
+        '<path d="' + dMarch + '" fill="none" stroke="rgba(0,0,0,0.75)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />' +
+        '<path d="' + dMarch + '" fill="none" stroke="' + fac.color + '" stroke-width="5" stroke-dasharray="14,9" stroke-linecap="round" stroke-linejoin="round" filter="url(#wiPinGlow)">' +
+          '<animate attributeName="stroke-dashoffset" values="46;0" dur="0.95s" repeatCount="indefinite"/>' +
+        '</path>' +
+        wpDots +
+      '</g>';
+    }).join('');
+
+    // 3. Автоматические индикаторы столкновений и сражений между враждебными отрядами
+    var clashes = detectWiTacticalClashes(m.tacticalUnits || []);
+    var clashesHtml = clashes.map(function(cl){
+      return '<g class="wi-clash-indicator" data-wi-clash-pair="' + cl.idxA + ',' + cl.idxB + '" transform="translate(' + cl.mx + ',' + cl.my + ')" style="cursor:pointer;">' +
+        '<title>⚔️ Столкновение: ' + escA((cl.uA.label || 'Отряд 1') + ' vs ' + (cl.uB.label || 'Отряд 2') + ' — Кликните, чтобы открыть Симулятор Боя!') + '</title>' +
+        '<line x1="' + (cl.uA.x - cl.mx) + '" y1="' + (cl.uA.y - cl.my) + '" x2="' + (cl.uB.x - cl.mx) + '" y2="' + (cl.uB.y - cl.my) + '" stroke="#ef4444" stroke-width="3.5" stroke-dasharray="6,5" opacity="0.85" />' +
+        '<circle cx="0" cy="0" r="24" fill="none" stroke="#ef4444" class="wi-battle-shockwave" />' +
+        '<circle cx="0" cy="0" r="24" fill="none" stroke="#f97316" class="wi-battle-shockwave-delayed" />' +
+        '<rect x="-44" y="-13" width="88" height="24" rx="12" fill="rgba(127,29,29,0.95)" stroke="#fca5a5" stroke-width="1.8" filter="url(#wiPinGlow)" />' +
+        '<text x="0" y="3" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="900" font-family="\'JetBrains Mono\',monospace" pointer-events="none">⚔️ В БОЙ!</text>' +
+      '</g>';
+    }).join('');
+
+    // 4. Боевые соединения, герои, флот, крепости и события
     var unitsHtml = (m.tacticalUnits || []).map(function(u, idx){
       var facKey = u.nation_override || u.nation;
       var fac = WI_TACTICAL_FACTIONS[facKey] || WI_TACTICAL_FACTIONS.nilfgaard;
       var ut = WI_TACTICAL_UNIT_TYPES[u.type] || WI_TACTICAL_UNIT_TYPES.army;
+      var st = WI_TACTICAL_UNIT_STATUSES[u.status || 'ready'] || WI_TACTICAL_UNIT_STATUSES.ready;
+      var hp = (u.hp != null ? Math.max(0, Math.min(100, u.hp)) : 100);
+      var strText = u.strength || ut.defaultStr || '';
+      var isSel = (m.selectedUnitIdx === idx);
       var titleText = u.label || (ut.label + ' (' + fac.name + ')');
-      return '<g class="wi-tactical-unit" data-wi-unit-idx="' + idx + '" transform="translate(' + u.x + ',' + u.y + ')" style="cursor:grab;touch-action:none;">' +
-        '<title>' + escA(titleText + ' — Клик: переименовать/удалить, Зажать ЛКМ: переместить') + '</title>' +
-        '<circle cx="0" cy="0" r="24" fill="rgba(9,12,18,0.94)" stroke="' + fac.color + '" stroke-width="4" filter="url(#wiPinGlow)" />' +
-        '<circle cx="0" cy="0" r="30" fill="none" stroke="' + fac.color + '" stroke-width="1.8" stroke-dasharray="6,4" opacity="0.85" />' +
+
+      var isCombatAura = (u.status === 'battle' || u.status === 'siege' || u.type === 'battle' || u.type === 'siege' || u.type === 'raze');
+      var auraCol = (u.type === 'mages' ? '#c084fc' : (isCombatAura ? '#ef4444' : fac.color));
+      var auraSvg = '';
+      if(isCombatAura || u.type === 'mages' || u.type === 'witcher'){
+        auraSvg = '<circle cx="0" cy="0" r="32" fill="' + auraCol + '" fill-opacity="0.18" stroke="' + auraCol + '" stroke-width="2" class="wi-unit-aura-pulse" />' +
+          (isCombatAura ? '<circle cx="0" cy="0" r="26" fill="none" stroke="#ef4444" class="wi-battle-shockwave" />' : '');
+      }
+
+      var selHaloSvg = '';
+      if(isSel){
+        selHaloSvg = '<circle cx="0" cy="0" r="37" fill="rgba(251,191,36,0.16)" stroke="#fbbf24" stroke-width="3" stroke-dasharray="8,5">' +
+          '<animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="8s" repeatCount="indefinite"/>' +
+        '</circle>';
+      }
+
+      var hpColor = hp >= 70 ? '#10b981' : (hp >= 40 ? '#f59e0b' : '#ef4444');
+      var hpBarW = Math.round(38 * (hp / 100));
+
+      return '<g class="wi-tactical-unit ' + (isSel ? 'selected' : '') + '" data-wi-unit-idx="' + idx + '" transform="translate(' + u.x + ',' + u.y + ')" style="cursor:' + (isEraser ? 'pointer' : 'grab') + ';touch-action:none;">' +
+        '<title>' + escA(titleText + ' [' + st.label + ' • ' + hp + '%] — Клик: выбрать в штабе, Зажать ЛКМ: переместить') + '</title>' +
+        auraSvg +
+        selHaloSvg +
+        '<circle cx="0" cy="0" r="24" fill="rgba(9,12,18,0.95)" stroke="' + (isSel ? '#fbbf24' : fac.color) + '" stroke-width="' + (isSel ? '4.5' : '3.8') + '" filter="url(#wiPinGlow)" />' +
+        '<circle cx="0" cy="0" r="29" fill="none" stroke="' + fac.color + '" stroke-width="1.6" stroke-dasharray="6,4" opacity="0.85" />' +
         '<text x="0" y="7" text-anchor="middle" font-size="21" pointer-events="none">' + ut.icon + '</text>' +
-        '<circle cx="17" cy="-17" r="11" fill="#090d16" stroke="' + fac.color + '" stroke-width="2" />' +
-        '<text x="17" y="-12" text-anchor="middle" font-size="13" pointer-events="none">' + fac.icon + '</text>' +
+        '<circle cx="18" cy="-18" r="10.5" fill="#090d16" stroke="' + fac.color + '" stroke-width="2" />' +
+        '<text x="18" y="-13" text-anchor="middle" font-size="12.5" pointer-events="none">' + fac.icon + '</text>' +
+        '<circle cx="-18" cy="-18" r="10" fill="#090d16" stroke="' + st.color + '" stroke-width="1.8" />' +
+        '<text x="-18" y="-14" text-anchor="middle" font-size="11.5" pointer-events="none">' + st.icon + '</text>' +
+        '<rect x="-19" y="19" width="38" height="4.5" rx="2" fill="rgba(0,0,0,0.85)" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" pointer-events="none" />' +
+        '<rect x="-19" y="19" width="' + hpBarW + '" height="4.5" rx="2" fill="' + hpColor + '" pointer-events="none" />' +
         (m.showLabels !== false ? (
-          '<rect x="-95" y="28" width="190" height="22" rx="5" fill="rgba(9,13,22,0.9)" stroke="' + fac.color + '" stroke-width="1.3" />' +
-          '<text x="0" y="43" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="700" font-family="\'JetBrains Mono\',monospace" pointer-events="none">' + esc(titleText.slice(0, 26)) + '</text>'
+          '<rect x="-102" y="27" width="204" height="' + (strText ? '34' : '22') + '" rx="5" fill="rgba(9,13,22,0.92)" stroke="' + (isSel ? '#fbbf24' : fac.color) + '" stroke-width="' + (isSel ? '1.8' : '1.2') + '" pointer-events="none" />' +
+          '<text x="0" y="41" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700" font-family="\'JetBrains Mono\',monospace" pointer-events="none">' + esc(titleText.slice(0, 27)) + '</text>' +
+          (strText ? '<text x="0" y="55" text-anchor="middle" fill="#cbd5e1" font-size="10" font-family="\'JetBrains Mono\',monospace" pointer-events="none">' + esc(strText.slice(0, 30)) + ' • ' + hp + '%</text>' : '')
         ) : '') +
       '</g>';
     }).join('');
 
     return '<g class="wi-war-paths-layer">' + pathsHtml + '</g>' +
+           '<g class="wi-war-march-layer">' + marchPathsHtml + '</g>' +
+           '<g class="wi-war-clashes-layer">' + clashesHtml + '</g>' +
            '<g class="wi-war-units-layer">' + unitsHtml + '</g>';
   }
 
@@ -3633,9 +3830,24 @@
     // 2. Растровая 4K карта Континента (Nolan Kotulan, 2880x4096)
     var mapImg = '<image href="new-4k-map-of-the-continent-v0-s4ryngvic0ga1.webp" x="0" y="0" width="2880" height="4096" preserveAspectRatio="xMidYMid meet" />';
 
-    // 2.5. Политические границы и зоны контроля держав (активны в режиме Тактики или при включённом слое Границы)
+    // 2.3. Слой стратегических рек и переправ (при включении кнопки 🌊 Реки)
+    var riversSvg = '';
+    if(m.showRivers && typeof WI_MAP_RIVERS !== 'undefined'){
+      riversSvg = WI_MAP_RIVERS.map(function(rv){
+        if(!rv.pts || rv.pts.length < 2) return '';
+        var dRv = 'M ' + rv.pts.map(function(p){ return p[0] + ' ' + p[1]; }).join(' L ');
+        var midPt = rv.pts[Math.floor(rv.pts.length / 2)];
+        return '<g class="wi-river-overlay" pointer-events="none">' +
+          '<path d="' + dRv + '" fill="none" stroke="rgba(14,165,233,0.45)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />' +
+          '<path d="' + dRv + '" fill="none" stroke="#38bdf8" stroke-width="4" stroke-dasharray="12,6" stroke-linecap="round" stroke-linejoin="round" />' +
+          (m.showLabels !== false && midPt ? '<text x="' + midPt[0] + '" y="' + (midPt[1] - 10) + '" text-anchor="middle" fill="#7dd3fc" font-size="13" font-family="Cinzel, serif" font-weight="800" filter="url(#wiLabelShadow)">🌊 ' + esc(rv.name) + '</text>' : '') +
+        '</g>';
+      }).join('');
+    }
+
+    // 2.5. Политические границы и зоны контроля держав (активны при включённом слое Границы или инструменте захвата)
     var territoriesSvg = '';
-    if(m.mode === 'tactics' || m.showTerritories){
+    if(m.showTerritories || (m.mode === 'tactics' && m.tacticsTool === 'capture')){
       var territoriesList = getWiTerritoriesList();
       territoriesSvg = territoriesList.map(function(t){
         var isSel = (m.selectedRegionId === t.id || (selLoc && selLoc.id === t.locId));
@@ -3655,7 +3867,7 @@
       }).join('');
     }
 
-    // 2.8. Слой тактики (линии фронтов + боевые соединения)
+    // 2.8. Слой тактики (линии фронтов + маршруты марша + индикаторы боёв + боевые соединения)
     var warGroupSvg = '<g id="wiMapWarGroup">' + renderWiWarLayerInner() + '</g>';
 
     // 3. Маршрут между выбранными точками
@@ -3701,9 +3913,9 @@
       routeSvg = '<g id="wiRouteLayer">' + linesSvg + waypointsSvg + '</g>';
     }
 
-    // 4. Интерактивные пины городов, крепостей ведьмаков и столиц Континента
+    // 4. Интерактивные пины городов, крепостей ведьмаков и столиц Континента (только при включённом слое Города)
     var pinsSvg = '';
-    if(m.showPins !== false){
+    if(m.showPins === true){
       var regFilter = m.regionFilter || 'all';
       var tpFilter = m.typeFilter || 'all';
       var qSearch = (m.search || '').toLowerCase().trim();
@@ -3775,14 +3987,6 @@
           labelSvg +
         '</g>';
       }).join('');
-    } else if(selLoc && m.mode === 'inspect'){
-      pinsSvg = '<g class="wi-selected-loc-marker" transform="translate(' + selLoc.x + ',' + selLoc.y + ')">' +
-        '<circle r="26" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="6,4">' +
-          '<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="10s" repeatCount="indefinite"/>' +
-        '</circle>' +
-        '<circle r="7" fill="#f59e0b" stroke="#ffffff" stroke-width="2" filter="url(#wiPinGlow)"/>' +
-        (m.showLabels !== false ? ('<text y="34" fill="#fbbf24" font-size="13.5" font-family="Cinzel, serif" font-weight="700" text-anchor="middle" filter="url(#wiLabelShadow)">' + esc(selLoc.name) + '</text>') : '') +
-      '</g>';
     }
 
     // 5. Пользовательские тактические метки
@@ -3800,6 +4004,7 @@
     return '<svg id="wiMapSvg" viewBox="' + minX + ' ' + minY + ' ' + vbW + ' ' + vbH + '" width="100%" height="100%" style="display:block;touch-action:none;user-select:none;">' +
       defsSvg +
       mapImg +
+      '<g id="wiMapRivers">' + riversSvg + '</g>' +
       '<g id="wiMapTerritories">' + territoriesSvg + '</g>' +
       warGroupSvg +
       routeSvg +
@@ -3808,8 +4013,321 @@
     '</svg>';
   }
 
+  function buildWiUnitTypeOptionsHtml(selectedKey){
+    var groups = {};
+    Object.keys(WI_TACTICAL_UNIT_TYPES).forEach(function(uk){
+      var ut = WI_TACTICAL_UNIT_TYPES[uk];
+      var cat = ut.cat || 'Войска';
+      if(!groups[cat]) groups[cat] = [];
+      groups[cat].push(ut);
+    });
+    return Object.keys(groups).map(function(cat){
+      var opts = groups[cat].map(function(ut){
+        return '<option value="' + escA(ut.id) + '"' + (selectedKey === ut.id ? ' selected' : '') + '>' + ut.icon + ' ' + esc(ut.label) + ' (Сила ' + (ut.basePow || 5) + ')</option>';
+      }).join('');
+      return '<optgroup label="' + escA(cat) + '">' + opts + '</optgroup>';
+    }).join('');
+  }
+
   function renderWiTacticsInspector(){
-    return '';
+    var m = WI.map;
+    var units = m.tacticalUnits || [];
+    var curTab = m.tacticsTab || 'units';
+    var clashes = detectWiTacticalClashes(units);
+    var marchingUnitsCount = units.filter(function(u){ return u && Array.isArray(u.marchPath) && u.marchPath.length > 0; }).length;
+
+    // Карточка выбранного соединения (если выбран отряд на карте или в списке)
+    var selectedUnitHtml = '';
+    if(m.selectedUnitIdx != null && m.selectedUnitIdx >= 0 && units[m.selectedUnitIdx]){
+      var su = units[m.selectedUnitIdx];
+      var suIdx = m.selectedUnitIdx;
+      var suFacKey = su.nation_override || su.nation || 'nilfgaard';
+      var suFac = WI_TACTICAL_FACTIONS[suFacKey] || WI_TACTICAL_FACTIONS.nilfgaard;
+      var suType = WI_TACTICAL_UNIT_TYPES[su.type] || WI_TACTICAL_UNIT_TYPES.army;
+      var suStatus = WI_TACTICAL_UNIT_STATUSES[su.status || 'ready'] || WI_TACTICAL_UNIT_STATUSES.ready;
+      var suHp = (su.hp != null ? su.hp : 100);
+      var suTer = getTerrainAt(su.x, su.y);
+      var suMarchCount = (su.marchPath && su.marchPath.length) || 0;
+
+      var facOpts = Object.keys(WI_TACTICAL_FACTIONS).filter(function(fk){ return fk !== 'independent'; }).map(function(fk){
+        var f = WI_TACTICAL_FACTIONS[fk];
+        return '<option value="' + fk + '"' + (suFacKey === fk ? ' selected' : '') + '>' + f.icon + ' ' + esc(f.name) + '</option>';
+      }).join('');
+
+      var stOpts = Object.keys(WI_TACTICAL_UNIT_STATUSES).map(function(sk){
+        var st = WI_TACTICAL_UNIT_STATUSES[sk];
+        return '<option value="' + sk + '"' + ((su.status || 'ready') === sk ? ' selected' : '') + '>' + st.icon + ' ' + esc(st.label) + '</option>';
+      }).join('');
+
+      selectedUnitHtml =
+        '<div class="wi-char-sheet-card" style="margin-top:12px;border-color:' + suFac.color + ';background:linear-gradient(145deg, rgba(16,22,34,0.96) 0%, rgba(9,12,18,0.98) 100%);box-shadow:0 0 20px rgba(0,0,0,0.6);">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.08);">' +
+            '<div style="display:flex;align-items:center;gap:10px;">' +
+              '<span style="font-size:26px;background:rgba(0,0,0,0.5);border:2px solid ' + suFac.color + ';border-radius:50%;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;">' + suType.icon + '</span>' +
+              '<div>' +
+                '<div style="font-size:10.5px;color:' + suFac.color + ';font-family:\'JetBrains Mono\',monospace;font-weight:800;text-transform:uppercase;">УПРАВЛЕНИЕ ВЫБРАННЫМ СОЕДИНЕНИЕМ #' + (suIdx + 1) + '</div>' +
+                '<div style="font-family:\'Cinzel\',serif;font-size:16px;font-weight:800;color:#fff;">' + esc(su.label || suType.label) + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+              '<button class="btn btn-primary" id="wiSelUnitMarchModeBtn" style="font-size:11.5px;padding:5px 10px;' + (m.tacticsTool === 'march' ? 'box-shadow:0 0 12px #38bdf8;' : '') + '">🏃 ' + (m.tacticsTool === 'march' ? 'Кликайте по карте (Марш активен)' : 'Проложить марш') + '</button>' +
+              (suMarchCount > 0 ? '<button class="btn btn-ghost" id="wiSelUnitAnimMarchBtn" style="font-size:11.5px;padding:5px 10px;color:#38bdf8;border-color:rgba(56,189,248,0.45);">▶️ Двинуть по маршруту (' + suMarchCount + ')</button>' : '') +
+              (suMarchCount > 0 ? '<button class="btn btn-ghost" id="wiSelUnitClearMarchBtn" style="font-size:11.5px;padding:5px 10px;color:#fca5a5;">✖ Сброс марша</button>' : '') +
+              '<button class="btn btn-ghost" data-wi-focus-unit="' + suIdx + '" style="font-size:11.5px;padding:5px 10px;">🎯 Навести</button>' +
+              '<button class="btn btn-ghost" id="wiSelUnitCloneBtn" style="font-size:11.5px;padding:5px 10px;" title="Дублировать отряд рядом">📑 Копия</button>' +
+              '<button class="btn btn-ghost" data-wi-del-unit="' + suIdx + '" style="font-size:11.5px;padding:5px 10px;color:#ef4444;">🗑️ Снять</button>' +
+              '<button class="btn btn-ghost" id="wiSelUnitCloseBtn" style="font-size:11.5px;padding:5px 8px;">✕</button>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(185px, 1fr));gap:10px;align-items:end;">' +
+            '<div>' +
+              '<label style="font-size:10.5px;color:var(--wi-steel);display:block;margin-bottom:3px;">НАЗВАНИЕ АРМИИ / ОТРЯДА</label>' +
+              '<input type="text" id="wiSelUnitNameInp" class="wi-input" style="font-size:12.5px;padding:5px 8px;" value="' + escA(su.label || '') + '">' +
+            '</div>' +
+            '<div>' +
+              '<label style="font-size:10.5px;color:var(--wi-steel);display:block;margin-bottom:3px;">ЧИСЛЕННОСТЬ / СОСТАВ</label>' +
+              '<input type="text" id="wiSelUnitStrInp" class="wi-input" style="font-size:12.5px;padding:5px 8px;" placeholder="Напр. 5 000 латников" value="' + escA(su.strength || suType.defaultStr || '') + '">' +
+            '</div>' +
+            '<div>' +
+              '<label style="font-size:10.5px;color:var(--wi-steel);display:block;margin-bottom:3px;">ДЕРЖАВА / ФРАКЦИЯ</label>' +
+              '<select id="wiSelUnitFacSel" class="wi-war-select" style="width:100%;">' + facOpts + '</select>' +
+            '</div>' +
+            '<div>' +
+              '<label style="font-size:10.5px;color:var(--wi-steel);display:block;margin-bottom:3px;">РОД ВОЙСК / ТИП</label>' +
+              '<select id="wiSelUnitTypeSel" class="wi-war-select" style="width:100%;">' + buildWiUnitTypeOptionsHtml(su.type || 'army') + '</select>' +
+            '</div>' +
+            '<div>' +
+              '<label style="font-size:10.5px;color:var(--wi-steel);display:block;margin-bottom:3px;">БОЕВОЙ СТАТУС</label>' +
+              '<select id="wiSelUnitStatusSel" class="wi-war-select" style="width:100%;">' + stOpts + '</select>' +
+            '</div>' +
+            '<div>' +
+              '<label style="font-size:10.5px;color:var(--wi-steel);display:block;margin-bottom:3px;">БОЕСПОСОБНОСТЬ: <b id="wiSelUnitHpVal" style="color:#fbbf24;">' + suHp + '%</b> (' + suTer.icon + ' ' + esc(suTer.name) + ')</label>' +
+              '<input type="range" id="wiSelUnitHpRange" min="10" max="100" step="5" value="' + suHp + '" style="width:100%;accent-color:#f59e0b;cursor:pointer;">' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }
+
+    // Вкладки Тактического Штаба
+    var tabsBarHtml =
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--wi-border);">' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+          '<button class="wi-tactics-tab-btn ' + (curTab === 'units' ? 'active' : '') + '" data-wi-tactics-tab="units">♟️ Войска и Штаб (' + units.length + ')</button>' +
+          '<button class="wi-tactics-tab-btn ' + (curTab === 'battles' ? 'active' : '') + '" data-wi-tactics-tab="battles">⚔️ Бои и Симулятор' + (clashes.length > 0 ? ' <span style="background:#ef4444;color:#fff;padding:1px 6px;border-radius:10px;font-size:10.5px;">' + clashes.length + '</span>' : '') + '</button>' +
+          '<button class="wi-tactics-tab-btn ' + (curTab === 'regions' ? 'active' : '') + '" data-wi-tactics-tab="regions">🏴 Державы и Границы (21)</button>' +
+          '<button class="wi-tactics-tab-btn ' + (curTab === 'scenarios' ? 'active' : '') + '" data-wi-tactics-tab="scenarios">📜 Сценарии и Сводка ИИ</button>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+          (marchingUnitsCount > 0 ? '<button class="btn btn-primary" id="wiWarAnimateAllInspectorBtn" style="font-size:12px;padding:5px 12px;">▶️ Двинуть все войска на марше (' + marchingUnitsCount + ')</button>' : '') +
+          '<button class="btn btn-ghost" id="wiWarQuickSpawnCenterBtn" style="font-size:12px;padding:5px 10px;">➕ Разместить отряд в центре</button>' +
+        '</div>' +
+      '</div>';
+
+    var tabBodyHtml = '';
+
+    if(curTab === 'units'){
+      var facFilter = m.unitFactionFilter || 'all';
+      var facFilterOpts = '<option value="all"' + (facFilter === 'all' ? ' selected' : '') + '>Все фракции (' + units.length + ')</option>' +
+        Object.keys(WI_TACTICAL_FACTIONS).filter(function(fk){ return fk !== 'independent'; }).map(function(fk){
+          var f = WI_TACTICAL_FACTIONS[fk];
+          var cnt = units.filter(function(u){ return (u.nation_override || u.nation) === fk; }).length;
+          if(cnt === 0 && facFilter !== fk) return '';
+          return '<option value="' + fk + '"' + (facFilter === fk ? ' selected' : '') + '>' + f.icon + ' ' + esc(f.name) + ' (' + cnt + ')</option>';
+        }).join('');
+
+      var filteredUnits = [];
+      units.forEach(function(u, idx){
+        var fk = u.nation_override || u.nation;
+        if(facFilter === 'all' || fk === facFilter){
+          filteredUnits.push({ u: u, idx: idx });
+        }
+      });
+
+      tabBodyHtml =
+        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+            '<span style="font-size:11.5px;color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;">ФИЛЬТР ПО ДЕРЖАВЕ:</span>' +
+            '<select id="wiTacticsRosterFilter" class="wi-war-select">' + facFilterOpts + '</select>' +
+          '</div>' +
+          '<div style="font-size:11.5px;color:var(--wi-steel);">💡 Кликните по отряду в списке или на карте для настройки приказа, численности и маршрута марша</div>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:8px;max-height:360px;overflow-y:auto;padding-right:4px;">' +
+          (filteredUnits.length ? filteredUnits.map(function(item){
+            var u = item.u;
+            var idx = item.idx;
+            var fk = u.nation_override || u.nation;
+            var fac = WI_TACTICAL_FACTIONS[fk] || WI_TACTICAL_FACTIONS.nilfgaard;
+            var ut = WI_TACTICAL_UNIT_TYPES[u.type] || WI_TACTICAL_UNIT_TYPES.army;
+            var st = WI_TACTICAL_UNIT_STATUSES[u.status || 'ready'] || WI_TACTICAL_UNIT_STATUSES.ready;
+            var hp = (u.hp != null ? u.hp : 100);
+            var isSel = (m.selectedUnitIdx === idx);
+            var hasMarch = (u.marchPath && u.marchPath.length > 0);
+            return '<div class="wi-unit-roster-row ' + (isSel ? 'selected' : '') + '" data-wi-select-unit="' + idx + '">' +
+              '<div style="display:flex;align-items:center;gap:9px;min-width:0;flex:1;">' +
+                '<span style="font-size:20px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,0.55);border:2px solid ' + fac.color + ';display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">' + ut.icon + '</span>' +
+                '<div style="min-width:0;flex:1;">' +
+                  '<div style="font-weight:700;font-size:12.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + fac.icon + ' ' + esc(u.label || ut.label) + '</div>' +
+                  '<div style="font-size:11px;color:var(--wi-steel);display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+                    '<span style="color:' + st.color + ';font-weight:700;">' + st.icon + ' ' + esc(st.label) + '</span>' +
+                    '<span>• ' + esc(u.strength || ut.defaultStr || ut.label) + '</span>' +
+                    '<span style="color:' + (hp >= 70 ? '#6ee7b7' : (hp >= 40 ? '#fde68a' : '#fca5a5')) + ';">• ' + hp + '%</span>' +
+                    (hasMarch ? '<span style="color:#38bdf8;font-weight:700;">• 🏃 Марш (' + u.marchPath.length + ')</span>' : '') +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div style="display:flex;gap:4px;flex-shrink:0;">' +
+                '<button class="btn btn-ghost" data-wi-focus-unit="' + idx + '" style="font-size:11px;padding:3px 7px;" title="Навести камеру">🎯</button>' +
+                '<button class="btn btn-ghost" data-wi-march-unit="' + idx + '" style="font-size:11px;padding:3px 7px;color:#38bdf8;" title="Задать маршрут марша">🏃</button>' +
+                '<button class="btn btn-ghost" data-wi-del-unit="' + idx + '" style="font-size:11px;padding:3px 7px;color:#ef4444;" title="Снять соединение">🗑️</button>' +
+              '</div>' +
+            '</div>';
+          }).join('') : '<div class="char-empty" style="grid-column:1/-1;">Нет размещённых соединений выбранной фракции. Выберите инструмент «♟️ Отряд» и кликните по карте или загрузите сценарий!</div>') +
+        '</div>';
+
+    } else if(curTab === 'battles'){
+      var attIdx = Math.max(0, Math.min(units.length - 1, m.battleAttackerIdx || 0));
+      var defIdx = Math.max(0, Math.min(units.length - 1, m.battleDefenderIdx != null ? m.battleDefenderIdx : (units.length > 1 ? 1 : 0)));
+      var unitSelectOpts = function(selIdx){
+        return units.map(function(u, i){
+          var fk = u.nation_override || u.nation;
+          var fac = WI_TACTICAL_FACTIONS[fk] || WI_TACTICAL_FACTIONS.nilfgaard;
+          var ut = WI_TACTICAL_UNIT_TYPES[u.type] || WI_TACTICAL_UNIT_TYPES.army;
+          var hp = (u.hp != null ? u.hp : 100);
+          return '<option value="' + i + '"' + (i === selIdx ? ' selected' : '') + '>' + fac.icon + ' ' + ut.icon + ' ' + esc(u.label || ut.label) + ' (Сила ' + (ut.basePow || 5) + ', Боесп. ' + hp + '%)</option>';
+        }).join('');
+      };
+
+      var clashesCardsHtml = clashes.length ? (
+        '<div style="margin-bottom:14px;">' +
+          '<div style="font-size:11.5px;color:#fca5a5;font-weight:800;font-family:\'JetBrains Mono\',monospace;margin-bottom:6px;">🔥 АКТИВНЫЕ СОПРИКОСНОВЕНИЯ ВОЙСК НА КАРТЕ (' + clashes.length + '):</div>' +
+          '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:8px;">' +
+            clashes.map(function(cl){
+              var facA = WI_TACTICAL_FACTIONS[cl.uA.nation_override || cl.uA.nation] || WI_TACTICAL_FACTIONS.nilfgaard;
+              var facB = WI_TACTICAL_FACTIONS[cl.uB.nation_override || cl.uB.nation] || WI_TACTICAL_FACTIONS.redania;
+              var ter = getTerrainAt(cl.mx, cl.my);
+              return '<div style="background:rgba(127,29,29,0.22);border:1px solid rgba(239,68,68,0.45);border-radius:6px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;">' +
+                '<div style="min-width:0;">' +
+                  '<div style="font-size:12px;font-weight:700;color:#fff;">' + facA.icon + ' ' + esc(cl.uA.label) + ' <span style="color:#ef4444;">⚔️</span> ' + facB.icon + ' ' + esc(cl.uB.label) + '</div>' +
+                  '<div style="font-size:11px;color:var(--wi-steel);">Поле боя: ' + ter.icon + ' ' + esc(ter.name) + ' • Дистанция: ' + cl.dist + 'px</div>' +
+                '</div>' +
+                '<button class="btn btn-primary" data-wi-sim-pair="' + cl.idxA + ',' + cl.idxB + '" style="font-size:11px;padding:4px 9px;flex-shrink:0;">🎲 В симулятор</button>' +
+              '</div>';
+            }).join('') +
+          '</div>' +
+        '</div>'
+      ) : '';
+
+      var logHtml = (m.battleLog && m.battleLog.length) ? (
+        '<div style="margin-top:12px;border-top:1px solid var(--wi-border);padding-top:10px;">' +
+          '<div style="font-size:11.5px;color:var(--wi-amber);font-family:\'JetBrains Mono\',monospace;font-weight:700;margin-bottom:6px;">📜 ХРОНИКА СРАЖЕНИЙ И ПОТЕРЬ:</div>' +
+          '<div style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;">' +
+            m.battleLog.map(function(entry){
+              return '<div style="background:rgba(255,255,255,0.03);border-left:3px solid ' + (entry.color || '#f59e0b') + ';padding:6px 10px;border-radius:4px;font-size:12px;color:#e2e8f0;">' +
+                '<div style="font-weight:700;color:#fbbf24;">' + esc(entry.title) + '</div>' +
+                '<div style="font-size:11.5px;color:var(--wi-silver);margin-top:2px;">' + esc(entry.desc) + '</div>' +
+              '</div>';
+            }).join('') +
+          '</div>' +
+        '</div>'
+      ) : '';
+
+      tabBodyHtml =
+        clashesCardsHtml +
+        '<div style="background:rgba(15,20,30,0.85);border:1px solid var(--wi-border);border-radius:8px;padding:12px;">' +
+          '<div style="font-family:\'Cinzel\',serif;font-weight:800;font-size:14px;color:var(--wi-amber);margin-bottom:8px;">🎲 ТАКТИЧЕСКИЙ СИМУЛЯТОР СРАЖЕНИЯ (2d6 + Мощь рода войск + Рельеф)</div>' +
+          (units.length >= 2 ? (
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));gap:10px;align-items:end;">' +
+              '<div>' +
+                '<label style="font-size:11px;color:#fca5a5;font-weight:700;display:block;margin-bottom:4px;">⚔️ АТАКУЮЩЕЕ СОЕДИНЕНИЕ:</label>' +
+                '<select id="wiSimAttackerSel" class="wi-war-select" style="width:100%;">' + unitSelectOpts(attIdx) + '</select>' +
+              '</div>' +
+              '<div>' +
+                '<label style="font-size:11px;color:#6ee7b7;font-weight:700;display:block;margin-bottom:4px;">🛡️ ОБОРОНЯЮЩЕЕСЯ СОЕДИНЕНИЕ:</label>' +
+                '<select id="wiSimDefenderSel" class="wi-war-select" style="width:100%;">' + unitSelectOpts(defIdx) + '</select>' +
+              '</div>' +
+              '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+                '<button class="btn btn-primary" id="wiSimRollClashBtn" style="flex:1;padding:7px 14px;font-weight:800;">⚔️ Разыграть столкновение (2d6)</button>' +
+                '<button class="btn btn-ghost" id="wiSimMoveToBattleBtn" title="Подтянуть атакующий отряд вплотную к обороняющемуся с анимацией">🏃 Сблизить войска</button>' +
+              '</div>' +
+            '</div>'
+          ) : '<div class="char-empty">Разместите на карте хотя бы 2 отряда, чтобы разыгрывать тактические сражения.</div>') +
+          logHtml +
+        '</div>';
+
+    } else if(curTab === 'regions'){
+      var territoriesList = getWiTerritoriesList();
+      var counts = {};
+      territoriesList.forEach(function(t){
+        var fk = t.ownerKey || t.defaultFaction || 'independent';
+        counts[fk] = (counts[fk] || 0) + 1;
+      });
+      var totalReg = territoriesList.length || 1;
+      var barSegments = Object.keys(counts).map(function(fk){
+        var f = WI_TACTICAL_FACTIONS[fk] || { name: fk, color: '#64748b', icon: '🏴' };
+        var pct = ((counts[fk] / totalReg) * 100).toFixed(1);
+        return '<div style="width:' + pct + '%;background:' + f.color + ';height:100%;" title="' + escA(f.name + ': ' + counts[fk] + ' рег. (' + pct + '%)') + '"></div>';
+      }).join('');
+
+      var qReg = (m.regionSearch || '').toLowerCase().trim();
+      var filteredRegs = territoriesList.filter(function(t){
+        return !qReg || t.name.toLowerCase().indexOf(qReg) !== -1 || t.labelText.toLowerCase().indexOf(qReg) !== -1;
+      });
+
+      tabBodyHtml =
+        '<div style="margin-bottom:10px;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:11.5px;color:var(--wi-steel);">' +
+            '<span>ГЕОПОЛИТИЧЕСКИЙ БАЛАНС КОНТИНЕНТА (' + territoriesList.length + ' СТРАН И КНЯЖЕСТВ):</span>' +
+            '<input type="text" id="wiTacticsRegionSearch" class="wi-input" style="max-width:220px;padding:3px 8px;font-size:11.5px;" placeholder="🔍 Фильтр региона..." value="' + escA(m.regionSearch || '') + '">' +
+          '</div>' +
+          '<div style="height:10px;width:100%;border-radius:5px;overflow:hidden;display:flex;background:#090d16;border:1px solid var(--wi-border);">' + barSegments + '</div>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));gap:8px;max-height:320px;overflow-y:auto;padding-right:4px;">' +
+          filteredRegs.map(function(t){
+            var curOwner = (m.territoryOwners && m.territoryOwners[t.id]) || 'independent';
+            var opts = Object.keys(WI_TACTICAL_FACTIONS).map(function(fk){
+              var f = WI_TACTICAL_FACTIONS[fk];
+              return '<option value="' + fk + '"' + (curOwner === fk ? ' selected' : '') + '>' + f.short + '</option>';
+            }).join('');
+            return '<div style="background:rgba(15,20,30,0.75);border:1px solid var(--wi-border);border-left:4px solid ' + t.color + ';border-radius:6px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;">' +
+              '<div style="min-width:0;flex:1;">' +
+                '<div style="font-weight:700;font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + t.icon + ' ' + esc(t.name) + '</div>' +
+              '</div>' +
+              '<select class="wi-war-select wi-territory-owner-sel" data-tid="' + escA(t.id) + '" style="padding:3px 6px;font-size:11px;max-width:145px;">' + opts + '</select>' +
+            '</div>';
+          }).join('') +
+        '</div>';
+
+    } else if(curTab === 'scenarios'){
+      tabBodyHtml =
+        '<div style="margin-bottom:12px;">' +
+          '<div style="font-size:11.5px;color:var(--wi-steel);margin-bottom:8px;">Выберите историческую кампанию Северных войн, чтобы мгновенно расставить армии, фронты, стрелы ударов и границы:</div>' +
+          '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(270px, 1fr));gap:10px;">' +
+            WI_TACTICAL_SCENARIOS.map(function(sc){
+              return '<div class="wi-tactics-scenario-card" data-wi-scenario="' + escA(sc.id) + '">' +
+                '<div style="font-family:\'Cinzel\',serif;font-weight:800;font-size:13px;color:var(--wi-amber);margin-bottom:4px;">' + esc(sc.name) + '</div>' +
+                '<div style="font-size:11.5px;color:var(--wi-silver);line-height:1.4;">' + esc(sc.desc) + '</div>' +
+                '<div style="margin-top:6px;font-size:10.5px;color:#38bdf8;font-family:\'JetBrains Mono\',monospace;">♟️ Соединений: ' + (sc.units ? sc.units.length : 0) + ' • 🏹 Фронтов: ' + (sc.warPaths ? sc.warPaths.length : 0) + '</div>' +
+              '</div>';
+            }).join('') +
+          '</div>' +
+        '</div>' +
+        '<div style="background:rgba(15,20,30,0.85);border:1px solid rgba(245,158,11,0.35);border-radius:8px;padding:12px;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+            '<div>' +
+              '<div style="font-family:\'Cinzel\',serif;font-weight:800;font-size:14px;color:#fbbf24;">🤖 Сводка Военного Совета и Разведки ИИ</div>' +
+              '<div style="font-size:11.5px;color:var(--wi-steel);">ИИ-аналитик (Дийкстра / Ваттье де Ридо) проанализирует текущее положение армий и границ на вашей карте</div>' +
+            '</div>' +
+            '<button class="btn btn-primary" id="wiTacticsAiReportBtn" style="font-size:12px;">📜 Составить оперативную сводку</button>' +
+          '</div>' +
+          (m.aiWarReport ? ('<div style="margin-top:10px;padding:10px 12px;background:rgba(0,0,0,0.45);border-left:3px solid var(--wi-amber);border-radius:4px;font-family:\'EB Garamond\',serif;font-size:14.5px;line-height:1.55;color:#f1f5f9;white-space:pre-wrap;">' + esc(m.aiWarReport) + '</div>') : '') +
+        '</div>';
+    }
+
+    return selectedUnitHtml +
+      '<div class="wi-char-sheet-card" style="margin-top:12px;">' +
+        tabsBarHtml +
+        tabBodyHtml +
+      '</div>';
   }
 
   /* Экран КАРТА МИРА (wiMap) */
@@ -3825,64 +4343,75 @@
     var isRoute = (m.mode === 'route');
     var isMarkers = (m.mode === 'markers');
 
-    // Панель инструментов режима Тактики
+    // Компактная панель инструментов режима Тактики (выпадающие списки вместо громоздких рядов кнопок)
     var tacticsPaletteHtml = '';
     if(isTactics){
       var toolBtns = [
-        { id: 'pan',     label: '✋ Камера',         title: 'Перемещение и масштабирование карты' },
-        { id: 'paint',   label: '🖌️ Фронт / Удар',  title: 'Зажмите ЛКМ и рисуйте линию фронта или направление удара армии' },
-        { id: 'capture', label: '🏴 Захват региона', title: 'Кликните по контуру королевства на карте, чтобы передать его выбранной фракции' },
-        { id: 'unit',    label: '♟️ Отряд / Флот',   title: 'Кликните в любую точку карты, чтобы разместить армию, кавалерию, флот или осаду' }
+        { id: 'pan',     label: '✋ Выбор / Камера', title: 'Перемещение карты и выбор отрядов кликом' },
+        { id: 'unit',    label: '♟️ + Отряд',        title: 'Клик по карте размещает выбранный род войск' },
+        { id: 'march',   label: '🏃 Марш',           title: 'Клик по карте добавляет точку маршрута выбранному отряду' },
+        { id: 'arrow',   label: '🏹 Стрела удара',   title: 'Зажмите ЛКМ и проведите стрелу наступления армии' },
+        { id: 'paint',   label: '🧱 Линия фронта',   title: 'Зажмите ЛКМ и нарисуйте оборонительный рубеж' },
+        { id: 'capture', label: '🏴 Захват страны',  title: 'Клик по региону передаёт его выбранной державе' },
+        { id: 'eraser',  label: '🧹 Ластик',         title: 'Клик по отряду или линии фронта удаляет их с карты' }
       ].map(function(tb){
         return '<button class="wi-war-tool ' + (m.tacticsTool === tb.id ? 'active' : '') + '" data-wi-tactics-tool="' + tb.id + '" title="' + escA(tb.title) + '">' + tb.label + '</button>';
       }).join('');
 
-      var factionBtns = Object.keys(WI_TACTICAL_FACTIONS).map(function(fk){
+      var factionSelectOpts = Object.keys(WI_TACTICAL_FACTIONS).map(function(fk){
         var f = WI_TACTICAL_FACTIONS[fk];
-        var isAct = (m.warNation === fk);
-        return '<button class="wi-war-tool ' + (isAct ? 'active' : '') + '" data-wi-nation="' + fk + '" style="' + (isAct ? 'border-color:' + f.color + ';box-shadow:0 0 12px ' + f.color + '88;' : '') + '">' + f.short + '</button>';
+        return '<option value="' + fk + '"' + (m.warNation === fk ? ' selected' : '') + '>' + f.short + ' — ' + esc(f.name) + '</option>';
       }).join('');
 
-      var subOptionsHtml = '';
-      if(m.tacticsTool === 'paint'){
-        var sizes = [
-          { s: 28, l: 'Тонкая (28px)' },
-          { s: 48, l: 'Средняя (48px)' },
-          { s: 80, l: 'Широкая (80px)' }
-        ];
-        subOptionsHtml = '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-top:6px;border-top:1px solid rgba(255,255,255,0.08);width:100%;">' +
-          '<span style="font-size:11px;color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;">ТОЛЩИНА ЛИНИИ ФРОНТА:</span>' +
-          sizes.map(function(sz){
-            return '<button class="wi-war-tool ' + (m.brushSize === sz.s ? 'active' : '') + '" data-wi-brush-size="' + sz.s + '" style="font-size:11px;padding:3px 9px;">' + sz.l + '</button>';
-          }).join('') +
-        '</div>';
-      } else if(m.tacticsTool === 'unit'){
-        subOptionsHtml = '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-top:6px;border-top:1px solid rgba(255,255,255,0.08);width:100%;">' +
-          '<span style="font-size:11px;color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;">ТИП БОЕВОЙ ЕДИНИЦЫ:</span>' +
-          Object.keys(WI_TACTICAL_UNIT_TYPES).map(function(uk){
-            var ut = WI_TACTICAL_UNIT_TYPES[uk];
-            return '<button class="wi-war-tool ' + (m.unitType === uk ? 'active' : '') + '" data-wi-unit-type="' + uk + '" style="font-size:11px;padding:3px 9px;">' + ut.icon + ' ' + ut.label + '</button>';
-          }).join('') +
-        '</div>';
-      }
+      var brushSelectOpts = [
+        { s: 28, l: 'Тонкая (28px)' },
+        { s: 48, l: 'Средняя (48px)' },
+        { s: 75, l: 'Широкая (75px)' }
+      ].map(function(sz){
+        return '<option value="' + sz.s + '"' + ((m.brushSize || 48) === sz.s ? ' selected' : '') + '>' + sz.l + '</option>';
+      }).join('');
+
+      var toolHint = '✋ Клик по отряду — открыть штаб соединения; Зажать ЛКМ — перетащить';
+      if(m.tacticsTool === 'unit') toolHint = '♟️ Кликните в любую точку карты для высадки выбранного отряда';
+      else if(m.tacticsTool === 'march') toolHint = '🏃 Кликайте по карте, чтобы задать маршрут марша выбранному отряду';
+      else if(m.tacticsTool === 'arrow') toolHint = '🏹 Зажмите ЛКМ и проведите наступательную стрелу удара';
+      else if(m.tacticsTool === 'paint') toolHint = '🧱 Зажмите ЛКМ и проведите линию фронта';
+      else if(m.tacticsTool === 'capture') toolHint = '🏴 Кликните внутри границ королевства для смены владельца';
+      else if(m.tacticsTool === 'eraser') toolHint = '🧹 Кликните по любому отряду или линии/стреле, чтобы удалить';
+
+      var activeFac = WI_TACTICAL_FACTIONS[m.warNation] || WI_TACTICAL_FACTIONS.nilfgaard;
 
       tacticsPaletteHtml =
         '<div class="wi-war-palette">' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;width:100%;">' +
-            '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
-              '<span style="font-size:11px;color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;margin-right:2px;">ИНСТРУМЕНТ:</span>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;width:100%;">' +
+            '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">' +
               toolBtns +
             '</div>' +
-            '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
-              '<button class="wi-war-tool" id="wiWarUndoBtn" title="Отменить последнюю линию фронта">↩️ Шаг назад</button>' +
-              '<button class="wi-war-tool" id="wiWarClearBtn" style="color:#fca5a5;">🗑️ Сброс</button>' +
+            '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">' +
+              '<button class="wi-war-tool" id="wiWarAnimateAllBtn" style="color:#38bdf8;border-color:rgba(56,189,248,0.45);" title="Плавно переместить все отряды по их маршрутам марша">▶️ Ход марша</button>' +
+              '<button class="wi-war-tool" id="wiWarUndoBtn" title="Отменить последнее действие">↩️ Назад</button>' +
+              '<button class="wi-war-tool" id="wiWarClearBtn" style="color:#fca5a5;" title="Сбросить тактическую карту">🗑️ Сброс</button>' +
             '</div>' +
           '</div>' +
-          '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-top:6px;border-top:1px solid rgba(255,255,255,0.08);width:100%;">' +
-            '<span style="font-size:11px;color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;margin-right:2px;">ФРАКЦИЯ:</span>' +
-            factionBtns +
+          '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-top:6px;border-top:1px solid rgba(255,255,255,0.08);width:100%;">' +
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+              '<label style="font-size:11px;color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;display:inline-flex;align-items:center;gap:5px;">' +
+                '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + activeFac.color + ';"></span>ФРАКЦИЯ:' +
+                '<select id="wiWarFactionSelect" class="wi-war-select">' + factionSelectOpts + '</select>' +
+              '</label>' +
+              '<label style="font-size:11px;color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;display:inline-flex;align-items:center;gap:5px;">' +
+                'РОД ВОЙСК:' +
+                '<select id="wiWarUnitTypeSelect" class="wi-war-select">' + buildWiUnitTypeOptionsHtml(m.unitType || 'army') + '</select>' +
+              '</label>' +
+              ((m.tacticsTool === 'paint' || m.tacticsTool === 'arrow') ? (
+                '<label style="font-size:11px;color:var(--wi-steel);font-family:\'JetBrains Mono\',monospace;display:inline-flex;align-items:center;gap:5px;">' +
+                  'МАСШТАБ:' +
+                  '<select id="wiWarBrushSizeSelect" class="wi-war-select">' + brushSelectOpts + '</select>' +
+                '</label>'
+              ) : '') +
+            '</div>' +
+            '<div style="font-size:11.5px;color:#fde68a;font-family:\'JetBrains Mono\',monospace;">' + toolHint + '</div>' +
           '</div>' +
-          subOptionsHtml +
         '</div>';
     }
 
@@ -4253,8 +4782,9 @@
             '<input type="text" id="wiMapSearch" class="wi-input" style="padding:5px 10px;font-size:12.5px;max-width:300px;" placeholder="Поиск города, крепости, школы или реки..." value="' + escA(m.search || '') + '">' +
           '</div>' +
           '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
-            '<button class="btn btn-ghost" id="wiMapToggleTerritories" title="Показать/скрыть границы королевств и регионов" style="padding:4px 9px;font-size:12px;' + ((m.showTerritories || isTactics) ? 'color:#fbbf24;border-color:rgba(245,158,11,0.45);' : '') + '">🏴 Границы</button>' +
-            '<button class="btn btn-ghost" id="wiMapTogglePins" title="Показать/скрыть интерактивные пины городов и крепостей" style="padding:4px 9px;font-size:12px;' + (m.showPins !== false ? 'color:#fbbf24;border-color:rgba(245,158,11,0.45);' : '') + '">📍 Города</button>' +
+            '<button class="btn btn-ghost" id="wiMapToggleTerritories" title="Показать/скрыть границы королевств и регионов" style="padding:4px 9px;font-size:12px;' + (m.showTerritories ? 'color:#fbbf24;border-color:rgba(245,158,11,0.45);' : '') + '">🏴 Границы</button>' +
+            '<button class="btn btn-ghost" id="wiMapToggleRivers" title="Показать/скрыть стратегические реки и переправы" style="padding:4px 9px;font-size:12px;' + (m.showRivers ? 'color:#38bdf8;border-color:rgba(56,189,248,0.45);' : '') + '">🌊 Реки</button>' +
+            '<button class="btn btn-ghost" id="wiMapTogglePins" title="Показать/скрыть интерактивные пины городов и крепостей" style="padding:4px 9px;font-size:12px;' + (m.showPins === true ? 'color:#fbbf24;border-color:rgba(245,158,11,0.45);' : '') + '">📍 Города</button>' +
             '<button class="btn btn-ghost" id="wiMapToggleLabels" title="Показать/скрыть подписи городов" style="padding:4px 9px;font-size:12px;">' + (m.showLabels !== false ? '🏷️ Текст' : '🏷️ Без текста') + '</button>' +
             '<button class="btn btn-ghost" id="wiMapZoomIn" title="Приблизить" style="padding:4px 10px;font-size:12px;">➕</button>' +
             '<button class="btn btn-ghost" id="wiMapZoomOut" title="Отдалить" style="padding:4px 10px;font-size:12px;">➖</button>' +
@@ -4582,6 +5112,14 @@
       });
     }
 
+    var toggleRiversBtn = document.getElementById('wiMapToggleRivers');
+    if(toggleRiversBtn){
+      toggleRiversBtn.addEventListener('click', function(){
+        m.showRivers = !m.showRivers;
+        if(typeof render === 'function') render();
+      });
+    }
+
     var togglePinsBtn = document.getElementById('wiMapTogglePins');
     if(togglePinsBtn){
       togglePinsBtn.addEventListener('click', function(){
@@ -4753,45 +5291,486 @@
       });
     }
 
-    // Панель инструментов и инспектор режима ТАКТИКА (⚔️)
+    // ============================================================
+    // ПАНЕЛЬ ИНСТРУМЕНТОВ И ШТАБ РЕЖИМА ТАКТИКА (⚔️)
+    // ============================================================
     document.querySelectorAll('[data-wi-tactics-tool]').forEach(function(btn){
       btn.addEventListener('click', function(){
-        m.tacticsTool = btn.getAttribute('data-wi-tactics-tool') || 'pan';
+        var tl = btn.getAttribute('data-wi-tactics-tool') || 'pan';
+        if(tl === 'march' && (m.selectedUnitIdx == null || m.selectedUnitIdx < 0 || !m.tacticalUnits || !m.tacticalUnits[m.selectedUnitIdx])){
+          if(m.tacticalUnits && m.tacticalUnits.length > 0){
+            m.selectedUnitIdx = 0;
+            WI.toast('🏃 Выбран отряд «' + (m.tacticalUnits[0].label || 'Отряд #1') + '» — кликайте по карте для маршрута марша', 'info');
+          } else {
+            WI.toast('⚠️ Сначала разместите или выберите отряд на карте', 'info');
+            m.tacticsTool = 'unit';
+            if(typeof render === 'function') render();
+            return;
+          }
+        }
+        m.tacticsTool = tl;
         if(typeof render === 'function') render();
       });
     });
 
-    document.querySelectorAll('[data-wi-nation]').forEach(function(btn){
+    var warFacSel = document.getElementById('wiWarFactionSelect');
+    if(warFacSel){
+      warFacSel.addEventListener('change', function(){
+        m.warNation = warFacSel.value || 'nilfgaard';
+        if(typeof render === 'function') render();
+      });
+    }
+
+    var warUnitTypeSel = document.getElementById('wiWarUnitTypeSelect');
+    if(warUnitTypeSel){
+      warUnitTypeSel.addEventListener('change', function(){
+        m.unitType = warUnitTypeSel.value || 'army';
+        if(m.tacticsTool === 'pan') m.tacticsTool = 'unit';
+        if(typeof render === 'function') render();
+      });
+    }
+
+    var warBrushSizeSel = document.getElementById('wiWarBrushSizeSelect');
+    if(warBrushSizeSel){
+      warBrushSizeSel.addEventListener('change', function(){
+        m.brushSize = parseInt(warBrushSizeSel.value, 10) || 48;
+        if(typeof render === 'function') render();
+      });
+    }
+
+    document.querySelectorAll('[data-wi-tactics-tab]').forEach(function(btn){
       btn.addEventListener('click', function(){
-        m.warNation = btn.getAttribute('data-wi-nation') || 'nilfgaard';
+        m.tacticsTab = btn.getAttribute('data-wi-tactics-tab') || 'units';
         if(typeof render === 'function') render();
       });
     });
 
-    document.querySelectorAll('[data-wi-brush-size]').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        m.brushSize = parseInt(btn.getAttribute('data-wi-brush-size'), 10) || 40;
+    // Анимация плавного передвижения войск по их маршрутам марша (marchPath)
+    function animateWiUnitsMarch(unitIndices){
+      if(m.isAnimatingMarch) return;
+      var units = m.tacticalUnits || [];
+      var targets = [];
+      unitIndices.forEach(function(idx){
+        var u = units[idx];
+        if(u && Array.isArray(u.marchPath) && u.marchPath.length > 0){
+          targets.push({ u: u, idx: idx });
+        }
+      });
+      if(targets.length === 0){
+        WI.toast('💡 Нет назначенных точек марша. Выберите инструмент «🏃 Марш» и кликните по карте!', 'info');
+        return;
+      }
+      m.isAnimatingMarch = true;
+      WI.toast('🥁 Войска выдвинулись по маршруту марша (' + targets.length + ' соед.)...', 'info');
+
+      var speedPxPerFrame = 7.5;
+      function stepFrame(){
+        var anyMoving = false;
+        targets.forEach(function(t){
+          var u = t.u;
+          if(!u.marchPath || u.marchPath.length === 0) return;
+          anyMoving = true;
+          var wp = u.marchPath[0];
+          var dx = wp.x - u.x;
+          var dy = wp.y - u.y;
+          var dist = Math.hypot(dx, dy);
+          if(dist <= speedPxPerFrame){
+            u.x = Math.round(wp.x);
+            u.y = Math.round(wp.y);
+            u.marchPath.shift();
+            if(u.marchPath.length === 0){
+              u.status = 'ready';
+            }
+          } else {
+            u.x = Math.round(u.x + (dx / dist) * speedPxPerFrame);
+            u.y = Math.round(u.y + (dy / dist) * speedPxPerFrame);
+          }
+        });
+
+        updateWiWarLayerOnly();
+
+        if(anyMoving){
+          requestAnimationFrame(stepFrame);
+        } else {
+          m.isAnimatingMarch = false;
+          var clashesNow = detectWiTacticalClashes(m.tacticalUnits || []);
+          if(clashesNow.length > 0){
+            clashesNow.forEach(function(cl){
+              cl.uA.status = 'battle';
+              cl.uB.status = 'battle';
+            });
+            WI.toast('⚔️ Войска вошли в соприкосновение с противником! (' + clashesNow.length + ' боёв)', 'success');
+          } else {
+            WI.toast('🏁 Марш успешно завершён, войска заняли новые позиции', 'success');
+          }
+          WI.saveTacticalState();
+          if(typeof render === 'function') render();
+        }
+      }
+      requestAnimationFrame(stepFrame);
+    }
+
+    var animAllBtn = document.getElementById('wiWarAnimateAllBtn');
+    if(animAllBtn){
+      animAllBtn.addEventListener('click', function(){
+        var allIndices = (m.tacticalUnits || []).map(function(_, i){ return i; });
+        animateWiUnitsMarch(allIndices);
+      });
+    }
+    var animAllInspBtn = document.getElementById('wiWarAnimateAllInspectorBtn');
+    if(animAllInspBtn){
+      animAllInspBtn.addEventListener('click', function(){
+        var allIndices = (m.tacticalUnits || []).map(function(_, i){ return i; });
+        animateWiUnitsMarch(allIndices);
+      });
+    }
+
+    var quickSpawnBtn = document.getElementById('wiWarQuickSpawnCenterBtn');
+    if(quickSpawnBtn){
+      quickSpawnBtn.addEventListener('click', function(){
+        var cx = Math.round(m.cx || 1440);
+        var cy = Math.round(m.cy || 1200);
+        var facKey = m.warNation === 'independent' ? 'nilfgaard' : (m.warNation || 'nilfgaard');
+        var facInfo = WI_TACTICAL_FACTIONS[facKey] || WI_TACTICAL_FACTIONS.nilfgaard;
+        var uType = m.unitType || 'army';
+        var uInfo = WI_TACTICAL_UNIT_TYPES[uType] || WI_TACTICAL_UNIT_TYPES.army;
+        var nearLoc = findNearestCity(cx, cy, 110);
+        var defaultLabel = uInfo.label + ' (' + (nearLoc ? nearLoc.name.split(' (')[0] : facInfo.name.split(' ')[0]) + ')';
+        m.tacticalUnits = m.tacticalUnits || [];
+        m.tacticalUnits.push({
+          id: 'u_' + Date.now(),
+          x: cx,
+          y: cy,
+          nation: facKey,
+          type: uType,
+          status: 'ready',
+          strength: uInfo.defaultStr || '4 000 бойцов',
+          hp: 100,
+          label: defaultLabel
+        });
+        m.selectedUnitIdx = m.tacticalUnits.length - 1;
+        WI.saveTacticalState();
+        WI.toast('♟️ Размещено в центре карты: ' + defaultLabel, 'success');
+        if(typeof render === 'function') render();
+      });
+    }
+
+    // Управление карточкой выбранного отряда
+    var selUnitObj = (m.selectedUnitIdx != null && m.selectedUnitIdx >= 0 && m.tacticalUnits) ? m.tacticalUnits[m.selectedUnitIdx] : null;
+    if(selUnitObj){
+      var uNameInp = document.getElementById('wiSelUnitNameInp');
+      if(uNameInp){
+        uNameInp.addEventListener('change', function(){
+          selUnitObj.label = uNameInp.value.trim() || 'Отряд';
+          WI.saveTacticalState();
+          if(typeof render === 'function') render();
+        });
+      }
+      var uStrInp = document.getElementById('wiSelUnitStrInp');
+      if(uStrInp){
+        uStrInp.addEventListener('change', function(){
+          selUnitObj.strength = uStrInp.value.trim();
+          WI.saveTacticalState();
+          if(typeof render === 'function') render();
+        });
+      }
+      var uFacSel = document.getElementById('wiSelUnitFacSel');
+      if(uFacSel){
+        uFacSel.addEventListener('change', function(){
+          selUnitObj.nation = uFacSel.value;
+          delete selUnitObj.nation_override;
+          WI.saveTacticalState();
+          if(typeof render === 'function') render();
+        });
+      }
+      var uTypeSel = document.getElementById('wiSelUnitTypeSel');
+      if(uTypeSel){
+        uTypeSel.addEventListener('change', function(){
+          selUnitObj.type = uTypeSel.value;
+          var utInfo = WI_TACTICAL_UNIT_TYPES[selUnitObj.type];
+          if(utInfo && !selUnitObj.strength) selUnitObj.strength = utInfo.defaultStr;
+          WI.saveTacticalState();
+          if(typeof render === 'function') render();
+        });
+      }
+      var uStatusSel = document.getElementById('wiSelUnitStatusSel');
+      if(uStatusSel){
+        uStatusSel.addEventListener('change', function(){
+          selUnitObj.status = uStatusSel.value;
+          WI.saveTacticalState();
+          if(typeof render === 'function') render();
+        });
+      }
+      var uHpRange = document.getElementById('wiSelUnitHpRange');
+      var uHpVal = document.getElementById('wiSelUnitHpVal');
+      if(uHpRange){
+        uHpRange.addEventListener('input', function(){
+          selUnitObj.hp = parseInt(uHpRange.value, 10) || 100;
+          if(uHpVal) uHpVal.textContent = selUnitObj.hp + '%';
+          updateWiWarLayerOnly();
+        });
+        uHpRange.addEventListener('change', function(){
+          selUnitObj.hp = parseInt(uHpRange.value, 10) || 100;
+          if(selUnitObj.hp <= 45 && selUnitObj.status === 'ready') selUnitObj.status = 'damaged';
+          WI.saveTacticalState();
+          if(typeof render === 'function') render();
+        });
+      }
+      var uMarchModeBtn = document.getElementById('wiSelUnitMarchModeBtn');
+      if(uMarchModeBtn){
+        uMarchModeBtn.addEventListener('click', function(){
+          m.tacticsTool = (m.tacticsTool === 'march' ? 'pan' : 'march');
+          if(m.tacticsTool === 'march'){
+            WI.toast('🏃 Режим марша: кликайте по карте, чтобы проложить путь для «' + (selUnitObj.label || 'Отряда') + '»', 'info');
+          }
+          if(typeof render === 'function') render();
+        });
+      }
+      var uAnimMarchBtn = document.getElementById('wiSelUnitAnimMarchBtn');
+      if(uAnimMarchBtn){
+        uAnimMarchBtn.addEventListener('click', function(){
+          animateWiUnitsMarch([m.selectedUnitIdx]);
+        });
+      }
+      var uClearMarchBtn = document.getElementById('wiSelUnitClearMarchBtn');
+      if(uClearMarchBtn){
+        uClearMarchBtn.addEventListener('click', function(){
+          selUnitObj.marchPath = [];
+          if(selUnitObj.status === 'march') selUnitObj.status = 'ready';
+          WI.saveTacticalState();
+          if(typeof render === 'function') render();
+        });
+      }
+      var uCloneBtn = document.getElementById('wiSelUnitCloneBtn');
+      if(uCloneBtn){
+        uCloneBtn.addEventListener('click', function(){
+          var copy = JSON.parse(JSON.stringify(selUnitObj));
+          copy.id = 'u_' + Date.now();
+          copy.x = Math.min(2840, (selUnitObj.x || 1400) + 45);
+          copy.y = Math.min(4040, (selUnitObj.y || 1200) + 35);
+          copy.marchPath = [];
+          m.tacticalUnits.push(copy);
+          m.selectedUnitIdx = m.tacticalUnits.length - 1;
+          WI.saveTacticalState();
+          WI.toast('📑 Соединение дублировано на карте', 'success');
+          if(typeof render === 'function') render();
+        });
+      }
+      var uCloseBtn = document.getElementById('wiSelUnitCloseBtn');
+      if(uCloseBtn){
+        uCloseBtn.addEventListener('click', function(){
+          m.selectedUnitIdx = -1;
+          if(m.tacticsTool === 'march') m.tacticsTool = 'pan';
+          if(typeof render === 'function') render();
+        });
+      }
+    }
+
+    var rosterFilterSel = document.getElementById('wiTacticsRosterFilter');
+    if(rosterFilterSel){
+      rosterFilterSel.addEventListener('change', function(){
+        m.unitFactionFilter = rosterFilterSel.value || 'all';
+        if(typeof render === 'function') render();
+      });
+    }
+
+    document.querySelectorAll('[data-wi-select-unit]').forEach(function(row){
+      row.addEventListener('click', function(e){
+        if(e.target.closest && e.target.closest('button')) return;
+        var idx = parseInt(row.getAttribute('data-wi-select-unit'), 10);
+        m.selectedUnitIdx = idx;
+        var u = (m.tacticalUnits || [])[idx];
+        if(u){
+          focusOn(u.x, u.y, Math.max(m.zoom || 1.1, 1.9));
+        }
         if(typeof render === 'function') render();
       });
     });
 
-    document.querySelectorAll('[data-wi-unit-type]').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        m.unitType = btn.getAttribute('data-wi-unit-type') || 'army';
+    document.querySelectorAll('[data-wi-march-unit]').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var idx = parseInt(btn.getAttribute('data-wi-march-unit'), 10);
+        m.selectedUnitIdx = idx;
+        m.tacticsTool = 'march';
+        var u = (m.tacticalUnits || [])[idx];
+        if(u){
+          focusOn(u.x, u.y, Math.max(m.zoom || 1.1, 1.9));
+          WI.toast('🏃 Кликайте по карте, чтобы проложить маршрут марша для «' + (u.label || 'Отряда') + '»', 'info');
+        }
         if(typeof render === 'function') render();
       });
     });
+
+    // Симулятор боя и индикаторы схваток
+    var simAttSel = document.getElementById('wiSimAttackerSel');
+    if(simAttSel){
+      simAttSel.addEventListener('change', function(){
+        m.battleAttackerIdx = parseInt(simAttSel.value, 10) || 0;
+      });
+    }
+    var simDefSel = document.getElementById('wiSimDefenderSel');
+    if(simDefSel){
+      simDefSel.addEventListener('change', function(){
+        m.battleDefenderIdx = parseInt(simDefSel.value, 10) || 0;
+      });
+    }
+
+    document.querySelectorAll('[data-wi-sim-pair]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var parts = (btn.getAttribute('data-wi-sim-pair') || '0,1').split(',');
+        m.battleAttackerIdx = parseInt(parts[0], 10) || 0;
+        m.battleDefenderIdx = parseInt(parts[1], 10) || 1;
+        m.tacticsTab = 'battles';
+        if(typeof render === 'function') render();
+      });
+    });
+
+    var simMoveToBattleBtn = document.getElementById('wiSimMoveToBattleBtn');
+    if(simMoveToBattleBtn){
+      simMoveToBattleBtn.addEventListener('click', function(){
+        var uA = (m.tacticalUnits || [])[m.battleAttackerIdx || 0];
+        var uB = (m.tacticalUnits || [])[m.battleDefenderIdx || 1];
+        if(!uA || !uB || uA === uB){
+          WI.toast('⚠️ Выберите два разных отряда для сближения', 'info');
+          return;
+        }
+        var ang = Math.atan2(uA.y - uB.y, uA.x - uB.x);
+        uA.marchPath = [{
+          x: Math.round(uB.x + Math.cos(ang) * 58),
+          y: Math.round(uB.y + Math.sin(ang) * 58)
+        }];
+        uA.status = 'march';
+        focusOn(uB.x, uB.y, Math.max(m.zoom || 1.1, 2.0));
+        animateWiUnitsMarch([m.battleAttackerIdx || 0]);
+      });
+    }
+
+    var simRollClashBtn = document.getElementById('wiSimRollClashBtn');
+    if(simRollClashBtn){
+      simRollClashBtn.addEventListener('click', function(){
+        var idxA = m.battleAttackerIdx || 0;
+        var idxB = m.battleDefenderIdx != null ? m.battleDefenderIdx : 1;
+        var uA = (m.tacticalUnits || [])[idxA];
+        var uB = (m.tacticalUnits || [])[idxB];
+        if(!uA || !uB || idxA === idxB){
+          WI.toast('⚠️ Выберите два разных соединения (Атакующего и Обороняющегося)', 'info');
+          return;
+        }
+        var utA = WI_TACTICAL_UNIT_TYPES[uA.type] || WI_TACTICAL_UNIT_TYPES.army;
+        var utB = WI_TACTICAL_UNIT_TYPES[uB.type] || WI_TACTICAL_UNIT_TYPES.army;
+        var ter = getTerrainAt(uB.x, uB.y);
+        var defTerBonus = (ter.id === 'mountain' || ter.id === 'swamp' || ter.id === 'forest') ? 2 : (uB.type === 'fort' ? 3 : 1);
+
+        var rollA = (1 + Math.floor(Math.random() * 6)) + (1 + Math.floor(Math.random() * 6));
+        var rollB = (1 + Math.floor(Math.random() * 6)) + (1 + Math.floor(Math.random() * 6));
+        var hpModA = Math.round(((uA.hp != null ? uA.hp : 100) / 100) * 4);
+        var hpModB = Math.round(((uB.hp != null ? uB.hp : 100) / 100) * 4);
+
+        var totalA = rollA + (utA.basePow || 5) + hpModA;
+        var totalB = rollB + (utB.basePow || 5) + hpModB + defTerBonus;
+
+        var diff = totalA - totalB;
+        var lossA = 0, lossB = 0, outcomeTitle = '', outcomeColor = '#f59e0b';
+        if(diff >= 3){
+          lossA = 10; lossB = 30;
+          outcomeTitle = '🏆 Сокрушительная победа атакующих: ' + (uA.label || utA.label);
+          outcomeColor = '#10b981';
+          uA.status = 'battle';
+          uB.status = 'damaged';
+        } else if(diff > 0){
+          lossA = 15; lossB = 20;
+          outcomeTitle = '⚔️ Тактический успех атаки: ' + (uA.label || utA.label);
+          outcomeColor = '#38bdf8';
+          uA.status = 'battle';
+          uB.status = 'battle';
+        } else if(diff === 0){
+          lossA = 20; lossB = 20;
+          outcomeTitle = '🩸 Кровавая ничья на рубеже (' + ter.name + ')';
+          outcomeColor = '#f59e0b';
+          uA.status = 'battle';
+          uB.status = 'battle';
+        } else {
+          lossA = 25; lossB = 10;
+          outcomeTitle = '🛡️ Оборона устояла! ' + (uB.label || utB.label) + ' отбили штурм';
+          outcomeColor = '#ef4444';
+          uA.status = 'damaged';
+          uB.status = 'ready';
+        }
+
+        uA.hp = Math.max(10, (uA.hp != null ? uA.hp : 100) - lossA);
+        uB.hp = Math.max(10, (uB.hp != null ? uB.hp : 100) - lossB);
+
+        m.battleLog = m.battleLog || [];
+        m.battleLog.unshift({
+          title: outcomeTitle,
+          color: outcomeColor,
+          desc: 'Атака [' + (uA.label || utA.label) + ']: 2d6(' + rollA + ') + Сила(' + (utA.basePow || 5) + ') + Боесп.(' + hpModA + ') = ' + totalA +
+                '  VS  Оборона [' + (uB.label || utB.label) + ']: 2d6(' + rollB + ') + Сила(' + (utB.basePow || 5) + ') + Боесп.(' + hpModB + ') + Рельеф(' + defTerBonus + ', ' + ter.name + ') = ' + totalB +
+                ' • Потери: -' + lossA + '% / -' + lossB + '%'
+        });
+        focusOn(Math.round((uA.x + uB.x) / 2), Math.round((uA.y + uB.y) / 2), Math.max(m.zoom || 1.1, 1.9));
+        WI.saveTacticalState();
+        WI.toast(outcomeTitle + ' (' + totalA + ' против ' + totalB + ')', 'success');
+        if(typeof render === 'function') render();
+      });
+    }
+
+    var regSearchInp = document.getElementById('wiTacticsRegionSearch');
+    if(regSearchInp){
+      regSearchInp.addEventListener('input', function(){
+        m.regionSearch = regSearchInp.value;
+        if(typeof render === 'function') render();
+        var el = document.getElementById('wiTacticsRegionSearch');
+        if(el){
+          el.focus();
+          el.setSelectionRange(el.value.length, el.value.length);
+        }
+      });
+    }
+
+    var aiReportBtn = document.getElementById('wiTacticsAiReportBtn');
+    if(aiReportBtn){
+      aiReportBtn.addEventListener('click', function(){
+        var unitsList = (m.tacticalUnits || []).map(function(u){
+          var fac = WI_TACTICAL_FACTIONS[u.nation_override || u.nation] || WI_TACTICAL_FACTIONS.nilfgaard;
+          var ut = WI_TACTICAL_UNIT_TYPES[u.type] || WI_TACTICAL_UNIT_TYPES.army;
+          return '- ' + (u.label || ut.label) + ' (' + fac.name + ', ' + (u.strength || ut.label) + ', Боеспособность ' + (u.hp != null ? u.hp : 100) + '%)';
+        }).join('\n');
+        var clashesNow = detectWiTacticalClashes(m.tacticalUnits || []);
+
+        aiReportBtn.disabled = true;
+        aiReportBtn.textContent = '⏳ Разведка собирает донесения...';
+
+        var sysPrompt = 'Ты — глава военной разведки Континента во вселенной «Ведьмака» (в стиле Сигизмунда Дийкстры и маршала Менно Коегоорна). Напиши краткую, атмосферную оперативно-стратегическую сводку (4-6 предложений) по текущей карте боевых действий.';
+        var userPrompt = 'Развернутые войска на карте:\n' + (unitsList || 'Войска не развернуты') + '\nАктивных столкновений: ' + clashesNow.length + '. Опиши стратегическую обстановку, угрозы флангам и дай 1 тактический совет командующему.';
+
+        if(typeof WI.callGemini === 'function'){
+          WI.callGemini(sysPrompt, userPrompt, 0.8).then(function(res){
+            m.aiWarReport = (res || '').trim();
+            if(typeof render === 'function') render();
+          }).catch(function(){
+            m.aiWarReport = '📜 Донесение Реданской Секретной Службы (Дийкстра):\nНа театре военных действий развёрнуто ' + (m.tacticalUnits || []).length + ' соединений (активных очагов боёв: ' + clashesNow.length + '). Основные переправы через Яругу и Понтар остаются ключевыми узлами снабжения. Рекомендуется подтянуть тяжёлую кавалерию во фланг наступающим колоннам и удерживать высоты силами чародеев и стрелков.';
+            if(typeof render === 'function') render();
+          });
+        } else {
+          m.aiWarReport = '📜 Донесение Реданской Секретной Службы (Дийкстра):\nНа театре военных действий развёрнуто ' + (m.tacticalUnits || []).length + ' соединений (активных очагов боёв: ' + clashesNow.length + '). Основные переправы через Яругу и Понтар остаются ключевыми узлами снабжения.';
+          if(typeof render === 'function') render();
+        }
+      });
+    }
 
     function undoWarAction(){
       if(m.warPaths && m.warPaths.length > 0){
         m.warPaths.pop();
         WI.saveTacticalState();
-        WI.toast('↩️ Последняя линия фронта удалена', 'info');
+        WI.toast('↩️ Последняя линия/стрела удалена', 'info');
         if(typeof render === 'function') render();
       } else if(m.tacticalUnits && m.tacticalUnits.length > 0){
         m.tacticalUnits.pop();
+        if(m.selectedUnitIdx >= m.tacticalUnits.length) m.selectedUnitIdx = m.tacticalUnits.length - 1;
         WI.saveTacticalState();
-        WI.toast('↩️ Последний размещённый отряд удалён', 'info');
+        WI.toast('↩️ Последний размещённый отряд снят', 'info');
         if(typeof render === 'function') render();
       } else {
         WI.toast('Нет тактических действий для отмены', 'info');
@@ -4803,8 +5782,10 @@
       m.warPaths = [];
       m.tacticalUnits = [];
       m.territoryOwners = {};
+      m.battleLog = [];
+      m.selectedUnitIdx = -1;
       WI.saveTacticalState();
-      WI.toast('🧹 Тактическая карта сброшена', 'info');
+      WI.toast('🧹 Тактическая карта полностью очищена', 'info');
       if(typeof render === 'function') render();
     }
 
@@ -4826,7 +5807,8 @@
         if(sc){
           m.territoryOwners = JSON.parse(JSON.stringify(sc.owners || {}));
           m.tacticalUnits = JSON.parse(JSON.stringify(sc.units || []));
-          m.warPaths = JSON.parse(JSON.stringify(sc.paths || []));
+          m.warPaths = JSON.parse(JSON.stringify(sc.warPaths || sc.paths || []));
+          m.selectedUnitIdx = m.tacticalUnits.length > 0 ? 0 : -1;
           if(sc.cam){
             m.cx = sc.cam.cx;
             m.cy = sc.cam.cy;
@@ -4845,7 +5827,11 @@
         var tid = sel.getAttribute('data-tid');
         if(tid){
           m.territoryOwners = m.territoryOwners || {};
-          m.territoryOwners[tid] = sel.value;
+          if(sel.value === 'independent'){
+            delete m.territoryOwners[tid];
+          } else {
+            m.territoryOwners[tid] = sel.value;
+          }
           WI.saveTacticalState();
           var fac = WI_TACTICAL_FACTIONS[sel.value];
           WI.toast('🏴 Регион перешёл под контроль: ' + (fac ? fac.name : sel.value), 'info');
@@ -4856,37 +5842,29 @@
 
     // Действия со списком отрядов в инспекторе
     document.querySelectorAll('[data-wi-focus-unit]').forEach(function(btn){
-      btn.addEventListener('click', function(){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
         var idx = parseInt(btn.getAttribute('data-wi-focus-unit'), 10);
         var u = (m.tacticalUnits || [])[idx];
         if(u){
+          m.selectedUnitIdx = idx;
           focusOn(u.x, u.y, Math.max(m.zoom || 1.1, 2.2));
           WI.toast('🎯 Камера наведена на ' + (u.label || 'отряд'), 'info');
-        }
-      });
-    });
-
-    document.querySelectorAll('[data-wi-edit-unit]').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        var idx = parseInt(btn.getAttribute('data-wi-edit-unit'), 10);
-        var u = (m.tacticalUnits || [])[idx];
-        if(u){
-          var newLbl = prompt('Введите название армии / соединения:', u.label || '');
-          if(newLbl !== null){
-            u.label = newLbl.trim();
-            WI.saveTacticalState();
-            if(typeof render === 'function') render();
-          }
+          if(typeof render === 'function') render();
         }
       });
     });
 
     document.querySelectorAll('[data-wi-del-unit]').forEach(function(btn){
-      btn.addEventListener('click', function(){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
         var idx = parseInt(btn.getAttribute('data-wi-del-unit'), 10);
         if(m.tacticalUnits && m.tacticalUnits[idx]){
-          m.tacticalUnits.splice(idx, 1);
+          var removed = m.tacticalUnits.splice(idx, 1)[0];
+          if(m.selectedUnitIdx === idx) m.selectedUnitIdx = -1;
+          else if(m.selectedUnitIdx > idx) m.selectedUnitIdx--;
           WI.saveTacticalState();
+          WI.toast('🗑️ Соединение «' + (removed.label || 'Отряд') + '» снято с карты', 'info');
           if(typeof render === 'function') render();
         }
       });
@@ -5389,14 +6367,15 @@
           }
         }
 
-        // 4. Режим рисования линии фронта (Тактика -> Фронт / Удар)
-        if(m.mode === 'tactics' && m.tacticsTool === 'paint'){
+        // 4. Режим рисования линии фронта или наступательной стрелы удара (Тактика -> Фронт / Стрела)
+        if(m.mode === 'tactics' && (m.tacticsTool === 'paint' || m.tacticsTool === 'arrow')){
           isPaintingWar = true;
           hasDragged = true;
           var pt = clientToSvgCoords(e.clientX, e.clientY);
           currentWarPath = {
-            nation: m.warNation || 'nilfgaard',
-            size: m.brushSize || 40,
+            nation: m.warNation === 'independent' ? 'nilfgaard' : (m.warNation || 'nilfgaard'),
+            style: (m.tacticsTool === 'arrow' ? 'arrow' : 'front'),
+            size: m.brushSize || 48,
             d: 'M ' + pt.x + ' ' + pt.y
           };
           m.warPaths = m.warPaths || [];
@@ -5424,7 +6403,7 @@
           updateHud(hoverPt.x, hoverPt.y);
         }
 
-        // Рисование линии фронта
+        // Рисование линии фронта или стрелы удара
         if(isPaintingWar && currentWarPath){
           var wPt = clientToSvgCoords(e.clientX, e.clientY);
           currentWarPath.d += ' L ' + wPt.x + ' ' + wPt.y;
@@ -5536,20 +6515,30 @@
           dragUnitObj = null;
           dragUnitEl = null;
           dragUnitHasMoved = false;
-          if(vport) vport.style.cursor = (m.mode === 'tactics' && m.tacticsTool === 'paint') ? 'crosshair' : 'grab';
+          if(vport) vport.style.cursor = (m.mode === 'tactics' && (m.tacticsTool === 'paint' || m.tacticsTool === 'arrow')) ? 'crosshair' : 'grab';
 
           justHandledPointAction = true;
           setTimeout(function(){ justHandledPointAction = false; }, 200);
 
           if(uMoved){
+            m.selectedUnitIdx = uIdxDone;
             WI.saveTacticalState();
             WI.toast('♟️ Позиция соединения обновлена [' + uRef.x + ', ' + uRef.y + ']', 'success');
             if(typeof render === 'function') render();
-          } else if(m.mode === 'tactics' && m.tacticalUnits && m.tacticalUnits[uIdxDone]){
-            var removedU = m.tacticalUnits.splice(uIdxDone, 1)[0];
-            WI.saveTacticalState();
-            WI.toast('🗑️ Соединение «' + (removedU.label || 'Отряд') + '» снято с карты', 'info');
-            if(typeof render === 'function') render();
+          } else if(m.tacticalUnits && m.tacticalUnits[uIdxDone]){
+            if(m.mode === 'tactics' && m.tacticsTool === 'eraser'){
+              var removedU = m.tacticalUnits.splice(uIdxDone, 1)[0];
+              if(m.selectedUnitIdx === uIdxDone) m.selectedUnitIdx = -1;
+              else if(m.selectedUnitIdx > uIdxDone) m.selectedUnitIdx--;
+              WI.saveTacticalState();
+              WI.toast('🗑️ Соединение «' + (removedU.label || 'Отряд') + '» стёрто с карты', 'info');
+              if(typeof render === 'function') render();
+            } else {
+              m.selectedUnitIdx = uIdxDone;
+              m.mode = 'tactics';
+              WI.toast('♟️ Выбрано соединение: «' + (uRef.label || 'Отряд') + '»', 'info');
+              if(typeof render === 'function') render();
+            }
           }
           return;
         }
@@ -5623,7 +6612,7 @@
 
         if(isDown){
           isDown = false;
-          if(vport) vport.style.cursor = (m.mode === 'tactics' && m.tacticsTool === 'paint') ? 'crosshair' : 'grab';
+          if(vport) vport.style.cursor = (m.mode === 'tactics' && (m.tacticsTool === 'paint' || m.tacticsTool === 'arrow')) ? 'crosshair' : 'grab';
         }
       };
 
@@ -5670,6 +6659,19 @@
         var clickX = cPt.x;
         var clickY = cPt.y;
 
+        // Проверяем клик по индикатору столкновения войск (⚔️ В БОЙ!)
+        var clashEl = e.target.closest && e.target.closest('[data-wi-clash-pair]');
+        if(clashEl){
+          var clParts = (clashEl.getAttribute('data-wi-clash-pair') || '0,1').split(',');
+          m.battleAttackerIdx = parseInt(clParts[0], 10) || 0;
+          m.battleDefenderIdx = parseInt(clParts[1], 10) || 1;
+          m.mode = 'tactics';
+          m.tacticsTab = 'battles';
+          WI.toast('⚔️ Открыт Тактический Симулятор Сражения!', 'info');
+          if(typeof render === 'function') render();
+          return;
+        }
+
         // Проверяем клик непосредственно по интерактивному пину города
         var pinEl = e.target.closest && e.target.closest('[data-wi-loc-pin]');
         if(pinEl && m.mode !== 'tactics'){
@@ -5702,6 +6704,45 @@
 
         // В режиме 'tactics' (Военный штаб)
         if(m.mode === 'tactics'){
+          if(m.tacticsTool === 'eraser'){
+            var wpEl = e.target.closest && e.target.closest('[data-wi-warpath-idx]');
+            if(wpEl){
+              var wpIdx = parseInt(wpEl.getAttribute('data-wi-warpath-idx'), 10);
+              if(m.warPaths && m.warPaths[wpIdx]){
+                m.warPaths.splice(wpIdx, 1);
+                WI.saveTacticalState();
+                WI.toast('🧹 Линия фронта / стрела удара стёрта', 'info');
+                if(typeof render === 'function') render();
+              }
+              return;
+            }
+            WI.toast('🧹 Кликните по отряду или линии фронта, чтобы стереть их', 'info');
+            return;
+          }
+
+          if(m.tacticsTool === 'march'){
+            var marchU = (m.selectedUnitIdx != null && m.selectedUnitIdx >= 0 && m.tacticalUnits) ? m.tacticalUnits[m.selectedUnitIdx] : null;
+            if(!marchU && m.tacticalUnits && m.tacticalUnits.length > 0){
+              m.selectedUnitIdx = 0;
+              marchU = m.tacticalUnits[0];
+            }
+            if(marchU){
+              marchU.marchPath = Array.isArray(marchU.marchPath) ? marchU.marchPath : [];
+              var nearCityM = findNearestCity(clickX, clickY, 65);
+              marchU.marchPath.push({
+                x: nearCityM ? nearCityM.x : clickX,
+                y: nearCityM ? nearCityM.y : clickY
+              });
+              marchU.status = 'march';
+              WI.saveTacticalState();
+              WI.toast('🏃 Назначена точка марша #' + marchU.marchPath.length + ' для «' + (marchU.label || 'Отряда') + '» (Нажмите «▶️ Ход марша» для анимации!)', 'success');
+              if(typeof render === 'function') render();
+            } else {
+              WI.toast('⚠️ Сначала выберите или разместите отряд на карте', 'info');
+            }
+            return;
+          }
+
           if(m.tacticsTool === 'capture'){
             var terEl = e.target.closest && e.target.closest('.wi-territory');
             if(terEl){
@@ -5729,7 +6770,7 @@
           }
 
           if(m.tacticsTool === 'unit'){
-            var facKey = m.warNation || 'nilfgaard';
+            var facKey = m.warNation === 'independent' ? 'nilfgaard' : (m.warNation || 'nilfgaard');
             var facInfo = WI_TACTICAL_FACTIONS[facKey] || WI_TACTICAL_FACTIONS.nilfgaard;
             var uType = m.unitType || 'army';
             var uInfo = WI_TACTICAL_UNIT_TYPES[uType] || WI_TACTICAL_UNIT_TYPES.army;
@@ -5737,12 +6778,17 @@
             var defaultLabel = uInfo.label + ' (' + (nearLoc ? nearLoc.name.split(' (')[0] : facInfo.name.split(' ')[0]) + ')';
             m.tacticalUnits = m.tacticalUnits || [];
             m.tacticalUnits.push({
+              id: 'u_' + Date.now(),
               x: clickX,
               y: clickY,
               nation: facKey,
               type: uType,
+              status: 'ready',
+              strength: uInfo.defaultStr || '4 000 бойцов',
+              hp: 100,
               label: defaultLabel
             });
+            m.selectedUnitIdx = m.tacticalUnits.length - 1;
             WI.saveTacticalState();
             WI.toast('♟️ Размещено: ' + defaultLabel, 'success');
             if(typeof render === 'function') render();
