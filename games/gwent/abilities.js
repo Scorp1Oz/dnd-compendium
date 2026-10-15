@@ -118,7 +118,7 @@ var ability_dict = {
 	muster: {
 		name: "Двойник", 
 		description: "Мгновенно призывает на поле боя все карты с тем же именем (или из той же группы) из вашей колоды и руки.",
-		placed: async (card) => {
+		placed: async (card, row) => {
 			let i = card.name.indexOf('-');
 			let cardName = i === -1 ?  card.name : card.name.substring(0, i);
 			if (card['muster'])
@@ -131,7 +131,11 @@ var ability_dict = {
 			if (units.length === 0)
 				return;
 			await card.animate("muster");
-			await Promise.all( units.map( async p =>  await board.addCardToRow(p[1], p[1].row, p[1].holder, p[0])));
+			const fallbackRow = (row && row.type) ? row.type : "close";
+			await Promise.all( units.map( async p => {
+				const targetRowName = p[1].row === "agile" ? fallbackRow : p[1].row;
+				await board.addCardToRow(p[1], targetRowName, p[1].holder, p[0]);
+			}));
 		}
 	},
 	spy: {
@@ -170,6 +174,7 @@ var ability_dict = {
 			{
 				// move card visual to top of grave
 				const res = wrapper.card;
+				res.holder = card.holder;
 				grave.removeCard(res);
 				grave.addCard(res);
 				let selectedRow = null;
@@ -229,8 +234,10 @@ var ability_dict = {
 		name: "Прочная связь",
 		description: "Удваивает силу каждой такой карты, когда в одном ряду находятся две или более карты с одинаковым именем.",
 		audio: "bond",
-		placed: async card => {
-			let bonds = board.getRow(card, card.row, card.holder).findCards(c => c.name === card.name);
+		placed: async (card, row) => {
+			let targetRow = row || board.getRow(card, card.row, card.holder);
+			if (!targetRow) return;
+			let bonds = targetRow.findCards(c => c.id() === card.id());
 			if (bonds.length > 1)
 				await Promise.all( bonds.map(c => c.animate("bond")) );
 		}
@@ -355,7 +362,7 @@ var ability_dict = {
 				return;
 			let container = new CardContainer();
 			container.cards = card.holder.opponent().hand.findCardsRandom(() => true, 3);
-			Carousel.curr.cancel();
+			Carousel.curr?.cancel();
 			await ui.viewCardsInContainer(container);
 		},
 		weight: card => {
@@ -380,7 +387,7 @@ var ability_dict = {
 				await board.toHand(newCard, grave);
 				return;
 			}
-			Carousel.curr.cancel();
+			Carousel.curr?.cancel();
 			await ui.queueCarousel(grave, 1, async (c,i) => {
 				let newCard = c.cards[i];
 				newCard.holder = card.holder;
@@ -445,7 +452,7 @@ var ability_dict = {
 			if (card.holder.controller instanceof ControllerAI) {
 				newCard = card.holder.controller.medic(card, card.holder.grave)
 			} else {
-				Carousel.curr.exit();
+				Carousel.curr?.exit();
 				await ui.queueCarousel(card.holder.grave, 1, (c,i) => newCard = c.cards[i], c => c.isUnit(), false, false);
 			}
 			if (newCard)
@@ -462,10 +469,11 @@ var ability_dict = {
 			if (card.holder.controller instanceof ControllerAI) {
 				let cards = card.holder.controller.discardOrder(card).splice(0,2).filter(c => c.basePower < 7);
 				await Promise.all(cards.map(async c => await board.toGrave(c, card.holder.hand)));
-				card.holder.deck.draw(card.holder.hand);
+				if (card.holder.deck.cards.length > 0)
+					await card.holder.deck.draw(card.holder.hand);
 				return;
 			} else
-				Carousel.curr.exit();
+				Carousel.curr?.exit();
 			await ui.queueCarousel(hand, 2, (c,i) => board.toGrave(c.cards[i], c), () => true);
 			await ui.queueCarousel(deck, 1, (c,i) => board.toHand(c.cards[i], deck), () => true, true);
 		},
@@ -482,17 +490,19 @@ var ability_dict = {
 		activated: async card => {
 			let deck = board.getRow(card, "deck", card.holder);
 			if (card.holder.controller instanceof ControllerAI) {
-				await ability_dict["eredin_king"].helper(card).card.autoplay(card.holder.deck);
+				const h = ability_dict["eredin_king"].helper(card);
+				if (h && h.card)
+					await h.card.autoplay(card.holder.deck);
 			} else {
-				Carousel.curr.cancel();
+				Carousel.curr?.cancel();
 				await ui.queueCarousel(deck, 1, (c,i) => board.toWeather(c.cards[i], deck), c => c.faction === "weather", true);
 			}
 		},
-		weight: (card, ai, max) => ability_dict["eredin_king"].helper(card).weight,
+		weight: (card, ai, max) => Math.max(0, ability_dict["eredin_king"].helper(card).weight),
 		helper: card => {
 			let weather = card.holder.deck.cards.filter(c => c.row === "weather").reduce((a,c) =>a.map(c => c.name).includes(c.name) ? a : a.concat([c]), [] );
 			
-			let out, weight = -1;
+			let out = null, weight = 0;
 			weather.forEach( c => {
 				let w = card.holder.controller.weightWeatherFromDeck(c, c.abilities[0]);
 				if (w > weight) {
@@ -550,7 +560,7 @@ var ability_dict = {
 		},
 		weight: card => {
 			const {score, cards} = ability_dict["francesca_hope"].helper(card);
-			return score;
+			return Math.max(0, score);
 		},
 		helper: card => {
 			const close = board.getRow(card, "close");
@@ -570,7 +580,7 @@ var ability_dict = {
 			function findBest(close, ranged, agile, depth = 0, pattern=null)
 			{
 				if (agile.length === 0)
-					return {score: -1, pattern: []};
+					return {score: 0, pattern: []};
 				else if (agile.length === depth)
 				{
 					const closeCopy = close.getVirtualCopy();
@@ -600,8 +610,8 @@ var ability_dict = {
 		description: "Замешивает все отряды из сбросов обоих игроков обратно в их колоды.",
 		activated: async card => {
 			AudioManager.playSFX('redraw');
-			Promise.all(card.holder.grave.cards.map(c => board.toDeck(c, card.holder.grave)));
-			await Promise.all(card.holder.opponent().grave.cards.map(c => board.toDeck(c, card.holder.opponent().grave)));
+			await Promise.all(card.holder.grave.cards.slice().map(c => board.toDeck(c, card.holder.grave)));
+			await Promise.all(card.holder.opponent().grave.cards.slice().map(c => board.toDeck(c, card.holder.opponent().grave)));
 		},
 		weight: (card, ai, max, data) => {
 			if( game.roundCount < 2)

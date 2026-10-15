@@ -216,12 +216,12 @@ class ControllerAI {
 		let data_max = this.getMaximums();
 		let data_board = this.getBoardData();
 		let weights = player.hand.cards.map(c => 
-			({weight: this.weightCard(c, data_max, data_board), action: async () => await this.playCard(c, data_max, data_board)}) );
+			({weight: Math.max(0, this.weightCard(c, data_max, data_board)), action: async () => await this.playCard(c, data_max, data_board)}) );
 		if (player.leaderAvailable)
-			weights.push( {weight: this.weightLeader(player.leader, data_max, data_board), action: async () => await player.activateLeader()} );
-		weights.push( {weight: this.weightPass(), action: async () => await player.passRound()} );
+			weights.push( {weight: Math.max(0, this.weightLeader(player.leader, data_max, data_board)), action: async () => await player.activateLeader()} );
+		weights.push( {weight: Math.max(0, this.weightPass()), action: async () => await player.passRound()} );
 		let weightTotal = weights.reduce( (a,c) => a + c.weight, 0);
-		if (weightTotal === 0){
+		if (weightTotal <= 0){
 			for (let i=0; i<player.hand.cards.length; ++i) {
 				let card = player.hand.cards[i];
 				if (card.row === "weather" && this.weightWeather(card) > -1 || card.abilities.some(a => a.startsWith("avenger"))) {
@@ -237,7 +237,7 @@ class ControllerAI {
 				if (rand < 0)
 					break;
 			}
-			await weights[i].action();
+			await weights[Math.min(i, weights.length - 1)].action();
 		}
 	}
 	
@@ -283,9 +283,9 @@ class ControllerAI {
 						data["scorch"].push(c);
 						break;
 					case "bond":
-						if (!data.bond[c.name])
-							data.bond[c.name] = 0;
-						data.bond[c.name]++;
+						if (!data.bond[c.id()])
+							data.bond[c.id()] = 0;
+						data.bond[c.id()]++;
 				}
 			}
 		});
@@ -357,7 +357,7 @@ class ControllerAI {
 	// Plays a Commander's Horn to the most beneficial row. Assumes at least one viable row.
 	async horn(card){
 		let rows = [0,1,2].map(i => board.row[i]).filter(r => r.special === null);
-		let max_row;
+		let max_row = rows[0] || board.row[2];
 		let max = 0;
 		for (let i=0; i<rows.length; ++i) {
 			let r = rows[i];
@@ -377,7 +377,7 @@ class ControllerAI {
 	
 	// Plays a Mardroeme to the most beneficial row. Assumes at least one viable row.
 	async mardroeme(card){ // TODO skellige
-		let row, max = 0;
+		let row = board.row[2], max = 0;
 		for (let i=1; i<3; i++){
 			let curr = this.weightMardroemeRow(card, board.row[i]);
 			if (curr > max){
@@ -422,18 +422,20 @@ class ControllerAI {
 				r.cards.map(c => ({r:r.row, c:c})).concat(a)
 			, []);
 			let pair = pairs[randomInt(pairs.length)];
-			targ = pair.c;
-			row = pair.r;
+			if (pair) {
+				targ = pair.c;
+				row = pair.r;
+			}
 		}
 		
-		for (let i = 0; !row ; ++i){
+		for (let i = 0; i < board.row.length && !row; ++i){
 			if (board.row[i].cards.indexOf(targ) !== -1){
 				row = board.row[i];
 				break;
 			}
 		}
-		
-		setTimeout(() => board.toHand(targ, row), 1000);
+		if (!row) row = board.row[2];
+		if (targ) setTimeout(() => board.toHand(targ, row), 1000);
 		await this.player.playCardToRow(card, row);
 	}
 	
@@ -537,8 +539,7 @@ class ControllerAI {
 		let ermion = card.holder.hand.cards.filter(c => c.name === "Ermion").length > 0;
 		if (ermion && card.name !== "Ermion" && row === board.row[1])
 			return 0;
-		let name = row === board.row[1] ? "Young Berserker" : "Berserker";
-		let n = row.cards.filter(c => c.name === name).length;
+		let n = row.cards.filter(c => c.abilities && c.abilities.includes("berserker")).length;
 		let weight = row === board.row[2] ? 10*n : 8*n*n - 2*n
 		return Math.max(1, weight);
 	}
@@ -1626,16 +1627,20 @@ class Board {
 	getRow(card, row_name, player){
 		player = player ? player : card ? card.holder : player_me;
 		let isMe = player === player_me;
-		let isSpy = card.abilities.includes("spy");
+		let isSpy = card ? card.abilities.includes("spy") : false;
 		switch (row_name) {
 			case "weather": return weather; break;
 			case "close":  return this.row[ isMe^isSpy ? 3 : 2];
 			case "ranged": return this.row[ isMe^isSpy ? 4 : 1];
 			case "siege":  return this.row[ isMe^isSpy ? 5 : 0];
+			case "agile": {
+				const existingRow = card ? this.row.find(r => r && r.cards && r.cards.includes(card)) : null;
+				return existingRow || this.row[ isMe^isSpy ? 3 : 2];
+			}
 			case "grave": return player.grave;
 			case "deck": return player.deck;
 			case "hand": return player.hand;
-			default: console.error( card.name + " sent to incorrect row \"" +row_name+ "\" by " +card.holder.name );
+			default: console.error( (card ? card.name : "Card") + " sent to incorrect row \"" +row_name+ "\" by " +(card && card.holder ? card.holder.name : "unknown") );
 		}
 	}
 	
@@ -2228,7 +2233,7 @@ class Card {
 	
 	// Returns the identifier for this type of card
 	id() {
-		return this.name;
+		return (this.raw_data && this.raw_data.bondGroup) ? this.raw_data.bondGroup : this.name;
 	}
 	
 	// Sets and displays the current power of this card
