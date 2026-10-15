@@ -36,6 +36,7 @@
     meta: { name: 'Хроники Континента: Неверлэнд', note: 'Контракты, заказчики, награды и бестиарий.' },
 
     _migrateAndNormalizeProfiles: function(arr, activeId){
+      if(!Array.isArray(arr)) return [];
       var hasAnyTechsField = arr.some(function(p){ return p && Array.isArray(p.techs); });
       var hasAnyMovesField = arr.some(function(p){ return p && Array.isArray(p.moves); });
 
@@ -44,7 +45,7 @@
       if(!hasAnyTechsField){
         try {
           var rawT = localStorage.getItem('ttc_wi_techs');
-          if(rawT){
+          if(rawT && rawT !== 'undefined'){
             var parsedT = JSON.parse(rawT);
             if(Array.isArray(parsedT)){
               legacyTechs = parsedT.filter(function(t){ return t && (!OLD_DEFAULT_TECH_IDS || OLD_DEFAULT_TECH_IDS.indexOf(t.id) === -1); });
@@ -55,7 +56,7 @@
       if(!hasAnyMovesField){
         try {
           var rawM = localStorage.getItem('ttc_wi_moves');
-          if(rawM){
+          if(rawM && rawM !== 'undefined'){
             var parsedM = JSON.parse(rawM);
             if(Array.isArray(parsedM)){
               legacyMoves = parsedM.filter(function(m){ return m && (!OLD_DEFAULT_MOVE_IDS || OLD_DEFAULT_MOVE_IDS.indexOf(m.id) === -1); });
@@ -71,46 +72,55 @@
         } else {
           p.techs = p.techs.filter(function(t){ return t && (!OLD_DEFAULT_TECH_IDS || OLD_DEFAULT_TECH_IDS.indexOf(t.id) === -1); });
         }
+        p.techs.forEach(function(t, idx){
+          if(t && !t.id) t.id = 'wi_tech_' + Date.now() + '_' + idx;
+        });
         if(!Array.isArray(p.moves)){
           p.moves = (p.id === activeId && legacyMoves.length) ? JSON.parse(JSON.stringify(legacyMoves)) : [];
         } else {
           p.moves = p.moves.filter(function(m){ return m && (!OLD_DEFAULT_MOVE_IDS || OLD_DEFAULT_MOVE_IDS.indexOf(m.id) === -1); });
         }
+        p.moves.forEach(function(m, idx){
+          if(m && !m.id) m.id = 'wi_move_' + Date.now() + '_' + idx;
+        });
       });
+      return arr;
     },
 
     loadProfiles: function(){
       try {
         var raw = localStorage.getItem(WI_PROFILES_KEY);
-        if(raw){
-          var arr = JSON.parse(raw);
-          if(Array.isArray(arr) && arr.length > 0){
-            // Очищаем стандартного Геральта из прошлых версий
-            arr = arr.filter(function(p){
-              if(!p) return false;
-              if(p.id === 'wi_prof_geralt') return false;
-              if(p.name === 'Геральт из Ривии' && (!p.notes || p.notes.indexOf('Мутации третьего круга') !== -1)) return false;
-              return true;
-            });
-            if(arr.length > 0){
-              var savedActive = localStorage.getItem(WI_ACTIVE_ID_KEY);
-              var resolvedId = (savedActive && arr.some(function(p){ return p.id === savedActive; })) ? savedActive : arr[0].id;
-              WI._migrateAndNormalizeProfiles(arr, resolvedId);
-              WI.profiles = arr;
-              WI.activeProfileId = resolvedId;
-              var actProf = WI.profiles.find(function(p){ return p.id === WI.activeProfileId; }) || WI.profiles[0];
-              WI.techs = actProf && Array.isArray(actProf.techs) ? actProf.techs : [];
-              WI.moves = actProf && Array.isArray(actProf.moves) ? actProf.moves : [];
-              WI.saveProfiles();
-              return WI.profiles;
+        if(raw && raw !== 'undefined'){
+          try {
+            var arr = JSON.parse(raw);
+            if(Array.isArray(arr) && arr.length > 0){
+              // Очищаем стандартного Геральта из прошлых версий
+              arr = arr.filter(function(p){
+                if(!p) return false;
+                if(p.id === 'wi_prof_geralt') return false;
+                if(p.name === 'Геральт из Ривии' && (!p.notes || p.notes.indexOf('Мутации третьего круга') !== -1)) return false;
+                return true;
+              });
+              if(arr.length > 0){
+                var savedActive = localStorage.getItem(WI_ACTIVE_ID_KEY);
+                var resolvedId = (savedActive && arr.some(function(p){ return p.id === savedActive; })) ? savedActive : arr[0].id;
+                WI._migrateAndNormalizeProfiles(arr, resolvedId);
+                WI.profiles = arr;
+                WI.activeProfileId = resolvedId;
+                var actProf = WI.profiles.find(function(p){ return p.id === WI.activeProfileId; }) || WI.profiles[0];
+                WI.techs = actProf && Array.isArray(actProf.techs) ? actProf.techs : [];
+                WI.moves = actProf && Array.isArray(actProf.moves) ? actProf.moves : [];
+                WI.saveProfiles();
+                return WI.profiles;
+              }
             }
-          }
+          } catch(innerErr){}
         }
         var legacyRaw = localStorage.getItem('wi_profile');
-        if(legacyRaw){
+        if(legacyRaw && legacyRaw !== 'undefined'){
           var legacy = JSON.parse(legacyRaw);
           if(legacy && legacy.name && legacy.name !== 'Геральт из Ривии' && legacy.id !== 'wi_prof_geralt'){
-            legacy.id = 'wi_prof_legacy';
+            if(!legacy.id) legacy.id = 'wi_prof_legacy';
             if(!legacy.school) legacy.school = '';
             if(!legacy.energy) legacy.energy = 50;
             if(!legacy.maxEnergy) legacy.maxEnergy = 50;
@@ -142,13 +152,17 @@
       try {
         var act = (WI.profiles || []).find(function(p){ return p && p.id === WI.activeProfileId; }) || (WI.profiles && WI.profiles[0]);
         if(act){
-          if(!Array.isArray(act.techs)) act.techs = Array.isArray(WI.techs) ? WI.techs : [];
-          if(!Array.isArray(act.moves)) act.moves = Array.isArray(WI.moves) ? WI.moves : [];
+          if(Array.isArray(WI.techs)) act.techs = WI.techs;
+          else if(!Array.isArray(act.techs)) act.techs = [];
+          if(Array.isArray(WI.moves)) act.moves = WI.moves;
+          else if(!Array.isArray(act.moves)) act.moves = [];
           localStorage.setItem('wi_profile', JSON.stringify(act));
           localStorage.setItem('ttc_wi_techs', JSON.stringify(act.techs));
           localStorage.setItem('ttc_wi_moves', JSON.stringify(act.moves));
         }
-        localStorage.setItem(WI_PROFILES_KEY, JSON.stringify(WI.profiles));
+        if(Array.isArray(WI.profiles)){
+          localStorage.setItem(WI_PROFILES_KEY, JSON.stringify(WI.profiles));
+        }
         localStorage.setItem(WI_ACTIVE_ID_KEY, WI.activeProfileId);
       } catch(e){}
     },
@@ -551,7 +565,7 @@
         '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">' +
           schoolBadge +
           '<span class="wi-stat-badge">Ур. ' + p.level + '</span>' +
-          '<span class="wi-stat-badge hp">❤️ ' + p.hp + '/' + p.maxHp + ' HP</span>' +
+          '<span class="wi-stat-badge hp">❤️ ХП ' + p.hp + '</span>' +
           '<span class="wi-stat-badge ac">🛡️ КБ ' + p.ac + '</span>' +
         '</div>' +
       '</div>' +
@@ -939,19 +953,15 @@
               '<input type="number" min="1" max="100" id="wiDataInLevel" class="wi-input" value="' + escA(p.level != null ? p.level : '1') + '" placeholder="1">' +
             '</div>' +
             '<div class="wi-edit-item">' +
-              '<label>Очки здоровья (HP)</label>' +
+              '<label>❤️ ХП</label>' +
               '<input type="number" id="wiDataInHp" class="wi-input" value="' + escA(p.hp != null ? p.hp : '20') + '" placeholder="20">' +
             '</div>' +
             '<div class="wi-edit-item">' +
-              '<label>Максимум HP</label>' +
-              '<input type="number" id="wiDataInMaxHp" class="wi-input" value="' + escA(p.maxHp != null ? p.maxHp : '20') + '" placeholder="20">' +
-            '</div>' +
-            '<div class="wi-edit-item">' +
-              '<label>Класс брони (КБ)</label>' +
+              '<label>🛡️ Класс брони (КБ)</label>' +
               '<input type="number" id="wiDataInAc" class="wi-input" value="' + escA(p.ac != null ? p.ac : '10') + '" placeholder="10">' +
             '</div>' +
             '<div class="wi-edit-item">' +
-              '<label>Энергия знаков / Выносливость</label>' +
+              '<label>⚡ Энергия знаков / Выносливость</label>' +
               '<input type="number" id="wiDataInEnergy" class="wi-input" value="' + escA(p.energy != null ? p.energy : '50') + '" placeholder="50">' +
             '</div>' +
             '<div class="wi-edit-item">' +
@@ -1092,7 +1102,7 @@
         p.title = (v('wiDataInTitle') || '').trim();
         p.level = parseInt(v('wiDataInLevel'), 10) || 1;
         p.hp = parseInt(v('wiDataInHp'), 10) || 0;
-        p.maxHp = parseInt(v('wiDataInMaxHp'), 10) || 20;
+        p.maxHp = p.hp;
         p.ac = parseInt(v('wiDataInAc'), 10) || 10;
         p.energy = parseInt(v('wiDataInEnergy'), 10) || 50;
         p.maxEnergy = p.energy;
@@ -3040,7 +3050,10 @@
     var act = WI.getActiveProfile();
     if(act){
       if(!Array.isArray(act.techs)) act.techs = [];
-      act.techs = act.techs.filter(function(t){ return t && OLD_DEFAULT_TECH_IDS.indexOf(t.id) === -1; });
+      act.techs = act.techs.filter(function(t){ return t && (!OLD_DEFAULT_TECH_IDS || OLD_DEFAULT_TECH_IDS.indexOf(t.id) === -1); });
+      act.techs.forEach(function(t, idx){
+        if(t && !t.id) t.id = 'wi_tech_' + Date.now() + '_' + idx;
+      });
       WI.techs = act.techs;
       return WI.techs;
     }
@@ -3049,23 +3062,36 @@
   };
 
   WI.saveTechs = function(){
+    var currentTechs = Array.isArray(WI.techs) ? WI.techs : [];
     var act = WI.getActiveProfile();
+    WI.techs = currentTechs;
     if(act){
-      act.techs = Array.isArray(WI.techs) ? WI.techs : [];
+      act.techs = currentTechs;
     }
     WI.saveProfiles();
   };
 
   WI.getTechById = function(id){
     WI.loadTechs();
-    return (WI.techs || []).find(function(t){ return t.id === id; });
+    return (WI.techs || []).find(function(t){ return t && String(t.id) === String(id); });
+  };
+
+  WI.deleteTech = function(id){
+    if(id == null) return;
+    WI.loadTechs();
+    var targetId = String(id);
+    WI.techs = (WI.techs || []).filter(function(t){ return t && String(t.id) !== targetId; });
+    WI.saveTechs();
   };
 
   WI.loadMoves = function(){
     var act = WI.getActiveProfile();
     if(act){
       if(!Array.isArray(act.moves)) act.moves = [];
-      act.moves = act.moves.filter(function(m){ return m && OLD_DEFAULT_MOVE_IDS.indexOf(m.id) === -1; });
+      act.moves = act.moves.filter(function(m){ return m && (!OLD_DEFAULT_MOVE_IDS || OLD_DEFAULT_MOVE_IDS.indexOf(m.id) === -1); });
+      act.moves.forEach(function(m, idx){
+        if(m && !m.id) m.id = 'wi_move_' + Date.now() + '_' + idx;
+      });
       WI.moves = act.moves;
       return WI.moves;
     }
@@ -3074,16 +3100,26 @@
   };
 
   WI.saveMoves = function(){
+    var currentMoves = Array.isArray(WI.moves) ? WI.moves : [];
     var act = WI.getActiveProfile();
+    WI.moves = currentMoves;
     if(act){
-      act.moves = Array.isArray(WI.moves) ? WI.moves : [];
+      act.moves = currentMoves;
     }
     WI.saveProfiles();
   };
 
   WI.getMoveById = function(id){
     WI.loadMoves();
-    return (WI.moves || []).find(function(m){ return m.id === id; });
+    return (WI.moves || []).find(function(m){ return m && String(m.id) === String(id); });
+  };
+
+  WI.deleteMove = function(id){
+    if(id == null) return;
+    WI.loadMoves();
+    var targetId = String(id);
+    WI.moves = (WI.moves || []).filter(function(m){ return m && String(m.id) !== targetId; });
+    WI.saveMoves();
   };
 
   WI.loadUserMarkers = function(){
@@ -3207,8 +3243,9 @@
           '<div class="wi-ref-card-v" style="font-size:12.5px;line-height:1.45;">' + esc(t.desc || '') + '</div>' +
         '</div>' +
         '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">' +
-          '<button class="btn btn-ghost" data-nav="wiTechView:' + escA(t.id) + '" style="font-size:11px;padding:3px 8px;">Подробнее</button>' +
-          '<button class="btn btn-ghost" data-nav="wiTechEdit:' + escA(t.id) + '" style="font-size:11px;padding:3px 8px;">✏️</button>' +
+          '<button class="btn btn-ghost" data-nav="wiTechView:' + escA(t.id) + '" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiTechView:' + escA(t.id) + '\');" style="font-size:11px;padding:3px 8px;">Подробнее</button>' +
+          '<button class="btn btn-ghost" data-nav="wiTechEdit:' + escA(t.id) + '" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiTechEdit:' + escA(t.id) + '\');" style="font-size:11px;padding:3px 8px;" title="Редактировать">✏️</button>' +
+          '<button class="btn btn-ghost" data-wi-del-tech="' + escA(t.id) + '" style="font-size:11px;padding:3px 8px;color:#ef4444;" title="Удалить из ростера">🗑️</button>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -3332,7 +3369,8 @@
             '<textarea id="wiEdTechDesc" class="wi-input" rows="4" placeholder="Подробное описание применения...">' + esc(t.desc || '') + '</textarea>' +
           '</div>' +
         '</div>' +
-        '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">' +
+        '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;">' +
+          (!isNew ? '<button class="btn btn-ghost" id="wiEdTechDelBtn" data-tech-id="' + escA(t.id) + '" style="color:#ef4444;margin-right:auto;">🗑️ Удалить</button>' : '') +
           '<button class="btn btn-ghost" data-nav="wiTechs" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiTechs\');">Отмена</button>' +
           '<button class="btn btn-primary" id="wiEdTechSaveBtn" data-tech-id="' + escA(t.id) + '">💾 Сохранить способность</button>' +
         '</div>' +
@@ -3380,8 +3418,9 @@
           '<div class="wi-ref-card-v" style="font-size:12.5px;line-height:1.45;">' + esc(m.desc || '') + '</div>' +
         '</div>' +
         '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">' +
-          '<button class="btn btn-ghost" data-nav="wiMoveView:' + escA(m.id) + '" style="font-size:11px;padding:3px 8px;">Подробнее</button>' +
-          '<button class="btn btn-ghost" data-nav="wiMoveEdit:' + escA(m.id) + '" style="font-size:11px;padding:3px 8px;">✏️</button>' +
+          '<button class="btn btn-ghost" data-nav="wiMoveView:' + escA(m.id) + '" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiMoveView:' + escA(m.id) + '\');" style="font-size:11px;padding:3px 8px;">Подробнее</button>' +
+          '<button class="btn btn-ghost" data-nav="wiMoveEdit:' + escA(m.id) + '" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiMoveEdit:' + escA(m.id) + '\');" style="font-size:11px;padding:3px 8px;" title="Редактировать">✏️</button>' +
+          '<button class="btn btn-ghost" data-wi-del-move="' + escA(m.id) + '" style="font-size:11px;padding:3px 8px;color:#ef4444;" title="Удалить из ростера">🗑️</button>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -3491,7 +3530,8 @@
             '<textarea id="wiEdMoveDesc" class="wi-input" rows="4" placeholder="Подробное описание действия...">' + esc(m.desc || '') + '</textarea>' +
           '</div>' +
         '</div>' +
-        '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">' +
+        '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;">' +
+          (!isNew ? '<button class="btn btn-ghost" id="wiEdMoveDelBtn" data-move-id="' + escA(m.id) + '" style="color:#ef4444;margin-right:auto;">🗑️ Удалить</button>' : '') +
           '<button class="btn btn-ghost" data-nav="wiMoves" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiMoves\');">Отмена</button>' +
           '<button class="btn btn-primary" id="wiEdMoveSaveBtn" data-move-id="' + escA(m.id) + '">💾 Сохранить приём</button>' +
         '</div>' +
@@ -4266,6 +4306,19 @@
       });
     });
 
+    document.querySelectorAll('[data-wi-del-tech]').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var id = btn.getAttribute('data-wi-del-tech');
+        var t = WI.getTechById(id);
+        var title = (t && t.name) ? ('«' + t.name + '»') : 'эту способность';
+        if(!confirm('Удалить ' + title + ' из ростера персонажа?')) return;
+        WI.deleteTech(id);
+        WI.toast('✓ Способность удалена из ростера', 'info');
+        if(typeof render === 'function') render();
+      });
+    });
+
     wireWiNav();
   }
 
@@ -4274,9 +4327,8 @@
     if(delBtn){
       delBtn.addEventListener('click', function(){
         var id = delBtn.getAttribute('data-tech-id');
-        if(!confirm('Удалить эту способность?')) return;
-        WI.techs = (WI.techs || []).filter(function(t){ return t.id !== id; });
-        WI.saveTechs();
+        if(!confirm('Удалить эту способность из ростера персонажа?')) return;
+        WI.deleteTech(id);
         WI.toast('✓ Способность удалена', 'info');
         if(typeof window.navigate === 'function') window.navigate('wiTechs');
       });
@@ -4285,6 +4337,17 @@
   }
 
   function wireWiTechEdit(){
+    var delBtn = document.getElementById('wiEdTechDelBtn');
+    if(delBtn){
+      delBtn.addEventListener('click', function(){
+        var id = delBtn.getAttribute('data-tech-id');
+        if(!confirm('Удалить эту способность из ростера персонажа?')) return;
+        WI.deleteTech(id);
+        WI.toast('✓ Способность удалена', 'info');
+        if(typeof window.navigate === 'function') window.navigate('wiTechs');
+      });
+    }
+
     var saveBtn = document.getElementById('wiEdTechSaveBtn');
     if(saveBtn){
       saveBtn.addEventListener('click', function(){
@@ -4306,7 +4369,7 @@
         t.dmgMod = parseInt(document.getElementById('wiEdTechDmgMod').value, 10) || 0;
         t.desc = (document.getElementById('wiEdTechDesc').value || '').trim();
 
-        var idx = (WI.techs || []).findIndex(function(x){ return x.id === id; });
+        var idx = (WI.techs || []).findIndex(function(x){ return x && String(x.id) === String(id); });
         if(idx !== -1){
           WI.techs[idx] = t;
         } else {
@@ -4337,6 +4400,19 @@
       });
     });
 
+    document.querySelectorAll('[data-wi-del-move]').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var id = btn.getAttribute('data-wi-del-move');
+        var m = WI.getMoveById(id);
+        var title = (m && m.name) ? ('«' + m.name + '»') : 'этот боевой приём';
+        if(!confirm('Удалить ' + title + ' из ростера персонажа?')) return;
+        WI.deleteMove(id);
+        WI.toast('✓ Боевой приём удален из ростера', 'info');
+        if(typeof render === 'function') render();
+      });
+    });
+
     wireWiNav();
   }
 
@@ -4345,9 +4421,8 @@
     if(delBtn){
       delBtn.addEventListener('click', function(){
         var id = delBtn.getAttribute('data-move-id');
-        if(!confirm('Удалить этот боевой приём?')) return;
-        WI.moves = (WI.moves || []).filter(function(m){ return m.id !== id; });
-        WI.saveMoves();
+        if(!confirm('Удалить этот боевой приём из ростера персонажа?')) return;
+        WI.deleteMove(id);
         WI.toast('✓ Приём удален', 'info');
         if(typeof window.navigate === 'function') window.navigate('wiMoves');
       });
@@ -4356,6 +4431,17 @@
   }
 
   function wireWiMoveEdit(){
+    var delBtn = document.getElementById('wiEdMoveDelBtn');
+    if(delBtn){
+      delBtn.addEventListener('click', function(){
+        var id = delBtn.getAttribute('data-move-id');
+        if(!confirm('Удалить этот боевой приём из ростера персонажа?')) return;
+        WI.deleteMove(id);
+        WI.toast('✓ Приём удален', 'info');
+        if(typeof window.navigate === 'function') window.navigate('wiMoves');
+      });
+    }
+
     var saveBtn = document.getElementById('wiEdMoveSaveBtn');
     if(saveBtn){
       saveBtn.addEventListener('click', function(){
@@ -4374,7 +4460,7 @@
         m.trigger = (document.getElementById('wiEdMoveTrigger').value || '').trim();
         m.desc = (document.getElementById('wiEdMoveDesc').value || '').trim();
 
-        var idx = (WI.moves || []).findIndex(function(x){ return x.id === id; });
+        var idx = (WI.moves || []).findIndex(function(x){ return x && String(x.id) === String(id); });
         if(idx !== -1){
           WI.moves[idx] = m;
         } else {

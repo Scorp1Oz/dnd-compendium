@@ -242,9 +242,12 @@ var GHSync = window.GHSync = {
         if(bundle.witcher.profiles && Array.isArray(bundle.witcher.profiles)){
           var wActId = bundle.witcher.activeProfileId || (typeof WI !== 'undefined' && WI.activeProfileId) || localStorage.getItem('ttc_wi_active_id') || '';
           if(typeof WI !== 'undefined'){
-            WI.profiles = WI._migrateAndNormalizeProfiles ? WI._migrateAndNormalizeProfiles(bundle.witcher.profiles, wActId) : bundle.witcher.profiles;
+            if(typeof WI._migrateAndNormalizeProfiles === 'function'){
+              WI._migrateAndNormalizeProfiles(bundle.witcher.profiles, wActId);
+            }
+            WI.profiles = bundle.witcher.profiles;
           }
-          localStorage.setItem('ttc_wi_profiles', JSON.stringify(typeof WI !== 'undefined' ? WI.profiles : bundle.witcher.profiles));
+          localStorage.setItem('ttc_wi_profiles', JSON.stringify(bundle.witcher.profiles));
         }
         if(bundle.witcher.activeProfileId){
           if(typeof WI !== 'undefined') WI.activeProfileId = bundle.witcher.activeProfileId;
