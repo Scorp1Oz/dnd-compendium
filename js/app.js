@@ -248,6 +248,7 @@ function hideInactiveModeFx(activeMode){
   if(activeMode !== 'sw'){
     var swFx = document.getElementById('swThemeFx');
     if(swFx) swFx.style.display = 'none';
+    document.body.classList.remove('sw-theme', 'sw-theme-sith', 'sw-theme-jedi');
   }
 }
 

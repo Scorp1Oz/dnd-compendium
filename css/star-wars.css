@@ -1,12 +1,25 @@
 /* ==========================================================================
-   STAR WARS (ГАЛАКТИКА / СИЛА И СВЕТОВЫЕ МЕЧИ) THEME & COMPONENTS
+   STAR WARS (ГАЛАКТИКА / ДЖЕДАИ И СИТХИ) THEME & COMPONENTS
    ========================================================================== */
+
+/* --- Переменные темы по умолчанию (Храм Джедаев / Голокрон Света) --- */
 body.sw-theme {
+  --sw-accent: #38bdf8;
+  --sw-accent-bright: #7dd3fc;
+  --sw-accent-pale: #e0f2fe;
+  --sw-accent-soft: rgba(56, 189, 248, 0.14);
+  --sw-border: rgba(56, 189, 248, 0.35);
+  --sw-border-subtle: rgba(56, 189, 248, 0.16);
+  --sw-glow: rgba(56, 189, 248, 0.35);
+  --sw-panel-bg: rgba(4, 9, 20, 0.55);
+  --sw-empty-bg: rgba(10, 20, 38, 0.45);
+  --sw-muted: #94a3b8;
   background: radial-gradient(circle at 50% 0%, #0d1b2e 0%, #050a14 55%, #020408 100%) !important;
   color: #e2edf8;
   position: relative;
   min-height: 100vh;
 }
+
 body.sw-theme::before {
   content: '';
   position: fixed;
@@ -20,7 +33,41 @@ body.sw-theme::before {
   z-index: 0;
 }
 
-/* --- Анимированный фон (Эмблема Ордена, Звёздное поле, Искры Кайбер-кристаллов и Туманность) --- */
+/* ==========================================================================
+   ТЕМА СИТХА (ИМПЕРИЯ СИТХОВ / ТЁМНЫЙ ГОЛОКРОН КОРРИБАНА)
+   ========================================================================== */
+body.sw-theme.sw-theme-sith {
+  --sw-accent: #ef4444;
+  --sw-accent-bright: #fca5a5;
+  --sw-accent-pale: #ffe4e6;
+  --sw-accent-soft: rgba(239, 68, 68, 0.16);
+  --sw-border: rgba(239, 68, 68, 0.45);
+  --sw-border-subtle: rgba(239, 68, 68, 0.22);
+  --sw-glow: rgba(220, 38, 38, 0.45);
+  --sw-panel-bg: rgba(18, 3, 6, 0.68);
+  --sw-empty-bg: rgba(28, 5, 9, 0.55);
+  --sw-muted: #c4a3a8;
+  background:
+    radial-gradient(circle at 50% -10%, #3b070e 0%, #1c0307 42%, #090103 78%, #030001 100%) !important;
+  color: #f8e8ea;
+}
+
+body.sw-theme.sw-theme-sith::before {
+  background-image:
+    radial-gradient(ellipse at 20% 18%, rgba(220, 38, 38, 0.15) 0%, transparent 48%),
+    radial-gradient(ellipse at 82% 72%, rgba(185, 28, 28, 0.14) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 95%, rgba(249, 115, 22, 0.09) 0%, transparent 55%),
+    radial-gradient(circle at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.65) 100%),
+    repeating-linear-gradient(0deg, rgba(239, 68, 68, 0.022) 0px, rgba(239, 68, 68, 0.022) 1px, transparent 1px, transparent 4px);
+}
+
+/* Индикатор в верхнем меню навигации для темы Ситха */
+body.sw-theme.sw-theme-sith .hb-seg-indicator[data-mode="sw"] {
+  background-color: #b91c1c !important;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.65) !important;
+}
+
+/* --- Анимированный фон (#swThemeFx) --- */
 #swThemeFx {
   position: fixed;
   inset: 0;
@@ -45,6 +92,12 @@ body.sw-theme #swThemeFx {
   animation: swEmblemPulse 14s ease-in-out infinite alternate;
 }
 
+body.sw-theme.sw-theme-sith .sw-bg-emblem {
+  opacity: 0.12;
+  filter: drop-shadow(0 0 42px rgba(239, 68, 68, 0.65)) drop-shadow(0 0 95px rgba(185, 28, 28, 0.45));
+  animation: swSithEmblemPulse 12s ease-in-out infinite alternate;
+}
+
 @keyframes swEmblemPulse {
   0% {
     opacity: 0.055;
@@ -63,6 +116,24 @@ body.sw-theme #swThemeFx {
   }
 }
 
+@keyframes swSithEmblemPulse {
+  0% {
+    opacity: 0.085;
+    transform: translate(-50%, -50%) scale(0.96) rotate(-2deg);
+    filter: drop-shadow(0 0 28px rgba(220, 38, 38, 0.5)) drop-shadow(0 0 65px rgba(153, 27, 27, 0.35));
+  }
+  50% {
+    opacity: 0.145;
+    transform: translate(-50%, -50%) scale(1.02) rotate(0deg);
+    filter: drop-shadow(0 0 55px rgba(239, 68, 68, 0.85)) drop-shadow(0 0 110px rgba(249, 115, 22, 0.4));
+  }
+  100% {
+    opacity: 0.11;
+    transform: translate(-50%, -50%) scale(1.04) rotate(2deg);
+    filter: drop-shadow(0 0 45px rgba(220, 38, 38, 0.7)) drop-shadow(0 0 90px rgba(225, 29, 72, 0.45));
+  }
+}
+
 .sw-nebula-layer {
   position: absolute;
   inset: -12%;
@@ -71,6 +142,72 @@ body.sw-theme #swThemeFx {
     radial-gradient(circle at 75% 65%, rgba(220, 38, 38, 0.06) 0%, transparent 45%),
     radial-gradient(circle at 50% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
   animation: swNebulaDrift 26s ease-in-out infinite alternate;
+}
+
+body.sw-theme.sw-theme-sith .sw-nebula-layer {
+  background:
+    radial-gradient(circle at 22% 28%, rgba(220, 38, 38, 0.16) 0%, transparent 48%),
+    radial-gradient(circle at 78% 62%, rgba(153, 27, 27, 0.18) 0%, transparent 50%),
+    radial-gradient(circle at 50% 88%, rgba(234, 88, 12, 0.1) 0%, transparent 52%),
+    radial-gradient(circle at 50% 15%, rgba(136, 19, 55, 0.14) 0%, transparent 45%);
+}
+
+/* Нижнее багровое зарево кузницы / алтаря Коррибана в теме Ситха */
+.sw-sith-horizon {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -8%;
+  height: 42vh;
+  background: radial-gradient(ellipse at 50% 100%, rgba(220, 38, 38, 0.24) 0%, rgba(153, 27, 27, 0.1) 45%, transparent 75%);
+  pointer-events: none;
+  animation: swSithHorizonBreathe 8s ease-in-out infinite alternate;
+}
+
+@keyframes swSithHorizonBreathe {
+  0% { opacity: 0.65; transform: scaleY(0.95); }
+  100% { opacity: 1; transform: scaleY(1.08); }
+}
+
+/* Разряды Молнии Силы на заднем плане Ситха */
+.sw-sith-lightning {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.sw-lightning-arc {
+  fill: none;
+  stroke: #f87171;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 8px #ef4444) drop-shadow(0 0 16px #dc2626);
+  opacity: 0;
+  animation: swLightningCrack 9s ease-in-out infinite;
+}
+
+.sw-lightning-arc.arc-2 {
+  stroke: #fb7185;
+  animation-duration: 13s;
+  animation-delay: -4.5s;
+}
+
+.sw-lightning-arc.arc-3 {
+  stroke: #fca5a5;
+  animation-duration: 11s;
+  animation-delay: -7.2s;
+}
+
+@keyframes swLightningCrack {
+  0%, 86%, 100% { opacity: 0; }
+  88% { opacity: 0.55; }
+  89.5% { opacity: 0.12; }
+  91% { opacity: 0.7; }
+  93% { opacity: 0; }
 }
 
 @keyframes swNebulaDrift {
@@ -84,6 +221,11 @@ body.sw-theme #swThemeFx {
   background: #e0f2fe;
   box-shadow: 0 0 6px rgba(186, 230, 253, 0.85);
   animation: swStarTwinkle ease-in-out infinite;
+}
+
+body.sw-theme.sw-theme-sith .sw-star {
+  background: #fecdd3;
+  box-shadow: 0 0 7px rgba(248, 113, 113, 0.9);
 }
 
 @keyframes swStarTwinkle {
@@ -125,6 +267,12 @@ body.sw-theme #swThemeFx {
   animation: swHyperStreak linear infinite;
 }
 
+body.sw-theme.sw-theme-sith .sw-hyperline {
+  width: 2px;
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0) 0%, rgba(220, 38, 38, 0.78) 50%, rgba(255, 228, 230, 0.95) 100%);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
 @keyframes swHyperStreak {
   0% { transform: translateY(-20vh) scaleY(0.3); opacity: 0; }
   15% { opacity: 0.55; }
@@ -142,22 +290,32 @@ body.sw-theme .app {
   font-family: 'Cinzel', 'Georgia', serif;
   font-size: 24px;
   font-weight: 700;
-  color: #7dd3fc;
-  text-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+  color: var(--sw-accent-bright);
+  text-shadow: 0 0 12px var(--sw-glow);
   letter-spacing: 0.03em;
+}
+
+body.sw-theme.sw-theme-sith .sw-title {
+  color: #fecaca;
+  text-shadow: 0 0 16px rgba(239, 68, 68, 0.55), 0 0 32px rgba(185, 28, 28, 0.35);
+}
+
+body.sw-theme.sw-theme-sith h1 {
+  color: #ffe4e6;
+  text-shadow: 0 0 18px rgba(220, 38, 38, 0.35);
 }
 
 .sw-subtitle {
   font-family: 'EB Garamond', serif;
   font-style: italic;
-  color: #94a3b8;
+  color: var(--sw-muted);
   font-size: 14px;
 }
 
 /* --- Главный HUD Профиля --- */
 .sw-hud {
   background: linear-gradient(135deg, rgba(12, 22, 40, 0.95) 0%, rgba(7, 14, 28, 0.92) 100%);
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  border: 1px solid var(--sw-border);
   border-radius: 12px;
   padding: 16px 20px;
   margin: 12px 0 20px;
@@ -176,9 +334,21 @@ body.sw-theme .app {
   opacity: 0.85;
 }
 
+body.sw-theme.sw-theme-sith .sw-hud {
+  background: linear-gradient(135deg, rgba(36, 6, 11, 0.96) 0%, rgba(16, 2, 5, 0.95) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.78), 0 0 24px rgba(220, 38, 38, 0.16), inset 0 0 30px rgba(220, 38, 38, 0.1);
+}
+body.sw-theme.sw-theme-sith .sw-hud::before {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #7f1d1d, #ef4444, #fde047, #ef4444, #7f1d1d, transparent);
+  box-shadow: 0 0 14px #ef4444;
+  opacity: 0.95;
+}
+
 .sw-rule {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, var(--sw-border), transparent);
   margin: 14px 0 18px;
 }
 
@@ -193,10 +363,17 @@ body.sw-theme .app {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background: rgba(56, 189, 248, 0.14);
-  border: 1px solid rgba(56, 189, 248, 0.42);
-  color: #7dd3fc;
+  background: var(--sw-accent-soft);
+  border: 1px solid var(--sw-border);
+  color: var(--sw-accent-bright);
   white-space: nowrap;
+}
+
+body.sw-theme.sw-theme-sith .sw-role-badge {
+  background: linear-gradient(135deg, rgba(185, 28, 28, 0.28), rgba(127, 29, 29, 0.35));
+  border-color: rgba(248, 113, 113, 0.55);
+  color: #fecaca;
+  box-shadow: 0 0 12px rgba(220, 38, 38, 0.25);
 }
 
 .sw-stat-badge {
@@ -226,19 +403,19 @@ body.sw-theme .app {
   color: #93c5fd;
 }
 
+body.sw-theme.sw-theme-sith .sw-stat-badge.ac {
+  border-color: rgba(251, 146, 60, 0.42);
+  background: rgba(251, 146, 60, 0.14);
+  color: #fdba74;
+}
+
 .sw-stat-badge.force {
   border-color: rgba(245, 158, 11, 0.42);
   background: rgba(245, 158, 11, 0.13);
   color: #fde047;
 }
 
-.sw-stat-badge.credits {
-  border-color: rgba(16, 185, 129, 0.38);
-  background: rgba(16, 185, 129, 0.12);
-  color: #6ee7b7;
-}
-
-/* --- Главная кнопка броска костей (кликабельная, как в Ведьмаке / Волшебнике) --- */
+/* --- Главная кнопка броска костей --- */
 .sw-hero-dice {
   display: flex;
   align-items: center;
@@ -259,6 +436,18 @@ body.sw-theme .app {
   transform: translateY(-2px);
 }
 
+body.sw-theme.sw-theme-sith .sw-hero-dice {
+  background: linear-gradient(135deg, rgba(44, 7, 13, 0.96) 0%, rgba(18, 3, 6, 0.97) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.58);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.7), 0 0 22px rgba(220, 38, 38, 0.2), inset 0 0 20px rgba(239, 68, 68, 0.08);
+}
+
+body.sw-theme.sw-theme-sith .sw-hero-dice:hover {
+  border-color: #f87171;
+  box-shadow: 0 8px 28px rgba(220, 38, 38, 0.45), 0 0 20px rgba(239, 68, 68, 0.35);
+  transform: translateY(-2px);
+}
+
 .sw-hero-dice-icon {
   width: 56px;
   height: 56px;
@@ -267,7 +456,7 @@ body.sw-theme .app {
   justify-content: center;
   font-size: 28px;
   flex-shrink: 0;
-  color: #38bdf8;
+  color: var(--sw-accent);
 }
 
 .sw-hero-dice-icon svg {
@@ -275,6 +464,10 @@ body.sw-theme .app {
   height: 100%;
   display: block;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+}
+
+body.sw-theme.sw-theme-sith .sw-hero-dice-icon svg {
+  filter: hue-rotate(-28deg) saturate(1.5) drop-shadow(0 0 12px rgba(239, 68, 68, 0.55));
 }
 
 .sw-hero-dice-title {
@@ -286,25 +479,30 @@ body.sw-theme .app {
   margin-bottom: 4px;
 }
 
+body.sw-theme.sw-theme-sith .sw-hero-dice-title {
+  color: #ffe4e6;
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
+
 .sw-hero-dice-desc {
   font-family: 'EB Garamond', serif;
   font-size: 14.5px;
-  color: #94a3b8;
+  color: var(--sw-muted);
   font-style: italic;
   line-height: 1.4;
 }
 
 .sw-hero-dice-arrow {
   font-size: 24px;
-  color: #38bdf8;
+  color: var(--sw-accent);
   font-weight: 700;
   flex-shrink: 0;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .sw-hero-dice:hover .sw-hero-dice-arrow {
   transform: translateX(4px);
-  color: #7dd3fc;
+  color: var(--sw-accent-bright);
 }
 
 body.sw-theme .section-label {
@@ -312,9 +510,14 @@ body.sw-theme .section-label {
   font-size: 11px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: #38bdf8;
-  opacity: 0.85;
+  color: var(--sw-accent);
+  opacity: 0.9;
   margin: 26px 0 14px;
+}
+
+body.sw-theme.sw-theme-sith .section-label {
+  color: #f87171;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
 }
 
 /* --- Карточки меню и списков --- */
@@ -329,6 +532,12 @@ body.sw-theme .section-label {
   transition: all 0.22s ease;
   position: relative;
   overflow: hidden;
+}
+
+body.sw-theme.sw-theme-sith .sw-card {
+  background: linear-gradient(135deg, rgba(32, 6, 11, 0.95) 0%, rgba(14, 2, 5, 0.97) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.34);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.65), inset 0 0 16px rgba(220, 38, 38, 0.05);
 }
 
 .sw-card-clickable {
@@ -346,15 +555,27 @@ body.sw-theme .section-label {
   left: 0;
   width: 3px;
   height: 100%;
-  background: #38bdf8;
+  background: var(--sw-accent);
   opacity: 0;
   transition: opacity 0.2s ease;
+}
+
+body.sw-theme.sw-theme-sith .sw-card-clickable::before {
+  background: linear-gradient(180deg, #ff4d4d, #991b1b);
+  box-shadow: 0 0 12px #ef4444;
 }
 
 .sw-card-clickable:hover {
   border-color: rgba(56, 189, 248, 0.65);
   background: linear-gradient(135deg, rgba(17, 33, 58, 0.98) 0%, rgba(10, 20, 38, 0.98) 100%);
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55), 0 0 18px rgba(56, 189, 248, 0.22);
+  transform: translateY(-2px);
+}
+
+body.sw-theme.sw-theme-sith .sw-card-clickable:hover {
+  border-color: rgba(248, 113, 113, 0.8);
+  background: linear-gradient(135deg, rgba(48, 8, 15, 0.98) 0%, rgba(22, 4, 8, 0.98) 100%);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.75), 0 0 22px rgba(220, 38, 38, 0.32);
   transform: translateY(-2px);
 }
 
@@ -373,25 +594,29 @@ body.sw-theme .section-label {
   margin-bottom: 4px;
 }
 
+body.sw-theme.sw-theme-sith .sw-card-title {
+  color: #ffe4e6;
+}
+
 .sw-card-desc {
   font-family: 'EB Garamond', serif;
   font-size: 13.5px;
-  color: #94a3b8;
+  color: var(--sw-muted);
   line-height: 1.45;
   font-style: italic;
 }
 
 .sw-card-arrow {
-  color: #38bdf8;
+  color: var(--sw-accent);
   font-size: 20px;
   font-weight: 700;
   flex-shrink: 0;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .sw-card-clickable:hover .sw-card-arrow {
   transform: translateX(4px);
-  color: #7dd3fc;
+  color: var(--sw-accent-bright);
 }
 
 /* --- Табы навигации (Способности / Приёмы / Навыки) и Пиллы фильтров --- */
@@ -400,14 +625,14 @@ body.sw-theme .section-label {
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 18px;
-  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+  border-bottom: 1px solid var(--sw-border-subtle);
   padding-bottom: 10px;
 }
 
 .sw-nav-tab {
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(56, 189, 248, 0.18);
-  color: #94a3b8;
+  border: 1px solid var(--sw-border-subtle);
+  color: var(--sw-muted);
   padding: 8px 16px;
   border-radius: 6px;
   font-family: 'Cinzel', serif;
@@ -418,23 +643,30 @@ body.sw-theme .section-label {
 }
 
 .sw-nav-tab:hover {
-  background: rgba(56, 189, 248, 0.12);
+  background: var(--sw-accent-soft);
   color: #fff;
-  border-color: rgba(56, 189, 248, 0.45);
+  border-color: var(--sw-border);
 }
 
 .sw-nav-tab.active {
   background: rgba(14, 165, 233, 0.22);
-  border-color: #38bdf8;
-  color: #7dd3fc;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.28);
+  border-color: var(--sw-accent);
+  color: var(--sw-accent-bright);
+  box-shadow: 0 0 12px var(--sw-glow);
+}
+
+body.sw-theme.sw-theme-sith .sw-nav-tab.active {
+  background: linear-gradient(135deg, rgba(185, 28, 28, 0.38), rgba(127, 29, 29, 0.45));
+  border-color: #ef4444;
+  color: #fecaca;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
 }
 
 .sw-pill {
   padding: 6px 14px;
   border-radius: 20px;
   background: rgba(11, 22, 40, 0.85);
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  border: 1px solid var(--sw-border-subtle);
   color: #cbd5e1;
   font-size: 12px;
   font-weight: 600;
@@ -444,21 +676,34 @@ body.sw-theme .section-label {
   font-family: inherit;
 }
 
+body.sw-theme.sw-theme-sith .sw-pill {
+  background: rgba(26, 5, 9, 0.88);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #e5ced1;
+}
+
 .sw-pill:hover {
-  background: rgba(56, 189, 248, 0.14);
-  border-color: #38bdf8;
+  background: var(--sw-accent-soft);
+  border-color: var(--sw-accent);
   color: #ffffff;
 }
 
 .sw-pill.active {
   background: rgba(14, 165, 233, 0.25);
-  border-color: #38bdf8;
-  color: #7dd3fc;
+  border-color: var(--sw-accent);
+  color: var(--sw-accent-bright);
   font-weight: 700;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 12px var(--sw-glow);
 }
 
-/* --- Кнопки в стиле Звездных войн (Голокрон / Световой меч) --- */
+body.sw-theme.sw-theme-sith .sw-pill.active {
+  background: rgba(185, 28, 28, 0.38);
+  border-color: #ef4444;
+  color: #fecaca;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
+}
+
+/* --- Кнопки в стиле Звездных войн (Джедаи vs Ситхи) --- */
 body.sw-theme .btn {
   background: rgba(12, 24, 44, 0.9);
   border: 1px solid rgba(56, 189, 248, 0.35);
@@ -518,6 +763,88 @@ body.sw-theme .back:hover {
   color: #ffffff;
 }
 
+/* --- Кнопки в теме Ситха --- */
+body.sw-theme.sw-theme-sith .btn {
+  background: rgba(30, 5, 10, 0.92);
+  border: 1px solid rgba(239, 68, 68, 0.42);
+  color: #ffe4e6;
+}
+
+body.sw-theme.sw-theme-sith .btn:hover:not(:disabled) {
+  border-color: #f87171;
+  background: rgba(220, 38, 38, 0.22);
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.35);
+}
+
+body.sw-theme.sw-theme-sith .btn-primary,
+body.sw-theme.sw-theme-sith .btn.primary {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 55%, #7f1d1d 100%);
+  border: 1px solid #f87171;
+  color: #ffffff;
+  box-shadow: 0 2px 14px rgba(220, 38, 38, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+body.sw-theme.sw-theme-sith .btn-primary:hover:not(:disabled),
+body.sw-theme.sw-theme-sith .btn.primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 55%, #991b1b 100%);
+  border-color: #fca5a5;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.75), 0 0 14px rgba(252, 165, 165, 0.45);
+}
+
+body.sw-theme.sw-theme-sith .btn-ghost {
+  background: rgba(28, 5, 9, 0.72);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5 !important;
+}
+
+body.sw-theme.sw-theme-sith .btn-ghost:hover:not(:disabled) {
+  border-color: #ef4444 !important;
+  background: rgba(220, 38, 38, 0.22);
+  color: #ffffff !important;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.32);
+}
+
+body.sw-theme.sw-theme-sith .back {
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.38);
+  background: rgba(24, 4, 8, 0.82);
+}
+
+body.sw-theme.sw-theme-sith .back:hover {
+  border-color: #ef4444;
+  background: rgba(220, 38, 38, 0.24);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.32);
+}
+
+/* --- Кастомные выпадающие списки (.ttc-select) в Звездных войнах --- */
+body.sw-theme .ttc-select-btn {
+  background: rgba(6, 13, 26, 0.94);
+  border-color: rgba(56, 189, 248, 0.32);
+  border-left: 3px solid #38bdf8;
+  color: #e2edf8;
+}
+body.sw-theme .ttc-select-btn:hover,
+body.sw-theme .ttc-select-btn.open {
+  border-color: #38bdf8;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+}
+body.sw-theme .ttc-select-arrow { color: #38bdf8; }
+
+body.sw-theme.sw-theme-sith .ttc-select-btn {
+  background: rgba(18, 3, 6, 0.95);
+  border-color: rgba(239, 68, 68, 0.38);
+  border-left: 3px solid #ef4444;
+  color: #ffe4e6;
+}
+body.sw-theme.sw-theme-sith .ttc-select-btn:hover,
+body.sw-theme.sw-theme-sith .ttc-select-btn.open {
+  border-color: #ef4444;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.42);
+}
+body.sw-theme.sw-theme-sith .ttc-select-arrow { color: #ef4444; }
+
 /* --- Поиск по справочнику и способностям --- */
 .sw-ref-search-wrap,
 body.sw-theme .wi-ref-search-wrap {
@@ -531,18 +858,25 @@ body.sw-theme .wi-ref-search-input {
   box-sizing: border-box;
   padding: 10px 14px 10px 38px !important;
   background: rgba(6, 13, 26, 0.92) !important;
-  border: 1px solid rgba(56, 189, 248, 0.32) !important;
+  border: 1px solid var(--sw-border) !important;
   border-radius: 6px;
   color: #e2edf8 !important;
   font-size: 13.5px;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
+body.sw-theme.sw-theme-sith .sw-ref-search-input,
+body.sw-theme.sw-theme-sith .wi-ref-search-input {
+  background: rgba(16, 3, 6, 0.94) !important;
+  border-color: rgba(239, 68, 68, 0.38) !important;
+  color: #ffe4e6 !important;
+}
+
 .sw-ref-search-input:focus,
 body.sw-theme .wi-ref-search-input:focus {
   outline: none;
-  border-color: #38bdf8 !important;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  border-color: var(--sw-accent) !important;
+  box-shadow: 0 0 12px var(--sw-glow);
 }
 
 .sw-ref-search-icon,
@@ -552,7 +886,7 @@ body.sw-theme .wi-ref-search-icon {
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  color: #7dd3fc;
+  color: var(--sw-accent-bright);
   font-size: 14px;
 }
 
@@ -570,7 +904,7 @@ body.sw-theme input[type="password"],
 body.sw-theme select,
 body.sw-theme textarea {
   background: rgba(6, 13, 26, 0.92) !important;
-  border: 1px solid rgba(56, 189, 248, 0.32) !important;
+  border: 1px solid var(--sw-border) !important;
   color: #e2edf8 !important;
   border-radius: 6px;
   padding: 8px 12px;
@@ -580,13 +914,25 @@ body.sw-theme textarea {
   font-family: inherit;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
+body.sw-theme.sw-theme-sith .sw-input,
+body.sw-theme.sw-theme-sith input[type="text"],
+body.sw-theme.sw-theme-sith input[type="number"],
+body.sw-theme.sw-theme-sith input[type="password"],
+body.sw-theme.sw-theme-sith select,
+body.sw-theme.sw-theme-sith textarea {
+  background: rgba(16, 3, 6, 0.94) !important;
+  border: 1px solid rgba(239, 68, 68, 0.38) !important;
+  color: #ffe4e6 !important;
+}
+
 .sw-input:focus,
 body.sw-theme input:focus,
 body.sw-theme select:focus,
 body.sw-theme textarea:focus {
   outline: none;
-  border-color: #38bdf8 !important;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+  border-color: var(--sw-accent) !important;
+  box-shadow: 0 0 10px var(--sw-glow);
 }
 
 /* --- Бейджи Сторон Силы и Категорий --- */
@@ -600,7 +946,7 @@ body.sw-theme textarea:focus {
   letter-spacing: 0.6px;
 }
 .sw-side-light { background: rgba(56, 189, 248, 0.18); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.45); }
-.sw-side-dark  { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.45); }
+.sw-side-dark  { background: rgba(239, 68, 68, 0.22); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.52); }
 .sw-side-uni   { background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); }
 .sw-side-tech  { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.45); }
 
@@ -619,18 +965,30 @@ body.sw-theme textarea:focus {
   word-wrap: break-word;
 }
 
+body.sw-theme.sw-theme-sith .sw-ref-card {
+  background: rgba(24, 4, 8, 0.9);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.55);
+}
+
 .sw-ref-card:hover {
-  border-color: #38bdf8;
+  border-color: var(--sw-accent);
   background: rgba(14, 26, 48, 0.96);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 12px rgba(56, 189, 248, 0.18);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 12px var(--sw-glow);
   transform: translateY(-1px);
+}
+
+body.sw-theme.sw-theme-sith .sw-ref-card:hover {
+  border-color: #ef4444;
+  background: rgba(38, 6, 12, 0.96);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.7), 0 0 16px rgba(239, 68, 68, 0.25);
 }
 
 .sw-ref-card-k {
   font-family: 'Cinzel', serif;
   font-size: 15px;
   font-weight: 700;
-  color: #7dd3fc;
+  color: var(--sw-accent-bright);
   margin-bottom: 4px;
   word-break: break-word;
 }
@@ -641,14 +999,24 @@ body.sw-theme textarea:focus {
   line-height: 1.5;
 }
 
+body.sw-theme.sw-theme-sith .sw-ref-card-v {
+  color: #e5ced1;
+}
+
 /* --- Экран Данные и Карточка Персонажа --- */
 .sw-char-sheet-card {
   background: linear-gradient(155deg, rgba(13, 25, 45, 0.95), rgba(7, 14, 28, 0.98)) !important;
-  border: 1px solid rgba(56, 189, 248, 0.32) !important;
+  border: 1px solid var(--sw-border) !important;
   border-radius: 10px;
   padding: 18px 20px;
   margin-bottom: 16px;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(125, 211, 252, 0.12);
+}
+
+body.sw-theme.sw-theme-sith .sw-char-sheet-card {
+  background: linear-gradient(155deg, rgba(32, 6, 11, 0.95), rgba(14, 2, 5, 0.98)) !important;
+  border: 1px solid rgba(239, 68, 68, 0.42) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.72), 0 0 18px rgba(220, 38, 38, 0.12), inset 0 1px 0 rgba(252, 165, 165, 0.14);
 }
 
 .sw-char-header {
@@ -658,11 +1026,11 @@ body.sw-theme textarea:focus {
   flex-wrap: wrap;
   gap: 10px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(56, 189, 248, 0.16);
+  border-bottom: 1px solid var(--sw-border-subtle);
   font-family: 'Cinzel', serif;
   font-size: 16px;
   font-weight: 700;
-  color: #7dd3fc;
+  color: var(--sw-accent-bright);
 }
 
 .sw-edit-grid {
@@ -684,7 +1052,7 @@ body.sw-theme textarea:focus {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #7dd3fc;
+  color: var(--sw-accent-bright);
   margin-bottom: 5px;
 }
 
@@ -695,8 +1063,96 @@ body.sw-theme textarea:focus {
   margin-top: 14px;
   padding: 14px;
   background: rgba(5, 10, 20, 0.65);
-  border: 1px solid rgba(56, 189, 248, 0.22);
+  border: 1px solid var(--sw-border-subtle);
   border-radius: 8px;
+}
+
+body.sw-theme.sw-theme-sith .sw-stat-box-grid {
+  background: rgba(12, 2, 4, 0.72);
+  border-color: rgba(239, 68, 68, 0.28);
+}
+
+/* --- Карточки выбора визуальной темы на экране Данные --- */
+.sw-theme-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.sw-theme-option-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  overflow: hidden;
+  user-select: none;
+}
+
+.sw-theme-option-card.jedi-opt {
+  background: linear-gradient(135deg, rgba(10, 25, 48, 0.95) 0%, rgba(5, 12, 24, 0.98) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+.sw-theme-option-card.jedi-opt:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.28);
+  transform: translateY(-2px);
+}
+.sw-theme-option-card.jedi-opt.active {
+  border: 2px solid #38bdf8;
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.42), inset 0 0 18px rgba(56, 189, 248, 0.14);
+}
+
+.sw-theme-option-card.sith-opt {
+  background: linear-gradient(135deg, rgba(44, 6, 12, 0.96) 0%, rgba(16, 2, 5, 0.98) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.38);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+}
+.sw-theme-option-card.sith-opt:hover {
+  border-color: #ef4444;
+  box-shadow: 0 6px 22px rgba(220, 38, 38, 0.35);
+  transform: translateY(-2px);
+}
+.sw-theme-option-card.sith-opt.active {
+  border: 2px solid #ef4444;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.5), inset 0 0 20px rgba(220, 38, 38, 0.18);
+}
+
+.sw-theme-opt-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.sw-theme-option-card.jedi-opt .sw-theme-opt-icon {
+  background: rgba(56, 189, 248, 0.16);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+.sw-theme-option-card.sith-opt .sw-theme-opt-icon {
+  background: rgba(220, 38, 38, 0.22);
+  border: 1px solid rgba(239, 68, 68, 0.55);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
+}
+
+.sw-theme-opt-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 @media (max-width: 560px) {
@@ -711,15 +1167,21 @@ body.sw-theme textarea:focus {
   width: 100%;
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(56, 189, 248, 0.4);
+  border: 1px solid var(--sw-border);
   background: radial-gradient(ellipse at 50% 50%, #0d1f3d 0%, #050b16 65%, #020409 100%);
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(56, 189, 248, 0.12);
 }
+
+body.sw-theme.sw-theme-sith .sw-galaxy-wrap {
+  border-color: rgba(239, 68, 68, 0.48);
+  background: radial-gradient(ellipse at 50% 50%, #2d070e 0%, #120205 65%, #040001 100%);
+  box-shadow: 0 12px 38px rgba(0, 0, 0, 0.88), inset 0 0 45px rgba(220, 38, 38, 0.18);
+}
+
 .sw-planet-node {
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 .sw-planet-node:hover {
-  filter: drop-shadow(0 0 10px #38bdf8);
+  filter: drop-shadow(0 0 10px var(--sw-accent));
 }
-

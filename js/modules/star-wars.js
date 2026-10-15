@@ -57,7 +57,30 @@ var SW = {
   meta: {
     worldName: 'Далёкая-далёкая Галактика',
     era: 'Эпоха Старой Республики / Войн Клонов / Империи',
-    campaignNotes: ''
+    campaignNotes: '',
+    theme: 'jedi'
+  },
+
+  getTheme: function() {
+    try {
+      var saved = localStorage.getItem('ttc_sw_theme');
+      if (saved === 'sith' || saved === 'jedi') {
+        SW.meta.theme = saved;
+        return saved;
+      }
+    } catch (e) {}
+    return SW.meta && SW.meta.theme === 'sith' ? 'sith' : 'jedi';
+  },
+
+  setTheme: function(themeName) {
+    var t = (themeName === 'sith') ? 'sith' : 'jedi';
+    SW.meta.theme = t;
+    try {
+      localStorage.setItem('ttc_sw_theme', t);
+    } catch (e) {}
+    SW.saveMeta();
+    applyStarWarsTheme();
+    if (typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
   },
 
   defaultTechs: function() {
@@ -449,86 +472,163 @@ window.SW = SW;
 SW.loadAll();
 
 /* ==========================================================================
-   ВИЗУАЛЬНАЯ ТЕМА И АНИМИРОВАННЫЙ ФОН (#swThemeFx)
+   ВИЗУАЛЬНАЯ ТЕМА И АНИМИРОВАННЫЙ ФОН (#swThemeFx) — ДЖЕДАИ И СИТХИ
    ========================================================================== */
-function ensureSwThemeFx() {
+function ensureSwThemeFx(themeMode) {
+  var mode = (themeMode || SW.getTheme()) === 'sith' ? 'sith' : 'jedi';
   var fx = document.getElementById('swThemeFx');
-  if (fx) return fx;
-
-  fx = document.createElement('div');
-  fx.id = 'swThemeFx';
+  if (!fx) {
+    fx = document.createElement('div');
+    fx.id = 'swThemeFx';
+    document.body.appendChild(fx);
+  }
+  if (fx.getAttribute('data-sw-theme') === mode && fx.children.length > 0) {
+    return fx;
+  }
+  fx.setAttribute('data-sw-theme', mode);
 
   // Звёздное поле (мерцающие звёзды)
   var starsHtml = '';
-  for (var s = 0; s < 42; s++) {
+  for (var s = 0; s < 44; s++) {
     var sx = (Math.random() * 98 + 1).toFixed(1);
     var sy = (Math.random() * 96 + 2).toFixed(1);
-    var sz = (Math.random() * 2.2 + 1).toFixed(1);
+    var sz = (Math.random() * 2.3 + 1).toFixed(1);
     var sdur = (2.5 + Math.random() * 4.5).toFixed(1);
     var sdel = (Math.random() * 5).toFixed(1);
     starsHtml += '<div class="sw-star" style="left:' + sx + '%;top:' + sy + '%;width:' + sz + 'px;height:' + sz + 'px;animation-duration:' + sdur + 's;animation-delay:-' + sdel + 's"></div>';
   }
 
-  // Искры Кайбер-кристаллов (синие, золотые, багровые)
-  var sparksHtml = '';
-  var colors = [
-    'rgba(56, 189, 248, 0.85)',
-    'rgba(125, 211, 252, 0.8)',
-    'rgba(245, 158, 11, 0.75)',
-    'rgba(239, 68, 68, 0.7)'
-  ];
-  for (var i = 0; i < 20; i++) {
-    var left = (Math.random() * 96 + 2).toFixed(1);
-    var dur = (8 + Math.random() * 11).toFixed(1);
-    var delay = (Math.random() * 12).toFixed(1);
-    var drift = ((Math.random() - 0.5) * 90).toFixed(0) + 'px';
-    var size = (2 + Math.random() * 3).toFixed(1) + 'px';
-    var col = colors[i % colors.length];
-    sparksHtml += '<div class="sw-spark" style="left:' + left + '%;width:' + size + ';height:' + size + ';background:' + col + ';box-shadow:0 0 10px ' + col + ';animation-duration:' + dur + 's;animation-delay:-' + delay + 's;--sw-drift:' + drift + '"></div>';
-  }
-
-  // Тонкие гиперпространственные росчерки
+  // Гиперпространственные росчерки
   var hyperHtml = '';
-  for (var h = 0; h < 6; h++) {
-    var hleft = (10 + h * 15 + Math.random() * 6).toFixed(1);
-    var hlen = (55 + Math.random() * 65).toFixed(0);
-    var hdur = (7 + Math.random() * 7).toFixed(1);
+  var hyperCount = mode === 'sith' ? 8 : 6;
+  for (var h = 0; h < hyperCount; h++) {
+    var hleft = (8 + h * (84 / hyperCount) + Math.random() * 6).toFixed(1);
+    var hlen = (60 + Math.random() * 75).toFixed(0);
+    var hdur = (6.5 + Math.random() * 6.5).toFixed(1);
     var hdel = (Math.random() * 10).toFixed(1);
     hyperHtml += '<div class="sw-hyperline" style="left:' + hleft + '%;height:' + hlen + 'px;animation-duration:' + hdur + 's;animation-delay:-' + hdel + 's"></div>';
   }
 
-  fx.innerHTML =
-    '<div class="sw-nebula-layer"></div>' +
-    starsHtml +
-    hyperHtml +
-    '<svg class="sw-bg-emblem" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-      '<!-- Внешние кольца Голокрона и Галактического Астрографа -->' +
-      '<circle cx="150" cy="150" r="138" stroke="#38bdf8" stroke-width="1.4" stroke-dasharray="6 6" opacity="0.55"/>' +
-      '<circle cx="150" cy="150" r="120" stroke="#f59e0b" stroke-width="1" opacity="0.38"/>' +
-      '<circle cx="150" cy="150" r="96" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="14 8" opacity="0.45"/>' +
-      '<!-- Геометрия Голокрона (октагон + ромб) -->' +
-      '<polygon points="150,18 282,150 150,282 18,150" stroke="#38bdf8" stroke-width="1.2" opacity="0.32"/>' +
-      '<rect x="55" y="55" width="190" height="190" stroke="#f59e0b" stroke-width="0.9" opacity="0.24"/>' +
-      '<!-- Крылья Ордена Джедаев и центральный луч Светового Меча -->' +
-      '<path d="M150 32 L156 122 L150 135 L144 122 Z" fill="#7dd3fc" opacity="0.75"/>' +
-      '<path d="M150 28 L150 250" stroke="#38bdf8" stroke-width="2.2" opacity="0.65"/>' +
-      '<!-- Левое и правое крыло эмблемы Ордена -->' +
-      '<path d="M135 190 C92 178, 66 136, 76 82 C88 122, 112 148, 138 160 C105 138, 92 104, 102 64 C112 104, 128 130, 142 144 Z" fill="#38bdf8" opacity="0.45"/>' +
-      '<path d="M165 190 C208 178, 234 136, 224 82 C212 122, 188 148, 162 160 C195 138, 208 104, 198 64 C188 104, 172 130, 158 144 Z" fill="#38bdf8" opacity="0.45"/>' +
-      '<!-- Звезда Кайбер-сердца в центре -->' +
-      '<polygon points="150,115 158,142 185,150 158,158 150,185 142,158 115,150 142,142" fill="#f59e0b" opacity="0.55"/>' +
-      '<circle cx="150" cy="150" r="8" fill="#e0f2fe" opacity="0.85"/>' +
-    '</svg>' +
-    sparksHtml;
+  if (mode === 'sith') {
+    // Искры кровоточащих Кайбер-кристаллов и пепла Коррибана
+    var sithSparksHtml = '';
+    var sithColors = [
+      'rgba(239, 68, 68, 0.92)',
+      'rgba(220, 38, 38, 0.88)',
+      'rgba(249, 115, 22, 0.85)',
+      'rgba(251, 113, 133, 0.85)',
+      'rgba(185, 28, 28, 0.9)'
+    ];
+    for (var i = 0; i < 28; i++) {
+      var left = (Math.random() * 96 + 2).toFixed(1);
+      var dur = (7 + Math.random() * 10).toFixed(1);
+      var delay = (Math.random() * 12).toFixed(1);
+      var drift = ((Math.random() - 0.5) * 110).toFixed(0) + 'px';
+      var size = (2.2 + Math.random() * 3.4).toFixed(1) + 'px';
+      var col = sithColors[i % sithColors.length];
+      sithSparksHtml += '<div class="sw-spark" style="left:' + left + '%;width:' + size + ';height:' + size + ';background:' + col + ';box-shadow:0 0 12px ' + col + ', 0 0 22px rgba(220,38,38,0.6);animation-duration:' + dur + 's;animation-delay:-' + delay + 's;--sw-drift:' + drift + '"></div>';
+    }
 
-  document.body.appendChild(fx);
+    // Разряды Молнии Силы на фоне
+    var lightningSvg =
+      '<svg class="sw-sith-lightning" viewBox="0 0 1000 700" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">' +
+        '<polyline class="sw-lightning-arc arc-1" points="140,0 165,85 130,145 185,230 155,310 210,415"/>' +
+        '<polyline class="sw-lightning-arc arc-1" points="165,85 215,130 240,195"/>' +
+        '<polyline class="sw-lightning-arc arc-2" points="860,0 825,95 870,165 810,255 845,340 790,440"/>' +
+        '<polyline class="sw-lightning-arc arc-2" points="825,95 775,150 750,210"/>' +
+        '<polyline class="sw-lightning-arc arc-3" points="510,680 485,590 525,520 490,445"/>' +
+      '</svg>';
+
+    // Монументальная Эмблема Империи Ситхов, Пирамидального Голокрона Коррибана и Гардового Меча
+    fx.innerHTML =
+      '<div class="sw-nebula-layer"></div>' +
+      '<div class="sw-sith-horizon"></div>' +
+      starsHtml +
+      hyperHtml +
+      lightningSvg +
+      '<svg class="sw-bg-emblem" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+        '<!-- Внешние рунические кольца Коррибана -->' +
+        '<circle cx="160" cy="160" r="148" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="10 6 2 6" opacity="0.65"/>' +
+        '<circle cx="160" cy="160" r="134" stroke="#f97316" stroke-width="1" stroke-dasharray="4 8" opacity="0.42"/>' +
+        '<circle cx="160" cy="160" r="112" stroke="#ef4444" stroke-width="1.4" opacity="0.5"/>' +
+        '<!-- Внешний гексагон Империи Ситхов -->' +
+        '<polygon points="160,16 285,88 285,232 160,304 35,232 35,88" stroke="#ef4444" stroke-width="1.5" opacity="0.48"/>' +
+        '<!-- Пирамидальный Голокрон Ситхов (внешний и перевёрнутый внутренний треугольник) -->' +
+        '<polygon points="160,24 286,238 34,238" stroke="#ef4444" stroke-width="1.8" fill="rgba(153,27,27,0.08)" opacity="0.72"/>' +
+        '<polygon points="160,292 272,96 48,96" stroke="#f97316" stroke-width="1.1" stroke-dasharray="6 4" opacity="0.45"/>' +
+        '<!-- 6 лучей-клинков Империи Ситхов -->' +
+        '<path d="M160 24 L170 120 L160 138 L150 120 Z" fill="#ef4444" opacity="0.6"/>' +
+        '<path d="M160 296 L170 200 L160 182 L150 200 Z" fill="#ef4444" opacity="0.5"/>' +
+        '<path d="M42 92 L128 134 L142 150 L118 150 Z" fill="#dc2626" opacity="0.5"/>' +
+        '<path d="M278 92 L192 134 L178 150 L202 150 Z" fill="#dc2626" opacity="0.5"/>' +
+        '<path d="M42 228 L118 170 L142 170 L128 186 Z" fill="#dc2626" opacity="0.5"/>' +
+        '<path d="M278 228 L202 170 L178 170 L192 186 Z" fill="#dc2626" opacity="0.5"/>' +
+        '<!-- Багровый Световой Меч с плазменной гардой-перекрестием -->' +
+        '<line x1="160" y1="18" x2="160" y2="278" stroke="#ef4444" stroke-width="5" opacity="0.45"/>' +
+        '<line x1="160" y1="22" x2="160" y2="274" stroke="#ffe4e6" stroke-width="2" opacity="0.9"/>' +
+        '<!-- Боковые плазменные квилоны гарды -->' +
+        '<line x1="112" y1="218" x2="208" y2="218" stroke="#ef4444" stroke-width="4" opacity="0.65"/>' +
+        '<line x1="116" y1="218" x2="204" y2="218" stroke="#ffe4e6" stroke-width="1.6" opacity="0.9"/>' +
+        '<!-- Кровоточащее сердце Кайбер-кристалла в центре Голокрона -->' +
+        '<polygon points="160,112 172,148 208,160 172,172 160,208 148,172 112,160 148,148" fill="#ef4444" opacity="0.75"/>' +
+        '<circle cx="160" cy="160" r="16" stroke="#fde047" stroke-width="1.4" opacity="0.7"/>' +
+        '<circle cx="160" cy="160" r="8" fill="#ffe4e6" opacity="0.95"/>' +
+      '</svg>' +
+      sithSparksHtml;
+  } else {
+    // Искры Кайбер-кристаллов (Храм Джедаев — лазурные и золотые)
+    var sparksHtml = '';
+    var colors = [
+      'rgba(56, 189, 248, 0.85)',
+      'rgba(125, 211, 252, 0.8)',
+      'rgba(245, 158, 11, 0.75)',
+      'rgba(239, 68, 68, 0.7)'
+    ];
+    for (var j = 0; j < 20; j++) {
+      var jleft = (Math.random() * 96 + 2).toFixed(1);
+      var jdur = (8 + Math.random() * 11).toFixed(1);
+      var jdelay = (Math.random() * 12).toFixed(1);
+      var jdrift = ((Math.random() - 0.5) * 90).toFixed(0) + 'px';
+      var jsize = (2 + Math.random() * 3).toFixed(1) + 'px';
+      var jcol = colors[j % colors.length];
+      sparksHtml += '<div class="sw-spark" style="left:' + jleft + '%;width:' + jsize + ';height:' + jsize + ';background:' + jcol + ';box-shadow:0 0 10px ' + jcol + ';animation-duration:' + jdur + 's;animation-delay:-' + jdelay + 's;--sw-drift:' + jdrift + '"></div>';
+    }
+
+    fx.innerHTML =
+      '<div class="sw-nebula-layer"></div>' +
+      starsHtml +
+      hyperHtml +
+      '<svg class="sw-bg-emblem" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+        '<!-- Внешние кольца Голокрона и Галактического Астрографа -->' +
+        '<circle cx="150" cy="150" r="138" stroke="#38bdf8" stroke-width="1.4" stroke-dasharray="6 6" opacity="0.55"/>' +
+        '<circle cx="150" cy="150" r="120" stroke="#f59e0b" stroke-width="1" opacity="0.38"/>' +
+        '<circle cx="150" cy="150" r="96" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="14 8" opacity="0.45"/>' +
+        '<!-- Геометрия Голокрона (октагон + ромб) -->' +
+        '<polygon points="150,18 282,150 150,282 18,150" stroke="#38bdf8" stroke-width="1.2" opacity="0.32"/>' +
+        '<rect x="55" y="55" width="190" height="190" stroke="#f59e0b" stroke-width="0.9" opacity="0.24"/>' +
+        '<!-- Крылья Ордена Джедаев и центральный луч Светового Меча -->' +
+        '<path d="M150 32 L156 122 L150 135 L144 122 Z" fill="#7dd3fc" opacity="0.75"/>' +
+        '<path d="M150 28 L150 250" stroke="#38bdf8" stroke-width="2.2" opacity="0.65"/>' +
+        '<!-- Левое и правое крыло эмблемы Ордена -->' +
+        '<path d="M135 190 C92 178, 66 136, 76 82 C88 122, 112 148, 138 160 C105 138, 92 104, 102 64 C112 104, 128 130, 142 144 Z" fill="#38bdf8" opacity="0.45"/>' +
+        '<path d="M165 190 C208 178, 234 136, 224 82 C212 122, 188 148, 162 160 C195 138, 208 104, 198 64 C188 104, 172 130, 158 144 Z" fill="#38bdf8" opacity="0.45"/>' +
+        '<!-- Звезда Кайбер-сердца в центре -->' +
+        '<polygon points="150,115 158,142 185,150 158,158 150,185 142,158 115,150 142,142" fill="#f59e0b" opacity="0.55"/>' +
+        '<circle cx="150" cy="150" r="8" fill="#e0f2fe" opacity="0.85"/>' +
+      '</svg>' +
+      sparksHtml;
+  }
+
   return fx;
 }
 
 function applyStarWarsTheme() {
   var isSw = (typeof HB !== 'undefined' && HB.mode === 'sw');
+  var mode = SW.getTheme();
   document.body.classList.toggle('sw-theme', isSw);
-  var fx = ensureSwThemeFx();
+  document.body.classList.toggle('sw-theme-sith', isSw && mode === 'sith');
+  document.body.classList.toggle('sw-theme-jedi', isSw && mode !== 'sith');
+  var fx = ensureSwThemeFx(mode);
   if (fx) fx.style.display = isSw ? 'block' : 'none';
 }
 window.applyStarWarsTheme = applyStarWarsTheme;
@@ -595,7 +695,7 @@ function swHome() {
         '</div>' +
       '</div>' +
       (prof.weapon || prof.armor
-        ? '<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(56,189,248,0.18);display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#bae6fd">' +
+        ? '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--sw-border-subtle);display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--sw-accent-pale)">' +
             (prof.weapon ? '<span>⚡ <b>Оружие:</b> ' + esc(prof.weapon) + '</span>' : '') +
             (prof.armor ? '<span>🥋 <b>Броня:</b> ' + esc(prof.armor) + '</span>' : '') +
           '</div>'
@@ -724,27 +824,27 @@ function swTechs() {
           '<div class="sw-ref-card-k" style="margin-bottom:0;">✨ ' + esc(t.name) + '</div>' +
           '<span class="sw-side-badge ' + swSideBadgeClass(t.side) + '">' + esc(t.side || 'Универсальная') + '</span>' +
         '</div>' +
-        '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:#94a3b8;margin-bottom:6px;">' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--sw-muted);margin-bottom:6px;">' +
           (t.cost ? '<span style="background:rgba(245,158,11,0.14);padding:2px 6px;border-radius:3px;color:#fde047;">⚡ ' + esc(t.cost) + '</span>' : '') +
-          (t.actionType ? '<span style="background:rgba(56,189,248,0.12);padding:2px 6px;border-radius:3px;color:#7dd3fc;">⏱ ' + esc(t.actionType) + '</span>' : '') +
+          (t.actionType ? '<span style="background:var(--sw-accent-soft);padding:2px 6px;border-radius:3px;color:var(--sw-accent-bright);">⏱ ' + esc(t.actionType) + '</span>' : '') +
           (t.range ? '<span style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:3px;">📏 ' + esc(t.range) + '</span>' : '') +
           (t.rank ? '<span style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:3px;">📜 ' + esc(t.rank) + '</span>' : '') +
         '</div>' +
         '<div class="sw-ref-card-v" style="font-size:12.5px;line-height:1.45;">' + esc(t.desc || '') + '</div>' +
       '</div>' +
-      '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;padding-top:6px;border-top:1px solid rgba(56,189,248,0.12);">' +
+      '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;padding-top:6px;border-top:1px solid var(--sw-border-subtle);">' +
         '<button class="btn btn-ghost" data-sw-tech-view="' + esc(t.id) + '" style="font-size:11px;padding:3px 8px;">Подробнее</button>' +
         '<button class="btn btn-ghost" data-sw-tech-edit="' + esc(t.id) + '" style="font-size:11px;padding:3px 8px;">✏️</button>' +
       '</div>' +
     '</div>';
   }).join('') : (
-    '<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:44px 16px;border:1px dashed rgba(56,189,248,0.35);border-radius:12px;background:rgba(10,20,38,0.45);">' +
+    '<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:44px 16px;border:1px dashed var(--sw-border);border-radius:12px;background:var(--sw-empty-bg);">' +
       '<div style="font-size:40px;margin-bottom:8px;">✨ 🔷</div>' +
-      '<div style="font-family:Cinzel,serif;font-size:17px;color:#7dd3fc;margin-bottom:6px;">Архив способностей персонажа пуст</div>' +
-      '<div style="color:#94a3b8;font-size:13px;max-width:460px;margin:0 auto 16px;">Создайте способность Силы или тактический гаджет вручную, либо загрузите классический набор из Голокрона.</div>' +
+      '<div style="font-family:Cinzel,serif;font-size:17px;color:var(--sw-accent-bright);margin-bottom:6px;">Архив способностей персонажа пуст</div>' +
+      '<div style="color:var(--sw-muted);font-size:13px;max-width:460px;margin:0 auto 16px;">Создайте способность Силы или тактический гаджет вручную, либо загрузите классический набор из Голокрона.</div>' +
       '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
         '<button class="btn btn-primary" id="swAddTechEmptyBtn">➕ Создать способность</button>' +
-        '<button class="btn btn-ghost" id="swAiTechEmptyBtn" style="color:#7dd3fc;border-color:rgba(56,189,248,0.5);">✨ AI Генератор способностей</button>' +
+        '<button class="btn btn-ghost" id="swAiTechEmptyBtn" style="color:var(--sw-accent-bright);border-color:var(--sw-border);">✨ AI Генератор способностей</button>' +
         (SW.techs.length === 0 ? '<button class="btn btn-ghost" id="swLoadDefaultTechsBtn">📚 Загрузить базовые из Голокрона</button>' : '') +
       '</div>' +
     '</div>'
@@ -760,7 +860,7 @@ function swTechs() {
       '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
         '<button class="btn btn-primary" id="swAddTechBtn">➕ Новая способность</button>' +
-        '<button class="btn btn-ghost" id="swAiTechBtn" style="color:#7dd3fc;border-color:rgba(56,189,248,0.5);">✨ AI Генератор способностей</button>' +
+        '<button class="btn btn-ghost" id="swAiTechBtn" style="color:var(--sw-accent-bright);border-color:var(--sw-border);">✨ AI Генератор способностей</button>' +
       '</div>' +
     '</div>' +
     '<div class="sw-ref-search-wrap" style="margin-top:10px;">' +
@@ -852,7 +952,7 @@ function swTechView(id) {
       '<div class="sw-char-header">' +
         '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
           '<span style="font-size:22px;">✨</span>' +
-          '<span style="font-size:20px;color:#e0f2fe;">' + esc(t.name) + '</span>' +
+          '<span style="font-size:20px;color:var(--sw-accent-pale);">' + esc(t.name) + '</span>' +
           '<span class="sw-side-badge ' + swSideBadgeClass(t.side) + '">' + esc(t.side || 'Универсальная') + '</span>' +
         '</div>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
@@ -866,7 +966,7 @@ function swTechView(id) {
         '<div><div class="sw-field-lbl">Время применения</div><div style="font-weight:700">' + esc(t.actionType || '1 действие') + '</div></div>' +
         '<div><div class="sw-field-lbl">Дистанция</div><div style="font-weight:700">' + esc(t.range || '9 м') + '</div></div>' +
       '</div>' +
-      '<div style="font-size:14px;line-height:1.65;color:#e2edf8;background:rgba(4,9,20,0.55);padding:14px;border-radius:8px;border:1px solid rgba(56,189,248,0.15);white-space:pre-wrap;">' + esc(t.desc) + '</div>' +
+      '<div style="font-size:14px;line-height:1.65;color:#e2edf8;background:var(--sw-panel-bg);padding:14px;border-radius:8px;border:1px solid var(--sw-border-subtle);white-space:pre-wrap;">' + esc(t.desc) + '</div>' +
     '</div>';
 
   mount(html);
@@ -1003,26 +1103,26 @@ function swMoves() {
           '<div class="sw-ref-card-k" style="margin-bottom:0;">⚔️ ' + esc(m.name) + '</div>' +
           '<span class="sw-side-badge sw-side-uni">' + esc(m.category || 'Форма светового меча') + '</span>' +
         '</div>' +
-        '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:#94a3b8;margin-bottom:6px;">' +
-          (m.actionType ? '<span style="background:rgba(56,189,248,0.12);padding:2px 6px;border-radius:3px;color:#7dd3fc;">⏱ ' + esc(m.actionType) + '</span>' : '') +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--sw-muted);margin-bottom:6px;">' +
+          (m.actionType ? '<span style="background:var(--sw-accent-soft);padding:2px 6px;border-radius:3px;color:var(--sw-accent-bright);">⏱ ' + esc(m.actionType) + '</span>' : '') +
           (m.cost ? '<span style="background:rgba(245,158,11,0.14);padding:2px 6px;border-radius:3px;color:#fde047;">⚡ ' + esc(m.cost) + '</span>' : '') +
           (m.damage ? '<span style="background:rgba(239,68,68,0.15);padding:2px 6px;border-radius:3px;color:#fca5a5;">💥 ' + esc(m.damage) + '</span>' : '') +
         '</div>' +
         '<div class="sw-ref-card-v" style="font-size:12.5px;line-height:1.45;">' + esc(m.desc || '') + '</div>' +
       '</div>' +
-      '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;padding-top:6px;border-top:1px solid rgba(56,189,248,0.12);">' +
+      '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;padding-top:6px;border-top:1px solid var(--sw-border-subtle);">' +
         '<button class="btn btn-ghost" data-sw-move-view="' + esc(m.id) + '" style="font-size:11px;padding:3px 8px;">Подробнее</button>' +
         '<button class="btn btn-ghost" data-sw-move-edit="' + esc(m.id) + '" style="font-size:11px;padding:3px 8px;">✏️</button>' +
       '</div>' +
     '</div>';
   }).join('') : (
-    '<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:44px 16px;border:1px dashed rgba(56,189,248,0.35);border-radius:12px;background:rgba(10,20,38,0.45);">' +
+    '<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:44px 16px;border:1px dashed var(--sw-border);border-radius:12px;background:var(--sw-empty-bg);">' +
       '<div style="font-size:40px;margin-bottom:8px;">⚔️ 🔷</div>' +
-      '<div style="font-family:Cinzel,serif;font-size:17px;color:#7dd3fc;margin-bottom:6px;">Список боевых приёмов пуст</div>' +
-      '<div style="color:#94a3b8;font-size:13px;max-width:460px;margin:0 auto 16px;">Добавьте форму фехтования на световых мечах или стрелковый приём вручную, либо воспользуйтесь AI Генератором или базовым набором Голокрона.</div>' +
+      '<div style="font-family:Cinzel,serif;font-size:17px;color:var(--sw-accent-bright);margin-bottom:6px;">Список боевых приёмов пуст</div>' +
+      '<div style="color:var(--sw-muted);font-size:13px;max-width:460px;margin:0 auto 16px;">Добавьте форму фехтования на световых мечах или стрелковый приём вручную, либо воспользуйтесь AI Генератором или базовым набором Голокрона.</div>' +
       '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
         '<button class="btn btn-primary" id="swAddMoveEmptyBtn">➕ Создать приём</button>' +
-        '<button class="btn btn-ghost" id="swAiMoveEmptyBtn" style="color:#7dd3fc;border-color:rgba(56,189,248,0.5);">⚔️ AI Генератор приёмов</button>' +
+        '<button class="btn btn-ghost" id="swAiMoveEmptyBtn" style="color:var(--sw-accent-bright);border-color:var(--sw-border);">⚔️ AI Генератор приёмов</button>' +
         (SW.moves.length === 0 ? '<button class="btn btn-ghost" id="swLoadDefaultMovesBtn">📚 Загрузить 7 Форм фехтования</button>' : '') +
       '</div>' +
     '</div>'
@@ -1038,7 +1138,7 @@ function swMoves() {
       '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
         '<button class="btn btn-primary" id="swAddMoveBtn">➕ Новый приём</button>' +
-        '<button class="btn btn-ghost" id="swAiMoveBtn" style="color:#7dd3fc;border-color:rgba(56,189,248,0.5);">⚔️ AI Генератор приёмов</button>' +
+        '<button class="btn btn-ghost" id="swAiMoveBtn" style="color:var(--sw-accent-bright);border-color:var(--sw-border);">⚔️ AI Генератор приёмов</button>' +
       '</div>' +
     '</div>' +
     '<div class="sw-ref-search-wrap" style="margin-top:10px;">' +
@@ -1127,7 +1227,7 @@ function swMoveView(id) {
       '<div class="sw-char-header">' +
         '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
           '<span style="font-size:22px;">⚔️</span>' +
-          '<span style="font-size:20px;color:#e0f2fe;">' + esc(m.name) + '</span>' +
+          '<span style="font-size:20px;color:var(--sw-accent-pale);">' + esc(m.name) + '</span>' +
           '<span class="sw-side-badge sw-side-uni">' + esc(m.category || 'Приём') + '</span>' +
         '</div>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
@@ -1140,7 +1240,7 @@ function swMoveView(id) {
         '<div><div class="sw-field-lbl">Затраты</div><div style="font-weight:700;color:#fcd34d">' + esc(m.cost || 'Без затрат') + '</div></div>' +
         '<div><div class="sw-field-lbl">Урон / Бонус</div><div style="font-weight:700;color:#fca5a5">' + esc(m.damage || '—') + '</div></div>' +
       '</div>' +
-      '<div style="font-size:14px;line-height:1.65;color:#e2edf8;background:rgba(4,9,20,0.55);padding:14px;border-radius:8px;border:1px solid rgba(56,189,248,0.15);white-space:pre-wrap;">' + esc(m.desc) + '</div>' +
+      '<div style="font-size:14px;line-height:1.65;color:#e2edf8;background:var(--sw-panel-bg);padding:14px;border-radius:8px;border:1px solid var(--sw-border-subtle);white-space:pre-wrap;">' + esc(m.desc) + '</div>' +
     '</div>';
 
   mount(html);
@@ -1276,24 +1376,24 @@ function swSkills() {
             '<span class="sw-stat-badge" style="color:#fcd34d;padding:2px 8px;font-size:11.5px;">' + esc(sk.bonus || '+2') + '</span>' +
           '</div>' +
         '</div>' +
-        '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:#94a3b8;margin-bottom:6px;">' +
-          '<span style="background:rgba(56,189,248,0.12);padding:2px 6px;border-radius:3px;color:#7dd3fc;">📂 ' + esc(sk.category || 'Общий') + '</span>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--sw-muted);margin-bottom:6px;">' +
+          '<span style="background:var(--sw-accent-soft);padding:2px 6px;border-radius:3px;color:var(--sw-accent-bright);">📂 ' + esc(sk.category || 'Общий') + '</span>' +
           (sk.stat ? '<span style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:3px;">🧠 ' + esc(sk.stat) + '</span>' : '') +
         '</div>' +
         '<div class="sw-ref-card-v" style="font-size:12.5px;line-height:1.45;">' + esc(sk.desc || '') + '</div>' +
       '</div>' +
-      '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;padding-top:6px;border-top:1px solid rgba(56,189,248,0.12);">' +
+      '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;padding-top:6px;border-top:1px solid var(--sw-border-subtle);">' +
         '<button class="btn btn-ghost" data-sw-skill-id="' + esc(sk.id) + '" style="font-size:11px;padding:3px 8px;">✏️ Изменить</button>' +
       '</div>' +
     '</div>';
   }).join('') : (
-    '<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:44px 16px;border:1px dashed rgba(56,189,248,0.35);border-radius:12px;background:rgba(10,20,38,0.45);">' +
+    '<div class="char-empty" style="grid-column:1/-1;text-align:center;padding:44px 16px;border:1px dashed var(--sw-border);border-radius:12px;background:var(--sw-empty-bg);">' +
       '<div style="font-size:40px;margin-bottom:8px;">🎯 🔷</div>' +
-      '<div style="font-family:Cinzel,serif;font-size:17px;color:#7dd3fc;margin-bottom:6px;">Список навыков персонажа пуст</div>' +
-      '<div style="color:#94a3b8;font-size:13px;max-width:460px;margin:0 auto 16px;">Добавьте боевую или техническую специализацию вручную, либо воспользуйтесь AI Генератором или базовыми навыками Галактики.</div>' +
+      '<div style="font-family:Cinzel,serif;font-size:17px;color:var(--sw-accent-bright);margin-bottom:6px;">Список навыков персонажа пуст</div>' +
+      '<div style="color:var(--sw-muted);font-size:13px;max-width:460px;margin:0 auto 16px;">Добавьте боевую или техническую специализацию вручную, либо воспользуйтесь AI Генератором или базовыми навыками Галактики.</div>' +
       '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">' +
         '<button class="btn btn-primary" id="swAddSkillEmptyBtn">➕ Создать навык</button>' +
-        '<button class="btn btn-ghost" id="swAiSkillEmptyBtn" style="color:#7dd3fc;border-color:rgba(56,189,248,0.5);">🎯 AI Генератор навыков</button>' +
+        '<button class="btn btn-ghost" id="swAiSkillEmptyBtn" style="color:var(--sw-accent-bright);border-color:var(--sw-border);">🎯 AI Генератор навыков</button>' +
         (SW.skills.length === 0 ? '<button class="btn btn-ghost" id="swLoadDefaultSkillsBtn">📚 Загрузить базовые навыки</button>' : '') +
       '</div>' +
     '</div>'
@@ -1309,7 +1409,7 @@ function swSkills() {
       '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
         '<button class="btn btn-primary" id="swAddSkillBtn">➕ Добавить навык</button>' +
-        '<button class="btn btn-ghost" id="swAiSkillBtn" style="color:#7dd3fc;border-color:rgba(56,189,248,0.5);">🎯 AI Генератор навыков</button>' +
+        '<button class="btn btn-ghost" id="swAiSkillBtn" style="color:var(--sw-accent-bright);border-color:var(--sw-border);">🎯 AI Генератор навыков</button>' +
       '</div>' +
     '</div>' +
     '<div class="sw-ref-search-wrap" style="margin-top:10px;">' +
@@ -1549,14 +1649,14 @@ function swRequestGemini(promptText, apiKey, callback) {
 }
 
 function renderSwTechCardPreview(t) {
-  return '<div class="sw-ref-card" style="border-color:#38bdf8;box-shadow:0 0 18px rgba(56,189,248,0.28);">' +
+  return '<div class="sw-ref-card" style="border-color:var(--sw-accent);box-shadow:0 0 18px var(--sw-glow);">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
       '<div class="sw-ref-card-k" style="margin-bottom:0;font-size:16px;">✨ ' + esc(t.name || 'Способность Силы') + '</div>' +
       '<span class="sw-side-badge ' + swSideBadgeClass(t.side) + '">' + esc(t.side || 'Универсальная') + '</span>' +
     '</div>' +
-    '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:#94a3b8;margin-bottom:8px;">' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--sw-muted);margin-bottom:8px;">' +
       (t.cost ? '<span style="background:rgba(245,158,11,0.14);padding:2px 8px;border-radius:3px;color:#fde047;">⚡ ' + esc(t.cost) + '</span>' : '') +
-      (t.actionType ? '<span style="background:rgba(56,189,248,0.12);padding:2px 8px;border-radius:3px;color:#7dd3fc;">⏱ ' + esc(t.actionType) + '</span>' : '') +
+      (t.actionType ? '<span style="background:var(--sw-accent-soft);padding:2px 8px;border-radius:3px;color:var(--sw-accent-bright);">⏱ ' + esc(t.actionType) + '</span>' : '') +
       (t.range ? '<span style="background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:3px;">📏 ' + esc(t.range) + '</span>' : '') +
       (t.rank ? '<span style="background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:3px;">📜 ' + esc(t.rank) + '</span>' : '') +
     '</div>' +
@@ -1565,13 +1665,13 @@ function renderSwTechCardPreview(t) {
 }
 
 function renderSwMoveCardPreview(m) {
-  return '<div class="sw-ref-card" style="border-color:#38bdf8;box-shadow:0 0 18px rgba(56,189,248,0.28);">' +
+  return '<div class="sw-ref-card" style="border-color:var(--sw-accent);box-shadow:0 0 18px var(--sw-glow);">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
       '<div class="sw-ref-card-k" style="margin-bottom:0;font-size:16px;">⚔️ ' + esc(m.name || 'Боевой приём') + '</div>' +
       '<span class="sw-side-badge sw-side-uni">' + esc(m.category || 'Форма светового меча') + '</span>' +
     '</div>' +
-    '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:#94a3b8;margin-bottom:8px;">' +
-      (m.actionType ? '<span style="background:rgba(56,189,248,0.12);padding:2px 8px;border-radius:3px;color:#7dd3fc;">⏱ ' + esc(m.actionType) + '</span>' : '') +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--sw-muted);margin-bottom:8px;">' +
+      (m.actionType ? '<span style="background:var(--sw-accent-soft);padding:2px 8px;border-radius:3px;color:var(--sw-accent-bright);">⏱ ' + esc(m.actionType) + '</span>' : '') +
       (m.cost ? '<span style="background:rgba(245,158,11,0.14);padding:2px 8px;border-radius:3px;color:#fde047;">⚡ ' + esc(m.cost) + '</span>' : '') +
       (m.damage ? '<span style="background:rgba(239,68,68,0.15);padding:2px 8px;border-radius:3px;color:#fca5a5;">💥 ' + esc(m.damage) + '</span>' : '') +
     '</div>' +
@@ -1580,7 +1680,7 @@ function renderSwMoveCardPreview(m) {
 }
 
 function renderSwSkillCardPreview(sk) {
-  return '<div class="sw-ref-card" style="border-color:#38bdf8;box-shadow:0 0 18px rgba(56,189,248,0.28);">' +
+  return '<div class="sw-ref-card" style="border-color:var(--sw-accent);box-shadow:0 0 18px var(--sw-glow);">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
       '<div class="sw-ref-card-k" style="margin-bottom:0;font-size:16px;">🎯 ' + esc(sk.name || 'Навык') + '</div>' +
       '<div style="display:flex;gap:6px;align-items:center;">' +
@@ -1588,8 +1688,8 @@ function renderSwSkillCardPreview(sk) {
         '<span class="sw-stat-badge" style="color:#fcd34d;padding:2px 8px;font-size:11.5px;">' + esc(sk.bonus || '+3') + '</span>' +
       '</div>' +
     '</div>' +
-    '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:#94a3b8;margin-bottom:8px;">' +
-      '<span style="background:rgba(56,189,248,0.12);padding:2px 8px;border-radius:3px;color:#7dd3fc;">📂 ' + esc(sk.category || 'Сила') + '</span>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--sw-muted);margin-bottom:8px;">' +
+      '<span style="background:var(--sw-accent-soft);padding:2px 8px;border-radius:3px;color:var(--sw-accent-bright);">📂 ' + esc(sk.category || 'Сила') + '</span>' +
       (sk.stat ? '<span style="background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:3px;">🧠 ' + esc(sk.stat) + '</span>' : '') +
     '</div>' +
     '<div class="sw-ref-card-v" style="font-size:13.5px;line-height:1.55;">' + esc(sk.desc || '').replace(/\n/g, '<br>') + '</div>' +
@@ -2291,6 +2391,7 @@ var SW_REF = {
 
 function swRef() {
   applyStarWarsTheme();
+  var isSith = SW.getTheme() === 'sith';
   renderCrumb([
     { label: 'Звездные войны', nav: 'swHome' },
     { label: 'Справочник' }
@@ -2302,17 +2403,17 @@ function swRef() {
       var it = SW_REF[k];
       return '<div class="sw-ref-card" data-sw-ref-key="' + esc(k) + '" style="cursor:pointer;">' +
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;">' +
-          '<div class="sw-ref-card-k">' + (it.icon || '🔷') + ' ' + esc(it.name) + '</div>' +
+          '<div class="sw-ref-card-k">' + (it.icon || (isSith ? '🔺' : '🔷')) + ' ' + esc(it.name) + '</div>' +
           '<span class="sw-stat-badge" style="font-size:11px;">' + esc(it.tag) + '</span>' +
         '</div>' +
-        '<div class="sw-ref-card-v" style="font-size:12.5px;color:#94a3b8;">' + esc(it.lead) + '</div>' +
+        '<div class="sw-ref-card-v" style="font-size:12.5px;color:var(--sw-muted);">' + esc(it.lead) + '</div>' +
       '</div>';
     }).join('');
 
     return '<div class="sw-char-sheet-card" style="margin-bottom:20px;">' +
       '<div class="sw-char-header">' +
         '<span>' + sec.icon + ' ' + esc(sec.title) + '</span>' +
-        '<span style="font-size:12px;color:#38bdf8;">' + keys.length + ' стат.</span>' +
+        '<span style="font-size:12px;color:var(--sw-accent);">' + keys.length + ' стат.</span>' +
       '</div>' +
       '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:10px;margin-top:12px;">' +
         itemsHtml +
@@ -2325,7 +2426,7 @@ function swRef() {
   var html =
     '<button class="back" id="swRefBackHome">← Назад</button>' +
     '<div style="margin-bottom:14px;">' +
-      '<h1 style="margin-bottom:4px;">🔷 Справочник Великого Голокрона</h1>' +
+      '<h1 style="margin-bottom:4px;">' + (isSith ? '🔺 Справочник Великого Голокрона' : '🔷 Справочник Великого Голокрона') + '</h1>' +
       '<div class="desc" style="margin-bottom:0;">Подробная энциклопедия Далёкой-далёкой Галактики: ' + SW_REF_SECTIONS.length + ' тематических разделов (' + totalTopics + ' статей) — Ордена Джедаев и Ситхов, Кредо Мандалора, все 7 Форм фехтования на световых мечах, кайбер-кристаллы, высшие техники Силы, расы, фракции, корабли и бестиарий.</div>' +
     '</div>' +
     '<div class="sw-ref-search-wrap" style="margin-bottom:16px;">' +
@@ -2371,21 +2472,21 @@ function swRef() {
       defaultBox.style.display = 'none';
       resultsBox.style.display = 'block';
       if (!matched.length) {
-        resultsBox.innerHTML = '<div class="sw-char-sheet-card"><div style="color:#94a3b8;text-align:center;padding:18px;">По запросу «' + esc(searchInp.value) + '» в архивах Голокрона ничего не найдено.</div></div>';
+        resultsBox.innerHTML = '<div class="sw-char-sheet-card"><div style="color:var(--sw-muted);text-align:center;padding:18px;">По запросу «' + esc(searchInp.value) + '» в архивах Голокрона ничего не найдено.</div></div>';
         return;
       }
       resultsBox.innerHTML =
         '<div class="sw-char-sheet-card">' +
-          '<div class="sw-char-header"><span>🔍 Результаты поиска в Голокроне</span><span style="font-size:12px;color:#38bdf8;">Найдено: ' + matched.length + '</span></div>' +
+          '<div class="sw-char-header"><span>🔍 Результаты поиска в Голокроне</span><span style="font-size:12px;color:var(--sw-accent);">Найдено: ' + matched.length + '</span></div>' +
           '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:10px;margin-top:12px;">' +
             matched.map(function(k) {
               var it = SW_REF[k];
               return '<div class="sw-ref-card" data-sw-ref-key="' + esc(k) + '" style="cursor:pointer;">' +
                 '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;">' +
-                  '<div class="sw-ref-card-k">' + (it.icon || '🔷') + ' ' + esc(it.name) + '</div>' +
+                  '<div class="sw-ref-card-k">' + (it.icon || (isSith ? '🔺' : '🔷')) + ' ' + esc(it.name) + '</div>' +
                   '<span class="sw-stat-badge" style="font-size:11px;">' + esc(it.tag) + '</span>' +
                 '</div>' +
-                '<div class="sw-ref-card-v" style="font-size:12.5px;color:#94a3b8;">' + esc(it.lead) + '</div>' +
+                '<div class="sw-ref-card-v" style="font-size:12.5px;color:var(--sw-muted);">' + esc(it.lead) + '</div>' +
               '</div>';
             }).join('') +
           '</div>' +
@@ -2421,7 +2522,7 @@ function swRefView(refKey) {
           '<button class="btn btn-ghost" id="swCopyLoreBtn" style="font-size:11.5px;padding:4px 10px;">📋 Скопировать</button>' +
         '</div>' +
       '</div>' +
-      '<div style="font-size:15px;line-height:1.6;color:#7dd3fc;font-style:italic;margin-top:12px;margin-bottom:14px;border-left:3px solid #38bdf8;padding-left:12px;">' +
+      '<div style="font-size:15px;line-height:1.6;color:var(--sw-accent-bright);font-style:italic;margin-top:12px;margin-bottom:14px;border-left:3px solid var(--sw-accent);padding-left:12px;">' +
         esc(item.lead) +
       '</div>' +
       '<div style="font-size:14.5px;line-height:1.7;color:#e2edf8;white-space:pre-line;">' +
@@ -2476,6 +2577,7 @@ var swSelectedPlanetId = 'coruscant';
 
 function swMap() {
   applyStarWarsTheme();
+  var isSith = SW.getTheme() === 'sith';
   renderCrumb([
     { label: 'Звездные войны', nav: 'swHome' },
     { label: 'Карта Галактики' }
@@ -2489,9 +2591,14 @@ function swMap() {
     return '<g class="sw-planet-node" data-sw-planet="' + esc(p.id) + '">' +
       (isSel ? '<circle cx="' + p.x + '" cy="' + p.y + '" r="16" fill="none" stroke="' + p.color + '" stroke-width="1.6" stroke-dasharray="4 3"/>' : '') +
       '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + r + '" fill="' + p.color + '" stroke="#020617" stroke-width="2"/>' +
-      '<text x="' + p.x + '" y="' + (p.y - 12) + '" text-anchor="middle" fill="' + (isSel ? '#ffffff' : '#bae6fd') + '" font-size="' + (isSel ? '13' : '11') + '" font-weight="700" style="text-shadow:0 2px 6px #000">' + esc(p.name) + '</text>' +
+      '<text x="' + p.x + '" y="' + (p.y - 12) + '" text-anchor="middle" fill="' + (isSel ? '#ffffff' : (isSith ? '#fecdd3' : '#bae6fd')) + '" font-size="' + (isSel ? '13' : '11') + '" font-weight="700" style="text-shadow:0 2px 6px #000">' + esc(p.name) + '</text>' +
     '</g>';
   }).join('');
+
+  var ringStrokeOuter = isSith ? 'rgba(239,68,68,0.2)' : 'rgba(56,189,248,0.16)';
+  var ringStrokeMid = isSith ? 'rgba(239,68,68,0.28)' : 'rgba(56,189,248,0.22)';
+  var routeStrokeA = isSith ? 'rgba(239,68,68,0.36)' : 'rgba(56,189,248,0.32)';
+  var coreGlowColor = isSith ? '#ef4444' : '#38bdf8';
 
   var html =
     '<button class="back" id="swMapBackHome">← Назад</button>' +
@@ -2507,22 +2614,22 @@ function swMap() {
         '<defs>' +
           '<radialGradient id="swCoreGlow" cx="50%" cy="50%" r="50%">' +
             '<stop offset="0%" stop-color="#f59e0b" stop-opacity="0.38"/>' +
-            '<stop offset="35%" stop-color="#38bdf8" stop-opacity="0.16"/>' +
+            '<stop offset="35%" stop-color="' + coreGlowColor + '" stop-opacity="0.22"/>' +
             '<stop offset="100%" stop-color="#020617" stop-opacity="0"/>' +
           '</radialGradient>' +
         '</defs>' +
         '<!-- Спиральные рукава и Кольца Галактики -->' +
-        '<ellipse cx="500" cy="275" rx="440" ry="225" fill="none" stroke="rgba(56,189,248,0.16)" stroke-dasharray="8 6"/>' +
-        '<ellipse cx="500" cy="275" rx="310" ry="160" fill="none" stroke="rgba(56,189,248,0.22)" stroke-dasharray="6 4"/>' +
+        '<ellipse cx="500" cy="275" rx="440" ry="225" fill="none" stroke="' + ringStrokeOuter + '" stroke-dasharray="8 6"/>' +
+        '<ellipse cx="500" cy="275" rx="310" ry="160" fill="none" stroke="' + ringStrokeMid + '" stroke-dasharray="6 4"/>' +
         '<ellipse cx="500" cy="275" rx="170" ry="92" fill="none" stroke="rgba(245,158,11,0.28)"/>' +
         '<circle cx="500" cy="275" r="185" fill="url(#swCoreGlow)"/>' +
         '<!-- Главные гипермаршруты (Перлемианский, Кореллианский, Хайдианский) -->' +
-        '<polyline points="380,425 430,465 505,455 585,390 530,310 500,275 640,165 695,120 740,145" fill="none" stroke="rgba(56,189,248,0.32)" stroke-width="1.8" stroke-dasharray="5 5"/>' +
+        '<polyline points="380,425 430,465 505,455 585,390 530,310 500,275 640,165 695,120 740,145" fill="none" stroke="' + routeStrokeA + '" stroke-width="1.8" stroke-dasharray="5 5"/>' +
         '<polyline points="255,225 310,175 500,275 548,260 625,240 715,295 685,385 720,410 790,445" fill="none" stroke="rgba(245,158,11,0.32)" stroke-width="1.8" stroke-dasharray="5 5"/>' +
         '<!-- Подписи регионов -->' +
-        '<text x="200" y="95" fill="rgba(125,211,252,0.45)" font-size="12" font-family="Cinzel,serif" letter-spacing="2">НЕИЗВЕДАННЫЕ РЕГИОНЫ</text>' +
+        '<text x="200" y="95" fill="' + (isSith ? 'rgba(252,165,165,0.5)' : 'rgba(125,211,252,0.45)') + '" font-size="12" font-family="Cinzel,serif" letter-spacing="2">НЕИЗВЕДАННЫЕ РЕГИОНЫ</text>' +
         '<text x="500" y="210" text-anchor="middle" fill="rgba(252,211,77,0.55)" font-size="11" font-family="Cinzel,serif" letter-spacing="2">МИРЫ ЯДРА</text>' +
-        '<text x="815" y="95" text-anchor="end" fill="rgba(252,165,165,0.5)" font-size="12" font-family="Cinzel,serif" letter-spacing="2">ВНЕШНЕЕ КОЛЬЦО</text>' +
+        '<text x="815" y="95" text-anchor="end" fill="rgba(252,165,165,0.55)" font-size="12" font-family="Cinzel,serif" letter-spacing="2">ВНЕШНЕЕ КОЛЬЦО</text>' +
         nodesSvg +
       '</svg>' +
     '</div>' +
@@ -2549,12 +2656,13 @@ function swMap() {
 }
 
 /* ==========================================================================
-   7. ЭКРАН ДАННЫЕ И ПРОФИЛИ (swData) — СВОРАЧИВАЕМАЯ АНКЕТА И СТАТИЧНЫЕ ПОЛЯ
+   7. ЭКРАН ДАННЫЕ И ПРОФИЛИ (swData) — СВОРАЧИВАЕМАЯ АНКЕТА, ТЕМЫ И СТАТИЧНЫЕ ПОЛЯ
    ========================================================================== */
 function swData() {
   applyStarWarsTheme();
   SW.loadAll();
   var prof = SW.getActiveProfile();
+  var currentTheme = SW.getTheme();
 
   renderCrumb([
     { label: 'Звездные войны', nav: 'swHome' },
@@ -2571,21 +2679,6 @@ function swData() {
     '</option>';
   }).join('');
 
-  var pathsList = [
-    '',
-    'Джедай-страж',
-    'Джедай-консул',
-    'Джедай-часовой',
-    'Ситх-воин',
-    'Ситх-инквизитор',
-    'Серый Джедай / Адепт Силы',
-    'Мандалорец',
-    'Охотник за головами',
-    'Контрабандист / Пилот',
-    'Оперативник / Штурмовик'
-  ];
-  if (prof.path && pathsList.indexOf(prof.path) === -1) pathsList.push(prof.path);
-
   var roleBadgeHtml = prof.path
     ? '<span class="sw-role-badge" style="font-size:11px;">⚔️ ' + esc(prof.path) + '</span>'
     : '<span class="sw-role-badge" style="font-size:11px;background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15);color:#cbd5e1;">👤 Без ордена</span>';
@@ -2594,10 +2687,49 @@ function swData() {
     '<button class="back" id="swDataBackHome">← На главную</button>' +
     '<h1>Данные</h1>' +
 
+    /* Выбор визуальной темы раздела (Голокрон Джедаев vs Империя Ситхов) */
+    '<div class="sheet-section">' +
+      '<div class="section-label" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px;">' +
+        '<span>🎨 Визуальная Тема Раздела («Звездные войны»)</span>' +
+        '<span class="sw-side-badge ' + (currentTheme === 'sith' ? 'sw-side-dark' : 'sw-side-light') + '">' +
+          (currentTheme === 'sith' ? '🔺 Тема Ситха (Тёмная сторона)' : '🔷 Голокрон Джедаев (Светлая сторона)') +
+        '</span>' +
+      '</div>' +
+      '<div class="desc">' +
+        'Выберите оформление интерфейса, кнопок, карточек и задних эффектов Силы в разделе «Звездные войны».' +
+      '</div>' +
+      '<div style="max-width:440px;margin:10px 0 12px 0;">' +
+        '<select id="swThemeSelect" class="sw-input" style="font-weight:700;font-size:14px;padding:9px 12px;">' +
+          '<option value="jedi" ' + (currentTheme === 'jedi' ? 'selected' : '') + '>🔷 Голокрон Джедаев — Светлая сторона (Лазурный кайбер)</option>' +
+          '<option value="sith" ' + (currentTheme === 'sith' ? 'selected' : '') + '>🔺 Империя Ситхов — Тёмная сторона (Багровый кайбер и молнии Силы)</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="sw-theme-picker-grid">' +
+        '<div class="sw-theme-option-card jedi-opt ' + (currentTheme === 'jedi' ? 'active' : '') + '" data-sw-theme-pick="jedi">' +
+          '<div class="sw-theme-opt-head">' +
+            '<div class="sw-theme-opt-title">🔷 Голокрон Джедаев</div>' +
+            '<span class="sw-theme-opt-badge">' + (currentTheme === 'jedi' ? '✓ Активна' : 'Выбрать') + '</span>' +
+          '</div>' +
+          '<div class="sw-theme-opt-desc">' +
+            'Лазурное сияние Храма Джедаев и Великого Голокрона, чистые голубые кайбер-искры, звёздная туманность Корусанта и Тайтона.' +
+          '</div>' +
+        '</div>' +
+        '<div class="sw-theme-option-card sith-opt ' + (currentTheme === 'sith' ? 'active' : '') + '" data-sw-theme-pick="sith">' +
+          '<div class="sw-theme-opt-head">' +
+            '<div class="sw-theme-opt-title">🔺 Империя Ситхов</div>' +
+            '<span class="sw-theme-opt-badge">' + (currentTheme === 'sith' ? '✓ Активна' : 'Выбрать') + '</span>' +
+          '</div>' +
+          '<div class="sw-theme-opt-desc">' +
+            'Багровая обсидиановая атмосфера Коррибана и Экзегола, пирамидальный Голокрон Ситхов, «обескровленный» алый кайбер, всполохи молний Тёмной стороны и тёмно-багровые кнопки.' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
     '<div class="sheet-section">' +
       '<div class="section-label" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px;">' +
         '<span>👥 Выбор и управление персонажами</span>' +
-        '<span style="font-size:12px;color:#94a3b8;">Всего профилей: ' + SW.profiles.length + '</span>' +
+        '<span style="font-size:12px;color:var(--sw-muted);">Всего профилей: ' + SW.profiles.length + '</span>' +
       '</div>' +
       '<div class="desc">' +
         'Выберите активного персонажа Галактики или создайте нового. Способности, боевые приёмы и навыки сохраняются индивидуально для каждого профиля.' +
@@ -2605,7 +2737,7 @@ function swData() {
 
       '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:14px 0 14px 0;">' +
         '<div style="flex:1;min-width:240px;">' +
-          '<label style="display:block;font-size:12px;color:#94a3b8;margin-bottom:4px;font-weight:600;">Активный персонаж (переключение на лету):</label>' +
+          '<label style="display:block;font-size:12px;color:var(--sw-muted);margin-bottom:4px;font-weight:600;">Активный персонаж (переключение на лету):</label>' +
           '<select id="swProfileSelect" class="sw-input" style="font-weight:700;font-size:14px;padding:9px 12px;">' +
             profOptions +
           '</select>' +
@@ -2620,12 +2752,12 @@ function swData() {
       '<div class="sw-char-sheet-card" id="swCharSheetCard">' +
         '<div class="sw-char-header" id="swCharHeaderToggle" style="cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;gap:10px;" title="Нажмите, чтобы свернуть или развернуть анкету">' +
           '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-            '<span>Анкета персонажа: <b style="color:#e0f2fe;">⚔️ ' + esc(prof.name || 'Новый персонаж') + '</b></span>' +
+            '<span>Анкета персонажа: <b style="color:var(--sw-accent-pale);">⚔️ ' + esc(prof.name || 'Новый персонаж') + '</b></span>' +
             roleBadgeHtml +
           '</div>' +
           '<div style="display:flex;align-items:center;gap:6px;">' +
-            '<span id="swCharToggleLabel" style="font-size:11.5px;color:#94a3b8;font-weight:normal;">' + (isCollapsed ? 'Развернуть' : 'Свернуть') + '</span>' +
-            '<span id="swCharToggleIcon" style="font-size:12px;color:#38bdf8;transition:transform 0.2s ease;' + (isCollapsed ? 'transform:rotate(-90deg);' : '') + '">▼</span>' +
+            '<span id="swCharToggleLabel" style="font-size:11.5px;color:var(--sw-muted);font-weight:normal;">' + (isCollapsed ? 'Развернуть' : 'Свернуть') + '</span>' +
+            '<span id="swCharToggleIcon" style="font-size:12px;color:var(--sw-accent);transition:transform 0.2s ease;' + (isCollapsed ? 'transform:rotate(-90deg);' : '') + '">▼</span>' +
           '</div>' +
         '</div>' +
 
@@ -2641,16 +2773,11 @@ function swData() {
             '</div>' +
             '<div class="sw-edit-item">' +
               '<label>Путь / Орден / Класс</label>' +
-              '<select id="swInpPath" class="sw-input">' +
-                pathsList.map(function(pt) {
-                  var lbl = pt ? pt : '— Без ордена / Свободный странник —';
-                  return '<option value="' + esc(pt) + '" ' + ((prof.path || '') === pt ? 'selected' : '') + '>' + esc(lbl) + '</option>';
-                }).join('') +
-              '</select>' +
+              '<input type="text" id="swInpPath" class="sw-input" value="' + esc(prof.path || '') + '" placeholder="Джедай-страж, Ситх-инквизитор, Мандалорец, Охотник...">' +
             '</div>' +
             '<div class="sw-edit-item">' +
               '<label>Титул / Звание / Клан</label>' +
-              '<input type="text" id="swInpTitle" class="sw-input" value="' + esc(prof.title || '') + '" placeholder="Падаван, Рыцарь, Мастер, Клан Мандалора...">' +
+              '<input type="text" id="swInpTitle" class="sw-input" value="' + esc(prof.title || '') + '" placeholder="Падаван, Рыцарь, Дарт, Лорд Ситхов, Клан Мандалора...">' +
             '</div>' +
           '</div>' +
 
@@ -2697,9 +2824,9 @@ function swData() {
             '</div>' +
           '</div>' +
 
-          '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:18px;padding-top:14px;border-top:1px solid rgba(56,189,248,0.16);">' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--sw-border-subtle);">' +
             '<button class="btn btn-primary" id="swSaveCharBtn">✓ Сохранить анкету</button>' +
-            '<span id="swSaveStatus" style="font-size:12px;color:#7dd3fc;">Автосохранение активно</span>' +
+            '<span id="swSaveStatus" style="font-size:12px;color:var(--sw-accent-bright);">Автосохранение активно</span>' +
             (SW.profiles.length > 1
               ? '<button class="btn btn-ghost" id="swDelProfBtn" style="color:#fca5a5;border-color:rgba(239,68,68,0.4);margin-left:auto;" title="Удалить текущий профиль">🗑️ Удалить профиль</button>'
               : '') +
@@ -2764,6 +2891,24 @@ function swData() {
     go({ screen: 'swHome' });
   });
 
+  // Переключение визуальной темы (Jedi vs Sith)
+  var themeSel = document.getElementById('swThemeSelect');
+  if (themeSel) {
+    themeSel.addEventListener('change', function() {
+      SW.setTheme(themeSel.value);
+      swData();
+    });
+  }
+  document.querySelectorAll('[data-sw-theme-pick]').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var picked = card.getAttribute('data-sw-theme-pick');
+      if (picked) {
+        SW.setTheme(picked);
+        swData();
+      }
+    });
+  });
+
   // Сворачивание и разворачивание анкеты персонажа
   var toggleHeader = document.getElementById('swCharHeaderToggle');
   if (toggleHeader) {
@@ -2809,7 +2954,7 @@ function swData() {
   function collectCharInputs() {
     prof.name = (document.getElementById('swInpName').value || '').trim();
     prof.race = (document.getElementById('swInpRace').value || '').trim();
-    prof.path = document.getElementById('swInpPath').value;
+    prof.path = (document.getElementById('swInpPath').value || '').trim();
     prof.title = (document.getElementById('swInpTitle').value || '').trim();
     prof.level = parseInt(document.getElementById('swInpLevel').value, 10) || 1;
     prof.hp = parseInt(document.getElementById('swInpHp').value, 10) || 0;
@@ -2828,7 +2973,10 @@ function swData() {
 
   ['swInpName','swInpRace','swInpPath','swInpTitle','swInpLevel','swInpHp','swInpAc','swInpForce','swInpSpeed','swInpWeapon','swInpArmor','swInpShip','swInpNotes'].forEach(function(id) {
     var el = document.getElementById(id);
-    if (el) el.addEventListener('change', collectCharInputs);
+    if (el) {
+      el.addEventListener('change', collectCharInputs);
+      el.addEventListener('input', collectCharInputs);
+    }
   });
 
   document.getElementById('swSaveCharBtn').addEventListener('click', function() {
@@ -2916,6 +3064,7 @@ function swData() {
           SW.profiles = data.profiles.map(function(p) { return SW._normalizeProfile(p); });
           SW.activeProfileId = data.activeProfileId || SW.profiles[0].id;
           if (data.meta) SW.meta = Object.assign(SW.meta, data.meta);
+          if (SW.meta && SW.meta.theme) SW.setTheme(SW.meta.theme);
           SW.saveProfiles();
           SW.saveMeta();
           if (typeof paintShBar === 'function') paintShBar();
