@@ -746,8 +746,8 @@ function swHome() {
 
       '<div class="sw-card sw-card-clickable" data-sw-nav="swMap" role="button" tabindex="0">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="sw-card-title"><span>🌌</span> Карта Мира</div>' +
-          '<div class="sw-card-desc">Астрографическая карта Галактики: Миры Ядра, Мандалор, Коррибан и Внешнее Кольцо</div>' +
+          '<div class="sw-card-title"><span>🌌</span> Карта Галактики</div>' +
+          '<div class="sw-card-desc">Оцифрованный Атлас 4000×4000: 200 детальных миров, архив 6 755 систем из PDF по сетке и навигатор гиперпрыжков</div>' +
         '</div>' +
         '<div class="sw-card-arrow">›</div>' +
       '</div>' +
@@ -2549,31 +2549,139 @@ function swRefView(refKey) {
 }
 
 /* ==========================================================================
-   6. КАРТА ГАЛАКТИКИ (swMap)
+   6. КАРТА ГАЛАКТИКИ 4000×4000 (swMap) — АТЛАС 200 МИРОВ + АРХИВ PDF (6 755 СИСТЕМ) + НАВИКОМПЬЮТЕР
    ========================================================================== */
-var SW_PLANETS = [
-  { id: 'coruscant', name: 'Корусант', region: 'Миры Ядра', x: 500, y: 275, color: '#38bdf8', desc: 'Столица Галактики, планета-экуменополис, место расположения Храма Джедаев и Галактического Сената.' },
-  { id: 'tython', name: 'Тайтон', region: 'Глубокое Ядро', x: 465, y: 315, color: '#7dd3fc', desc: 'Древняя колыбель Ордена Дже’дайи и Джедаев, богатая мощными нексусами Живой Силы.' },
-  { id: 'alderaan', name: 'Альдераан', region: 'Миры Ядра', x: 548, y: 260, color: '#60a5fa', desc: 'Мир искусства, дипломатии и благородных домов вблизи Корусанта.' },
-  { id: 'corellia', name: 'Кореллия', region: 'Миры Ядра', x: 530, y: 310, color: '#93c5fd', desc: 'Знаменитые верфи Галактики, родина лучших пилотов, контрабандистов и кораблей серии YT.' },
-  { id: 'ilum', name: 'Илум', region: 'Неизведанные Регионы', x: 310, y: 175, color: '#38bdf8', desc: 'Ледяной священный мир в Неизведанных Регионах, где падаваны проходят Испытание и находят свой кайбер-кристалл.' },
-  { id: 'csilla', name: 'Ксилла', region: 'Неизведанные Регионы', x: 255, y: 225, color: '#0284c7', desc: 'Скрытая ледяная столица Доминации Чиссов.' },
-  { id: 'mandalore', name: 'Мандалор', region: 'Внешнее Кольцо', x: 640, y: 165, color: '#f59e0b', desc: 'Родина воинственных кланов Мандалорцев и кузниц священного сплава бескара.' },
-  { id: 'korriban', name: 'Коррибан (Морабанд)', region: 'Внешнее Кольцо (Пространство Ситхов)', x: 695, y: 120, color: '#ef4444', desc: 'Древняя прародина Ситхов, Долина Тёмных Лордов и Академия Ситхов.' },
-  { id: 'dromund', name: 'Дромунд-Каас', region: 'Пространство Ситхов', x: 740, y: 145, color: '#dc2626', desc: 'Окутанная грозовыми джунглями имперская столица Империи Ситхов.' },
-  { id: 'dathomir', name: 'Датомир', region: 'Внешнее Кольцо', x: 600, y: 140, color: '#f43f5e', desc: 'Багровый мир Сестёр Ночи, Забраков и диких ранкоров.' },
-  { id: 'kashyyyk', name: 'Кашиик', region: 'Среднее Кольцо', x: 625, y: 240, color: '#10b981', desc: 'Мир гигантских деревьев врошир, родина гордого народа Вуки.' },
-  { id: 'nar_shaddaa', name: 'Нар-Шаддаа / Нал-Хатта', region: 'Пространство Хаттов', x: 715, y: 295, color: '#eab308', desc: '«Луна контрабандистов», неоновая столица криминальных синдикатов и Картеля Хаттов.' },
-  { id: 'naboo', name: 'Набу', region: 'Среднее Кольцо', x: 585, y: 390, color: '#34d399', desc: 'Живописная планета озёр, водопадов и подводных городов гунганов.' },
-  { id: 'tatooine', name: 'Татуин', region: 'Внешнее Кольцо', x: 685, y: 385, color: '#fbbf24', desc: 'Пустынный мир под двумя солнцами: космопорты Мос-Эйсли и Мос-Эспа, кантины и дюнные моря.' },
-  { id: 'geonosis', name: 'Джеонозис', region: 'Внешнее Кольцо', x: 720, y: 410, color: '#f97316', desc: 'Каменистый мир оружейных заводов, литейных фабрик дроидов и гладиаторских арен.' },
-  { id: 'kamino', name: 'Камино', region: 'За пределами Внешнего Кольца', x: 790, y: 445, color: '#38bdf8', desc: 'Штормовой океанический мир на краю Галактики, центр передового клонирования.' },
-  { id: 'mustafar', name: 'Мустафар', region: 'Внешнее Кольцо', x: 430, y: 465, color: '#ef4444', desc: 'Вулканическая планета лавовых рек и древних святилищ Тёмной стороны.' },
-  { id: 'hoth', name: 'Хот / Беспин', region: 'Внешнее Кольцо (Коридор Иссон)', x: 380, y: 425, color: '#bae6fd', desc: 'Ледяная пустошь Хот и газовый гигант Беспин с Облачным Городом.' },
-  { id: 'dagobah', name: 'Дагоба', region: 'Внешнее Кольцо', x: 505, y: 455, color: '#4ade80', desc: 'Затерянный мир болот и джунглей, пронизанный чистой Живой Силой.' }
+var swMapState = {
+  mode: 'inspect', // 'inspect' | 'archive' | 'route' | 'markers'
+  selectedId: 'coruscant',
+  regionFilter: 'all',
+  typeFilter: 'all',
+  searchQuery: '',
+  // Архив PDF (6 755 систем)
+  pdfSearch: '',
+  pdfRegionFilter: 'all',
+  selectedGrid: 'L-9',
+  highlightedPdfSys: null,
+  // Слои карты
+  showPins: true,
+  showLabels: true,
+  showRoutes: false,
+  showGrid: false,
+  showUserMarkers: true,
+  // Навигационный компьютер (Гиперпрыжки)
+  routeWaypoints: ['coruscant', 'corellia', 'tatooine'],
+  hyperdriveClass: 1.0,
+  astrogationMode: 'standard', // 'lane' | 'standard' | 'blind' | 'smuggler'
+  lastEncounterText: '',
+  lastHookText: '',
+  // Полноэкранный режим и камера
+  isFullscreen: false,
+  camInit: false,
+  tx: 0,
+  ty: 0,
+  scale: 0.34,
+  // Пользовательские тактические метки (чистая карта по умолчанию)
+  editingMarkerId: null
+};
+
+var SW_CUSTOM_MARKERS_KEY = 'sw_galaxy_custom_markers_v1';
+
+function swLoadCustomMarkers() {
+  try {
+    var raw = localStorage.getItem(SW_CUSTOM_MARKERS_KEY);
+    if (!raw) return [];
+    var parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function swSaveCustomMarkers(arr) {
+  try {
+    localStorage.setItem(SW_CUSTOM_MARKERS_KEY, JSON.stringify(arr || []));
+  } catch (e) {}
+}
+
+var SW_MARKER_TYPES = [
+  { id: 'fleet', icon: '🚀', label: 'Флот / Эскадра', color: '#38bdf8' },
+  { id: 'base', icon: '🛡️', label: 'База / Аванпост', color: '#10b981' },
+  { id: 'battle', icon: '⚔️', label: 'Поле битвы / Осада', color: '#ef4444' },
+  { id: 'bounty', icon: '💀', label: 'Цель / Охота', color: '#f97316' },
+  { id: 'holocron', icon: '🏛️', label: 'Храм / Артефакт Силы', color: '#c084fc' },
+  { id: 'smuggler', icon: '📦', label: 'Тайник / Контрабанда', color: '#facc15' }
 ];
 
-var swSelectedPlanetId = 'coruscant';
+var SW_PLANET_TYPE_LABELS = {
+  capital: { label: 'Столицы и центры секторов', badge: '👑 Столица / Узел' },
+  force:   { label: 'Святыни и миры Силы', badge: '☯️ Локус Силы' },
+  fortress:{ label: 'Крепости и военные базы', badge: '🛡️ Цитадель / База' },
+  industry:{ label: 'Верфи, кузницы и рудники', badge: '🏭 Верфь / Индустрия' },
+  city:    { label: 'Колонии и космопорты', badge: '🌆 Мир / Космопорт' }
+};
+
+var SW_CANONICAL_ROUTES = [
+  { name: '① Перлемианский путь (Корусант ➔ Оссус ➔ Мон-Кала)', ids: ['coruscant', 'anaxes', 'brentaal', 'ralltiir', 'carida', 'lantillies', 'roche', 'ossus', 'felucia', 'raxus', 'mon_cala'] },
+  { name: '② Кореллианский путь (Корусант ➔ Кореллия ➔ Татуин ➔ Рилот)', ids: ['coruscant', 'corellia', 'byblos', 'allanteen', 'druckenwell', 'christophsis', 'rodia', 'tatooine', 'geonosis', 'ryloth'] },
+  { name: '③ Кореллианский хребет (Кореллия ➔ Фондор ➔ Беспин ➔ Хот)', ids: ['corellia', 'duro', 'fondor', 'bestine', 'thyferra', 'yag_dhul', 'belsavis', 'bespin', 'hoth'] },
+  { name: '⑤ Хайдианский супермаршрут (Бонадан ➔ Мандалор ➔ Корусант ➔ Мустафар)', ids: ['bonadan', 'cantonica', 'serenno', 'taris', 'mandalore', 'brentaal', 'coruscant', 'chandrila', 'malastare', 'eriadu', 'mustafar', 'polis_massa'] },
+  { name: '⚡ Дуга Кесселя и Хатты (Кристофсис ➔ Нар-Шаддаа ➔ Кессель)', ids: ['christophsis', 'scarif', 'circumtore', 'nal_hutta', 'ylesia', 'sleheyron', 'kessel'] },
+  { name: '☯️ Путь Джедаев и Ситхов (Тайтон ➔ Джеда ➔ Илум ➔ Ак-То ➔ Морабанд)', ids: ['tython', 'coruscant', 'jedha', 'ilum', 'ahch_to', 'ossus', 'moraband', 'malachor', 'exegol'] }
+];
+
+var SW_HYPERSPACE_ENCOUNTERS = [
+  '🚨 Гравитационная тень! Крейсер-заградитель типа «Иммобилайзер-418» активировал генераторы гравитационных колодцев и вырвал ваш корабль из гиперпространства. До прибытия патруля TIE-истребителей — 3 раунда!',
+  '🐋 В иллюминаторах гипертуннеля показалась стая звёздных китов — пёрргилов! Их естественные био-гиперпрыжки создают мощный резонанс в Силе: навигатор получает Преимущество на следующую проверку Астронавигации.',
+  '⚡ Нестабильный вихрь масс-тени! На маршруте вспыхнула блуждающая гравитационная аномалия. Требуется проверка Пилотирования (КС 15), иначе гипердвигатель получит перегрузку охлаждающего контура.',
+  '🏴‍☠️ Сигнал бедствия на частотах Старой Республики: дрейфующий грузовой фрегат с отключённым транспондером. На борту могут быть ценные контейнеры коаксиума... или засада пиратов Хондо Онаки.',
+  '✨ Чистый гиперкоридор! Навигационный компьютер рассчитал идеальный вектор сквозь гравитационные колодцы сектора — расход гипертоплива снижен на 15%, прыжок проходит без помех.',
+  '🛰️ Древний ретранслятор эпохи Расцвета Республики передаёт зашифрованные координаты забытого аванпоста в соседнем квадрате сетки.'
+];
+
+function swGetPlanets() {
+  return window.SW_MAP_PLANETS || [];
+}
+
+function swGetRegionMap() {
+  var list = window.SW_GALAXY_REGIONS || [];
+  var map = {};
+  for (var i = 0; i < list.length; i++) map[list[i].id] = list[i];
+  return map;
+}
+
+function swGeneratePlanetHook(p) {
+  var hooks = [
+    'На орбите мира «' + p.name + '» (квадрат ' + p.grid + ') перехвачена зашифрованная передача фракции «' + p.faction + '». Местный связной готов продать коды доступа к закрытому посадочному доку за 2 500 кредитов или услугу.',
+    'В космопорте системы «' + p.name + '» (сектор ' + p.sector + ') заблокирован грузовой корабль с партией необработанного коаксиума и древним голокроном. Охотники за головами уже оцепили периметр.',
+    'Секретная миссия в мире «' + p.name + '»: климатические условия (' + p.climate.toLowerCase() + ') вывели из строя сенсоры аванпоста. Отряду необходимо проникнуть на объект до прибытия подкрепления.',
+    'Древний навигационный маяк на маршруте «' + p.route + '» у планеты «' + p.name + '» пробудился и указывает координаты затерянного крейсера времён Старой Республики в квадрате ' + p.grid + '.'
+  ];
+  return hooks[Math.floor(Math.random() * hooks.length)];
+}
+
+function swFocusCameraOn(px, py, targetScale) {
+  var vp = document.getElementById('swMapViewport');
+  var w = vp ? vp.clientWidth : 960;
+  var h = vp ? vp.clientHeight : 640;
+  var sc = targetScale || Math.max(swMapState.scale, 0.85);
+  sc = Math.max(0.20, Math.min(5.5, sc));
+  swMapState.scale = sc;
+  swMapState.tx = (w / 2) - px * sc;
+  swMapState.ty = (h / 2) - py * sc;
+  swMapState.camInit = true;
+}
+
+function swFitFullGalaxy() {
+  var vp = document.getElementById('swMapViewport');
+  var w = vp ? vp.clientWidth : 960;
+  var h = vp ? vp.clientHeight : 640;
+  var sc = Math.min(w / 3200, h / 3200);
+  sc = Math.max(0.20, Math.min(0.55, sc));
+  swMapState.scale = sc;
+  swMapState.tx = (w / 2) - 2080 * sc;
+  swMapState.ty = (h / 2) - 2240 * sc;
+  swMapState.camInit = true;
+}
 
 function swMap() {
   applyStarWarsTheme();
@@ -2583,73 +2691,1170 @@ function swMap() {
     { label: 'Карта Галактики' }
   ]);
 
-  var selected = SW_PLANETS.find(function(p) { return p.id === swSelectedPlanetId; }) || SW_PLANETS[0];
+  var planets = swGetPlanets();
+  var regMap = swGetRegionMap();
+  var atlas = window.SW_GALAXY_ATLAS;
+  var customMarkers = swLoadCustomMarkers();
 
-  var nodesSvg = SW_PLANETS.map(function(p) {
-    var isSel = (p.id === selected.id);
-    var r = isSel ? 9 : 6;
-    return '<g class="sw-planet-node" data-sw-planet="' + esc(p.id) + '">' +
-      (isSel ? '<circle cx="' + p.x + '" cy="' + p.y + '" r="16" fill="none" stroke="' + p.color + '" stroke-width="1.6" stroke-dasharray="4 3"/>' : '') +
-      '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + r + '" fill="' + p.color + '" stroke="#020617" stroke-width="2"/>' +
-      '<text x="' + p.x + '" y="' + (p.y - 12) + '" text-anchor="middle" fill="' + (isSel ? '#ffffff' : (isSith ? '#fecdd3' : '#bae6fd')) + '" font-size="' + (isSel ? '13' : '11') + '" font-weight="700" style="text-shadow:0 2px 6px #000">' + esc(p.name) + '</text>' +
+  var selected = planets.find(function(p) { return p.id === swMapState.selectedId; }) || planets[0];
+  if (selected && !swMapState.selectedGrid) {
+    swMapState.selectedGrid = selected.grid;
+  }
+
+  // Фильтрация 200 курируемых планет
+  var qLower = (swMapState.searchQuery || '').trim().toLowerCase();
+  var filteredPlanets = planets.filter(function(p) {
+    if (swMapState.regionFilter !== 'all' && p.region !== swMapState.regionFilter) return false;
+    if (swMapState.typeFilter !== 'all' && p.type !== swMapState.typeFilter) return false;
+    if (qLower) {
+      var mName = p.name.toLowerCase().indexOf(qLower) !== -1;
+      var mEn = p.en.toLowerCase().indexOf(qLower) !== -1;
+      var mGrid = p.grid.toLowerCase().indexOf(qLower) !== -1;
+      var mSec = (p.sector || '').toLowerCase().indexOf(qLower) !== -1;
+      var mDesc = (p.desc || '').toLowerCase().indexOf(qLower) !== -1;
+      if (!mName && !mEn && !mGrid && !mSec && !mDesc) return false;
+    }
+    return true;
+  });
+
+  // Сборка SVG-слоя сетки C-1..U-21 (если включена сетка или режим Архива PDF)
+  var gridOverlaySvg = '';
+  var showGridNow = swMapState.showGrid || swMapState.mode === 'archive';
+  if (showGridNow && atlas) {
+    var gridCounts = atlas.getGridCounts();
+    var cols = 'CDEFGHIJKLMNOPQRSTU'.split('');
+    var cellsArr = [];
+    for (var ci = 0; ci < cols.length; ci++) {
+      for (var rNum = 1; rNum <= 21; rNum++) {
+        var gCode = cols[ci] + '-' + rNum;
+        var box = atlas.gridToBox(gCode);
+        if (!box) continue;
+        var cnt = gridCounts[gCode] || 0;
+        var isSelGrid = (swMapState.selectedGrid === gCode);
+        cellsArr.push(
+          '<g class="sw-grid-cell-group" data-sw-grid="' + gCode + '">' +
+            '<rect class="sw-grid-cell-rect' + (isSelGrid ? ' active' : '') + '" x="' + box.x1 + '" y="' + box.y1 + '" width="' + box.size + '" height="' + box.size + '"/>' +
+            '<text x="' + (box.x1 + 8) + '" y="' + (box.y1 + 20) + '" fill="' + (isSelGrid ? '#fde047' : 'rgba(186,230,253,0.75)') + '" font-size="15" font-family="JetBrains Mono,monospace" font-weight="700" pointer-events="none">' + gCode + '</text>' +
+            (cnt > 0 ? '<text x="' + (box.x2 - 8) + '" y="' + (box.y1 + 20) + '" text-anchor="end" fill="' + (isSelGrid ? '#fde047' : 'rgba(56,189,248,0.8)') + '" font-size="13" font-family="JetBrains Mono,monospace" pointer-events="none">' + cnt + '✦</text>' : '') +
+          '</g>'
+        );
+      }
+    }
+    gridOverlaySvg = '<g id="swSvgGridLayer">' + cellsArr.join('') + '</g>';
+  } else if (swMapState.selectedGrid && atlas && swMapState.mode === 'archive') {
+    var sBox = atlas.gridToBox(swMapState.selectedGrid);
+    if (sBox) {
+      gridOverlaySvg = '<rect class="sw-grid-cell-rect active" x="' + sBox.x1 + '" y="' + sBox.y1 + '" width="' + sBox.size + '" height="' + sBox.size + '"/>';
+    }
+  }
+
+  // Сборка SVG-слоя 5 Великих торговых гипермаршрутов
+  var tradeRoutesSvg = '';
+  if (swMapState.showRoutes && window.SW_TRADE_ROUTES) {
+    tradeRoutesSvg = '<g id="swSvgTradeRoutes" pointer-events="none">' +
+      window.SW_TRADE_ROUTES.map(function(tr) {
+        if (!tr.points || tr.points.length < 2) return '';
+        var ptsStr = tr.points.map(function(pt) { return pt[0] + ',' + pt[1]; }).join(' ');
+        var midPt = tr.points[Math.floor(tr.points.length / 2)];
+        return '<g>' +
+          '<polyline points="' + ptsStr + '" fill="none" stroke="' + tr.color + '" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" opacity="0.22"/>' +
+          '<polyline class="sw-route-line" points="' + ptsStr + '" fill="none" stroke="' + tr.color + '" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>' +
+          '<g transform="translate(' + midPt[0] + ',' + (midPt[1] - 18) + ')">' +
+            '<rect x="-110" y="-14" width="220" height="22" rx="6" fill="rgba(2,6,23,0.86)" stroke="' + tr.color + '" stroke-width="1.5"/>' +
+            '<text x="0" y="1" text-anchor="middle" fill="' + tr.color + '" font-size="12" font-weight="700">' + esc(tr.num + ' ' + tr.name) + '</text>' +
+          '</g>' +
+        '</g>';
+      }).join('') +
     '</g>';
-  }).join('');
+  }
 
-  var ringStrokeOuter = isSith ? 'rgba(239,68,68,0.2)' : 'rgba(56,189,248,0.16)';
-  var ringStrokeMid = isSith ? 'rgba(239,68,68,0.28)' : 'rgba(56,189,248,0.22)';
-  var routeStrokeA = isSith ? 'rgba(239,68,68,0.36)' : 'rgba(56,189,248,0.32)';
-  var coreGlowColor = isSith ? '#ef4444' : '#38bdf8';
+  // Сборка SVG-слоя проложенного маршрута Навикомпьютера
+  var activeRouteSvg = '';
+  var routeStats = { totalLy: 0, totalParsecs: 0, segments: [], hazards: [] };
+  var pById = {};
+  for (var pi = 0; pi < planets.length; pi++) pById[planets[pi].id] = planets[pi];
+
+  if (swMapState.routeWaypoints && swMapState.routeWaypoints.length >= 2) {
+    var wpObjs = swMapState.routeWaypoints.map(function(id) { return pById[id]; }).filter(Boolean);
+    if (wpObjs.length >= 2) {
+      var segSvg = [];
+      var lyPerPx = atlas ? atlas.lyPerPx : (5000 / 145.5926);
+      for (var wi = 0; wi < wpObjs.length - 1; wi++) {
+        var a = wpObjs[wi];
+        var b = wpObjs[wi + 1];
+        var dx = b.x - a.x;
+        var dy = b.y - a.y;
+        var distPx = Math.sqrt(dx * dx + dy * dy);
+        var distLy = Math.round(distPx * lyPerPx);
+        var distPc = Math.round(distLy / 3.26156);
+        routeStats.totalLy += distLy;
+        routeStats.totalParsecs += distPc;
+        routeStats.segments.push({ from: a, to: b, ly: distLy, pc: distPc });
+        if (a.region === 'deep_core' || b.region === 'deep_core') {
+          routeStats.hazards.push('🕳️ Гравитационные аномалии Глубокого Ядра (+5 к КС Астронавигации)');
+        }
+        if (a.region === 'unknown' || b.region === 'unknown') {
+          routeStats.hazards.push('🌌 Барьеры Неизведанных Регионов (требуется путеводник Силы или расчёт Небесных странниц)');
+        }
+        if (a.region === 'hutt_corp' || b.region === 'hutt_corp') {
+          routeStats.hazards.push('🐌 Таможенные патрули Картеля Хаттов и синдикатов');
+        }
+        var mx = (a.x + b.x) / 2;
+        var my = (a.y + b.y) / 2;
+        segSvg.push(
+          '<line x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '" stroke="rgba(250,204,21,0.28)" stroke-width="14" stroke-linecap="round"/>' +
+          '<line class="sw-active-route-line" x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '" stroke="#facc15" stroke-width="5.5" stroke-linecap="round"/>' +
+          '<g transform="translate(' + mx + ',' + my + ')">' +
+            '<rect x="-68" y="-13" width="136" height="24" rx="7" fill="rgba(2,6,23,0.92)" stroke="#facc15" stroke-width="1.8"/>' +
+            '<text x="0" y="3" text-anchor="middle" fill="#fef08a" font-size="12.5" font-family="JetBrains Mono,monospace" font-weight="700">' + distLy.toLocaleString('ru-RU') + ' св.л.</text>' +
+          '</g>'
+        );
+      }
+      for (var wj = 0; wj < wpObjs.length; wj++) {
+        var wp = wpObjs[wj];
+        segSvg.push(
+          '<g transform="translate(' + wp.x + ',' + wp.y + ')">' +
+            '<circle r="19" fill="none" stroke="#facc15" stroke-width="3" stroke-dasharray="6 4"/>' +
+            '<circle r="11" fill="#facc15" stroke="#020617" stroke-width="2.5"/>' +
+            '<text x="0" y="4" text-anchor="middle" fill="#020617" font-size="12" font-weight="900">' + (wj + 1) + '</text>' +
+          '</g>'
+        );
+      }
+      if (swMapState.mode === 'route' || swMapState.showRoutes) {
+        activeRouteSvg = '<g id="swSvgActiveRoute" pointer-events="none">' + segSvg.join('') + '</g>';
+      }
+    }
+  }
+
+  // Сборка SVG-слоя маркеров 200 курируемых планет
+  var filteredIds = {};
+  for (var fi = 0; fi < filteredPlanets.length; fi++) filteredIds[filteredPlanets[fi].id] = true;
+
+  var pinsSvg = '';
+  if (swMapState.showPins) {
+    pinsSvg = '<g id="swSvgPlanetPins">' +
+      planets.map(function(p) {
+        var isMatch = !!filteredIds[p.id];
+        if (!isMatch && (swMapState.regionFilter !== 'all' || swMapState.typeFilter !== 'all' || qLower)) {
+          return '';
+        }
+        var isSel = selected && (p.id === selected.id);
+        var regInfo = regMap[p.region] || { color: '#38bdf8' };
+        var col = regInfo.color || '#38bdf8';
+        var r = isSel ? 12 : (p.type === 'capital' || p.type === 'force' ? 7.5 : 6);
+        var labelHtml = '';
+        if (swMapState.showLabels || isSel) {
+          var shortRu = p.name.split(' (')[0];
+          labelHtml =
+            '<g transform="translate(' + p.x + ',' + (p.y - r - 9) + ')" pointer-events="none">' +
+              '<rect x="' + (-shortRu.length * 4.4 - 8) + '" y="-13" width="' + (shortRu.length * 8.8 + 16) + '" height="19" rx="5" fill="rgba(2,6,23,' + (isSel ? '0.92' : '0.78') + ')" stroke="' + (isSel ? '#ffffff' : col) + '" stroke-width="' + (isSel ? '1.8' : '1') + '"/>' +
+              '<text x="0" y="1" text-anchor="middle" fill="' + (isSel ? '#ffffff' : '#f1f5f9') + '" font-size="' + (isSel ? '13.5' : '11.5') + '" font-weight="700">' + esc(shortRu) + '</text>' +
+            '</g>';
+        }
+        return '<g class="sw-planet-node" data-sw-planet="' + esc(p.id) + '">' +
+          (isSel
+            ? '<circle cx="' + p.x + '" cy="' + p.y + '" r="26" fill="rgba(56,189,248,0.15)" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="6 4"/>' +
+              '<circle cx="' + p.x + '" cy="' + p.y + '" r="18" fill="none" stroke="' + col + '" stroke-width="2"/>'
+            : '') +
+          '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + r + '" fill="' + col + '" stroke="#020617" stroke-width="2.2"/>' +
+          labelHtml +
+        '</g>';
+      }).join('') +
+    '</g>';
+  }
+
+  // Радарный маяк выбранной системы из Архива PDF (если она не входит в 200 курируемых)
+  var pdfBeaconSvg = '';
+  if (swMapState.highlightedPdfSys && atlas) {
+    var bBox = atlas.gridToBox(swMapState.highlightedPdfSys.grid);
+    if (bBox) {
+      pdfBeaconSvg =
+        '<g id="swSvgPdfBeacon" pointer-events="none" transform="translate(' + bBox.cx + ',' + bBox.cy + ')">' +
+          '<circle r="38" fill="rgba(250,204,21,0.16)" stroke="#facc15" stroke-width="3" stroke-dasharray="8 5"/>' +
+          '<circle r="10" fill="#facc15" stroke="#020617" stroke-width="2.5"/>' +
+          '<rect x="-120" y="-44" width="240" height="26" rx="7" fill="rgba(2,6,23,0.94)" stroke="#facc15" stroke-width="2"/>' +
+          '<text x="0" y="-26" text-anchor="middle" fill="#fde047" font-size="13.5" font-weight="700">📡 ' + esc(swMapState.highlightedPdfSys.system) + ' [' + esc(swMapState.highlightedPdfSys.grid) + ']</text>' +
+        '</g>';
+    }
+  }
+
+  // Сборка SVG-слоя пользовательских меток и флотов
+  var customMarkersSvg = '';
+  if (swMapState.showUserMarkers && customMarkers.length > 0) {
+    customMarkersSvg = '<g id="swSvgCustomMarkers">' +
+      customMarkers.map(function(m) {
+        var mType = SW_MARKER_TYPES.find(function(t) { return t.id === m.type; }) || SW_MARKER_TYPES[0];
+        var isEdit = (swMapState.editingMarkerId === m.id);
+        return '<g class="sw-planet-node" data-sw-marker="' + esc(m.id) + '" transform="translate(' + m.x + ',' + m.y + ')">' +
+          (isEdit ? '<circle r="26" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="5 4"/>' : '') +
+          '<circle r="15" fill="rgba(2,6,23,0.9)" stroke="' + mType.color + '" stroke-width="3"/>' +
+          '<text x="0" y="5" text-anchor="middle" font-size="15">' + mType.icon + '</text>' +
+          '<g transform="translate(0,-24)">' +
+            '<rect x="-85" y="-12" width="170" height="20" rx="5" fill="rgba(2,6,23,0.92)" stroke="' + mType.color + '" stroke-width="1.5"/>' +
+            '<text x="0" y="2" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">' + esc(m.title) + '</text>' +
+          '</g>' +
+        '</g>';
+      }).join('') +
+    '</g>';
+  }
+
+  // Формирование нижней панели в зависимости от активного режима
+  var bottomPanelHtml = '';
+
+  if (swMapState.mode === 'inspect') {
+    var selReg = selected ? (regMap[selected.region] || {}) : {};
+    var selTypeObj = selected ? (SW_PLANET_TYPE_LABELS[selected.type] || { badge: '🪐 Мир' }) : { badge: '🪐 Мир' };
+    var gridSysList = (selected && atlas) ? atlas.getSystemsInGrid(selected.grid) : [];
+
+    bottomPanelHtml =
+      '<div class="sw-map-panels-grid">' +
+        '<!-- Левая колонка: Досье выбранного мира -->' +
+        '<div class="sw-char-sheet-card">' +
+          (selected ? (
+            '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">' +
+              '<div>' +
+                '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+                  '<span style="font-size:24px">' + selected.icon + '</span>' +
+                  '<h2 style="margin:0;font-size:20px;color:#fff">' + esc(selected.name) + '</h2>' +
+                  '<span class="sw-grid-badge" title="Квадрат астрографической сетки">Сетка ' + esc(selected.grid) + '</span>' +
+                '</div>' +
+                '<div style="font-size:12.5px;color:#94a3b8;margin-top:3px">' +
+                  'Оригинал в Атласе: <strong style="color:#e2e8f0">' + esc(selected.en) + '</strong> • Координаты на карте 4000×4000: <code>[' + selected.x + ', ' + selected.y + ']</code>' +
+                '</div>' +
+              '</div>' +
+              '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
+                '<span class="sw-role-badge" style="border-color:' + (selReg.color || '#38bdf8') + ';color:' + (selReg.color || '#38bdf8') + '">' + esc(selected.regionName) + '</span>' +
+                '<span class="sw-role-badge">' + esc(selTypeObj.badge) + '</span>' +
+              '</div>' +
+            '</div>' +
+
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:12px">' +
+              '<div style="padding:8px 10px;border-radius:8px;background:rgba(15,23,42,0.65);border:1px solid rgba(56,189,248,0.18)">' +
+                '<div style="font-size:11px;color:#94a3b8;text-transform:uppercase">Официальный сектор (PDF)</div>' +
+                '<div style="font-size:13.5px;color:#f8fafc;font-weight:600;margin-top:2px">📡 ' + esc(selected.sector || 'Не указан') + '</div>' +
+              '</div>' +
+              '<div style="padding:8px 10px;border-radius:8px;background:rgba(15,23,42,0.65);border:1px solid rgba(56,189,248,0.18)">' +
+                '<div style="font-size:11px;color:#94a3b8;text-transform:uppercase">Фракция / Контроль</div>' +
+                '<div style="font-size:13.5px;color:#f8fafc;font-weight:600;margin-top:2px">🏛️ ' + esc(selected.faction) + '</div>' +
+              '</div>' +
+              '<div style="padding:8px 10px;border-radius:8px;background:rgba(15,23,42,0.65);border:1px solid rgba(56,189,248,0.18)">' +
+                '<div style="font-size:11px;color:#94a3b8;text-transform:uppercase">Климат и биосфера</div>' +
+                '<div style="font-size:13.5px;color:#f8fafc;font-weight:600;margin-top:2px">🌡️ ' + esc(selected.climate) + '</div>' +
+              '</div>' +
+              '<div style="padding:8px 10px;border-radius:8px;background:rgba(15,23,42,0.65);border:1px solid rgba(56,189,248,0.18)">' +
+                '<div style="font-size:11px;color:#94a3b8;text-transform:uppercase">Гипермаршрут / Коридор</div>' +
+                '<div style="font-size:13.5px;color:#f8fafc;font-weight:600;margin-top:2px">🛤️ ' + esc(selected.route) + '</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<div style="margin-top:12px;padding:11px 13px;border-radius:10px;background:rgba(2,6,23,0.55);border-left:3px solid ' + (selReg.color || '#38bdf8') + ';font-size:14px;color:#e2edf8;line-height:1.65">' +
+              esc(selected.desc) +
+            '</div>' +
+
+            '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">' +
+              '<button class="sw-btn sw-btn-primary" id="swBtnFocusSelected">🎯 Приблизить на карте</button>' +
+              '<button class="sw-btn" id="swBtnInspectGridPdf">📡 Все системы квадрата ' + esc(selected.grid) + ' в PDF (' + gridSysList.length + ')</button>' +
+              '<button class="sw-btn" id="swBtnAddSelectedToRoute">🧭 + В маршрут прыжка</button>' +
+              '<button class="sw-btn" id="swBtnGenHook">🎲 Зацепка миссии</button>' +
+            '</div>' +
+            (swMapState.lastHookText
+              ? '<div style="margin-top:10px;padding:10px 12px;border-radius:9px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.4);color:#fde68a;font-size:13px;line-height:1.5"><strong>🎲 Сюжетная зацепка:</strong> ' + esc(swMapState.lastHookText) + '</div>'
+              : '')
+          ) : '<div>Планета не выбрана</div>') +
+        '</div>' +
+
+        '<!-- Правая колонка: Поиск и фильтр по 200 мирам -->' +
+        '<div class="sw-char-sheet-card">' +
+          '<div class="sw-char-header" style="margin-bottom:8px">' +
+            '<span>🪐 Каталог систем на карте (' + filteredPlanets.length + ' из ' + planets.length + ')</span>' +
+          '</div>' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">' +
+            '<select id="swMapRegionSelect" class="sw-input">' +
+              '<option value="all"' + (swMapState.regionFilter === 'all' ? ' selected' : '') + '>🌌 Все регионы (' + planets.length + ')</option>' +
+              (window.SW_GALAXY_REGIONS || []).map(function(r) {
+                return '<option value="' + esc(r.id) + '"' + (swMapState.regionFilter === r.id ? ' selected' : '') + '>' + esc(r.icon + ' ' + r.name) + '</option>';
+              }).join('') +
+            '</select>' +
+            '<select id="swMapTypeSelect" class="sw-input">' +
+              '<option value="all"' + (swMapState.typeFilter === 'all' ? ' selected' : '') + '>🪐 Все типы миров</option>' +
+              Object.keys(SW_PLANET_TYPE_LABELS).map(function(tk) {
+                return '<option value="' + esc(tk) + '"' + (swMapState.typeFilter === tk ? ' selected' : '') + '>' + esc(SW_PLANET_TYPE_LABELS[tk].badge) + '</option>';
+              }).join('') +
+            '</select>' +
+          '</div>' +
+          '<input type="text" id="swMapSearchInput" class="sw-input" placeholder="🔍 Поиск планеты (Корусант, Mandalore, R-16, Arkanis...)" value="' + esc(swMapState.searchQuery) + '" style="width:100%;margin-bottom:10px"/>' +
+
+          '<div class="sw-planet-list-scroll">' +
+            filteredPlanets.map(function(p) {
+              var isAct = selected && (p.id === selected.id);
+              var rCol = (regMap[p.region] && regMap[p.region].color) || '#38bdf8';
+              return '<div class="sw-planet-list-item' + (isAct ? ' active' : '') + '" data-sw-list-planet="' + esc(p.id) + '">' +
+                '<div style="min-width:0">' +
+                  '<div style="font-size:13.5px;font-weight:700;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' +
+                    p.icon + ' ' + esc(p.name) + ' <span style="font-weight:400;color:#94a3b8;font-size:12px">(' + esc(p.en) + ')</span>' +
+                  '</div>' +
+                  '<div style="font-size:11.5px;color:#94a3b8">' +
+                    '<span style="color:' + rCol + '">' + esc(p.regionName) + '</span> • Сектор: ' + esc(p.sector) +
+                  '</div>' +
+                '</div>' +
+                '<span class="sw-grid-badge">' + esc(p.grid) + '</span>' +
+              '</div>';
+            }).join('') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+  } else if (swMapState.mode === 'archive') {
+    var totalPdf = atlas ? atlas.totalSystems : 0;
+    var gridSys = atlas ? atlas.getSystemsInGrid(swMapState.selectedGrid) : [];
+    var searchResults = atlas ? atlas.searchSystems(swMapState.pdfSearch, swMapState.pdfRegionFilter, '', 150) : [];
+    var curatedInGrid = planets.filter(function(p) { return p.grid.toUpperCase() === (swMapState.selectedGrid || '').toUpperCase(); });
+
+    bottomPanelHtml =
+      '<div class="sw-map-panels-grid">' +
+        '<!-- Левая колонка: Глобальный поиск по всем 6 755 системам из galaxy map.pdf -->' +
+        '<div class="sw-char-sheet-card">' +
+          '<div class="sw-char-header" style="margin-bottom:8px">' +
+            '<span>📡 Полный Архив PDF «Star Systems of the Galaxy» (' + totalPdf.toLocaleString('ru-RU') + ' систем)</span>' +
+            '<span class="sw-role-badge">612 секторов</span>' +
+          '</div>' +
+          '<div style="font-size:12.5px;color:#94a3b8;margin-bottom:10px">' +
+            'Оцифрованная база всех 61 страниц приложения <code>galaxy map.pdf</code>. Введите название любой системы, сектора или квадрат сетки (например, <code>Coruscant</code>, <code>Mandalore</code>, <code>Chommell</code>, <code>L-9</code>):' +
+          '</div>' +
+          '<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-bottom:10px">' +
+            '<input type="text" id="swPdfSearchInput" class="sw-input" placeholder="🔍 Система, сектор или квадрат (напр. Alderaan, Arkanis, R-16)..." value="' + esc(swMapState.pdfSearch) + '"/>' +
+            '<select id="swPdfRegionSelect" class="sw-input">' +
+              '<option value="all"' + (swMapState.pdfRegionFilter === 'all' ? ' selected' : '') + '>Все регионы PDF</option>' +
+              '<option value="Deep Core"' + (swMapState.pdfRegionFilter === 'Deep Core' ? ' selected' : '') + '>Глубокое Ядро (Deep Core)</option>' +
+              '<option value="Core Worlds"' + (swMapState.pdfRegionFilter === 'Core Worlds' ? ' selected' : '') + '>Миры Ядра (Core Worlds)</option>' +
+              '<option value="Colonies"' + (swMapState.pdfRegionFilter === 'Colonies' ? ' selected' : '') + '>Колонии (Colonies)</option>' +
+              '<option value="Inner Rim"' + (swMapState.pdfRegionFilter === 'Inner Rim' ? ' selected' : '') + '>Внутреннее Кольцо (Inner Rim)</option>' +
+              '<option value="Expansion Region"' + (swMapState.pdfRegionFilter === 'Expansion Region' ? ' selected' : '') + '>Регион Экспансии (Expansion Region)</option>' +
+              '<option value="Mid Rim"' + (swMapState.pdfRegionFilter === 'Mid Rim' ? ' selected' : '') + '>Среднее Кольцо (Mid Rim)</option>' +
+              '<option value="Outer Rim Territories"' + (swMapState.pdfRegionFilter === 'Outer Rim Territories' ? ' selected' : '') + '>Внешнее Кольцо (Outer Rim)</option>' +
+              '<option value="Hutt Space"' + (swMapState.pdfRegionFilter === 'Hutt Space' ? ' selected' : '') + '>Пространство Хаттов (Hutt Space)</option>' +
+              '<option value="Unknown Regions"' + (swMapState.pdfRegionFilter === 'Unknown Regions' ? ' selected' : '') + '>Неизведанные Регионы (Unknown Regions)</option>' +
+              '<option value="Wild Space"' + (swMapState.pdfRegionFilter === 'Wild Space' ? ' selected' : '') + '>Дикое Пространство (Wild Space)</option>' +
+            '</select>' +
+          '</div>' +
+          '<div class="sw-planet-list-scroll">' +
+            searchResults.map(function(item) {
+              return '<div class="sw-planet-list-item" data-sw-pdf-sys="' + esc(item.system) + '" data-sw-pdf-grid="' + esc(item.grid) + '" data-sw-pdf-curated="' + esc(item.curatedId || '') + '">' +
+                '<div style="min-width:0">' +
+                  '<div style="font-size:13.5px;font-weight:700;color:#f8fafc">' +
+                    (item.curatedId ? '🪐 ' : '✦ ') + esc(item.system) +
+                    (item.ruName ? ' <span style="color:#38bdf8;font-weight:600">— ' + esc(item.ruName) + '</span>' : '') +
+                  '</div>' +
+                  '<div style="font-size:11.5px;color:#94a3b8">' +
+                    'Сектор: <strong style="color:#cbd5e1">' + esc(item.sector || '—') + '</strong> • Регион: ' + esc(item.regionRu) +
+                  '</div>' +
+                '</div>' +
+                '<div style="display:flex;align-items:center;gap:6px">' +
+                  '<span class="sw-grid-badge">' + esc(item.grid) + '</span>' +
+                '</div>' +
+              '</div>';
+            }).join('') +
+          '</div>' +
+        '</div>' +
+
+        '<!-- Правая колонка: Инспектор выбранного квадрата сетки (5000×5000 св. лет) -->' +
+        '<div class="sw-char-sheet-card">' +
+          '<div class="sw-char-header" style="margin-bottom:8px">' +
+            '<span>🔢 Квадрат сетки <strong style="color:#fde047">' + esc(swMapState.selectedGrid) + '</strong> (5 000 × 5 000 св. лет)</span>' +
+            '<button class="sw-btn" id="swBtnZoomGridBox" style="padding:4px 10px;font-size:12px">🎯 Показать квадрат</button>' +
+          '</div>' +
+          '<div style="font-size:12.5px;color:#94a3b8;margin-bottom:8px">' +
+            'Кликните по любому квадрату на карте 4000×4000, чтобы увидеть все звёздные системы в этом секторе по данным PDF. Всего систем в квадрате <strong>' + esc(swMapState.selectedGrid) + '</strong>: <strong style="color:#fde047">' + gridSys.length + '</strong>.' +
+          '</div>' +
+          (curatedInGrid.length > 0 ? (
+            '<div style="margin-bottom:10px;padding:8px 10px;border-radius:8px;background:rgba(14,165,233,0.12);border:1px solid rgba(56,189,248,0.3)">' +
+              '<div style="font-size:11.5px;color:#bae6fd;font-weight:700;margin-bottom:6px">🪐 Ключевые миры на карте в квадрате ' + esc(swMapState.selectedGrid) + ':</div>' +
+              '<div style="display:flex;flex-wrap:wrap;gap:6px">' +
+                curatedInGrid.map(function(cp) {
+                  return '<button class="sw-map-jump-btn" data-sw-jump-planet="' + esc(cp.id) + '">' + cp.icon + ' ' + esc(cp.name.split(' (')[0]) + '</button>';
+                }).join('') +
+              '</div>' +
+            '</div>'
+          ) : '') +
+          '<div class="sw-planet-list-scroll" style="max-height:340px">' +
+            (gridSys.length > 0 ? gridSys.map(function(item) {
+              return '<div class="sw-planet-list-item" data-sw-pdf-sys="' + esc(item.system) + '" data-sw-pdf-grid="' + esc(item.grid) + '" data-sw-pdf-curated="' + esc(item.curatedId || '') + '">' +
+                '<div>' +
+                  '<div style="font-size:13px;font-weight:700;color:#fff">' +
+                    (item.curatedId ? '🪐 ' : '✦ ') + esc(item.system) +
+                    (item.ruName ? ' <span style="color:#38bdf8">(' + esc(item.ruName) + ')</span>' : '') +
+                  '</div>' +
+                  '<div style="font-size:11.5px;color:#94a3b8">Сектор: ' + esc(item.sector || '—') + ' • ' + esc(item.regionRu) + '</div>' +
+                '</div>' +
+                '<span class="sw-grid-badge">' + esc(item.grid) + '</span>' +
+              '</div>';
+            }).join('') : '<div style="color:#94a3b8;font-size:13px;padding:12px">В этом квадрате нет зарегистрированных систем в каталоге PDF.</div>') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+  } else if (swMapState.mode === 'route') {
+    var modeMultipliers = { lane: 0.65, standard: 1.0, blind: 1.85, smuggler: 0.52 };
+    var mult = modeMultipliers[swMapState.astrogationMode] || 1.0;
+    var hoursTotal = Math.round((routeStats.totalLy / 1000) * 3.2 * swMapState.hyperdriveClass * mult * 10) / 10;
+    var daysTotal = Math.round((hoursTotal / 24) * 10) / 10;
+    var fuelCredits = Math.round(routeStats.totalLy * 0.18 * (1 / Math.max(0.5, swMapState.hyperdriveClass)) * (swMapState.astrogationMode === 'smuggler' ? 1.45 : 1.0));
+    var uniqueHazards = [];
+    for (var hi = 0; hi < routeStats.hazards.length; hi++) {
+      if (uniqueHazards.indexOf(routeStats.hazards[hi]) === -1) uniqueHazards.push(routeStats.hazards[hi]);
+    }
+
+    bottomPanelHtml =
+      '<div class="sw-map-panels-grid">' +
+        '<!-- Левая колонка: Навигационный компьютер гиперпрыжка -->' +
+        '<div class="sw-char-sheet-card">' +
+          '<div class="sw-char-header" style="margin-bottom:8px">' +
+            '<span>🧭 Навигационный Компьютер Гиперпрыжка</span>' +
+            '<span class="sw-role-badge">Масштаб: 1 квадрат = 5 000 св. лет</span>' +
+          '</div>' +
+          '<div style="font-size:12.5px;color:#94a3b8;margin-bottom:10px">' +
+            'Кликайте по планетам прямо на карте, чтобы добавить их в цепочку прыжка, или выберите один из канонических торговых маршрутов:' +
+          '</div>' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">' +
+            '<div>' +
+              '<label style="font-size:11.5px;color:#94a3b8;display:block;margin-bottom:4px">Класс гипердвигателя корабля</label>' +
+              '<select id="swRouteHyperdriveSelect" class="sw-input" style="width:100%">' +
+                '<option value="0.5"' + (swMapState.hyperdriveClass === 0.5 ? ' selected' : '') + '>Класс 0.5 («Тысячелетний сокол» — сверхбыстрый)</option>' +
+                '<option value="1"' + (swMapState.hyperdriveClass === 1.0 ? ' selected' : '') + '>Класс 1.0 (Военный флот / Истребители Джедаев)</option>' +
+                '<option value="2"' + (swMapState.hyperdriveClass === 2.0 ? ' selected' : '') + '>Класс 2.0 (Стандартный гражданский / грузовой)</option>' +
+                '<option value="3"' + (swMapState.hyperdriveClass === 3.0 ? ' selected' : '') + '>Класс 3.0 (Тяжёлые баржи и колониальные суда)</option>' +
+                '<option value="4"' + (swMapState.hyperdriveClass === 4.0 ? ' selected' : '') + '>Класс 4.0 (Резервный / Устаревший привод)</option>' +
+              '</select>' +
+            '</div>' +
+            '<div>' +
+              '<label style="font-size:11.5px;color:#94a3b8;display:block;margin-bottom:4px">Режим астронавигации</label>' +
+              '<select id="swRouteAstroModeSelect" class="sw-input" style="width:100%">' +
+                '<option value="lane"' + (swMapState.astrogationMode === 'lane' ? ' selected' : '') + '>По главным гипермаршрутам ①–⑤ (×0.65 времени, КС 10)</option>' +
+                '<option value="standard"' + (swMapState.astrogationMode === 'standard' ? ' selected' : '') + '>Стандартные секторные коридоры (×1.0, КС 13)</option>' +
+                '<option value="blind"' + (swMapState.astrogationMode === 'blind' ? ' selected' : '') + '>Дикое Пространство / Обход блокады (×1.85, КС 17)</option>' +
+                '<option value="smuggler"' + (swMapState.astrogationMode === 'smuggler' ? ' selected' : '') + '>Срез контрабандиста сквозь гравиколодцы (×0.52, КС 20!)</option>' +
+              '</select>' +
+            '</div>' +
+          '</div>' +
+
+          '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">' +
+            '<div style="padding:10px;border-radius:9px;background:rgba(15,23,42,0.75);border:1px solid rgba(250,204,21,0.35);text-align:center">' +
+              '<div style="font-size:11px;color:#94a3b8">ДИСТАНЦИЯ ПРЫЖКА</div>' +
+              '<div style="font-size:16px;font-weight:800;color:#fde047;margin-top:3px">' + routeStats.totalLy.toLocaleString('ru-RU') + ' св. лет</div>' +
+              '<div style="font-size:11.5px;color:#cbd5e1">' + routeStats.totalParsecs.toLocaleString('ru-RU') + ' парсек</div>' +
+            '</div>' +
+            '<div style="padding:10px;border-radius:9px;background:rgba(15,23,42,0.75);border:1px solid rgba(56,189,248,0.35);text-align:center">' +
+              '<div style="font-size:11px;color:#94a3b8">ВРЕМЯ В ГИПЕРПРОСТРАНСТВЕ</div>' +
+              '<div style="font-size:16px;font-weight:800;color:#38bdf8;margin-top:3px">' + hoursTotal + ' ч.</div>' +
+              '<div style="font-size:11.5px;color:#cbd5e1">≈ ' + daysTotal + ' ст. суток</div>' +
+            '</div>' +
+            '<div style="padding:10px;border-radius:9px;background:rgba(15,23,42,0.75);border:1px solid rgba(16,185,129,0.35);text-align:center">' +
+              '<div style="font-size:11px;color:#94a3b8">РАСХОД КОАКСИУМА</div>' +
+              '<div style="font-size:16px;font-weight:800;color:#34d399;margin-top:3px">' + fuelCredits.toLocaleString('ru-RU') + ' кр.</div>' +
+              '<div style="font-size:11.5px;color:#cbd5e1">Точек маршрута: ' + swMapState.routeWaypoints.length + '</div>' +
+            '</div>' +
+          '</div>' +
+
+          (uniqueHazards.length > 0 ? (
+            '<div style="margin-bottom:10px;padding:9px 12px;border-radius:8px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);font-size:12.5px;color:#fecaca">' +
+              '<strong>⚠️ Навигационные предупреждения на маршруте:</strong><br/>' +
+              uniqueHazards.map(function(h) { return '• ' + esc(h); }).join('<br/>') +
+            '</div>'
+          ) : '') +
+
+          '<div style="display:flex;flex-wrap:wrap;gap:8px">' +
+            '<button class="sw-btn sw-btn-primary" id="swBtnRollHyperspaceEvent">🎲 Событие в гиперпрыжке</button>' +
+            '<button class="sw-btn" id="swBtnReverseRoute">⇄ Развернуть маршрут</button>' +
+            '<button class="sw-btn" id="swBtnClearRoute">🗑️ Очистить точки</button>' +
+          '</div>' +
+          (swMapState.lastEncounterText ? (
+            '<div style="margin-top:10px;padding:10px 12px;border-radius:9px;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.45);color:#e0f2fe;font-size:13px;line-height:1.5">' +
+              esc(swMapState.lastEncounterText) +
+            '</div>'
+          ) : '') +
+        '</div>' +
+
+        '<!-- Правая колонка: Точки маршрута и канонические пресеты -->' +
+        '<div class="sw-char-sheet-card">' +
+          '<div class="sw-char-header" style="margin-bottom:8px">' +
+            '<span>📍 Цепочка путевых точек (' + swMapState.routeWaypoints.length + ')</span>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px;margin-bottom:10px">' +
+            '<select id="swRouteAddPlanetSelect" class="sw-input" style="flex:1">' +
+              planets.map(function(p) {
+                return '<option value="' + esc(p.id) + '">' + esc(p.name) + ' [' + esc(p.grid) + ']</option>';
+              }).join('') +
+            '</select>' +
+            '<button class="sw-btn sw-btn-primary" id="swBtnAddWaypointSelect">+ Добавить</button>' +
+          '</div>' +
+          '<div class="sw-planet-list-scroll" style="max-height:210px;margin-bottom:12px">' +
+            (swMapState.routeWaypoints.map(function(wpId, idx) {
+              var wp = pById[wpId];
+              if (!wp) return '';
+              var segInfo = idx > 0 && routeStats.segments[idx - 1]
+                ? ' (+' + routeStats.segments[idx - 1].ly.toLocaleString('ru-RU') + ' св.л. / ' + routeStats.segments[idx - 1].pc + ' пк)'
+                : ' (Точка старта)';
+              return '<div class="sw-planet-list-item">' +
+                '<div style="font-size:13px;color:#fff">' +
+                  '<strong style="color:#fde047">#' + (idx + 1) + '</strong> ' + wp.icon + ' <strong>' + esc(wp.name) + '</strong> <span class="sw-grid-badge">' + esc(wp.grid) + '</span>' +
+                  '<span style="font-size:11.5px;color:#94a3b8">' + esc(segInfo) + '</span>' +
+                '</div>' +
+                '<button class="sw-btn" data-sw-remove-wp="' + idx + '" style="padding:2px 8px;font-size:11px">✕</button>' +
+              '</div>';
+            }).join('') || '<div style="color:#94a3b8;font-size:13px;padding:8px">Маршрут пуст. Кликните по любой планете на карте или выберите пресет ниже.</div>') +
+          '</div>' +
+          '<div style="font-size:12px;color:#94a3b8;font-weight:700;margin-bottom:6px">🛤️ Канонические гипермаршруты Галактики:</div>' +
+          '<div style="display:flex;flex-direction:column;gap:5px">' +
+            SW_CANONICAL_ROUTES.map(function(cr, cIdx) {
+              return '<button class="sw-map-jump-btn" data-sw-preset-route="' + cIdx + '" style="text-align:left;padding:6px 10px">' + esc(cr.name) + '</button>';
+            }).join('') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+  } else if (swMapState.mode === 'markers') {
+    bottomPanelHtml =
+      '<div class="sw-map-panels-grid">' +
+        '<div class="sw-char-sheet-card">' +
+          '<div class="sw-char-header" style="margin-bottom:8px">' +
+            '<span>🚩 Тактические Метки и Флот Мастера</span>' +
+            '<span class="sw-role-badge">В памяти: ' + customMarkers.length + '</span>' +
+          '</div>' +
+          '<div style="font-size:13px;color:#cbd5e1;line-height:1.55;margin-bottom:10px">' +
+            'Карта по умолчанию полностью чистая от лишних фишек. В этом режиме <strong>клик в любое место карты 4000×4000</strong> создаёт вашу собственную метку (эскадру, секретную базу игроков, место крушения или цель охоты). Все метки сохраняются автоматически.' +
+          '</div>' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">' +
+            '<input type="text" id="swNewMarkerTitle" class="sw-input" placeholder="Название метки (напр. База «Эхо», 501-й флот)"/>' +
+            '<select id="swNewMarkerType" class="sw-input">' +
+              SW_MARKER_TYPES.map(function(t) {
+                return '<option value="' + esc(t.id) + '">' + esc(t.icon + ' ' + t.label) + '</option>';
+              }).join('') +
+            '</select>' +
+          '</div>' +
+          '<input type="text" id="swNewMarkerNote" class="sw-input" placeholder="Заметка мастера (состав флота, гарнизон, секреты)..." style="width:100%;margin-bottom:10px"/>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+            '<button class="sw-btn sw-btn-primary" id="swBtnAddMarkerAtSelected">📍 Поставить у выбранной планеты (' + esc(selected ? selected.name.split(' (')[0] : '') + ')</button>' +
+            (customMarkers.length > 0 ? '<button class="sw-btn" id="swBtnClearAllMarkers">🗑️ Удалить все метки</button>' : '') +
+          '</div>' +
+        '</div>' +
+
+        '<div class="sw-char-sheet-card">' +
+          '<div class="sw-char-header" style="margin-bottom:8px">' +
+            '<span>📋 Список пользовательских меток (' + customMarkers.length + ')</span>' +
+          '</div>' +
+          '<div class="sw-planet-list-scroll">' +
+            (customMarkers.length > 0 ? customMarkers.map(function(m) {
+              var mType = SW_MARKER_TYPES.find(function(t) { return t.id === m.type; }) || SW_MARKER_TYPES[0];
+              var gStr = atlas ? (atlas.pixelToGrid(m.x, m.y) || '—') : '—';
+              return '<div class="sw-planet-list-item" data-sw-focus-marker="' + esc(m.id) + '">' +
+                '<div>' +
+                  '<div style="font-size:13.5px;font-weight:700;color:#fff">' + mType.icon + ' ' + esc(m.title) + ' <span class="sw-grid-badge">' + esc(gStr) + '</span></div>' +
+                  '<div style="font-size:11.5px;color:#94a3b8">' + esc(m.note || mType.label) + ' • [' + m.x + ', ' + m.y + ']</div>' +
+                '</div>' +
+                '<button class="sw-btn" data-sw-del-marker="' + esc(m.id) + '" style="padding:3px 8px;font-size:11px">✕</button>' +
+              '</div>';
+            }).join('') : '<div style="color:#94a3b8;font-size:13px;padding:12px">Пользовательских меток пока нет. Кликните в любую точку карты в этом режиме, чтобы разместить первую метку.</div>') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
 
   var html =
     '<button class="back" id="swMapBackHome">← Назад</button>' +
-    '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:10px">' +
       '<div>' +
-        '<h1 style="margin-bottom:4px;">🌌 Астрографическая Карта Галактики</h1>' +
-        '<div class="desc" style="margin-bottom:0;">Выберите звёздную систему на голо-карте для просмотра разведданных сектора</div>' +
+        '<h1 style="margin-bottom:4px;">🌌 Астрографический Атлас Галактики (4000×4000)</h1>' +
+        '<div class="desc" style="margin-bottom:0;">Оцифрованная карта Звёздных Войн: 200 калиброванных миров, архив всех 6 755 систем из PDF по сетке C-1..U-21 и навигатор гиперпрыжков</div>' +
       '</div>' +
     '</div>' +
 
-    '<div class="sw-galaxy-wrap">' +
-      '<svg viewBox="0 0 1000 540" style="width:100%;height:auto;display:block">' +
-        '<defs>' +
-          '<radialGradient id="swCoreGlow" cx="50%" cy="50%" r="50%">' +
-            '<stop offset="0%" stop-color="#f59e0b" stop-opacity="0.38"/>' +
-            '<stop offset="35%" stop-color="' + coreGlowColor + '" stop-opacity="0.22"/>' +
-            '<stop offset="100%" stop-color="#020617" stop-opacity="0"/>' +
-          '</radialGradient>' +
-        '</defs>' +
-        '<!-- Спиральные рукава и Кольца Галактики -->' +
-        '<ellipse cx="500" cy="275" rx="440" ry="225" fill="none" stroke="' + ringStrokeOuter + '" stroke-dasharray="8 6"/>' +
-        '<ellipse cx="500" cy="275" rx="310" ry="160" fill="none" stroke="' + ringStrokeMid + '" stroke-dasharray="6 4"/>' +
-        '<ellipse cx="500" cy="275" rx="170" ry="92" fill="none" stroke="rgba(245,158,11,0.28)"/>' +
-        '<circle cx="500" cy="275" r="185" fill="url(#swCoreGlow)"/>' +
-        '<!-- Главные гипермаршруты (Перлемианский, Кореллианский, Хайдианский) -->' +
-        '<polyline points="380,425 430,465 505,455 585,390 530,310 500,275 640,165 695,120 740,145" fill="none" stroke="' + routeStrokeA + '" stroke-width="1.8" stroke-dasharray="5 5"/>' +
-        '<polyline points="255,225 310,175 500,275 548,260 625,240 715,295 685,385 720,410 790,445" fill="none" stroke="rgba(245,158,11,0.32)" stroke-width="1.8" stroke-dasharray="5 5"/>' +
-        '<!-- Подписи регионов -->' +
-        '<text x="200" y="95" fill="' + (isSith ? 'rgba(252,165,165,0.5)' : 'rgba(125,211,252,0.45)') + '" font-size="12" font-family="Cinzel,serif" letter-spacing="2">НЕИЗВЕДАННЫЕ РЕГИОНЫ</text>' +
-        '<text x="500" y="210" text-anchor="middle" fill="rgba(252,211,77,0.55)" font-size="11" font-family="Cinzel,serif" letter-spacing="2">МИРЫ ЯДРА</text>' +
-        '<text x="815" y="95" text-anchor="end" fill="rgba(252,165,165,0.55)" font-size="12" font-family="Cinzel,serif" letter-spacing="2">ВНЕШНЕЕ КОЛЬЦО</text>' +
-        nodesSvg +
-      '</svg>' +
-    '</div>' +
-
-    '<div class="sw-char-sheet-card" style="margin-top:14px">' +
-      '<div class="sw-char-header">' +
-        '<span>🪐 ' + esc(selected.name) + '</span>' +
-        '<span class="sw-role-badge">' + esc(selected.region) + '</span>' +
+    '<div class="sw-map-shell">' +
+      '<!-- Панель режимов и слоёв -->' +
+      '<div class="sw-map-mode-bar">' +
+        '<div class="sw-map-mode-tabs">' +
+          '<button class="sw-map-mode-btn' + (swMapState.mode === 'inspect' ? ' active' : '') + '" data-sw-mode="inspect">🪐 Атлас Планет (200)</button>' +
+          '<button class="sw-map-mode-btn' + (swMapState.mode === 'archive' ? ' active' : '') + '" data-sw-mode="archive">📡 Архив PDF (6 755 систем и Сетка)</button>' +
+          '<button class="sw-map-mode-btn' + (swMapState.mode === 'route' ? ' active' : '') + '" data-sw-mode="route">🧭 Гиперпрыжок и Маршруты</button>' +
+          '<button class="sw-map-mode-btn' + (swMapState.mode === 'markers' ? ' active' : '') + '" data-sw-mode="markers">🚩 Метки и Флот (' + customMarkers.length + ')</button>' +
+        '</div>' +
+        '<div class="sw-map-layer-bar">' +
+          '<span class="sw-map-layer-chip' + (swMapState.showPins ? ' on' : '') + '" data-sw-layer="showPins">📍 Пины (200)</span>' +
+          '<span class="sw-map-layer-chip' + (swMapState.showLabels ? ' on' : '') + '" data-sw-layer="showLabels">🏷️ Подписи</span>' +
+          '<span class="sw-map-layer-chip' + (swMapState.showRoutes ? ' on' : '') + '" data-sw-layer="showRoutes">🛤️ Гипермаршруты ①–⑤</span>' +
+          '<span class="sw-map-layer-chip' + (swMapState.showGrid ? ' on' : '') + '" data-sw-layer="showGrid">🔢 Сетка PDF (C-1..U-21)</span>' +
+        '</div>' +
       '</div>' +
-      '<div style="margin-top:10px;font-size:14px;color:#e2edf8;line-height:1.6">' + esc(selected.desc) + '</div>' +
+
+      '<!-- Быстрые прыжки камеры по секторам -->' +
+      '<div class="sw-map-quick-jumps">' +
+        '<span style="font-size:11.5px;color:#94a3b8;font-weight:600">Быстрый обзор:</span>' +
+        '<button class="sw-map-jump-btn" data-sw-cam-preset="full">🌌 Весь Диск</button>' +
+        '<button class="sw-map-jump-btn" data-sw-cam-preset="core">👑 Миры Ядра (Корусант L-9)</button>' +
+        '<button class="sw-map-jump-btn" data-sw-cam-preset="deep_core">🕳️ Глубокое Ядро (Тайтон)</button>' +
+        '<button class="sw-map-jump-btn" data-sw-cam-preset="mandalore">🪖 Мандалор и Датомир (O-7)</button>' +
+        '<button class="sw-map-jump-btn" data-sw-cam-preset="sith">💀 Морабанд и Малахор (R-5)</button>' +
+        '<button class="sw-map-jump-btn" data-sw-cam-preset="hutt">🐌 Нал-Хатта и Кессель (S-12)</button>' +
+        '<button class="sw-map-jump-btn" data-sw-cam-preset="tatooine">☀️ Татуин, Джеонозис, Рилот (R-16)</button>' +
+        '<button class="sw-map-jump-btn" data-sw-cam-preset="south">🌋 Набу, Мустафар, Дагоба (M-19)</button>' +
+        '<button class="sw-map-jump-btn" data-sw-cam-preset="anoat">❄️ Хот и Беспин (K-18)</button>' +
+        '<button class="sw-map-jump-btn" data-sw-cam-preset="unknown">🟦 Ксилла, Илум, Экзегол (F-8)</button>' +
+      '</div>' +
+
+      '<!-- Интерактивный вьюпорт 4000×4000 -->' +
+      '<div class="sw-galaxy-wrap' + (swMapState.isFullscreen ? ' sw-map-fullscreen' : '') + '" id="swMapViewport">' +
+        '<div class="sw-map-canvas-layer" id="swMapCanvasLayer">' +
+          '<img class="sw-map-base-img" src="star_wars_galaxy_map_4000x4000_20251009_3c4d0e08.jpeg" width="4000" height="4000" alt="Star Wars Galaxy Map 4000x4000" draggable="false"/>' +
+          '<svg class="sw-map-overlay-svg" viewBox="0 0 4000 4000" width="4000" height="4000">' +
+            gridOverlaySvg +
+            tradeRoutesSvg +
+            activeRouteSvg +
+            pinsSvg +
+            pdfBeaconSvg +
+            customMarkersSvg +
+          '</svg>' +
+        '</div>' +
+
+        '<!-- Кнопки управления камерой -->' +
+        '<div class="sw-map-zoom-controls">' +
+          '<button class="sw-map-ctrl-btn" id="swMapZoomIn" title="Приблизить (+)">+</button>' +
+          '<button class="sw-map-ctrl-btn" id="swMapZoomOut" title="Отдалить (−)">−</button>' +
+          '<button class="sw-map-ctrl-btn" id="swMapZoomReset" title="Показать всю Галактику">⟲</button>' +
+          '<button class="sw-map-ctrl-btn" id="swMapCenterSel" title="Центрировать на выбранной планете">🎯</button>' +
+          '<button class="sw-map-ctrl-btn" id="swMapToggleFs" title="Полноэкранный режим">' + (swMapState.isFullscreen ? '🗗' : '⛶') + '</button>' +
+        '</div>' +
+
+        '<!-- Нижний астрографический HUD -->' +
+        '<div class="sw-map-hud" id="swMapHud">' +
+          '<span id="swHudCoords">🎯 Выбран: ' + esc(selected ? selected.name : '—') + ' [' + esc(selected ? selected.grid : 'L-9') + ']</span>' +
+          '<span id="swHudGridInfo">📡 Архив PDF: 6 755 систем • 1 квадрат = 5 000 св. лет</span>' +
+          '<span id="swHudZoom">Зум: ' + Math.round(swMapState.scale * 100) + '%</span>' +
+        '</div>' +
+      '</div>' +
+
+      bottomPanelHtml +
     '</div>';
 
   mount(html);
 
+  var vp = document.getElementById('swMapViewport');
+  var canvasLayer = document.getElementById('swMapCanvasLayer');
+  var hudCoords = document.getElementById('swHudCoords');
+  var hudGridInfo = document.getElementById('swHudGridInfo');
+  var hudZoom = document.getElementById('swHudZoom');
+
+  if (!swMapState.camInit) {
+    swFitFullGalaxy();
+  }
+
+  function applyTransform() {
+    if (!canvasLayer) return;
+    canvasLayer.style.transform = 'translate(' + swMapState.tx + 'px, ' + swMapState.ty + 'px) scale(' + swMapState.scale + ')';
+    if (hudZoom) hudZoom.textContent = 'Зум: ' + Math.round(swMapState.scale * 100) + '%';
+  }
+  applyTransform();
+
+  function screenToMap(clientX, clientY) {
+    var rect = vp.getBoundingClientRect();
+    var mx = (clientX - rect.left - swMapState.tx) / swMapState.scale;
+    var my = (clientY - rect.top - swMapState.ty) / swMapState.scale;
+    return { x: Math.round(mx), y: Math.round(my) };
+  }
+
+  function zoomAtPoint(factor, clientX, clientY) {
+    var rect = vp.getBoundingClientRect();
+    var cx = clientX !== undefined ? (clientX - rect.left) : (rect.width / 2);
+    var cy = clientY !== undefined ? (clientY - rect.top) : (rect.height / 2);
+    var oldScale = swMapState.scale;
+    var newScale = Math.max(0.18, Math.min(5.5, oldScale * factor));
+    var mapX = (cx - swMapState.tx) / oldScale;
+    var mapY = (cy - swMapState.ty) / oldScale;
+    swMapState.scale = newScale;
+    swMapState.tx = cx - mapX * newScale;
+    swMapState.ty = cy - mapY * newScale;
+    applyTransform();
+  }
+
+  // Панорамирование мышью и зумирование колесом
+  var isDragging = false;
+  var dragMoved = false;
+  var startX = 0;
+  var startY = 0;
+  var startTx = 0;
+  var startTy = 0;
+
+  vp.addEventListener('mousedown', function(e) {
+    if (e.button !== 0) return;
+    if (e.target.closest('.sw-map-zoom-controls')) return;
+    isDragging = true;
+    dragMoved = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    startTx = swMapState.tx;
+    startTy = swMapState.ty;
+    vp.classList.add('dragging');
+  });
+
+  window.addEventListener('mousemove', function onMove(e) {
+    if (!document.body.contains(vp)) {
+      window.removeEventListener('mousemove', onMove);
+      return;
+    }
+    if (isDragging) {
+      var dx = e.clientX - startX;
+      var dy = e.clientY - startY;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) dragMoved = true;
+      swMapState.tx = startTx + dx;
+      swMapState.ty = startTy + dy;
+      applyTransform();
+    }
+  });
+
+  window.addEventListener('mouseup', function onUp() {
+    if (!document.body.contains(vp)) {
+      window.removeEventListener('mouseup', onUp);
+      return;
+    }
+    if (isDragging) {
+      isDragging = false;
+      vp.classList.remove('dragging');
+    }
+  });
+
+  vp.addEventListener('mousemove', function(e) {
+    if (isDragging) return;
+    var pt = screenToMap(e.clientX, e.clientY);
+    if (pt.x >= 0 && pt.x <= 4000 && pt.y >= 0 && pt.y <= 4000) {
+      var gStr = atlas ? atlas.pixelToGrid(pt.x, pt.y) : null;
+      if (hudCoords) {
+        hudCoords.textContent = 'Коорд: [' + pt.x + ', ' + pt.y + ']' + (gStr ? ' • Квадрат сетки: ' + gStr : '');
+      }
+      if (hudGridInfo && gStr && atlas) {
+        var sysCnt = atlas.getSystemsInGrid(gStr).length;
+        hudGridInfo.textContent = '📡 Систем из PDF в квадрате ' + gStr + ': ' + sysCnt + ' (1 квадрат = 5 000 св. лет)';
+      }
+    }
+  });
+
+  vp.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var factor = e.deltaY < 0 ? 1.18 : (1 / 1.18);
+    zoomAtPoint(factor, e.clientX, e.clientY);
+  }, { passive: false });
+
+  // Сенсорное управление (1 палец — перемещение, 2 пальца — pinch-зум)
+  var touchDist = 0;
+  vp.addEventListener('touchstart', function(e) {
+    if (e.target.closest('.sw-map-zoom-controls')) return;
+    if (e.touches.length === 1) {
+      isDragging = true;
+      dragMoved = false;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      startTx = swMapState.tx;
+      startTy = swMapState.ty;
+    } else if (e.touches.length === 2) {
+      isDragging = false;
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      touchDist = Math.sqrt(dx * dx + dy * dy);
+    }
+  }, { passive: true });
+
+  vp.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 1 && isDragging) {
+      e.preventDefault();
+      var dx = e.touches[0].clientX - startX;
+      var dy = e.touches[0].clientY - startY;
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) dragMoved = true;
+      swMapState.tx = startTx + dx;
+      swMapState.ty = startTy + dy;
+      applyTransform();
+    } else if (e.touches.length === 2 && touchDist > 0) {
+      e.preventDefault();
+      var dx2 = e.touches[0].clientX - e.touches[1].clientX;
+      var dy2 = e.touches[0].clientY - e.touches[1].clientY;
+      var newDist = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+      var cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      var cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      zoomAtPoint(newDist / touchDist, cx, cy);
+      touchDist = newDist;
+    }
+  }, { passive: false });
+
+  vp.addEventListener('touchend', function() {
+    isDragging = false;
+    touchDist = 0;
+  });
+
+  // Клик по карте в режиме меток или архива сетки
+  vp.addEventListener('click', function(e) {
+    if (dragMoved) return;
+    if (e.target.closest('.sw-map-zoom-controls')) return;
+    if (e.target.closest('[data-sw-planet]') || e.target.closest('[data-sw-marker]')) return;
+
+    var pt = screenToMap(e.clientX, e.clientY);
+    if (pt.x < 0 || pt.x > 4000 || pt.y < 0 || pt.y > 4000) return;
+
+    if (swMapState.mode === 'markers') {
+      var titleInput = document.getElementById('swNewMarkerTitle');
+      var typeSelect = document.getElementById('swNewMarkerType');
+      var noteInput = document.getElementById('swNewMarkerNote');
+      var titleVal = (titleInput && titleInput.value.trim()) || ('Метка [' + (atlas ? (atlas.pixelToGrid(pt.x, pt.y) || '') : '') + ']');
+      var typeVal = (typeSelect && typeSelect.value) || 'fleet';
+      var noteVal = (noteInput && noteInput.value.trim()) || '';
+      var list = swLoadCustomMarkers();
+      list.push({
+        id: 'swm_' + Date.now(),
+        title: titleVal,
+        type: typeVal,
+        note: noteVal,
+        x: pt.x,
+        y: pt.y
+      });
+      swSaveCustomMarkers(list);
+      swMap();
+      return;
+    }
+
+    if (swMapState.mode === 'archive' || swMapState.showGrid) {
+      var gClicked = atlas ? atlas.pixelToGrid(pt.x, pt.y) : null;
+      if (gClicked) {
+        swMapState.selectedGrid = gClicked;
+        swMapState.highlightedPdfSys = null;
+        swMap();
+      }
+    }
+  });
+
+  // Клик по пинам планет на карте
+  document.querySelectorAll('[data-sw-planet]').forEach(function(node) {
+    node.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (dragMoved) return;
+      var pid = node.getAttribute('data-sw-planet');
+      swMapState.selectedId = pid;
+      swMapState.lastHookText = '';
+      var pObj = pById[pid];
+      if (pObj) swMapState.selectedGrid = pObj.grid;
+      if (swMapState.mode === 'route') {
+        var wps = swMapState.routeWaypoints || [];
+        if (wps[wps.length - 1] !== pid) {
+          wps.push(pid);
+          swMapState.routeWaypoints = wps;
+        }
+      }
+      swMap();
+    });
+  });
+
+  // Навигация и кнопки управления камерой
   document.getElementById('swMapBackHome').addEventListener('click', function() {
+    swMapState.isFullscreen = false;
     go({ screen: 'swHome' });
   });
-  document.querySelectorAll('[data-sw-planet]').forEach(function(node) {
-    node.addEventListener('click', function() {
-      swSelectedPlanetId = node.getAttribute('data-sw-planet');
+
+  document.getElementById('swMapZoomIn').addEventListener('click', function() { zoomAtPoint(1.3); });
+  document.getElementById('swMapZoomOut').addEventListener('click', function() { zoomAtPoint(1 / 1.3); });
+  document.getElementById('swMapZoomReset').addEventListener('click', function() {
+    swFitFullGalaxy();
+    applyTransform();
+  });
+  document.getElementById('swMapCenterSel').addEventListener('click', function() {
+    if (selected) {
+      swFocusCameraOn(selected.x, selected.y, 1.35);
+      applyTransform();
+    }
+  });
+  document.getElementById('swMapToggleFs').addEventListener('click', function() {
+    swMapState.isFullscreen = !swMapState.isFullscreen;
+    swMap();
+  });
+
+  // Переключение режимов и слоёв
+  document.querySelectorAll('[data-sw-mode]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      swMapState.mode = btn.getAttribute('data-sw-mode');
+      swMap();
+    });
+  });
+
+  document.querySelectorAll('[data-sw-layer]').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var key = chip.getAttribute('data-sw-layer');
+      swMapState[key] = !swMapState[key];
+      swMap();
+    });
+  });
+
+  // Быстрые прыжки по секторам
+  var camPresets = {
+    full:      function() { swFitFullGalaxy(); },
+    core:      function() { swFocusCameraOn(1987, 1986, 1.15); },
+    deep_core: function() { swFocusCameraOn(1902, 2248, 1.35); },
+    mandalore: function() { swFocusCameraOn(2458, 1670, 1.35); },
+    sith:      function() { swFocusCameraOn(2880, 1360, 1.35); },
+    hutt:      function() { swFocusCameraOn(3010, 2260, 1.15); },
+    tatooine:  function() { swFocusCameraOn(2850, 3070, 1.35); },
+    south:     function() { swFocusCameraOn(2220, 3320, 1.10); },
+    anoat:     function() { swFocusCameraOn(1787, 3310, 1.45); },
+    unknown:   function() { swFocusCameraOn(1180, 1850, 1.05); }
+  };
+  document.querySelectorAll('[data-sw-cam-preset]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var k = btn.getAttribute('data-sw-cam-preset');
+      if (camPresets[k]) {
+        camPresets[k]();
+        applyTransform();
+      }
+    });
+  });
+
+  // Обработчики режима 1: Атлас Планет
+  var btnFocusSel = document.getElementById('swBtnFocusSelected');
+  if (btnFocusSel && selected) {
+    btnFocusSel.addEventListener('click', function() {
+      swFocusCameraOn(selected.x, selected.y, 1.55);
+      applyTransform();
+    });
+  }
+  var btnInspectGridPdf = document.getElementById('swBtnInspectGridPdf');
+  if (btnInspectGridPdf && selected) {
+    btnInspectGridPdf.addEventListener('click', function() {
+      swMapState.selectedGrid = selected.grid;
+      swMapState.mode = 'archive';
+      swMap();
+    });
+  }
+  var btnAddSelRoute = document.getElementById('swBtnAddSelectedToRoute');
+  if (btnAddSelRoute && selected) {
+    btnAddSelRoute.addEventListener('click', function() {
+      swMapState.routeWaypoints.push(selected.id);
+      swMapState.mode = 'route';
+      swMap();
+    });
+  }
+  var btnGenHook = document.getElementById('swBtnGenHook');
+  if (btnGenHook && selected) {
+    btnGenHook.addEventListener('click', function() {
+      swMapState.lastHookText = swGeneratePlanetHook(selected);
+      swMap();
+    });
+  }
+
+  var regSel = document.getElementById('swMapRegionSelect');
+  if (regSel) {
+    regSel.addEventListener('change', function() {
+      swMapState.regionFilter = regSel.value;
+      swMap();
+    });
+  }
+  var typeSel = document.getElementById('swMapTypeSelect');
+  if (typeSel) {
+    typeSel.addEventListener('change', function() {
+      swMapState.typeFilter = typeSel.value;
+      swMap();
+    });
+  }
+  var searchInp = document.getElementById('swMapSearchInput');
+  if (searchInp) {
+    searchInp.addEventListener('input', function() {
+      swMapState.searchQuery = searchInp.value;
+      var pos = searchInp.selectionStart;
+      swMap();
+      var nextInp = document.getElementById('swMapSearchInput');
+      if (nextInp) {
+        nextInp.focus();
+        try { nextInp.setSelectionRange(pos, pos); } catch (e) {}
+      }
+    });
+  }
+  document.querySelectorAll('[data-sw-list-planet]').forEach(function(row) {
+    row.addEventListener('click', function() {
+      var pid = row.getAttribute('data-sw-list-planet');
+      swMapState.selectedId = pid;
+      swMapState.lastHookText = '';
+      var pObj = pById[pid];
+      if (pObj) {
+        swMapState.selectedGrid = pObj.grid;
+        swFocusCameraOn(pObj.x, pObj.y, 1.35);
+      }
+      swMap();
+    });
+  });
+
+  // Обработчики режима 2: Архив PDF (6 755 систем)
+  var pdfSearchInp = document.getElementById('swPdfSearchInput');
+  if (pdfSearchInp) {
+    pdfSearchInp.addEventListener('input', function() {
+      swMapState.pdfSearch = pdfSearchInp.value;
+      var pos = pdfSearchInp.selectionStart;
+      swMap();
+      var nextInp = document.getElementById('swPdfSearchInput');
+      if (nextInp) {
+        nextInp.focus();
+        try { nextInp.setSelectionRange(pos, pos); } catch (e) {}
+      }
+    });
+  }
+  var pdfRegSel = document.getElementById('swPdfRegionSelect');
+  if (pdfRegSel) {
+    pdfRegSel.addEventListener('change', function() {
+      swMapState.pdfRegionFilter = pdfRegSel.value;
+      swMap();
+    });
+  }
+  var btnZoomGridBox = document.getElementById('swBtnZoomGridBox');
+  if (btnZoomGridBox && atlas && swMapState.selectedGrid) {
+    btnZoomGridBox.addEventListener('click', function() {
+      var box = atlas.gridToBox(swMapState.selectedGrid);
+      if (box) {
+        swFocusCameraOn(box.cx, box.cy, 1.35);
+        applyTransform();
+      }
+    });
+  }
+  document.querySelectorAll('[data-sw-jump-planet]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var pid = btn.getAttribute('data-sw-jump-planet');
+      var pObj = pById[pid];
+      if (pObj) {
+        swMapState.selectedId = pid;
+        swMapState.mode = 'inspect';
+        swFocusCameraOn(pObj.x, pObj.y, 1.45);
+        swMap();
+      }
+    });
+  });
+  document.querySelectorAll('[data-sw-pdf-sys]').forEach(function(row) {
+    row.addEventListener('click', function() {
+      var sysName = row.getAttribute('data-sw-pdf-sys');
+      var gCode = row.getAttribute('data-sw-pdf-grid');
+      var curId = row.getAttribute('data-sw-pdf-curated');
+      swMapState.selectedGrid = gCode;
+      if (curId && pById[curId]) {
+        swMapState.selectedId = curId;
+        swMapState.highlightedPdfSys = null;
+        swFocusCameraOn(pById[curId].x, pById[curId].y, 1.45);
+      } else if (atlas && gCode) {
+        swMapState.highlightedPdfSys = { system: sysName, grid: gCode };
+        var box = atlas.gridToBox(gCode);
+        if (box) swFocusCameraOn(box.cx, box.cy, 1.25);
+      }
+      swMap();
+    });
+  });
+
+  // Обработчики режима 3: Навигационный компьютер
+  var hdSel = document.getElementById('swRouteHyperdriveSelect');
+  if (hdSel) {
+    hdSel.addEventListener('change', function() {
+      swMapState.hyperdriveClass = parseFloat(hdSel.value) || 1.0;
+      swMap();
+    });
+  }
+  var astroSel = document.getElementById('swRouteAstroModeSelect');
+  if (astroSel) {
+    astroSel.addEventListener('change', function() {
+      swMapState.astrogationMode = astroSel.value;
+      swMap();
+    });
+  }
+  var btnAddWpSel = document.getElementById('swBtnAddWaypointSelect');
+  if (btnAddWpSel) {
+    btnAddWpSel.addEventListener('click', function() {
+      var selEl = document.getElementById('swRouteAddPlanetSelect');
+      if (selEl && selEl.value) {
+        swMapState.routeWaypoints.push(selEl.value);
+        swMap();
+      }
+    });
+  }
+  document.querySelectorAll('[data-sw-remove-wp]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(btn.getAttribute('data-sw-remove-wp'), 10);
+      swMapState.routeWaypoints.splice(idx, 1);
+      swMap();
+    });
+  });
+  document.querySelectorAll('[data-sw-preset-route]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var cIdx = parseInt(btn.getAttribute('data-sw-preset-route'), 10);
+      var preset = SW_CANONICAL_ROUTES[cIdx];
+      if (preset) {
+        swMapState.routeWaypoints = preset.ids.slice();
+        swFitFullGalaxy();
+        swMap();
+      }
+    });
+  });
+  var btnRollEnc = document.getElementById('swBtnRollHyperspaceEvent');
+  if (btnRollEnc) {
+    btnRollEnc.addEventListener('click', function() {
+      swMapState.lastEncounterText = SW_HYPERSPACE_ENCOUNTERS[Math.floor(Math.random() * SW_HYPERSPACE_ENCOUNTERS.length)];
+      swMap();
+    });
+  }
+  var btnRevRoute = document.getElementById('swBtnReverseRoute');
+  if (btnRevRoute) {
+    btnRevRoute.addEventListener('click', function() {
+      swMapState.routeWaypoints.reverse();
+      swMap();
+    });
+  }
+  var btnClearRoute = document.getElementById('swBtnClearRoute');
+  if (btnClearRoute) {
+    btnClearRoute.addEventListener('click', function() {
+      swMapState.routeWaypoints = [];
+      swMapState.lastEncounterText = '';
+      swMap();
+    });
+  }
+
+  // Обработчики режима 4: Пользовательские метки
+  var btnAddAtSel = document.getElementById('swBtnAddMarkerAtSelected');
+  if (btnAddAtSel && selected) {
+    btnAddAtSel.addEventListener('click', function() {
+      var titleInput = document.getElementById('swNewMarkerTitle');
+      var typeSelect = document.getElementById('swNewMarkerType');
+      var noteInput = document.getElementById('swNewMarkerNote');
+      var list = swLoadCustomMarkers();
+      list.push({
+        id: 'swm_' + Date.now(),
+        title: (titleInput && titleInput.value.trim()) || ('Флот у ' + selected.name.split(' (')[0]),
+        type: (typeSelect && typeSelect.value) || 'fleet',
+        note: (noteInput && noteInput.value.trim()) || '',
+        x: selected.x + 22,
+        y: selected.y - 22
+      });
+      swSaveCustomMarkers(list);
+      swMap();
+    });
+  }
+  var btnClearMarkers = document.getElementById('swBtnClearAllMarkers');
+  if (btnClearMarkers) {
+    btnClearMarkers.addEventListener('click', function() {
+      swSaveCustomMarkers([]);
+      swMap();
+    });
+  }
+  document.querySelectorAll('[data-sw-focus-marker]').forEach(function(row) {
+    row.addEventListener('click', function(e) {
+      if (e.target.closest('[data-sw-del-marker]')) return;
+      var mid = row.getAttribute('data-sw-focus-marker');
+      var m = customMarkers.find(function(it) { return it.id === mid; });
+      if (m) {
+        swMapState.editingMarkerId = m.id;
+        swFocusCameraOn(m.x, m.y, 1.45);
+        swMap();
+      }
+    });
+  });
+  document.querySelectorAll('[data-sw-del-marker]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var mid = btn.getAttribute('data-sw-del-marker');
+      var list = swLoadCustomMarkers().filter(function(it) { return it.id !== mid; });
+      swSaveCustomMarkers(list);
       swMap();
     });
   });

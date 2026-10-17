@@ -390,21 +390,9 @@ class ControllerAI {
 	
 	// Selects a card to remove from a Grave. Assumes at least one valid card.
 	medic(card, grave){
-		let data = this.countCards(grave);
-		let targ;
-		if (data.spy.length){
-			let min = data.spy.reduce( (a,c) => Math.min(a, c.power), Number.MAX_VALUE);
-			targ = data.spy.filter(c => c.power === min)[0];
-		} else if (data.medic.length) {
-			let max = data.medic.reduce( (a,c) => Math.max(a, c.power), Number.MIN_VALUE);
-			targ = data.medic.filter(c => c.power === max)[0];
-		} else if (data.scorch.length) {
-			targ = data.scorch[randomInt(data.scorch.length)];
-		} else {
-			let units = grave.findCards(c => c.isUnit());
-			targ = units.reduce( (a,c) => a.power < c.power ? c : a, units[0] );
-		}
-		return targ;
+		let units = grave.findCards(c => c.isUnit());
+		if (!units.length) return null;
+		return units.reduce( (a,c) => a.basePower < c.basePower ? c : a, units[0] );
 	}
 	
 	// Selects a card to return to the Hand and replaces it with a Decoy. Assumes at least one valid card.
@@ -546,9 +534,10 @@ class ControllerAI {
 	
 	// Calculates the weight for cards with the medic ability
 	weightMedic(data, score, owner){
-		let units = owner.grave.findCards(c => c.isUnit());
-		let grave = data["grave_" + owner.opponent().tag];
-		return !units.length ? Math.min(1,score) : score + (grave.spy.length ? 50 : grave.medic.length ? 15 : grave.scorch.length  ? 10 : this.player.health === 1 ? 1 : 0);
+		let units = owner.grave.findCards(c => c.isUnit() && c.basePower > 0);
+		if (!units.length) return Math.min(1, score);
+		let maxPower = units.reduce((a, c) => Math.max(a, c.basePower), 0);
+		return score + maxPower;
 	}
 	
 	// Calculates the weight for cards with the berserker ability
@@ -1413,9 +1402,11 @@ class Row extends CardContainer {
 		}
 		if (game.doubleSpyPower && card.abilities.includes("spy"))
 			total *= 2;
-		let bond = this.effects.bond[card.id()];
-		if (isNumber(bond) && bond > 1)
-			total *= Number(bond);
+		if (card.abilities.includes("bond")) {
+			let bond = this.effects.bond[card.id()];
+			if (isNumber(bond) && bond > 1)
+				total *= Number(bond);
+		}
 		total += Math.max(0, this.effects.morale + (card.abilities.includes("morale") ? -1 : 0 ));
 		if (this.effects.horn - (card.abilities.includes("horn") ? 1 : 0) >  0 )
 			total *= 2;
@@ -1443,9 +1434,18 @@ class Row extends CardContainer {
 	// Removes all cards and effects from this row
 	async clear() {
 		const toGrave  = this.cards.filter(c => !c.noRemove);
+		const kept = this.cards.filter(c => c.noRemove);
 		if (this.special != null)
 			toGrave.push(this.special);
 		await Promise.all(toGrave.map(async c => await board.toGrave(c, this)));
+		kept.forEach(c => {
+			if (typeof c.silence === "function") c.silence(this);
+		});
+		this.effects.morale = 0;
+		this.effects.horn = 0;
+		this.effects.mardroeme = 0;
+		this.effects.bond = {};
+		this.updateScore();
 	}
 
 	// Returns all regular unit cards with the heighest power
@@ -1588,6 +1588,9 @@ class Board {
 	
 	// Sends and translates a card from the source to the Deck of the card's combat row
 	async toRow(card, source) {
+		if (card && source instanceof Grave && typeof card.silence === "function") {
+			card.silence();
+		}
 		let row = card.row;
 		if (row === "agile")
 		{
@@ -1605,6 +1608,9 @@ class Board {
 	
 	// Sends and translates a card from the source to a specified row name or CardContainer
 	async moveTo(card, dest, source) {
+		if (card && source instanceof Grave && dest !== "deck" && dest !== card.holder?.deck) {
+			if (typeof card.silence === "function") card.silence();
+		}
 		if (isString(dest))
 			dest = this.getRow(card, dest);
 		if (card && card.holder && dest === card.holder.hand) {
@@ -1618,6 +1624,9 @@ class Board {
 	
 	// Sends and translates a card from the source to a row name associated with the passed player
 	async addCardToRow(card, row_name, player, source) {
+		if (card && source instanceof Grave && typeof card.silence === "function") {
+			card.silence();
+		}
 		let row = this.getRow(card, row_name, player);
 		await translateTo(card, source, row);
 		await row.addCard(card);
@@ -2231,6 +2240,42 @@ class Card {
 		this.elem = newElem;
 	}
 	
+	// Disables all abilities on this card (when revived from grave or remaining across rounds)
+	silence(row = null) {
+		if (row && typeof row.updateState === "function") {
+			row.updateState(this, false);
+		}
+		this.abilities = [];
+		this.placed = [];
+		this.removed = [];
+		this.activated = [];
+		this._silenced = true;
+		if (this.elem && this.elem.children && this.elem.children[2]) {
+			if (this.row === "agile") {
+				this.elem.children[2].style.backgroundImage = iconURL("card_ability_agile");
+			} else {
+				this.elem.children[2].style.backgroundImage = "";
+			}
+		}
+		const ruTitle = this.nameRu || this.name;
+		let abilityTitle = "";
+		if (this.row === "agile")
+			abilityTitle = ability_dict["agile"].name;
+		else if (this.hero)
+			abilityTitle = ability_dict["hero"].name;
+		this.desc_name = abilityTitle ? `${ruTitle} — ${abilityTitle}` : ruTitle;
+		this.desc = this.row === "agile" ? ability_dict["agile"].description : "";
+		if (this.hero)
+			this.desc += ability_dict["hero"].description;
+		if (!this.desc) {
+			const rowLabel = this.row === "close" ? "Рукопашный отряд" : this.row === "ranged" ? "Дальнобойный отряд" : this.row === "siege" ? "Осадный отряд" : "Отряд";
+			this.desc = `${rowLabel} (сила ${this.basePower}). Способность неактивна.`;
+		}
+		if (row && typeof row.updateScore === "function") {
+			row.updateScore();
+		}
+	}
+
 	// Returns the identifier for this type of card
 	id() {
 		return (this.raw_data && this.raw_data.bondGroup) ? this.raw_data.bondGroup : this.name;

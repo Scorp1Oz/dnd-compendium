@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v145';
+const CACHE_NAME = 'compendium-cache-v148';
 const APP_SHELL = [
   './',
   './index.html',
@@ -22,12 +22,14 @@ const APP_SHELL = [
   './js/modules/avatar.js',
   './js/modules/witcher.js',
   './js/modules/wizard.js',
+  './js/sw-galaxy-atlas.js',
   './js/modules/star-wars.js',
   './js/modules/github-sync.js',
   './js/app.js',
   './mass_effect_galaxy_map.jpg',
   './shinobi_map_accurate.svg',
   './new-4k-map-of-the-continent-v0-s4ryngvic0ga1.webp',
+  './star_wars_galaxy_map_4000x4000_20251009_3c4d0e08.jpeg',
   './symbols/Witcher/Aard.png',
   './symbols/Witcher/Axii.png',
   './symbols/Witcher/Igni.png',

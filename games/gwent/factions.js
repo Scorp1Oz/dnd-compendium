@@ -26,13 +26,15 @@ var factions = {
 			const card = units[randomInt(units.length)];
 			card.noRemove = true;
 			game.roundStart.push( async () => {
+				const row = board.row.find(r => r.cards.includes(card));
+				if (typeof card.silence === "function") card.silence(row);
 				await ui.notification("monsters", 1200);
 				delete card.noRemove;
 				return true; 
 			});
 			return false;
 		}),
-		description: "Свирепость Чудовищ: в конце каждого раунда на поле боя остаётся один случайный отряд (не герой)."
+		description: "Свирепость Чудовищ: в конце каждого раунда на поле боя остаётся один случайный отряд (не герой), но его способность в новом раунде не действует."
 	},
 	scoiatael: {
 		name: "Скоя'таэли",
@@ -67,7 +69,11 @@ var factions = {
 			await ui.notification("skellige-" + player.tag, 1200);
 			if (player.controller instanceof ControllerAI)
 			{
-				await Promise.all(player.grave.findCardsRandom(c => c.isUnit(), 2).map(c => board.toRow(c, player.grave)));
+				await Promise.all(player.grave.findCardsRandom(c => c.isUnit(), 2).map(c => {
+					c.holder = player;
+					if (typeof c.silence === "function") c.silence();
+					return board.toRow(c, player.grave);
+				}));
 			}
 			else
 			{
@@ -82,6 +88,8 @@ var factions = {
 			if (units.length === 0)
 				return;
 			const card = units[0];
+			card.holder = player;
+			if (typeof card.silence === "function") card.silence();
 			if (card.row === 'agile')
 			{
 				const selectedRow = await ui.waitForRowSelection(card);
@@ -95,7 +103,7 @@ var factions = {
 				await board.toRow(card, player.grave);
 			}
 		},
-		description: "Ярость Скеллиге: в начале третьего раунда 2 случайных отряда из вашего сброса возвращаются на поле боя."
+		description: "Ярость Скеллиге: в начале третьего раунда 2 случайных отряда из вашего сброса возвращаются на поле боя (без срабатывания их способностей)."
 	},
 	syndicate: {
 		name: "Синдикат",

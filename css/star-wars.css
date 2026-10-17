@@ -1161,27 +1161,394 @@ body.sw-theme.sw-theme-sith .sw-stat-box-grid {
   }
 }
 
-/* --- Карта Галактики --- */
+/* --- Карта Галактики 4000x4000 (Астрографический Атлас и Архив PDF) --- */
+.sw-map-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sw-map-mode-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(8, 17, 34, 0.86);
+  border: 1px solid var(--sw-border);
+}
+
+body.sw-theme.sw-theme-sith .sw-map-mode-bar {
+  background: rgba(24, 6, 10, 0.88);
+  border-color: rgba(239, 68, 68, 0.38);
+}
+
+.sw-map-mode-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sw-map-mode-btn {
+  padding: 8px 13px;
+  border-radius: 9px;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  background: rgba(15, 29, 54, 0.72);
+  color: #cbe7ff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sw-map-mode-btn:hover {
+  border-color: var(--sw-accent);
+  background: rgba(56, 189, 248, 0.16);
+  color: #fff;
+}
+
+.sw-map-mode-btn.active {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.34), rgba(3, 105, 161, 0.52));
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.32);
+}
+
+body.sw-theme.sw-theme-sith .sw-map-mode-btn {
+  border-color: rgba(239, 68, 68, 0.28);
+  background: rgba(40, 10, 16, 0.72);
+  color: #fecdd3;
+}
+
+body.sw-theme.sw-theme-sith .sw-map-mode-btn.active {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.42), rgba(153, 27, 27, 0.58));
+  border-color: #ef4444;
+  color: #fff;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.35);
+}
+
+.sw-map-layer-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.sw-map-layer-chip {
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(15, 23, 42, 0.75);
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.16s ease;
+}
+
+.sw-map-layer-chip.on {
+  border-color: rgba(56, 189, 248, 0.65);
+  background: rgba(14, 165, 233, 0.2);
+  color: #e0f2fe;
+}
+
+body.sw-theme.sw-theme-sith .sw-map-layer-chip.on {
+  border-color: rgba(239, 68, 68, 0.65);
+  background: rgba(220, 38, 38, 0.22);
+  color: #ffe4e6;
+}
+
+.sw-map-quick-jumps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.sw-map-jump-btn {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  background: rgba(10, 20, 38, 0.8);
+  color: #bae6fd;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sw-map-jump-btn:hover {
+  border-color: var(--sw-accent);
+  background: rgba(56, 189, 248, 0.18);
+  color: #fff;
+}
+
+body.sw-theme.sw-theme-sith .sw-map-jump-btn {
+  border-color: rgba(239, 68, 68, 0.25);
+  background: rgba(28, 7, 12, 0.8);
+  color: #fecdd3;
+}
+
+body.sw-theme.sw-theme-sith .sw-map-jump-btn:hover {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.2);
+  color: #fff;
+}
+
 .sw-galaxy-wrap {
   position: relative;
   width: 100%;
+  height: clamp(500px, 74vh, 820px);
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--sw-border);
-  background: radial-gradient(ellipse at 50% 50%, #0d1f3d 0%, #050b16 65%, #020409 100%);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(56, 189, 248, 0.12);
+  background: radial-gradient(ellipse at 50% 50%, #0a162c 0%, #040914 70%, #010307 100%);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85), inset 0 0 40px rgba(56, 189, 248, 0.12);
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+}
+
+.sw-galaxy-wrap.dragging {
+  cursor: grabbing;
+}
+
+.sw-galaxy-wrap.sw-map-fullscreen {
+  position: fixed;
+  inset: 10px;
+  width: auto;
+  height: auto;
+  z-index: 9999;
+  border-radius: 16px;
 }
 
 body.sw-theme.sw-theme-sith .sw-galaxy-wrap {
   border-color: rgba(239, 68, 68, 0.48);
-  background: radial-gradient(ellipse at 50% 50%, #2d070e 0%, #120205 65%, #040001 100%);
-  box-shadow: 0 12px 38px rgba(0, 0, 0, 0.88), inset 0 0 45px rgba(220, 38, 38, 0.18);
+  background: radial-gradient(ellipse at 50% 50%, #22060c 0%, #0d0205 70%, #040001 100%);
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.9), inset 0 0 45px rgba(220, 38, 38, 0.18);
+}
+
+.sw-map-canvas-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4000px;
+  height: 4000px;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.sw-map-base-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4000px;
+  height: 4000px;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.sw-map-overlay-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4000px;
+  height: 4000px;
+  display: block;
+  overflow: visible;
 }
 
 .sw-planet-node {
   cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition: filter 0.15s ease;
 }
+
 .sw-planet-node:hover {
-  filter: drop-shadow(0 0 10px var(--sw-accent));
+  filter: drop-shadow(0 0 12px #38bdf8) brightness(1.2);
 }
+
+.sw-route-line {
+  stroke-dasharray: 18 10;
+  animation: swRouteFlow 28s linear infinite;
+}
+
+@keyframes swRouteFlow {
+  from { stroke-dashoffset: 560; }
+  to { stroke-dashoffset: 0; }
+}
+
+.sw-active-route-line {
+  stroke-dasharray: 22 10;
+  animation: swRouteFlow 12s linear infinite;
+}
+
+.sw-grid-cell-rect {
+  fill: rgba(56, 189, 248, 0.01);
+  stroke: rgba(56, 189, 248, 0.26);
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: fill 0.12s ease, stroke 0.12s ease;
+}
+
+.sw-grid-cell-rect:hover {
+  fill: rgba(56, 189, 248, 0.14);
+  stroke: rgba(56, 189, 248, 0.85);
+  stroke-width: 3;
+}
+
+.sw-grid-cell-rect.active {
+  fill: rgba(250, 204, 21, 0.18);
+  stroke: #facc15;
+  stroke-width: 4.5;
+}
+
+/* Панель зума и управления на карте */
+.sw-map-zoom-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 15;
+}
+
+.sw-map-ctrl-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border: 1px solid rgba(56, 189, 248, 0.42);
+  background: rgba(7, 15, 30, 0.88);
+  color: #e0f2fe;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65);
+  transition: all 0.15s ease;
+}
+
+.sw-map-ctrl-btn:hover {
+  background: rgba(14, 165, 233, 0.35);
+  border-color: #38bdf8;
+  transform: translateY(-1px);
+}
+
+body.sw-theme.sw-theme-sith .sw-map-ctrl-btn {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(24, 5, 10, 0.88);
+  color: #ffe4e6;
+}
+
+/* Нижний астрографический HUD */
+.sw-map-hud {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  background: rgba(5, 12, 24, 0.88);
+  border: 1px solid rgba(56, 189, 248, 0.32);
+  color: #bae6fd;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  z-index: 15;
+  pointer-events: none;
+  backdrop-filter: blur(6px);
+}
+
+body.sw-theme.sw-theme-sith .sw-map-hud {
+  background: rgba(20, 4, 8, 0.9);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fecdd3;
+}
+
+/* Сетка панелей под картой */
+.sw-map-panels-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 920px) {
+  .sw-map-panels-grid {
+    grid-template-columns: 1fr;
+  }
+  .sw-galaxy-wrap {
+    height: clamp(420px, 62vh, 640px);
+  }
+}
+
+.sw-planet-list-scroll {
+  max-height: 430px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 4px;
+}
+
+.sw-planet-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 11px;
+  border-radius: 9px;
+  border: 1px solid rgba(56, 189, 248, 0.16);
+  background: rgba(11, 22, 41, 0.68);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sw-planet-list-item:hover {
+  border-color: rgba(56, 189, 248, 0.52);
+  background: rgba(14, 165, 233, 0.15);
+}
+
+.sw-planet-list-item.active {
+  border-color: #38bdf8;
+  background: rgba(14, 165, 233, 0.25);
+  box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.2);
+}
+
+body.sw-theme.sw-theme-sith .sw-planet-list-item {
+  border-color: rgba(239, 68, 68, 0.18);
+  background: rgba(28, 7, 12, 0.68);
+}
+
+body.sw-theme.sw-theme-sith .sw-planet-list-item.active {
+  border-color: #ef4444;
+  background: rgba(220, 38, 38, 0.25);
+}
+
+.sw-grid-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(250, 204, 21, 0.16);
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  color: #fde047;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+

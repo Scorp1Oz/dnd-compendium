@@ -154,7 +154,7 @@ var ability_dict = {
 	},
 	medic: {
 		name: "Медик",
-		description: "Позволяет выбрать один отряд из вашего сброса (кроме героев и спецкарт) и мгновенно сыграть его на поле боя.",
+		description: "Позволяет выбрать один отряд из вашего сброса (кроме героев и спецкарт) и мгновенно сыграть его на поле боя (без срабатывания его способности).",
 		audio: "medic",
 		placed: async (card) => {
 			let grave = board.getRow(card, "grave", card.holder);
@@ -175,6 +175,7 @@ var ability_dict = {
 				// move card visual to top of grave
 				const res = wrapper.card;
 				res.holder = card.holder;
+				if (typeof res.silence === "function") res.silence();
 				grave.removeCard(res);
 				grave.addCard(res);
 				let selectedRow = null;
@@ -235,17 +236,20 @@ var ability_dict = {
 		description: "Удваивает силу каждой такой карты, когда в одном ряду находятся две или более карты с одинаковым именем.",
 		audio: "bond",
 		placed: async (card, row) => {
-			let targetRow = row || board.getRow(card, card.row, card.holder);
-			if (!targetRow) return;
-			let bonds = targetRow.findCards(c => c.id() === card.id());
-			if (bonds.length > 1)
-				await Promise.all( bonds.map(c => c.animate("bond")) );
+			let rows = [board.getRow(card, "close", card.holder), board.getRow(card, "ranged", card.holder), board.getRow(card, "siege", card.holder)].filter(Boolean);
+			for (let r of rows) {
+				let bonds = r.findCards(c => c.id() === card.id());
+				if (bonds.length > 1 && bonds.includes(card)) {
+					await Promise.all( bonds.map(c => c.animate("bond")) );
+				}
+			}
 		}
 	},
 	avenger: {
 		name: "Мститель",
 		description: "Когда эта карта покидает поле боя, на её место призывается новый могучий отряд.",
 		removed: async (card) => {
+			if (card._isDecoyed) return;
 			let bdf = new Card(card_dict[21], card.holder);
 			bdf.removed.push( () => setTimeout( () => {
 				if (game.isPlaying())
@@ -259,6 +263,7 @@ var ability_dict = {
 		name: "Мститель — Хеймдалль",
 		description: "Когда Камби покидает поле боя, на его место призывается легендарный герой Хеймдалль (сила 11).",
 		removed: async card => {
+			if (card._isDecoyed) return;
 			let bdf = new Card(card_dict[196], card.holder);
 			bdf.removed.push( () => setTimeout( () => {
 				if (game.isPlaying())
@@ -376,21 +381,25 @@ var ability_dict = {
 	},
 	emhyr_relentless: {
 		name: "Безжалостный",
-		description: "Позволяет забрать один отряд (не героя) из сброса противника себе в руку.",
+		description: "Позволяет забрать один отряд (не героя) из сброса противника себе в руку (без его способности).",
 		activated: async card => {
 			let grave = board.getRow(card, "grave", card.holder.opponent());
 			if (grave.findCards(c => c.isUnit()).length === 0)
 				return;
 			if (card.holder.controller instanceof ControllerAI) {
 				let newCard = card.holder.controller.medic(card, grave);
-				newCard.holder = card.holder;
-				await board.toHand(newCard, grave);
+				if (newCard) {
+					newCard.holder = card.holder;
+					if (typeof newCard.silence === "function") newCard.silence();
+					await board.toHand(newCard, grave);
+				}
 				return;
 			}
 			Carousel.curr?.cancel();
 			await ui.queueCarousel(grave, 1, async (c,i) => {
 				let newCard = c.cards[i];
 				newCard.holder = card.holder;
+				if (typeof newCard.silence === "function") newCard.silence();
 				await board.toHand(newCard, grave);
 			}, c => c.isUnit(), true);
 		},
@@ -446,7 +455,7 @@ var ability_dict = {
 	},
 	eredin_bringer_of_death: {
 		name: "Вестник Смерти",
-		description: "Возвращает выбранный отряд (не героя) из вашего сброса обратно в руку.",
+		description: "Возвращает выбранный отряд (не героя) из вашего сброса обратно в руку (без его способности).",
 		activated: async card => {
 			let newCard;
 			if (card.holder.controller instanceof ControllerAI) {
@@ -455,8 +464,11 @@ var ability_dict = {
 				Carousel.curr?.exit();
 				await ui.queueCarousel(card.holder.grave, 1, (c,i) => newCard = c.cards[i], c => c.isUnit(), false, false);
 			}
-			if (newCard)
+			if (newCard) {
+				newCard.holder = card.holder;
+				if (typeof newCard.silence === "function") newCard.silence();
 				await board.toHand(newCard, card.holder.grave);
+			}
 		},
 		weight: (card, ai, max, data) => ai.weightMedic(data, 0, card.holder)
 	},
