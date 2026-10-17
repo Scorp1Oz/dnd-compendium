@@ -898,8 +898,8 @@ body.sw-theme .wi-ref-search-icon {
 
 /* --- Формы и Инпуты --- */
 .sw-input,
-body.sw-theme input[type="text"],
-body.sw-theme input[type="number"],
+body.sw-theme input[type="text"]:not(.custom-input),
+body.sw-theme input[type="number"]:not(.custom-input),
 body.sw-theme input[type="password"],
 body.sw-theme select,
 body.sw-theme textarea {
@@ -915,9 +915,18 @@ body.sw-theme textarea {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+body.sw-theme .custom-input {
+  width: 58px !important;
+  text-align: center;
+  padding: 5px 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  border-radius: 2px;
+}
+
 body.sw-theme.sw-theme-sith .sw-input,
-body.sw-theme.sw-theme-sith input[type="text"],
-body.sw-theme.sw-theme-sith input[type="number"],
+body.sw-theme.sw-theme-sith input[type="text"]:not(.custom-input),
+body.sw-theme.sw-theme-sith input[type="number"]:not(.custom-input),
 body.sw-theme.sw-theme-sith input[type="password"],
 body.sw-theme.sw-theme-sith select,
 body.sw-theme.sw-theme-sith textarea {
@@ -927,7 +936,7 @@ body.sw-theme.sw-theme-sith textarea {
 }
 
 .sw-input:focus,
-body.sw-theme input:focus,
+body.sw-theme input:not(.custom-input):focus,
 body.sw-theme select:focus,
 body.sw-theme textarea:focus {
   outline: none;
