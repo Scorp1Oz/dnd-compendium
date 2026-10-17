@@ -756,7 +756,7 @@
         document.body.insertBefore(cont, document.body.firstChild);
       }
       var curTheme = WI.getTheme();
-      if(cont.children.length === 0 || !cont.querySelector('.wi-bg-signs img') || cont.getAttribute('data-wi-theme') !== curTheme){
+      if(cont.children.length === 0 || !cont.querySelector('.wi-sign-particle') || cont.getAttribute('data-wi-theme') !== curTheme){
         WI.buildThemeFx(cont);
       }
       cont.style.display = 'block';
@@ -768,7 +768,7 @@
       if(typeof HB === 'undefined' || HB.mode !== 'wi'){
         document.body.classList.remove('wi-theme');
         WI.THEMES.forEach(function(t){
-          if(t.id !== 'wolf') document.body.classList.remove('wi-theme-' + t.id);
+          document.body.classList.remove('wi-theme-' + t.id);
         });
         if(fx) fx.style.display = 'none';
         return;
@@ -776,9 +776,7 @@
       var curTheme = WI.getTheme();
       document.body.classList.add('wi-theme');
       WI.THEMES.forEach(function(t){
-        if(t.id !== 'wolf'){
-          document.body.classList.toggle('wi-theme-' + t.id, curTheme === t.id);
-        }
+        document.body.classList.toggle('wi-theme-' + t.id, curTheme === t.id);
       });
       WI.initWitcherFx();
     }

@@ -989,6 +989,41 @@ body.el-theme.el-theme-dark .hb-seg-indicator[data-mode="el"]{
   box-shadow:none;
 }
 
+/* Темы раздела «Ведьмак» — цвет подсветки кнопки раздела подстраивается под выбранную тему */
+body.wi-theme .hb-seg-indicator[data-mode="wi"],
+body.wi-theme.wi-theme-wolf .hb-seg-indicator[data-mode="wi"]{
+  background-color:#d97706;
+  box-shadow:0 0 12px rgba(245, 158, 11, 0.35);
+}
+body.wi-theme.wi-theme-hunt .hb-seg-indicator[data-mode="wi"]{
+  background-color:#0284c7;
+  box-shadow:0 0 14px rgba(56, 189, 248, 0.45);
+}
+body.wi-theme.wi-theme-north .hb-seg-indicator[data-mode="wi"]{
+  background-color:#1d4ed8;
+  box-shadow:0 0 14px rgba(59, 130, 246, 0.45);
+}
+body.wi-theme.wi-theme-nilfgaard .hb-seg-indicator[data-mode="wi"]{
+  background-color:#ca8a04;
+  box-shadow:0 0 14px rgba(234, 179, 8, 0.42);
+}
+body.wi-theme.wi-theme-scoiatael .hb-seg-indicator[data-mode="wi"]{
+  background-color:#059669;
+  box-shadow:0 0 14px rgba(16, 185, 129, 0.42);
+}
+body.wi-theme.wi-theme-skellige .hb-seg-indicator[data-mode="wi"]{
+  background-color:#0d9488;
+  box-shadow:0 0 14px rgba(20, 184, 166, 0.42);
+}
+body.wi-theme.wi-theme-syndicate .hb-seg-indicator[data-mode="wi"]{
+  background-color:#b45309;
+  box-shadow:0 0 14px rgba(220, 38, 38, 0.45), inset 0 0 0 1px rgba(253, 224, 71, 0.35);
+}
+body.wi-theme.wi-theme-dragon .hb-seg-indicator[data-mode="wi"]{
+  background-color:#27272a;
+  box-shadow:0 0 12px rgba(212, 212, 216, 0.25), inset 0 0 0 1px rgba(212, 212, 216, 0.38);
+}
+
 .hb-seg-btn{
   position:relative;
   z-index:2;
