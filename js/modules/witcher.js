@@ -389,6 +389,15 @@
         accent: '#fbbf24',
         glow: 'rgba(251,191,36,0.55)',
         toast: '🪙 Тема: Синдикат и Бандиты (Золото Новиграда)'
+      },
+      {
+        id: 'dragon',
+        title: 'Ониксовый Дракон',
+        sub: 'Чёрный Оникс • Обсидиан и Пепел',
+        icon: 'symbols/Witcher/onyx_dragon_crest.png?v=165',
+        accent: '#d4d4d8',
+        glow: 'rgba(212,212,216,0.45)',
+        toast: '🐉 Тема: Ониксовый Дракон (Чёрный Оникс и Обсидиан)'
       }
     ],
 
@@ -522,6 +531,14 @@
       '</div>';
     },
 
+    buildOnyxDragonEmblemSvg: function(){
+      return '<div class="wi-bg-dragon-wrap" aria-hidden="true">' +
+        '<div class="wi-bg-dragon-crest">' +
+          '<img src="symbols/Witcher/onyx_dragon_crest.png?v=165" alt="" draggable="false" />' +
+        '</div>' +
+      '</div>';
+    },
+
     buildThemeFx: function(cont){
       if(!cont) return;
       cont.innerHTML = '';
@@ -542,16 +559,18 @@
         medallionWrap.innerHTML = WI.buildSkelligeEmblemSvg();
       } else if(theme === 'syndicate'){
         medallionWrap.innerHTML = WI.buildSyndicateEmblemSvg();
+      } else if(theme === 'dragon'){
+        medallionWrap.innerHTML = WI.buildOnyxDragonEmblemSvg();
       } else {
         medallionWrap.innerHTML = WI.buildWolfMedallionSvg();
       }
       cont.appendChild(medallionWrap.firstChild);
 
-      // 2. Фоновые парящие знаки Ведьмаков (8 шт, в разные стороны с неоновым свечением)
+      // 2. Фоновые парящие знаки Ведьмаков (для всех тем кроме Ониксового Дракона, где летает пепельная пыль)
       var signContainer = document.createElement('div');
       signContainer.className = 'wi-bg-signs';
 
-      var particleDefs = [
+      var particleDefs = (theme === 'dragon') ? [] : [
         { type: 'aard', file: 'symbols/Witcher/Aard.png', top: 72, left: 12, dir: 'up-right', dur: 22, delay: -6 },
         { type: 'igni', file: 'symbols/Witcher/Igni.png', top: 18, left: 82, dir: 'down-left', dur: 24, delay: -14 },
         { type: 'quen', file: 'symbols/Witcher/Quen.png', top: 76, left: 78, dir: 'up-left', dur: 21, delay: -8 },
@@ -586,6 +605,38 @@
           { type: 'coin', file: 'symbols/Witcher/coin_oren.png?v=163', top: -6, left: 94, dir: 'coin-fall-left', dur: 23, delay: -21, size: 28 },
           { type: 'coin', file: 'symbols/Witcher/coin_ducat.png?v=163', top: -6, left: 12, dir: 'coin-fall-right', dur: 27, delay: -23, size: 24 }
         ]);
+      }
+
+      if (theme === 'dragon') {
+        var dustDirs = ['up-right', 'up-left', 'down-right', 'down-left', 'cross', 'wave'];
+        var dustCount = 42;
+        for (var d = 0; d < dustCount; d++) {
+          var mote = document.createElement('div');
+          var dir = dustDirs[d % dustDirs.length];
+          mote.className = 'wi-sign-particle wi-dragon-dust wi-dir-' + dir;
+          var dSize = (Math.random() * 3.8 + 1.6).toFixed(1);
+          var dTop = (Math.random() * 90 + 5).toFixed(1);
+          var dLeft = (Math.random() * 94 + 3).toFixed(1);
+          var dDur = (Math.random() * 18 + 16).toFixed(1);
+          var dDelay = (-Math.random() * 32).toFixed(1);
+          mote.style.width = dSize + 'px';
+          mote.style.height = dSize + 'px';
+          mote.style.top = dTop + '%';
+          mote.style.left = dLeft + '%';
+          mote.style.animationDuration = dDur + 's';
+          mote.style.animationDelay = dDelay + 's';
+          if (d % 3 === 0) {
+            mote.style.background = '#e4e4e7';
+            mote.style.boxShadow = '0 0 6px rgba(228, 228, 231, 0.55)';
+          } else if (d % 3 === 1) {
+            mote.style.background = '#a1a1aa';
+            mote.style.boxShadow = '0 0 5px rgba(161, 161, 170, 0.45)';
+          } else {
+            mote.style.background = '#71717a';
+            mote.style.boxShadow = '0 0 4px rgba(113, 113, 122, 0.38)';
+          }
+          signContainer.appendChild(mote);
+        }
       }
 
       for (var s = 0; s < particleDefs.length; s++) {
@@ -678,6 +729,14 @@
           } else {
             ember.style.background = '#f87171';
             ember.style.boxShadow = '0 0 9px #dc2626, 0 0 18px rgba(220, 38, 38, 0.85)';
+          }
+        } else if(theme === 'dragon'){
+          if(Math.random() > 0.45){
+            ember.style.background = '#e4e4e7';
+            ember.style.boxShadow = '0 0 9px #a1a1aa, 0 0 18px rgba(212, 212, 216, 0.75)';
+          } else {
+            ember.style.background = '#71717a';
+            ember.style.boxShadow = '0 0 8px #52525b, 0 0 16px rgba(161, 161, 170, 0.65)';
           }
         } else if(Math.random() > 0.6){
           ember.style.background = '#ff4500';
