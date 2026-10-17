@@ -326,18 +326,88 @@
       if(typeof render === 'function') render();
     },
 
+    THEMES: [
+      {
+        id: 'wolf',
+        title: 'Школа Волка',
+        sub: 'Каэр Морхен • Игни',
+        icon: 'symbols/Witcher/wolf_medallion.png?v=154',
+        accent: '#f59e0b',
+        glow: 'rgba(245,158,11,0.45)',
+        toast: '🐺 Тема: Школа Волка и Пламя Игни'
+      },
+      {
+        id: 'hunt',
+        title: 'Дикая Охота',
+        sub: 'Белый Хлад • Нагльфар',
+        icon: 'symbols/Witcher/wild_hunt_crest.png?v=154',
+        accent: '#38bdf8',
+        glow: 'rgba(56,189,248,0.55)',
+        toast: '❄️ Тема: Дикая Охота и Белый Хлад'
+      },
+      {
+        id: 'north',
+        title: 'Королевства Севера',
+        sub: 'Темерия • Серебряные лилии',
+        icon: 'symbols/Witcher/northern_realms_crest.png?v=155',
+        accent: '#60a5fa',
+        glow: 'rgba(59,130,246,0.5)',
+        toast: '⚜️ Тема: Королевства Севера (Серебряные лилии Темерии)'
+      },
+      {
+        id: 'nilfgaard',
+        title: 'Империя Нильфгаард',
+        sub: 'Великое Солнце • Оникс и Золото',
+        icon: 'symbols/Witcher/nilfgaard_sun.png?v=156',
+        accent: '#eab308',
+        glow: 'rgba(234,179,8,0.5)',
+        toast: '☀️ Тема: Империя Нильфгаард (Великое Солнце)'
+      },
+      {
+        id: 'scoiatael',
+        title: 'Эльфы и Скоя\'таэли',
+        sub: 'Aen Seidhe • Брокилон и Дол Блатанна',
+        icon: 'symbols/Witcher/scoiatael_crest.png?v=160',
+        accent: '#34d399',
+        glow: 'rgba(52,211,153,0.5)',
+        toast: '🌿 Тема: Эльфы Aen Seidhe и Скоя\'таэли'
+      },
+      {
+        id: 'skellige',
+        title: 'Острова Скеллиге',
+        sub: 'Кланы и Драккары • Шторм и Сталь',
+        icon: 'symbols/Witcher/skellige_crest.png?v=161',
+        accent: '#2dd4bf',
+        glow: 'rgba(45,212,191,0.5)',
+        toast: '🌊 Тема: Острова Скеллиге (Кланы и Драккары)'
+      },
+      {
+        id: 'syndicate',
+        title: 'Синдикат и Бандиты',
+        sub: 'Новиград • Золото и Кинжалы',
+        icon: 'symbols/Witcher/syndicate_crest.png?v=162',
+        accent: '#fbbf24',
+        glow: 'rgba(251,191,36,0.55)',
+        toast: '🪙 Тема: Синдикат и Бандиты (Золото Новиграда)'
+      }
+    ],
+
     getTheme: function(){
+      var valid = function(id){
+        return WI.THEMES.some(function(item){ return item.id === id; });
+      };
       try {
         var t = localStorage.getItem(WI_THEME_KEY);
-        if(t === 'hunt' || t === 'wolf') return t;
+        if(t && valid(t)) return t;
       } catch(e){}
       var m = WI.meta;
-      if(m && (m.theme === 'hunt' || m.theme === 'wolf')) return m.theme;
+      if(m && m.theme && valid(m.theme)) return m.theme;
       return 'wolf';
     },
 
     setTheme: function(themeName){
-      var t = (themeName === 'hunt') ? 'hunt' : 'wolf';
+      var valid = WI.THEMES.some(function(item){ return item.id === themeName; });
+      var t = valid ? themeName : 'wolf';
       try {
         localStorage.setItem(WI_THEME_KEY, t);
       } catch(e){}
@@ -388,13 +458,67 @@
 
     buildWolfMedallionSvg: function(){
       return '<div class="wi-bg-medallion" aria-hidden="true">' +
-        '<img src="symbols/Witcher/wolf_medallion.png?v=152" alt="" draggable="false" style="width:100%;height:100%;object-fit:contain;display:block;" />' +
+        '<img src="symbols/Witcher/wolf_medallion.png?v=154" alt="" draggable="false" style="width:100%;height:100%;object-fit:contain;display:block;" />' +
       '</div>';
     },
 
     buildWildHuntEmblemSvg: function(){
       return '<div class="wi-bg-medallion wi-bg-medallion-hunt" aria-hidden="true">' +
-        '<img src="symbols/Witcher/wild_hunt_crest.png?v=152" alt="" draggable="false" style="width:100%;height:100%;object-fit:contain;display:block;" />' +
+        '<img src="symbols/Witcher/wild_hunt_crest.png?v=154" alt="" draggable="false" style="width:100%;height:100%;object-fit:contain;display:block;" />' +
+      '</div>';
+    },
+
+    buildNorthernRealmsEmblemSvg: function(){
+      return '<div class="wi-bg-north-banners" aria-hidden="true">' +
+        '<div class="wi-bg-north-crest wi-bg-north-crest-tr">' +
+          '<img src="symbols/Witcher/northern_realms_crest.png?v=155" alt="" draggable="false" />' +
+        '</div>' +
+        '<div class="wi-bg-north-crest wi-bg-north-crest-bl">' +
+          '<img src="symbols/Witcher/northern_realms_crest.png?v=155" alt="" draggable="false" />' +
+        '</div>' +
+      '</div>';
+    },
+
+    buildNilfgaardEmblemSvg: function(){
+      return '<div class="wi-bg-nilfgaard-wrap" aria-hidden="true">' +
+        '<div class="wi-bg-nilfgaard-ring wi-bg-nilfgaard-ring-outer"></div>' +
+        '<div class="wi-bg-nilfgaard-ring wi-bg-nilfgaard-ring-inner"></div>' +
+        '<div class="wi-bg-nilfgaard-sun">' +
+          '<img src="symbols/Witcher/nilfgaard_sun.png?v=156" alt="" draggable="false" />' +
+        '</div>' +
+      '</div>';
+    },
+
+    buildScoiataelEmblemSvg: function(){
+      return '<div class="wi-bg-scoiatael-wrap" aria-hidden="true">' +
+        '<div class="wi-bg-scoiatael-crest wi-bg-scoiatael-main">' +
+          '<img src="symbols/Witcher/scoiatael_crest.png?v=160" alt="" draggable="false" />' +
+        '</div>' +
+        '<div class="wi-bg-scoiatael-crest wi-bg-scoiatael-corner">' +
+          '<img src="symbols/Witcher/scoiatael_crest.png?v=160" alt="" draggable="false" />' +
+        '</div>' +
+      '</div>';
+    },
+
+    buildSkelligeEmblemSvg: function(){
+      return '<div class="wi-bg-skellige-wrap" aria-hidden="true">' +
+        '<div class="wi-bg-skellige-crest wi-bg-skellige-main">' +
+          '<img src="symbols/Witcher/skellige_crest.png?v=161" alt="" draggable="false" />' +
+        '</div>' +
+        '<div class="wi-bg-skellige-crest wi-bg-skellige-corner">' +
+          '<img src="symbols/Witcher/skellige_crest.png?v=161" alt="" draggable="false" />' +
+        '</div>' +
+      '</div>';
+    },
+
+    buildSyndicateEmblemSvg: function(){
+      return '<div class="wi-bg-syndicate-wrap" aria-hidden="true">' +
+        '<div class="wi-bg-syndicate-crest wi-bg-syndicate-main">' +
+          '<img src="symbols/Witcher/syndicate_crest.png?v=162" alt="" draggable="false" />' +
+        '</div>' +
+        '<div class="wi-bg-syndicate-crest wi-bg-syndicate-corner">' +
+          '<img src="symbols/Witcher/syndicate_crest.png?v=162" alt="" draggable="false" />' +
+        '</div>' +
       '</div>';
     },
 
@@ -404,9 +528,23 @@
       var theme = WI.getTheme();
       cont.setAttribute('data-wi-theme', theme);
 
-      // 1. Медальон Волка или Корона Дикой Охоты
+      // 1. Фоновая геральдика активной темы
       var medallionWrap = document.createElement('div');
-      medallionWrap.innerHTML = (theme === 'hunt') ? WI.buildWildHuntEmblemSvg() : WI.buildWolfMedallionSvg();
+      if(theme === 'hunt'){
+        medallionWrap.innerHTML = WI.buildWildHuntEmblemSvg();
+      } else if(theme === 'north'){
+        medallionWrap.innerHTML = WI.buildNorthernRealmsEmblemSvg();
+      } else if(theme === 'nilfgaard'){
+        medallionWrap.innerHTML = WI.buildNilfgaardEmblemSvg();
+      } else if(theme === 'scoiatael'){
+        medallionWrap.innerHTML = WI.buildScoiataelEmblemSvg();
+      } else if(theme === 'skellige'){
+        medallionWrap.innerHTML = WI.buildSkelligeEmblemSvg();
+      } else if(theme === 'syndicate'){
+        medallionWrap.innerHTML = WI.buildSyndicateEmblemSvg();
+      } else {
+        medallionWrap.innerHTML = WI.buildWolfMedallionSvg();
+      }
       cont.appendChild(medallionWrap.firstChild);
 
       // 2. Фоновые парящие знаки Ведьмаков (8 шт, в разные стороны с неоновым свечением)
@@ -424,6 +562,32 @@
         { type: 'axii', file: 'symbols/Witcher/Axii.png', top: 80, left: 52, dir: 'up-left', dur: 23, delay: -13 }
       ];
 
+      if (theme === 'nilfgaard') {
+        particleDefs = particleDefs.concat([
+          { type: 'sun', file: 'symbols/clans/sun.png', top: 64, left: 8, dir: 'up-right', dur: 40, delay: -5, size: 48 },
+          { type: 'sun', file: 'symbols/clans/sun.png', top: 14, left: 88, dir: 'down-left', dur: 44, delay: -16, size: 44 },
+          { type: 'sun', file: 'symbols/clans/sun.png', top: 82, left: 84, dir: 'up-left', dur: 38, delay: -24, size: 52 },
+          { type: 'sun', file: 'symbols/clans/sun.png', top: 28, left: 22, dir: 'down-right', dur: 42, delay: -12, size: 42 },
+          { type: 'sun', file: 'symbols/clans/sun.png', top: 52, left: 62, dir: 'wave', dur: 46, delay: -31, size: 46 },
+          { type: 'sun', file: 'symbols/clans/sun.png', top: 75, left: 38, dir: 'cross', dur: 39, delay: -9, size: 50 }
+        ]);
+      } else if (theme === 'syndicate') {
+        particleDefs = particleDefs.concat([
+          { type: 'coin', file: 'symbols/Witcher/coin_crown.png?v=163', top: -6, left: 7, dir: 'coin-fall-right', dur: 20, delay: -2, size: 28 },
+          { type: 'coin', file: 'symbols/Witcher/coin_floren.png?v=163', top: -6, left: 16, dir: 'coin-fall-left', dur: 24, delay: -11, size: 25 },
+          { type: 'coin', file: 'symbols/Witcher/coin_oren.png?v=163', top: -6, left: 25, dir: 'coin-fall-right', dur: 19, delay: -6, size: 26 },
+          { type: 'coin', file: 'symbols/Witcher/coin_ducat.png?v=163', top: -6, left: 34, dir: 'coin-fall-left', dur: 23, delay: -17, size: 30 },
+          { type: 'coin', file: 'symbols/Witcher/coin_crown.png?v=163', top: -6, left: 43, dir: 'coin-fall-right', dur: 21, delay: -9, size: 24 },
+          { type: 'coin', file: 'symbols/Witcher/coin_floren.png?v=163', top: -6, left: 53, dir: 'coin-fall-left', dur: 25, delay: -14, size: 29 },
+          { type: 'coin', file: 'symbols/Witcher/coin_oren.png?v=163', top: -6, left: 62, dir: 'coin-fall-right', dur: 18, delay: -4, size: 27 },
+          { type: 'coin', file: 'symbols/Witcher/coin_ducat.png?v=163', top: -6, left: 71, dir: 'coin-fall-left', dur: 22, delay: -19, size: 25 },
+          { type: 'coin', file: 'symbols/Witcher/coin_crown.png?v=163', top: -6, left: 80, dir: 'coin-fall-right', dur: 26, delay: -8, size: 31 },
+          { type: 'coin', file: 'symbols/Witcher/coin_floren.png?v=163', top: -6, left: 88, dir: 'coin-fall-left', dur: 20, delay: -15, size: 26 },
+          { type: 'coin', file: 'symbols/Witcher/coin_oren.png?v=163', top: -6, left: 94, dir: 'coin-fall-left', dur: 23, delay: -21, size: 28 },
+          { type: 'coin', file: 'symbols/Witcher/coin_ducat.png?v=163', top: -6, left: 12, dir: 'coin-fall-right', dur: 27, delay: -23, size: 24 }
+        ]);
+      }
+
       for (var s = 0; s < particleDefs.length; s++) {
         var p = particleDefs[s];
         var img = document.createElement('img');
@@ -432,7 +596,7 @@
         img.alt = p.type;
         img.draggable = false;
 
-        var size = (s % 2 === 0) ? 26 : 24;
+        var size = p.size || ((s % 2 === 0) ? 26 : 24);
         img.style.width = size + 'px';
         img.style.height = 'auto';
         img.style.top = p.top + '%';
@@ -453,7 +617,7 @@
       mist2.className = 'wi-mist-layer wi-mist-layer-2';
       cont.appendChild(mist2);
 
-      // 4. Парящие искры (Игни) или кристаллы льда Белого Хлада (Дикая Охота)
+      // 4. Парящие частицы темы
       var emberCount = 26;
       for(var i = 0; i < emberCount; i++){
         var ember = document.createElement('div');
@@ -474,6 +638,46 @@
           } else {
             ember.style.background = '#38bdf8';
             ember.style.boxShadow = '0 0 8px #0284c7, 0 0 16px rgba(56, 189, 248, 0.85)';
+          }
+        } else if(theme === 'north'){
+          if(Math.random() > 0.45){
+            ember.style.background = '#f8fafc';
+            ember.style.boxShadow = '0 0 9px #cbd5e1, 0 0 18px rgba(147, 197, 253, 0.85)';
+          } else {
+            ember.style.background = '#93c5fd';
+            ember.style.boxShadow = '0 0 9px #3b82f6, 0 0 18px rgba(59, 130, 246, 0.85)';
+          }
+        } else if(theme === 'nilfgaard'){
+          if(Math.random() > 0.4){
+            ember.style.background = '#fef08a';
+            ember.style.boxShadow = '0 0 10px #eab308, 0 0 20px rgba(250, 204, 21, 0.85)';
+          } else {
+            ember.style.background = '#eab308';
+            ember.style.boxShadow = '0 0 8px #ca8a04, 0 0 16px rgba(234, 179, 8, 0.75)';
+          }
+        } else if(theme === 'scoiatael'){
+          if(Math.random() > 0.4){
+            ember.style.background = '#6ee7b7';
+            ember.style.boxShadow = '0 0 10px #10b981, 0 0 20px rgba(52, 211, 153, 0.85)';
+          } else {
+            ember.style.background = '#fcd34d';
+            ember.style.boxShadow = '0 0 9px #d97706, 0 0 18px rgba(245, 158, 11, 0.8)';
+          }
+        } else if(theme === 'skellige'){
+          if(Math.random() > 0.45){
+            ember.style.background = '#5eead4';
+            ember.style.boxShadow = '0 0 10px #14b8a6, 0 0 18px rgba(45, 212, 191, 0.85)';
+          } else {
+            ember.style.background = '#fbbf24';
+            ember.style.boxShadow = '0 0 9px #d97706, 0 0 18px rgba(217, 119, 6, 0.85)';
+          }
+        } else if(theme === 'syndicate'){
+          if(Math.random() > 0.35){
+            ember.style.background = '#fde047';
+            ember.style.boxShadow = '0 0 10px #f59e0b, 0 0 20px rgba(251, 191, 36, 0.9)';
+          } else {
+            ember.style.background = '#f87171';
+            ember.style.boxShadow = '0 0 9px #dc2626, 0 0 18px rgba(220, 38, 38, 0.85)';
           }
         } else if(Math.random() > 0.6){
           ember.style.background = '#ff4500';
@@ -503,13 +707,20 @@
       if(typeof document === 'undefined' || !document.body) return;
       var fx = document.getElementById('wiThemeFx');
       if(typeof HB === 'undefined' || HB.mode !== 'wi'){
-        document.body.classList.remove('wi-theme', 'wi-theme-hunt');
+        document.body.classList.remove('wi-theme');
+        WI.THEMES.forEach(function(t){
+          if(t.id !== 'wolf') document.body.classList.remove('wi-theme-' + t.id);
+        });
         if(fx) fx.style.display = 'none';
         return;
       }
       var curTheme = WI.getTheme();
       document.body.classList.add('wi-theme');
-      document.body.classList.toggle('wi-theme-hunt', curTheme === 'hunt');
+      WI.THEMES.forEach(function(t){
+        if(t.id !== 'wolf'){
+          document.body.classList.toggle('wi-theme-' + t.id, curTheme === t.id);
+        }
+      });
       WI.initWitcherFx();
     }
   };
@@ -911,43 +1122,31 @@
 
     var schoolIcon = getSchoolIcon(p.school);
     var curTheme = WI.getTheme();
+    var activeThemeObj = WI.THEMES.find(function(t){ return t.id === curTheme; }) || WI.THEMES[0];
+
+    var themeChipsHtml = WI.THEMES.map(function(t){
+      var isAct = (t.id === curTheme);
+      return '<button type="button" class="wi-theme-option-card wi-theme-card-' + escA(t.id) + (isAct ? ' active' : '') + '" data-wi-theme-pick="' + escA(t.id) + '" style="--wi-chip-accent:' + escA(t.accent) + ';--wi-chip-glow:' + escA(t.glow) + ';">' +
+        '<span class="wi-theme-card-icon"><img src="' + escA(t.icon) + '" alt="" draggable="false" /></span>' +
+        '<span class="wi-theme-card-info">' +
+          '<span class="wi-theme-card-title">' + esc(t.title) + '</span>' +
+          '<span class="wi-theme-card-sub">' + esc(t.sub) + '</span>' +
+        '</span>' +
+        '<span class="wi-theme-card-dot">' + (isAct ? '✓' : '') + '</span>' +
+      '</button>';
+    }).join('');
 
     return crumbWi([{ label: 'Ведьмак', nav: 'wiHome' }, { label: 'Данные' }]) +
       '<button class="back" data-nav="wiHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiHome\');">← Назад</button>' +
       '<h1>Данные и Ростер Персонажей</h1>' +
 
-      '<div class="sheet-section wi-data-section">' +
-        '<div class="section-label" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
-          '<span>🎨 Визуальная Тема Раздела («Ведьмак»)</span>' +
-          '<span style="font-size:12px;color:var(--wi-amber, #f59e0b);font-weight:700;">' + (curTheme === 'hunt' ? '❄️ Дикая Охота и Белый Хлад' : '🐺 Школа Волка и Пламя Игни') + '</span>' +
-        '</div>' +
-        '<div class="desc">' +
-          'Выберите атмосферное оформление всего раздела «Ведьмак». Изменяет цветовую палитру интерфейса, свечение карточек, фоновую геральдическую эмблему и частицы окружения.' +
-        '</div>' +
-        '<div style="margin:12px 0 14px 0;max-width:460px;">' +
-          '<label style="display:block;font-size:12px;color:var(--wi-steel, #94a3b8);margin-bottom:6px;font-weight:600;">Выбор темы оформления:</label>' +
-          '<select id="wiThemeSelect" class="wi-hud-profile-sel" style="width:100%;font-size:14px;padding:9px 12px;border-radius:4px;">' +
-            '<option value="wolf"' + (curTheme === 'wolf' ? ' selected' : '') + '>🐺 Школа Волка — Каэр Морхен и Пламя Игни (Янтарь, кованая сталь и угли)</option>' +
-            '<option value="hunt"' + (curTheme === 'hunt' ? ' selected' : '') + '>❄️ Дикая Охота — Белый Хлад и Нагльфар (Ледяной циан, сталь Морхунга и иней)</option>' +
-          '</select>' +
+      '<div class="sheet-section wi-data-section wi-theme-section-compact">' +
+        '<div class="section-label" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' +
+          '<span>🎨 Тема раздела</span>' +
+          '<span style="font-size:11.5px;color:var(--wi-amber, #f59e0b);font-weight:700;">' + esc(activeThemeObj.title) + '</span>' +
         '</div>' +
         '<div class="wi-theme-picker-grid">' +
-          '<div class="wi-theme-option-card wi-theme-card-wolf' + (curTheme === 'wolf' ? ' active' : '') + '" data-wi-theme-pick="wolf">' +
-            '<div class="wi-theme-card-top">' +
-              '<span class="wi-theme-card-icon"><img src="symbols/Witcher/wolf_medallion.png?v=152" alt="Волк" style="width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(245,158,11,0.45));" /></span>' +
-              '<span class="wi-theme-card-badge">' + (curTheme === 'wolf' ? '✓ Активна' : 'Выбрать') + '</span>' +
-            '</div>' +
-            '<div class="wi-theme-card-title">Школа Волка и Пламя Игни</div>' +
-            '<div class="wi-theme-card-sub">Классическая атмосфера крепости Каэр Морхен: тёмный обсидиан, кованое серебро, пылающий янтарь знака Игни, медальон Волка и летящие искры костра.</div>' +
-          '</div>' +
-          '<div class="wi-theme-option-card wi-theme-card-hunt' + (curTheme === 'hunt' ? ' active' : '') + '" data-wi-theme-pick="hunt">' +
-            '<div class="wi-theme-card-top">' +
-              '<span class="wi-theme-card-icon"><img src="symbols/Witcher/wild_hunt_crest.png?v=152" alt="Дикая Охота" style="width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(56,189,248,0.55));" /></span>' +
-              '<span class="wi-theme-card-badge">' + (curTheme === 'hunt' ? '✓ Активна' : 'Выбрать') + '</span>' +
-            '</div>' +
-            '<div class="wi-theme-card-title">Дикая Охота и Белый Хлад</div>' +
-            '<div class="wi-theme-card-sub">Призрачная кавалькада Эредина (Dearg Ruadhri): ледяная полночь Спирали, морозный циан, астральный индиго Старшей Крови, корона-череп Морхунга и кристаллы инея.</div>' +
-          '</div>' +
+          themeChipsHtml +
         '</div>' +
       '</div>' +
 
@@ -1081,22 +1280,14 @@
     var v = function(id){ var e = g(id); return e ? e.value : ''; };
 
     // Переключение визуальной темы раздела «Ведьмак»
-    var themeSel = g('wiThemeSelect');
-    if(themeSel){
-      themeSel.addEventListener('change', function(){
-        var chosen = this.value === 'hunt' ? 'hunt' : 'wolf';
-        WI.setTheme(chosen);
-        if(typeof render === 'function') render();
-        WI.toast(chosen === 'hunt' ? '❄️ Включена тема «Дикая Охота и Белый Хлад»' : '🐺 Включена тема «Школа Волка и Пламя Игни»', 'success');
-      });
-    }
     document.querySelectorAll('[data-wi-theme-pick]').forEach(function(card){
       card.addEventListener('click', function(){
-        var chosen = card.getAttribute('data-wi-theme-pick') === 'hunt' ? 'hunt' : 'wolf';
+        var chosen = card.getAttribute('data-wi-theme-pick') || 'wolf';
         if(WI.getTheme() === chosen) return;
         WI.setTheme(chosen);
         if(typeof render === 'function') render();
-        WI.toast(chosen === 'hunt' ? '❄️ Включена тема «Дикая Охота и Белый Хлад»' : '🐺 Включена тема «Школа Волка и Пламя Игни»', 'success');
+        var tObj = WI.THEMES.find(function(t){ return t.id === chosen; });
+        WI.toast(tObj && tObj.toast ? tObj.toast : ('✓ Включена тема «' + chosen + '»'), 'success');
       });
     });
 

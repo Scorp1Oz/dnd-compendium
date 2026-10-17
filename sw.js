@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v152';
+const CACHE_NAME = 'compendium-cache-v163';
 const APP_SHELL = [
   './',
   './index.html',
@@ -36,6 +36,16 @@ const APP_SHELL = [
   './symbols/Witcher/Quen.png',
   './symbols/Witcher/wolf_medallion.png',
   './symbols/Witcher/wild_hunt_crest.png',
+  './symbols/Witcher/northern_realms_crest.png',
+  './symbols/Witcher/nilfgaard_sun.png',
+  './symbols/Witcher/scoiatael_crest.png',
+  './symbols/Witcher/skellige_crest.png',
+  './symbols/Witcher/syndicate_crest.png',
+  './symbols/Witcher/coin_crown.png',
+  './symbols/Witcher/coin_floren.png',
+  './symbols/Witcher/coin_oren.png',
+  './symbols/Witcher/coin_ducat.png',
+  './symbols/clans/sun.png',
   './symbols/Avatar/air.png',
   './symbols/Avatar/earth.png',
   './symbols/Avatar/water.png',

@@ -98,6 +98,14 @@ body.wi-theme {
   filter: drop-shadow(0 0 2px #10b981) drop-shadow(0 0 6px rgba(16, 185, 129, 0.75));
 }
 
+.wi-sign-sun {
+  filter: opacity(0.68) drop-shadow(0 0 4px rgba(234, 179, 8, 0.22));
+}
+
+.wi-sign-coin {
+  filter: opacity(0.62) drop-shadow(0 0 4px rgba(245, 158, 11, 0.28));
+}
+
 /* Разнонаправленные траектории полета */
 .wi-dir-up-right { animation-name: wiDriftUpRight; }
 .wi-dir-up-left { animation-name: wiDriftUpLeft; }
@@ -105,6 +113,50 @@ body.wi-theme {
 .wi-dir-down-left { animation-name: wiDriftDownLeft; }
 .wi-dir-cross { animation-name: wiDriftCross; }
 .wi-dir-wave { animation-name: wiDriftWave; }
+.wi-dir-coin-fall-right { animation-name: wiCoinFallRight; }
+.wi-dir-coin-fall-left { animation-name: wiCoinFallLeft; }
+
+@keyframes wiCoinFallRight {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.92);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(26px, 54vh) rotate(160deg) scale(1);
+    opacity: 0.82;
+  }
+  88% {
+    opacity: 0.72;
+  }
+  100% {
+    transform: translate(-12px, 110vh) rotate(320deg) scale(0.92);
+    opacity: 0;
+  }
+}
+
+@keyframes wiCoinFallLeft {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.92);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(-28px, 54vh) rotate(-160deg) scale(1);
+    opacity: 0.82;
+  }
+  88% {
+    opacity: 0.72;
+  }
+  100% {
+    transform: translate(14px, 110vh) rotate(-320deg) scale(0.92);
+    opacity: 0;
+  }
+}
 
 @keyframes wiDriftUpRight {
   0% {
@@ -1718,122 +1770,127 @@ body.wi-theme .wi-war-path-hit:hover {
 }
 
 /* ============================================================
-   ВЫБОР ВИЗУАЛЬНОЙ ТЕМЫ ВЕДЬМАКА (КАРТОЧКИ НА ЭКРАНЕ ДАННЫЕ)
+   ВЫБОР ВИЗУАЛЬНОЙ ТЕМЫ ВЕДЬМАКА (КОМПАКТНЫЕ МИНИ-ПЛИТКИ)
    ============================================================ */
+
+.wi-theme-section-compact {
+  padding: 12px 16px !important;
+}
 
 .wi-theme-picker-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 14px;
-  margin-top: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 8px;
 }
 
 .wi-theme-option-card {
   position: relative;
-  border-radius: 8px;
-  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 6px;
+  padding: 7px 10px;
   cursor: pointer;
-  transition: all 0.22s ease;
+  transition: all 0.18s ease;
+  background: rgba(14, 18, 26, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.14);
+  text-align: left;
+  width: 100%;
   overflow: hidden;
 }
 
-.wi-theme-option-card.wi-theme-card-wolf {
-  background:
-    radial-gradient(circle at 85% 15%, rgba(245, 158, 11, 0.22), transparent 55%),
-    linear-gradient(155deg, rgba(22, 26, 34, 0.96) 0%, rgba(11, 13, 17, 0.98) 100%);
-  border-color: rgba(245, 158, 11, 0.35);
+.wi-theme-option-card:hover {
+  border-color: var(--wi-chip-accent, #fbbf24);
+  background: rgba(20, 26, 38, 0.95);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55), 0 0 10px var(--wi-chip-glow, rgba(245, 158, 11, 0.25));
+  transform: translateY(-1px);
 }
 
-.wi-theme-option-card.wi-theme-card-wolf:hover {
-  border-color: #fbbf24;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 18px rgba(245, 158, 11, 0.28);
-  transform: translateY(-2px);
-}
-
-.wi-theme-option-card.wi-theme-card-wolf.active {
-  border-color: #fbbf24;
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.8), 0 0 22px rgba(245, 158, 11, 0.38), inset 0 0 0 1px rgba(251, 191, 36, 0.4);
-}
-
-.wi-theme-option-card.wi-theme-card-hunt {
-  background:
-    radial-gradient(circle at 85% 15%, rgba(56, 189, 248, 0.26), transparent 55%),
-    radial-gradient(circle at 15% 85%, rgba(129, 140, 248, 0.18), transparent 55%),
-    linear-gradient(155deg, rgba(10, 20, 38, 0.96) 0%, rgba(4, 9, 20, 0.98) 100%);
-  border-color: rgba(56, 189, 248, 0.38);
-}
-
-.wi-theme-option-card.wi-theme-card-hunt:hover {
-  border-color: #7dd3fc;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 18px rgba(56, 189, 248, 0.32);
-  transform: translateY(-2px);
-}
-
-.wi-theme-option-card.wi-theme-card-hunt.active {
-  border-color: #7dd3fc;
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.82), 0 0 24px rgba(56, 189, 248, 0.42), inset 0 0 0 1px rgba(125, 211, 252, 0.45);
-}
-
-.wi-theme-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+.wi-theme-option-card.active {
+  border-color: var(--wi-chip-accent, #fbbf24);
+  background: linear-gradient(135deg, rgba(22, 30, 44, 0.96) 0%, rgba(10, 14, 22, 0.98) 100%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65), 0 0 12px var(--wi-chip-glow, rgba(245, 158, 11, 0.35)), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .wi-theme-card-icon {
-  font-size: 24px;
-  line-height: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.wi-theme-card-badge {
-  font-family: 'Cinzel', serif;
-  font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: #cbd5e1;
+.wi-theme-option-card.active .wi-theme-card-icon {
+  border-color: var(--wi-chip-accent, #fbbf24);
+  box-shadow: 0 0 8px var(--wi-chip-glow, rgba(245, 158, 11, 0.35));
 }
 
-.wi-theme-card-wolf.active .wi-theme-card-badge {
-  background: rgba(245, 158, 11, 0.22);
-  border-color: #fbbf24;
-  color: #fde68a;
+.wi-theme-card-icon img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
 }
 
-.wi-theme-card-hunt.active .wi-theme-card-badge {
-  background: rgba(56, 189, 248, 0.24);
-  border-color: #7dd3fc;
-  color: #e0f2fe;
+.wi-theme-card-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
 }
 
 .wi-theme-card-title {
   font-family: 'Cinzel', serif;
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
-.wi-theme-card-wolf .wi-theme-card-title {
-  color: #fbbf24;
-}
-
-.wi-theme-card-hunt .wi-theme-card-title {
-  color: #7dd3fc;
+.wi-theme-option-card.active .wi-theme-card-title {
+  color: var(--wi-chip-accent, #fbbf24);
 }
 
 .wi-theme-card-sub {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 13.5px;
-  line-height: 1.45;
-  color: #cbd5e1;
+  font-size: 10.5px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+  line-height: 1.2;
 }
+
+.wi-theme-card-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: transparent;
+  flex-shrink: 0;
+}
+
+.wi-theme-option-card.active .wi-theme-card-dot {
+  border-color: var(--wi-chip-accent, #fbbf24);
+  background: var(--wi-chip-accent, #fbbf24);
+  color: #090d16;
+  box-shadow: 0 0 8px var(--wi-chip-glow, rgba(245, 158, 11, 0.45));
+}
+
 
 /* ============================================================
    ВТОРАЯ ТЕМА: ДИКАЯ ОХОТА И БЕЛЫЙ ХЛАД (wi-theme-hunt)
@@ -2189,4 +2246,1207 @@ body.wi-theme.wi-theme-hunt .wi-tactics-tab-btn.active {
   color: #7dd3fc;
   box-shadow: 0 0 14px rgba(56, 189, 248, 0.26);
 }
+
+/* ============================================================
+   ТРЕТЬЯ ТЕМА: КОРОЛЕВСТВА СЕВЕРА (wi-theme-north)
+   Королевский сапфир Темерии и три серебряные лилии (без золота)
+   ============================================================ */
+
+.wi-bg-north-banners {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Главный герб — три серебряные лилии Темерии в правом верхнем углу */
+.wi-bg-north-crest-tr {
+  position: absolute;
+  top: 64px;
+  right: 4%;
+  width: 340px;
+  max-width: 48vw;
+  height: 340px;
+  opacity: 0.11;
+  filter: drop-shadow(0 0 32px rgba(59, 130, 246, 0.45)) drop-shadow(0 0 14px rgba(226, 232, 240, 0.25));
+  animation: wiNorthBannerSway 9s ease-in-out infinite alternate;
+}
+
+/* Вторичный водяной знак лилий в левом нижнем углу */
+.wi-bg-north-crest-bl {
+  position: absolute;
+  bottom: 4%;
+  left: 3%;
+  width: 250px;
+  max-width: 38vw;
+  height: 250px;
+  opacity: 0.055;
+  transform: rotate(-8deg);
+  filter: drop-shadow(0 0 24px rgba(59, 130, 246, 0.35));
+}
+
+.wi-bg-north-crest img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+@keyframes wiNorthBannerSway {
+  0% { transform: translateY(0px) scale(0.99); opacity: 0.09; }
+  100% { transform: translateY(6px) scale(1.02); opacity: 0.13; }
+}
+
+body.wi-theme.wi-theme-north {
+  --wi-bg: #050c1c;
+  --wi-bg-surface: rgba(9, 20, 44, 0.88);
+  --wi-bg-elevated: rgba(14, 30, 64, 0.94);
+  --wi-border: rgba(147, 197, 253, 0.28);
+  --wi-border-hover: #e2e8f0;
+  --wi-amber: #e2e8f0;
+  --wi-amber-glow: rgba(96, 165, 250, 0.45);
+  --wi-amber-dim: rgba(59, 130, 246, 0.18);
+  --wi-igni: #3b82f6;
+  --wi-crimson: #1d4ed8;
+  --wi-silver: #f8fafc;
+  --wi-steel: #93c5fd;
+  --wi-parchment: #e2e8f0;
+
+  background-color: var(--wi-bg) !important;
+  background-image:
+    radial-gradient(ellipse at 88% 12%, rgba(37, 99, 235, 0.25) 0%, transparent 55%),
+    radial-gradient(ellipse at 15% 88%, rgba(148, 163, 184, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 40%, rgba(30, 58, 138, 0.18) 0%, transparent 65%),
+    linear-gradient(180deg, #040a18 0%, #081530 52%, #040915 100%) !important;
+  color: var(--wi-parchment) !important;
+}
+
+body.wi-theme.wi-theme-north #wiThemeFx::after {
+  background: radial-gradient(circle at 50% 45%, transparent 45%, rgba(3, 8, 20, 0.85) 100%);
+}
+
+body.wi-theme.wi-theme-north .wi-mist-layer {
+  background:
+    radial-gradient(ellipse at 80% 25%, rgba(59, 130, 246, 0.09) 0%, transparent 55%),
+    radial-gradient(ellipse at 25% 75%, rgba(226, 232, 240, 0.05) 0%, transparent 50%);
+}
+
+body.wi-theme.wi-theme-north .shbar {
+  background: linear-gradient(180deg, rgba(8, 18, 40, 0.96) 0%, rgba(5, 12, 28, 0.93) 100%) !important;
+  border-bottom: 1px solid rgba(147, 197, 253, 0.35) !important;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(226, 232, 240, 0.16) !important;
+}
+
+body.wi-theme.wi-theme-north .shbar .world-pill {
+  background: rgba(12, 26, 56, 0.92) !important;
+  border: 1px solid rgba(203, 213, 225, 0.42) !important;
+  color: #f8fafc !important;
+}
+
+body.wi-theme.wi-theme-north .shbar .world-pill:hover {
+  border-color: #93c5fd !important;
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.45) !important;
+}
+
+body.wi-theme.wi-theme-north h1 {
+  color: #f8fafc;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9), 0 0 18px rgba(59, 130, 246, 0.38);
+  border-bottom-color: rgba(147, 197, 253, 0.32);
+}
+
+body.wi-theme.wi-theme-north h1::after {
+  background: linear-gradient(90deg, #f8fafc, #3b82f6, transparent);
+  box-shadow: 0 0 10px rgba(147, 197, 253, 0.6);
+}
+
+body.wi-theme.wi-theme-north h2,
+body.wi-theme.wi-theme-north .section-title,
+body.wi-theme.wi-theme-north .section-label {
+  color: #e2e8f0 !important;
+}
+
+body.wi-theme.wi-theme-north .crumb {
+  color: #93c5fd;
+}
+
+body.wi-theme.wi-theme-north .crumb b {
+  color: #f8fafc;
+}
+
+body.wi-theme.wi-theme-north button.back {
+  background: rgba(10, 22, 48, 0.9) !important;
+  border-color: rgba(147, 197, 253, 0.36) !important;
+  color: #e2e8f0 !important;
+}
+
+body.wi-theme.wi-theme-north button.back:hover {
+  border-color: #f8fafc !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.4) !important;
+}
+
+body.wi-theme.wi-theme-north .wi-hud,
+body.wi-theme.wi-theme-north .wi-hud-card {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(37, 99, 235, 0.2), transparent 48%),
+    radial-gradient(circle at 10% 90%, rgba(226, 232, 240, 0.08), transparent 50%),
+    linear-gradient(145deg, rgba(12, 25, 52, 0.94) 0%, rgba(6, 14, 30, 0.97) 100%);
+  border-color: rgba(147, 197, 253, 0.35);
+}
+
+body.wi-theme.wi-theme-north .wi-school-badge {
+  background: rgba(37, 99, 235, 0.24);
+  border-color: rgba(226, 232, 240, 0.48);
+  color: #f8fafc;
+}
+
+body.wi-theme.wi-theme-north .wi-hud-profile-sel {
+  background: rgba(8, 18, 38, 0.92);
+  border-color: rgba(147, 197, 253, 0.42);
+  color: #f8fafc;
+}
+
+body.wi-theme.wi-theme-north .wi-hud-profile-sel:hover,
+body.wi-theme.wi-theme-north .wi-hud-profile-sel:focus {
+  border-color: #f8fafc;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.38);
+}
+
+body.wi-theme.wi-theme-north .wi-card,
+body.wi-theme.wi-theme-north .cat-card,
+body.wi-theme.wi-theme-north .item-card,
+body.wi-theme.wi-theme-north .sheet-section {
+  background: linear-gradient(160deg, rgba(12, 26, 54, 0.88) 0%, rgba(6, 14, 32, 0.95) 100%) !important;
+  border-color: rgba(147, 197, 253, 0.26) !important;
+}
+
+body.wi-theme.wi-theme-north .wi-card:hover,
+body.wi-theme.wi-theme-north .cat-card:hover,
+body.wi-theme.wi-theme-north .item-card:hover {
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.85), 0 0 18px rgba(59, 130, 246, 0.32) !important;
+}
+
+body.wi-theme.wi-theme-north .wi-char-sheet-card {
+  background: rgba(8, 18, 38, 0.8);
+  border-color: rgba(147, 197, 253, 0.28);
+}
+
+body.wi-theme.wi-theme-north .wi-char-header {
+  color: #f8fafc;
+  border-bottom-color: rgba(147, 197, 253, 0.26);
+}
+
+body.wi-theme.wi-theme-north .wi-input {
+  background: rgba(5, 12, 26, 0.88);
+  border-color: rgba(147, 197, 253, 0.28);
+  color: #f8fafc;
+}
+
+body.wi-theme.wi-theme-north .wi-input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.35);
+}
+
+body.wi-theme.wi-theme-north .btn-primary {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%) !important;
+  border-color: #cbd5e1 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 4px 14px rgba(29, 78, 216, 0.45) !important;
+}
+
+body.wi-theme.wi-theme-north .btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(59, 130, 246, 0.55), 0 0 8px rgba(248, 250, 252, 0.35) !important;
+}
+
+body.wi-theme.wi-theme-north .wi-nav-tab {
+  background: rgba(10, 22, 46, 0.85);
+}
+
+body.wi-theme.wi-theme-north .wi-nav-tab.active {
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.48) 0%, rgba(30, 58, 138, 0.65) 100%);
+  border-color: #e2e8f0;
+  color: #f8fafc;
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.38);
+}
+
+body.wi-theme.wi-theme-north .wi-pill.active {
+  background: rgba(37, 99, 235, 0.32);
+  border-color: #e2e8f0;
+  color: #f8fafc;
+}
+
+/* ============================================================
+   ЧЕТВЁРТАЯ ТЕМА: ИМПЕРИЯ НИЛЬФГААРД (wi-theme-nilfgaard)
+   Аристократический чёрный оникс, тонкая золотая филигрань и Великое Солнце
+   ============================================================ */
+
+.wi-bg-nilfgaard-wrap {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: 480px;
+  max-width: 82vw;
+  height: 480px;
+  max-height: 82vw;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Тонкие аристократические орбитальные кольца вокруг Солнца */
+.wi-bg-nilfgaard-ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.wi-bg-nilfgaard-ring-outer {
+  width: 96%;
+  height: 96%;
+  border: 1px dashed rgba(234, 179, 8, 0.16);
+  box-shadow: 0 0 40px rgba(234, 179, 8, 0.05), inset 0 0 40px rgba(234, 179, 8, 0.05);
+  animation: wiNilfgaardOrbitCCW 110s linear infinite;
+}
+
+.wi-bg-nilfgaard-ring-inner {
+  width: 66%;
+  height: 66%;
+  border: 1px solid rgba(254, 240, 138, 0.12);
+}
+
+.wi-bg-nilfgaard-sun {
+  width: 86%;
+  height: 86%;
+  opacity: 0.105;
+  filter: drop-shadow(0 0 36px rgba(234, 179, 8, 0.45)) drop-shadow(0 0 12px rgba(254, 240, 138, 0.28));
+  animation: wiNilfgaardSunPulse 10s ease-in-out infinite alternate;
+}
+
+.wi-bg-nilfgaard-sun img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  animation: wiNilfgaardOrbitCW 160s linear infinite;
+}
+
+@keyframes wiNilfgaardOrbitCW {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes wiNilfgaardOrbitCCW {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes wiNilfgaardSunPulse {
+  0% { opacity: 0.085; transform: scale(0.985); }
+  100% { opacity: 0.125; transform: scale(1.015); }
+}
+
+body.wi-theme.wi-theme-nilfgaard {
+  --wi-bg: #050507;
+  --wi-bg-surface: rgba(11, 10, 14, 0.90);
+  --wi-bg-elevated: rgba(17, 15, 22, 0.95);
+  --wi-border: rgba(234, 179, 8, 0.28);
+  --wi-border-hover: #fde047;
+  --wi-amber: #eab308;
+  --wi-amber-glow: rgba(234, 179, 8, 0.42);
+  --wi-amber-dim: rgba(234, 179, 8, 0.14);
+  --wi-igni: #ca8a04;
+  --wi-crimson: #854d0e;
+  --wi-silver: #fefce8;
+  --wi-steel: #d6d3c4;
+  --wi-parchment: #f5f3ea;
+
+  background-color: var(--wi-bg) !important;
+  background-image:
+    radial-gradient(ellipse at 50% 22%, rgba(234, 179, 8, 0.14) 0%, transparent 56%),
+    radial-gradient(ellipse at 85% 85%, rgba(202, 138, 4, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 15% 80%, rgba(254, 240, 138, 0.05) 0%, transparent 48%),
+    linear-gradient(180deg, #040406 0%, #09080c 50%, #030305 100%) !important;
+  color: var(--wi-parchment) !important;
+}
+
+body.wi-theme.wi-theme-nilfgaard #wiThemeFx::after {
+  background: radial-gradient(circle at 50% 45%, transparent 42%, rgba(2, 2, 4, 0.88) 100%);
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-mist-layer {
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(234, 179, 8, 0.06) 0%, transparent 58%),
+    radial-gradient(ellipse at 25% 75%, rgba(254, 240, 138, 0.04) 0%, transparent 50%);
+}
+
+body.wi-theme.wi-theme-nilfgaard .shbar {
+  background: linear-gradient(180deg, rgba(10, 9, 13, 0.97) 0%, rgba(5, 5, 8, 0.95) 100%) !important;
+  border-bottom: 1px solid rgba(234, 179, 8, 0.38) !important;
+  box-shadow: 0 4px 28px rgba(0, 0, 0, 0.92), 0 1px 0 rgba(254, 240, 138, 0.14) !important;
+}
+
+body.wi-theme.wi-theme-nilfgaard .shbar .world-pill {
+  background: rgba(16, 14, 20, 0.94) !important;
+  border: 1px solid rgba(234, 179, 8, 0.45) !important;
+  color: #fef08a !important;
+  letter-spacing: 0.04em;
+}
+
+body.wi-theme.wi-theme-nilfgaard .shbar .world-pill:hover {
+  border-color: #fefce8 !important;
+  box-shadow: 0 0 16px rgba(234, 179, 8, 0.45) !important;
+}
+
+body.wi-theme.wi-theme-nilfgaard h1 {
+  color: #fefce8;
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95), 0 0 20px rgba(234, 179, 8, 0.32);
+  border-bottom-color: rgba(234, 179, 8, 0.32);
+}
+
+body.wi-theme.wi-theme-nilfgaard h1::after {
+  background: linear-gradient(90deg, #fde047, #eab308, rgba(234, 179, 8, 0.2), transparent);
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.65);
+}
+
+body.wi-theme.wi-theme-nilfgaard h2,
+body.wi-theme.wi-theme-nilfgaard .section-title,
+body.wi-theme.wi-theme-nilfgaard .section-label {
+  color: #fde047 !important;
+  letter-spacing: 0.05em;
+}
+
+body.wi-theme.wi-theme-nilfgaard .crumb {
+  color: #d6d3c4;
+}
+
+body.wi-theme.wi-theme-nilfgaard .crumb b {
+  color: #fef08a;
+}
+
+body.wi-theme.wi-theme-nilfgaard button.back {
+  background: rgba(12, 11, 16, 0.92) !important;
+  border-color: rgba(234, 179, 8, 0.35) !important;
+  color: #fefce8 !important;
+}
+
+body.wi-theme.wi-theme-nilfgaard button.back:hover {
+  border-color: #fde047 !important;
+  color: #fde047 !important;
+  box-shadow: 0 0 14px rgba(234, 179, 8, 0.38) !important;
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-hud,
+body.wi-theme.wi-theme-nilfgaard .wi-hud-card {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(234, 179, 8, 0.14), transparent 48%),
+    radial-gradient(circle at 12% 88%, rgba(254, 240, 138, 0.06), transparent 50%),
+    linear-gradient(145deg, rgba(15, 14, 19, 0.95) 0%, rgba(7, 7, 10, 0.98) 100%);
+  border-color: rgba(234, 179, 8, 0.36);
+  box-shadow: inset 0 1px 0 rgba(254, 240, 138, 0.15), 0 10px 30px rgba(0, 0, 0, 0.88);
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-school-badge {
+  background: rgba(234, 179, 8, 0.16);
+  border-color: rgba(250, 204, 21, 0.52);
+  color: #fef08a;
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-hud-profile-sel {
+  background: rgba(9, 8, 12, 0.94);
+  border-color: rgba(234, 179, 8, 0.4);
+  color: #fefce8;
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-hud-profile-sel:hover,
+body.wi-theme.wi-theme-nilfgaard .wi-hud-profile-sel:focus {
+  border-color: #fde047;
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.38);
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-card,
+body.wi-theme.wi-theme-nilfgaard .cat-card,
+body.wi-theme.wi-theme-nilfgaard .item-card,
+body.wi-theme.wi-theme-nilfgaard .sheet-section {
+  background: linear-gradient(160deg, rgba(16, 15, 21, 0.90) 0%, rgba(8, 7, 11, 0.96) 100%) !important;
+  border-color: rgba(234, 179, 8, 0.25) !important;
+  box-shadow: inset 0 1px 0 rgba(254, 240, 138, 0.09), 0 6px 22px rgba(0, 0, 0, 0.8) !important;
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-card:hover,
+body.wi-theme.wi-theme-nilfgaard .cat-card:hover,
+body.wi-theme.wi-theme-nilfgaard .item-card:hover {
+  border-color: #fde047 !important;
+  box-shadow: inset 0 1px 0 rgba(254, 240, 138, 0.22), 0 10px 28px rgba(0, 0, 0, 0.9), 0 0 18px rgba(234, 179, 8, 0.25) !important;
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-char-sheet-card {
+  background: rgba(10, 9, 14, 0.85);
+  border-color: rgba(234, 179, 8, 0.28);
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-char-header {
+  color: #fde047;
+  border-bottom-color: rgba(234, 179, 8, 0.26);
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-input {
+  background: rgba(6, 6, 9, 0.92);
+  border-color: rgba(234, 179, 8, 0.28);
+  color: #fefce8;
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-input:focus {
+  border-color: #fde047;
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.35);
+}
+
+body.wi-theme.wi-theme-nilfgaard .btn-primary {
+  background: linear-gradient(135deg, #272214 0%, #141109 100%) !important;
+  border-color: #eab308 !important;
+  color: #fef08a !important;
+  box-shadow: inset 0 1px 0 rgba(254, 240, 138, 0.22), 0 4px 14px rgba(0, 0, 0, 0.75) !important;
+}
+
+body.wi-theme.wi-theme-nilfgaard .btn-primary:hover {
+  background: linear-gradient(135deg, #3b3219 0%, #1f1a0d 100%) !important;
+  border-color: #fef08a !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(234, 179, 8, 0.48) !important;
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-nav-tab {
+  background: rgba(12, 11, 16, 0.88);
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-nav-tab.active {
+  background: linear-gradient(135deg, rgba(161, 98, 7, 0.35) 0%, rgba(66, 32, 6, 0.55) 100%);
+  border-color: #fde047;
+  color: #fef08a;
+  box-shadow: 0 0 14px rgba(234, 179, 8, 0.32);
+}
+
+body.wi-theme.wi-theme-nilfgaard .wi-pill.active {
+  background: rgba(234, 179, 8, 0.22);
+  border-color: #fde047;
+  color: #fef08a;
+}
+
+/* ============================================================
+   ПЯТАЯ ТЕМА: ЭЛЬФЫ И СКОЯ'ТАЭЛИ (wi-theme-scoiatael)
+   Изумрудные чащи Брокилона, бронзовое золото Дол Блатанна и лук Aen Seidhe
+   ============================================================ */
+
+.wi-bg-scoiatael-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.wi-bg-scoiatael-crest img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Главный эльфийский герб с дубовым венком и луком по центру экрана */
+.wi-bg-scoiatael-main {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: 430px;
+  max-width: 78vw;
+  height: 430px;
+  max-height: 78vw;
+  transform: translate(-50%, -50%);
+  opacity: 0.11;
+  filter: drop-shadow(0 0 34px rgba(16, 185, 129, 0.45)) drop-shadow(0 0 14px rgba(245, 158, 11, 0.28));
+  animation: wiScoiataelBreathe 11s ease-in-out infinite alternate;
+}
+
+/* Вторичный лесной знак в правом нижнем углу */
+.wi-bg-scoiatael-corner {
+  position: absolute;
+  bottom: 3%;
+  right: 3%;
+  width: 240px;
+  max-width: 36vw;
+  height: 240px;
+  opacity: 0.05;
+  transform: rotate(12deg);
+  filter: drop-shadow(0 0 22px rgba(16, 185, 129, 0.35));
+}
+
+@keyframes wiScoiataelBreathe {
+  0% { transform: translate(-50%, -50%) scale(0.985); opacity: 0.09; }
+  100% { transform: translate(-50%, -50%) scale(1.015); opacity: 0.13; }
+}
+
+body.wi-theme.wi-theme-scoiatael {
+  --wi-bg: #040e0a;
+  --wi-bg-surface: rgba(8, 25, 19, 0.89);
+  --wi-bg-elevated: rgba(12, 36, 27, 0.94);
+  --wi-border: rgba(52, 211, 153, 0.28);
+  --wi-border-hover: #fbbf24;
+  --wi-amber: #34d399;
+  --wi-amber-glow: rgba(16, 185, 129, 0.45);
+  --wi-amber-dim: rgba(16, 185, 129, 0.16);
+  --wi-igni: #10b981;
+  --wi-crimson: #047857;
+  --wi-silver: #ecfdf5;
+  --wi-steel: #6ee7b7;
+  --wi-parchment: #d1fae5;
+
+  background-color: var(--wi-bg) !important;
+  background-image:
+    radial-gradient(ellipse at 50% 24%, rgba(16, 185, 129, 0.18) 0%, transparent 56%),
+    radial-gradient(ellipse at 85% 82%, rgba(245, 158, 11, 0.09) 0%, transparent 50%),
+    radial-gradient(ellipse at 15% 78%, rgba(5, 150, 105, 0.14) 0%, transparent 52%),
+    linear-gradient(180deg, #030b08 0%, #071912 52%, #030906 100%) !important;
+  color: var(--wi-parchment) !important;
+}
+
+body.wi-theme.wi-theme-scoiatael #wiThemeFx::after {
+  background: radial-gradient(circle at 50% 45%, transparent 44%, rgba(2, 9, 6, 0.86) 100%);
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-mist-layer {
+  background:
+    radial-gradient(ellipse at 70% 30%, rgba(16, 185, 129, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 30% 75%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+}
+
+body.wi-theme.wi-theme-scoiatael .shbar {
+  background: linear-gradient(180deg, rgba(6, 20, 15, 0.96) 0%, rgba(4, 13, 9, 0.94) 100%) !important;
+  border-bottom: 1px solid rgba(52, 211, 153, 0.36) !important;
+  box-shadow: 0 4px 26px rgba(0, 0, 0, 0.88), 0 1px 0 rgba(251, 191, 36, 0.15) !important;
+}
+
+body.wi-theme.wi-theme-scoiatael .shbar .world-pill {
+  background: rgba(9, 30, 22, 0.92) !important;
+  border: 1px solid rgba(52, 211, 153, 0.45) !important;
+  color: #6ee7b7 !important;
+}
+
+body.wi-theme.wi-theme-scoiatael .shbar .world-pill:hover {
+  border-color: #fbbf24 !important;
+  color: #fde68a !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.45) !important;
+}
+
+body.wi-theme.wi-theme-scoiatael h1 {
+  color: #ecfdf5;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.92), 0 0 18px rgba(16, 185, 129, 0.35);
+  border-bottom-color: rgba(52, 211, 153, 0.32);
+}
+
+body.wi-theme.wi-theme-scoiatael h1::after {
+  background: linear-gradient(90deg, #34d399, #fbbf24, transparent);
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
+}
+
+body.wi-theme.wi-theme-scoiatael h2,
+body.wi-theme.wi-theme-scoiatael .section-title,
+body.wi-theme.wi-theme-scoiatael .section-label {
+  color: #6ee7b7 !important;
+}
+
+body.wi-theme.wi-theme-scoiatael .crumb {
+  color: #a7f3d0;
+}
+
+body.wi-theme.wi-theme-scoiatael .crumb b {
+  color: #fcd34d;
+}
+
+body.wi-theme.wi-theme-scoiatael button.back {
+  background: rgba(8, 24, 18, 0.9) !important;
+  border-color: rgba(52, 211, 153, 0.36) !important;
+  color: #d1fae5 !important;
+}
+
+body.wi-theme.wi-theme-scoiatael button.back:hover {
+  border-color: #fbbf24 !important;
+  color: #fde68a !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.38) !important;
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-hud,
+body.wi-theme.wi-theme-scoiatael .wi-hud-card {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(16, 185, 129, 0.18), transparent 48%),
+    radial-gradient(circle at 12% 88%, rgba(245, 158, 11, 0.10), transparent 50%),
+    linear-gradient(145deg, rgba(10, 31, 23, 0.94) 0%, rgba(5, 16, 12, 0.97) 100%);
+  border-color: rgba(52, 211, 153, 0.36);
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-school-badge {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(251, 191, 36, 0.48);
+  color: #fde68a;
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-hud-profile-sel {
+  background: rgba(6, 20, 15, 0.92);
+  border-color: rgba(52, 211, 153, 0.42);
+  color: #ecfdf5;
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-hud-profile-sel:hover,
+body.wi-theme.wi-theme-scoiatael .wi-hud-profile-sel:focus {
+  border-color: #fbbf24;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.38);
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-card,
+body.wi-theme.wi-theme-scoiatael .cat-card,
+body.wi-theme.wi-theme-scoiatael .item-card,
+body.wi-theme.wi-theme-scoiatael .sheet-section {
+  background: linear-gradient(160deg, rgba(10, 32, 24, 0.89) 0%, rgba(5, 17, 13, 0.95) 100%) !important;
+  border-color: rgba(52, 211, 153, 0.26) !important;
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-card:hover,
+body.wi-theme.wi-theme-scoiatael .cat-card:hover,
+body.wi-theme.wi-theme-scoiatael .item-card:hover {
+  border-color: #fbbf24 !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.86), 0 0 18px rgba(16, 185, 129, 0.28) !important;
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-char-sheet-card {
+  background: rgba(7, 22, 16, 0.84);
+  border-color: rgba(52, 211, 153, 0.28);
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-char-header {
+  color: #6ee7b7;
+  border-bottom-color: rgba(52, 211, 153, 0.26);
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-input {
+  background: rgba(4, 14, 10, 0.9);
+  border-color: rgba(52, 211, 153, 0.28);
+  color: #ecfdf5;
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-input:focus {
+  border-color: #34d399;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+}
+
+body.wi-theme.wi-theme-scoiatael .btn-primary {
+  background: linear-gradient(135deg, #047857 0%, #064e3b 100%) !important;
+  border-color: #fbbf24 !important;
+  color: #fef3c7 !important;
+  box-shadow: 0 4px 14px rgba(4, 120, 87, 0.45) !important;
+}
+
+body.wi-theme.wi-theme-scoiatael .btn-primary:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  border-color: #fde68a !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.52), 0 0 8px rgba(251, 191, 36, 0.35) !important;
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-nav-tab {
+  background: rgba(8, 25, 19, 0.86);
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-nav-tab.active {
+  background: linear-gradient(135deg, rgba(4, 120, 87, 0.48) 0%, rgba(6, 78, 59, 0.65) 100%);
+  border-color: #fbbf24;
+  color: #fde68a;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+}
+
+body.wi-theme.wi-theme-scoiatael .wi-pill.active {
+  background: rgba(16, 185, 129, 0.28);
+  border-color: #fbbf24;
+  color: #fde68a;
+}
+
+/* ============================================================
+   ШЕСТАЯ ТЕМА: ОСТРОВА СКЕЛЛИГЕ (wi-theme-skellige)
+   Штормовое северное море, северная сталь, драккары и кованая бронза кланов
+   ============================================================ */
+
+.wi-bg-skellige-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.wi-bg-skellige-crest img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Главный клановый герб Скеллиге по центру с лёгким покачиванием на волнах */
+.wi-bg-skellige-main {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: 430px;
+  max-width: 78vw;
+  height: 430px;
+  max-height: 78vw;
+  transform: translate(-50%, -50%);
+  opacity: 0.115;
+  filter: drop-shadow(0 0 34px rgba(45, 212, 191, 0.42)) drop-shadow(0 0 14px rgba(217, 119, 6, 0.3));
+  animation: wiSkelligeWaveRock 10s ease-in-out infinite alternate;
+}
+
+/* Вторичный водяной знак кланов в левом нижнем углу */
+.wi-bg-skellige-corner {
+  position: absolute;
+  bottom: 4%;
+  left: 3%;
+  width: 240px;
+  max-width: 36vw;
+  height: 240px;
+  opacity: 0.05;
+  transform: rotate(-10deg);
+  filter: drop-shadow(0 0 22px rgba(45, 212, 191, 0.35));
+}
+
+@keyframes wiSkelligeWaveRock {
+  0% { transform: translate(-50%, -50%) rotate(-1.5deg) translateY(-3px) scale(0.99); opacity: 0.095; }
+  100% { transform: translate(-50%, -50%) rotate(1.5deg) translateY(4px) scale(1.015); opacity: 0.13; }
+}
+
+body.wi-theme.wi-theme-skellige {
+  --wi-bg: #040d13;
+  --wi-bg-surface: rgba(9, 24, 34, 0.90);
+  --wi-bg-elevated: rgba(13, 34, 48, 0.95);
+  --wi-border: rgba(45, 212, 191, 0.28);
+  --wi-border-hover: #f59e0b;
+  --wi-amber: #2dd4bf;
+  --wi-amber-glow: rgba(45, 212, 191, 0.45);
+  --wi-amber-dim: rgba(20, 184, 166, 0.16);
+  --wi-igni: #d97706;
+  --wi-crimson: #0f766e;
+  --wi-silver: #f0fdfa;
+  --wi-steel: #99f6e4;
+  --wi-parchment: #e2e8f0;
+
+  background-color: var(--wi-bg) !important;
+  background-image:
+    radial-gradient(ellipse at 50% 20%, rgba(20, 184, 166, 0.18) 0%, transparent 56%),
+    radial-gradient(ellipse at 85% 84%, rgba(217, 119, 6, 0.11) 0%, transparent 50%),
+    radial-gradient(ellipse at 15% 80%, rgba(15, 118, 110, 0.16) 0%, transparent 52%),
+    linear-gradient(180deg, #030a0f 0%, #071722 52%, #03080d 100%) !important;
+  color: var(--wi-parchment) !important;
+}
+
+body.wi-theme.wi-theme-skellige #wiThemeFx::after {
+  background: radial-gradient(circle at 50% 45%, transparent 44%, rgba(2, 8, 13, 0.86) 100%);
+}
+
+body.wi-theme.wi-theme-skellige .wi-mist-layer {
+  background:
+    radial-gradient(ellipse at 75% 30%, rgba(45, 212, 191, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 25% 75%, rgba(217, 119, 6, 0.06) 0%, transparent 50%);
+}
+
+body.wi-theme.wi-theme-skellige .shbar {
+  background: linear-gradient(180deg, rgba(7, 20, 29, 0.96) 0%, rgba(4, 12, 18, 0.94) 100%) !important;
+  border-bottom: 1px solid rgba(45, 212, 191, 0.36) !important;
+  box-shadow: 0 4px 26px rgba(0, 0, 0, 0.88), 0 1px 0 rgba(245, 158, 11, 0.18) !important;
+}
+
+body.wi-theme.wi-theme-skellige .shbar .world-pill {
+  background: rgba(11, 29, 41, 0.92) !important;
+  border: 1px solid rgba(45, 212, 191, 0.45) !important;
+  color: #5eead4 !important;
+}
+
+body.wi-theme.wi-theme-skellige .shbar .world-pill:hover {
+  border-color: #f59e0b !important;
+  color: #fde68a !important;
+  box-shadow: 0 0 14px rgba(45, 212, 191, 0.45) !important;
+}
+
+body.wi-theme.wi-theme-skellige h1 {
+  color: #f0fdfa;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.92), 0 0 18px rgba(20, 184, 166, 0.35);
+  border-bottom-color: rgba(45, 212, 191, 0.32);
+}
+
+body.wi-theme.wi-theme-skellige h1::after {
+  background: linear-gradient(90deg, #2dd4bf, #f59e0b, transparent);
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.6);
+}
+
+body.wi-theme.wi-theme-skellige h2,
+body.wi-theme.wi-theme-skellige .section-title,
+body.wi-theme.wi-theme-skellige .section-label {
+  color: #5eead4 !important;
+}
+
+body.wi-theme.wi-theme-skellige .crumb {
+  color: #99f6e4;
+}
+
+body.wi-theme.wi-theme-skellige .crumb b {
+  color: #fbbf24;
+}
+
+body.wi-theme.wi-theme-skellige button.back {
+  background: rgba(9, 24, 34, 0.9) !important;
+  border-color: rgba(45, 212, 191, 0.36) !important;
+  color: #e2e8f0 !important;
+}
+
+body.wi-theme.wi-theme-skellige button.back:hover {
+  border-color: #f59e0b !important;
+  color: #fde68a !important;
+  box-shadow: 0 0 14px rgba(45, 212, 191, 0.38) !important;
+}
+
+body.wi-theme.wi-theme-skellige .wi-hud,
+body.wi-theme.wi-theme-skellige .wi-hud-card {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(20, 184, 166, 0.18), transparent 48%),
+    radial-gradient(circle at 12% 88%, rgba(217, 119, 6, 0.12), transparent 50%),
+    linear-gradient(145deg, rgba(11, 29, 41, 0.94) 0%, rgba(5, 15, 22, 0.97) 100%);
+  border-color: rgba(45, 212, 191, 0.36);
+}
+
+body.wi-theme.wi-theme-skellige .wi-school-badge {
+  background: rgba(20, 184, 166, 0.22);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fde68a;
+}
+
+body.wi-theme.wi-theme-skellige .wi-hud-profile-sel {
+  background: rgba(7, 19, 28, 0.92);
+  border-color: rgba(45, 212, 191, 0.42);
+  color: #f0fdfa;
+}
+
+body.wi-theme.wi-theme-skellige .wi-hud-profile-sel:hover,
+body.wi-theme.wi-theme-skellige .wi-hud-profile-sel:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.38);
+}
+
+body.wi-theme.wi-theme-skellige .wi-card,
+body.wi-theme.wi-theme-skellige .cat-card,
+body.wi-theme.wi-theme-skellige .item-card,
+body.wi-theme.wi-theme-skellige .sheet-section {
+  background: linear-gradient(160deg, rgba(11, 30, 42, 0.89) 0%, rgba(5, 16, 24, 0.95) 100%) !important;
+  border-color: rgba(45, 212, 191, 0.26) !important;
+}
+
+body.wi-theme.wi-theme-skellige .wi-card:hover,
+body.wi-theme.wi-theme-skellige .cat-card:hover,
+body.wi-theme.wi-theme-skellige .item-card:hover {
+  border-color: #f59e0b !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.86), 0 0 18px rgba(45, 212, 191, 0.28) !important;
+}
+
+body.wi-theme.wi-theme-skellige .wi-char-sheet-card {
+  background: rgba(8, 22, 31, 0.84);
+  border-color: rgba(45, 212, 191, 0.28);
+}
+
+body.wi-theme.wi-theme-skellige .wi-char-header {
+  color: #5eead4;
+  border-bottom-color: rgba(45, 212, 191, 0.26);
+}
+
+body.wi-theme.wi-theme-skellige .wi-input {
+  background: rgba(4, 13, 19, 0.9);
+  border-color: rgba(45, 212, 191, 0.28);
+  color: #f0fdfa;
+}
+
+body.wi-theme.wi-theme-skellige .wi-input:focus {
+  border-color: #2dd4bf;
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.35);
+}
+
+body.wi-theme.wi-theme-skellige .btn-primary {
+  background: linear-gradient(135deg, #0f766e 0%, #115e59 100%) !important;
+  border-color: #f59e0b !important;
+  color: #fef3c7 !important;
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.45) !important;
+}
+
+body.wi-theme.wi-theme-skellige .btn-primary:hover {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
+  border-color: #fde68a !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(45, 212, 191, 0.52), 0 0 8px rgba(245, 158, 11, 0.35) !important;
+}
+
+body.wi-theme.wi-theme-skellige .wi-nav-tab {
+  background: rgba(9, 24, 34, 0.86);
+}
+
+body.wi-theme.wi-theme-skellige .wi-nav-tab.active {
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.5) 0%, rgba(19, 78, 74, 0.68) 100%);
+  border-color: #f59e0b;
+  color: #fde68a;
+  box-shadow: 0 0 14px rgba(45, 212, 191, 0.35);
+}
+
+body.wi-theme.wi-theme-skellige .wi-pill.active {
+  background: rgba(20, 184, 166, 0.28);
+  border-color: #f59e0b;
+  color: #fde68a;
+}
+
+/* ============================================================
+   СЕДЬМАЯ ТЕМА: СИНДИКАТ И БАНДИТЫ (wi-theme-syndicate)
+   Червонное золото Новиграда, бархатный багрянец и скрещённые кинжалы
+   ============================================================ */
+
+.wi-bg-syndicate-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.wi-bg-syndicate-crest img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Главный золотой знак Синдиката с кинжалами и короной */
+.wi-bg-syndicate-main {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: 430px;
+  max-width: 78vw;
+  height: 430px;
+  max-height: 78vw;
+  transform: translate(-50%, -50%);
+  opacity: 0.12;
+  filter: drop-shadow(0 0 36px rgba(245, 158, 11, 0.5)) drop-shadow(0 0 14px rgba(220, 38, 38, 0.35));
+  animation: wiSyndicateGleam 9s ease-in-out infinite alternate;
+}
+
+/* Вторичная бандитская печать в правом верхнем углу */
+.wi-bg-syndicate-corner {
+  position: absolute;
+  top: 66px;
+  right: 3%;
+  width: 220px;
+  max-width: 34vw;
+  height: 220px;
+  opacity: 0.055;
+  transform: rotate(10deg);
+  filter: drop-shadow(0 0 22px rgba(245, 158, 11, 0.4));
+}
+
+@keyframes wiSyndicateGleam {
+  0% { transform: translate(-50%, -50%) scale(0.985); opacity: 0.095; }
+  100% { transform: translate(-50%, -50%) scale(1.015); opacity: 0.135; }
+}
+
+body.wi-theme.wi-theme-syndicate {
+  --wi-bg: #110804;
+  --wi-bg-surface: rgba(28, 14, 8, 0.90);
+  --wi-bg-elevated: rgba(38, 19, 11, 0.95);
+  --wi-border: rgba(251, 191, 36, 0.34);
+  --wi-border-hover: #fde047;
+  --wi-amber: #fbbf24;
+  --wi-amber-glow: rgba(245, 158, 11, 0.5);
+  --wi-amber-dim: rgba(245, 158, 11, 0.18);
+  --wi-igni: #dc2626;
+  --wi-crimson: #991b1b;
+  --wi-silver: #fef3c7;
+  --wi-steel: #fcd34d;
+  --wi-parchment: #fef9c3;
+
+  background-color: var(--wi-bg) !important;
+  background-image:
+    radial-gradient(ellipse at 50% 20%, rgba(245, 158, 11, 0.20) 0%, transparent 56%),
+    radial-gradient(ellipse at 85% 82%, rgba(185, 28, 28, 0.15) 0%, transparent 52%),
+    radial-gradient(ellipse at 15% 80%, rgba(217, 119, 6, 0.14) 0%, transparent 50%),
+    linear-gradient(180deg, #0d0603 0%, #1a0c06 52%, #0b0502 100%) !important;
+  color: var(--wi-parchment) !important;
+}
+
+body.wi-theme.wi-theme-syndicate #wiThemeFx::after {
+  background: radial-gradient(circle at 50% 45%, transparent 44%, rgba(10, 4, 2, 0.86) 100%);
+}
+
+body.wi-theme.wi-theme-syndicate .wi-mist-layer {
+  background:
+    radial-gradient(ellipse at 70% 30%, rgba(251, 191, 36, 0.09) 0%, transparent 55%),
+    radial-gradient(ellipse at 30% 75%, rgba(220, 38, 38, 0.06) 0%, transparent 50%);
+}
+
+body.wi-theme.wi-theme-syndicate .shbar {
+  background: linear-gradient(180deg, rgba(24, 11, 6, 0.96) 0%, rgba(14, 6, 3, 0.94) 100%) !important;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.44) !important;
+  box-shadow: 0 4px 26px rgba(0, 0, 0, 0.88), 0 1px 0 rgba(220, 38, 38, 0.22) !important;
+}
+
+body.wi-theme.wi-theme-syndicate .shbar .world-pill {
+  background: rgba(34, 16, 9, 0.92) !important;
+  border: 1px solid rgba(251, 191, 36, 0.52) !important;
+  color: #fde047 !important;
+}
+
+body.wi-theme.wi-theme-syndicate .shbar .world-pill:hover {
+  border-color: #fef08a !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.5) !important;
+}
+
+body.wi-theme.wi-theme-syndicate h1 {
+  color: #fef08a;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.92), 0 0 18px rgba(245, 158, 11, 0.42);
+  border-bottom-color: rgba(251, 191, 36, 0.38);
+}
+
+body.wi-theme.wi-theme-syndicate h1::after {
+  background: linear-gradient(90deg, #fbbf24, #dc2626, transparent);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.65);
+}
+
+body.wi-theme.wi-theme-syndicate h2,
+body.wi-theme.wi-theme-syndicate .section-title,
+body.wi-theme.wi-theme-syndicate .section-label {
+  color: #fcd34d !important;
+}
+
+body.wi-theme.wi-theme-syndicate .crumb {
+  color: #fde68a;
+}
+
+body.wi-theme.wi-theme-syndicate .crumb b {
+  color: #fbbf24;
+}
+
+body.wi-theme.wi-theme-syndicate button.back {
+  background: rgba(26, 12, 7, 0.9) !important;
+  border-color: rgba(251, 191, 36, 0.4) !important;
+  color: #fef3c7 !important;
+}
+
+body.wi-theme.wi-theme-syndicate button.back:hover {
+  border-color: #fde047 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.45) !important;
+}
+
+body.wi-theme.wi-theme-syndicate .wi-hud,
+body.wi-theme.wi-theme-syndicate .wi-hud-card {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(245, 158, 11, 0.2), transparent 48%),
+    radial-gradient(circle at 12% 88%, rgba(185, 28, 28, 0.14), transparent 50%),
+    linear-gradient(145deg, rgba(32, 15, 9, 0.94) 0%, rgba(16, 7, 4, 0.97) 100%);
+  border-color: rgba(251, 191, 36, 0.42);
+  box-shadow: inset 0 1px 0 rgba(254, 240, 138, 0.18), 0 10px 28px rgba(0, 0, 0, 0.86);
+}
+
+body.wi-theme.wi-theme-syndicate .wi-school-badge {
+  background: rgba(185, 28, 28, 0.28);
+  border-color: rgba(251, 191, 36, 0.55);
+  color: #fde047;
+}
+
+body.wi-theme.wi-theme-syndicate .wi-hud-profile-sel {
+  background: rgba(20, 9, 5, 0.92);
+  border-color: rgba(251, 191, 36, 0.45);
+  color: #fef3c7;
+}
+
+body.wi-theme.wi-theme-syndicate .wi-hud-profile-sel:hover,
+body.wi-theme.wi-theme-syndicate .wi-hud-profile-sel:focus {
+  border-color: #fde047;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.42);
+}
+
+body.wi-theme.wi-theme-syndicate .wi-card,
+body.wi-theme.wi-theme-syndicate .cat-card,
+body.wi-theme.wi-theme-syndicate .item-card,
+body.wi-theme.wi-theme-syndicate .sheet-section {
+  background: linear-gradient(160deg, rgba(30, 15, 8, 0.90) 0%, rgba(15, 7, 4, 0.96) 100%) !important;
+  border-color: rgba(251, 191, 36, 0.30) !important;
+  box-shadow: inset 0 1px 0 rgba(254, 240, 138, 0.10), 0 6px 22px rgba(0, 0, 0, 0.82) !important;
+}
+
+body.wi-theme.wi-theme-syndicate .wi-card:hover,
+body.wi-theme.wi-theme-syndicate .cat-card:hover,
+body.wi-theme.wi-theme-syndicate .item-card:hover {
+  border-color: #fde047 !important;
+  box-shadow: inset 0 1px 0 rgba(254, 240, 138, 0.25), 0 10px 28px rgba(0, 0, 0, 0.88), 0 0 18px rgba(245, 158, 11, 0.32) !important;
+}
+
+body.wi-theme.wi-theme-syndicate .wi-char-sheet-card {
+  background: rgba(22, 10, 6, 0.85);
+  border-color: rgba(251, 191, 36, 0.32);
+}
+
+body.wi-theme.wi-theme-syndicate .wi-char-header {
+  color: #fde047;
+  border-bottom-color: rgba(251, 191, 36, 0.30);
+}
+
+body.wi-theme.wi-theme-syndicate .wi-input {
+  background: rgba(13, 6, 3, 0.9);
+  border-color: rgba(251, 191, 36, 0.32);
+  color: #fef3c7;
+}
+
+body.wi-theme.wi-theme-syndicate .wi-input:focus {
+  border-color: #fbbf24;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+body.wi-theme.wi-theme-syndicate .btn-primary {
+  background: linear-gradient(135deg, #b45309 0%, #78350f 100%) !important;
+  border-color: #fde047 !important;
+  color: #fef9c3 !important;
+  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.48) !important;
+}
+
+body.wi-theme.wi-theme-syndicate .btn-primary:hover {
+  background: linear-gradient(135deg, #d97706 0%, #92400e 100%) !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.58), 0 0 8px rgba(220, 38, 38, 0.35) !important;
+}
+
+body.wi-theme.wi-theme-syndicate .wi-nav-tab {
+  background: rgba(26, 12, 7, 0.86);
+}
+
+body.wi-theme.wi-theme-syndicate .wi-nav-tab.active {
+  background: linear-gradient(135deg, rgba(180, 83, 9, 0.52) 0%, rgba(127, 29, 29, 0.65) 100%);
+  border-color: #fde047;
+  color: #fef08a;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+}
+
+body.wi-theme.wi-theme-syndicate .wi-pill.active {
+  background: rgba(217, 119, 6, 0.32);
+  border-color: #fde047;
+  color: #fef08a;
+}
+
+
+
+
+
+
 
