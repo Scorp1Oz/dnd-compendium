@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v149';
+const CACHE_NAME = 'compendium-cache-v152';
 const APP_SHELL = [
   './',
   './index.html',
@@ -34,6 +34,8 @@ const APP_SHELL = [
   './symbols/Witcher/Axii.png',
   './symbols/Witcher/Igni.png',
   './symbols/Witcher/Quen.png',
+  './symbols/Witcher/wolf_medallion.png',
+  './symbols/Witcher/wild_hunt_crest.png',
   './symbols/Avatar/air.png',
   './symbols/Avatar/earth.png',
   './symbols/Avatar/water.png',

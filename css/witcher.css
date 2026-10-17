@@ -44,23 +44,23 @@ body.wi-theme {
   transition: opacity 0.5s ease;
 }
 
-/* Большой полупрозрачный фоновый Медальон Волка */
+/* Большой полупрозрачный фоновый Медальон Волка / Дикой Охоты */
 .wi-bg-medallion {
   position: absolute;
   top: 42%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 580px;
-  max-width: 92vw;
-  height: 580px;
-  opacity: 0.045;
-  filter: drop-shadow(0 0 40px rgba(245, 158, 11, 0.25));
+  width: 560px;
+  max-width: 90vw;
+  height: 560px;
+  opacity: 0.08;
+  filter: drop-shadow(0 0 36px rgba(245, 158, 11, 0.3));
   animation: wiMedallionPulse 8s ease-in-out infinite alternate;
 }
 
 @keyframes wiMedallionPulse {
-  0% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.035; }
-  100% { transform: translate(-50%, -50%) scale(1.02); opacity: 0.06; }
+  0% { transform: translate(-50%, -50%) scale(0.98); opacity: 0.06; }
+  100% { transform: translate(-50%, -50%) scale(1.02); opacity: 0.105; }
 }
 
 /* Фоновые парящие Знаки Ведьмаков */
@@ -1716,3 +1716,477 @@ body.wi-theme .wi-war-path-hit:hover {
   filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.9));
   cursor: pointer;
 }
+
+/* ============================================================
+   ВЫБОР ВИЗУАЛЬНОЙ ТЕМЫ ВЕДЬМАКА (КАРТОЧКИ НА ЭКРАНЕ ДАННЫЕ)
+   ============================================================ */
+
+.wi-theme-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.wi-theme-option-card {
+  position: relative;
+  border-radius: 8px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.wi-theme-option-card.wi-theme-card-wolf {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(245, 158, 11, 0.22), transparent 55%),
+    linear-gradient(155deg, rgba(22, 26, 34, 0.96) 0%, rgba(11, 13, 17, 0.98) 100%);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.wi-theme-option-card.wi-theme-card-wolf:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 18px rgba(245, 158, 11, 0.28);
+  transform: translateY(-2px);
+}
+
+.wi-theme-option-card.wi-theme-card-wolf.active {
+  border-color: #fbbf24;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.8), 0 0 22px rgba(245, 158, 11, 0.38), inset 0 0 0 1px rgba(251, 191, 36, 0.4);
+}
+
+.wi-theme-option-card.wi-theme-card-hunt {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(56, 189, 248, 0.26), transparent 55%),
+    radial-gradient(circle at 15% 85%, rgba(129, 140, 248, 0.18), transparent 55%),
+    linear-gradient(155deg, rgba(10, 20, 38, 0.96) 0%, rgba(4, 9, 20, 0.98) 100%);
+  border-color: rgba(56, 189, 248, 0.38);
+}
+
+.wi-theme-option-card.wi-theme-card-hunt:hover {
+  border-color: #7dd3fc;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 18px rgba(56, 189, 248, 0.32);
+  transform: translateY(-2px);
+}
+
+.wi-theme-option-card.wi-theme-card-hunt.active {
+  border-color: #7dd3fc;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.82), 0 0 24px rgba(56, 189, 248, 0.42), inset 0 0 0 1px rgba(125, 211, 252, 0.45);
+}
+
+.wi-theme-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.wi-theme-card-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.wi-theme-card-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #cbd5e1;
+}
+
+.wi-theme-card-wolf.active .wi-theme-card-badge {
+  background: rgba(245, 158, 11, 0.22);
+  border-color: #fbbf24;
+  color: #fde68a;
+}
+
+.wi-theme-card-hunt.active .wi-theme-card-badge {
+  background: rgba(56, 189, 248, 0.24);
+  border-color: #7dd3fc;
+  color: #e0f2fe;
+}
+
+.wi-theme-card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  margin-bottom: 6px;
+}
+
+.wi-theme-card-wolf .wi-theme-card-title {
+  color: #fbbf24;
+}
+
+.wi-theme-card-hunt .wi-theme-card-title {
+  color: #7dd3fc;
+}
+
+.wi-theme-card-sub {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #cbd5e1;
+}
+
+/* ============================================================
+   ВТОРАЯ ТЕМА: ДИКАЯ ОХОТА И БЕЛЫЙ ХЛАД (wi-theme-hunt)
+   Ледяная полночь Спирали, сталь Морхунга, морозный циан и иней
+   ============================================================ */
+
+body.wi-theme.wi-theme-hunt {
+  --wi-bg: #040914;
+  --wi-bg-surface: rgba(8, 17, 34, 0.88);
+  --wi-bg-elevated: rgba(12, 25, 48, 0.94);
+  --wi-border: rgba(125, 211, 252, 0.26);
+  --wi-border-hover: #38bdf8;
+  --wi-amber: #38bdf8;
+  --wi-amber-glow: rgba(56, 189, 248, 0.45);
+  --wi-amber-dim: rgba(56, 189, 248, 0.14);
+  --wi-igni: #818cf8;
+  --wi-crimson: #6366f1;
+  --wi-silver: #f0f9ff;
+  --wi-steel: #93c5fd;
+  --wi-parchment: #e0f2fe;
+
+  background-color: var(--wi-bg) !important;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 90%, rgba(99, 102, 241, 0.16) 0%, transparent 55%),
+    radial-gradient(ellipse at 12% 75%, rgba(14, 165, 233, 0.12) 0%, transparent 50%),
+    linear-gradient(180deg, #030711 0%, #071124 50%, #03060e 100%) !important;
+  color: var(--wi-parchment) !important;
+}
+
+body.wi-theme.wi-theme-hunt #wiThemeFx::after {
+  background: radial-gradient(circle at 50% 45%, transparent 42%, rgba(2, 6, 16, 0.88) 100%);
+}
+
+body.wi-theme.wi-theme-hunt .wi-bg-medallion {
+  filter: drop-shadow(0 0 42px rgba(56, 189, 248, 0.65)) drop-shadow(0 0 18px rgba(129, 140, 248, 0.5));
+}
+
+body.wi-theme.wi-theme-hunt .wi-mist-layer {
+  background:
+    radial-gradient(ellipse at 25% 50%, rgba(56, 189, 248, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 60%, rgba(129, 140, 248, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(186, 230, 253, 0.05) 0%, transparent 60%);
+}
+
+body.wi-theme.wi-theme-hunt .shbar {
+  background: linear-gradient(180deg, rgba(6, 13, 28, 0.96) 0%, rgba(4, 9, 20, 0.92) 100%) !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.35) !important;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(125, 211, 252, 0.14) !important;
+}
+
+body.wi-theme.wi-theme-hunt .shbar .world-pill {
+  background: rgba(10, 22, 44, 0.9) !important;
+  border: 1px solid rgba(56, 189, 248, 0.42) !important;
+  color: #7dd3fc !important;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+body.wi-theme.wi-theme-hunt .shbar .world-pill:hover {
+  border-color: #bae6fd !important;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.4) !important;
+}
+
+body.wi-theme.wi-theme-hunt h1 {
+  color: #f0f9ff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9), 0 0 20px rgba(56, 189, 248, 0.32);
+  border-bottom-color: rgba(56, 189, 248, 0.32);
+}
+
+body.wi-theme.wi-theme-hunt h1::after {
+  background: linear-gradient(90deg, #38bdf8, #818cf8, transparent);
+  box-shadow: 0 0 10px #38bdf8;
+}
+
+body.wi-theme.wi-theme-hunt h2,
+body.wi-theme.wi-theme-hunt .section-title,
+body.wi-theme.wi-theme-hunt .section-label {
+  color: #7dd3fc !important;
+}
+
+body.wi-theme.wi-theme-hunt .crumb {
+  color: #93c5fd;
+}
+
+body.wi-theme.wi-theme-hunt .crumb b {
+  color: #7dd3fc;
+}
+
+body.wi-theme.wi-theme-hunt button.back {
+  background: rgba(8, 18, 36, 0.88) !important;
+  border-color: rgba(125, 211, 252, 0.32) !important;
+  color: #e0f2fe !important;
+}
+
+body.wi-theme.wi-theme-hunt button.back:hover {
+  border-color: #38bdf8 !important;
+  color: #7dd3fc !important;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.32) !important;
+}
+
+body.wi-theme.wi-theme-hunt .wi-hud-card {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(56, 189, 248, 0.14), transparent 45%),
+    radial-gradient(circle at 10% 90%, rgba(99, 102, 241, 0.12), transparent 50%),
+    linear-gradient(145deg, rgba(10, 20, 40, 0.94) 0%, rgba(5, 11, 24, 0.97) 100%);
+  border-color: rgba(125, 211, 252, 0.32);
+}
+
+body.wi-theme.wi-theme-hunt .wi-hud-card::before {
+  background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, #38bdf8, transparent);
+}
+
+body.wi-theme.wi-theme-hunt .wi-hud-avatar {
+  background: radial-gradient(circle, rgba(14, 30, 58, 1) 0%, rgba(5, 11, 24, 1) 100%);
+  border-color: #38bdf8;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.35), inset 0 0 12px rgba(0, 0, 0, 0.8);
+}
+
+body.wi-theme.wi-theme-hunt .wi-school-badge {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #7dd3fc;
+}
+
+body.wi-theme.wi-theme-hunt .wi-hud-profile-sel {
+  background: rgba(6, 14, 28, 0.92);
+  border-color: rgba(56, 189, 248, 0.42);
+  color: #e0f2fe;
+}
+
+body.wi-theme.wi-theme-hunt .wi-hud-profile-sel:hover,
+body.wi-theme.wi-theme-hunt .wi-hud-profile-sel:focus {
+  border-color: #7dd3fc;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.32);
+}
+
+body.wi-theme.wi-theme-hunt .wi-hud-icon-btn:hover {
+  border-color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.18);
+}
+
+body.wi-theme.wi-theme-hunt .wi-hud-edit-btn {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #7dd3fc;
+}
+
+body.wi-theme.wi-theme-hunt .wi-hud-edit-btn:hover {
+  background: rgba(56, 189, 248, 0.28);
+  border-color: #bae6fd;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+}
+
+body.wi-theme.wi-theme-hunt .wi-stat-pill {
+  background: rgba(6, 14, 28, 0.82);
+  border-color: rgba(125, 211, 252, 0.2);
+}
+
+body.wi-theme.wi-theme-hunt .wi-stat-pill.energy .v {
+  color: #7dd3fc;
+}
+
+body.wi-theme.wi-theme-hunt .wi-sword-slot {
+  background: linear-gradient(90deg, rgba(8, 18, 36, 0.92) 0%, rgba(14, 28, 52, 0.68) 100%);
+}
+
+body.wi-theme.wi-theme-hunt .wi-sword-slot.silver {
+  border-left-color: #e0f2fe;
+}
+
+body.wi-theme.wi-theme-hunt .wi-sword-slot.steel {
+  border-left-color: #38bdf8;
+}
+
+body.wi-theme.wi-theme-hunt .wi-sword-slot.armor {
+  border-left-color: #818cf8;
+}
+
+body.wi-theme.wi-theme-hunt .cat-card,
+body.wi-theme.wi-theme-hunt .item-card,
+body.wi-theme.wi-theme-hunt .sheet-section {
+  background: linear-gradient(160deg, rgba(10, 22, 44, 0.88) 0%, rgba(5, 12, 26, 0.95) 100%) !important;
+  border-color: rgba(125, 211, 252, 0.24) !important;
+}
+
+body.wi-theme.wi-theme-hunt .cat-card::after {
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.55), transparent);
+}
+
+body.wi-theme.wi-theme-hunt .cat-card:hover,
+body.wi-theme.wi-theme-hunt .item-card:hover {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.88), 0 0 20px rgba(56, 189, 248, 0.24) !important;
+}
+
+body.wi-theme.wi-theme-hunt .cat-card .t,
+body.wi-theme.wi-theme-hunt .item-card .t {
+  color: #f0f9ff !important;
+}
+
+body.wi-theme.wi-theme-hunt .cat-card:hover .t,
+body.wi-theme.wi-theme-hunt .item-card:hover .t {
+  color: #7dd3fc !important;
+}
+
+body.wi-theme.wi-theme-hunt .wi-char-sheet-card {
+  background: rgba(6, 14, 28, 0.78);
+  border-color: rgba(125, 211, 252, 0.25);
+}
+
+body.wi-theme.wi-theme-hunt .wi-char-header {
+  color: #7dd3fc;
+  border-bottom-color: rgba(56, 189, 248, 0.24);
+}
+
+body.wi-theme.wi-theme-hunt .wi-input {
+  background: rgba(4, 10, 22, 0.88);
+  border-color: rgba(125, 211, 252, 0.26);
+  color: #f0f9ff;
+}
+
+body.wi-theme.wi-theme-hunt .wi-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+body.wi-theme.wi-theme-hunt .btn-primary {
+  background: linear-gradient(135deg, #0284c7 0%, #1e3a8a 100%) !important;
+  border-color: #7dd3fc !important;
+  color: #f0f9ff !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4) !important;
+}
+
+body.wi-theme.wi-theme-hunt .btn-primary:hover {
+  background: linear-gradient(135deg, #0ea5e9 0%, #1d4ed8 100%) !important;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.55) !important;
+}
+
+body.wi-theme.wi-theme-hunt .wi-ref-hero {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(56, 189, 248, 0.16), transparent 45%),
+    linear-gradient(145deg, rgba(10, 22, 44, 0.95) 0%, rgba(5, 11, 24, 0.98) 100%);
+  border-color: rgba(56, 189, 248, 0.32);
+}
+
+body.wi-theme.wi-theme-hunt .wi-ref-header-badge {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #7dd3fc;
+}
+
+body.wi-theme.wi-theme-hunt .wi-ref-copy-btn {
+  background: rgba(56, 189, 248, 0.14);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #7dd3fc;
+}
+
+body.wi-theme.wi-theme-hunt .wi-ref-copy-btn:hover {
+  background: rgba(56, 189, 248, 0.26);
+  border-color: #bae6fd;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+}
+
+body.wi-theme.wi-theme-hunt .wi-ref-card {
+  background: linear-gradient(160deg, rgba(10, 20, 40, 0.92) 0%, rgba(5, 11, 24, 0.96) 100%);
+  border-color: rgba(125, 211, 252, 0.22);
+}
+
+body.wi-theme.wi-theme-hunt .wi-ref-card:hover {
+  border-color: rgba(56, 189, 248, 0.55);
+}
+
+body.wi-theme.wi-theme-hunt .wi-ref-card-k {
+  color: #7dd3fc;
+}
+
+body.wi-theme.wi-theme-hunt .wi-nav-tab {
+  background: rgba(8, 18, 36, 0.85);
+}
+
+body.wi-theme.wi-theme-hunt .wi-nav-tab.active {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.35) 0%, rgba(30, 58, 138, 0.48) 100%);
+  border-color: #38bdf8;
+  color: #e0f2fe;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.3);
+}
+
+body.wi-theme.wi-theme-hunt .wi-pill.active {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
+  color: #bae6fd;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
+body.wi-theme.wi-theme-hunt .wi-tavern-hero {
+  background:
+    radial-gradient(circle at 12% 20%, rgba(56, 189, 248, 0.16), transparent 50%),
+    radial-gradient(circle at 88% 80%, rgba(99, 102, 241, 0.16), transparent 50%),
+    linear-gradient(145deg, rgba(10, 22, 44, 0.95) 0%, rgba(4, 10, 22, 0.98) 100%);
+}
+
+body.wi-theme.wi-theme-hunt .wi-tavern-hero::before {
+  background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, #38bdf8, transparent);
+}
+
+body.wi-theme.wi-theme-hunt .wi-tavern-emblem {
+  background: radial-gradient(circle at 50% 35%, rgba(56, 189, 248, 0.24), rgba(6, 14, 28, 0.94));
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.65), inset 0 0 12px rgba(56, 189, 248, 0.18);
+}
+
+body.wi-theme.wi-theme-hunt .wi-hub-ext-btn {
+  background: linear-gradient(180deg, rgba(12, 26, 50, 0.92) 0%, rgba(6, 14, 28, 0.97) 100%);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #7dd3fc;
+}
+
+body.wi-theme.wi-theme-hunt .wi-hub-ext-btn svg {
+  color: #38bdf8;
+}
+
+body.wi-theme.wi-theme-hunt .wi-hub-ext-btn:hover {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.32) 0%, rgba(30, 58, 138, 0.42) 100%);
+  border-color: #bae6fd;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
+}
+
+body.wi-theme.wi-theme-hunt .wi-tavern-quote {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.1) 0%, rgba(6, 14, 28, 0.72) 100%);
+  border-color: rgba(125, 211, 252, 0.25);
+  border-left-color: #38bdf8;
+}
+
+body.wi-theme.wi-theme-hunt .wi-tavern-quote-text {
+  color: #dbeafe;
+}
+
+body.wi-theme.wi-theme-hunt .wi-war-select {
+  background: rgba(6, 14, 28, 0.95);
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+body.wi-theme.wi-theme-hunt .wi-war-select:hover,
+body.wi-theme.wi-theme-hunt .wi-war-select:focus {
+  border-color: #7dd3fc;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+body.wi-theme.wi-theme-hunt .wi-tactics-tab-btn.active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.24) 0%, rgba(30, 58, 138, 0.4) 100%);
+  border-color: #38bdf8;
+  color: #7dd3fc;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.26);
+}
+
