@@ -1774,6 +1774,124 @@ body.wi-theme .wi-war-path-hit:hover {
   cursor: pointer;
 }
 
+/* Роза ветров, масштабная линейка, мини-карта (радар) и карточка локации на карте */
+body.wi-theme .wi-map-compass {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 68px;
+  height: 68px;
+  pointer-events: none;
+  z-index: 14;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.85));
+  opacity: 0.92;
+}
+
+body.wi-theme .wi-map-scale-bar {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  background: rgba(9, 12, 18, 0.88);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 6px;
+  padding: 5px 10px;
+  z-index: 15;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65);
+}
+
+body.wi-theme .wi-map-scale-line {
+  height: 5px;
+  border: 1.5px solid #fbbf24;
+  border-top: none;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.35) 50%, rgba(255, 255, 255, 0.15) 50%);
+  transition: width 0.15s ease;
+}
+
+body.wi-theme .wi-map-minimap {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: 118px;
+  height: 168px;
+  background: #05080e;
+  border: 1.5px solid rgba(245, 158, 11, 0.55);
+  border-radius: 6px;
+  overflow: hidden;
+  z-index: 16;
+  cursor: crosshair;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85), 0 0 12px rgba(245, 158, 11, 0.18);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+body.wi-theme .wi-map-minimap:hover {
+  border-color: #fbbf24;
+}
+
+body.wi-theme .wi-lore-hotspot {
+  cursor: pointer;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+body.wi-theme .wi-lore-hotspot:hover {
+  filter: drop-shadow(0 0 12px rgba(192, 132, 252, 0.95));
+}
+
+body.wi-theme .wi-river-crossing-pin {
+  cursor: pointer;
+  transition: filter 0.18s ease;
+}
+
+body.wi-theme .wi-river-crossing-pin:hover {
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.95));
+}
+
+body.wi-theme .wi-atlas-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+body.wi-theme .wi-atlas-stat-box {
+  background: rgba(15, 20, 30, 0.72);
+  border: 1px solid var(--wi-border);
+  border-radius: 6px;
+  padding: 9px 12px;
+}
+
+body.wi-theme .wi-atlas-stat-k {
+  color: var(--wi-steel);
+  font-size: 10.5px;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 3px;
+}
+
+body.wi-theme .wi-atlas-stat-v {
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  body.wi-theme .wi-map-minimap {
+    width: 84px;
+    height: 120px;
+  }
+  body.wi-theme .wi-map-compass {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+
 /* ============================================================
    ВЫБОР ВИЗУАЛЬНОЙ ТЕМЫ ВЕДЬМАКА (КОМПАКТНЫЕ МИНИ-ПЛИТКИ)
    ============================================================ */
@@ -3655,10 +3773,231 @@ body.wi-theme.wi-theme-dragon .wi-pill.active {
   color: #fafafa;
 }
 
+/* ============================================================
+   УДОБНЫЙ ДВУХКОЛОНОЧНЫЙ ЭКРАН КАРТЫ И ПОШАГОВАЯ ДОСКА ОБЪЯВЛЕНИЙ
+   ============================================================ */
+body.wi-theme .wi-map-workspace.layout-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 460px;
+  gap: 12px;
+  align-items: start;
+}
 
+body.wi-theme .wi-map-workspace.layout-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
+body.wi-theme .wi-map-workspace.layout-split .wi-map-side-col {
+  max-height: 662px;
+  overflow-y: auto;
+  padding-right: 3px;
+}
 
+@media (max-width: 1120px) {
+  body.wi-theme .wi-map-workspace.layout-split {
+    grid-template-columns: 1fr;
+  }
+  body.wi-theme .wi-map-workspace.layout-split .wi-map-side-col {
+    max-height: none;
+    overflow-y: visible;
+  }
+}
 
+body.wi-theme .wi-map-floating-zoom {
+  position: absolute;
+  right: 12px;
+  bottom: 42px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 12;
+}
 
+body.wi-theme .wi-zoom-fab {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: rgba(9, 13, 22, 0.88);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #f8fafc;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65);
+  transition: all 0.15s ease;
+}
 
+body.wi-theme .wi-zoom-fab:hover {
+  border-color: #fbbf24;
+  color: #fbbf24;
+  background: rgba(20, 26, 38, 0.96);
+}
+
+body.wi-theme .wi-atlas-compact-bar {
+  background: rgba(11, 15, 24, 0.92);
+  border: 1px solid var(--wi-border);
+  border-radius: 8px;
+  padding: 7px 9px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+body.wi-theme .wi-atlas-minimal-card {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+}
+
+body.wi-theme .wi-atlas-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 5px;
+}
+
+body.wi-theme .wi-atlas-mini-cell {
+  background: rgba(9, 13, 22, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 11px;
+  color: #cbd5e1;
+  line-height: 1.35;
+}
+
+body.wi-theme .wi-atlas-mini-k {
+  color: #fbbf24;
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+body.wi-theme .wi-notice-board-wrap {
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.78), inset 0 1px 0 rgba(251, 191, 36, 0.16);
+}
+
+body.wi-theme .wi-board-builder-panel {
+  background: rgba(10, 14, 23, 0.92);
+  border: 1px solid rgba(192, 132, 252, 0.35);
+  border-radius: 7px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+body.wi-theme .wi-board-step-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+body.wi-theme .wi-board-step-chip {
+  background: rgba(18, 24, 36, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: #cbd5e1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.15s ease;
+}
+
+body.wi-theme .wi-board-step-chip:hover {
+  border-color: rgba(251, 191, 36, 0.6);
+  color: #fff;
+}
+
+body.wi-theme .wi-board-step-chip.customized {
+  border-color: rgba(245, 158, 11, 0.55);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+body.wi-theme .wi-board-step-chip.active {
+  border-color: #c084fc;
+  background: rgba(168, 85, 247, 0.18);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.25);
+}
+
+body.wi-theme .wi-board-step-chip-k {
+  color: #94a3b8;
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+body.wi-theme .wi-board-step-chip-v {
+  color: #fde68a;
+  font-weight: 700;
+}
+
+body.wi-theme .wi-board-step-picker {
+  margin-top: 7px;
+  padding: 7px 9px;
+  background: rgba(6, 9, 15, 0.95);
+  border: 1px solid rgba(192, 132, 252, 0.4);
+  border-radius: 6px;
+}
+
+body.wi-theme .wi-board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 7px;
+}
+
+body.wi-theme .wi-board-note {
+  position: relative;
+  background: linear-gradient(155deg, rgba(45, 34, 20, 0.92) 0%, rgba(28, 20, 12, 0.96) 100%);
+  border: 1px solid rgba(217, 119, 6, 0.38);
+  border-radius: 6px;
+  padding: 9px 9px 7px 9px;
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+}
+
+body.wi-theme .wi-board-note:hover {
+  transform: translateY(-2px);
+  border-color: rgba(251, 191, 36, 0.75);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.75), 0 0 12px rgba(245, 158, 11, 0.18);
+}
+
+body.wi-theme .wi-board-note.active {
+  background: linear-gradient(155deg, rgba(68, 48, 22, 0.96) 0%, rgba(38, 26, 12, 0.98) 100%);
+  border-color: #fbbf24;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.28), inset 0 0 0 1px rgba(251, 191, 36, 0.35);
+}
+
+body.wi-theme .wi-board-pin {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f87171, #991b1b);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+body.wi-theme .wi-board-del-btn {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 1px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+body.wi-theme .wi-board-del-btn:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+}
 
