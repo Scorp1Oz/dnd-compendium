@@ -1953,6 +1953,147 @@ body.hb-theme .ai-gen-result-card {
   to { opacity: 1; transform: translateY(0); }
 }
 
+.fae-gen-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+@media (max-width: 920px) {
+  .fae-gen-cat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 580px) {
+  .fae-gen-cat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.fae-gen-cat-card {
+  background: rgba(15, 20, 28, 0.88);
+  border: 1px solid rgba(201, 164, 92, 0.24);
+  border-radius: 8px;
+  padding: 11px 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #e2e8f0;
+}
+.fae-gen-cat-card:hover {
+  border-color: rgba(251, 191, 36, 0.6);
+  background: rgba(26, 33, 46, 0.95);
+  transform: translateY(-1px);
+}
+.fae-gen-cat-card.active {
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.5) 0%, rgba(20, 27, 40, 0.96) 100%);
+  border-color: #fbbf24;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.25);
+}
+.fae-gen-cat-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fde68a;
+}
+.fae-gen-cat-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+  line-height: 1.3;
+}
+.fae-gen-preset-wrap {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: rgba(12, 16, 23, 0.72);
+  border: 1px dashed rgba(201, 164, 92, 0.28);
+  border-radius: 8px;
+}
+.fae-gen-preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 7px;
+}
+.fae-gen-preset-chip {
+  background: rgba(30, 41, 59, 0.75);
+  border: 1px solid rgba(201, 164, 92, 0.28);
+  border-radius: 999px;
+  color: #cbd5e1;
+  font-size: 12px;
+  padding: 5px 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.fae-gen-preset-chip:hover {
+  border-color: #fbbf24;
+  color: #fef3c7;
+  background: rgba(120, 53, 15, 0.45);
+}
+.fae-gen-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+.fae-gen-stat-box {
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(201, 164, 92, 0.25);
+  border-radius: 6px;
+  padding: 8px 11px;
+}
+.fae-gen-stat-box .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 3px;
+}
+.fae-gen-stat-box .val {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fde68a;
+}
+.fae-gen-block {
+  background: rgba(15, 23, 42, 0.52);
+  border-left: 3px solid #c9a45c;
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #e2e8f0;
+  line-height: 1.55;
+}
+.fae-ai-hist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.fae-ai-hist-card {
+  background: rgba(16, 21, 29, 0.88);
+  border: 1px solid rgba(201, 164, 92, 0.24);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.fae-ai-hist-card:hover {
+  border-color: #c9a45c;
+  background: rgba(24, 31, 43, 0.96);
+  transform: translateY(-1px);
+}
+
 /* ============================================================
    ФАЭРУН СПРАВОЧНИК И ДАННЫЕ (REF & DATA)
    ============================================================ */
@@ -1969,6 +2110,44 @@ body.hb-theme .ai-gen-result-card {
   border-radius: 8px;
   padding: 16px 20px;
   margin-top: 14px;
+}
+.fae-sheet-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(201, 164, 92, 0.25);
+}
+.fae-sheet-tab {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(201, 164, 92, 0.28);
+  border-radius: 6px;
+  color: #cbd5e1;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.fae-sheet-tab:hover {
+  border-color: rgba(251, 191, 36, 0.65);
+  color: #fef3c7;
+  background: rgba(30, 41, 59, 0.85);
+}
+.fae-sheet-tab.active {
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.55), rgba(30, 41, 59, 0.92));
+  border-color: #fbbf24;
+  color: #fde68a;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.22);
+}
+.attack-row.fae-attack-row-2024 {
+  grid-template-columns: 1.8fr 0.8fr 1.2fr 1fr 1.1fr auto;
+}
+@media (max-width: 760px) {
+  .attack-row.fae-attack-row-2024 {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 .fae-ref-search-wrap {
   position: relative;
