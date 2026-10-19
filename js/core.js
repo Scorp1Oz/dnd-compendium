@@ -929,7 +929,12 @@ function normalizeFaerunCharacter(c){
         id: t.id || ('fae_tech_' + Date.now() + '_' + idx),
         name: t.name || 'Способность',
         icon: t.icon || '✨',
-        cat: t.cat || 'Классовые умения',
+        category: t.category || t.cat || 'Классовые умения',
+        cat: t.category || t.cat || 'Классовые умения',
+        source: t.source || t.req || '',
+        actionCost: t.actionCost || t.cost || '1 действие',
+        cooldown: t.cooldown || '',
+        checkOrSave: t.checkOrSave || '',
         cost: t.cost || '',
         req: t.req || '',
         dmgN: Number(t.dmgN) || 0,
@@ -947,8 +952,14 @@ function normalizeFaerunCharacter(c){
         id: m.id || ('fae_move_' + Date.now() + '_' + idx),
         name: m.name || 'Боевой приём',
         icon: m.icon || '⚔️',
-        kind: m.kind || 'Манёвры и Фехтование',
-        action: m.action || 'Основное действие',
+        category: m.category || m.kind || 'Оружейные атаки и Мастерство (2024)',
+        kind: m.category || m.kind || 'Оружейные атаки и Мастерство (2024)',
+        weaponOrStyle: m.weaponOrStyle || '',
+        attackBonus: m.attackBonus || '',
+        damageOrSave: m.damageOrSave || '',
+        mastery: m.mastery || '',
+        actionCost: m.actionCost || m.action || 'Часть действия Атаки',
+        action: m.actionCost || m.action || 'Часть действия Атаки',
         trigger: m.trigger || '',
         cost: m.cost || '',
         desc: m.desc || ''
@@ -1817,21 +1828,60 @@ const FAE_ALCHEMY_COMPENDIUM = [
   }
 ];
 
-function newRecipe(){
-  return {
-    id: null,
+var FAE_ALCHEMY_CATEGORIES = [
+  { key: 'all', label: 'Все разделы', icon: '🧪' },
+  { key: 'potions', label: 'Зелья и Эликсиры', icon: '❤️' },
+  { key: 'bombs', label: 'Алхимические смеси и Бомбы', icon: '💣' },
+  { key: 'oils', label: 'Боевые масла и Покрытия', icon: '🗡️' },
+  { key: 'poisons', label: 'Яды и Токсины', icon: '☠️' },
+  { key: 'herbs', label: 'Травы и Реагенты Фаэруна', icon: '🌿' },
+  { key: 'rules', label: 'Правила крафта и СЛ', icon: '📜' }
+];
+
+function normalizeAlchemyCategory(val){
+  var v = String(val || '').trim();
+  if(v === 'potions' || v === 'bombs' || v === 'oils' || v === 'poisons' || v === 'herbs' || v === 'rules') return v;
+  var low = v.toLowerCase();
+  if(low.indexOf('бомб') !== -1 || low.indexOf('смес') !== -1) return 'bombs';
+  if(low.indexOf('масл') !== -1 || low.indexOf('покрыт') !== -1) return 'oils';
+  if(low.indexOf('яд') !== -1 || low.indexOf('токс') !== -1) return 'poisons';
+  if(low.indexOf('трав') !== -1 || low.indexOf('реагент') !== -1) return 'herbs';
+  if(low.indexOf('правил') !== -1 || low.indexOf('таблиц') !== -1 || low.indexOf('крафт') !== -1) return 'rules';
+  return 'potions';
+}
+
+FAE_ALCHEMY_COMPENDIUM.forEach(function(item){
+  if(!item.category) item.category = normalizeAlchemyCategory(item.cat);
+  if(!item.kitLabel){
+    item.kitLabel = item.kit === 'herbalism'
+      ? 'Набор травника'
+      : (item.kit === 'poisoner' ? 'Набор отравителя' : 'Алхимический набор');
+  }
+});
+
+function newRecipe(overrides){
+  var base = {
+    id: (overrides && overrides.id) ? overrides.id : genId(),
     name: '',
     icon: '🧪',
+    category: 'potions',
     cat: 'Зелья и Эликсиры',
     rarity: 'Необычный',
     kit: 'alchemist',
     cost: 50,
-    time: '1 день',
+    time: '4 часа',
     dc: 13,
     ingredients: [{ name: '', qty: 1 }],
+    appearance: '',
     effect: '',
     isCustom: true
   };
+  if(overrides && typeof overrides === 'object'){
+    Object.assign(base, overrides);
+    if(!base.id) base.id = genId();
+    base.category = normalizeAlchemyCategory(base.category || base.cat);
+  }
+  return base;
 }
 
 function loadRecipes(){
@@ -1846,17 +1896,20 @@ function loadRecipes(){
       if(r.isCustom === false && oldSeedNames.indexOf(r.name) !== -1) return false;
       return true;
     }).map(function(r){
+      var normCat = normalizeAlchemyCategory(r.category || r.cat || (r.kit === 'poisoner' ? 'poisons' : 'potions'));
       return {
         id: r.id || genId(),
         name: r.name || 'Алхимический рецепт',
         icon: r.icon || (r.kit === 'poisoner' ? '☠️' : (r.kit === 'herbalism' ? '🌿' : '🧪')),
+        category: normCat,
         cat: r.cat || (r.kit === 'poisoner' ? 'Яды и Токсины' : 'Зелья и Эликсиры'),
         rarity: r.rarity || 'Необычный',
         kit: r.kit || 'alchemist',
         cost: Number(r.cost) || 0,
         time: r.time || '4 часа',
-        dc: r.dc != null ? r.dc : '',
+        dc: r.dc != null ? r.dc : 13,
         ingredients: Array.isArray(r.ingredients) && r.ingredients.length ? r.ingredients : [{ name: '', qty: 1 }],
+        appearance: r.appearance || '',
         effect: r.effect || '',
         isCustom: true
       };
