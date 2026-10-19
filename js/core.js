@@ -2508,12 +2508,6 @@ function recomputeDerived(){
   const atkEl = document.getElementById('spellAtk');
   if(atkEl) atkEl.textContent = fmtMod(pb + abilityMod(d.abilities[d.spellAbility]));
 
-  const goldTotalEl = document.getElementById('faeGoldTotal');
-  if(goldTotalEl){
-    const totalGp = (Number(d.pp)||0)*10 + (Number(d.gp)||0) + (Number(d.ep)||0)*0.5 + (Number(d.sp)||0)*0.1 + (Number(d.cp)||0)*0.01;
-    goldTotalEl.textContent = totalGp.toFixed(2).replace(/\.00$/, '') + ' ЗМ';
-  }
-
   const hdrTitle = document.getElementById('faeSheetHeroTitle');
   if(hdrTitle){
     hdrTitle.textContent = getFaerunClassIcon(d.className) + ' ' + (d.name || 'Безымянный герой') + ' — ' + (d.className || 'Герой') + ' ' + d.level + ' ур.';
@@ -6764,7 +6758,6 @@ function renderFaeData(){
   var passiveInvestigation = 10 + abilityMod(d.abilities.int) + (Number(d.skillProf.investigation)||0)*pb;
   var passiveInsight = 10 + abilityMod(d.abilities.wis) + (Number(d.skillProf.insight)||0)*pb;
   var initTotal = abilityMod(d.abilities.dex) + Number(d.initMisc||0);
-  var totalGp = ((Number(d.pp)||0)*10 + (Number(d.gp)||0) + (Number(d.ep)||0)*0.5 + (Number(d.sp)||0)*0.1 + (Number(d.cp)||0)*0.01).toFixed(2).replace(/\.00$/, '');
 
   var abilityBoxes = ABILITY_KEYS.map(function(k){ return faeAbilityBoxHtml(k, d); }).join('');
   var saveRows = ABILITY_KEYS.map(function(k){ return faeSaveRowHtml(k, d, pb); }).join('');
@@ -6930,21 +6923,9 @@ function renderFaeData(){
             '</div>' +
           '</div>' +
 
-          /* ВКЛАДКА 4: СНАРЯЖЕНИЕ, МОНЕТЫ И УМЕНИЯ */
+          /* ВКЛАДКА 4: СНАРЯЖЕНИЕ И УМЕНИЯ */
           '<div class="fae-sheet-pane" data-fae-pane="gear" style="' + showTab('gear') + 'padding-top:12px;">' +
-            '<div class="section-label" style="margin-top:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">' +
-              '<span>🪙 Кошелёк и Монеты Фаэруна</span>' +
-              '<span style="font-size:12px;color:#fbbf24;">Всего в пересчёте на золото: <b id="faeGoldTotal">' + totalGp + ' ЗМ</b></span>' +
-            '</div>' +
-            '<div class="currency-row">' +
-              '<div class="field"><label>ММ (Медь)</label><input type="number" min="0" data-field="cp" value="' + d.cp + '"></div>' +
-              '<div class="field"><label>СМ (Серебро)</label><input type="number" min="0" data-field="sp" value="' + d.sp + '"></div>' +
-              '<div class="field"><label>ЭМ (Электрум)</label><input type="number" min="0" data-field="ep" value="' + d.ep + '"></div>' +
-              '<div class="field"><label>ЗМ (Золото)</label><input type="number" min="0" data-field="gp" value="' + d.gp + '"></div>' +
-              '<div class="field"><label>ПМ (Платина)</label><input type="number" min="0" data-field="pp" value="' + d.pp + '"></div>' +
-            '</div>' +
-
-            '<div class="section-label" style="margin-top:20px;">🛡️ Владения и Языки</div>' +
+            '<div class="section-label" style="margin-top:4px;">🛡️ Владения и Языки</div>' +
             '<div class="sheet-grid">' +
               '<div class="field"><label>Доспехи и щиты</label><input type="text" data-field="profArmor" value="' + escapeAttr(d.profArmor) + '"></div>' +
               '<div class="field"><label>Оружие</label><input type="text" data-field="profWeapons" value="' + escapeAttr(d.profWeapons) + '"></div>' +
