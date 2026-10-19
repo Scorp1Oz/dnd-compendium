@@ -592,12 +592,60 @@ const DICE_LABEL_CATEGORIES = window.DICE_LABEL_CATEGORIES = [
 
 function getAvailableDiceCategories(){
   const curMode = (typeof HB !== 'undefined' && HB.mode) ? HB.mode : 'core';
-  return DICE_LABEL_CATEGORIES.filter(c => {
+  const baseCats = DICE_LABEL_CATEGORIES.filter(c => {
     if(c.mode){
       return c.mode === curMode;
     }
     return true;
   });
+  if(curMode === 'core' || curMode === 'faerun'){
+    try {
+      const hero = (typeof getActiveFaerunCharacter === 'function') ? getActiveFaerunCharacter() : null;
+      const extraCats = [];
+      if(hero && Array.isArray(hero.techs) && hero.techs.length > 0){
+        extraCats.push({
+          key: 'fae_techs',
+          icon: '✨',
+          ru: 'Способности героя',
+          items: hero.techs.map(function(t){
+            var dNum = parseInt(String(t.dmgD || '').replace(/\D+/g, ''), 10);
+            return {
+              icon: t.icon || '✨',
+              ru: t.name || 'Способность',
+              std: (!isNaN(dNum) && dNum >= 2) ? dNum : 20
+            };
+          })
+        });
+      }
+      const moveItems = [];
+      if(hero && Array.isArray(hero.moves)){
+        hero.moves.forEach(function(m){
+          if(m && m.name){
+            moveItems.push({ icon: m.icon || '⚔️', ru: m.name, std: 20 });
+          }
+        });
+      }
+      if(hero && Array.isArray(hero.attacks)){
+        hero.attacks.forEach(function(a){
+          if(a && a.name && a.name.trim()){
+            moveItems.push({ icon: '🗡️', ru: 'Атака: ' + a.name.trim() + (a.bonus ? (' (' + a.bonus + ')') : ''), std: 20 });
+          }
+        });
+      }
+      if(moveItems.length > 0){
+        extraCats.push({
+          key: 'fae_moves',
+          icon: '⚔️',
+          ru: 'Приёмы и Атаки героя',
+          items: moveItems
+        });
+      }
+      if(extraCats.length > 0){
+        return extraCats.concat(baseCats);
+      }
+    } catch(e){}
+  }
+  return baseCats;
 }
 window.getAvailableDiceCategories = getAvailableDiceCategories;
 
@@ -666,7 +714,7 @@ function renderDice(){
         return renderCrumb([{label:'Ведьмак', nav:'wiHome'},{label:'Бросок костей'}]) +
           '<button class="back" data-go="wiHome">← Назад на большак</button>' +
           '<h1>Кости Судьбы</h1>' +
-          '<p class="subtitle">ВЕДЬМАЧЬИ ЗНАКИ // СТАЛЬ И СЕРЕБРО // БРОСОК КОСТЕЙ</p>';
+          '<p class="subtitle">ВЕДЬМАЧЬЬИ ЗНАКИ // СТАЛЬ И СЕРЕБРО // БРОСОК КОСТЕЙ</p>';
       } else if(HB.mode==='hb'){
         return renderCrumb([{label:'Технологии', nav:'hbHome'},{label:'Бросок костей'}]) +
           '<button class="back" data-go="hbHome">← Назад</button>' +
@@ -815,6 +863,7 @@ function newCharacter(overrides){
     ac:16, initMisc:0, speed:30, hpMax:12, hpCurrent:12, hpTemp:0, hitDiceTotal:1, hitDiceType:'d10',
     deathSuccess:0, deathFail:0,
     attacks:[{name:'Длинный меч',bonus:'+5',damage:'1d8+3',type:'рубящий',mastery:'Подрыв (Sap)'}],
+    techs:[], moves:[],
     cp:0,sp:0,ep:0,gp:15,pp:0,
     equipment:'Кольчуга, щит, длинный меч, набор путешественника, 15 зм',
     features:'Второе дыхание (1d10 + ур. бонусным действием)\nМастерство оружия (3 вида оружия)',
@@ -871,6 +920,40 @@ function normalizeFaerunCharacter(c){
       type: (a && a.type) || '',
       mastery: (a && a.mastery) || ''
     }));
+  }
+  if(!Array.isArray(c.techs)){
+    c.techs = [];
+  } else {
+    c.techs = c.techs.filter(Boolean).map(function(t, idx){
+      return {
+        id: t.id || ('fae_tech_' + Date.now() + '_' + idx),
+        name: t.name || 'Способность',
+        icon: t.icon || '✨',
+        cat: t.cat || 'Классовые умения',
+        cost: t.cost || '',
+        req: t.req || '',
+        dmgN: Number(t.dmgN) || 0,
+        dmgD: t.dmgD || 'd0',
+        dmgMod: Number(t.dmgMod) || 0,
+        desc: t.desc || ''
+      };
+    });
+  }
+  if(!Array.isArray(c.moves)){
+    c.moves = [];
+  } else {
+    c.moves = c.moves.filter(Boolean).map(function(m, idx){
+      return {
+        id: m.id || ('fae_move_' + Date.now() + '_' + idx),
+        name: m.name || 'Боевой приём',
+        icon: m.icon || '⚔️',
+        kind: m.kind || 'Манёвры и Фехтование',
+        action: m.action || 'Основное действие',
+        trigger: m.trigger || '',
+        cost: m.cost || '',
+        desc: m.desc || ''
+      };
+    });
   }
   ['cp','sp','ep','gp','pp'].forEach(k=>{ c[k] = Number(c[k]) || 0; });
   ['playerName','subclass','background','alignment','equipment','features','profArmor','profWeapons','profTools','languages','traits','ideals','bonds','flaws','age','height','weight','eyes','skin','hair','backstory','spellNotes','activeCondition'].forEach(k=>{
@@ -1005,60 +1088,788 @@ const MISC_RULES_2024 = [
   {ru:"Героическое вдохновение", desc:"Замена преимуществу: потратьте, чтобы перебросить любой один кубик после броска (не только d20) и оставить новый результат. Можно подарить другому игроку."}
 ];
 
-/* ---------- alchemy ---------- */
-const ALCHEMY_DC = [
-  {ru:"Определить вещество", desc:"Проверка Интеллекта (Природа/Магия) или мудрости (Медицина) СЛ 10–15 в зависимости от редкости, чтобы опознать неизвестный ингредиент или зелье."},
-  {ru:"Сварить по известному рецепту", desc:"Проверка не требуется, если есть все ингредиенты, время и владение нужным набором — только затраты времени и денег."},
-  {ru:"Сварить без полного рецепта", desc:"Проверка Интеллекта (использование набора) СЛ 15–20 на усмотрение мастера — риск испортить ингредиенты при провале."},
-  {ru:"Стоимость и время (ориентир DMG)", desc:"1 рабочий день (8 часов) на каждые 25 зм рыночной цены предмета; расходуется материалов на половину его цены."},
-  {ru:"Импровизированный яд/кислота в бою", desc:"Проверка Интеллекта (Алхимический набор) СЛ 10–15, чтобы наспех собрать простой эффект из подручных ингредиентов."}
+/* ---------- Алхимия, Травничество и Яды D&D 5e / 2024 ---------- */
+const FAE_ALCHEMY_COMPENDIUM = [
+  /* 1. Зелья и Эликсиры */
+  {
+    id: 'alch_ref_heal_common',
+    name: 'Зелье лечения (Potion of Healing)',
+    icon: '❤️',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Обычный',
+    kit: 'herbalism',
+    cost: 25,
+    marketPrice: '50 зм',
+    time: '1 рабочий день (8 ч)',
+    dc: 10,
+    ingredients: [{ name: 'Королевский лист (Лургас)', qty: 2 }, { name: 'Чистая родниковая вода', qty: 1 }],
+    effect: 'Густая рубиновая жидкость, мерцающая при встряхивании. В редакции D&D 2024 выпивается или вливается союзнику Бонусным действием: мгновенно восстанавливает 2d4 + 2 хитов.'
+  },
+  {
+    id: 'alch_ref_heal_greater',
+    name: 'Большое зелье лечения (Greater Healing)',
+    icon: '❤️‍🔥',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Необычный',
+    kit: 'herbalism',
+    cost: 100,
+    marketPrice: '150–200 зм',
+    time: '5 дней',
+    dc: 13,
+    ingredients: [{ name: 'Королевский лист (Лургас)', qty: 3 }, { name: 'Концентрат сока алоэ', qty: 1 }, { name: 'Пыльца солнечника', qty: 1 }],
+    effect: 'Насыщенный алый эликсир. При употреблении Бонусным действием восстанавливает 4d4 + 4 хитов.'
+  },
+  {
+    id: 'alch_ref_heal_superior',
+    name: 'Превосходное зелье лечения (Superior Healing)',
+    icon: '💖',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Редкий',
+    kit: 'herbalism',
+    cost: 1000,
+    marketPrice: '500–2000 зм',
+    time: '15 дней',
+    dc: 16,
+    ingredients: [{ name: 'Слёзы Селунэ', qty: 2 }, { name: 'Очищенная кровь тролля', qty: 1 }, { name: 'Сон-трава Латандера', qty: 2 }],
+    effect: 'Сияющий карминный состав высшей очистки. Бонусным действием восстанавливает 8d4 + 8 хитов и затягивает глубокие раны.'
+  },
+  {
+    id: 'alch_ref_heal_supreme',
+    name: 'Высшее зелье лечения (Supreme Healing)',
+    icon: '🌟',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Очень редкий',
+    kit: 'herbalism',
+    cost: 5000,
+    marketPrice: '5000–10000 зм',
+    time: '30 дней',
+    dc: 18,
+    ingredients: [{ name: 'Эссенция пера феникса', qty: 1 }, { name: 'Золотой лотос', qty: 2 }, { name: 'Слёзы Селунэ', qty: 2 }],
+    effect: 'Вершина искусства травников Фаэруна. Бонусным действием восстанавливает 10d4 + 20 хитов.'
+  },
+  {
+    id: 'alch_ref_antitoxin',
+    name: 'Противоядие (Antitoxin)',
+    icon: '🧪',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Обычный',
+    kit: 'herbalism',
+    cost: 25,
+    marketPrice: '50 зм',
+    time: '4 часа',
+    dc: 11,
+    ingredients: [{ name: 'Змеиный корень', qty: 1 }, { name: 'Активированный древесный уголь', qty: 1 }],
+    effect: 'Горькая изумрудная микстура. Существо, выпившее этот фиал Бонусным действием, получает Преимущество на спасброски против яда на 1 час.'
+  },
+  {
+    id: 'alch_ref_heroism',
+    name: 'Зелье героизма (Potion of Heroism)',
+    icon: '🦁',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Редкий',
+    kit: 'herbalism',
+    cost: 500,
+    marketPrice: '1000 зм',
+    time: '10 дней',
+    dc: 15,
+    ingredients: [{ name: 'Сердцевина дуба Сильвануса', qty: 1 }, { name: 'Рубиновая пыль', qty: 1 }],
+    effect: 'Пенящийся синий отвар. На 1 час вы получаете 10 временных хитов и находитесь под действием заклинания «Благословение» (+1d4 ко всем броскам атаки и спасброскам, концентрация не требуется).'
+  },
+  {
+    id: 'alch_ref_speed',
+    name: 'Зелье скорости (Potion of Speed)',
+    icon: '⚡',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Очень редкий',
+    kit: 'alchemist',
+    cost: 4000,
+    marketPrice: '8000 зм',
+    time: '25 дней',
+    dc: 18,
+    ingredients: [{ name: 'Перо стремительного грифона', qty: 1 }, { name: 'Ртутный дистиллят', qty: 1 }, { name: 'Электрический кварц', qty: 1 }],
+    effect: 'Жёлтое зелье с чёрными прожилками. На 1 минуту даёт эффект заклинания «Ускорение» (без концентрации и без волны вялости по окончании): скорость удваивается, +2 к КД, преимущество на спасброски Ловкости и 1 дополнительное действие в каждый ход.'
+  },
+  {
+    id: 'alch_ref_invisibility',
+    name: 'Зелье невидимости (Potion of Invisibility)',
+    icon: '👻',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Очень редкий',
+    kit: 'alchemist',
+    cost: 2500,
+    marketPrice: '5000 зм',
+    time: '20 дней',
+    dc: 17,
+    ingredients: [{ name: 'Пыльца пикси', qty: 1 }, { name: 'Светящийся мох Подземья', qty: 2 }],
+    effect: 'Флакон кажется совершенно пустым, но ощущается тяжёлым. Выпив его, вы и всё ваше снаряжение получаете состояние «Невидим» на 1 час. Эффект прекращается досрочно, если вы атакуете или сотворите заклинание.'
+  },
+  {
+    id: 'alch_ref_flying',
+    name: 'Зелье полёта (Potion of Flying)',
+    icon: '🦅',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Очень редкий',
+    kit: 'alchemist',
+    cost: 2500,
+    marketPrice: '5000 зм',
+    time: '20 дней',
+    dc: 17,
+    ingredients: [{ name: 'Перо воздушного элементаля', qty: 1 }, { name: 'Эфирный конденсат облаков', qty: 1 }],
+    effect: 'Прозрачная жидкость с плавающими белыми облачками. На 1 час даёт вам скорость полёта, равную вашей скорости ходьбы, а также возможность зависать в воздухе.'
+  },
+  {
+    id: 'alch_ref_giant_hill',
+    name: 'Зелье силы холмового великана (Hill Giant Strength)',
+    icon: '💪',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Необычный',
+    kit: 'alchemist',
+    cost: 200,
+    marketPrice: '400 зм',
+    time: '5 дней',
+    dc: 13,
+    ingredients: [{ name: 'Ноготь холмового великана', qty: 1 }, { name: 'Железный купорос', qty: 1 }],
+    effect: 'Внутри прозрачного геля плавает осколок великанского ногтя. На 1 час ваша характеристика Силы становится равной 21 (+5).'
+  },
+  {
+    id: 'alch_ref_giant_fire',
+    name: 'Зелье силы огненного великана (Fire Giant Strength)',
+    icon: '🔥',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Редкий',
+    kit: 'alchemist',
+    cost: 1000,
+    marketPrice: '2000 зм',
+    time: '15 дней',
+    dc: 16,
+    ingredients: [{ name: 'Кровь огненного великана', qty: 1 }, { name: 'Пепельник Невервинтера', qty: 2 }],
+    effect: 'Горячее оранжево-багровое зелье. На 1 час ваша характеристика Силы становится равной 25 (+7).'
+  },
+  {
+    id: 'alch_ref_giant_storm',
+    name: 'Зелье силы штормового великана (Storm Giant Strength)',
+    icon: '🌩️',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Легендарный',
+    kit: 'alchemist',
+    cost: 10000,
+    marketPrice: '20000 зм',
+    time: '50 дней',
+    dc: 20,
+    ingredients: [{ name: 'Осколок грозового кристалла великана', qty: 1 }, { name: 'Эссенция первородной бури', qty: 1 }],
+    effect: 'Фиолетовая жидкость, в которой проскакивают настоящие молнии. На 1 час ваша характеристика Силы становится равной 29 (+9).'
+  },
+  {
+    id: 'alch_ref_resistance',
+    name: 'Зелье сопротивления стихиям (Potion of Resistance)',
+    icon: '🛡️',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Необычный',
+    kit: 'alchemist',
+    cost: 150,
+    marketPrice: '300 зм',
+    time: '5 дней',
+    dc: 13,
+    ingredients: [{ name: 'Драконья чешуйка / Элементальная соль', qty: 1 }, { name: 'Базовый эликсир стойкости', qty: 1 }],
+    effect: 'На 1 час даёт Сопротивление одному типу урона (определяется при варке): огонь, холод, электричество, кислота, яд, звук, излучение, некротическая энергия или силовое поле.'
+  },
+  {
+    id: 'alch_ref_water_breath',
+    name: 'Зелье подводного дыхания (Water Breathing)',
+    icon: '🫧',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Необычный',
+    kit: 'herbalism',
+    cost: 100,
+    marketPrice: '200 зм',
+    time: '4 дня',
+    dc: 12,
+    ingredients: [{ name: 'Жаберная водоросль Моря Мечей', qty: 2 }, { name: 'Перламутровая пыль', qty: 1 }],
+    effect: 'Мутновато-зелёное зелье с запахом морского бриза. Позволяет дышать под водой в течение 24 часов (D&D 2024), сохраняя обычное дыхание на суше.'
+  },
+  {
+    id: 'alch_ref_mind_reading',
+    name: 'Зелье чтения мыслей (Potion of Mind Reading)',
+    icon: '👁️',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Редкий',
+    kit: 'alchemist',
+    cost: 750,
+    marketPrice: '1500 зм',
+    time: '12 дней',
+    dc: 15,
+    ingredients: [{ name: 'Светящийся мох Подземья', qty: 2 }, { name: 'Спинномозговой ликвор иллитида / краниальной крысы', qty: 1 }],
+    effect: 'Густая пурпурная жидкость с розовым облачком. На 10 минут даёт эффект заклинания «Обнаружение мыслей» (СЛ спасброска Мудрости 13).'
+  },
+  {
+    id: 'alch_ref_elixir_health',
+    name: 'Эликсир здоровья (Elixir of Health)',
+    icon: '✨',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Редкий',
+    kit: 'herbalism',
+    cost: 600,
+    marketPrice: '1200 зм',
+    time: '10 дней',
+    dc: 15,
+    ingredients: [{ name: 'Сон-трава Латандера', qty: 2 }, { name: 'Слёзы Селунэ', qty: 1 }],
+    effect: 'Прозрачная голубоватая вода с крошечными пузырьками света. Излечивает все болезни и мгновенно снимает состояния: Ослеплён, Оглохший, Парализован и Отравлен.'
+  },
+  {
+    id: 'alch_ref_vitality',
+    name: 'Зелье живучести (Potion of Vitality)',
+    icon: '🩸',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Очень редкий',
+    kit: 'herbalism',
+    cost: 2000,
+    marketPrice: '4000 зм',
+    time: '15 дней',
+    dc: 17,
+    ingredients: [{ name: 'Очищенная кровь тролля', qty: 2 }, { name: 'Сердцевина древня', qty: 1 }],
+    effect: 'Пульсирующий багровый эликсир. Снимает все уровни Истощения, исцеляет от любых ядов и болезней. В течение следующих 24 часов вы восстанавливаете максимум возможных хитов при любой трате Костей Хитов.'
+  },
+
+  /* 2. Алхимические смеси и Бомбы */
+  {
+    id: 'alch_ref_fire',
+    name: 'Алхимический огонь (Alchemist\'s Fire)',
+    icon: '🔥',
+    cat: 'Алхимические смеси и Бомбы',
+    rarity: 'Обычный',
+    kit: 'alchemist',
+    cost: 25,
+    marketPrice: '50 зм',
+    time: '1 рабочий день',
+    dc: 12,
+    ingredients: [{ name: 'Горючая смола', qty: 2 }, { name: 'Пепельник Невервинтера / Белый фосфор', qty: 1 }, { name: 'Стеклянная колба', qty: 1 }],
+    effect: 'Липкая воспламеняющаяся на воздухе жидкость. Действием метните колбу на дистанцию до 20 фт (спасбросок Ловкости в 2024: СЛ 8 + Лов + БМ). При провале цель получает 1d4 урона огнём и загорается (1d4 урона огнём в конце каждого её хода, пока пламя не сбито).'
+  },
+  {
+    id: 'alch_ref_acid',
+    name: 'Колба с кислотой (Acid Vial)',
+    icon: '🧪',
+    cat: 'Алхимические смеси и Бомбы',
+    rarity: 'Обычный',
+    kit: 'alchemist',
+    cost: 12,
+    marketPrice: '25 зм',
+    time: '4 часа',
+    dc: 11,
+    ingredients: [{ name: 'Едкий купорос', qty: 1 }, { name: 'Желудочный сок слизи / кислоты', qty: 1 }, { name: 'Стеклянный фиал', qty: 1 }],
+    effect: 'Шипящая зелёная кислота. Действием выплесните на 5 фт или метните на 20 фт. Цель проходит спасбросок Ловкости (СЛ 8 + Лов + БМ) или получает 2d6 урона кислотой.'
+  },
+  {
+    id: 'alch_ref_holy_water',
+    name: 'Святая вода (Holy Water)',
+    icon: '⛲',
+    cat: 'Алхимические смеси и Бомбы',
+    rarity: 'Обычный',
+    kit: 'herbalism',
+    cost: 25,
+    marketPrice: '25 зм',
+    time: '1 час',
+    dc: 10,
+    ingredients: [{ name: 'Толчёное серебро (на 25 зм)', qty: 1 }, { name: 'Родниковая вода', qty: 1 }],
+    effect: 'При попадании по Исчадию (Fiend) или Нежити (Undead) на дистанции до 20 фт наносит 2d6 урона излучением.'
+  },
+  {
+    id: 'alch_ref_smoke_bomb',
+    name: 'Дымовая шашка Лантана (Alchemical Smoke Bomb)',
+    icon: '💨',
+    cat: 'Алхимические смеси и Бомбы',
+    rarity: 'Необычный',
+    kit: 'alchemist',
+    cost: 40,
+    marketPrice: '80 зм',
+    time: '1 день',
+    dc: 13,
+    ingredients: [{ name: 'Дымный порох Лантана', qty: 1 }, { name: 'Селитра и смола', qty: 1 }],
+    effect: 'При броске в точку в пределах 30 футов мгновенно выпускает густое облако сизого дыма радиусом 15 футов на 1 минуту. Область внутри считается Сильно заслонённой (существа внутри ослеплены для внешних наблюдателей). Сильный ветер рассеивает дым за 1 раунд.'
+  },
+  {
+    id: 'alch_ref_tanglefoot',
+    name: 'Сумка с путами (Tanglefoot Bag)',
+    icon: '🕸️',
+    cat: 'Алхимические смеси и Бомбы',
+    rarity: 'Необычный',
+    kit: 'alchemist',
+    cost: 50,
+    marketPrice: '100 зм',
+    time: '1 день',
+    dc: 13,
+    ingredients: [{ name: 'Паучий шёлк Подземья', qty: 1 }, { name: 'Липкая болотная смола', qty: 2 }],
+    effect: 'Кожаный мешочек с быстротвердеющей алхимической патокой. Метните в существо в пределах 20 фт: цель проходит спасбросок Ловкости СЛ 13 или получает состояние «Опутан» (Restrained, скорость 0) на 1 минуту. Существо может вырваться действием, пройдя проверку Силы (Атлетика) СЛ 13.'
+  },
+  {
+    id: 'alch_ref_thunderstone',
+    name: 'Громовой камень (Thunderstone)',
+    icon: '💥',
+    cat: 'Алхимические смеси и Бомбы',
+    rarity: 'Необычный',
+    kit: 'alchemist',
+    cost: 75,
+    marketPrice: '150 зм',
+    time: '2 дня',
+    dc: 14,
+    ingredients: [{ name: 'Кварцевая жеода', qty: 1 }, { name: 'Гремучая ртуть', qty: 1 }],
+    effect: 'Кристаллический снаряд, детонирующий при ударе о твёрдую поверхность (дистанция 30 фт). Каждое существо в радиусе 10 футов проходит спасбросок Телосложения СЛ 13: при провале получает 2d6 урона звуком, отбрасывается на 10 футов и становится «Оглохшим» на 1 минуту.'
+  },
+  {
+    id: 'alch_ref_solvent',
+    name: 'Универсальный растворитель (Universal Solvent)',
+    icon: '💧',
+    cat: 'Алхимические смеси и Бомбы',
+    rarity: 'Легендарный',
+    kit: 'alchemist',
+    cost: 5000,
+    marketPrice: '10000 зм',
+    time: '30 дней',
+    dc: 20,
+    ingredients: [{ name: 'Эфирный спирт', qty: 2 }, { name: 'Слеза алхимического гомункула', qty: 1 }],
+    effect: 'Молочно-белая жидкость с резким спиртовым запахом. Действием вы можете вылить содержимое тюбика на поверхность в пределах досягаемости: мгновенно растворяет до 1 квадратного фута любого клея или смолы (включая Суверенный клей и паутину).'
+  },
+  {
+    id: 'alch_ref_glue',
+    name: 'Суверенный клей (Sovereign Glue)',
+    icon: '🏺',
+    cat: 'Алхимические смеси и Бомбы',
+    rarity: 'Легендарный',
+    kit: 'alchemist',
+    cost: 5000,
+    marketPrice: '10000 зм',
+    time: '30 дней',
+    dc: 20,
+    ingredients: [{ name: 'Железа мимика', qty: 2 }, { name: 'Алмазная пыль', qty: 1 }],
+    effect: 'Вязкая янтарная субстанция, хранящаяся только во флаконе, обработанном Маслом скольжения. За 1 минуту намертво соединяет любые два предмета (площадью до 1 кв. фт). Соединение можно разрушить только Универсальным растворителем, Маслом эфирности или заклинанием «Желание».'
+  },
+
+  /* 3. Боевые масла и Покрытия */
+  {
+    id: 'alch_ref_oil_sharpness',
+    name: 'Масло остроты (Oil of Sharpness)',
+    icon: '🗡️',
+    cat: 'Боевые масла и Покрытия',
+    rarity: 'Очень редкий',
+    kit: 'alchemist',
+    cost: 1600,
+    marketPrice: '3200 зм',
+    time: '20 дней',
+    dc: 18,
+    ingredients: [{ name: 'Алмазный абразив', qty: 2 }, { name: 'Ртутное масло', qty: 1 }],
+    effect: 'Прозрачное желе с крошечными серебряными осколками. Наносится на одно рубящее или колющее оружие (или до 5 боеприпасов) за 1 минуту. На 1 час покрытый предмет становится магическим и получает бонус +3 к броскам атаки и урона.'
+  },
+  {
+    id: 'alch_ref_oil_slipperiness',
+    name: 'Масло скольжения (Oil of Slipperiness)',
+    icon: '🌊',
+    cat: 'Боевые масла и Покрытия',
+    rarity: 'Необычный',
+    kit: 'alchemist',
+    cost: 200,
+    marketPrice: '400 зм',
+    time: '5 дней',
+    dc: 13,
+    ingredients: [{ name: 'Слизь пещерного червя', qty: 1 }, { name: 'Очищенный рыбий жир', qty: 1 }],
+    effect: 'Густая чёрная мазь. При нанесении на существо (10 минут) даёт эффект заклинания «Свобода перемещения» на 8 часов. Либо действием выливается на пол (квадрат 10×10 фт), создавая эффект заклинания «Скольжение» (Grease) на 8 часов.'
+  },
+  {
+    id: 'alch_ref_oil_etherealness',
+    name: 'Масло эфирности (Oil of Etherealness)',
+    icon: '🌫️',
+    cat: 'Боевые масла и Покрытия',
+    rarity: 'Редкий',
+    kit: 'alchemist',
+    cost: 800,
+    marketPrice: '1600 зм',
+    time: '12 дней',
+    dc: 16,
+    ingredients: [{ name: 'Шёлковая железа фазового паука', qty: 1 }, { name: 'Светящийся мох Подземья', qty: 2 }],
+    effect: 'Серая клубящаяся мазь. После втирания в кожу и снаряжение (10 минут) существо переходит на Пограничный Эфирный План (эффект заклинания «Эфирность») на 1 час.'
+  },
+  {
+    id: 'alch_ref_silver_paste',
+    name: 'Алхимическая серебряная паста (Silvercoat Paste)',
+    icon: '🪙',
+    cat: 'Боевые масла и Покрытия',
+    rarity: 'Обычный',
+    kit: 'alchemist',
+    cost: 35,
+    marketPrice: '70 зм',
+    time: '2 часа',
+    dc: 11,
+    ingredients: [{ name: 'Серебряный порошок', qty: 1 }, { name: 'Восковая основа', qty: 1 }],
+    effect: 'Наносится действием на 1 оружие ближнего боя или 10 стрел/болтов. В течение 24 часов оружие считается посеребрённым для преодоления сопротивления и иммунитета оборотней (Ликантропов), Дьяволов и Нежити.'
+  },
+  {
+    id: 'alch_ref_flame_resin',
+    name: 'Пламенная смола Коссута (Flameblade Resin)',
+    icon: '🔥',
+    cat: 'Боевые масла и Покрытия',
+    rarity: 'Необычный',
+    kit: 'alchemist',
+    cost: 100,
+    marketPrice: '200 зм',
+    time: '1 день',
+    dc: 13,
+    ingredients: [{ name: 'Пепельник Невервинтера', qty: 1 }, { name: 'Железа огненного жука', qty: 2 }],
+    effect: 'Бонусным действием наносится на оружие ближнего боя: клинок вспыхивает пламенем на 1 минуту, излучая яркий свет в радиусе 20 футов и нанося дополнительно +1d6 урона огнём при каждом попадании.'
+  },
+  {
+    id: 'alch_ref_frost_oil',
+    name: 'Хладный закал Ориль (Frostbite Coating)',
+    icon: '❄️',
+    cat: 'Боевые масла и Покрытия',
+    rarity: 'Необычный',
+    kit: 'alchemist',
+    cost: 100,
+    marketPrice: '200 зм',
+    time: '1 день',
+    dc: 13,
+    ingredients: [{ name: 'Ледяной вереск Долины', qty: 2 }, { name: 'Эфирный спирт', qty: 1 }],
+    effect: 'Бонусным действием покрывает оружие морозной изморозью на 1 минуту. При попадании наносит дополнительно +1d4 урона холодом и снижает скорость цели на 10 футов до начала вашего следующего хода.'
+  },
+
+  /* 4. Яды и Токсины (DMG / 2024) */
+  {
+    id: 'alch_ref_poison_basic',
+    name: 'Базовый яд (Basic Poison)',
+    icon: '☠️',
+    cat: 'Яды и Токсины',
+    rarity: 'Обычный',
+    kit: 'poisoner',
+    cost: 50,
+    marketPrice: '100 зм',
+    time: '4 часа',
+    dc: 10,
+    ingredients: [{ name: 'Вытяжка болиголова', qty: 1 }, { name: 'Змеиная желчь', qty: 1 }],
+    effect: 'Оружейный яд. В редакции 2024 наносится Бонусным действием на одно оружие или 3 боеприпаса (сохраняет силу 1 минуту). При попадании цель получает дополнительно 1d4 урона ядом.'
+  },
+  {
+    id: 'alch_ref_poison_drow',
+    name: 'Снотворный яд дроу (Drow Poison)',
+    icon: '🕷️',
+    cat: 'Яды и Токсины',
+    rarity: 'Необычный',
+    kit: 'poisoner',
+    cost: 100,
+    marketPrice: '200 зм',
+    time: '3 дня',
+    dc: 13,
+    ingredients: [{ name: 'Чёрная поганка Мензоберранзана', qty: 2 }, { name: 'Паучий нейротоксин', qty: 1 }],
+    effect: 'Оружейный яд темных эльфов Подземья. Поражённая цель проходит спасбросок Телосложения СЛ 13: при провале получает состояние «Отравлен» на 1 час. Если спасбросок провален на 5 или более единиц, цель также теряет сознание («Без сознания»), пока не получит урон или кто-либо не потратит действие, чтобы растолкать её.'
+  },
+  {
+    id: 'alch_ref_poison_crawler',
+    name: 'Слизь падальщика (Crawler Mucus)',
+    icon: '🐛',
+    cat: 'Яды и Токсины',
+    rarity: 'Необычный',
+    kit: 'poisoner',
+    cost: 100,
+    marketPrice: '200 зм',
+    time: '3 дня',
+    dc: 13,
+    ingredients: [{ name: 'Парализующая слизь усиков падальщика', qty: 1 }],
+    effect: 'Контактный яд. Существо, коснувшееся смазанного предмета, проходит спасбросок Телосложения СЛ 13: при провале получает состояние «Отравлен» и «Парализован» на 1 минуту. Цель повторяет спасбросок в конце каждого своего хода.'
+  },
+  {
+    id: 'alch_ref_poison_malice',
+    name: 'Злоба (Malice)',
+    icon: '👁️‍🗨️',
+    cat: 'Яды и Токсины',
+    rarity: 'Необычный',
+    kit: 'poisoner',
+    cost: 125,
+    marketPrice: '250 зм',
+    time: '4 дня',
+    dc: 15,
+    ingredients: [{ name: 'Споры слепящего трутовика', qty: 2 }, { name: 'Серный порошок', qty: 1 }],
+    effect: 'Вдыхаемый яд (куб 5 фт). Существо проходит спасбросок Телосложения СЛ 15 или становится «Отравлено» на 1 час. Пока действует это отравление, существо также имеет состояние «Ослеплён».'
+  },
+  {
+    id: 'alch_ref_poison_truth',
+    name: 'Сыворотка правды (Truth Serum)',
+    icon: '🗣️',
+    cat: 'Яды и Токсины',
+    rarity: 'Необычный',
+    kit: 'poisoner',
+    cost: 75,
+    marketPrice: '150 зм',
+    time: '2 дня',
+    dc: 11,
+    ingredients: [{ name: 'Корень сонного лотоса', qty: 1 }, { name: 'Серебряный дистиллят', qty: 1 }],
+    effect: 'Поглощаемый состав (подмешивается в напиток или еду). Цель проходит спасбросок Телосложения СЛ 11: при провале в течение 1 часа не может намеренно произнести ложь, как если бы находилась под действием заклинания «Область истины».'
+  },
+  {
+    id: 'alch_ref_poison_assassin',
+    name: 'Кровь ассасина (Assassin\'s Blood)',
+    icon: '🩸',
+    cat: 'Яды и Токсины',
+    rarity: 'Необычный',
+    kit: 'poisoner',
+    cost: 75,
+    marketPrice: '150 зм',
+    time: '2 дня',
+    dc: 12,
+    ingredients: [{ name: 'Ягоды белладонны', qty: 2 }, { name: 'Кристаллический мышьяк', qty: 1 }],
+    effect: 'Поглощаемый яд. Существо проходит спасбросок Телосложения СЛ 10: при провале получает 1d12 урона ядом и состояние «Отравлен» на 24 часа. При успехе получает половину урона и не отравляется.'
+  },
+  {
+    id: 'alch_ref_poison_pale',
+    name: 'Бледная настойка (Pale Tincture)',
+    icon: '💀',
+    cat: 'Яды и Токсины',
+    rarity: 'Редкий',
+    kit: 'poisoner',
+    cost: 125,
+    marketPrice: '250 зм',
+    time: '4 дня',
+    dc: 16,
+    ingredients: [{ name: 'Белый болиголов', qty: 2 }, { name: 'Прах умертвия', qty: 1 }],
+    effect: 'Поглощаемый яд без вкуса и запаха. Спасбросок Телосложения СЛ 16: при провале 1d6 урона ядом и состояние «Отравлен». Каждые 24 часа цель повторяет спасбросок, получая 1d6 урона ядом при провале (этот урон снижает максимум хитов цели и не лечится магией, пока яд не выведен семью успешными спасбросками).'
+  },
+  {
+    id: 'alch_ref_poison_wyvern',
+    name: 'Яд виверны (Wyvern Poison)',
+    icon: '🐉',
+    cat: 'Яды и Токсины',
+    rarity: 'Редкий',
+    kit: 'poisoner',
+    cost: 600,
+    marketPrice: '1200 зм',
+    time: '10 дней',
+    dc: 15,
+    ingredients: [{ name: 'Хвостовая ядовитая железа виверны', qty: 1 }],
+    effect: 'Оружейный яд. Поражённая атакой цель проходит спасбросок Телосложения СЛ 15: получает 7d6 (24) урона ядом при провале или половину этого урона при успехе.'
+  },
+  {
+    id: 'alch_ref_poison_midnight',
+    name: 'Полуночные слёзы (Midnight Tears)',
+    icon: '🌙',
+    cat: 'Яды и Токсины',
+    rarity: 'Очень редкий',
+    kit: 'poisoner',
+    cost: 750,
+    marketPrice: '1500 зм',
+    time: '12 дней',
+    dc: 17,
+    ingredients: [{ name: 'Чёрный лотос Чулта', qty: 1 }, { name: 'Ночная роса святилища Шар', qty: 1 }],
+    effect: 'Поглощаемый яд идеального убийства. Не оказывает абсолютно никакого эффекта до наступления полуночи. Ровно в полночь жертва проходит спасбросок Телосложения СЛ 17: получает 9d6 (31) урона ядом при провале или половину при успехе.'
+  },
+  {
+    id: 'alch_ref_poison_worm',
+    name: 'Яд пурпурного червя (Purple Worm Poison)',
+    icon: '🪱',
+    cat: 'Яды и Токсины',
+    rarity: 'Очень редкий',
+    kit: 'poisoner',
+    cost: 1000,
+    marketPrice: '2000 зм',
+    time: '15 дней',
+    dc: 19,
+    ingredients: [{ name: 'Ядовитое жало пурпурного червя', qty: 1 }],
+    effect: 'Смертоносный оружейный яд из глубин Подземья. При попадании цель проходит спасбросок Телосложения СЛ 19: получает 12d6 (42) урона ядом при провале или половину урона при успехе.'
+  },
+
+  /* 5. Травы и Реагенты Фаэруна */
+  {
+    id: 'alch_ref_herb_kingsfoil',
+    name: 'Королевский лист / Лургас (Kingsfoil)',
+    icon: '🌿',
+    cat: 'Травы и Реагенты Фаэруна',
+    rarity: 'Обычный',
+    kit: 'herbalism',
+    cost: 10,
+    marketPrice: '10 зм',
+    time: 'Сбор в лесах (1 час)',
+    dc: 10,
+    ingredients: [{ name: 'Среда обитания: Леса и предгорья Побережья Мечей', qty: 1 }],
+    effect: 'Душистая серебристо-зелёная трава — главный базовый компонент всех Зелий лечения и припарок. Если разжевать свежий лист во время Короткого отдыха, персонаж дополнительно восстанавливает +1d4 хитов.'
+  },
+  {
+    id: 'alch_ref_herb_lathander',
+    name: 'Сон-трава Латандера (Dawnflower Petal)',
+    icon: '🌻',
+    cat: 'Травы и Реагенты Фаэруна',
+    rarity: 'Необычный',
+    kit: 'herbalism',
+    cost: 35,
+    marketPrice: '35 зм',
+    time: 'Сбор на рассвете',
+    dc: 13,
+    ingredients: [{ name: 'Среда обитания: Солнечные луга и холмы Дессарина', qty: 1 }],
+    effect: 'Золотистый цветок, раскрывающий бутоны ровно на 15 минут с первыми лучами рассвета. Очищает кровь от некротических проклятий и используется для создания Эликсира здоровья и Превосходных зелий лечения.'
+  },
+  {
+    id: 'alch_ref_herb_cinderbloom',
+    name: 'Пепельник Невервинтера (Neverwinter Cinderbloom)',
+    icon: '🌺',
+    cat: 'Травы и Реагенты Фаэруна',
+    rarity: 'Необычный',
+    kit: 'alchemist',
+    cost: 40,
+    marketPrice: '40 зм',
+    time: 'Сбор у геотермальных источников',
+    dc: 14,
+    ingredients: [{ name: 'Среда обитания: Склоны горы Хотеноу и Лес Невервинтера', qty: 1 }],
+    effect: 'Огненно-рыжий цветок, лепестки которого всегда тёплые на ощупь и тлеют в темноте. Незаменимый реагент для Алхимического огня, Пламенной смолы и Зелий сопротивления огню.'
+  },
+  {
+    id: 'alch_ref_herb_underdark',
+    name: 'Светящийся мох Подземья (Faerzress Glow-Moss)',
+    icon: '🍄',
+    cat: 'Травы и Реагенты Фаэруна',
+    rarity: 'Необычный',
+    kit: 'alchemist',
+    cost: 30,
+    marketPrice: '30 зм',
+    time: 'Сбор в пещерах Подземья',
+    dc: 12,
+    ingredients: [{ name: 'Среда обитания: Пещеры Подземья с излучением Фаэрзрес', qty: 1 }],
+    effect: 'Биолюминесцентный сине-фиолетовый мох, впитавший дикую радиацию Подземья. Служит катализатором для Зелий невидимости, Зелий чтения мыслей и Масла эфирности.'
+  },
+  {
+    id: 'alch_ref_herb_frostheather',
+    name: 'Ледяной вереск Долины (Icewind Frost-Heather)',
+    icon: '❄️',
+    cat: 'Травы и Реагенты Фаэруна',
+    rarity: 'Необычный',
+    kit: 'herbalism',
+    cost: 35,
+    marketPrice: '35 зм',
+    time: 'Сбор в тундре',
+    dc: 13,
+    ingredients: [{ name: 'Среда обитания: Долина Ледяного Ветра и Хребет Мира', qty: 1 }],
+    effect: 'Хрустально-голубой вереск, звенящий на ледяном ветру. Используется в Хладном закале клинка, криогенных бомбах и зельях защиты от стужи.'
+  },
+  {
+    id: 'alch_ref_herb_lotus',
+    name: 'Чёрный лотос Чулта (Chultan Black Lotus)',
+    icon: '🥀',
+    cat: 'Травы и Реагенты Фаэруна',
+    rarity: 'Очень редкий',
+    kit: 'poisoner',
+    cost: 400,
+    marketPrice: '400 зм',
+    time: 'Сбор в джунглях',
+    dc: 18,
+    ingredients: [{ name: 'Среда обитания: Глубокие болота полуострова Чулт', qty: 1 }],
+    effect: 'Редчайший бархатно-чёрный цветок, растущий на костях погибших хищников. Пыльца вызывает мгновенный паралич дыхания; основа яда «Полуночные слёзы».'
+  },
+
+  /* 6. Правила крафта и СЛ (D&D 2024 / DMG) */
+  {
+    id: 'alch_ref_rule_herbalism',
+    name: 'Набор травника (Herbalism Kit — Правила 2024)',
+    icon: '🌿',
+    cat: 'Правила крафта и СЛ',
+    rarity: 'Правило',
+    kit: 'herbalism',
+    cost: 5,
+    marketPrice: '5 зм',
+    time: 'Инструмент',
+    dc: 10,
+    ingredients: [{ name: 'Секатор, ступка с пестиком, стеклянные флаконы, мешочки для трав', qty: 1 }],
+    effect: 'Хар-ка: Интеллект или Мудрость. Владение набором позволяет опознавать растения (СЛ 10) и варить Зелья лечения, Противоядия и свечи. В D&D 2024 создание обычного Зелья лечения требует 1 дня работы (8 часов) и сырья на 25 зм.'
+  },
+  {
+    id: 'alch_ref_rule_alchemist',
+    name: 'Инструменты алхимика (Alchemist\'s Supplies — Правила 2024)',
+    icon: '⚗️',
+    cat: 'Правила крафта и СЛ',
+    rarity: 'Правило',
+    kit: 'alchemist',
+    cost: 50,
+    marketPrice: '50 зм',
+    time: 'Инструмент',
+    dc: 15,
+    ingredients: [{ name: 'Две реторты, спиртовая горелка, штатив, стеклянная трубка, химикаты', qty: 1 }],
+    effect: 'Хар-ка: Интеллект. Позволяет опознавать зелья и кислоты (СЛ 15), разводить огонь (СЛ 15) и нейтрализовать кислоту (СЛ 10). Во время Долгого отдыха вы можете потратить реагенты, чтобы быстро создать 1 фиал Кислоты, Алхимического огня, Масла, Духов или Мыла.'
+  },
+  {
+    id: 'alch_ref_rule_poisoner',
+    name: 'Инструменты отравителя (Poisoner\'s Kit — Правила 2024)',
+    icon: '☠️',
+    cat: 'Правила крафта и СЛ',
+    rarity: 'Правило',
+    kit: 'poisoner',
+    cost: 50,
+    marketPrice: '50 зм',
+    time: 'Инструмент',
+    dc: 15,
+    ingredients: [{ name: 'Тёмные склянки, пипетки, защитные перчатки, скальпель для желёз', qty: 1 }],
+    effect: 'Хар-ка: Интеллект или Ловкость. Позволяет безопасно наносить яды без риска отравить себя, опознавать отравленную пищу/оружие (СЛ 10) и сцеживать яд с убитых ядовитых чудовищ (проверка Природы или Медицины СЛ 15–20 за 1d6 минут; при провале на 5+ отравитель сам получает урон ядом).'
+  },
+  {
+    id: 'alch_ref_rule_table',
+    name: 'Таблица стоимости и сроков варки по редкости',
+    icon: '📊',
+    cat: 'Правила крафта и СЛ',
+    rarity: 'Правило',
+    kit: 'alchemist',
+    cost: 0,
+    marketPrice: 'Таблица DMG / XGE',
+    time: '1–50 дней',
+    dc: 15,
+    ingredients: [{ name: 'Расходники требуют в 2 раза меньше времени и золота, чем постоянные артефакты', qty: 1 }],
+    effect: '• Обычный (Common): 1–5 дней · 25–50 зм сырья · СЛ 10\n• Необычный (Uncommon): 5 дней · 100–200 зм сырья · СЛ 13\n• Редкий (Rare): 10–15 дней · 500–1 000 зм сырья · СЛ 15\n• Очень редкий (Very Rare): 20–25 дней · 2 500–5 000 зм сырья · СЛ 18\n• Легендарный (Legendary): 50 дней · 10 000–25 000 зм сырья · СЛ 20'
+  }
 ];
 
 function newRecipe(){
   return {
-    id:null, name:'', kit:'alchemist', cost:0, time:'', dc:'',
-    ingredients:[{name:'', qty:1}], effect:'', isCustom:true
+    id: null,
+    name: '',
+    icon: '🧪',
+    cat: 'Зелья и Эликсиры',
+    rarity: 'Необычный',
+    kit: 'alchemist',
+    cost: 50,
+    time: '1 день',
+    dc: 13,
+    ingredients: [{ name: '', qty: 1 }],
+    effect: '',
+    isCustom: true
   };
 }
-function seedRecipes(){
-  return [
-    {id:genId(), name:'Зелье лечения', kit:'herbalism', cost:25, time:'4 часа', dc:'',
-      ingredients:[{name:'Лечебные травы',qty:2}], effect:'Восстанавливает 2к4+2 хитов при использовании.', isCustom:false},
-    {id:genId(), name:'Противоядие', kit:'herbalism', cost:50, time:'4 часа', dc:'',
-      ingredients:[{name:'Змеиный корень',qty:1},{name:'Дистиллированная вода',qty:1}], effect:'Даёт преимущество на спасброски против яда в течение 1 часа.', isCustom:false},
-    {id:genId(), name:'Алхимический огонь', kit:'alchemist', cost:50, time:'1 рабочий день', dc:'',
-      ingredients:[{name:'Горючая смола',qty:2},{name:'Стеклянная колба',qty:1}], effect:'Бросаемое оружие: 1к4 урона огнём в начале каждого хода цели, пока не потушат (действие).', isCustom:false},
-    {id:genId(), name:'Кислота', kit:'alchemist', cost:25, time:'4 часа', dc:'',
-      ingredients:[{name:'Едкий реагент',qty:1},{name:'Стеклянная колба',qty:1}], effect:'Бросаемое оружие: 2к6 урона кислотой при попадании.', isCustom:false}
-  ];
-}
+
 function loadRecipes(){
   try{
     const raw = localStorage.getItem('ttc_recipes');
-    if(!raw) return seedRecipes();
+    if(!raw) return [];
     const arr = JSON.parse(raw);
-    return Array.isArray(arr) && arr.length ? arr : seedRecipes();
-  }catch(e){ return seedRecipes(); }
+    if(!Array.isArray(arr)) return [];
+    const oldSeedNames = ['Зелье лечения', 'Противоядие', 'Алхимический огонь', 'Кислота'];
+    return arr.filter(function(r){
+      if(!r) return false;
+      if(r.isCustom === false && oldSeedNames.indexOf(r.name) !== -1) return false;
+      return true;
+    }).map(function(r){
+      return {
+        id: r.id || genId(),
+        name: r.name || 'Алхимический рецепт',
+        icon: r.icon || (r.kit === 'poisoner' ? '☠️' : (r.kit === 'herbalism' ? '🌿' : '🧪')),
+        cat: r.cat || (r.kit === 'poisoner' ? 'Яды и Токсины' : 'Зелья и Эликсиры'),
+        rarity: r.rarity || 'Необычный',
+        kit: r.kit || 'alchemist',
+        cost: Number(r.cost) || 0,
+        time: r.time || '4 часа',
+        dc: r.dc != null ? r.dc : '',
+        ingredients: Array.isArray(r.ingredients) && r.ingredients.length ? r.ingredients : [{ name: '', qty: 1 }],
+        effect: r.effect || '',
+        isCustom: true
+      };
+    });
+  }catch(e){ return []; }
 }
 function saveRecipesToStorage(){
   try{ localStorage.setItem('ttc_recipes', JSON.stringify(RECIPES)); }catch(e){}
 }
 
-function loadIngredients(){
-  try{
-    const raw = localStorage.getItem('ttc_ingredients');
-    if(!raw) return [];
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr) ? arr : [];
-  }catch(e){ return []; }
-}
-function saveIngredientsToStorage(){
-  try{ localStorage.setItem('ttc_ingredients', JSON.stringify(INGREDIENTS)); }catch(e){}
-}
-function findIngredient(name){
-  const norm = name.trim().toLowerCase();
-  return INGREDIENTS.find(i=>i.name.trim().toLowerCase()===norm);
-}
+function loadIngredients(){ return []; }
+function saveIngredientsToStorage(){}
+function findIngredient(){ return null; }
 
 function hashColor(str){
   let h=0;
@@ -1068,7 +1879,7 @@ function hashColor(str){
 }
 
 let RECIPES = loadRecipes();
-let INGREDIENTS = loadIngredients();
+let INGREDIENTS = [];
 let recipeDraft = null;
 
 /* ---------- magic ---------- */
@@ -1247,6 +2058,12 @@ function render(){
   if(view.screen === 'commands'){
     view.screen = 'dice';
   }
+  if(view.screen === 'stock'){
+    view.screen = 'alchemy';
+  }
+  if(view.screen === 'alchemyDC'){
+    view.screen = 'alchemyRef';
+  }
   updateHomeScreenLock(view.screen);
   const app = document.getElementById('app');
   app.classList.toggle('wide', view.screen === 'map');
@@ -1254,10 +2071,19 @@ function render(){
   if(view.screen === 'home') app.innerHTML = renderHome();
   else if(view.screen === 'rules2024') app.innerHTML = renderRules2024();
   else if(view.screen === 'alchemy') app.innerHTML = renderAlchemyHub();
+  else if(view.screen === 'alchemyRef') app.innerHTML = renderAlchemyRef();
   else if(view.screen === 'recipes') app.innerHTML = renderRecipes();
+  else if(view.screen === 'recipeView') app.innerHTML = renderRecipeView();
   else if(view.screen === 'recipeForm') app.innerHTML = renderRecipeForm();
-  else if(view.screen === 'stock') app.innerHTML = renderStock();
-  else if(view.screen === 'alchemyDC') app.innerHTML = renderAlchemyDC();
+  else if(view.screen === 'alchemyAiGen') app.innerHTML = renderAlchemyAiGen();
+  else if(view.screen === 'faeTechs') app.innerHTML = renderFaeTechs();
+  else if(view.screen === 'faeTechView') app.innerHTML = renderFaeTechView();
+  else if(view.screen === 'faeTechEdit') app.innerHTML = renderFaeTechEdit();
+  else if(view.screen === 'faeTechGen') app.innerHTML = renderFaeTechGen();
+  else if(view.screen === 'faeMoves') app.innerHTML = renderFaeMoves();
+  else if(view.screen === 'faeMoveView') app.innerHTML = renderFaeMoveView();
+  else if(view.screen === 'faeMoveEdit') app.innerHTML = renderFaeMoveEdit();
+  else if(view.screen === 'faeMoveGen') app.innerHTML = renderFaeMoveGen();
   else if(view.screen === 'subclass') app.innerHTML = renderSubclassFeatures();
   else if(view.screen === 'magic') app.innerHTML = renderMagicHub();
   else if(view.screen === 'schoolSpells') app.innerHTML = renderSchoolSpells();
@@ -1310,6 +2136,8 @@ function renderHome(){
   var lvlVal = c ? (c.level || 1) : 1;
   var spdVal = c ? (c.speed != null ? c.speed : 30) : 30;
   var pbVal = fmtMod(profBonus(lvlVal));
+  var techsCount = (c && Array.isArray(c.techs)) ? c.techs.length : 0;
+  var movesCount = (c && Array.isArray(c.moves)) ? c.moves.length : 0;
 
   var hudHtml = '<div class="fae-hud" data-go="faeData" role="button" tabindex="0" title="Открыть лист персонажа и ростер отряда в разделе Данные" style="cursor:pointer;">' +
     '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">' +
@@ -1335,12 +2163,26 @@ function renderHome(){
     '</div>' +
     '<div style="flex:1;min-width:0;">' +
       '<div class="fae-hero-dice-title">Бросок костей</div>' +
-      '<div class="fae-hero-dice-desc">Кости d4–d100, модификатор, выбор проверки из списка (характеристики, навыки, спасброски, атака, урон)</div>' +
+      '<div class="fae-hero-dice-desc">Кости d4–d100, модификатор, выбор проверки из списка (характеристики, навыки, спасброски, способности, приёмы)</div>' +
     '</div>' +
     '<div class="fae-hero-dice-arrow">→</div>' +
   '</div>';
 
   var cardsHtml = '<div class="menu-list grid-2">' +
+    '<div class="fae-card fae-card-clickable" data-go="faeTechs" role="button" tabindex="0">' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="fae-card-title"><span>✨</span> Способности ' + (techsCount ? '<span class="fae-ref-header-badge" style="margin-left:6px;padding:1px 8px;font-size:11px;">' + techsCount + '</span>' : '') + '</div>' +
+        '<div class="fae-card-desc">Классовые умения, особенности вида, черты (Feats), магические дары и AI-конструктор способностей героя</div>' +
+      '</div>' +
+      '<div class="fae-card-arrow">›</div>' +
+    '</div>' +
+    '<div class="fae-card fae-card-clickable" data-go="faeMoves" role="button" tabindex="0">' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="fae-card-title"><span>⚔️</span> Боевые приёмы ' + (movesCount ? '<span class="fae-ref-header-badge" style="margin-left:6px;padding:1px 8px;font-size:11px;">' + movesCount + '</span>' : '') + '</div>' +
+        '<div class="fae-card-desc">Оружейные техники, Мастерство оружия D&D 2024, манёвры Боевого Мастера, стойки и AI-генератор приёмов</div>' +
+      '</div>' +
+      '<div class="fae-card-arrow">›</div>' +
+    '</div>' +
     '<div class="fae-card fae-card-clickable" data-go="map" role="button" tabindex="0">' +
       '<div style="flex:1;min-width:0;">' +
         '<div class="fae-card-title"><span>🗺️</span> Карта Фаэруна</div>' +
@@ -1740,198 +2582,395 @@ function renderRules2024(){
   `;
 }
 
-function flaskSvg(uid, color){
-  const clipId = 'flaskClip_'+uid;
-  const shape = 'M38,8 L38,42 L18,118 Q18,132 33,132 L67,132 Q82,132 82,118 L62,42 L62,8 Z';
-  return `<svg class="flask" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
-    <defs><clipPath id="${clipId}"><path d="${shape}"/></clipPath></defs>
-    <g clip-path="url(#${clipId})">
-      <rect class="flask-liquid" x="10" y="135" width="80" height="0" fill="${color}"></rect>
-    </g>
-    <path d="${shape}" fill="none" stroke="var(--ink-dim)" stroke-width="3"/>
-    <line x1="30" y1="8" x2="70" y2="8" stroke="var(--ink-dim)" stroke-width="4" stroke-linecap="round"/>
-  </svg>`;
+/* ============================================================
+   НОВАЯ СИСТЕМА АЛХИМИИ, ТРАВНИЧЕСТВА И ЯДОВ ФАЭРУНА
+   (2 основных раздела: Справочник D&D + Мои Рецепты и Лаборатория ИИ)
+   ============================================================ */
+
+function renderAlchemyTabBar(activeTab){
+  var refCount = Array.isArray(FAE_ALCHEMY_COMPENDIUM) ? FAE_ALCHEMY_COMPENDIUM.length : 0;
+  var myCount = Array.isArray(RECIPES) ? RECIPES.length : 0;
+  return '<div class="fae-nav-tabs">' +
+    '<button type="button" class="fae-nav-tab ' + (activeTab==='ref'?'active':'') + '" data-go="alchemyRef">' +
+      '📖 Справочник Алхимии D&D (' + refCount + ')' +
+    '</button>' +
+    '<button type="button" class="fae-nav-tab ' + (activeTab==='my'?'active':'') + '" data-go="recipes">' +
+      '⚗️ Мои Рецепты и Лаборатория ИИ (' + myCount + ')' +
+    '</button>' +
+  '</div>';
 }
 
-function recipeCardHtml(r){
-  const kitLabel = r.kit==='herbalism' ? 'Набор травника' : 'Алхимический набор';
-  const ingRows = (r.ingredients||[]).filter(i=>i.name).map(ing=>{
-    const stock = findIngredient(ing.name);
-    const have = stock ? stock.qty : 0;
-    const cls = have>=ing.qty ? 'have' : 'short';
-    return `<div class="rc-ing-row"><span>${escapeHtml(ing.name)}</span><span class="${cls}">${have}/${ing.qty}</span></div>`;
-  }).join('') || '<div class="rc-ing-row"><span>Без ингредиентов</span></div>';
-  const uid = 'flask'+Math.random().toString(36).slice(2,8);
-  return `
-    <div class="recipe-card" data-recipe-id="${r.id}">
-      <div class="rc-top">
-        <div>
-          <div class="rc-name">${escapeHtml(r.name||'Без названия')}</div>
-          <div class="rc-meta">${r.cost||0} зм · ${escapeHtml(r.time||'—')}${r.dc?(' · СЛ '+escapeHtml(String(r.dc))):''}</div>
-        </div>
-        <span class="kit-badge">${kitLabel}</span>
-      </div>
-      <div class="rc-ingredients">${ingRows}</div>
-      ${r.effect?`<div class="rc-effect">${escapeHtml(r.effect)}</div>`:''}
-      <div class="rc-actions">
-        <button type="button" class="rc-btn brew" data-brew="${r.id}">⚗️ Сварить</button>
-        <button type="button" class="rc-btn" data-go="recipeForm:${r.id}">Изменить</button>
-        <button type="button" class="rc-btn" data-delete-recipe="${r.id}" style="color:var(--crimson-bright);">Удалить</button>
-      </div>
-      <div class="rc-missing-note" style="display:none;"></div>
-      <div class="brew-overlay">
-        ${flaskSvg(uid, hashColor(r.name||uid))}
-        <div class="brew-label"></div>
-      </div>
-    </div>`;
-}
-
-function attemptBrew(recipeId){
-  const recipe = RECIPES.find(r=>r.id===recipeId);
-  if(!recipe) return;
-  const missing = [];
-  (recipe.ingredients||[]).forEach(ing=>{
-    if(!ing.name) return;
-    const stock = findIngredient(ing.name);
-    const have = stock ? stock.qty : 0;
-    if(have < ing.qty) missing.push(`${ing.name} (нужно ${ing.qty}, есть ${have})`);
-  });
-  const card = document.querySelector(`.recipe-card[data-recipe-id="${recipeId}"]`);
-  if(missing.length){
-    const note = card ? card.querySelector('.rc-missing-note') : null;
-    if(note){ note.textContent = 'Не хватает: '+missing.join(', '); note.style.display='block'; }
-    return;
-  }
-  const note = card ? card.querySelector('.rc-missing-note') : null;
-  if(note) note.style.display='none';
-
-  (recipe.ingredients||[]).forEach(ing=>{
-    if(!ing.name) return;
-    const stock = findIngredient(ing.name);
-    if(stock) stock.qty -= ing.qty;
-  });
-  INGREDIENTS = INGREDIENTS.filter(i=>i.qty>0);
-  saveIngredientsToStorage();
-  copyText(`*[Сварено: ${recipe.name}]*`);
-
-  if(card){
-    const overlay = card.querySelector('.brew-overlay');
-    const label = card.querySelector('.brew-label');
-    const liquid = card.querySelector('.flask-liquid');
-    if(label) label.textContent = 'Сварено: '+recipe.name;
-    if(overlay) overlay.classList.add('active');
-    if(liquid){
-      liquid.setAttribute('y','135'); liquid.setAttribute('height','0');
-      const raf = typeof requestAnimationFrame==='function' ? requestAnimationFrame : (fn)=>setTimeout(fn,16);
-      raf(()=>{ raf(()=>{
-        liquid.setAttribute('y','48'); liquid.setAttribute('height','87');
-      });});
-    }
-    setTimeout(()=>{ if(overlay) overlay.classList.remove('active'); render(); }, 1900);
-  } else {
-    render();
-  }
+function getAlchemyCatMeta(catKey){
+  var found = (FAE_ALCHEMY_CATEGORIES || []).find(function(c){ return c.key === catKey; });
+  return found || { key: catKey || 'potions', label: 'Зелья и Эликсиры', icon: '🧪' };
 }
 
 function renderAlchemyHub(){
-  return `
-    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Алхимия и Зелья'}])}
-    <button class="back" data-go="faeRef">← В справочник</button>
-    <h1>Алхимия и Зелья</h1>
-    <p class="subtitle">Рецепты, запасы ингредиентов и справочник по крафту.</p>
-    <div class="rule"></div>
-    <div class="menu-list">
-      <div class="menu-item" data-go="recipes">
-        <div>
-          <div class="name">Рецепты</div>
-          <div class="desc">Известные и открытые в игре рецепты, варение зелий</div>
-        </div>
-        <div class="arrow">→</div>
-      </div>
-      <div class="menu-item" data-go="stock">
-        <div>
-          <div class="name">Запасы ингредиентов</div>
-          <div class="desc">Что реально лежит в рюкзаке — чтобы не полагаться на память</div>
-        </div>
-        <div class="arrow">→</div>
-      </div>
-      <div class="menu-item" data-go="alchemyDC">
-        <div>
-          <div class="name">Справочник СЛ и крафта</div>
-          <div class="desc">Сложности проверок, время и стоимость изготовления</div>
-        </div>
-        <div class="arrow">→</div>
-      </div>
-    </div>
-  `;
+  var refCount = Array.isArray(FAE_ALCHEMY_COMPENDIUM) ? FAE_ALCHEMY_COMPENDIUM.length : 0;
+  var myCount = Array.isArray(RECIPES) ? RECIPES.length : 0;
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Справочник', nav:'faeRef'}, {label:'Алхимия, Травничество и Яды'}]) +
+    '<button class="back" data-go="faeRef">← В справочник</button>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">' +
+      '<div>' +
+        '<h1>🧪 Алхимия, Травничество и Яды</h1>' +
+        '<p class="subtitle">Канонический компендиум D&D 5e / 2024 и персональная лаборатория с AI-генератором рецептов.</p>' +
+      '</div>' +
+      '<span class="fae-ref-header-badge">⚗️ D&D 5e / 2024</span>' +
+    '</div>' +
+    '<div class="fae-rule"></div>' +
+
+    '<div class="fae-ref-lead">' +
+      'Вся алхимия Забытых Королевств разделена на <b>два ключевых направления</b>: полный <b>Справочник существующих в D&D зелий, эликсиров, бомб, масел, ядов, трав и правил крафта</b> и раздел <b>Мои созданные рецепты</b> с ручным конструктором и встроенной Лабораторией ИИ.' +
+    '</div>' +
+
+    '<div class="menu-list grid-2" style="margin-top:18px;">' +
+      '<div class="fae-card fae-card-clickable" data-go="alchemyRef" role="button" tabindex="0" style="padding:20px;border-color:rgba(201,164,92,0.45);">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">' +
+            '<span class="fae-ref-item-tag">КАНОН D&D 5E / 2024</span>' +
+            '<span style="font-size:12px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;">' + refCount + ' записей</span>' +
+          '</div>' +
+          '<div class="fae-card-title" style="font-size:18px;margin-bottom:6px;"><span>📖</span> Справочник Алхимии, Трав и Ядов D&D</div>' +
+          '<div class="fae-card-desc" style="font-size:13.5px;line-height:1.55;">' +
+            'Все официальные зелья исцеления, эликсиры силы великанов, невидимости, скорости и полёта, алхимический огонь и бомбы, оружейные масла, яды DMG (от «Злобы» до «Слёз полуночи»), травы Фаэруна и таблицы СЛ крафта.' +
+          '</div>' +
+        '</div>' +
+        '<div class="fae-card-arrow">→</div>' +
+      '</div>' +
+
+      '<div class="fae-card fae-card-clickable" data-go="recipes" role="button" tabindex="0" style="padding:20px;border-color:rgba(201,164,92,0.45);">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">' +
+            '<span class="fae-ref-item-tag">ЛИЧНАЯ ЛАБОРАТОРИЯ + AI</span>' +
+            '<span style="font-size:12px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;">' + myCount + ' в списке</span>' +
+          '</div>' +
+          '<div class="fae-card-title" style="font-size:18px;margin-bottom:6px;"><span>⚗️</span> Мои Рецепты и Лаборатория ИИ</div>' +
+          '<div class="fae-card-desc" style="font-size:13.5px;line-height:1.55;">' +
+            'Список ваших собственных открытых или созданных зелий, ядов и составов. Ручная запись рецептов, редактирование ингредиентов и встроенный ИИ-генератор авторской алхимии внутри раздела.' +
+          '</div>' +
+        '</div>' +
+        '<div class="fae-card-arrow">→</div>' +
+      '</div>' +
+    '</div>';
+}
+
+function alchemyCompendiumCardHtml(item){
+  var catMeta = getAlchemyCatMeta(item.category);
+  var ingStr = (item.ingredients || []).map(function(i){
+    return escapeHtml(i.name) + (i.qty > 1 ? (' ×' + i.qty) : '');
+  }).join(', ') || 'Стандартные реагенты';
+  var copyPayload = item.name + (item.orig ? (' (' + item.orig + ')') : '') + ' [' + (item.rarity || 'Обычный') + ', СЛ ' + (item.dc || 10) + ', ' + (item.cost || 0) + ' ЗМ]: ' + (item.effect || '');
+
+  return '<div class="fae-ref-card" data-alch-ref-id="' + escapeAttr(item.id) + '" style="display:flex;flex-direction:column;justify-content:space-between;">' +
+    '<div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
+        '<div class="fae-ref-card-k" style="margin-bottom:0;">' + catMeta.icon + ' ' + escapeHtml(item.name) + '</div>' +
+        '<span class="fae-ref-item-tag">' + escapeHtml(item.rarity || 'Обычный') + '</span>' +
+      '</div>' +
+      (item.orig ? '<div style="font-size:11.5px;color:#94a3b8;font-style:italic;margin-bottom:8px;">' + escapeHtml(item.orig) + '</div>' : '') +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11.5px;color:#cbd5e1;font-family:\'JetBrains Mono\',monospace;">' +
+        '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;">🧰 ' + escapeHtml(item.kitLabel || 'Алхимический набор') + '</span>' +
+        (item.dc ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#fde68a;">🎲 СЛ ' + escapeHtml(String(item.dc)) + '</span>' : '') +
+        (item.cost ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#fbbf24;">🪙 ' + escapeHtml(String(item.cost)) + ' ЗМ</span>' : '') +
+        (item.time ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;">⏳ ' + escapeHtml(item.time) + '</span>' : '') +
+      '</div>' +
+      (item.appearance ? '<div style="font-size:12.5px;color:#94a3b8;font-style:italic;margin-bottom:8px;line-height:1.45;">«' + escapeHtml(item.appearance) + '»</div>' : '') +
+      '<div class="fae-ref-card-v" style="margin-bottom:10px;">' + escapeHtml(item.effect || '') + '</div>' +
+      '<div style="font-size:12px;color:#cbd5e1;padding:7px 10px;background:rgba(10,14,22,0.65);border-left:2px solid #c9a45c;border-radius:4px;margin-bottom:12px;">' +
+        '<b style="color:#c9a45c;">Реагенты:</b> ' + ingStr +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(201,164,92,0.18);">' +
+      '<button type="button" class="rc-btn" data-alch-copy="' + escapeAttr(copyPayload) + '" title="Скопировать описание в буфер">📋 Копировать</button>' +
+      '<button type="button" class="rc-btn" data-alch-clone="' + escapeAttr(item.id) + '" title="Сохранить копию в Мои Рецепты для модификации">+ В мои рецепты</button>' +
+      '<button type="button" class="rc-btn" data-alch-equip="' + escapeAttr(item.id) + '" title="Добавить предмет в инвентарь активного героя">🎒 В снаряжение</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderAlchemyRef(){
+  var activeCat = window._faeAlchRefCat || 'all';
+  var searchQ = (window._faeAlchRefSearch || '').trim().toLowerCase();
+
+  var pillsHtml = (FAE_ALCHEMY_CATEGORIES || []).map(function(c){
+    var count = c.key === 'all'
+      ? FAE_ALCHEMY_COMPENDIUM.length
+      : FAE_ALCHEMY_COMPENDIUM.filter(function(x){ return x.category === c.key; }).length;
+    return '<button type="button" class="fae-pill ' + (activeCat === c.key ? 'active' : '') + '" data-alch-ref-cat="' + escapeAttr(c.key) + '">' +
+      c.icon + ' ' + escapeHtml(c.label) + ' <span style="opacity:0.75;font-size:11px;">(' + count + ')</span>' +
+    '</button>';
+  }).join('');
+
+  var filtered = (FAE_ALCHEMY_COMPENDIUM || []).filter(function(item){
+    if(activeCat !== 'all' && item.category !== activeCat) return false;
+    if(searchQ){
+      var hay = [item.name, item.orig, item.rarity, item.kitLabel, item.effect, item.appearance]
+        .concat((item.ingredients || []).map(function(i){ return i.name; }))
+        .join(' ').toLowerCase();
+      if(hay.indexOf(searchQ) === -1) return false;
+    }
+    return true;
+  });
+
+  var cardsHtml = filtered.length
+    ? '<div class="fae-ref-cards-grid">' + filtered.map(alchemyCompendiumCardHtml).join('') + '</div>'
+    : '<div class="char-empty">По выбранному фильтру ничего не найдено. Попробуйте сбросить категорию или изменить запрос.</div>';
+
+  return renderCrumb([
+      {label:'Фаэрун', nav:'home'},
+      {label:'Справочник', nav:'faeRef'},
+      {label:'Алхимия', nav:'alchemy'},
+      {label:'Справочник Алхимии D&D'}
+    ]) +
+    '<button class="back" data-go="alchemy">← К выбору раздела Алхимии</button>' +
+    renderAlchemyTabBar('ref') +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+      '<div>' +
+        '<h1>📖 Справочник Алхимии, Травничества и Ядов D&D</h1>' +
+        '<p class="subtitle">Каноническая база зелий, эликсиров, алхимических бомб, масел, ядов DMG, трав Фаэруна и правил крафта.</p>' +
+      '</div>' +
+      '<span class="fae-ref-header-badge">Показано: ' + filtered.length + ' из ' + FAE_ALCHEMY_COMPENDIUM.length + '</span>' +
+    '</div>' +
+    '<div class="fae-rule"></div>' +
+
+    '<div class="fae-ref-search-wrap" style="margin-bottom:14px;">' +
+      '<span class="fae-ref-search-icon">🔍</span>' +
+      '<input type="text" id="faeAlchRefSearch" class="fae-ref-search-input" value="' + escapeAttr(window._faeAlchRefSearch || '') + '" placeholder="Поиск по названию, эффекту, типу яда, траве или реагенту..." autocomplete="off">' +
+    '</div>' +
+
+    '<div class="pill-row" style="margin-bottom:18px;">' + pillsHtml + '</div>' +
+
+    '<div id="faeAlchRefGridWrap">' + cardsHtml + '</div>';
+}
+
+function wireAlchemyRef(){
+  document.querySelectorAll('[data-alch-ref-cat]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window._faeAlchRefCat = btn.getAttribute('data-alch-ref-cat') || 'all';
+      render();
+    });
+  });
+
+  var sInp = document.getElementById('faeAlchRefSearch');
+  if(sInp){
+    sInp.addEventListener('input', function(){
+      window._faeAlchRefSearch = this.value;
+      var pos = this.selectionStart;
+      render();
+      var nextInp = document.getElementById('faeAlchRefSearch');
+      if(nextInp){
+        nextInp.focus();
+        try{ nextInp.setSelectionRange(pos, pos); }catch(e){}
+      }
+    });
+  }
+
+  document.querySelectorAll('[data-alch-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      copyText(btn.getAttribute('data-alch-copy') || '');
+      var old = btn.textContent;
+      btn.textContent = '✓ Скопировано';
+      setTimeout(function(){ btn.textContent = old; }, 1100);
+    });
+  });
+
+  document.querySelectorAll('[data-alch-clone]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-alch-clone');
+      var src = (FAE_ALCHEMY_COMPENDIUM || []).find(function(x){ return x.id === id; });
+      if(!src) return;
+      var cloned = newRecipe({
+        name: src.name,
+        category: src.category === 'rules' ? 'potions' : (src.category || 'potions'),
+        rarity: src.rarity || 'Необычный',
+        kit: src.kit || 'alchemist',
+        cost: Number(src.cost) || 50,
+        time: src.time || '1 рабочий день',
+        dc: Number(src.dc) || 13,
+        ingredients: Array.isArray(src.ingredients) && src.ingredients.length
+          ? JSON.parse(JSON.stringify(src.ingredients))
+          : [{name:'Алхимический реагент', qty:1}],
+        appearance: src.appearance || '',
+        effect: src.effect || '',
+        source: 'compendium'
+      });
+      RECIPES.unshift(cloned);
+      saveRecipesToStorage();
+      btn.textContent = '✓ В моих рецептах!';
+      btn.disabled = true;
+    });
+  });
+
+  document.querySelectorAll('[data-alch-equip]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-alch-equip');
+      var src = (FAE_ALCHEMY_COMPENDIUM || []).find(function(x){ return x.id === id; });
+      var hero = getActiveFaerunCharacter();
+      if(!src || !hero) return;
+      var line = '• 🧪 ' + src.name + ' (' + (src.rarity || 'Обычный') + '): ' + (src.effect || '');
+      hero.equipment = hero.equipment ? (hero.equipment + '\n\n' + line) : line;
+      saveCharactersToStorage();
+      btn.textContent = '✓ Добавлено (' + (hero.name || 'Герой') + ')';
+      btn.disabled = true;
+    });
+  });
+}
+
+function customRecipeCardHtml(r){
+  var catMeta = getAlchemyCatMeta(r.category || 'potions');
+  var kitLabel = r.kit === 'herbalism' ? 'Набор травника' : (r.kit === 'poisoner' ? 'Набор отравителя' : 'Алхимический набор');
+  var ingStr = (r.ingredients || []).filter(function(i){ return i && i.name; }).map(function(i){
+    return escapeHtml(i.name) + (i.qty > 1 ? (' ×' + i.qty) : '');
+  }).join(', ') || 'По рецепту мастера';
+
+  var copyPayload = (r.name || 'Рецепт') + ' [' + (r.rarity || 'Необычный') + ', ' + kitLabel + ', СЛ ' + (r.dc || 10) + ', ' + (r.cost || 0) + ' ЗМ]: ' + (r.effect || '');
+
+  return '<div class="fae-ref-card" data-recipe-card="' + escapeAttr(r.id) + '" style="display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;">' +
+    '<div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
+        '<div class="fae-ref-card-k" style="margin-bottom:0;">' + catMeta.icon + ' ' + escapeHtml(r.name || 'Без названия') + '</div>' +
+        '<span class="fae-ref-item-tag">' + escapeHtml(r.rarity || 'Необычный') + '</span>' +
+      '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11.5px;color:#cbd5e1;font-family:\'JetBrains Mono\',monospace;">' +
+        '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;">🧰 ' + escapeHtml(kitLabel) + '</span>' +
+        (r.dc ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#fde68a;">🎲 СЛ ' + escapeHtml(String(r.dc)) + '</span>' : '') +
+        (r.cost ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#fbbf24;">🪙 ' + escapeHtml(String(r.cost)) + ' ЗМ</span>' : '') +
+        (r.time ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;">⏳ ' + escapeHtml(r.time) + '</span>' : '') +
+      '</div>' +
+      (r.appearance ? '<div style="font-size:12.5px;color:#94a3b8;font-style:italic;margin-bottom:8px;">«' + escapeHtml(r.appearance) + '»</div>' : '') +
+      '<div class="fae-ref-card-v" style="margin-bottom:10px;">' + escapeHtml(r.effect || 'Описание эффекта не указано.') + '</div>' +
+      '<div style="font-size:12px;color:#cbd5e1;padding:7px 10px;background:rgba(10,14,22,0.65);border-left:2px solid #c9a45c;border-radius:4px;margin-bottom:12px;">' +
+        '<b style="color:#c9a45c;">Ингредиенты:</b> ' + ingStr +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(201,164,92,0.18);">' +
+      '<button type="button" class="rc-btn" data-my-alch-copy="' + escapeAttr(copyPayload) + '">📋 Копировать</button>' +
+      '<button type="button" class="rc-btn" data-my-alch-equip="' + escapeAttr(r.id) + '">🎒 В снаряжение</button>' +
+      '<button type="button" class="rc-btn" data-go="recipeForm:' + escapeAttr(r.id) + '">✏️ Изменить</button>' +
+      '<button type="button" class="rc-btn" data-delete-recipe="' + escapeAttr(r.id) + '" style="color:#f87171;">🗑️</button>' +
+    '</div>' +
+  '</div>';
 }
 
 function renderRecipes(){
-  const cards = RECIPES.map(recipeCardHtml).join('') || '<div class="char-empty">Пока нет рецептов.</div>';
-  return `
-    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Алхимия', nav:'alchemy'},{label:'Рецепты'}])}
-    <button class="back" data-go="alchemy">← Назад</button>
-    <h1>Рецепты</h1>
-    <p class="subtitle">«Сварить» списывает ингредиенты из запасов, если их хватает. Добавляй новые по мере открытия в игре.</p>
-    <div class="rule"></div>
-    <button class="new-char-btn" data-go="recipeForm:new">+ Добавить рецепт</button>
-    ${cards}
-  `;
+  var activeCat = window._faeMyAlchCat || 'all';
+  var searchQ = (window._faeMyAlchSearch || '').trim().toLowerCase();
+
+  var customCats = (FAE_ALCHEMY_CATEGORIES || []).filter(function(c){ return c.key !== 'rules'; });
+  var pillsHtml = customCats.map(function(c){
+    var count = c.key === 'all'
+      ? RECIPES.length
+      : RECIPES.filter(function(x){ return (x.category || 'potions') === c.key; }).length;
+    return '<button type="button" class="fae-pill ' + (activeCat === c.key ? 'active' : '') + '" data-my-alch-cat="' + escapeAttr(c.key) + '">' +
+      c.icon + ' ' + escapeHtml(c.label) + ' <span style="opacity:0.75;font-size:11px;">(' + count + ')</span>' +
+    '</button>';
+  }).join('');
+
+  var filtered = (RECIPES || []).filter(function(r){
+    var rCat = r.category || 'potions';
+    if(activeCat !== 'all' && rCat !== activeCat) return false;
+    if(searchQ){
+      var hay = [r.name, r.rarity, r.effect, r.appearance]
+        .concat((r.ingredients || []).map(function(i){ return i.name; }))
+        .join(' ').toLowerCase();
+      if(hay.indexOf(searchQ) === -1) return false;
+    }
+    return true;
+  });
+
+  var cardsHtml = filtered.length
+    ? '<div class="fae-ref-cards-grid">' + filtered.map(customRecipeCardHtml).join('') + '</div>'
+    : '<div class="char-empty">В вашей личной книге рецептов пока нет записей в этой категории. Создайте рецепт вручную или сгенерируйте его с помощью ИИ!</div>';
+
+  return renderCrumb([
+      {label:'Фаэрун', nav:'home'},
+      {label:'Справочник', nav:'faeRef'},
+      {label:'Алхимия', nav:'alchemy'},
+      {label:'Мои Рецепты и Лаборатория ИИ'}
+    ]) +
+    '<button class="back" data-go="alchemy">← К выбору раздела Алхимии</button>' +
+    renderAlchemyTabBar('my') +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">' +
+      '<div>' +
+        '<h1>⚗️ Мои Рецепты и Лаборатория ИИ</h1>' +
+        '<p class="subtitle">Ваши собственные зелья, эликсиры, бомбы, масла и яды — созданные вручную или сгенерированные через Gemini AI.</p>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+        '<button type="button" class="btn btn-primary" data-go="recipeForm:new">+ Записать свой рецепт</button>' +
+        '<button type="button" class="ai-gen-btn" data-go="alchemyAiGen" style="padding:9px 16px;font-size:13px;">🤖 Создать рецепт с ИИ</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="fae-rule"></div>' +
+
+    '<div class="fae-ref-search-wrap" style="margin-bottom:14px;">' +
+      '<span class="fae-ref-search-icon">🔍</span>' +
+      '<input type="text" id="faeMyRecipesSearch" class="fae-ref-search-input" value="' + escapeAttr(window._faeMyAlchSearch || '') + '" placeholder="Поиск по вашим рецептам, ингредиентам и эффектам..." autocomplete="off">' +
+    '</div>' +
+
+    '<div class="pill-row" style="margin-bottom:18px;">' + pillsHtml + '</div>' +
+
+    cardsHtml;
 }
 
-function renderAlchemyDC(){
-  return `
-    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Алхимия', nav:'alchemy'},{label:'Справочник СЛ'}])}
-    <button class="back" data-go="alchemy">← Назад</button>
-    <h1>Справочник СЛ и крафта</h1>
-    <p class="subtitle">Ориентировочные сложности и правила изготовления — по DMG, на усмотрение мастера.</p>
-    <div class="rule"></div>
-    <div class="grid">${ALCHEMY_DC.map(termCard).join('')}</div>
-  `;
-}
+function renderRecipeView(){
+  var r = (RECIPES || []).find(function(x){ return x.id === view.recipeId; });
+  if(!r) return renderRecipes();
+  var catMeta = getAlchemyCatMeta(r.category || 'potions');
+  var kitLabel = r.kit === 'herbalism' ? 'Набор травника (Herbalism Kit)' : (r.kit === 'poisoner' ? 'Набор отравителя (Poisoner\'s Kit)' : 'Алхимический набор (Alchemist\'s Supplies)');
+  var ingRows = (r.ingredients || []).filter(function(i){ return i && i.name; }).map(function(i){
+    return '<li style="margin-bottom:4px;"><b>' + escapeHtml(i.name) + '</b> — ' + (i.qty || 1) + ' шт.</li>';
+  }).join('') || '<li>Базовые реагенты лаборатории</li>';
 
-function ingredientRowHtml(item){
-  return `
-    <div class="stock-row" data-ingredient-id="${item.id}">
-      <div class="stock-name">${escapeHtml(item.name)}</div>
-      <div class="stock-qty-ctrl">
-        <button type="button" data-stock-dec="${item.id}">−</button>
-        <span class="stock-qty-val">${item.qty}</span>
-        <button type="button" data-stock-inc="${item.id}">+</button>
-      </div>
-      <button type="button" class="stock-remove" data-stock-remove="${item.id}" title="Убрать">✕</button>
-    </div>`;
-}
-
-function renderStock(){
-  const rows = INGREDIENTS.map(ingredientRowHtml).join('') || '<div class="char-empty">Пока пусто — добавь то, что реально лежит в рюкзаке.</div>';
-  return `
-    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Алхимия', nav:'alchemy'},{label:'Запасы'}])}
-    <button class="back" data-go="alchemy">← Назад</button>
-    <h1>Запасы ингредиентов</h1>
-    <p class="subtitle">То, что реально при себе — чтобы не полагаться на память.</p>
-    <div class="rule"></div>
-    <div class="add-ingredient-row">
-      <input type="text" id="newIngName" placeholder="Название ингредиента">
-      <input type="number" id="newIngQty" placeholder="Кол-во" value="1" min="1">
-      <button class="btn-primary" id="addIngredientBtn">+ Добавить</button>
-    </div>
-    <div id="stockList">${rows}</div>
-  `;
+  return renderCrumb([
+      {label:'Фаэрун', nav:'home'},
+      {label:'Справочник', nav:'faeRef'},
+      {label:'Алхимия', nav:'alchemy'},
+      {label:'Мои Рецепты', nav:'recipes'},
+      {label:r.name || 'Рецепт'}
+    ]) +
+    '<button class="back" data-go="recipes">← К списку моих рецептов</button>' +
+    renderAlchemyTabBar('my') +
+    '<div class="fae-ref-card" style="padding:22px;border-color:rgba(201,164,92,0.45);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:10px;">' +
+        '<div>' +
+          '<span class="fae-ref-item-tag" style="margin-bottom:6px;">' + catMeta.icon + ' ' + escapeHtml(catMeta.label) + ' • ' + escapeHtml(r.rarity || 'Необычный') + '</span>' +
+          '<h1 style="margin:6px 0 0 0;font-size:24px;">' + escapeHtml(r.name || 'Без названия') + '</h1>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button type="button" class="btn btn-primary" data-go="recipeForm:' + escapeAttr(r.id) + '">✏️ Редактировать</button>' +
+          '<button type="button" class="btn btn-ghost" data-my-alch-equip="' + escapeAttr(r.id) + '">🎒 В снаряжение героя</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="fae-rule"></div>' +
+      '<div class="fae-gen-stat-grid" style="margin-bottom:14px;">' +
+        '<div class="fae-gen-stat-box"><span class="lbl">🧰 Инструменты</span><span class="val">' + escapeHtml(kitLabel) + '</span></div>' +
+        '<div class="fae-gen-stat-box"><span class="lbl">🎲 СЛ Крафта</span><span class="val">СЛ ' + escapeHtml(String(r.dc || 13)) + '</span></div>' +
+        '<div class="fae-gen-stat-box"><span class="lbl">🪙 Стоимость</span><span class="val">' + escapeHtml(String(r.cost || 0)) + ' ЗМ</span></div>' +
+        '<div class="fae-gen-stat-box"><span class="lbl">⏳ Время варки</span><span class="val">' + escapeHtml(r.time || '4 часа') + '</span></div>' +
+      '</div>' +
+      (r.appearance ? '<div class="fae-gen-block" style="border-left-color:#38bdf8;"><b>🧪 Внешний вид, цвет и аромат:</b><br><i>' + escapeHtml(r.appearance) + '</i></div>' : '') +
+      '<div class="fae-gen-block"><b>✨ Игровой эффект и механика:</b><br><span style="white-space:pre-line;">' + escapeHtml(r.effect || '') + '</span></div>' +
+      '<div style="margin-top:14px;padding:12px 16px;background:rgba(10,14,22,0.75);border:1px solid rgba(201,164,92,0.28);border-radius:6px;">' +
+        '<div style="font-size:12px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;margin-bottom:6px;">🌿 НЕОБХОДИМЫЕ ИНГРЕДИЕНТЫ И РЕАГЕНТЫ:</div>' +
+        '<ul style="margin:0 0 0 18px;padding:0;color:#e2e8f0;font-size:14px;line-height:1.5;">' + ingRows + '</ul>' +
+      '</div>' +
+    '</div>';
 }
 
 function initRecipeDraft(){
-  if(view.recipeId && view.recipeId!=='new'){
+  if(view.recipeId && view.recipeId !== 'new'){
     const existing = RECIPES.find(r=>r.id===view.recipeId);
     recipeDraft = existing ? JSON.parse(JSON.stringify(existing)) : newRecipe();
   } else {
     recipeDraft = newRecipe();
   }
 }
+
 function ingredientFormRowHtml(ing, idx){
   return `
     <div class="attack-row" data-ing-row="${idx}" style="grid-template-columns:2fr 1fr auto;">
-      <input type="text" placeholder="Название ингредиента" data-ing-idx="${idx}" data-ing-field="name" value="${escapeAttr(ing.name||'')}">
+      <input type="text" placeholder="Название ингредиента (напр. Пепел феникса, Слизь гуля)" data-ing-idx="${idx}" data-ing-field="name" value="${escapeAttr(ing.name||'')}">
       <input type="number" min="1" placeholder="Кол-во" data-ing-idx="${idx}" data-ing-field="qty" value="${ing.qty||1}">
       <button type="button" class="row-remove" data-remove-ing="${idx}" title="Убрать">✕</button>
     </div>`;
@@ -1941,46 +2980,1260 @@ function renderRecipeForm(){
   initRecipeDraft();
   const r = recipeDraft;
   const isExisting = !!(view.recipeId && view.recipeId!=='new' && RECIPES.find(x=>x.id===view.recipeId));
-  const ingRows = r.ingredients.map(ingredientFormRowHtml).join('');
+  const ingRows = (r.ingredients || [{name:'',qty:1}]).map(ingredientFormRowHtml).join('');
 
   return `
-    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Алхимия', nav:'alchemy'},{label:'Рецепты', nav:'recipes'},{label:r.name||'Новый рецепт'}])}
-    <button class="back" data-go="recipes">← Назад</button>
-    <h1>${escapeHtml(r.name || 'Новый рецепт')}</h1>
-    <p class="subtitle">Впиши, что узнал в игре — сохранится в общем списке рецептов.</p>
-    <div class="rule"></div>
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Алхимия', nav:'alchemy'},{label:'Мои Рецепты', nav:'recipes'},{label:r.name||'Новый рецепт'}])}
+    <button class="back" data-go="recipes">← К списку моих рецептов</button>
+    ${renderAlchemyTabBar('my')}
+    <h1>${escapeHtml(r.name || 'Запись нового рецепта')}</h1>
+    <p class="subtitle">Создайте собственное зелье, эликсир, бомбу, оружейное масло или боевой яд — он сохранится в разделе «Мои Рецепты».</p>
+    <div class="fae-rule"></div>
 
-    <div class="sheet-actions">
-      <button class="btn-primary" id="saveRecipeBtn">💾 Сохранить</button>
-      ${isExisting ? '<button class="btn-ghost" id="deleteRecipeBtn" style="color:var(--crimson-bright);border-color:var(--crimson-bright);">🗑 Удалить</button>' : ''}
+    <div class="sheet-actions" style="margin-bottom:18px;">
+      <button class="btn-primary" id="saveRecipeBtn">💾 Сохранить в Мои Рецепты</button>
+      ${isExisting ? '<button class="btn-ghost" id="deleteRecipeBtn" style="color:var(--crimson-bright);border-color:var(--crimson-bright);">🗑 Удалить рецепт</button>' : ''}
     </div>
 
-    <div id="recipeFormRoot">
-      <div class="field" style="margin-bottom:16px;">
-        <label>Название</label>
-        <input type="text" data-rfield="name" value="${escapeAttr(r.name)}" style="font-size:19px;padding:12px 14px;">
-      </div>
-      <div class="sheet-grid" style="margin-bottom:20px;">
-        <div class="field">
-          <label>Набор инструментов</label>
-          <select data-rfield="kit">
-            <option value="alchemist" ${r.kit==='alchemist'?'selected':''}>Алхимический набор</option>
-            <option value="herbalism" ${r.kit==='herbalism'?'selected':''}>Набор травника</option>
+    <div id="recipeFormRoot" class="fae-ref-card" style="padding:20px;">
+      <div class="fae-edit-grid">
+        <div class="fae-edit-item" style="grid-column:1 / -1;">
+          <label>Название зелья / состава / яда</label>
+          <input type="text" class="fae-input" data-rfield="name" value="${escapeAttr(r.name||'')}" placeholder="Напр. Эликсир Багрового Заката" style="font-size:17px;">
+        </div>
+        <div class="fae-edit-item">
+          <label>Категория состава</label>
+          <select class="fae-input" data-rfield="category">
+            <option value="potions" ${(r.category||'potions')==='potions'?'selected':''}>❤️ Зелья и Эликсиры</option>
+            <option value="bombs" ${r.category==='bombs'?'selected':''}>💣 Алхимические смеси и Бомбы</option>
+            <option value="oils" ${r.category==='oils'?'selected':''}>🗡️ Масла и Покрытия для оружия</option>
+            <option value="poisons" ${r.category==='poisons'?'selected':''}>☠️ Яды и Токсины</option>
+            <option value="herbs" ${r.category==='herbs'?'selected':''}>🌿 Травы и Особые реагенты</option>
           </select>
         </div>
-        <div class="field"><label>Цена (зм)</label><input type="number" min="0" data-rfield="cost" value="${r.cost}"></div>
-        <div class="field"><label>Время</label><input type="text" data-rfield="time" value="${escapeAttr(r.time)}" placeholder="напр. 4 часа"></div>
-        <div class="field"><label>СЛ проверки (если есть)</label><input type="text" data-rfield="dc" value="${escapeAttr(String(r.dc||''))}"></div>
+        <div class="fae-edit-item">
+          <label>Редкость</label>
+          <select class="fae-input" data-rfield="rarity">
+            <option value="Обычный" ${r.rarity==='Обычный'?'selected':''}>Обычный (Common)</option>
+            <option value="Необычный" ${(r.rarity||'Необычный')==='Необычный'?'selected':''}>Необычный (Uncommon)</option>
+            <option value="Редкий" ${r.rarity==='Редкий'?'selected':''}>Редкий (Rare)</option>
+            <option value="Очень редкий" ${r.rarity==='Очень редкий'?'selected':''}>Очень редкий (Very Rare)</option>
+            <option value="Легендарный" ${r.rarity==='Легендарный'?'selected':''}>Легендарный (Legendary)</option>
+          </select>
+        </div>
+        <div class="fae-edit-item">
+          <label>Набор инструментов</label>
+          <select class="fae-input" data-rfield="kit">
+            <option value="alchemist" ${(r.kit||'alchemist')==='alchemist'?'selected':''}>⚗️ Алхимический набор</option>
+            <option value="herbalism" ${r.kit==='herbalism'?'selected':''}>🌿 Набор травника</option>
+            <option value="poisoner" ${r.kit==='poisoner'?'selected':''}>☠️ Набор отравителя</option>
+          </select>
+        </div>
+        <div class="fae-edit-item">
+          <label>СЛ проверки (DC)</label>
+          <input type="text" class="fae-input" data-rfield="dc" value="${escapeAttr(String(r.dc||13))}" placeholder="напр. 15">
+        </div>
+        <div class="fae-edit-item">
+          <label>Стоимость создания (ЗМ)</label>
+          <input type="number" min="0" class="fae-input" data-rfield="cost" value="${r.cost||50}">
+        </div>
+        <div class="fae-edit-item">
+          <label>Время изготовления</label>
+          <input type="text" class="fae-input" data-rfield="time" value="${escapeAttr(r.time||'4 часа')}" placeholder="напр. 4 часа / 1 рабочий день">
+        </div>
+        <div class="fae-edit-item" style="grid-column:1 / -1;">
+          <label>Внешний вид, цвет, свечение и запах (необязательно)</label>
+          <input type="text" class="fae-input" data-rfield="appearance" value="${escapeAttr(r.appearance||'')}" placeholder="Густая рубиновая жидкость с золотистыми искрами и запахом шалфея...">
+        </div>
       </div>
 
-      <div class="field" style="margin-bottom:8px;"><label>Ингредиенты</label></div>
+      <div class="field" style="margin:18px 0 8px;"><label style="color:#c9a45c;font-family:'Cinzel',serif;font-size:12px;">🌿 Ингредиенты и реагенты рецепта</label></div>
       <div id="ingList">${ingRows}</div>
       <button type="button" class="add-row-btn" id="addIngRowBtn">+ Добавить ингредиент</button>
 
-      <div class="field" style="margin-top:20px;"><label>Эффект / описание</label><textarea data-rfield="effect" style="min-height:100px;">${escapeHtml(r.effect)}</textarea></div>
+      <div class="field" style="margin-top:20px;">
+        <label style="color:#c9a45c;font-family:'Cinzel',serif;font-size:12px;">✨ Игровой эффект и механика применения</label>
+        <textarea class="fae-input" data-rfield="effect" style="min-height:110px;">${escapeHtml(r.effect||'')}</textarea>
+      </div>
     </div>
   `;
 }
+
+function loadAlchLabHistory(){
+  try{
+    var raw = localStorage.getItem('fae_ai_hist_alchemy');
+    if(raw){
+      var arr = JSON.parse(raw);
+      if(Array.isArray(arr)) return arr;
+    }
+  }catch(e){}
+  return [];
+}
+
+function saveAlchLabHistory(arr){
+  try{
+    localStorage.setItem('fae_ai_hist_alchemy', JSON.stringify((arr || []).slice(0, 20)));
+  }catch(e){}
+}
+
+function renderAlchemyAiGen(){
+  var hasKey = !!((typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '');
+  var hist = loadAlchLabHistory();
+  var histHtml = hist.length ? (
+    '<div style="margin-top:24px;">' +
+      '<div class="section-label">📜 НЕДАВНО СОЗДАННЫЕ ИИ РЕЦЕПТЫ (' + hist.length + ')</div>' +
+      '<div class="fae-ref-cards-grid">' +
+        hist.map(function(h, idx){
+          return '<div class="fae-ref-card" data-alch-ai-hist-idx="' + idx + '" style="cursor:pointer;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:4px;">' +
+              '<div class="fae-ref-card-k" style="margin-bottom:0;">🧪 ' + escapeHtml(h.name || 'Рецепт ИИ') + '</div>' +
+              '<span class="fae-ref-item-tag">' + escapeHtml(h.rarity || 'Редкий') + '</span>' +
+            '</div>' +
+            '<div class="fae-ref-card-v">' + escapeHtml((h.effect || '').slice(0, 140)) + '...</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>'
+  ) : '';
+
+  var presets = [
+    { label: 'Эликсир драконьего дыхания', theme: 'Эликсир, дающий способность выдыхать конус стихийного пламени', cat: 'potions' },
+    { label: 'Теневое масло ассасинов Ам-на', theme: 'Оружейное масло, которое глушит звук удара и наносит некротический урон из скрытности', cat: 'oils' },
+    { label: 'Громовая граната Гонда', theme: 'Алхимическая бомба изобретателей Врат Балдура, оглушающая и отбрасывающая врагов', cat: 'bombs' },
+    { label: 'Нейротоксин дроу Мензоберранзана', theme: 'Оружейный яд глубинных пауков, лишающий жертву реакции и концентрации', cat: 'poisons' },
+    { label: 'Бальзам Серебряного Плетения', theme: 'Отвар редких лунных трав, восстанавливающий ячейку заклинаний и снимающий истощение', cat: 'potions' }
+  ];
+
+  return renderCrumb([
+      {label:'Фаэрун', nav:'home'},
+      {label:'Справочник', nav:'faeRef'},
+      {label:'Алхимия', nav:'alchemy'},
+      {label:'Мои Рецепты', nav:'recipes'},
+      {label:'Лаборатория ИИ'}
+    ]) +
+    '<button class="back" data-go="recipes">← К списку моих рецептов</button>' +
+    renderAlchemyTabBar('my') +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+      '<div>' +
+        '<h1>🤖 Алхимическая Лаборатория ИИ</h1>' +
+        '<p class="subtitle">Создайте уникальный рецепт зелья, эликсира, бомбы, оружейного масла или яда D&D 5e / 2024 и сохраните его в «Мои Рецепты».</p>' +
+      '</div>' +
+      '<span class="fae-ref-header-badge">GEMINI-4-ARGON</span>' +
+    '</div>' +
+    '<div class="fae-rule"></div>' +
+
+    '<div class="ai-gen-box" id="faeAlchAiFormBox">' +
+      '<div class="fae-gen-preset-wrap" style="margin-bottom:14px;">' +
+        '<div style="font-size:11.5px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;margin-bottom:6px;">⚡ БЫСТРЫЕ ИДЕИ ДЛЯ ЛАБОРАТОРИИ:</div>' +
+        '<div class="fae-gen-preset-row">' +
+          presets.map(function(p, i){
+            return '<button type="button" class="fae-gen-preset-chip" data-alch-lab-preset="' + i + '" data-theme="' + escapeAttr(p.theme) + '" data-cat="' + escapeAttr(p.cat) + '">💡 ' + escapeHtml(p.label) + '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+
+      '<div class="fae-edit-grid">' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Название или идея алхимического состава</label>' +
+          '<input type="text" class="fae-input" id="alchLabTheme" placeholder="Напр. Зелье призрачного шага, Кислотная бомба алхимика, Масло против демонов...">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Категория рецепта</label>' +
+          '<select class="fae-input" id="alchLabCat">' +
+            '<option value="potions" selected>❤️ Зелья и Эликсиры</option>' +
+            '<option value="bombs">💣 Алхимические смеси и Бомбы</option>' +
+            '<option value="oils">🗡️ Масла и Покрытия для оружия</option>' +
+            '<option value="poisons">☠️ Яды и Токсины</option>' +
+            '<option value="herbs">🌿 Травы и Редкие реагенты</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Редкость и СЛ крафта</label>' +
+          '<select class="fae-input" id="alchLabRarity">' +
+            '<option value="Обычный (СЛ 10, ~25 ЗМ)">Обычный (СЛ 10, ~25 ЗМ)</option>' +
+            '<option value="Необычный (СЛ 13, ~100 ЗМ)">Необычный (СЛ 13, ~100 ЗМ)</option>' +
+            '<option value="Редкий (СЛ 15, ~350 ЗМ)" selected>Редкий (СЛ 15, ~350 ЗМ)</option>' +
+            '<option value="Очень редкий (СЛ 18, ~1200 ЗМ)">Очень редкий (СЛ 18, ~1200 ЗМ)</option>' +
+            '<option value="Легендарный (СЛ 20, ~3500 ЗМ)">Легендарный (СЛ 20, ~3500 ЗМ)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Инструменты изготовления</label>' +
+          '<select class="fae-input" id="alchLabKit">' +
+            '<option value="alchemist" selected>⚗️ Алхимический набор (Alchemist\'s Supplies)</option>' +
+            '<option value="herbalism">🌿 Набор травника (Herbalism Kit)</option>' +
+            '<option value="poisoner">☠️ Набор отравителя (Poisoner\'s Kit)</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Желаемая механика, ингредиенты или побочный эффект (необязательно)</label>' +
+          '<textarea class="fae-input" id="alchLabReq" rows="3" placeholder="Напр. Пусть требует пепел горгульи, даёт +2 к КД на 10 минут и светится бирюзовым..."></textarea>' +
+        '</div>' +
+      '</div>' +
+
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:16px;">' +
+        '<button type="button" class="btn-ghost" id="alchLabKeyBtn" style="font-size:12.5px;">🔑 API ключ: ' + (hasKey ? '<span style="color:#4ade80;">✓ Установлен</span>' : '<span style="color:#fbbf24;">⚠️ Не задан</span>') + '</button>' +
+        '<button type="button" class="ai-gen-btn" id="btnAlchLabGenerate">⚗️ Синтезировать рецепт через AI</button>' +
+      '</div>' +
+    '</div>' +
+
+    '<div id="alchLabResultWrap" style="display:none;margin-top:20px;"></div>' +
+    histHtml;
+}
+
+function wireAlchemyCustom(){
+  document.querySelectorAll('[data-my-alch-cat]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window._faeMyAlchCat = btn.getAttribute('data-my-alch-cat') || 'all';
+      render();
+    });
+  });
+
+  var sInp = document.getElementById('faeMyRecipesSearch');
+  if(sInp){
+    sInp.addEventListener('input', function(){
+      window._faeMyAlchSearch = this.value;
+      var pos = this.selectionStart;
+      render();
+      var nextInp = document.getElementById('faeMyRecipesSearch');
+      if(nextInp){
+        nextInp.focus();
+        try{ nextInp.setSelectionRange(pos, pos); }catch(e){}
+      }
+    });
+  }
+
+  document.querySelectorAll('[data-recipe-card]').forEach(function(card){
+    card.addEventListener('click', function(e){
+      if(e.target.closest('button') || e.target.closest('[data-go]')) return;
+      var id = card.getAttribute('data-recipe-card');
+      navigate('recipeView:' + id);
+    });
+  });
+
+  document.querySelectorAll('[data-my-alch-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      copyText(btn.getAttribute('data-my-alch-copy') || '');
+      var old = btn.textContent;
+      btn.textContent = '✓ Скопировано';
+      setTimeout(function(){ btn.textContent = old; }, 1100);
+    });
+  });
+
+  document.querySelectorAll('[data-my-alch-equip]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var id = btn.getAttribute('data-my-alch-equip');
+      var rec = (RECIPES || []).find(function(x){ return x.id === id; });
+      var hero = getActiveFaerunCharacter();
+      if(!rec || !hero) return;
+      var line = '• 🧪 ' + (rec.name || 'Зелье') + ' (' + (rec.rarity || 'Необычный') + '): ' + (rec.effect || '');
+      hero.equipment = hero.equipment ? (hero.equipment + '\n\n' + line) : line;
+      saveCharactersToStorage();
+      btn.textContent = '✓ В снаряжении (' + (hero.name || 'Герой') + ')';
+      btn.disabled = true;
+    });
+  });
+
+  /* Лаборатория ИИ */
+  document.querySelectorAll('[data-alch-lab-preset]').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var tInp = document.getElementById('alchLabTheme');
+      var cSel = document.getElementById('alchLabCat');
+      if(tInp) tInp.value = chip.getAttribute('data-theme') || '';
+      if(cSel) cSel.value = chip.getAttribute('data-cat') || 'potions';
+    });
+  });
+
+  var keyBtn = document.getElementById('alchLabKeyBtn');
+  if(keyBtn){
+    keyBtn.addEventListener('click', function(){
+      var cur = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+      var inp = prompt('Введите Google Gemini API ключ (gemini-4-argon):', cur || '');
+      if(inp !== null && typeof window.saveGeminiApiKey === 'function'){
+        window.saveGeminiApiKey(inp.trim());
+        render();
+      }
+    });
+  }
+
+  function showAlchLabPreview(res, catKey){
+    var wrap = document.getElementById('alchLabResultWrap');
+    if(!wrap) return;
+    wrap.style.display = 'block';
+    var ingList = Array.isArray(res.ingredients) ? res.ingredients.map(function(i){ return escapeHtml(i.name) + ' ×' + (i.qty||1); }).join(', ') : '—';
+    wrap.innerHTML =
+      '<div class="fae-ref-card" style="padding:20px;border-color:#c9a45c;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">' +
+          '<div class="fae-ref-card-k" style="font-size:20px;margin:0;">🧪 ' + escapeHtml(res.name || 'Алхимический состав') + '</div>' +
+          '<span class="fae-ref-item-tag">' + escapeHtml(res.rarity || 'Редкий') + ' • СЛ ' + escapeHtml(String(res.dc || 15)) + '</span>' +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#cbd5e1;margin-bottom:10px;">' +
+          '<b>Стоимость:</b> ' + escapeHtml(String(res.cost || 150)) + ' ЗМ &nbsp;|&nbsp; <b>Время:</b> ' + escapeHtml(res.time || '4 часа') + ' &nbsp;|&nbsp; <b>Ингредиенты:</b> ' + ingList +
+        '</div>' +
+        (res.appearance ? '<div style="font-size:13px;color:#94a3b8;font-style:italic;margin-bottom:10px;">«' + escapeHtml(res.appearance) + '»</div>' : '') +
+        '<div class="fae-ref-card-v" style="margin-bottom:14px;">' + escapeHtml(res.effect || '') + '</div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+          '<button type="button" class="btn btn-primary" id="btnAlchLabSaveMy">💾 Сохранить в Мои Рецепты</button>' +
+          '<button type="button" class="btn btn-ghost" id="btnAlchLabSaveHero">🎒 В снаряжение героя</button>' +
+        '</div>' +
+      '</div>';
+
+    var saveMyBtn = document.getElementById('btnAlchLabSaveMy');
+    if(saveMyBtn){
+      saveMyBtn.addEventListener('click', function(){
+        var rec = newRecipe({
+          name: res.name || 'Алхимический состав',
+          category: catKey || 'potions',
+          rarity: res.rarity || 'Редкий',
+          kit: res.kit === 'herbalism' ? 'herbalism' : (res.kit === 'poisoner' ? 'poisoner' : 'alchemist'),
+          cost: Number(res.cost) || 150,
+          time: res.time || '4 часа',
+          dc: Number(res.dc) || 15,
+          ingredients: Array.isArray(res.ingredients) && res.ingredients.length ? res.ingredients : [{name:'Редкий реагент', qty:1}],
+          appearance: res.appearance || '',
+          effect: res.effect || '',
+          source: 'ai'
+        });
+        RECIPES.unshift(rec);
+        saveRecipesToStorage();
+        navigate('recipes');
+      });
+    }
+
+    var saveHeroBtn = document.getElementById('btnAlchLabSaveHero');
+    if(saveHeroBtn){
+      saveHeroBtn.addEventListener('click', function(){
+        var hero = getActiveFaerunCharacter();
+        if(!hero) return;
+        var line = '• 🧪 ' + (res.name || 'Зелье') + ' (' + (res.rarity || 'Редкий') + '): ' + (res.effect || '');
+        hero.equipment = hero.equipment ? (hero.equipment + '\n\n' + line) : line;
+        saveCharactersToStorage();
+        saveHeroBtn.textContent = '✓ В снаряжении (' + (hero.name || 'Герой') + ')!';
+        saveHeroBtn.disabled = true;
+      });
+    }
+  }
+
+  document.querySelectorAll('[data-alch-ai-hist-idx]').forEach(function(card){
+    card.addEventListener('click', function(){
+      var idx = Number(card.getAttribute('data-alch-ai-hist-idx'));
+      var hist = loadAlchLabHistory();
+      if(hist[idx]) showAlchLabPreview(hist[idx], hist[idx].category || 'potions');
+    });
+  });
+
+  var genBtn = document.getElementById('btnAlchLabGenerate');
+  if(genBtn){
+    genBtn.addEventListener('click', function(){
+      var k = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+      if(!k){
+        var inp = prompt('Введите Google Gemini API ключ для генерации:');
+        if(inp && inp.trim()){
+          k = inp.trim();
+          if(typeof window.saveGeminiApiKey === 'function') window.saveGeminiApiKey(k);
+        } else return;
+      }
+      var theme = (document.getElementById('alchLabTheme')?.value || '').trim() || 'Уникальный алхимический эликсир Фаэруна';
+      var catKey = document.getElementById('alchLabCat')?.value || 'potions';
+      var catMeta = getAlchemyCatMeta(catKey);
+      var rarity = document.getElementById('alchLabRarity')?.value || 'Редкий (СЛ 15)';
+      var kit = document.getElementById('alchLabKit')?.value || 'alchemist';
+      var req = (document.getElementById('alchLabReq')?.value || '').trim();
+
+      genBtn.disabled = true;
+      genBtn.textContent = '⚗️ Дистилляция реагентов в Плетении...';
+
+      callGeminiFaeGenerator({
+        cat: 'alchemy',
+        theme: theme,
+        alchType: catMeta.label,
+        alchRarity: rarity,
+        alchKit: kit,
+        req: req
+      }, k, function(err, result){
+        genBtn.disabled = false;
+        genBtn.textContent = '⚗️ Синтезировать рецепт через AI';
+        if(err || !result){
+          alert('Ошибка генерации рецепта: ' + (err || 'Пустой ответ'));
+          return;
+        }
+        result.category = catKey;
+        var hist = loadAlchLabHistory();
+        hist.unshift(result);
+        saveAlchLabHistory(hist);
+        showAlchLabPreview(result, catKey);
+      });
+    });
+  }
+}
+
+/* ============================================================
+   СПОСОБНОСТИ ГЕРОЯ (faeTechs) И БОЕВЫЕ ПРИЁМЫ (faeMoves) ФАЭРУНА
+   (по образцу разделов Ведьмака wiTechs / wiMoves)
+   ============================================================ */
+
+var FAE_TECH_CATEGORIES = [
+  { key: 'all', label: 'Все способности', icon: '✨' },
+  { key: 'Классовые умения', label: 'Классовые умения', icon: '⚔️' },
+  { key: 'Вид и Происхождение', label: 'Вид и Происхождение', icon: '🧬' },
+  { key: 'Черты (Feats)', label: 'Черты (Feats)', icon: '⭐' },
+  { key: 'Магические и Сверхъестественные дары', label: 'Магические дары', icon: '🔮' },
+  { key: 'Защитные и Пассивные особенности', label: 'Защита и Пассивные', icon: '🛡️' }
+];
+
+var FAE_MOVE_CATEGORIES = [
+  { key: 'all', label: 'Все приёмы', icon: '⚔️' },
+  { key: 'Оружейные атаки и Мастерство (2024)', label: 'Оружие и Мастерство 2024', icon: '🗡️' },
+  { key: 'Приёмы Боевого Мастера (Maneuvers)', label: 'Манёвры Боевого Мастера', icon: '🎯' },
+  { key: 'Особые удары, Захваты и Толчки', label: 'Особые удары и Захваты', icon: '💥' },
+  { key: 'Защитные стойки и Реакции', label: 'Стойки и Реакции', icon: '🛡️' },
+  { key: 'Дистанционные и Стрелковые приёмы', label: 'Стрелковые приёмы', icon: '🏹' }
+];
+
+function renderFaeAbilitiesTabBar(activeTab){
+  var c = getActiveFaerunCharacter();
+  var chars = Array.isArray(CHARACTERS) ? CHARACTERS : [c];
+  var tCount = (c && Array.isArray(c.techs)) ? c.techs.length : 0;
+  var mCount = (c && Array.isArray(c.moves)) ? c.moves.length : 0;
+
+  var charOpts = chars.map(function(ch){
+    var isSel = c && ch.id === c.id;
+    return '<option value="' + escapeAttr(ch.id) + '" ' + (isSel ? 'selected' : '') + '>' +
+      getFaerunClassIcon(ch.className) + ' ' + escapeHtml(ch.name || 'Герой') + ' (' + escapeHtml(ch.className || 'D&D') + ' ' + (ch.level||1) + ' ур.)' +
+    '</option>';
+  }).join('');
+
+  return '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">' +
+    '<div class="fae-nav-tabs" style="margin-bottom:0;flex:1;min-width:280px;">' +
+      '<button type="button" class="fae-nav-tab ' + (activeTab==='techs'?'active':'') + '" data-go="faeTechs">' +
+        '✨ Способности и Умения (' + tCount + ')' +
+      '</button>' +
+      '<button type="button" class="fae-nav-tab ' + (activeTab==='moves'?'active':'') + '" data-go="faeMoves">' +
+        '⚔️ Боевые приёмы (' + mCount + ')' +
+      '</button>' +
+    '</div>' +
+    '<div style="display:flex;align-items:center;gap:8px;">' +
+      '<span style="font-size:11.5px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;">Герой:</span>' +
+      '<select id="faeAbilHeroSelect" class="fae-input" style="padding:7px 12px;font-size:13px;min-width:210px;">' + charOpts + '</select>' +
+    '</div>' +
+  '</div>';
+}
+
+function wireFaeAbilitiesHeroSelect(){
+  var sel = document.getElementById('faeAbilHeroSelect');
+  if(sel){
+    sel.addEventListener('change', function(){
+      setActiveFaerunCharacter(this.value);
+      render();
+    });
+  }
+}
+
+function renderFaeTechs(){
+  var c = getActiveFaerunCharacter();
+  var techs = (c && Array.isArray(c.techs)) ? c.techs : [];
+  var activeCat = window._faeTechCat || 'all';
+  var searchQ = (window._faeTechSearch || '').trim().toLowerCase();
+
+  var pillsHtml = FAE_TECH_CATEGORIES.map(function(cat){
+    var cnt = cat.key === 'all' ? techs.length : techs.filter(function(t){ return t.category === cat.key; }).length;
+    return '<button type="button" class="fae-pill ' + (activeCat === cat.key ? 'active' : '') + '" data-fae-tech-cat="' + escapeAttr(cat.key) + '">' +
+      cat.icon + ' ' + escapeHtml(cat.label) + ' <span style="opacity:0.75;font-size:11px;">(' + cnt + ')</span>' +
+    '</button>';
+  }).join('');
+
+  var filtered = techs.filter(function(t){
+    if(activeCat !== 'all' && t.category !== activeCat) return false;
+    if(searchQ){
+      var hay = [t.name, t.category, t.source, t.actionCost, t.cooldown, t.checkOrSave, t.desc].join(' ').toLowerCase();
+      if(hay.indexOf(searchQ) === -1) return false;
+    }
+    return true;
+  });
+
+  var cardsHtml = filtered.length ? (
+    '<div class="fae-ref-cards-grid">' +
+      filtered.map(function(t){
+        var copyStr = '✨ ' + (t.name || 'Способность') + ' [' + (t.category || 'Умение') + ', ' + (t.actionCost || 'Пассивно') + (t.cooldown ? (', ' + t.cooldown) : '') + ']: ' + (t.desc || '');
+        return '<div class="fae-ref-card" data-fae-tech-open="' + escapeAttr(t.id) + '" style="display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;">' +
+          '<div>' +
+            '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
+              '<div class="fae-ref-card-k" style="margin-bottom:0;">✨ ' + escapeHtml(t.name || 'Без названия') + '</div>' +
+              '<span class="fae-ref-item-tag">' + escapeHtml(t.actionCost || '1 действие') + '</span>' +
+            '</div>' +
+            '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11.5px;color:#cbd5e1;font-family:\'JetBrains Mono\',monospace;">' +
+              '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;">📂 ' + escapeHtml(t.category || 'Классовые умения') + '</span>' +
+              (t.source ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#fde68a;">🎓 ' + escapeHtml(t.source) + '</span>' : '') +
+              (t.cooldown ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;">🔄 ' + escapeHtml(t.cooldown) + '</span>' : '') +
+              (t.checkOrSave ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#fca5a5;">🎲 ' + escapeHtml(t.checkOrSave) + '</span>' : '') +
+            '</div>' +
+            '<div class="fae-ref-card-v" style="margin-bottom:12px;">' + escapeHtml(t.desc || '') + '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(201,164,92,0.18);">' +
+            '<button type="button" class="rc-btn" data-fae-tech-copy="' + escapeAttr(copyStr) + '">📋 Копировать</button>' +
+            '<button type="button" class="rc-btn" data-go="faeTechEdit:' + escapeAttr(t.id) + '">✏️ Изменить</button>' +
+            '<button type="button" class="rc-btn" data-fae-tech-del="' + escapeAttr(t.id) + '" style="color:#f87171;">🗑️</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>'
+  ) : '<div class="char-empty">У героя пока нет способностей в этой категории. Нажмите «+ Добавить способность» или «🤖 Создать с ИИ»!</div>';
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Способности героя'}]) +
+    '<button class="back" data-go="home">← На главную</button>' +
+    renderFaeAbilitiesTabBar('techs') +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">' +
+      '<div>' +
+        '<h1>✨ Способности и Умения Героя</h1>' +
+        '<p class="subtitle">Классовые умения, особенности вида, черты (Feats) и сверхъестественные таланты персонажа. Доступны для выбора при броске костей.</p>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+        '<button type="button" class="btn btn-primary" data-go="faeTechEdit:new">+ Добавить способность</button>' +
+        '<button type="button" class="ai-gen-btn" data-go="faeTechGen" style="padding:9px 16px;font-size:13px;">🤖 Создать с ИИ</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="fae-rule"></div>' +
+
+    '<div class="fae-ref-search-wrap" style="margin-bottom:14px;">' +
+      '<span class="fae-ref-search-icon">🔍</span>' +
+      '<input type="text" id="faeTechSearchInp" class="fae-ref-search-input" value="' + escapeAttr(window._faeTechSearch || '') + '" placeholder="Поиск по названию способности, классу, черте или эффекту..." autocomplete="off">' +
+    '</div>' +
+
+    '<div class="pill-row" style="margin-bottom:18px;">' + pillsHtml + '</div>' +
+    cardsHtml;
+}
+
+function renderFaeTechView(){
+  var c = getActiveFaerunCharacter();
+  var t = (c && Array.isArray(c.techs)) ? c.techs.find(function(x){ return x.id === view.techId; }) : null;
+  if(!t) return renderFaeTechs();
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Способности', nav:'faeTechs'}, {label:t.name || 'Способность'}]) +
+    '<button class="back" data-go="faeTechs">← К списку способностей</button>' +
+    renderFaeAbilitiesTabBar('techs') +
+    '<div class="fae-ref-card" style="padding:22px;border-color:rgba(201,164,92,0.45);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">' +
+        '<div>' +
+          '<span class="fae-ref-item-tag">✨ ' + escapeHtml(t.category || 'Классовые умения') + '</span>' +
+          '<h1 style="margin:8px 0 0 0;font-size:24px;">' + escapeHtml(t.name || 'Способность') + '</h1>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button type="button" class="btn btn-primary" data-go="faeTechEdit:' + escapeAttr(t.id) + '">✏️ Редактировать</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="fae-rule"></div>' +
+      '<div class="fae-gen-stat-grid" style="margin-bottom:14px;">' +
+        '<div class="fae-gen-stat-box"><span class="lbl">🎓 Источник / Уровень</span><span class="val">' + escapeHtml(t.source || 'Умение героя') + '</span></div>' +
+        '<div class="fae-gen-stat-box"><span class="lbl">⚡ Тип действия</span><span class="val">' + escapeHtml(t.actionCost || '1 действие') + '</span></div>' +
+        '<div class="fae-gen-stat-box"><span class="lbl">🔄 Перезарядка</span><span class="val">' + escapeHtml(t.cooldown || 'Короткий / Долгий отдых') + '</span></div>' +
+        '<div class="fae-gen-stat-box"><span class="lbl">🎲 Бросок / СЛ</span><span class="val">' + escapeHtml(t.checkOrSave || '—') + '</span></div>' +
+      '</div>' +
+      '<div class="fae-gen-block"><b>📜 Описание и игровая механика:</b><br><span style="white-space:pre-line;">' + escapeHtml(t.desc || '') + '</span></div>' +
+    '</div>';
+}
+
+function renderFaeTechEdit(){
+  var c = getActiveFaerunCharacter();
+  var existing = (c && Array.isArray(c.techs) && view.techId && view.techId !== 'new')
+    ? c.techs.find(function(x){ return x.id === view.techId; })
+    : null;
+  var d = existing ? JSON.parse(JSON.stringify(existing)) : {
+    id: '',
+    name: '',
+    category: 'Классовые умения',
+    source: (c && c.className ? (c.className + ' ' + (c.level||1) + ' ур.') : 'Уровень 1'),
+    actionCost: '1 бонусное действие',
+    cooldown: '1 раз за короткий или долгий отдых',
+    checkOrSave: '',
+    desc: ''
+  };
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Способности', nav:'faeTechs'}, {label:existing ? d.name : 'Новая способность'}]) +
+    '<button class="back" data-go="faeTechs">← К списку способностей</button>' +
+    renderFaeAbilitiesTabBar('techs') +
+    '<h1>' + escapeHtml(existing ? ('Редактирование: ' + d.name) : 'Новая способность героя') + '</h1>' +
+    '<div class="fae-rule"></div>' +
+    '<div class="fae-ref-card" style="padding:20px;">' +
+      '<input type="hidden" id="faeTechEditId" value="' + escapeAttr(d.id || '') + '">' +
+      '<div class="fae-edit-grid">' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Название способности / черты / дара</label>' +
+          '<input type="text" class="fae-input" id="faeTechName" value="' + escapeAttr(d.name) + '" placeholder="Напр. Всплеск действий (Action Surge), Божественная кара, Черта: Бдительный">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Категория</label>' +
+          '<select class="fae-input" id="faeTechCat">' +
+            FAE_TECH_CATEGORIES.filter(function(x){ return x.key !== 'all'; }).map(function(cat){
+              return '<option value="' + escapeAttr(cat.key) + '" ' + (d.category === cat.key ? 'selected' : '') + '>' + cat.icon + ' ' + escapeHtml(cat.label) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Источник / Требование / Уровень</label>' +
+          '<input type="text" class="fae-input" id="faeTechSource" value="' + escapeAttr(d.source) + '" placeholder="Напр. Воин 2 ур. / Эльф / Черта 4 ур.">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Затраты времени (Action Economy)</label>' +
+          '<select class="fae-input" id="faeTechAction">' +
+            ['Пассивно (Постоянно)', '1 действие', '1 бонусное действие', '1 реакция', 'Часть действия Атаки', 'Свободное действие', '1 минута (Ритуал)'].map(function(act){
+              return '<option value="' + escapeAttr(act) + '" ' + (d.actionCost === act ? 'selected' : '') + '>' + escapeHtml(act) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Перезарядка / Заряды</label>' +
+          '<input type="text" class="fae-input" id="faeTechCooldown" value="' + escapeAttr(d.cooldown) + '" placeholder="Напр. Постоянно / Короткий отдых / БМ раз в день">' +
+        '</div>' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Формула броска, исцеления или СЛ спасброска (необязательно)</label>' +
+          '<input type="text" class="fae-input" id="faeTechSave" value="' + escapeAttr(d.checkOrSave) + '" placeholder="Напр. 1d10 + уровень хитов / СЛ 8 + БМ + Мод">' +
+        '</div>' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Полное описание и игровая механика</label>' +
+          '<textarea class="fae-input" id="faeTechDesc" rows="5" placeholder="Опишите точные правила работы способности по D&D 5e / 2024...">' + escapeHtml(d.desc) + '</textarea>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;margin-top:18px;">' +
+        '<button type="button" class="btn btn-primary" id="btnFaeSaveTech">💾 Сохранить способность</button>' +
+        '<button type="button" class="btn btn-ghost" data-go="faeTechs">Отмена</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function renderFaeTechGen(){
+  var c = getActiveFaerunCharacter();
+  var hasKey = !!((typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '');
+  var heroCtx = c ? (c.name + ' (' + (c.species || 'Человек') + ', ' + (c.className || 'Воин') + ' ' + (c.level || 1) + ' ур.' + (c.subclass ? (', ' + c.subclass) : '') + ')') : 'Герой Фаэруна';
+
+  var presets = [
+    { label: 'Клятва Рассветного Пламени', theme: 'Классовое умение паладина или воина, окутывающее клинок солнечным светом и защищающее союзников', cat: 'Классовые умения' },
+    { label: 'Наследие Теневого Плетения', theme: 'Видовая или магическая способность телепортации сквозь тени с преимуществом на следующую атаку', cat: 'Магические и Сверхъестественные дары' },
+    { label: 'Черта: Тактик Побережья Мечей', theme: 'Боевая черта D&D 2024 (+1 к характеристике и командный тактический манёвр для союзника)', cat: 'Черты (Feats)' },
+    { label: 'Несокрушимость Стального Бастиона', theme: 'Пассивно-реактивная защитная особенность, снижающая входящий урон и дающая иммунитет к опрокидыванию', cat: 'Защитные и Пассивные особенности' }
+  ];
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Способности', nav:'faeTechs'}, {label:'AI Конструктор способностей'}]) +
+    '<button class="back" data-go="faeTechs">← К списку способностей</button>' +
+    renderFaeAbilitiesTabBar('techs') +
+    '<h1>🤖 AI Генератор Способностей D&D</h1>' +
+    '<p class="subtitle">Создание сбалансированных классовых умений, черт (Feats) и мистических даров для героя: <b style="color:#c9a45c;">' + escapeHtml(heroCtx) + '</b></p>' +
+    '<div class="fae-rule"></div>' +
+
+    '<div class="ai-gen-box">' +
+      '<div class="fae-gen-preset-wrap" style="margin-bottom:14px;">' +
+        '<div style="font-size:11.5px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;margin-bottom:6px;">⚡ БЫСТРЫЕ ИДЕИ СПОСОБНОСТЕЙ:</div>' +
+        '<div class="fae-gen-preset-row">' +
+          presets.map(function(p){
+            return '<button type="button" class="fae-gen-preset-chip" data-fae-tech-preset="' + escapeAttr(p.theme) + '" data-cat="' + escapeAttr(p.cat) + '">💡 ' + escapeHtml(p.label) + '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="fae-edit-grid">' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Идея или название способности</label>' +
+          '<input type="text" class="fae-input" id="faeTechGenTheme" placeholder="Напр. Глаз дракона, Печать Мистры, Ярость северного медведя...">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Категория способности</label>' +
+          '<select class="fae-input" id="faeTechGenCat">' +
+            FAE_TECH_CATEGORIES.filter(function(x){ return x.key !== 'all'; }).map(function(cat){
+              return '<option value="' + escapeAttr(cat.key) + '">' + cat.icon + ' ' + escapeHtml(cat.label) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Тип активации в бою</label>' +
+          '<select class="fae-input" id="faeTechGenAction">' +
+            '<option value="1 бонусное действие" selected>🏃 1 бонусное действие</option>' +
+            '<option value="1 действие">⚡ 1 действие</option>' +
+            '<option value="1 реакция">🛡️ 1 реакция</option>' +
+            '<option value="Пассивно (Постоянно)">♾️ Пассивно (Постоянно)</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:16px;">' +
+        '<button type="button" class="btn-ghost" id="faeTechGenKeyBtn" style="font-size:12.5px;">🔑 API ключ: ' + (hasKey ? '<span style="color:#4ade80;">✓ Установлен</span>' : '<span style="color:#fbbf24;">⚠️ Не задан</span>') + '</button>' +
+        '<button type="button" class="ai-gen-btn" id="btnFaeTechAiRun">✨ Сгенерировать способность</button>' +
+      '</div>' +
+    '</div>' +
+    '<div id="faeTechGenPreviewWrap" style="display:none;margin-top:20px;"></div>';
+}
+
+function wireFaeTechs(){
+  wireFaeAbilitiesHeroSelect();
+
+  document.querySelectorAll('[data-fae-tech-cat]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window._faeTechCat = btn.getAttribute('data-fae-tech-cat') || 'all';
+      render();
+    });
+  });
+
+  var sInp = document.getElementById('faeTechSearchInp');
+  if(sInp){
+    sInp.addEventListener('input', function(){
+      window._faeTechSearch = this.value;
+      var pos = this.selectionStart;
+      render();
+      var next = document.getElementById('faeTechSearchInp');
+      if(next){ next.focus(); try{ next.setSelectionRange(pos, pos); }catch(e){} }
+    });
+  }
+
+  document.querySelectorAll('[data-fae-tech-open]').forEach(function(card){
+    card.addEventListener('click', function(e){
+      if(e.target.closest('button') || e.target.closest('[data-go]')) return;
+      navigate('faeTechView:' + card.getAttribute('data-fae-tech-open'));
+    });
+  });
+
+  document.querySelectorAll('[data-fae-tech-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      copyText(btn.getAttribute('data-fae-tech-copy') || '');
+      var old = btn.textContent;
+      btn.textContent = '✓ Скопировано';
+      setTimeout(function(){ btn.textContent = old; }, 1100);
+    });
+  });
+
+  document.querySelectorAll('[data-fae-tech-del]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var id = btn.getAttribute('data-fae-tech-del');
+      var c = getActiveFaerunCharacter();
+      if(!c || !Array.isArray(c.techs)) return;
+      var found = c.techs.find(function(x){ return x.id === id; });
+      if(!confirm('Удалить способность «' + (found ? found.name : '') + '»?')) return;
+      c.techs = c.techs.filter(function(x){ return x.id !== id; });
+      saveCharactersToStorage();
+      render();
+    });
+  });
+
+  var saveBtn = document.getElementById('btnFaeSaveTech');
+  if(saveBtn){
+    saveBtn.addEventListener('click', function(){
+      var c = getActiveFaerunCharacter();
+      if(!c) return;
+      if(!Array.isArray(c.techs)) c.techs = [];
+      var id = document.getElementById('faeTechEditId')?.value || genId();
+      var item = {
+        id: id,
+        name: (document.getElementById('faeTechName')?.value || '').trim() || 'Новая способность',
+        category: document.getElementById('faeTechCat')?.value || 'Классовые умения',
+        source: (document.getElementById('faeTechSource')?.value || '').trim() || 'Умение героя',
+        actionCost: document.getElementById('faeTechAction')?.value || '1 действие',
+        cooldown: (document.getElementById('faeTechCooldown')?.value || '').trim() || 'Короткий отдых',
+        checkOrSave: (document.getElementById('faeTechSave')?.value || '').trim(),
+        desc: (document.getElementById('faeTechDesc')?.value || '').trim()
+      };
+      var idx = c.techs.findIndex(function(x){ return x.id === id; });
+      if(idx >= 0) c.techs[idx] = item;
+      else c.techs.unshift(item);
+      saveCharactersToStorage();
+      navigate('faeTechs');
+    });
+  }
+
+  document.querySelectorAll('[data-fae-tech-preset]').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var tInp = document.getElementById('faeTechGenTheme');
+      var cSel = document.getElementById('faeTechGenCat');
+      if(tInp) tInp.value = chip.getAttribute('data-fae-tech-preset') || '';
+      if(cSel) cSel.value = chip.getAttribute('data-cat') || 'Классовые умения';
+    });
+  });
+
+  var keyBtn = document.getElementById('faeTechGenKeyBtn');
+  if(keyBtn){
+    keyBtn.addEventListener('click', function(){
+      var cur = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+      var inp = prompt('Введите Google Gemini API ключ (gemini-4-argon):', cur || '');
+      if(inp !== null && typeof window.saveGeminiApiKey === 'function'){
+        window.saveGeminiApiKey(inp.trim());
+        render();
+      }
+    });
+  }
+
+  var runAiBtn = document.getElementById('btnFaeTechAiRun');
+  if(runAiBtn){
+    runAiBtn.addEventListener('click', function(){
+      var k = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+      if(!k){
+        var inp = prompt('Введите Google Gemini API ключ:');
+        if(inp && inp.trim()){ k = inp.trim(); if(typeof window.saveGeminiApiKey === 'function') window.saveGeminiApiKey(k); }
+        else return;
+      }
+      var c = getActiveFaerunCharacter();
+      var theme = (document.getElementById('faeTechGenTheme')?.value || '').trim() || 'Уникальная способность героя Фаэруна';
+      var cat = document.getElementById('faeTechGenCat')?.value || 'Классовые умения';
+      var act = document.getElementById('faeTechGenAction')?.value || '1 бонусное действие';
+
+      runAiBtn.disabled = true;
+      runAiBtn.textContent = '🔮 Формирование способности...';
+
+      callGeminiFaeGenerator({
+        cat: 'feat',
+        theme: theme + ' (Активация: ' + act + ')',
+        featCat: cat,
+        featFocus: act,
+        contextInfo: c ? (c.name + ', ' + c.species + ', ' + c.className + ' ' + c.level + ' ур.') : ''
+      }, k, function(err, res){
+        runAiBtn.disabled = false;
+        runAiBtn.textContent = '✨ Сгенерировать способность';
+        if(err || !res){
+          alert('Ошибка генерации: ' + (err || 'Пустой ответ'));
+          return;
+        }
+        var fullDesc = (res.desc || '') + (Array.isArray(res.features) && res.features.length ? ('\n• ' + res.features.join('\n• ')) : '');
+        var wrap = document.getElementById('faeTechGenPreviewWrap');
+        if(wrap){
+          wrap.style.display = 'block';
+          wrap.innerHTML =
+            '<div class="fae-ref-card" style="padding:20px;border-color:#c9a45c;">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">' +
+                '<div class="fae-ref-card-k" style="font-size:19px;margin:0;">✨ ' + escapeHtml(res.name || 'Новая способность') + '</div>' +
+                '<span class="fae-ref-item-tag">' + escapeHtml(cat) + ' • ' + escapeHtml(act) + '</span>' +
+              '</div>' +
+              '<div class="fae-ref-card-v" style="white-space:pre-line;margin-bottom:14px;">' + escapeHtml(fullDesc) + '</div>' +
+              '<button type="button" class="btn btn-primary" id="btnFaeTechAiSave">💾 Добавить способность герою</button>' +
+            '</div>';
+          var sv = document.getElementById('btnFaeTechAiSave');
+          if(sv){
+            sv.addEventListener('click', function(){
+              var hero = getActiveFaerunCharacter();
+              if(!hero) return;
+              if(!Array.isArray(hero.techs)) hero.techs = [];
+              hero.techs.unshift({
+                id: genId(),
+                name: res.name || 'Способность',
+                category: cat,
+                source: res.prereq || (hero.className + ' ' + hero.level + ' ур.'),
+                actionCost: act,
+                cooldown: 'Короткий или долгий отдых',
+                checkOrSave: res.statBonus || '',
+                desc: fullDesc
+              });
+              saveCharactersToStorage();
+              navigate('faeTechs');
+            });
+          }
+        }
+      });
+    });
+  }
+}
+
+/* ---------- БОЕВЫЕ ПРИЁМЫ ФАЭРУНА (faeMoves) ---------- */
+
+function renderFaeMoves(){
+  var c = getActiveFaerunCharacter();
+  var moves = (c && Array.isArray(c.moves)) ? c.moves : [];
+  var activeCat = window._faeMoveCat || 'all';
+  var searchQ = (window._faeMoveSearch || '').trim().toLowerCase();
+
+  var pillsHtml = FAE_MOVE_CATEGORIES.map(function(cat){
+    var cnt = cat.key === 'all' ? moves.length : moves.filter(function(m){ return m.category === cat.key; }).length;
+    return '<button type="button" class="fae-pill ' + (activeCat === cat.key ? 'active' : '') + '" data-fae-move-cat="' + escapeAttr(cat.key) + '">' +
+      cat.icon + ' ' + escapeHtml(cat.label) + ' <span style="opacity:0.75;font-size:11px;">(' + cnt + ')</span>' +
+    '</button>';
+  }).join('');
+
+  var filtered = moves.filter(function(m){
+    if(activeCat !== 'all' && m.category !== activeCat) return false;
+    if(searchQ){
+      var hay = [m.name, m.category, m.weaponOrStyle, m.attackBonus, m.damageOrSave, m.mastery, m.actionCost, m.desc].join(' ').toLowerCase();
+      if(hay.indexOf(searchQ) === -1) return false;
+    }
+    return true;
+  });
+
+  var cardsHtml = filtered.length ? (
+    '<div class="fae-ref-cards-grid">' +
+      filtered.map(function(m){
+        var copyStr = '⚔️ ' + (m.name || 'Приём') + ' [' + (m.weaponOrStyle || 'Оружие') + (m.attackBonus ? (', атака ' + m.attackBonus) : '') + (m.damageOrSave ? (', ' + m.damageOrSave) : '') + (m.mastery ? (', Мастерство: ' + m.mastery) : '') + ']: ' + (m.desc || '');
+        return '<div class="fae-ref-card" data-fae-move-open="' + escapeAttr(m.id) + '" style="display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;">' +
+          '<div>' +
+            '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
+              '<div class="fae-ref-card-k" style="margin-bottom:0;">⚔️ ' + escapeHtml(m.name || 'Без названия') + '</div>' +
+              '<span class="fae-ref-item-tag">' + escapeHtml(m.actionCost || 'Атака') + '</span>' +
+            '</div>' +
+            '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11.5px;color:#cbd5e1;font-family:\'JetBrains Mono\',monospace;">' +
+              (m.weaponOrStyle ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;">🗡️ ' + escapeHtml(m.weaponOrStyle) + '</span>' : '') +
+              (m.attackBonus ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#4ade80;">🎯 ' + escapeHtml(m.attackBonus) + '</span>' : '') +
+              (m.damageOrSave ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#fca5a5;">💥 ' + escapeHtml(m.damageOrSave) + '</span>' : '') +
+              (m.mastery ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#fde68a;">⚡ ' + escapeHtml(m.mastery) + '</span>' : '') +
+            '</div>' +
+            '<div class="fae-ref-card-v" style="margin-bottom:12px;">' + escapeHtml(m.desc || '') + '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(201,164,92,0.18);">' +
+            '<button type="button" class="rc-btn" data-fae-move-copy="' + escapeAttr(copyStr) + '">📋 Копировать</button>' +
+            '<button type="button" class="rc-btn" data-go="faeMoveEdit:' + escapeAttr(m.id) + '">✏️ Изменить</button>' +
+            '<button type="button" class="rc-btn" data-fae-move-del="' + escapeAttr(m.id) + '" style="color:#f87171;">🗑️</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>'
+  ) : '<div class="char-empty">У героя пока нет боевых приёмов в этой категории. Нажмите «+ Добавить приём» или «🤖 Создать приём с ИИ»!</div>';
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Боевые приёмы'}]) +
+    '<button class="back" data-go="home">← На главную</button>' +
+    renderFaeAbilitiesTabBar('moves') +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">' +
+      '<div>' +
+        '<h1>⚔️ Боевые Приёмы и Оружейные Техники</h1>' +
+        '<p class="subtitle">Удары оружием, свойства Мастерства D&D 2024, манёвры Боевого Мастера и защитные стойки. Доступны в экране броска костей.</p>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+        '<button type="button" class="btn btn-primary" data-go="faeMoveEdit:new">+ Добавить приём</button>' +
+        '<button type="button" class="ai-gen-btn" data-go="faeMoveGen" style="padding:9px 16px;font-size:13px;">🤖 Создать приём с ИИ</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="fae-rule"></div>' +
+
+    '<div class="fae-ref-search-wrap" style="margin-bottom:14px;">' +
+      '<span class="fae-ref-search-icon">🔍</span>' +
+      '<input type="text" id="faeMoveSearchInp" class="fae-ref-search-input" value="' + escapeAttr(window._faeMoveSearch || '') + '" placeholder="Поиск по названию приёма, оружию, Мастерству 2024 или урону..." autocomplete="off">' +
+    '</div>' +
+
+    '<div class="pill-row" style="margin-bottom:18px;">' + pillsHtml + '</div>' +
+    cardsHtml;
+}
+
+function renderFaeMoveView(){
+  var c = getActiveFaerunCharacter();
+  var m = (c && Array.isArray(c.moves)) ? c.moves.find(function(x){ return x.id === view.moveId; }) : null;
+  if(!m) return renderFaeMoves();
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Боевые приёмы', nav:'faeMoves'}, {label:m.name || 'Боевой приём'}]) +
+    '<button class="back" data-go="faeMoves">← К списку боевых приёмов</button>' +
+    renderFaeAbilitiesTabBar('moves') +
+    '<div class="fae-ref-card" style="padding:22px;border-color:rgba(201,164,92,0.45);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">' +
+        '<div>' +
+          '<span class="fae-ref-item-tag">⚔️ ' + escapeHtml(m.category || 'Боевой приём') + '</span>' +
+          '<h1 style="margin:8px 0 0 0;font-size:24px;">' + escapeHtml(m.name || 'Приём') + '</h1>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button type="button" class="btn btn-primary" data-go="faeMoveEdit:' + escapeAttr(m.id) + '">✏️ Редактировать</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="fae-rule"></div>' +
+      '<div class="fae-gen-stat-grid" style="margin-bottom:14px;">' +
+        '<div class="fae-gen-stat-box"><span class="lbl">🗡️ Оружие / Стойка</span><span class="val">' + escapeHtml(m.weaponOrStyle || 'Любое оружие') + '</span></div>' +
+        '<div class="fae-gen-stat-box"><span class="lbl">🎯 Бонус атаки</span><span class="val">' + escapeHtml(m.attackBonus || '—') + '</span></div>' +
+        '<div class="fae-gen-stat-box"><span class="lbl">💥 Урон / Спасбросок</span><span class="val">' + escapeHtml(m.damageOrSave || '—') + '</span></div>' +
+        '<div class="fae-gen-stat-box"><span class="lbl">⚡ Мастерство 2024</span><span class="val">' + escapeHtml(m.mastery || '—') + '</span></div>' +
+      '</div>' +
+      '<div class="fae-gen-block"><b>📜 Тактика и боевой эффект:</b><br><span style="white-space:pre-line;">' + escapeHtml(m.desc || '') + '</span></div>' +
+    '</div>';
+}
+
+function renderFaeMoveEdit(){
+  var c = getActiveFaerunCharacter();
+  var existing = (c && Array.isArray(c.moves) && view.moveId && view.moveId !== 'new')
+    ? c.moves.find(function(x){ return x.id === view.moveId; })
+    : null;
+  var d = existing ? JSON.parse(JSON.stringify(existing)) : {
+    id: '',
+    name: '',
+    category: 'Оружейные атаки и Мастерство (2024)',
+    weaponOrStyle: 'Длинный меч / Рукопашный бой',
+    attackBonus: '+6',
+    damageOrSave: '1d8+4 рубящий',
+    mastery: 'Подрыв / Sap (Помеха следующей атаке врага)',
+    actionCost: 'Часть действия Атаки',
+    desc: ''
+  };
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Боевые приёмы', nav:'faeMoves'}, {label:existing ? d.name : 'Новый приём'}]) +
+    '<button class="back" data-go="faeMoves">← К списку боевых приёмов</button>' +
+    renderFaeAbilitiesTabBar('moves') +
+    '<h1>' + escapeHtml(existing ? ('Редактирование: ' + d.name) : 'Новый боевой приём') + '</h1>' +
+    '<div class="fae-rule"></div>' +
+    '<div class="fae-ref-card" style="padding:20px;">' +
+      '<input type="hidden" id="faeMoveEditId" value="' + escapeAttr(d.id || '') + '">' +
+      '<div class="fae-edit-grid">' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Название боевого приёма / манёвра</label>' +
+          '<input type="text" class="fae-input" id="faeMoveName" value="' + escapeAttr(d.name) + '" placeholder="Напр. Парирование и Рипост, Рассекающий вихрь, Опрокидывающий удар">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Категория приёма</label>' +
+          '<select class="fae-input" id="faeMoveCat">' +
+            FAE_MOVE_CATEGORIES.filter(function(x){ return x.key !== 'all'; }).map(function(cat){
+              return '<option value="' + escapeAttr(cat.key) + '" ' + (d.category === cat.key ? 'selected' : '') + '>' + cat.icon + ' ' + escapeHtml(cat.label) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Оружие / Боевой стиль</label>' +
+          '<input type="text" class="fae-input" id="faeMoveWeapon" value="' + escapeAttr(d.weaponOrStyle) + '" placeholder="Напр. Двуручный меч, Парные кинжалы, Длинный лук">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Бонус попадания / Затраты кости превосходства</label>' +
+          '<input type="text" class="fae-input" id="faeMoveBonus" value="' + escapeAttr(d.attackBonus) + '" placeholder="Напр. +7 к попаданию / 1 кость превосходства d8">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Формула урона или СЛ спасброска</label>' +
+          '<input type="text" class="fae-input" id="faeMoveDamage" value="' + escapeAttr(d.damageOrSave) + '" placeholder="Напр. 2d6+4 + 1d8 (СЛ Силы 15)">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Мастерство оружия D&D 2024 (если применимо)</label>' +
+          '<input type="text" class="fae-input" id="faeMoveMastery" value="' + escapeAttr(d.mastery) + '" placeholder="Напр. Поваливание (Topple), Прорубание (Cleave), Досада (Vex)">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Затраты действия</label>' +
+          '<select class="fae-input" id="faeMoveAction">' +
+            ['Часть действия Атаки', '1 действие', '1 бонусное действие', '1 реакция', 'Особая стойка'].map(function(act){
+              return '<option value="' + escapeAttr(act) + '" ' + (d.actionCost === act ? 'selected' : '') + '>' + escapeHtml(act) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Описание техники, условия и тактический эффект</label>' +
+          '<textarea class="fae-input" id="faeMoveDesc" rows="5" placeholder="Опишите механику удара, дистанцию, спасбросок врага и тактический эффект...">' + escapeHtml(d.desc) + '</textarea>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;margin-top:18px;">' +
+        '<button type="button" class="btn btn-primary" id="btnFaeSaveMove">💾 Сохранить приём</button>' +
+        '<button type="button" class="btn btn-ghost" data-go="faeMoves">Отмена</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function renderFaeMoveGen(){
+  var c = getActiveFaerunCharacter();
+  var hasKey = !!((typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '');
+  var heroCtx = c ? (c.name + ' (' + (c.species || 'Человек') + ', ' + (c.className || 'Воин') + ' ' + (c.level || 1) + ' ур.)') : 'Герой Фаэруна';
+
+  var presets = [
+    { label: 'Вихрь Стали Вотердипа', theme: 'Фехтовальный приём с прорубанием двоих противников и шагом из-под удара без провоцированной атаки', cat: 'Оружейные атаки и Мастерство (2024)' },
+    { label: 'Сокрушающий Гарпун Боевого Мастера', theme: 'Манёвр с костью превосходства, пробивающий щит врага и сбивающий его с ног (Topple)', cat: 'Приёмы Боевого Мастера (Maneuvers)' },
+    { label: 'Железный Заслон Стража', theme: 'Реактивная стойка со щитом или клинком, перехватывающая удар по соседнему союзнику с контратакой', cat: 'Защитные стойки и Реакции' },
+    { label: 'Стрела Громового Пронзания', theme: 'Стрелковый приём следопыта или воина, пригвождающий цель к месту и снижающий её скорость до 0', cat: 'Дистанционные и Стрелковые приёмы' }
+  ];
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Боевые приёмы', nav:'faeMoves'}, {label:'AI Конструктор приёмов'}]) +
+    '<button class="back" data-go="faeMoves">← К списку боевых приёмов</button>' +
+    renderFaeAbilitiesTabBar('moves') +
+    '<h1>🤖 AI Генератор Боевых Приёмов D&D</h1>' +
+    '<p class="subtitle">Создание оружейных техник, манёвров превосходства и приёмов Мастерства D&D 2024 для героя: <b style="color:#c9a45c;">' + escapeHtml(heroCtx) + '</b></p>' +
+    '<div class="fae-rule"></div>' +
+
+    '<div class="ai-gen-box">' +
+      '<div class="fae-gen-preset-wrap" style="margin-bottom:14px;">' +
+        '<div style="font-size:11.5px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;margin-bottom:6px;">⚡ БЫСТРЫЕ ИДЕИ БОЕВЫХ ПРИЁМОВ:</div>' +
+        '<div class="fae-gen-preset-row">' +
+          presets.map(function(p){
+            return '<button type="button" class="fae-gen-preset-chip" data-fae-move-preset="' + escapeAttr(p.theme) + '" data-cat="' + escapeAttr(p.cat) + '">💡 ' + escapeHtml(p.label) + '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="fae-edit-grid">' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Идея или название боевого приёма</label>' +
+          '<input type="text" class="fae-input" id="faeMoveGenTheme" placeholder="Напр. Рассекающий полумесяц, Контратака сквозь гарду, Выстрел по сухожилиям...">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Категория приёма</label>' +
+          '<select class="fae-input" id="faeMoveGenCat">' +
+            FAE_MOVE_CATEGORIES.filter(function(x){ return x.key !== 'all'; }).map(function(cat){
+              return '<option value="' + escapeAttr(cat.key) + '">' + cat.icon + ' ' + escapeHtml(cat.label) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Оружие исполнения</label>' +
+          '<input type="text" class="fae-input" id="faeMoveGenWeapon" value="Длинный меч / Универсальное оружие" placeholder="Напр. Двуручный меч, Рапира, Лук, Парные клинки">' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:16px;">' +
+        '<button type="button" class="btn-ghost" id="faeMoveGenKeyBtn" style="font-size:12.5px;">🔑 API ключ: ' + (hasKey ? '<span style="color:#4ade80;">✓ Установлен</span>' : '<span style="color:#fbbf24;">⚠️ Не задан</span>') + '</button>' +
+        '<button type="button" class="ai-gen-btn" id="btnFaeMoveAiRun">⚔️ Сгенерировать боевой приём</button>' +
+      '</div>' +
+    '</div>' +
+    '<div id="faeMoveGenPreviewWrap" style="display:none;margin-top:20px;"></div>';
+}
+
+function wireFaeMoves(){
+  wireFaeAbilitiesHeroSelect();
+
+  document.querySelectorAll('[data-fae-move-cat]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window._faeMoveCat = btn.getAttribute('data-fae-move-cat') || 'all';
+      render();
+    });
+  });
+
+  var sInp = document.getElementById('faeMoveSearchInp');
+  if(sInp){
+    sInp.addEventListener('input', function(){
+      window._faeMoveSearch = this.value;
+      var pos = this.selectionStart;
+      render();
+      var next = document.getElementById('faeMoveSearchInp');
+      if(next){ next.focus(); try{ next.setSelectionRange(pos, pos); }catch(e){} }
+    });
+  }
+
+  document.querySelectorAll('[data-fae-move-open]').forEach(function(card){
+    card.addEventListener('click', function(e){
+      if(e.target.closest('button') || e.target.closest('[data-go]')) return;
+      navigate('faeMoveView:' + card.getAttribute('data-fae-move-open'));
+    });
+  });
+
+  document.querySelectorAll('[data-fae-move-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      copyText(btn.getAttribute('data-fae-move-copy') || '');
+      var old = btn.textContent;
+      btn.textContent = '✓ Скопировано';
+      setTimeout(function(){ btn.textContent = old; }, 1100);
+    });
+  });
+
+  document.querySelectorAll('[data-fae-move-del]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var id = btn.getAttribute('data-fae-move-del');
+      var c = getActiveFaerunCharacter();
+      if(!c || !Array.isArray(c.moves)) return;
+      var found = c.moves.find(function(x){ return x.id === id; });
+      if(!confirm('Удалить боевой приём «' + (found ? found.name : '') + '»?')) return;
+      c.moves = c.moves.filter(function(x){ return x.id !== id; });
+      saveCharactersToStorage();
+      render();
+    });
+  });
+
+  var saveBtn = document.getElementById('btnFaeSaveMove');
+  if(saveBtn){
+    saveBtn.addEventListener('click', function(){
+      var c = getActiveFaerunCharacter();
+      if(!c) return;
+      if(!Array.isArray(c.moves)) c.moves = [];
+      var id = document.getElementById('faeMoveEditId')?.value || genId();
+      var item = {
+        id: id,
+        name: (document.getElementById('faeMoveName')?.value || '').trim() || 'Новый боевой приём',
+        category: document.getElementById('faeMoveCat')?.value || 'Оружейные атаки и Мастерство (2024)',
+        weaponOrStyle: (document.getElementById('faeMoveWeapon')?.value || '').trim() || 'Оружие ближнего боя',
+        attackBonus: (document.getElementById('faeMoveBonus')?.value || '').trim() || '+5',
+        damageOrSave: (document.getElementById('faeMoveDamage')?.value || '').trim() || '1d8+3',
+        mastery: (document.getElementById('faeMoveMastery')?.value || '').trim(),
+        actionCost: document.getElementById('faeMoveAction')?.value || 'Часть действия Атаки',
+        desc: (document.getElementById('faeMoveDesc')?.value || '').trim()
+      };
+      var idx = c.moves.findIndex(function(x){ return x.id === id; });
+      if(idx >= 0) c.moves[idx] = item;
+      else c.moves.unshift(item);
+      saveCharactersToStorage();
+      navigate('faeMoves');
+    });
+  }
+
+  document.querySelectorAll('[data-fae-move-preset]').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var tInp = document.getElementById('faeMoveGenTheme');
+      var cSel = document.getElementById('faeMoveGenCat');
+      if(tInp) tInp.value = chip.getAttribute('data-fae-move-preset') || '';
+      if(cSel) cSel.value = chip.getAttribute('data-cat') || 'Оружейные атаки и Мастерство (2024)';
+    });
+  });
+
+  var keyBtn = document.getElementById('faeMoveGenKeyBtn');
+  if(keyBtn){
+    keyBtn.addEventListener('click', function(){
+      var cur = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+      var inp = prompt('Введите Google Gemini API ключ (gemini-4-argon):', cur || '');
+      if(inp !== null && typeof window.saveGeminiApiKey === 'function'){
+        window.saveGeminiApiKey(inp.trim());
+        render();
+      }
+    });
+  }
+
+  var runAiBtn = document.getElementById('btnFaeMoveAiRun');
+  if(runAiBtn){
+    runAiBtn.addEventListener('click', function(){
+      var k = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+      if(!k){
+        var inp = prompt('Введите Google Gemini API ключ:');
+        if(inp && inp.trim()){ k = inp.trim(); if(typeof window.saveGeminiApiKey === 'function') window.saveGeminiApiKey(k); }
+        else return;
+      }
+      var c = getActiveFaerunCharacter();
+      var theme = (document.getElementById('faeMoveGenTheme')?.value || '').trim() || 'Мастерский оружейный приём Фаэруна';
+      var cat = document.getElementById('faeMoveGenCat')?.value || 'Оружейные атаки и Мастерство (2024)';
+      var wpn = (document.getElementById('faeMoveGenWeapon')?.value || '').trim() || 'Длинный меч';
+
+      runAiBtn.disabled = true;
+      runAiBtn.textContent = '⚔️ Ковка боевого приёма...';
+
+      callGeminiFaeGenerator({
+        cat: 'weapon',
+        theme: 'Боевой приём / техника фехтования: ' + theme,
+        weaponBase: wpn,
+        weaponRarity: cat,
+        weaponElement: 'Боевое мастерство и тактика D&D 2024',
+        weaponMastery: 'Автоматически под тип оружия',
+        contextInfo: c ? (c.name + ', ' + c.className + ' ' + c.level + ' ур.') : ''
+      }, k, function(err, res){
+        runAiBtn.disabled = false;
+        runAiBtn.textContent = '⚔️ Сгенерировать боевой приём';
+        if(err || !res){
+          alert('Ошибка генерации: ' + (err || 'Пустой ответ'));
+          return;
+        }
+        var fullDesc = (res.lore ? (res.lore + '\n\n') : '') + (res.mechanics || '');
+        var wrap = document.getElementById('faeMoveGenPreviewWrap');
+        if(wrap){
+          wrap.style.display = 'block';
+          wrap.innerHTML =
+            '<div class="fae-ref-card" style="padding:20px;border-color:#c9a45c;">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">' +
+                '<div class="fae-ref-card-k" style="font-size:19px;margin:0;">⚔️ ' + escapeHtml(res.name || 'Боевой приём') + '</div>' +
+                '<span class="fae-ref-item-tag">' + escapeHtml(wpn) + ' • ' + escapeHtml(res.mastery || 'Мастерство 2024') + '</span>' +
+              '</div>' +
+              '<div style="font-size:12.5px;color:#cbd5e1;margin-bottom:10px;">' +
+                '<b>Бонус:</b> ' + escapeHtml(res.attackBonus || '+6') + ' &nbsp;|&nbsp; <b>Урон / Эффект:</b> ' + escapeHtml((res.damage || '1d8+4') + ' ' + (res.damageType || '')) +
+              '</div>' +
+              '<div class="fae-ref-card-v" style="white-space:pre-line;margin-bottom:14px;">' + escapeHtml(fullDesc) + '</div>' +
+              '<button type="button" class="btn btn-primary" id="btnFaeMoveAiSave">💾 Добавить приём герою</button>' +
+            '</div>';
+          var sv = document.getElementById('btnFaeMoveAiSave');
+          if(sv){
+            sv.addEventListener('click', function(){
+              var hero = getActiveFaerunCharacter();
+              if(!hero) return;
+              if(!Array.isArray(hero.moves)) hero.moves = [];
+              hero.moves.unshift({
+                id: genId(),
+                name: res.name || 'Боевой приём',
+                category: cat,
+                weaponOrStyle: res.baseWeapon || wpn,
+                attackBonus: res.attackBonus || '+6',
+                damageOrSave: ((res.damage || '1d8+4') + ' ' + (res.damageType || '')).trim(),
+                mastery: res.mastery || 'Подрыв (Sap)',
+                actionCost: 'Часть действия Атаки',
+                desc: fullDesc
+              });
+              saveCharactersToStorage();
+              navigate('faeMoves');
+            });
+          }
+        }
+      });
+    });
+  }
+}
+
 
 function subclassFeatureCard(f){
   if(f.isLink){
@@ -4245,8 +6498,8 @@ function renderFaeRef(){
 
       '<div class="fae-card fae-card-clickable" data-go="alchemy" role="button" tabindex="0">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="fae-card-title"><span>🧪</span> Алхимия и Зелья</div>' +
-          '<div class="fae-card-desc">Рецепты зелий, экстракты, склад трав и реагентов, сложность варки (СЛ) и наборы мастера</div>' +
+          '<div class="fae-card-title"><span>🧪</span> Алхимия, Травничество и Яды</div>' +
+          '<div class="fae-card-desc">Справочник зелий, эликсиров, бомб, масел, ядов DMG и трав D&D + Личная книга рецептов с Лабораторией ИИ</div>' +
         '</div>' +
         '<div class="fae-card-arrow">→</div>' +
       '</div>' +
@@ -4337,16 +6590,31 @@ function wireFaeRef(){
         });
       }
 
-      // 4. Recipes
+      // 4. Canonical Alchemy Compendium & Custom Recipes
+      if(typeof FAE_ALCHEMY_COMPENDIUM !== 'undefined' && Array.isArray(FAE_ALCHEMY_COMPENDIUM)){
+        FAE_ALCHEMY_COMPENDIUM.forEach(function(ac){
+          var an = (ac.name || '').toLowerCase();
+          var ao = (ac.orig || '').toLowerCase();
+          var ae = (ac.effect || '').toLowerCase();
+          if(an.indexOf(q) !== -1 || ao.indexOf(q) !== -1 || ae.indexOf(q) !== -1){
+            matches.push({
+              badge: '📖 Справочник Алхимии D&D',
+              title: ac.name + (ac.orig ? (' (' + ac.orig + ')') : ''),
+              desc: ac.effect || 'Канонический алхимический предмет D&D',
+              go: 'alchemyRef'
+            });
+          }
+        });
+      }
       if(Array.isArray(RECIPES)){
         RECIPES.forEach(function(rc){
           var rn = (rc.name || '').toLowerCase();
           var eff = (rc.effect || '').toLowerCase();
           if(rn.indexOf(q) !== -1 || eff.indexOf(q) !== -1){
             matches.push({
-              badge: '🧪 Рецепт алхимии',
+              badge: '⚗️ Мой рецепт алхимии',
               title: rc.name,
-              desc: rc.effect || 'Алхимическое зелье или масло',
+              desc: rc.effect || 'Пользовательский рецепт алхимии',
               go: 'recipes'
             });
           }
@@ -5366,11 +7634,9 @@ function wireEvents(){
   });
 
   /* ---------- alchemy events ---------- */
-  document.querySelectorAll('[data-brew]').forEach(btn=>{
-    btn.addEventListener('click', ()=>attemptBrew(btn.getAttribute('data-brew')));
-  });
   document.querySelectorAll('[data-delete-recipe]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
       const id = btn.getAttribute('data-delete-recipe');
       const rec = RECIPES.find(r=>r.id===id);
       if(confirm('Удалить рецепт «'+(rec?rec.name:'')+'»?')){
@@ -5424,7 +7690,7 @@ function wireEvents(){
     if(!recipeDraft.ingredients.length) recipeDraft.ingredients.push({name:'',qty:1});
     const i = RECIPES.findIndex(x=>x.id===recipeDraft.id);
     const copy = JSON.parse(JSON.stringify(recipeDraft));
-    if(i>=0) RECIPES[i]=copy; else RECIPES.push(copy);
+    if(i>=0) RECIPES[i]=copy; else RECIPES.unshift(copy);
     saveRecipesToStorage();
     navigate('recipes');
   });
@@ -5488,50 +7754,10 @@ function wireEvents(){
     }
   });
 
-  const addIngredientBtn = document.getElementById('addIngredientBtn');
-  if(addIngredientBtn) addIngredientBtn.addEventListener('click', ()=>{
-    const nameEl = document.getElementById('newIngName');
-    const qtyEl = document.getElementById('newIngQty');
-    const name = nameEl.value.trim();
-    const qty = Math.max(1, Number(qtyEl.value)||1);
-    if(!name) return;
-    const existing = findIngredient(name);
-    if(existing) existing.qty += qty;
-    else INGREDIENTS.push({id:genId(), name, qty});
-    saveIngredientsToStorage();
-    render();
-  });
-  document.querySelectorAll('[data-stock-inc]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const item = INGREDIENTS.find(i=>i.id===btn.getAttribute('data-stock-inc'));
-      if(item){
-        item.qty++;
-        saveIngredientsToStorage();
-        const row = btn.closest('.stock-row');
-        const val = row ? row.querySelector('.stock-qty-val') : null;
-        if(val) val.textContent = item.qty;
-      }
-    });
-  });
-  document.querySelectorAll('[data-stock-dec]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const item = INGREDIENTS.find(i=>i.id===btn.getAttribute('data-stock-dec'));
-      if(item){
-        item.qty = Math.max(0, item.qty-1);
-        saveIngredientsToStorage();
-        const row = btn.closest('.stock-row');
-        const val = row ? row.querySelector('.stock-qty-val') : null;
-        if(val) val.textContent = item.qty;
-      }
-    });
-  });
-  document.querySelectorAll('[data-stock-remove]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      INGREDIENTS = INGREDIENTS.filter(i=>i.id!==btn.getAttribute('data-stock-remove'));
-      saveIngredientsToStorage();
-      render();
-    });
-  });
+  if(view.screen === 'alchemyRef') wireAlchemyRef();
+  if(view.screen === 'recipes' || view.screen === 'recipeView' || view.screen === 'alchemyAiGen') wireAlchemyCustom();
+  if(view.screen === 'faeTechs' || view.screen === 'faeTechView' || view.screen === 'faeTechEdit' || view.screen === 'faeTechGen') wireFaeTechs();
+  if(view.screen === 'faeMoves' || view.screen === 'faeMoveView' || view.screen === 'faeMoveEdit' || view.screen === 'faeMoveGen') wireFaeMoves();
   if(view.screen === 'faeGen') wireFaeGen();
   if(view.screen === 'faeRef' || view.screen === 'ref') wireFaeRef();
   if(view.screen === 'faeData' || view.screen === 'data') wireFaeData();
@@ -5544,10 +7770,20 @@ function navigate(val){
   else if(parts[0]==='commands') view = {screen:'dice'};
   else if(parts[0]==='rules2024') view = {screen:'rules2024'};
   else if(parts[0]==='alchemy') view = {screen:'alchemy'};
+  else if(parts[0]==='alchemyRef' || parts[0]==='alchemyDC') view = {screen:'alchemyRef'};
   else if(parts[0]==='recipes') view = {screen:'recipes'};
+  else if(parts[0]==='recipeView') view = {screen:'recipeView', recipeId: parts[1]};
   else if(parts[0]==='recipeForm') view = {screen:'recipeForm', recipeId: parts[1]};
-  else if(parts[0]==='stock') view = {screen:'stock'};
-  else if(parts[0]==='alchemyDC') view = {screen:'alchemyDC'};
+  else if(parts[0]==='alchemyAiGen') view = {screen:'alchemyAiGen'};
+  else if(parts[0]==='stock') view = {screen:'alchemy'};
+  else if(parts[0]==='faeTechs') view = {screen:'faeTechs'};
+  else if(parts[0]==='faeTechView') view = {screen:'faeTechView', techId: parts[1]};
+  else if(parts[0]==='faeTechEdit') view = {screen:'faeTechEdit', techId: parts[1]};
+  else if(parts[0]==='faeTechGen') view = {screen:'faeTechGen'};
+  else if(parts[0]==='faeMoves') view = {screen:'faeMoves'};
+  else if(parts[0]==='faeMoveView') view = {screen:'faeMoveView', moveId: parts[1]};
+  else if(parts[0]==='faeMoveEdit') view = {screen:'faeMoveEdit', moveId: parts[1]};
+  else if(parts[0]==='faeMoveGen') view = {screen:'faeMoveGen'};
   else if(parts[0]==='subclass') view = {screen:'subclass', clsKey:parts[1], subKey:parts[2]};
   else if(parts[0]==='magic') view = {screen:'magic'};
   else if(parts[0]==='schoolSpells') view = {screen:'schoolSpells', schoolKey:parts[1]};
