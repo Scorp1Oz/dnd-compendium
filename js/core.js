@@ -2187,7 +2187,6 @@ function renderHome(){
   var hpMax = c ? (c.hpMax != null ? c.hpMax : (c.maxHp != null ? c.maxHp : 20)) : 20;
   var acVal = c ? (c.ac != null ? c.ac : 10) : 10;
   var lvlVal = c ? (c.level || 1) : 1;
-  var spdVal = c ? (c.speed != null ? c.speed : 30) : 30;
   var pbVal = fmtMod(profBonus(lvlVal));
   var techsCount = (c && Array.isArray(c.techs)) ? c.techs.length : 0;
   var movesCount = (c && Array.isArray(c.moves)) ? c.moves.length : 0;
@@ -2205,7 +2204,6 @@ function renderHome(){
         '<span class="fae-stat-badge">Ур. ' + lvlVal + ' (БМ ' + pbVal + ')</span>' +
         '<span class="fae-stat-badge hp">❤️ ' + hpMax + ' HP</span>' +
         '<span class="fae-stat-badge ac">🛡️ КБ ' + acVal + '</span>' +
-        '<span class="fae-stat-badge" title="Скорость передвижения">⚡ ' + spdVal + ' фт</span>' +
       '</div>' +
     '</div>' +
   '</div>';
@@ -2589,7 +2587,7 @@ function copyCharacterAsText(){
     `Бонус мастерства: ${fmtMod(pb)}`,
     `Характеристики: ${abLine}`,
     `Спасброски (владение): ${savesProf}`,
-    `КД ${d.ac} · Инициатива ${fmtMod(abilityMod(d.abilities.dex)+Number(d.initMisc||0))} · Скорость ${d.speed} фт.`,
+    `КД ${d.ac} · Инициатива ${fmtMod(abilityMod(d.abilities.dex)+Number(d.initMisc||0))}`,
     `Хиты (HP): ${d.hpMax} · Кости хитов: ${d.hitDiceTotal}${d.hitDiceType}`,
     `Владение навыками: ${skillsProf}`,
     `Атаки:\n${attacksText}`
@@ -6861,7 +6859,6 @@ function renderFaeData(){
               '<div class="combat-box"><span class="cb-label">КД (Броня)</span><input type="number" data-field="ac" value="' + d.ac + '"></div>' +
               '<div class="combat-box"><span class="cb-label">Инициатива</span><div class="readonly-val" id="initTotal">' + fmtMod(initTotal) + '</div></div>' +
               '<div class="combat-box"><span class="cb-label">Бонус Иниц.</span><input type="number" data-field="initMisc" value="' + (d.initMisc||0) + '" title="Дополнительный бонус к инициативе (напр. от черты Бдительный)"></div>' +
-              '<div class="combat-box"><span class="cb-label">Скорость (фт)</span><input type="number" data-field="speed" value="' + d.speed + '"></div>' +
               '<div class="combat-box"><span class="cb-label">Хиты (HP)</span><input type="number" id="faeSheetHpMax" data-field="hpMax" value="' + d.hpMax + '" style="color:#fca5a5;font-weight:700;"></div>' +
               '<div class="combat-box"><span class="cb-label">Кости хитов</span><input type="text" data-field="hitDiceTotal" value="' + escapeAttr(String(d.hitDiceTotal)) + '"></div>' +
               '<div class="combat-box"><span class="cb-label">Тип кости</span><input type="text" data-field="hitDiceType" value="' + escapeAttr(d.hitDiceType) + '" placeholder="d10"></div>' +
