@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v175';
+const CACHE_NAME = 'compendium-cache-v176';
 const APP_SHELL = [
   './',
   './index.html',
@@ -26,6 +26,7 @@ const APP_SHELL = [
   './js/modules/star-wars.js',
   './js/modules/github-sync.js',
   './js/app.js',
+  './js/modules/ai-assistant.js',
   './mass_effect_galaxy_map.jpg',
   './shinobi_map_accurate.svg',
   './new-4k-map-of-the-continent-v0-s4ryngvic0ga1.webp',
