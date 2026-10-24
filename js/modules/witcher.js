@@ -414,9 +414,24 @@
       return 'wolf';
     },
 
+    resolveThemeId: function(themeName){
+      var raw = String(themeName || '').trim().toLowerCase();
+      if(!raw) return 'wolf';
+      var exact = WI.THEMES.find(function(item){ return item.id === raw; });
+      if(exact) return exact.id;
+      if(raw === 'wildhunt' || raw === 'wild_hunt' || raw.indexOf('охот') !== -1 || raw.indexOf('хлад') !== -1 || raw.indexOf('hunt') !== -1) return 'hunt';
+      if(raw.indexOf('синдикат') !== -1 || raw.indexOf('бандит') !== -1 || raw.indexOf('новиград') !== -1 || raw.indexOf('syndicate') !== -1) return 'syndicate';
+      if(raw.indexOf('дракон') !== -1 || raw.indexOf('оникс') !== -1 || raw.indexOf('dragon') !== -1 || raw.indexOf('onyx') !== -1) return 'dragon';
+      if(raw.indexOf('скеллиг') !== -1 || raw.indexOf('skellig') !== -1) return 'skellige';
+      if(raw.indexOf('скоя') !== -1 || raw.indexOf('эльф') !== -1 || raw.indexOf('scoiatael') !== -1 || raw.indexOf('elf') !== -1) return 'scoiatael';
+      if(raw.indexOf('нильф') !== -1 || raw.indexOf('солнц') !== -1 || raw.indexOf('nilf') !== -1) return 'nilfgaard';
+      if(raw.indexOf('север') !== -1 || raw.indexOf('темери') !== -1 || raw.indexOf('лили') !== -1 || raw.indexOf('north') !== -1) return 'north';
+      if(raw.indexOf('волк') !== -1 || raw.indexOf('игни') !== -1 || raw.indexOf('wolf') !== -1) return 'wolf';
+      return 'wolf';
+    },
+
     setTheme: function(themeName){
-      var valid = WI.THEMES.some(function(item){ return item.id === themeName; });
-      var t = valid ? themeName : 'wolf';
+      var t = WI.resolveThemeId(themeName);
       try {
         localStorage.setItem(WI_THEME_KEY, t);
       } catch(e){}
@@ -424,6 +439,7 @@
       m.theme = t;
       WI.saveMeta(m);
       WI.applyWitcherTheme();
+      return t;
     },
 
     getMeta: function(){

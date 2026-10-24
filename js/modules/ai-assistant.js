@@ -90,8 +90,9 @@
         }
       } else if(m === 'sh' && window.SH){
         var sp = (typeof window.SH.getActiveProfile === 'function') ? window.SH.getActiveProfile() : null;
-        if(g('shDataInName')){
+        if(g('shDataInCharName') || g('shDataInName')){
           var fields = [
+            ['shDataInCharName', 'charName'],
             ['shDataInName', 'charName'],
             ['shDataInClan', 'clan'],
             ['shDataInVillage', 'village'],
@@ -109,6 +110,7 @@
               if(sp) sp[pair[1]] = el.value;
             }
           });
+          if(g('shDataInNotes') && sp) sp.notes = g('shDataInNotes').value;
           if(typeof window.SH.saveMeta === 'function') window.SH.saveMeta();
           if(typeof window.SH.saveProfilesList === 'function') window.SH.saveProfilesList(window.SH.profiles);
         }
@@ -146,27 +148,57 @@
         }
       } else if(m === 'me' && window.ME && typeof window.ME.getChar === 'function'){
         var mc = window.ME.getChar();
-        if(mc && g('meEditName')){
-          mc.name = g('meEditName').value;
-          if(g('meEditCallsign')) mc.callsign = g('meEditCallsign').value;
-          if(g('meEditRace')) mc.race = g('meEditRace').value;
-          if(g('meEditRole')) mc.role = g('meEditRole').value;
-          if(g('meEditOrigin')) mc.origin = g('meEditOrigin').value;
-          if(g('meEditBio')) mc.biochemistry = g('meEditBio').value;
-          if(g('meEditLevel')) mc.level = parseInt(g('meEditLevel').value, 10) || 1;
-          if(g('meEditDevPoints')) mc.devPoints = parseInt(g('meEditDevPoints').value, 10) || 0;
-          if(g('meEditProf')) mc.profBonus = parseInt(g('meEditProf').value, 10) || 2;
-          if(g('meEditAc')) mc.baseAc = parseInt(g('meEditAc').value, 10) || 10;
-          if(g('meEditShield')) mc.baseShield = parseInt(g('meEditShield').value, 10) || 0;
-          if(g('meEditArmor')) mc.baseArmorPoints = parseInt(g('meEditArmor').value, 10) || 0;
-          if(g('meEditDt')) mc.damageThreshold = parseInt(g('meEditDt').value, 10) || 0;
-          if(g('meEditBarrier')) mc.baseBarrier = parseInt(g('meEditBarrier').value, 10) || 0;
-          if(g('meEditHp')) mc.maxHp = parseInt(g('meEditHp').value, 10) || 10;
-          if(g('meEditLoadout')) mc.loadout = g('meEditLoadout').value;
-          if(g('meEditOmni')) mc.omniTool = g('meEditOmni').value;
-          if(g('meEditBioAmp')) mc.bioAmp = g('meEditBioAmp').value;
-          if(g('meEditBg')) mc.background = g('meEditBg').value;
-          window.ME.saveChar(mc);
+        if(mc){
+          if(g('meEditName')){
+            mc.name = g('meEditName').value;
+            if(g('meEditCallsign')) mc.callsign = g('meEditCallsign').value;
+            if(g('meEditRace')) mc.race = g('meEditRace').value;
+            if(g('meEditRole')) mc.role = g('meEditRole').value;
+            if(g('meEditOrigin')) mc.origin = g('meEditOrigin').value;
+            if(g('meEditBio')) mc.biochemistry = g('meEditBio').value;
+            if(g('meEditLevel')) mc.level = parseInt(g('meEditLevel').value, 10) || 1;
+            if(g('meEditDevPoints')) mc.devPoints = parseInt(g('meEditDevPoints').value, 10) || 0;
+            if(g('meEditProf')) mc.profBonus = parseInt(g('meEditProf').value, 10) || 2;
+            if(g('meEditAc')) mc.baseAc = parseInt(g('meEditAc').value, 10) || 10;
+            if(g('meEditShield')) mc.baseShield = parseInt(g('meEditShield').value, 10) || 0;
+            if(g('meEditArmor')) mc.baseArmorPoints = parseInt(g('meEditArmor').value, 10) || 0;
+            if(g('meEditDt')) mc.damageThreshold = parseInt(g('meEditDt').value, 10) || 0;
+            if(g('meEditBarrier')) mc.baseBarrier = parseInt(g('meEditBarrier').value, 10) || 0;
+            if(g('meEditHp')) mc.maxHp = parseInt(g('meEditHp').value, 10) || 10;
+            if(g('meEditLoadout')) mc.loadout = g('meEditLoadout').value;
+            if(g('meEditOmni')) mc.omniTool = g('meEditOmni').value;
+            if(g('meEditBioAmp')) mc.bioAmp = g('meEditBioAmp').value;
+            if(g('meEditBg')) mc.background = g('meEditBg').value;
+            window.ME.saveChar(mc);
+          } else if(g('meInpName')){
+            mc.name = g('meInpName').value.trim();
+            if(g('meInpCallsign')) mc.callsign = g('meInpCallsign').value.trim();
+            if(g('meSelRace')) mc.race = g('meSelRace').value;
+            if(g('meInpRole')) mc.role = g('meInpRole').value.trim();
+            if(g('meInpLevel')) mc.level = parseInt(g('meInpLevel').value, 10) || 1;
+            if(g('meInpShield')) mc.baseShield = parseInt(g('meInpShield').value, 10) || 0;
+            if(g('meInpHp')) mc.maxHp = parseInt(g('meInpHp').value, 10) || 10;
+            if(g('meInpAc')) mc.baseAc = parseInt(g('meInpAc').value, 10) || 10;
+            window.ME.saveChar(mc);
+          }
+        }
+      } else if(m === 'sw' && window.SW && typeof window.SW.getActiveProfile === 'function'){
+        var swP = window.SW.getActiveProfile();
+        if(swP && g('swInpName')){
+          swP.name = g('swInpName').value.trim();
+          if(g('swInpRace')) swP.race = g('swInpRace').value.trim();
+          if(g('swInpPath')) swP.path = g('swInpPath').value.trim();
+          if(g('swInpTitle')) swP.title = g('swInpTitle').value.trim();
+          if(g('swInpLevel')) swP.level = parseInt(g('swInpLevel').value, 10) || 1;
+          if(g('swInpHp')) swP.hp = parseInt(g('swInpHp').value, 10) || 20;
+          if(g('swInpAc')) swP.ac = parseInt(g('swInpAc').value, 10) || 10;
+          if(g('swInpForce')) swP.force = parseInt(g('swInpForce').value, 10) || 0;
+          if(g('swInpSpeed')) swP.speed = g('swInpSpeed').value.trim();
+          if(g('swInpWeapon')) swP.weapon = g('swInpWeapon').value.trim();
+          if(g('swInpArmor')) swP.armor = g('swInpArmor').value.trim();
+          if(g('swInpShip')) swP.ship = g('swInpShip').value.trim();
+          if(g('swInpNotes')) swP.notes = g('swInpNotes').value.trim();
+          window.SW.saveProfiles();
         }
       }
     } catch(e){}
@@ -233,10 +265,112 @@
     return out.join('\n\n');
   }
 
+  function getAutoCodeInspection(mode, userText){
+    var m = mode || getActiveMode();
+    var symbols = [];
+    if(m === 'wi') symbols = ['WI.THEMES', 'WI.setTheme', 'WI.saveProfile'];
+    else if(m === 'sh') symbols = ['SH.meta', 'updateShinobiTheme'];
+    else if(m === 'me') symbols = ['ME', 'setMeTheme', 'applyMeTheme'];
+    else if(m === 'el') symbols = ['EL.setTheme', 'EL.saveProfile'];
+    else if(m === 'wz') symbols = ['WZ.applyTheme', 'WZ.saveProfiles'];
+    else if(m === 'sw') symbols = ['SW.setTheme', 'SW.saveProfiles'];
+    else if(m === 'faerun') symbols = ['saveCharactersToStorage'];
+    return inspectCodeSymbols(symbols);
+  }
+
+  function applyThemeForMode(rawTheme, mode){
+    var m = mode || getActiveMode();
+    var raw = String(rawTheme || '').trim();
+    var low = raw.toLowerCase();
+    if(!low) return null;
+
+    if(m === 'wi' && window.WI && typeof window.WI.setTheme === 'function'){
+      var wiId = window.WI.setTheme(raw);
+      var wiMeta = (Array.isArray(window.WI.THEMES) ? window.WI.THEMES.find(function(x){ return x.id === wiId; }) : null) || { id: wiId, title: raw };
+      return { id: wiId, title: wiMeta.title || wiId };
+    }
+
+    if(m === 'me'){
+      var meId = 'alliance';
+      if(low.indexOf('цербер') !== -1 || low.indexOf('cerb') !== -1 || low.indexOf('призрак') !== -1) meId = 'cerberus';
+      else if(low.indexOf('жнец') !== -1 || low.indexOf('reap') !== -1 || low.indexOf('предвестник') !== -1) meId = 'reaper';
+      else if(low.indexOf('азари') !== -1 || low.indexOf('asar') !== -1 || low.indexOf('тесси') !== -1) meId = 'asari';
+      else if(low.indexOf('квари') !== -1 || low.indexOf('quar') !== -1 || low.indexOf('флот') !== -1) meId = 'quarian';
+      else if(low.indexOf('кроган') !== -1 || low.indexOf('krog') !== -1 || low.indexOf('тучанк') !== -1) meId = 'krogan';
+      else if(low.indexOf('тури') !== -1 || low.indexOf('turi') !== -1 || low.indexOf('палавен') !== -1) meId = 'turian';
+      else if(low.indexOf('салар') !== -1 || low.indexOf('salar') !== -1 || low.indexOf('гОР') !== -1) meId = 'salarian';
+      else if(low.indexOf('гет') !== -1 || low.indexOf('geth') !== -1 || low.indexOf('консенсус') !== -1) meId = 'geth';
+      else if(low.indexOf('омег') !== -1 || low.indexOf('ари') !== -1 || low.indexOf('aria') !== -1 || low.indexOf('omeg') !== -1) meId = 'aria';
+      else if(low.indexOf('альянс') !== -1 || low.indexOf('allian') !== -1 || low.indexOf('n7') !== -1) meId = 'alliance';
+      else if(['alliance','cerberus','reaper','asari','quarian','krogan','turian','salarian','geth','aria'].indexOf(low) !== -1) meId = low;
+
+      try { localStorage.setItem('ttc_me_theme_v1', meId); } catch(e){}
+      if(typeof window.setMeTheme === 'function') window.setMeTheme(meId);
+      if(typeof window.applyMeTheme === 'function') window.applyMeTheme(meId);
+      return { id: meId, title: raw };
+    }
+
+    if(m === 'sw' && window.SW && typeof window.SW.setTheme === 'function'){
+      var swId = (low.indexOf('сит') !== -1 || low.indexOf('sith') !== -1 || low.indexOf('тьм') !== -1 || low.indexOf('темн') !== -1 || low.indexOf('тёмн') !== -1 || low.indexOf('импер') !== -1) ? 'sith' : 'jedi';
+      window.SW.setTheme(swId);
+      return { id: swId, title: swId === 'sith' ? 'Тёмная сторона (Ситх)' : 'Светлая сторона (Джедай)' };
+    }
+
+    if(m === 'el' && window.EL){
+      var elMap = [
+        ['огон', 'Огонь'], ['fire', 'Огонь'],
+        ['вод', 'Вода'], ['water', 'Вода'],
+        ['земл', 'Земля'], ['earth', 'Земля'],
+        ['ветер', 'Ветер'], ['воздух', 'Ветер'], ['air', 'Ветер'],
+        ['тьм', 'Тьма'], ['dark', 'Тьма'],
+        ['аватар', 'Аватар'], ['avatar', 'Аватар'],
+        ['без', 'Без стихии'], ['none', 'Без стихии']
+      ];
+      var chosenEl = raw;
+      for(var i = 0; i < elMap.length; i++){
+        if(low.indexOf(elMap[i][0]) !== -1){ chosenEl = elMap[i][1]; break; }
+      }
+      if(typeof window.EL.getProfile === 'function'){
+        var ep = window.EL.getProfile();
+        if(ep){ ep.element = chosenEl; window.EL.saveProfile(ep); }
+      }
+      if(typeof window.EL.setTheme === 'function') window.EL.setTheme(chosenEl);
+      if(typeof window.EL.applyTheme === 'function') window.EL.applyTheme();
+      return { id: chosenEl, title: chosenEl };
+    }
+
+    if(m === 'wz' && window.WZ && typeof window.WZ.getActiveProfile === 'function'){
+      var zp = window.WZ.getActiveProfile();
+      var wzHouse = raw;
+      if(low.indexOf('слизерин') !== -1 || low.indexOf('slyth') !== -1) wzHouse = 'Слизерин';
+      else if(low.indexOf('гриффиндор') !== -1 || low.indexOf('gryff') !== -1) wzHouse = 'Гриффиндор';
+      else if(low.indexOf('когтевран') !== -1 || low.indexOf('рейвенкло') !== -1 || low.indexOf('raven') !== -1) wzHouse = 'Когтевран';
+      else if(low.indexOf('пуффендуй') !== -1 || low.indexOf('хаффлпафф') !== -1 || low.indexOf('huffl') !== -1) wzHouse = 'Пуффендуй';
+      else if(low.indexOf('хогвартс') !== -1 || low.indexOf('hogw') !== -1) wzHouse = '';
+      if(zp){
+        zp.house = wzHouse;
+        window.WZ.saveProfiles();
+      }
+      if(typeof window.WZ.applyTheme === 'function') window.WZ.applyTheme();
+      return { id: wzHouse || 'hogwarts', title: wzHouse || 'Хогвартс' };
+    }
+
+    if(m === 'sh' && window.SH){
+      if(window.SH.meta) window.SH.meta.clan = raw;
+      var sp = (typeof window.SH.getActiveProfile === 'function') ? window.SH.getActiveProfile() : null;
+      if(sp) sp.clan = raw;
+      if(typeof window.SH.saveMeta === 'function') window.SH.saveMeta();
+      if(typeof window.SH.saveProfilesList === 'function') window.SH.saveProfilesList(window.SH.profiles);
+      if(typeof window.updateShinobiTheme === 'function') window.updateShinobiTheme();
+      return { id: raw, title: raw };
+    }
+
+    return null;
+  }
+
   /* ---------- 3. ПОЛНЫЙ СЛЕПОК СОСТОЯНИЯ АКТИВНОГО РАЗДЕЛА ---------- */
   function getModeContext(mode){
     var m = mode || getActiveMode();
-    syncDomInputsToState(m);
 
     if(m === 'wi'){
       var wiP = (window.WI && typeof window.WI.getActiveProfile === 'function') ? window.WI.getActiveProfile() : {};
@@ -257,7 +391,17 @@
         fullStateJson: JSON.stringify({
           profile: cloneWi,
           worldMeta: window.WI ? window.WI.meta : {},
-          availableThemes: ['wolf', 'wildhunt', 'north', 'nilfgaard', 'scoiatael', 'skellige', 'syndicate', 'dragon'],
+          currentTheme: (window.WI && typeof window.WI.getTheme === 'function') ? window.WI.getTheme() : 'wolf',
+          availableThemes: [
+            { id: 'wolf', title: 'Школа Волка и Пламя Игни' },
+            { id: 'hunt', title: 'Дикая Охота (Белый Хлад)' },
+            { id: 'north', title: 'Королевства Севера (Темерия)' },
+            { id: 'nilfgaard', title: 'Империя Нильфгаард' },
+            { id: 'scoiatael', title: 'Эльфы и Скоя\'таэли' },
+            { id: 'skellige', title: 'Острова Скеллиге' },
+            { id: 'syndicate', title: 'Синдикат и Бандиты (Новиград)' },
+            { id: 'dragon', title: 'Ониксовый Дракон' }
+          ],
           techs: wiTechs.map(function(t){ return { id: t.id, name: t.name, cat: t.cat, cost: t.cost, dmg: (t.dmgN ? (t.dmgN + t.dmgD) : '') }; }),
           moves: wiMoves.map(function(x){ return { id: x.id, name: x.name, kind: x.kind, action: x.action }; })
         }, null, 2)
@@ -459,7 +603,10 @@
       }
       if(d.worldName != null && window.WI.meta){ window.WI.meta.name = String(d.worldName); window.WI.saveMeta(); changes.push('Мир: ' + d.worldName); }
       if(d.worldNote != null && window.WI.meta){ window.WI.meta.note = String(d.worldNote); window.WI.saveMeta(); changes.push('Заметка мира обновлена'); }
-      if(d.theme && typeof window.WI.setTheme === 'function'){ window.WI.setTheme(String(d.theme)); changes.push('Тема: ' + d.theme); }
+      if(d.theme){
+        var wiTh = applyThemeForMode(d.theme, 'wi');
+        changes.push('Тема: ' + (wiTh ? wiTh.title : d.theme));
+      }
       return changes;
     }
 
@@ -525,6 +672,10 @@
         });
         window.ME.saveChar(mc);
       }
+      if(d.theme){
+        var meTh = applyThemeForMode(d.theme, 'me');
+        changes.push('Тема: ' + (meTh ? meTh.title : d.theme));
+      }
       return changes;
     }
 
@@ -540,7 +691,12 @@
         }
         if(d.firstName != null){ ep.firstName = String(d.firstName); changes.push('Имя: ' + ep.firstName); }
         if(d.lastName != null){ ep.lastName = String(d.lastName); changes.push('Фамилия: ' + ep.lastName); }
-        if(d.element != null || d.className != null){ ep.element = String(d.element != null ? d.element : d.className); changes.push('Стихия: ' + ep.element); }
+        if(d.element != null || d.className != null || d.theme != null){
+          var elVal = String(d.element != null ? d.element : (d.className != null ? d.className : d.theme));
+          var elRes = applyThemeForMode(elVal, 'el');
+          ep.element = elRes ? elRes.id : elVal;
+          changes.push('Стихия/Тема: ' + ep.element);
+        }
         if(d.level != null){ ep.level = parseInt(d.level, 10) || 1; changes.push('Уровень: ' + ep.level); }
         var elHp = d.hp != null ? d.hp : (d.hpMax != null ? d.hpMax : d.maxHp);
         if(elHp != null){ ep.hp = parseInt(elHp, 10) || 12; changes.push('HP: ' + ep.hp); }
@@ -568,7 +724,12 @@
         }
         if(d.firstName != null){ zp.firstName = String(d.firstName); zp.name = [zp.firstName, zp.lastName].filter(Boolean).join(' '); changes.push('Имя: ' + zp.firstName); }
         if(d.lastName != null){ zp.lastName = String(d.lastName); zp.name = [zp.firstName, zp.lastName].filter(Boolean).join(' '); changes.push('Фамилия: ' + zp.lastName); }
-        if(d.house != null || d.className != null){ zp.house = String(d.house != null ? d.house : d.className); changes.push('Факультет: ' + zp.house); }
+        if(d.house != null || d.className != null || d.theme != null){
+          var wzVal = String(d.house != null ? d.house : (d.className != null ? d.className : d.theme));
+          var wzRes = applyThemeForMode(wzVal, 'wz');
+          zp.house = wzRes ? (wzRes.id === 'hogwarts' ? '' : wzRes.id) : wzVal;
+          changes.push('Факультет/Тема: ' + (zp.house || 'Хогвартс'));
+        }
         if(d.year != null || d.level != null){ zp.year = String(d.year != null ? d.year : (d.level + ' курс')); changes.push('Курс/Статус: ' + zp.year); }
         if(d.title != null || d.subclass != null){ zp.title = String(d.title != null ? d.title : d.subclass); changes.push('Титул: ' + zp.title); }
         var wzHp = d.hp != null ? d.hp : (d.hpMax != null ? d.hpMax : d.maxHp);
@@ -586,6 +747,7 @@
         if(d.wandLength != null){ if(!zp.wand) zp.wand = {}; zp.wand.length = String(d.wandLength); zp.wand.saved = true; changes.push('Длина палочки: ' + d.wandLength); }
         if(d.wandFlex != null || d.wandFlexibility != null){ if(!zp.wand) zp.wand = {}; zp.wand.flexibility = String(d.wandFlex || d.wandFlexibility); zp.wand.saved = true; changes.push('Гибкость палочки: ' + zp.wand.flexibility); }
         window.WZ.saveProfiles();
+        if(typeof window.WZ.applyTheme === 'function') window.WZ.applyTheme();
       }
       return changes;
     }
@@ -612,7 +774,10 @@
         if(d.notes != null || d.backstory != null){ swP.notes = String(d.notes != null ? d.notes : d.backstory); changes.push('Заметки обновлены'); }
         window.SW.saveProfiles();
       }
-      if(d.theme && typeof window.SW.setTheme === 'function'){ window.SW.setTheme(String(d.theme)); changes.push('Тема: ' + d.theme); }
+      if(d.theme){
+        var swTh = applyThemeForMode(d.theme, 'sw');
+        changes.push('Тема: ' + (swTh ? swTh.title : d.theme));
+      }
       return changes;
     }
 
@@ -787,13 +952,39 @@
   }
 
   function executeSingleTask(t, mode, idx){
-    if(!t || !t.action) return null;
-    var action = String(t.action).toLowerCase().trim();
-    var d = t.item || t.data || t.fields || t.patch || t;
+    if(!t || typeof t !== 'object') return null;
+    var rawAction = t.action || t.type || t.tool || t.command || '';
+    if(!rawAction && t.theme) rawAction = 'switch_theme';
+    if(!rawAction && (t.code || (t.item && t.item.code))) rawAction = 'run_js';
+    if(!rawAction && (t.level != null || t.hp != null || t.ac != null || t.name != null || t.school != null || t.clan != null || t.house != null)) rawAction = 'update_character';
+    if(!rawAction) return null;
+
+    var action = String(rawAction).toLowerCase().trim();
+    var d = t.item || t.data || t.fields || t.patch || t.params || t;
     var reportId = 'task_' + Date.now() + '_' + idx + '_' + Math.random().toString(36).substr(2, 4);
 
+    // D. ПЕРЕКЛЮЧЕНИЕ ТЕМЫ / ЭКРАНА / РЕЖИМА (проверяем также если action содержит theme)
+    if(action === 'switch_theme' || action === 'set_theme' || action === 'change_theme' || action === 'update_theme' || action === 'theme' || (action.indexOf('theme') !== -1 && (d.theme || d.name || d.id || t.theme))){
+      var th = String(d.theme || d.name || d.id || d.value || t.theme || '').trim();
+      var applied = applyThemeForMode(th, mode);
+      var displayTh = (applied && applied.title) ? (applied.title + ' (' + applied.id + ')') : th;
+      return {
+        reportId: reportId,
+        badge: '🎨 Тема оформления изменена',
+        name: 'Тема: ' + displayTh,
+        meta: 'Визуальное оформление раздела обновлено',
+        canUndo: false,
+        canOpen: false
+      };
+    }
+
     // A. УНИВЕРСАЛЬНОЕ ИЗМЕНЕНИЕ ПАРАМЕТРОВ ПЕРСОНАЖА / ДОСЬЕ / ДАННЫХ
-    if(action === 'update_character' || action === 'patch_character' || action === 'set_stats' || action === 'edit_character' || action === 'update_profile' || action === 'update_data'){
+    if(
+      action === 'update_character' || action === 'patch_character' || action === 'set_stats' ||
+      action === 'edit_character' || action === 'update_profile' || action === 'update_data' ||
+      action === 'modify_character' || action === 'change_character' || action === 'set_character' ||
+      action === 'change_stats' || action === 'update_stats' || action === 'patch_profile'
+    ){
       var changes = applyCharacterPatch(d, mode);
       if(changes.length){
         return {
@@ -808,11 +999,11 @@
     }
 
     // B. ПРЯМАЯ УСТАНОВКА ПОЛЕЙ DOM НА ОТКРЫТОМ ЭКРАНЕ
-    if(action === 'set_dom_fields' || action === 'fill_form'){
+    if(action === 'set_dom_fields' || action === 'fill_form' || action === 'set_fields'){
       var map = d.fields || d;
       var domChanged = [];
       Object.keys(map).forEach(function(sel){
-        if(sel === 'action') return;
+        if(sel === 'action' || sel === 'type' || sel === 'tool') return;
         var val = map[sel];
         var el = document.querySelector(sel) || document.getElementById(sel.replace(/^#/, '')) || document.querySelector('[data-field="' + sel + '"]');
         if(el){
@@ -837,11 +1028,10 @@
     }
 
     // C. ПРЯМОЕ ВЫПОЛНЕНИЕ JS-КОДА НАД СОСТОЯНИЕМ ПРИЛОЖЕНИЯ (ДЛЯ ЛЮБЫХ НЕСТАНДАРТНЫХ ЗАДАЧ)
-    if(action === 'run_js' || action === 'exec_js'){
+    if(action === 'run_js' || action === 'exec_js' || action === 'execute_js' || action === 'js'){
       var codeStr = d.code || t.code || '';
       if(codeStr){
         try {
-          syncDomInputsToState(mode);
           var fn = new Function('mode', codeStr);
           var jsResult = fn(mode);
           return {
@@ -863,26 +1053,6 @@
           };
         }
       }
-    }
-
-    // D. ПЕРЕКЛЮЧЕНИЕ ТЕМЫ / ЭКРАНА / РЕЖИМА
-    if(action === 'switch_theme' || action === 'set_theme'){
-      var th = String(d.theme || d.name || '').trim();
-      if(mode === 'wi' && window.WI && typeof window.WI.setTheme === 'function'){
-        window.WI.setTheme(th);
-      } else if(mode === 'sw' && window.SW && typeof window.SW.setTheme === 'function'){
-        window.SW.setTheme(th);
-      } else if(mode === 'el' && window.EL && typeof window.EL.setTheme === 'function'){
-        window.EL.setTheme(th);
-      }
-      return {
-        reportId: reportId,
-        badge: '🎨 Тема оформления изменена',
-        name: 'Тема: ' + th,
-        meta: 'Визуальное оформление раздела обновлено',
-        canUndo: false,
-        canOpen: false
-      };
     }
 
     if(action === 'navigate' || action === 'open_screen'){
@@ -1626,6 +1796,149 @@
     return null;
   }
 
+  function normalizeTasksFromParsed(parsed){
+    if(!parsed || typeof parsed !== 'object') return [];
+    var rawList = [];
+    if(Array.isArray(parsed.tasks)) rawList = parsed.tasks.slice();
+    else if(Array.isArray(parsed.actions)) rawList = parsed.actions.slice();
+    else if(parsed.task && typeof parsed.task === 'object') rawList = [parsed.task];
+
+    if(rawList.length === 0){
+      if(parsed.action || parsed.type || parsed.tool){
+        rawList.push({
+          action: parsed.action || parsed.type || parsed.tool,
+          item: parsed.item || parsed.data || parsed.fields || parsed.patch || parsed
+        });
+      } else if(parsed.theme){
+        rawList.push({ action: 'switch_theme', item: { theme: parsed.theme } });
+      } else if(parsed.patch && typeof parsed.patch === 'object'){
+        rawList.push({ action: 'update_character', item: parsed.patch });
+      } else if(parsed.character && typeof parsed.character === 'object'){
+        rawList.push({ action: 'update_character', item: parsed.character });
+      }
+    }
+    return rawList;
+  }
+
+  function tryDeterministicFallback(userText, replyText, mode){
+    var u = String(userText || '').trim();
+    var lowU = u.toLowerCase();
+    var combined = (u + ' ' + String(replyText || '')).toLowerCase();
+    var fallbackTasks = [];
+
+    // 1. Детерминированное распознавание смены темы оформления
+    if(lowU.indexOf('тем') !== -1 || lowU.indexOf('оформлен') !== -1 || lowU.indexOf('theme') !== -1){
+      var themeCand = '';
+      if(mode === 'wi'){
+        if(combined.indexOf('синдикат') !== -1 || combined.indexOf('бандит') !== -1 || combined.indexOf('новиград') !== -1 || combined.indexOf('syndicate') !== -1) themeCand = 'syndicate';
+        else if(combined.indexOf('дракон') !== -1 || combined.indexOf('оникс') !== -1 || combined.indexOf('dragon') !== -1) themeCand = 'dragon';
+        else if(combined.indexOf('охот') !== -1 || combined.indexOf('хлад') !== -1 || combined.indexOf('wildhunt') !== -1 || combined.indexOf('hunt') !== -1) themeCand = 'hunt';
+        else if(combined.indexOf('скеллиг') !== -1 || combined.indexOf('skellige') !== -1) themeCand = 'skellige';
+        else if(combined.indexOf('скоя') !== -1 || combined.indexOf('эльф') !== -1 || combined.indexOf('scoiatael') !== -1) themeCand = 'scoiatael';
+        else if(combined.indexOf('нильф') !== -1 || combined.indexOf('солнц') !== -1 || combined.indexOf('nilfgaard') !== -1) themeCand = 'nilfgaard';
+        else if(combined.indexOf('север') !== -1 || combined.indexOf('темери') !== -1 || combined.indexOf('north') !== -1) themeCand = 'north';
+        else if(combined.indexOf('волк') !== -1 || combined.indexOf('игни') !== -1 || combined.indexOf('wolf') !== -1) themeCand = 'wolf';
+      } else if(mode === 'me'){
+        if(combined.indexOf('цербер') !== -1 || combined.indexOf('cerberus') !== -1) themeCand = 'cerberus';
+        else if(combined.indexOf('жнец') !== -1 || combined.indexOf('reaper') !== -1) themeCand = 'reaper';
+        else if(combined.indexOf('азари') !== -1 || combined.indexOf('asari') !== -1) themeCand = 'asari';
+        else if(combined.indexOf('квари') !== -1 || combined.indexOf('quarian') !== -1) themeCand = 'quarian';
+        else if(combined.indexOf('кроган') !== -1 || combined.indexOf('krogan') !== -1) themeCand = 'krogan';
+        else if(combined.indexOf('тури') !== -1 || combined.indexOf('turian') !== -1) themeCand = 'turian';
+        else if(combined.indexOf('салар') !== -1 || combined.indexOf('salarian') !== -1) themeCand = 'salarian';
+        else if(combined.indexOf('гет') !== -1 || combined.indexOf('geth') !== -1) themeCand = 'geth';
+        else if(combined.indexOf('омег') !== -1 || combined.indexOf('ари') !== -1 || combined.indexOf('aria') !== -1) themeCand = 'aria';
+        else if(combined.indexOf('альянс') !== -1 || combined.indexOf('alliance') !== -1) themeCand = 'alliance';
+      } else if(mode === 'sw'){
+        if(combined.indexOf('сит') !== -1 || combined.indexOf('sith') !== -1 || combined.indexOf('тьм') !== -1 || combined.indexOf('тёмн') !== -1 || combined.indexOf('темн') !== -1) themeCand = 'sith';
+        else if(combined.indexOf('джед') !== -1 || combined.indexOf('jedi') !== -1 || combined.indexOf('свет') !== -1) themeCand = 'jedi';
+      } else if(mode === 'el'){
+        if(combined.indexOf('огон') !== -1) themeCand = 'Огонь';
+        else if(combined.indexOf('вод') !== -1) themeCand = 'Вода';
+        else if(combined.indexOf('земл') !== -1) themeCand = 'Земля';
+        else if(combined.indexOf('ветер') !== -1 || combined.indexOf('воздух') !== -1) themeCand = 'Ветер';
+        else if(combined.indexOf('тьм') !== -1) themeCand = 'Тьма';
+        else if(combined.indexOf('аватар') !== -1) themeCand = 'Аватар';
+      } else if(mode === 'wz'){
+        if(combined.indexOf('слизерин') !== -1) themeCand = 'Слизерин';
+        else if(combined.indexOf('гриффиндор') !== -1) themeCand = 'Гриффиндор';
+        else if(combined.indexOf('когтевран') !== -1 || combined.indexOf('рейвенкло') !== -1) themeCand = 'Когтевран';
+        else if(combined.indexOf('пуффендуй') !== -1 || combined.indexOf('хаффлпафф') !== -1) themeCand = 'Пуффендуй';
+      }
+      if(themeCand){
+        fallbackTasks.push({ action: 'switch_theme', item: { theme: themeCand } });
+      }
+    }
+
+    // 2. Детерминированное распознавание изменения базовых параметров персонажа (уровень, HP, КБ/КД, энергия/чакра/сила/щиты, характеристики, школа/клан/класс)
+    var patch = {};
+    var hasPatch = false;
+    var mLvl = u.match(/(?:уровен[ьяюем]*|ур\.?|level|lvl)\s*(?:на|=|:|-)?\s*(\d{1,2})(?!\d)/i) || u.match(/(?:^|\s)(\d{1,2})\s*(?:уровен[ьяюем]*|ур\.?|ого\s+уровня|-го\s+уровня|курс[ау]?|lvl|level)/i);
+    if(mLvl){ patch.level = parseInt(mLvl[1], 10); hasPatch = true; }
+
+    var mHp = u.match(/(?:хит[а-я]*|здоров[ьяюем]*|хп|hp)\s*(?:на|=|:|-)?\s*(\d{1,4})(?!\d)/i) || u.match(/(?:^|\s)(\d{1,4})\s*(?:хит[а-я]*|хп|hp|ед\.\s*здоровья)/i);
+    if(mHp){ patch.hp = parseInt(mHp[1], 10); patch.hpMax = patch.hp; patch.maxHp = patch.hp; hasPatch = true; }
+
+    var mAc = u.match(/(?:кд|кб|ac|класс\s*(?:доспеха|брони))\s*(?:на|=|:|-)?\s*(\d{1,2})(?!\d)/i) || u.match(/(?:^|\s)(\d{1,2})\s*(?:кд|кб|ac)(?=\s|$|[,.!])/i);
+    if(mAc){ patch.ac = parseInt(mAc[1], 10); patch.baseAc = patch.ac; hasPatch = true; }
+
+    var mEn = u.match(/(?:энерги[яюией]|выносливост[ьию]|vigor|energy)\s*(?:на|=|:|-)?\s*(\d{1,4})(?!\d)/i) || u.match(/(?:^|\s)(\d{1,4})\s*(?:энерги[яюи]|выносливост[ьи])/i);
+    if(mEn){ patch.energy = parseInt(mEn[1], 10); hasPatch = true; }
+
+    var mCh = u.match(/(?:чакр[ауыеой]|chakra)\s*(?:на|=|:|-)?\s*(\d{1,4})(?!\d)/i) || u.match(/(?:^|\s)(\d{1,4})\s*(?:чакр[ауые]|ед\.\s*чакры)/i);
+    if(mCh){ patch.chakra = String(mCh[1]); hasPatch = true; }
+
+    var mSh = u.match(/(?:щит[ыаов]*|shield)\s*(?:на|=|:|-)?\s*(\d{1,4})(?!\d)/i) || u.match(/(?:^|\s)(\d{1,4})\s*(?:щит[ыаов]*)/i);
+    if(mSh){ patch.baseShield = parseInt(mSh[1], 10); hasPatch = true; }
+
+    var mName = u.match(/(?:имя(?:\s+персонажа)?|назови(?:\s+его|\s+меня)?|зовут)\s+(?:на\s+)?[«"']?([А-ЯЁA-Z][а-яёa-zА-ЯЁA-Z0-9\s\-]{1,28})[»"']?/);
+    if(mName){ patch.name = mName[1].trim(); hasPatch = true; }
+
+    var mSchool = u.match(/(?:школ[ауые]\s+ведьмака|школ[ауые])\s+[«"']?([А-ЯЁA-Zа-яёa-z\-]{3,20})[»"']?/i);
+    if(mSchool && mode === 'wi'){
+      var sRaw = mSchool[1].trim();
+      patch.school = 'Школа ' + sRaw.charAt(0).toUpperCase() + sRaw.slice(1);
+      hasPatch = true;
+    }
+
+    var mClan = u.match(/(?:клан[ауе]?)\s+[«"']?([А-ЯЁA-Zа-яёa-z\-]{2,20})[»"']?/i);
+    if(mClan && mode === 'sh'){
+      var cRaw = mClan[1].trim();
+      patch.clan = cRaw.charAt(0).toUpperCase() + cRaw.slice(1);
+      hasPatch = true;
+    }
+
+    var statPatterns = [
+      ['str', /(?:сил[ауыеой]|str)\s*(?:на|=|:|-)?\s*(\d{1,2})(?!\d)/i],
+      ['dex', /(?:ловкост[ьию]|dex)\s*(?:на|=|:|-)?\s*(\d{1,2})(?!\d)/i],
+      ['con', /(?:телосложени[еяю]|con)\s*(?:на|=|:|-)?\s*(\d{1,2})(?!\d)/i],
+      ['int', /(?:интеллект[ауе]?|int)\s*(?:на|=|:|-)?\s*(\d{1,2})(?!\d)/i],
+      ['wis', /(?:мудрост[ьию]|wis)\s*(?:на|=|:|-)?\s*(\d{1,2})(?!\d)/i],
+      ['cha', /(?:харизм[ауыеой]|cha)\s*(?:на|=|:|-)?\s*(\d{1,2})(?!\d)/i]
+    ];
+    statPatterns.forEach(function(sp){
+      var mSt = u.match(sp[1]);
+      if(mSt){
+        patch[sp[0]] = parseInt(mSt[1], 10);
+        hasPatch = true;
+      }
+    });
+
+    if(hasPatch){
+      fallbackTasks.push({ action: 'update_character', item: patch });
+    }
+
+    if(fallbackTasks.length > 0){
+      return executeTasksBatch(fallbackTasks, mode);
+    }
+    return [];
+  }
+
+  function isActionIntent(text){
+    var low = String(text || '').toLowerCase();
+    return /(измен|помен|смен|постав|установ|сдела|добав|созда|удал|убер|заполн|переключ|обнов|прокач|брось|кинь|открой|перейд)/i.test(low);
+  }
+
   function executeTasksBatch(tasks, mode){
     if(!Array.isArray(tasks) || tasks.length === 0) return [];
     var reports = [];
@@ -1652,6 +1965,8 @@
     var history = loadChatHistory(mode);
     var curScreen = (window.view && window.view.screen) ? window.view.screen : 'home';
     var domSnapshot = inspectLiveDom();
+    var autoCode = getAutoCodeInspection(mode, userText);
+    var combinedCodeInspection = [autoCode, extraCodeInspection].filter(Boolean).join('\n\n');
 
     var recentTurns = history.slice(-8).map(function(m){
       return (m.role === 'user' ? 'Игрок: ' : 'Ассистент: ') + m.text;
@@ -1659,43 +1974,46 @@
 
     return (
       'Ты — встроенный ИИ-Ассистент и автономный агент управления приложением «Тактический компендиум».\n' +
-      'Ты обязан понимать и ВЫПОЛНЯТЬ ЛЮБОЙ запрос пользователя по факту его написания!\n\n' +
+      'Ты обязан понимать и ВЫПОЛНЯТЬ ЛЮБОЙ запрос пользователя по факту его написания!\n' +
+      'ВАЖНЕЙШЕЕ ПРАВИЛО: Никогда не пиши в "reply", что ты что-то изменил, добавил или переключил, если ты НЕ передал соответствующую задачу в массиве "tasks"! Любое действие в приложении происходит ТОЛЬКО через массив "tasks".\n\n' +
       '=== ТЕКУЩИЙ КОНТЕКСТ ПРИЛОЖЕНИЯ ===\n' +
       '• Активный раздел (mode): "' + mode + '" (' + ctx.worldName + ')\n' +
       '• Открытый сейчас экран (view.screen): "' + curScreen + '"\n' +
       '• Полный JSON-слепок данных активного персонажа и списков раздела:\n' + ctx.fullStateJson + '\n\n' +
       '=== ОСМОТР DOM ОТКРЫТОГО ЭКРАНА (полей ввода на странице) ===\n' + domSnapshot + '\n\n' +
-      (extraCodeInspection ? ('=== РЕЗУЛЬТАТ ОСМОТРА КОДА ФУНКЦИЙ И ОБЪЕКТОВ ===\n' + extraCodeInspection + '\n\n') : '') +
+      (combinedCodeInspection ? ('=== РЕЗУЛЬТАТ АВТОМАТИЧЕСКОГО ОСМОТРА ИСХОДНОГО КОДА РАЗДЕЛА ===\n' + combinedCodeInspection + '\n\n') : '') +
       '=== ИНСТРУМЕНТЫ И ЗАДАЧИ (массив "tasks") ===\n' +
-      'Когда пользователь просит изменить любые параметры персонажа/анкеты/мира (на экране «Данные» или с любого другого экрана), добавить/удалить/изменить способности, приёмы, рецепты, заклинания, оружие, поменять тему, перейти на экран или выполнить нестандартное действие — ты ОБЯЗАН вернуть соответствующие задачи в массиве "tasks":\n\n' +
+      'Когда пользователь просит изменить любые параметры персонажа/анкеты/мира (на экране «Данные» или с любого другого экрана), добавить/удалить/изменить способности, приёмы, рецепты, заклинания, оружие, поменять тему оформления, перейти на экран или выполнить нестандартное действие — ты ОБЯЗАН вернуть соответствующие задачи в массиве "tasks":\n\n' +
       '1. "update_character" — универсальное изменение любых параметров персонажа, анкеты или мира в текущем разделе ("' + mode + '").\n' +
       '   Передай внутри "item" объект с любыми полями, которые нужно изменить (смотри точные ключи в JSON-слепке выше!).\n' +
       '   Примеры полей для разных разделов:\n' +
       '   - Фаэрун (faerun): { "name": "...", "species": "...", "className": "...", "subclass": "...", "background": "...", "alignment": "...", "level": 5, "xp": 6500, "ac": 18, "hpMax": 45, "initMisc": 2, "hitDiceTotal": "5", "hitDiceType": "d10", "abilities": {"str":18,"dex":14,"con":16,"int":10,"wis":12,"cha":10}, "profArmor": "...", "profWeapons": "...", "languages": "...", "equipment": "...", "features": "...", "backstory": "...", "slots": {"1":4,"2":3} }\n' +
-      '   - Ведьмак (wi): { "name": "...", "school": "...", "title": "...", "level": 10, "hp": 80, "ac": 17, "energy": 100, "silverSword": "...", "steelSword": "...", "armor": "...", "notes": "...", "worldName": "...", "worldNote": "...", "theme": "wolf|wildhunt|north|nilfgaard|scoiatael|skellige|syndicate|dragon" }\n' +
+      '   - Ведьмак (wi): { "name": "...", "school": "...", "title": "...", "level": 10, "hp": 80, "ac": 17, "energy": 100, "silverSword": "...", "steelSword": "...", "armor": "...", "notes": "...", "worldName": "...", "worldNote": "...", "theme": "wolf|hunt|north|nilfgaard|scoiatael|skellige|syndicate|dragon" }\n' +
       '   - Шиноби (sh): { "charName": "...", "clan": "...", "village": "...", "rank": "Джонин", "level": "10", "nature": "Молния", "chakra": "120", "hp": "95", "ac": "17", "notes": "...", "worldName": "...", "worldNote": "..." }\n' +
-      '   - Mass Effect (me): { "name": "...", "callsign": "...", "race": "...", "role": "...", "origin": "...", "level": 8, "baseAc": 17, "baseShield": 40, "baseArmorPoints": 25, "damageThreshold": 3, "baseBarrier": 20, "maxHp": 65, "stats": {"str":16,"dex":16,"con":14,"int":14,"wis":12,"cha":14}, "omniTool": "...", "bioAmp": "...", "loadout": "...", "backstory": "..." }\n' +
+      '   - Mass Effect (me): { "name": "...", "callsign": "...", "race": "...", "role": "...", "origin": "...", "level": 8, "baseAc": 17, "baseShield": 40, "baseArmorPoints": 25, "damageThreshold": 3, "baseBarrier": 20, "maxHp": 65, "stats": {"str":16,"dex":16,"con":14,"int":14,"wis":12,"cha":14}, "omniTool": "...", "bioAmp": "...", "loadout": "...", "backstory": "...", "theme": "alliance|cerberus|reaper|asari|quarian|krogan|turian|salarian|geth|aria" }\n' +
       '   - Стихия (el): { "firstName": "...", "lastName": "...", "element": "Огонь|Вода|Земля|Ветер|Тьма|Аватар|Без стихии", "level": 7, "hp": 55, "ac": 16, "note": "..." }\n' +
       '   - Волшебник (wz): { "firstName": "...", "lastName": "...", "house": "Слизерин|Гриффиндор|Когтевран|Пуффендуй", "year": "5 курс", "title": "...", "hp": 45, "ac": 15, "wand": {"name":"...","wood":"Тис","core":"Перо феникса","length":"11 дюймов","flexibility":"Упругая","features":"..."} }\n' +
       '   - Звёздные войны (sw): { "name": "...", "race": "...", "path": "...", "title": "...", "level": 8, "hp": 70, "ac": 17, "force": 35, "weapon": "...", "armor": "...", "ship": "...", "notes": "...", "theme": "jedi|sith" }\n\n' +
-      '2. "add_ability" — добавить способность / технику / знак / биотику / заклинание.\n' +
+      '2. "switch_theme" — изменить тему оформления раздела.\n' +
+      '   "item": { "theme": "syndicate" } (для Ведьмака: wolf, hunt, north, nilfgaard, scoiatael, skellige, syndicate, dragon; для Mass Effect: alliance, cerberus, reaper, asari, quarian, krogan, turian, salarian, geth, aria; для Звёздных войн: jedi, sith; для Стихии: Огонь, Вода, Земля, Ветер, Тьма, Аватар; для Волшебника: Слизерин, Гриффиндор, Когтевран, Пуффендуй).\n\n' +
+      '3. "add_ability" — добавить способность / технику / знак / биотику / заклинание.\n' +
       '   "item": { "name": "...", "icon": "⚡", "category": "...", "actionCost": "1 действие", "cooldown": "...", "checkOrSave": "...", "dmgN": 3, "dmgD": "d8", "dmgMod": 0, "desc": "Подробное описание..." }\n\n' +
-      '3. "add_move" — добавить боевой приём / приём фехтования / дуэльный приём.\n' +
+      '4. "add_move" — добавить боевой приём / приём фехтования / дуэльный приём.\n' +
       '   "item": { "name": "...", "icon": "⚔️", "category": "...", "weaponOrStyle": "...", "attackBonus": "+6", "damageOrSave": "2d8+4", "mastery": "...", "actionCost": "...", "trigger": "...", "desc": "..." }\n\n' +
-      '4. "add_recipe" — добавить рецепт алхимии / зелье ("item": { "name": "...", "category": "potions|bombs|oils|poisons", "rarity": "Редкий", "cost": 150, "dc": 15, "time": "4 часа", "ingredients": [{"name":"...","qty":1}], "appearance": "...", "effect": "..." }).\n\n' +
-      '5. "add_spell" — добавить заклинание ("item": { "name": "...", "level": 3, "school": "evocation", "effect": "..." }).\n\n' +
-      '6. "delete_item" — удалить способность, приём или рецепт по названию или ID ("item": { "name": "..." }).\n\n' +
-      '7. "set_dom_fields" — напрямую заполнить поля ввода на текущем открытом экране по их селектору из раздела ОСМОТР DOM ("item": { "#id_или_data_field": "значение" }).\n\n' +
-      '8. "run_js" — выполнить произвольный JS-код в браузере, если задача нестандартная (например: массовое редактирование карточек, создание нового профиля, сложная модификация состояния). Доступны глобальные объекты window.CHARACTERS, window.saveCharactersToStorage, window.WI, window.SH, window.ME, window.EL, window.WZ, window.SW, window.HB, window.RECIPES, window.SPELLS, localStorage.\n' +
+      '5. "add_recipe" — добавить рецепт алхимии / зелье ("item": { "name": "...", "category": "potions|bombs|oils|poisons", "rarity": "Редкий", "cost": 150, "dc": 15, "time": "4 часа", "ingredients": [{"name":"...","qty":1}], "appearance": "...", "effect": "..." }).\n\n' +
+      '6. "add_spell" — добавить заклинание ("item": { "name": "...", "level": 3, "school": "evocation", "effect": "..." }).\n\n' +
+      '7. "delete_item" — удалить способность, приём или рецепт по названию или ID ("item": { "name": "..." }).\n\n' +
+      '8. "set_dom_fields" — напрямую заполнить поля ввода на текущем открытом экране по их селектору из раздела ОСМОТР DOM ("item": { "#id_или_data_field": "значение" }).\n\n' +
+      '9. "run_js" — выполнить произвольный JS-код в браузере, если задача нестандартная (например: массовое редактирование карточек, создание нового профиля, сложная модификация состояния). Доступны глобальные объекты window.CHARACTERS, window.saveCharactersToStorage, window.WI, window.SH, window.ME, window.EL, window.WZ, window.SW, window.HB, window.RECIPES, window.SPELLS, localStorage.\n' +
       '   "item": { "title": "Краткое название операции", "code": "...валидный JS код..." }\n\n' +
-      '9. "roll_dice" — бросить кубики ("item": { "label": "...", "formula": "2d6+4" }).\n\n' +
-      '10. ОСМОТР ИСХОДНОГО КОДА ("inspect_code"):\n' +
-      '    Если для точного выполнения задачи тебе нужно сначала заглянуть в исходный код какой-либо функции или глобального объекта приложения (например: ["WI", "wireWiData", "renderFaeData", "SH", "ME", "EL", "WZ", "SW", "HB"]), укажи их имена в корневом массиве "inspect_code": ["имяФункцииИлиОбъекта"]. Система мгновенно прочитает их код и передаст тебе для финального выполнения!\n\n' +
+      '10. "roll_dice" — бросить кубики ("item": { "label": "...", "formula": "2d6+4" }).\n\n' +
+      '11. ДОПОЛНИТЕЛЬНЫЙ ОСМОТР ИСХОДНОГО КОДА ("inspect_code"):\n' +
+      '    Если для точного выполнения задачи тебе нужно заглянуть в исходный код ещё какой-либо функции или глобального объекта приложения, укажи их имена в корневом массиве "inspect_code": ["имяФункцииИлиОбъекта"].\n\n' +
       'Ответь СТРОГО валидным JSON-объектом:\n' +
       '{\n' +
       '  "inspect_code": [],\n' +
       '  "reply": "Твой ответ и отчёт о выполненных действиях на русском языке",\n' +
-      '  "tasks": [ ... список задач для выполнения ... ],\n' +
+      '  "tasks": [ { "action": "...", "item": { ... } } ],\n' +
       '  "suggestedRolls": []\n' +
       '}\n\n' +
       'История диалога:\n' + recentTurns + '\n\n' +
@@ -1710,7 +2028,7 @@
       body: JSON.stringify({
         contents: [{ parts: [{ text: promptText }] }],
         generationConfig: {
-          temperature: 0.4,
+          temperature: 0.25,
           responseMimeType: 'application/json'
         }
       })
@@ -1753,6 +2071,9 @@
     }
 
     var mode = getActiveMode();
+    // Синхронизируем несохранённые пользовательские поля DOM один раз ПЕРЕД чтением контекста
+    syncDomInputsToState(mode);
+
     var history = loadChatHistory(mode);
 
     history.push({
@@ -1763,7 +2084,7 @@
     saveChatHistory(mode, history);
 
     isBusy = true;
-    busyStatusText = '🔍 Осматриваю экран и состояние раздела...';
+    busyStatusText = '🔍 Осматриваю экран, код и состояние раздела...';
     updateBusyState();
     renderMessages();
 
@@ -1771,8 +2092,9 @@
 
     callGeminiJson(prompt1, apiKey)
       .then(function(parsed){
+        var normTasks = normalizeTasksFromParsed(parsed);
         // Если ИИ запросил дополнительный осмотр исходного кода функций/объектов
-        if(Array.isArray(parsed.inspect_code) && parsed.inspect_code.length > 0 && (!parsed.tasks || parsed.tasks.length === 0)){
+        if(Array.isArray(parsed.inspect_code) && parsed.inspect_code.length > 0 && normTasks.length === 0){
           busyStatusText = '🔍 Осматриваю код: ' + parsed.inspect_code.join(', ') + '...';
           renderMessages();
           var codeDump = inspectCodeSymbols(parsed.inspect_code);
@@ -1782,7 +2104,44 @@
         return parsed;
       })
       .then(function(finalParsed){
-        var reports = executeTasksBatch(finalParsed.tasks || [], mode);
+        var normTasks = normalizeTasksFromParsed(finalParsed);
+        var reports = executeTasksBatch(normTasks, mode);
+
+        // Если ИИ не вернул tasks (или они не сработали), запускаем детерминированный перехватчик
+        if(reports.length === 0){
+          reports = tryDeterministicFallback(trimmed, finalParsed.reply || '', mode);
+        }
+
+        // Если запрос явно содержит команду на изменение/добавление/удаление, а reports всё ещё пуст — принудительный повтор с требованием вернуть непустой tasks
+        if(reports.length === 0 && isActionIntent(trimmed)){
+          busyStatusText = '⚙️ Формирую команды изменения состояния...';
+          renderMessages();
+          var forcePrompt = buildAgentPrompt(
+            trimmed + '\n\n[СИСТЕМНОЕ ТРЕБОВАНИЕ]: В предыдущем ответе ты вернул пустой массив "tasks": [], поэтому изменения НЕ применились! Верни НЕПУСТОЙ массив "tasks" с конкретными действиями ("update_character", "switch_theme", "add_ability", "add_move", "add_recipe", "delete_item", "set_dom_fields" или "run_js"), чтобы реально выполнить запрос пользователя в коде приложения!',
+            mode,
+            ''
+          );
+          return callGeminiJson(forcePrompt, apiKey).then(function(retryParsed){
+            var retryTasks = normalizeTasksFromParsed(retryParsed);
+            var retryReports = executeTasksBatch(retryTasks, mode);
+            if(retryReports.length === 0){
+              retryReports = tryDeterministicFallback(trimmed, retryParsed.reply || finalParsed.reply || '', mode);
+            }
+            return {
+              parsed: retryParsed.reply ? retryParsed : finalParsed,
+              reports: retryReports
+            };
+          });
+        }
+
+        return {
+          parsed: finalParsed,
+          reports: reports
+        };
+      })
+      .then(function(outcome){
+        var finalParsed = outcome.parsed || {};
+        var reports = outcome.reports || [];
         var botMsg = {
           role: 'bot',
           text: finalParsed.reply || (reports.length ? 'Все задачи успешно выполнены!' : 'Готово.'),
@@ -1795,14 +2154,26 @@
         saveChatHistory(mode, curHist);
       })
       .catch(function(err){
+        // Даже если сеть/API вернули ошибку, проверяем локальный детерминированный исполнитель
+        var localReports = tryDeterministicFallback(trimmed, '', mode);
         var curHist = loadChatHistory(mode);
-        curHist.push({
-          role: 'bot',
-          text: '⚠️ Не удалось выполнить запрос к Gemini API (' + (err && err.message ? err.message : 'ошибка сети') + '). Проверьте ключ API кнопкой 🔑 в шапке чата.',
-          reports: [],
-          suggestedRolls: [],
-          ts: Date.now()
-        });
+        if(localReports.length > 0){
+          curHist.push({
+            role: 'bot',
+            text: 'Задача выполнена напрямую автономным модулем!',
+            reports: localReports,
+            suggestedRolls: [],
+            ts: Date.now()
+          });
+        } else {
+          curHist.push({
+            role: 'bot',
+            text: '⚠️ Не удалось выполнить запрос к Gemini API (' + (err && err.message ? err.message : 'ошибка сети') + '). Проверьте ключ API кнопкой 🔑 в шапке чата.',
+            reports: [],
+            suggestedRolls: [],
+            ts: Date.now()
+          });
+        }
         saveChatHistory(mode, curHist);
       })
       .finally(function(){
