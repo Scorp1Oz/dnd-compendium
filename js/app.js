@@ -983,21 +983,34 @@ window.render=function(){
 
 window.navigate=function(val){
   var p=String(val||'').split(':');
+  if(['dice','wiDice','shDice','meDice','elDice','wzDice','swDice','hbDice','faeDice'].indexOf(p[0]) !== -1){
+    p[0] = 'dice';
+  }
   if (window.view && window.view.screen !== p[0]) window._prevScreen = window.view.screen;
   if(HB.mode==='me'){
     var meScreens = {
       home: 'meHome',
       meHome: 'meHome',
       meChar: 'meData',
+      meData: 'meData',
+      data: 'meData',
       mePowers: 'mePowers',
+      powers: 'mePowers',
+      techs: 'mePowers',
+      abilities: 'mePowers',
       mePowerGen: 'mePowerGen',
       meArsenal: 'meArsenal',
+      arsenal: 'meArsenal',
+      moves: 'meArsenal',
       meArsenalGen: 'meArsenalGen',
       meShip: 'meShip',
+      ship: 'meShip',
       meCodex: 'meCodex',
+      codex: 'meCodex',
+      ref: 'meCodex',
       meMissions: 'meMap',
       meMap: 'meMap',
-      meData: 'meData',
+      map: 'meMap',
       dice: 'dice'
     };
     if(meScreens[p[0]]){
@@ -1024,12 +1037,18 @@ window.navigate=function(val){
       home: 'elHome',
       elHome: 'elHome',
       elData: 'elData',
+      data: 'elData',
       elRef: 'elRef',
+      ref: 'elRef',
       elTechs: 'elTechs',
+      techs: 'elTechs',
+      abilities: 'elTechs',
       elTechGen: 'elTechGen',
       elMoves: 'elMoves',
+      moves: 'elMoves',
       elMoveGen: 'elMoveGen',
       elMap: 'elMap',
+      map: 'elMap',
       dice: 'dice'
     };
     if(elScreens[p[0]]){
@@ -1194,7 +1213,7 @@ window.navigate=function(val){
     }
   }
   if(HB.mode==='sh'){
-    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',shJutsuGen:'shJutsuGen',shMoveGen:'shMoveGen',shMoves:'shMoves',shSkillGen:'shSkillGen',shSkills:'shSkills',shCmds:'shCmds',shRef:'shRef',shMap:'shMap',shData:'shData',dice:'dice'};
+    var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',techs:'shTechs',abilities:'shTechs',shJutsuGen:'shJutsuGen',shMoveGen:'shMoveGen',shMoves:'shMoves',moves:'shMoves',shSkillGen:'shSkillGen',shSkills:'shSkills',skills:'shSkills',shCmds:'shCmds',shRef:'shRef',ref:'shRef',shMap:'shMap',map:'shMap',shData:'shData',data:'shData',dice:'dice'};
     if(map[p[0]]){ window.view = view = {screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
     if(p[0]==='shTechEdit'||p[0]==='shTechView'||p[0]==='shMoveEdit'||p[0]==='shMoveView'||p[0]==='shSkillEdit'||p[0]==='shSkillView'||p[0]==='shRefView'){
       window.view = view = {screen:p[0], shId:p[1], shKey:p[1]}; SH.draft=null; render(); window.scrollTo(0,0); return;

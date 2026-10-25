@@ -926,35 +926,274 @@
   }
 
   /* ---------- 5. ВЫПОЛНЕНИЕ ЗАДАЧ (Task Execution Engine) ---------- */
-  function rollDiceFormula(formula){
-    var str = String(formula || '1d20').trim().toLowerCase().replace(/\s+/g, '');
-    var m = str.match(/^(\d*)d(\d+)([+-]\d+)?$/);
-    if(!m){
-      var d20 = Math.floor(Math.random() * 20) + 1;
-      return { formula: '1d20', rolls: [d20], mod: 0, total: d20 };
+  var liveDiceRolledInBatch = false;
+
+  function getScreenMapForMode(mode){
+    var m = mode || getActiveMode();
+    return {
+      home: m === 'wi' ? 'wiHome' : m === 'sh' ? 'shHome' : m === 'me' ? 'meHome' : m === 'el' ? 'elHome' : m === 'wz' ? 'wzHome' : m === 'sw' ? 'swHome' : m === 'hb' ? 'hbHome' : 'home',
+      data: m === 'wi' ? 'wiData' : m === 'sh' ? 'shData' : m === 'me' ? 'meData' : m === 'el' ? 'elData' : m === 'wz' ? 'wzData' : m === 'sw' ? 'swData' : m === 'hb' ? 'hbData' : 'characters',
+      techs: m === 'wi' ? 'wiTechs' : m === 'sh' ? 'shTechs' : m === 'me' ? 'mePowers' : m === 'el' ? 'elTechs' : m === 'wz' ? 'wzSpells' : m === 'sw' ? 'swTechs' : m === 'hb' ? 'hbTechs' : 'abilities',
+      moves: m === 'wi' ? 'wiMoves' : m === 'sh' ? 'shMoves' : m === 'me' ? 'meArsenal' : m === 'el' ? 'elMoves' : m === 'wz' ? 'wzDuels' : m === 'sw' ? 'swMoves' : m === 'hb' ? 'hbMoves' : 'combatMoves',
+      skills: m === 'wi' ? 'wiSkills' : m === 'sh' ? 'shSkills' : m === 'me' ? 'meSkills' : m === 'el' ? 'elSkills' : m === 'wz' ? 'wzSkills' : m === 'sw' ? 'swSkills' : m === 'hb' ? 'hbSkills' : 'skillsScreen',
+      recipes: m === 'wz' ? 'wzPotions' : 'myRecipes',
+      magic: m === 'wz' ? 'wzSpells' : 'magic',
+      ref: m === 'wi' ? 'wiRef' : m === 'sh' ? 'shRef' : m === 'me' ? 'meCodex' : m === 'el' ? 'elRef' : m === 'wz' ? 'wzRef' : m === 'sw' ? 'swRef' : m === 'hb' ? 'hbRef' : 'glossary',
+      map: m === 'wi' ? 'wiMap' : m === 'sh' ? 'shMap' : m === 'me' ? 'meMap' : m === 'el' ? 'elMap' : m === 'wz' ? 'wzMap' : m === 'sw' ? 'swMap' : m === 'hb' ? 'hbMap' : 'home',
+      games: 'wiGames',
+      ship: 'swShip',
+      dice: 'dice'
+    };
+  }
+
+  function resolveAndNavigateScreen(rawTarget, mode){
+    var raw = String(rawTarget || '').trim();
+    if(!raw) return null;
+    var low = raw.toLowerCase();
+    var m = mode || getActiveMode();
+    var sm = getScreenMapForMode(m);
+
+    // Если передан точный ID экрана с параметром (например wiTechView:...)
+    if(raw.indexOf(':') !== -1 && typeof window.navigate === 'function'){
+      window.navigate(raw);
+      return { screen: raw, title: raw };
     }
-    var count = Math.min(Math.max(parseInt(m[1] || '1', 10), 1), 30);
-    var sides = Math.min(Math.max(parseInt(m[2] || '20', 10), 2), 1000);
-    var mod = m[3] ? parseInt(m[3], 10) : 0;
+
+    var target = '';
+    var title = '';
+
+    // 1. Проверка на экран бросков костей
+    if(
+      low === 'dice' || low === 'widice' || low === 'shdice' || low === 'medice' ||
+      low === 'eldice' || low === 'wzdice' || low === 'swdice' || low === 'hbdice' || low === 'faedice' ||
+      low.indexOf('кост') !== -1 || low.indexOf('кубик') !== -1 || low.indexOf('кубов') !== -1 ||
+      low.indexOf('броск') !== -1 || low.indexOf('бросок') !== -1 || low.indexOf('dice') !== -1
+    ){
+      target = 'dice';
+      title = 'Бросок костей';
+    }
+    // 2. Экран Данные / Досье / Персонаж
+    else if(
+      low === 'data' || low === 'widata' || low === 'shdata' || low === 'medata' ||
+      low === 'eldata' || low === 'wzdata' || low === 'swdata' || low === 'hbdata' || low === 'characters' ||
+      low.indexOf('данн') !== -1 || low.indexOf('досье') !== -1 || low.indexOf('анкет') !== -1 ||
+      low.indexOf('профил') !== -1 || low.indexOf('квент') !== -1 || low.indexOf('персонаж') !== -1 || low.indexOf('стат') !== -1
+    ){
+      target = sm.data;
+      title = 'Данные персонажа';
+    }
+    // 3. Экран Способности / Техники / Умения / Заклинания
+    else if(
+      low === 'techs' || low === 'abilities' || low === 'powers' || low === 'spells' ||
+      low === 'witechs' || low === 'shtechs' || low === 'mepowers' || low === 'eltechs' ||
+      low === 'wzspells' || low === 'swtechs' || low === 'hbtechs' ||
+      low.indexOf('способност') !== -1 || low.indexOf('техник') !== -1 || low.indexOf('умения') !== -1 ||
+      low.indexOf('биотик') !== -1 || low.indexOf('знак') !== -1
+    ){
+      target = sm.techs;
+      title = 'Способности и техники';
+    }
+    // 4. Экран Приёмы / Дуэли / Арсенал
+    else if(
+      low === 'moves' || low === 'combatmoves' || low === 'arsenal' || low === 'duels' ||
+      low === 'wimoves' || low === 'shmoves' || low === 'mearsenal' || low === 'elmoves' ||
+      low === 'wzduels' || low === 'swmoves' || low === 'hbmoves' ||
+      low.indexOf('приём') !== -1 || low.indexOf('прием') !== -1 || low.indexOf('арсенал') !== -1 ||
+      low.indexOf('фехтован') !== -1 || low.indexOf('дуэл') !== -1 || low.indexOf('оружи') !== -1
+    ){
+      target = sm.moves;
+      title = 'Боевые приёмы и арсенал';
+    }
+    // 5. Экран Навыки
+    else if(
+      low === 'skills' || low === 'skillsscreen' || low === 'wiskills' || low === 'shskills' ||
+      low === 'meskills' || low === 'elskills' || low === 'wzskills' || low === 'swskills' || low === 'hbskills' ||
+      low.indexOf('навык') !== -1
+    ){
+      target = sm.skills;
+      title = 'Навыки';
+    }
+    // 6. Экран Алхимия / Рецепты / Зелья
+    else if(
+      low === 'recipes' || low === 'myrecipes' || low === 'potions' || low === 'wzpotions' || low === 'alchemy' ||
+      low.indexOf('алхим') !== -1 || low.indexOf('рецепт') !== -1 || low.indexOf('зель') !== -1 || low.indexOf('эликсир') !== -1
+    ){
+      target = sm.recipes;
+      title = 'Алхимия и рецепты';
+    }
+    // 7. Экран Магия / Книга заклинаний
+    else if(
+      low === 'magic' || low.indexOf('маги') !== -1 || low.indexOf('заклинан') !== -1
+    ){
+      target = sm.magic;
+      title = 'Магия и заклинания';
+    }
+    // 8. Экран Карта
+    else if(
+      low === 'map' || low === 'wimap' || low === 'shmap' || low === 'memap' ||
+      low === 'elmap' || low === 'wzmap' || low === 'swmap' || low === 'hbmap' ||
+      low.indexOf('карт') !== -1 || low.indexOf('атлас') !== -1
+    ){
+      target = sm.map;
+      title = 'Карта мира';
+    }
+    // 9. Экран Справка / Кодекс / Глоссарий
+    else if(
+      low === 'ref' || low === 'codex' || low === 'glossary' || low === 'wiref' || low === 'shref' ||
+      low === 'mecodex' || low === 'elref' || low === 'wzref' || low === 'swref' || low === 'hbref' ||
+      low.indexOf('справк') !== -1 || low.indexOf('кодекс') !== -1 || low.indexOf('глоссар') !== -1 || low.indexOf('бестиар') !== -1
+    ){
+      target = sm.ref;
+      title = 'Справка и Кодекс';
+    }
+    // 10. Гвинт и кости / Таверна (Ведьмак)
+    else if(
+      low === 'games' || low === 'wigames' || low.indexOf('гвинт') !== -1 || low.indexOf('покер') !== -1 || low.indexOf('таверн') !== -1 || low.indexOf('игр') !== -1
+    ){
+      target = 'wiGames';
+      title = 'Гвинт и кости';
+    }
+    // 11. Корабль (Звёздные войны)
+    else if(
+      low === 'ship' || low === 'swship' || low.indexOf('корабл') !== -1 || low.indexOf('звездолёт') !== -1 || low.indexOf('звездолет') !== -1
+    ){
+      target = 'swShip';
+      title = 'Корабль';
+    }
+    // 12. Главный экран
+    else if(
+      low === 'home' || low === 'wihome' || low === 'shhome' || low === 'mehome' ||
+      low === 'elhome' || low === 'wzhome' || low === 'swhome' || low === 'hbhome' ||
+      low.indexOf('главн') !== -1 || low.indexOf('меню') !== -1 || low.indexOf('домой') !== -1
+    ){
+      target = sm.home;
+      title = 'Главный экран';
+    } else {
+      target = raw;
+      title = raw;
+    }
+
+    if(target === 'dice' && liveDiceRolledInBatch && window.view && window.view.screen === 'dice'){
+      return { screen: 'dice', title: title || 'Бросок костей' };
+    }
+
+    if(typeof window.navigate === 'function'){
+      window.navigate(target);
+    } else if(window.view){
+      window.view.screen = target;
+      if(typeof window.render === 'function') window.render();
+    }
+    return { screen: target, title: title };
+  }
+
+  function parseDiceFormulaSpecs(formula){
+    var clean = String(formula || '1d20').trim().toLowerCase().replace(/[кk]/g, 'd').replace(/\s+/g, '');
+    var diceSpecs = [];
+    var mod = 0;
+    var re = /([+-]?\d*)d(\d+)|([+-]\d+)/g;
+    var m;
+    var matchedAny = false;
+    while((m = re.exec(clean)) !== null){
+      matchedAny = true;
+      if(m[2]){
+        var rawCnt = m[1];
+        var sign = 1;
+        if(rawCnt === '-') sign = -1;
+        var cnt = 1;
+        if(rawCnt && rawCnt !== '+' && rawCnt !== '-'){
+          cnt = Math.abs(parseInt(rawCnt, 10)) || 1;
+        }
+        cnt = Math.min(Math.max(cnt, 1), 30);
+        var sides = Math.min(Math.max(parseInt(m[2], 10) || 20, 2), 1000);
+        diceSpecs.push({ count: cnt, sides: sides, sign: sign });
+      } else if(m[3]){
+        mod += parseInt(m[3], 10) || 0;
+      }
+    }
+    if(!matchedAny || diceSpecs.length === 0){
+      var singleSides = clean.match(/^d(\d+)$/);
+      if(singleSides){
+        diceSpecs.push({ count: 1, sides: Math.min(Math.max(parseInt(singleSides[1], 10) || 20, 2), 1000), sign: 1 });
+      } else {
+        diceSpecs.push({ count: 1, sides: 20, sign: 1 });
+      }
+    }
+    var notationParts = diceSpecs.map(function(ds){ return ds.count + 'd' + ds.sides; });
+    var notation = notationParts.join('+') + (mod > 0 ? ('+' + mod) : (mod < 0 ? String(mod) : ''));
+    return { diceSpecs: diceSpecs, mod: mod, formula: notation };
+  }
+
+  function rollDiceFormula(formula){
+    var parsed = parseDiceFormulaSpecs(formula);
     var rolls = [];
     var sum = 0;
-    for(var i = 0; i < count; i++){
-      var r = Math.floor(Math.random() * sides) + 1;
-      rolls.push(r);
-      sum += r;
-    }
+    parsed.diceSpecs.forEach(function(ds){
+      for(var i = 0; i < ds.count; i++){
+        var r = Math.floor(Math.random() * ds.sides) + 1;
+        rolls.push(r);
+        sum += r * ds.sign;
+      }
+    });
     return {
-      formula: count + 'd' + sides + (mod > 0 ? ('+' + mod) : (mod < 0 ? String(mod) : '')),
+      formula: parsed.formula,
       rolls: rolls,
-      mod: mod,
-      total: sum + mod
+      mod: parsed.mod,
+      total: sum + parsed.mod
     };
+  }
+
+  function executeLiveDiceRoll(formula, label, mode){
+    var parsed = parseDiceFormulaSpecs(formula);
+    // 1. Вживую открываем экран броска костей
+    resolveAndNavigateScreen('dice', mode);
+
+    // 2. Если доступен глобальный стол костей (window.diceState + window.addDie), бросаем кубики вживую на экране!
+    if(window.diceState && typeof window.addDie === 'function'){
+      window.diceState.dice = [];
+      window.diceState.modifier = parsed.mod || 0;
+      window.diceState.labelCat = '';
+      window.diceState.label = '';
+      window.diceState.customLabel = label ? String(label) : '';
+
+      // Отрисовываем чистый стол костей с установленным модификатором и подписью
+      if(typeof window.render === 'function'){
+        window.render();
+      }
+
+      // Поочерёдно бросаем каждый кубик вживую на стол (.dice-tray) через штатный window.addDie(sides)
+      parsed.diceSpecs.forEach(function(ds){
+        if([4, 6, 8, 10, 12, 20, 100].indexOf(ds.sides) === -1){
+          window.diceState.customSides = ds.sides;
+        }
+        for(var i = 0; i < ds.count; i++){
+          window.addDie(ds.sides);
+        }
+      });
+
+      liveDiceRolledInBatch = true;
+
+      var liveRolls = (window.diceState.dice || []).map(function(dObj){ return dObj.value; });
+      if(liveRolls.length > 0){
+        var liveSum = liveRolls.reduce(function(acc, v){ return acc + v; }, 0);
+        return {
+          formula: parsed.formula,
+          rolls: liveRolls,
+          mod: parsed.mod,
+          total: liveSum + parsed.mod,
+          live: true
+        };
+      }
+    }
+
+    return rollDiceFormula(formula);
   }
 
   function executeSingleTask(t, mode, idx){
     if(!t || typeof t !== 'object') return null;
     var rawAction = t.action || t.type || t.tool || t.command || '';
     if(!rawAction && t.theme) rawAction = 'switch_theme';
+    if(!rawAction && (t.screen || t.target || (t.item && (t.item.screen || t.item.target)))) rawAction = 'navigate';
+    if(!rawAction && (t.formula || t.dice || (t.item && (t.item.formula || t.item.dice)))) rawAction = 'roll_dice';
     if(!rawAction && (t.code || (t.item && t.item.code))) rawAction = 'run_js';
     if(!rawAction && (t.level != null || t.hp != null || t.ac != null || t.name != null || t.school != null || t.clan != null || t.house != null)) rawAction = 'update_character';
     if(!rawAction) return null;
@@ -1030,10 +1269,16 @@
     // C. ПРЯМОЕ ВЫПОЛНЕНИЕ JS-КОДА НАД СОСТОЯНИЕМ ПРИЛОЖЕНИЯ (ДЛЯ ЛЮБЫХ НЕСТАНДАРТНЫХ ЗАДАЧ)
     if(action === 'run_js' || action === 'exec_js' || action === 'execute_js' || action === 'js'){
       var codeStr = d.code || t.code || '';
+      var titleStr = String(d.title || t.title || '');
       if(codeStr){
         try {
+          // Если ИИ попытался через run_js сделать переход на экран — перехватываем и дополнительно гарантируем живой переход
+          var combinedNavHint = (titleStr + ' ' + codeStr).toLowerCase();
           var fn = new Function('mode', codeStr);
           var jsResult = fn(mode);
+          if(combinedNavHint.indexOf('переход') !== -1 || combinedNavHint.indexOf('откр') !== -1 || combinedNavHint.indexOf('navigate') !== -1 || combinedNavHint.indexOf('экран') !== -1){
+            resolveAndNavigateScreen(titleStr + ' ' + codeStr, mode);
+          }
           return {
             reportId: reportId,
             badge: '⚡ Выполнена операция в коде',
@@ -1055,18 +1300,24 @@
       }
     }
 
-    if(action === 'navigate' || action === 'open_screen'){
-      var targetScreen = String(d.screen || d.target || '').trim();
-      if(targetScreen && typeof window.navigate === 'function'){
-        setTimeout(function(){ window.navigate(targetScreen); }, 50);
-        return {
-          reportId: reportId,
-          badge: '🧭 Переход выполнен',
-          name: 'Экран: ' + targetScreen,
-          meta: 'Открыт запрошенный экран',
-          canUndo: false,
-          canOpen: false
-        };
+    // E. ЖИВОЙ ПЕРЕХОД НА ЭКРАН
+    if(
+      action === 'navigate' || action === 'open_screen' || action === 'go_to' ||
+      action === 'switch_screen' || action === 'change_screen' || action === 'screen' || action === 'open'
+    ){
+      var targetScreen = String(d.screen || d.target || d.name || d.id || t.screen || t.target || '').trim();
+      if(targetScreen){
+        var navRes = resolveAndNavigateScreen(targetScreen, mode);
+        if(navRes){
+          return {
+            reportId: reportId,
+            badge: '🧭 Переход выполнен вживую',
+            name: 'Экран: ' + (navRes.title || navRes.screen),
+            meta: 'Открыт экран «' + (navRes.title || navRes.screen) + '»',
+            canUndo: false,
+            canOpen: false
+          };
+        }
       }
     }
 
@@ -1780,14 +2031,16 @@
       }
     }
 
-    // 6. БРОСОК КУБИКОВ
-    if(action === 'roll_dice'){
-      var rollRes = rollDiceFormula(d.formula || d.dice || '1d20');
+    // 6. ЖИВОЙ БРОСОК КУБИКОВ НА ЭКРАНЕ КОСТЕЙ
+    if(action === 'roll_dice' || action === 'roll' || action === 'dice_roll' || action === 'dice'){
+      var rawFormula = d.formula || d.dice || d.notation || t.formula || t.dice || '1d20';
+      var rawLabel = d.label || d.name || d.title || t.label || 'Бросок';
+      var rollRes = executeLiveDiceRoll(rawFormula, rawLabel, mode);
       return {
         reportId: reportId,
-        badge: '🎲 Результат броска: ' + rollRes.total,
-        name: (d.label || 'Бросок') + ' (' + rollRes.formula + ')',
-        meta: 'Кости: [' + rollRes.rolls.join(', ') + ']' + (rollRes.mod ? (' ' + (rollRes.mod > 0 ? '+' : '') + rollRes.mod) : '') + ' = ' + rollRes.total,
+        badge: '🎲 Бросок вживую: ' + rollRes.total,
+        name: rawLabel + ' (' + rollRes.formula + ')',
+        meta: 'Кости на столе: [' + rollRes.rolls.join(', ') + ']' + (rollRes.mod ? (' ' + (rollRes.mod > 0 ? '+' : '') + rollRes.mod) : '') + ' = ' + rollRes.total,
         canUndo: false,
         canOpen: false
       };
@@ -1811,6 +2064,10 @@
         });
       } else if(parsed.theme){
         rawList.push({ action: 'switch_theme', item: { theme: parsed.theme } });
+      } else if(parsed.screen || parsed.target){
+        rawList.push({ action: 'navigate', item: { screen: parsed.screen || parsed.target } });
+      } else if(parsed.formula || parsed.dice){
+        rawList.push({ action: 'roll_dice', item: { formula: parsed.formula || parsed.dice, label: parsed.label || 'Бросок' } });
       } else if(parsed.patch && typeof parsed.patch === 'object'){
         rawList.push({ action: 'update_character', item: parsed.patch });
       } else if(parsed.character && typeof parsed.character === 'object'){
@@ -1820,11 +2077,95 @@
     return rawList;
   }
 
+  function detectScreenAndDiceIntent(userText){
+    var u = String(userText || '').trim();
+    var low = u.toLowerCase();
+    var result = { navTarget: '', diceFormula: '', diceLabel: '' };
+
+    // 1. Проверка запроса на бросок кубиков (например "кинь 2d20", "брось 3к6+4", "бросок костей 1d20")
+    var mDice = u.match(/(?:^|[\s,(])(\d{0,2}\s*[dкk]\s*\d{1,4}(?:\s*[+-]\s*\d{1,3})?)(?=$|[\s,.!)])/i);
+    var hasRollVerb = /(?:кинь|кин[ьте]*|брось|брос[ить]*|выбрось|ролл|roll|прокинь)/i.test(low);
+    if(mDice && (hasRollVerb || low.indexOf('кост') !== -1 || low.indexOf('кубик') !== -1 || low.indexOf('кубов') !== -1 || low.indexOf('бросок') !== -1)){
+      result.diceFormula = mDice[1].replace(/\s+/g, '').replace(/[кk]/gi, 'd');
+      result.diceLabel = 'Бросок ' + result.diceFormula;
+    } else if(hasRollVerb && (low.indexOf('кост') !== -1 || low.indexOf('кубик') !== -1 || low.indexOf('д20') !== -1 || low.indexOf('d20') !== -1)){
+      result.diceFormula = '1d20';
+      result.diceLabel = 'Бросок 1d20';
+    }
+
+    // 2. Проверка запроса на переход / открытие экрана
+    var hasNavVerb = /(?:открой|открыть|перейди|перейти|переключи|зайди|покажи|включи\s+экран|на\s+экран)/i.test(low);
+    if(hasNavVerb){
+      if(low.indexOf('кост') !== -1 || low.indexOf('кубик') !== -1 || low.indexOf('броск') !== -1 || low.indexOf('бросок') !== -1 || low.indexOf('dice') !== -1){
+        result.navTarget = 'dice';
+      } else if(low.indexOf('данн') !== -1 || low.indexOf('досье') !== -1 || low.indexOf('анкет') !== -1 || low.indexOf('профил') !== -1 || low.indexOf('квент') !== -1){
+        result.navTarget = 'data';
+      } else if(low.indexOf('способност') !== -1 || low.indexOf('техник') !== -1 || low.indexOf('умения') !== -1 || low.indexOf('биотик') !== -1 || low.indexOf('знак') !== -1){
+        result.navTarget = 'techs';
+      } else if(low.indexOf('приём') !== -1 || low.indexOf('прием') !== -1 || low.indexOf('арсенал') !== -1 || low.indexOf('фехтован') !== -1 || low.indexOf('дуэл') !== -1){
+        result.navTarget = 'moves';
+      } else if(low.indexOf('навык') !== -1){
+        result.navTarget = 'skills';
+      } else if(low.indexOf('алхим') !== -1 || low.indexOf('рецепт') !== -1 || low.indexOf('зель') !== -1 || low.indexOf('эликсир') !== -1){
+        result.navTarget = 'recipes';
+      } else if(low.indexOf('карт') !== -1 || low.indexOf('атлас') !== -1){
+        result.navTarget = 'map';
+      } else if(low.indexOf('справк') !== -1 || low.indexOf('кодекс') !== -1 || low.indexOf('глоссар') !== -1 || low.indexOf('бестиар') !== -1){
+        result.navTarget = 'ref';
+      } else if(low.indexOf('гвинт') !== -1 || low.indexOf('покер') !== -1 || low.indexOf('таверн') !== -1 || low.indexOf('игр') !== -1){
+        result.navTarget = 'games';
+      } else if(low.indexOf('корабл') !== -1 || low.indexOf('звездолёт') !== -1 || low.indexOf('звездолет') !== -1){
+        result.navTarget = 'ship';
+      } else if(low.indexOf('маги') !== -1 || low.indexOf('заклинан') !== -1){
+        result.navTarget = 'magic';
+      } else if(low.indexOf('главн') !== -1 || low.indexOf('меню') !== -1 || low.indexOf('домой') !== -1){
+        result.navTarget = 'home';
+      }
+    }
+
+    return result;
+  }
+
+  function ensureLiveActionsCompleted(userText, reports, mode){
+    var intent = detectScreenAndDiceIntent(userText);
+    var outReports = Array.isArray(reports) ? reports.slice() : [];
+
+    // Если пользователь просил открыть экран (и это не перекрывается живым броском кубиков, который сам открывает dice)
+    if(intent.navTarget && (!intent.diceFormula || intent.navTarget !== 'dice')){
+      var expectedScreen = getScreenMapForMode(mode)[intent.navTarget] || intent.navTarget;
+      var curScreen = (window.view && window.view.screen) ? window.view.screen : '';
+      if(curScreen !== expectedScreen){
+        var navRep = executeSingleTask({ action: 'navigate', item: { screen: intent.navTarget } }, mode, outReports.length);
+        if(navRep) outReports.push(navRep);
+      }
+    }
+
+    // Если пользователь просил бросить кубики, проверяем, были ли реально брошены кубики вживую на экране dice
+    if(intent.diceFormula && !liveDiceRolledInBatch){
+      var diceRep = executeSingleTask({
+        action: 'roll_dice',
+        item: { formula: intent.diceFormula, label: intent.diceLabel || 'Бросок' }
+      }, mode, outReports.length);
+      if(diceRep) outReports.push(diceRep);
+    }
+
+    return outReports;
+  }
+
   function tryDeterministicFallback(userText, replyText, mode){
     var u = String(userText || '').trim();
     var lowU = u.toLowerCase();
     var combined = (u + ' ' + String(replyText || '')).toLowerCase();
     var fallbackTasks = [];
+
+    // 0. Детерминированное распознавание перехода на экран и живого броска костей
+    var navDice = detectScreenAndDiceIntent(u);
+    if(navDice.navTarget && (!navDice.diceFormula || navDice.navTarget !== 'dice')){
+      fallbackTasks.push({ action: 'navigate', item: { screen: navDice.navTarget } });
+    }
+    if(navDice.diceFormula){
+      fallbackTasks.push({ action: 'roll_dice', item: { formula: navDice.diceFormula, label: navDice.diceLabel || 'Бросок' } });
+    }
 
     // 1. Детерминированное распознавание смены темы оформления
     if(lowU.indexOf('тем') !== -1 || lowU.indexOf('оформлен') !== -1 || lowU.indexOf('theme') !== -1){
@@ -1941,6 +2282,7 @@
 
   function executeTasksBatch(tasks, mode){
     if(!Array.isArray(tasks) || tasks.length === 0) return [];
+    liveDiceRolledInBatch = false;
     var reports = [];
     tasks.forEach(function(t, idx){
       try {
@@ -1952,7 +2294,10 @@
     });
     if(reports.length > 0){
       try {
-        if(typeof window.render === 'function') window.render();
+        // Не перерисовываем экран поверх живой анимации кубиков на столе (.dice-tray)
+        if(!liveDiceRolledInBatch && typeof window.render === 'function'){
+          window.render();
+        }
         if(typeof window.paintShBar === 'function') window.paintShBar();
       } catch(e){}
     }
@@ -1975,7 +2320,7 @@
     return (
       'Ты — встроенный ИИ-Ассистент и автономный агент управления приложением «Тактический компендиум».\n' +
       'Ты обязан понимать и ВЫПОЛНЯТЬ ЛЮБОЙ запрос пользователя по факту его написания!\n' +
-      'ВАЖНЕЙШЕЕ ПРАВИЛО: Никогда не пиши в "reply", что ты что-то изменил, добавил или переключил, если ты НЕ передал соответствующую задачу в массиве "tasks"! Любое действие в приложении происходит ТОЛЬКО через массив "tasks".\n\n' +
+      'ВАЖНЕЙШЕЕ ПРАВИЛО: Никогда не пиши в "reply", что ты что-то изменил, добавил, открыл или бросил, если ты НЕ передал соответствующую задачу в массиве "tasks"! Любое действие в приложении происходит ТОЛЬКО через массив "tasks".\n\n' +
       '=== ТЕКУЩИЙ КОНТЕКСТ ПРИЛОЖЕНИЯ ===\n' +
       '• Активный раздел (mode): "' + mode + '" (' + ctx.worldName + ')\n' +
       '• Открытый сейчас экран (view.screen): "' + curScreen + '"\n' +
@@ -1983,7 +2328,7 @@
       '=== ОСМОТР DOM ОТКРЫТОГО ЭКРАНА (полей ввода на странице) ===\n' + domSnapshot + '\n\n' +
       (combinedCodeInspection ? ('=== РЕЗУЛЬТАТ АВТОМАТИЧЕСКОГО ОСМОТРА ИСХОДНОГО КОДА РАЗДЕЛА ===\n' + combinedCodeInspection + '\n\n') : '') +
       '=== ИНСТРУМЕНТЫ И ЗАДАЧИ (массив "tasks") ===\n' +
-      'Когда пользователь просит изменить любые параметры персонажа/анкеты/мира (на экране «Данные» или с любого другого экрана), добавить/удалить/изменить способности, приёмы, рецепты, заклинания, оружие, поменять тему оформления, перейти на экран или выполнить нестандартное действие — ты ОБЯЗАН вернуть соответствующие задачи в массиве "tasks":\n\n' +
+      'Когда пользователь просит изменить любые параметры персонажа/анкеты/мира (на экране «Данные» или с любого другого экрана), добавить/удалить/изменить способности, приёмы, рецепты, заклинания, оружие, поменять тему оформления, перейти на экран или бросить кубики — ты ОБЯЗАН вернуть соответствующие задачи в массиве "tasks":\n\n' +
       '1. "update_character" — универсальное изменение любых параметров персонажа, анкеты или мира в текущем разделе ("' + mode + '").\n' +
       '   Передай внутри "item" объект с любыми полями, которые нужно изменить (смотри точные ключи в JSON-слепке выше!).\n' +
       '   Примеры полей для разных разделов:\n' +
@@ -1996,18 +2341,24 @@
       '   - Звёздные войны (sw): { "name": "...", "race": "...", "path": "...", "title": "...", "level": 8, "hp": 70, "ac": 17, "force": 35, "weapon": "...", "armor": "...", "ship": "...", "notes": "...", "theme": "jedi|sith" }\n\n' +
       '2. "switch_theme" — изменить тему оформления раздела.\n' +
       '   "item": { "theme": "syndicate" } (для Ведьмака: wolf, hunt, north, nilfgaard, scoiatael, skellige, syndicate, dragon; для Mass Effect: alliance, cerberus, reaper, asari, quarian, krogan, turian, salarian, geth, aria; для Звёздных войн: jedi, sith; для Стихии: Огонь, Вода, Земля, Ветер, Тьма, Аватар; для Волшебника: Слизерин, Гриффиндор, Когтевран, Пуффендуй).\n\n' +
-      '3. "add_ability" — добавить способность / технику / знак / биотику / заклинание.\n' +
+      '3. "navigate" — вживую открыть нужный экран приложения.\n' +
+      '   "item": { "screen": "dice|data|techs|moves|skills|recipes|magic|map|ref|games|ship|home" }\n' +
+      '   (где "dice" — экран бросков костей, "data" — экран Данные/Досье, "techs" — Способности/Техники/Умения, "moves" — Боевые приёмы/Арсенал/Дуэли, "skills" — Навыки, "recipes" — Алхимия/Рецепты/Зелья, "map" — Карта, "ref" — Справка/Кодекс, "games" — Гвинт и кости, "ship" — Корабль, "home" — Главная).\n' +
+      '   ВАЖНО: Никогда не используй "run_js" для навигации по экранам — всегда используй "navigate"!\n\n' +
+      '4. "roll_dice" — вживую открыть экран бросков костей и физически бросить кубики на игровом столе.\n' +
+      '   "item": { "label": "Бросок 2d20", "formula": "2d20" } (поддерживаются любые формулы: "1d20", "2d20", "3d6+4", "1d8+1d6+2").\n' +
+      '   ВАЖНО: Задача "roll_dice" сама автоматически открывает экран костей и бросает их вживую на стол!\n\n' +
+      '5. "add_ability" — добавить способность / технику / знак / биотику / заклинание.\n' +
       '   "item": { "name": "...", "icon": "⚡", "category": "...", "actionCost": "1 действие", "cooldown": "...", "checkOrSave": "...", "dmgN": 3, "dmgD": "d8", "dmgMod": 0, "desc": "Подробное описание..." }\n\n' +
-      '4. "add_move" — добавить боевой приём / приём фехтования / дуэльный приём.\n' +
+      '6. "add_move" — добавить боевой приём / приём фехтования / дуэльный приём.\n' +
       '   "item": { "name": "...", "icon": "⚔️", "category": "...", "weaponOrStyle": "...", "attackBonus": "+6", "damageOrSave": "2d8+4", "mastery": "...", "actionCost": "...", "trigger": "...", "desc": "..." }\n\n' +
-      '5. "add_recipe" — добавить рецепт алхимии / зелье ("item": { "name": "...", "category": "potions|bombs|oils|poisons", "rarity": "Редкий", "cost": 150, "dc": 15, "time": "4 часа", "ingredients": [{"name":"...","qty":1}], "appearance": "...", "effect": "..." }).\n\n' +
-      '6. "add_spell" — добавить заклинание ("item": { "name": "...", "level": 3, "school": "evocation", "effect": "..." }).\n\n' +
-      '7. "delete_item" — удалить способность, приём или рецепт по названию или ID ("item": { "name": "..." }).\n\n' +
-      '8. "set_dom_fields" — напрямую заполнить поля ввода на текущем открытом экране по их селектору из раздела ОСМОТР DOM ("item": { "#id_или_data_field": "значение" }).\n\n' +
-      '9. "run_js" — выполнить произвольный JS-код в браузере, если задача нестандартная (например: массовое редактирование карточек, создание нового профиля, сложная модификация состояния). Доступны глобальные объекты window.CHARACTERS, window.saveCharactersToStorage, window.WI, window.SH, window.ME, window.EL, window.WZ, window.SW, window.HB, window.RECIPES, window.SPELLS, localStorage.\n' +
+      '7. "add_recipe" — добавить рецепт алхимии / зелье ("item": { "name": "...", "category": "potions|bombs|oils|poisons", "rarity": "Редкий", "cost": 150, "dc": 15, "time": "4 часа", "ingredients": [{"name":"...","qty":1}], "appearance": "...", "effect": "..." }).\n\n' +
+      '8. "add_spell" — добавить заклинание ("item": { "name": "...", "level": 3, "school": "evocation", "effect": "..." }).\n\n' +
+      '9. "delete_item" — удалить способность, приём или рецепт по названию или ID ("item": { "name": "..." }).\n\n' +
+      '10. "set_dom_fields" — напрямую заполнить поля ввода на текущем открытом экране по их селектору из раздела ОСМОТР DOM ("item": { "#id_или_data_field": "значение" }).\n\n' +
+      '11. "run_js" — выполнить произвольный JS-код в браузере, если задача нестандартная (например: массовое редактирование карточек, создание нового профиля, сложная модификация состояния). Доступны глобальные объекты window.CHARACTERS, window.saveCharactersToStorage, window.WI, window.SH, window.ME, window.EL, window.WZ, window.SW, window.HB, window.RECIPES, window.SPELLS, localStorage.\n' +
       '   "item": { "title": "Краткое название операции", "code": "...валидный JS код..." }\n\n' +
-      '10. "roll_dice" — бросить кубики ("item": { "label": "...", "formula": "2d6+4" }).\n\n' +
-      '11. ДОПОЛНИТЕЛЬНЫЙ ОСМОТР ИСХОДНОГО КОДА ("inspect_code"):\n' +
+      '12. ДОПОЛНИТЕЛЬНЫЙ ОСМОТР ИСХОДНОГО КОДА ("inspect_code"):\n' +
       '    Если для точного выполнения задачи тебе нужно заглянуть в исходный код ещё какой-либо функции или глобального объекта приложения, укажи их имена в корневом массиве "inspect_code": ["имяФункцииИлиОбъекта"].\n\n' +
       'Ответь СТРОГО валидным JSON-объектом:\n' +
       '{\n' +
@@ -2112,12 +2463,15 @@
           reports = tryDeterministicFallback(trimmed, finalParsed.reply || '', mode);
         }
 
+        // Гарантируем, что живой переход на экран и живой бросок костей на столе действительно выполнены
+        reports = ensureLiveActionsCompleted(trimmed, reports, mode);
+
         // Если запрос явно содержит команду на изменение/добавление/удаление, а reports всё ещё пуст — принудительный повтор с требованием вернуть непустой tasks
         if(reports.length === 0 && isActionIntent(trimmed)){
           busyStatusText = '⚙️ Формирую команды изменения состояния...';
           renderMessages();
           var forcePrompt = buildAgentPrompt(
-            trimmed + '\n\n[СИСТЕМНОЕ ТРЕБОВАНИЕ]: В предыдущем ответе ты вернул пустой массив "tasks": [], поэтому изменения НЕ применились! Верни НЕПУСТОЙ массив "tasks" с конкретными действиями ("update_character", "switch_theme", "add_ability", "add_move", "add_recipe", "delete_item", "set_dom_fields" или "run_js"), чтобы реально выполнить запрос пользователя в коде приложения!',
+            trimmed + '\n\n[СИСТЕМНОЕ ТРЕБОВАНИЕ]: В предыдущем ответе ты вернул пустой массив "tasks": [], поэтому изменения НЕ применились! Верни НЕПУСТОЙ массив "tasks" с конкретными действиями ("update_character", "switch_theme", "navigate", "roll_dice", "add_ability", "add_move", "add_recipe", "delete_item", "set_dom_fields" или "run_js"), чтобы реально выполнить запрос пользователя в коде приложения!',
             mode,
             ''
           );
@@ -2127,6 +2481,7 @@
             if(retryReports.length === 0){
               retryReports = tryDeterministicFallback(trimmed, retryParsed.reply || finalParsed.reply || '', mode);
             }
+            retryReports = ensureLiveActionsCompleted(trimmed, retryReports, mode);
             return {
               parsed: retryParsed.reply ? retryParsed : finalParsed,
               reports: retryReports
