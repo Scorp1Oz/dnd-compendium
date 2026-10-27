@@ -3425,3 +3425,472 @@ body.hb-theme {
     max-height: calc(100vh - 100px);
   }
 }
+
+/* ============================================================
+   ТЕМЫ КЛАССОВ ФАЭРУНА (D&D 5E / 2024 CLASS THEMES & FX)
+   ============================================================ */
+body.fae-theme {
+  --fae-accent: #c9a45c;
+  --fae-accent-bright: #fbbf24;
+  --fae-accent-dim: rgba(201, 164, 92, 0.38);
+  --fae-accent-soft: rgba(201, 164, 92, 0.14);
+  --fae-accent-glow: rgba(201, 164, 92, 0.45);
+  --fae-secondary: #b8404c;
+  --fae-secondary-glow: rgba(184, 64, 76, 0.35);
+  --fae-bg-0: #0c0f14;
+  --fae-bg-1: rgba(20, 24, 32, 0.90);
+  --fae-bg-2: rgba(28, 34, 45, 0.95);
+  --fae-radial-top: rgba(201, 164, 92, 0.14);
+  --fae-radial-bot: rgba(184, 64, 76, 0.10);
+
+  --brass: var(--fae-accent);
+  --brass-dim: var(--fae-accent-dim);
+  --crimson: var(--fae-secondary);
+  --crimson-bright: var(--fae-accent-bright);
+  --steel-0: var(--fae-bg-0);
+  --steel-1: var(--fae-bg-1);
+  --steel-2: var(--fae-bg-2);
+
+  background-color: var(--fae-bg-0) !important;
+  background-image:
+    radial-gradient(ellipse at 50% -8%, var(--fae-radial-top) 0%, transparent 62%),
+    radial-gradient(ellipse at 85% 88%, var(--fae-radial-bot) 0%, transparent 55%),
+    radial-gradient(ellipse at 12% 78%, var(--fae-accent-soft) 0%, transparent 50%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.012) 0px, rgba(255, 255, 255, 0.012) 1px, transparent 1px, transparent 28px),
+    linear-gradient(180deg, var(--fae-bg-0) 0%, #06080c 100%) !important;
+  transition: background-color 0.4s ease, color 0.3s ease;
+}
+
+/* Привязка компонентов Фаэруна к палитре выбранного класса */
+body.fae-theme .fae-hud {
+  background: linear-gradient(135deg, var(--fae-bg-1) 0%, var(--fae-bg-0) 100%);
+  border-color: var(--fae-accent-dim);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55), 0 0 22px var(--fae-accent-soft), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+body.fae-theme .fae-hud::before {
+  background: linear-gradient(90deg, transparent, var(--fae-accent), var(--fae-accent-bright), var(--fae-accent), transparent);
+}
+body.fae-theme .fae-class-badge {
+  background: var(--fae-accent-soft);
+  color: var(--fae-accent-bright);
+  border-color: var(--fae-accent-dim);
+}
+body.fae-theme .fae-hud-edit-btn {
+  background: var(--fae-accent-soft);
+  border-color: var(--fae-accent-dim);
+}
+body.fae-theme .fae-hud-edit-btn:hover {
+  background: var(--fae-accent);
+  border-color: var(--fae-accent-bright);
+  box-shadow: 0 0 14px var(--fae-accent-glow);
+}
+body.fae-theme .fae-rule {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--fae-accent-dim) 15%,
+    var(--fae-accent) calc(50% - 32px),
+    transparent calc(50% - 8px),
+    transparent calc(50% + 8px),
+    var(--fae-accent) calc(50% + 32px),
+    var(--fae-accent-dim) 85%,
+    transparent 100%
+  );
+}
+body.fae-theme .fae-rule::after {
+  color: var(--fae-accent-bright);
+  text-shadow: 0 0 8px var(--fae-accent-glow), 0 0 14px var(--fae-accent);
+}
+body.fae-theme .fae-hero-dice {
+  background: linear-gradient(135deg, var(--fae-bg-2) 0%, var(--fae-bg-1) 100%);
+  border-color: var(--fae-accent-dim);
+  border-left: 4px solid var(--fae-accent);
+}
+body.fae-theme .fae-hero-dice:hover {
+  border-color: var(--fae-accent-bright);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.48), 0 0 18px var(--fae-accent-glow);
+}
+body.fae-theme .fae-hero-dice-arrow,
+body.fae-theme .fae-card-arrow {
+  color: var(--fae-accent-bright);
+}
+body.fae-theme .fae-hero-dice-icon svg {
+  filter: drop-shadow(0 2px 10px var(--fae-accent-glow));
+}
+body.fae-theme .fae-card {
+  background: linear-gradient(135deg, var(--fae-bg-1) 0%, rgba(12, 15, 22, 0.94) 100%);
+  border-left: 3px solid var(--fae-accent-dim);
+}
+body.fae-theme .fae-card:hover {
+  border-color: var(--fae-accent-dim);
+  border-left-color: var(--fae-accent-bright);
+  background: linear-gradient(135deg, var(--fae-bg-2) 0%, var(--fae-bg-1) 100%);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45), 0 0 16px var(--fae-accent-soft);
+}
+body.fae-theme .fae-data-section,
+body.fae-theme .fae-data-card,
+body.fae-theme .fae-ref-card {
+  border-color: var(--fae-accent-dim);
+}
+body.fae-theme .fae-ref-card:hover {
+  border-color: var(--fae-accent-bright);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 0 12px var(--fae-accent-soft);
+}
+body.fae-theme .fae-ref-card-k,
+body.fae-theme .section-label {
+  color: var(--fae-accent-bright);
+}
+body.fae-theme .fae-sheet-tab {
+  border-color: var(--fae-accent-dim);
+}
+body.fae-theme .fae-sheet-tab:hover {
+  border-color: var(--fae-accent-bright);
+  color: #ffffff;
+}
+body.fae-theme .fae-sheet-tab.active {
+  background: linear-gradient(135deg, var(--fae-accent-soft), var(--fae-bg-2));
+  border-color: var(--fae-accent-bright);
+  color: var(--fae-accent-bright);
+  box-shadow: 0 0 14px var(--fae-accent-soft);
+}
+body.fae-theme .sh-launcher {
+  border-color: var(--fae-accent-dim);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 18px var(--fae-accent-soft);
+}
+body.fae-theme .sh-launcher-head {
+  border-bottom-color: var(--fae-accent-dim);
+}
+body.fae-theme .sh-launcher-title {
+  color: var(--fae-accent-bright);
+}
+
+/* Фоновый слой атмосферы и летающих элементов класса Фаэруна */
+#faeThemeFx {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  transition: opacity 0.45s ease;
+}
+
+.fae-fx-aura {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 38%, var(--fae-accent-soft) 0%, transparent 58%),
+    radial-gradient(circle at 82% 18%, var(--fae-secondary-glow) 0%, transparent 45%);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.fae-fx-mist {
+  position: absolute;
+  inset: -15% -25%;
+  background: radial-gradient(ellipse at 50% 65%, var(--fae-accent-soft) 0%, transparent 65%);
+  opacity: 0.45;
+  filter: blur(36px);
+  animation: faeMistDrift 22s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes faeMistDrift {
+  0% { transform: translate3d(-3%, -2%, 0) scale(0.98); }
+  100% { transform: translate3d(3%, 2%, 0) scale(1.04); }
+}
+
+/* Центральная и угловая декоративная эмблема класса на заднем фоне */
+.fae-bg-crest-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fae-bg-crest-main {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 550px;
+  max-width: 88vw;
+  height: 550px;
+  opacity: 0.085;
+  color: var(--fae-accent-bright);
+  filter: drop-shadow(0 0 32px var(--fae-accent-glow)) drop-shadow(0 0 64px var(--fae-secondary-glow));
+  animation: faeCrestPulse 9s ease-in-out infinite alternate;
+}
+
+.fae-bg-crest-main svg,
+.fae-bg-crest-corner svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fae-bg-crest-main.spin-slow svg .fae-spin-ring {
+  transform-origin: 100px 100px;
+  animation: faeCrestSpinSlow 48s linear infinite;
+}
+
+.fae-bg-crest-main.spin-slow svg .fae-spin-ring-rev {
+  transform-origin: 100px 100px;
+  animation: faeCrestSpinSlow 36s linear infinite reverse;
+}
+
+.fae-bg-crest-corner {
+  position: absolute;
+  bottom: -40px;
+  right: -40px;
+  width: 310px;
+  height: 310px;
+  opacity: 0.05;
+  color: var(--fae-accent);
+  filter: drop-shadow(0 0 24px var(--fae-accent-glow));
+  transform: rotate(-14deg);
+}
+
+@keyframes faeCrestPulse {
+  0% { transform: translate(-50%, -50%) scale(0.97); opacity: 0.065; }
+  100% { transform: translate(-50%, -50%) scale(1.03); opacity: 0.11; }
+}
+
+@keyframes faeCrestSpinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Летающие классовые символы */
+.fae-bg-signs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fae-flying-symbol {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  color: var(--fae-accent-bright);
+  filter: drop-shadow(0 0 4px var(--fae-accent)) drop-shadow(0 0 10px var(--fae-accent-glow));
+}
+
+.fae-flying-symbol.alt-color {
+  color: var(--fae-secondary);
+  filter: drop-shadow(0 0 4px var(--fae-secondary)) drop-shadow(0 0 10px var(--fae-secondary-glow));
+}
+
+.fae-flying-symbol svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fae-dir-up-right { animation-name: faeDriftUpRight; }
+.fae-dir-up-left { animation-name: faeDriftUpLeft; }
+.fae-dir-down-right { animation-name: faeDriftDownRight; }
+.fae-dir-down-left { animation-name: faeDriftDownLeft; }
+.fae-dir-cross { animation-name: faeDriftCross; }
+.fae-dir-wave { animation-name: faeDriftWave; }
+.fae-dir-fall-right { animation-name: faeFallRight; }
+.fae-dir-fall-left { animation-name: faeFallLeft; }
+
+@keyframes faeDriftUpRight {
+  0% { transform: translate(0, 0) scale(0.88) rotate(0deg); opacity: 0; }
+  16% { opacity: 0.62; }
+  50% { transform: translate(72px, -38vh) scale(1.05) rotate(14deg); opacity: 0.78; }
+  84% { opacity: 0.58; }
+  100% { transform: translate(145px, -78vh) scale(0.88) rotate(26deg); opacity: 0; }
+}
+
+@keyframes faeDriftUpLeft {
+  0% { transform: translate(0, 0) scale(0.88) rotate(0deg); opacity: 0; }
+  16% { opacity: 0.62; }
+  50% { transform: translate(-75px, -40vh) scale(1.05) rotate(-15deg); opacity: 0.78; }
+  84% { opacity: 0.58; }
+  100% { transform: translate(-150px, -80vh) scale(0.88) rotate(-28deg); opacity: 0; }
+}
+
+@keyframes faeDriftDownRight {
+  0% { transform: translate(0, 0) scale(0.88) rotate(0deg); opacity: 0; }
+  16% { opacity: 0.60; }
+  50% { transform: translate(68px, 38vh) scale(1.04) rotate(-12deg); opacity: 0.75; }
+  84% { opacity: 0.56; }
+  100% { transform: translate(136px, 76vh) scale(0.88) rotate(-22deg); opacity: 0; }
+}
+
+@keyframes faeDriftDownLeft {
+  0% { transform: translate(0, 0) scale(0.88) rotate(0deg); opacity: 0; }
+  16% { opacity: 0.60; }
+  50% { transform: translate(-68px, 40vh) scale(1.04) rotate(14deg); opacity: 0.75; }
+  84% { opacity: 0.56; }
+  100% { transform: translate(-138px, 78vh) scale(0.88) rotate(24deg); opacity: 0; }
+}
+
+@keyframes faeDriftCross {
+  0% { transform: translate(0, 0) scale(0.86) rotate(-8deg); opacity: 0; }
+  18% { opacity: 0.64; }
+  50% { transform: translate(92px, -28vh) scale(1.06) rotate(10deg); opacity: 0.80; }
+  82% { opacity: 0.60; }
+  100% { transform: translate(180px, -56vh) scale(0.90) rotate(22deg); opacity: 0; }
+}
+
+@keyframes faeDriftWave {
+  0% { transform: translate(0, 0) scale(0.90) rotate(0deg); opacity: 0; }
+  20% { transform: translate(-34px, -18vh) scale(1.02) rotate(-10deg); opacity: 0.68; }
+  50% { transform: translate(28px, -42vh) scale(1.06) rotate(12deg); opacity: 0.80; }
+  80% { transform: translate(-26px, -66vh) scale(0.96) rotate(-8deg); opacity: 0.62; }
+  100% { transform: translate(18px, -88vh) scale(0.88) rotate(6deg); opacity: 0; }
+}
+
+@keyframes faeFallRight {
+  0% { transform: translate(0, 0) rotate(0deg) scale(0.90); opacity: 0; }
+  14% { opacity: 0.68; }
+  50% { transform: translate(32px, 52vh) rotate(140deg) scale(1.02); opacity: 0.78; }
+  86% { opacity: 0.64; }
+  100% { transform: translate(-14px, 108vh) rotate(290deg) scale(0.90); opacity: 0; }
+}
+
+@keyframes faeFallLeft {
+  0% { transform: translate(0, 0) rotate(0deg) scale(0.90); opacity: 0; }
+  14% { opacity: 0.68; }
+  50% { transform: translate(-34px, 52vh) rotate(-140deg) scale(1.02); opacity: 0.78; }
+  86% { opacity: 0.64; }
+  100% { transform: translate(16px, 108vh) rotate(-290deg) scale(0.90); opacity: 0; }
+}
+
+/* Парящие искры / частицы стихии класса */
+.fae-ember {
+  position: absolute;
+  bottom: -16px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  animation: faeEmberRise linear infinite;
+}
+
+@keyframes faeEmberRise {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.7);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.85;
+  }
+  55% {
+    transform: translateY(-52vh) translateX(22px) scale(1.05);
+    opacity: 0.75;
+  }
+  85% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translateY(-106vh) translateX(-18px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+/* Карточки выбора классовой темы в разделе «Данные & Кампания» */
+.fae-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.fae-theme-option-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 13px;
+  border-radius: 8px;
+  background: rgba(13, 17, 24, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-left: 3px solid var(--fae-chip-accent, #c9a45c);
+  color: #e2e8f0;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.fae-theme-option-card:hover {
+  background: rgba(24, 30, 42, 0.96);
+  border-color: var(--fae-chip-accent, #c9a45c);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 0 14px var(--fae-chip-glow, rgba(201, 164, 92, 0.35));
+  transform: translateY(-1px);
+}
+
+.fae-theme-option-card.active {
+  background: linear-gradient(135deg, rgba(28, 35, 48, 0.96), rgba(14, 18, 26, 0.98));
+  border-color: var(--fae-chip-accent, #c9a45c);
+  border-left-width: 4px;
+  box-shadow: 0 0 18px var(--fae-chip-glow, rgba(201, 164, 92, 0.4)), inset 0 0 12px rgba(255, 255, 255, 0.04);
+}
+
+.fae-theme-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  flex-shrink: 0;
+  color: var(--fae-chip-accent, #c9a45c);
+  box-shadow: 0 0 10px var(--fae-chip-glow, rgba(201, 164, 92, 0.25));
+}
+
+.fae-theme-card-icon svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.fae-theme-card-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.fae-theme-card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fae-theme-option-card.active .fae-theme-card-title {
+  color: var(--fae-chip-accent, #fbbf24);
+}
+
+.fae-theme-card-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.fae-theme-card-dot {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--fae-chip-accent, #fbbf24);
+  flex-shrink: 0;
+}

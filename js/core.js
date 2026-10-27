@@ -2163,6 +2163,7 @@ function render(){
     view.screen = 'alchemyRef';
   }
   updateHomeScreenLock(view.screen);
+  if(typeof applyFaerunTheme === 'function') applyFaerunTheme();
   const app = document.getElementById('app');
   app.classList.toggle('wide', view.screen === 'map');
   app.classList.toggle('home-wide', view.screen === 'home');
@@ -10003,6 +10004,783 @@ function wireFaeRef(){
   }
 }
 
+/* ============================================================
+   ТЕМЫ КЛАССОВ ФАЭРУНА (14 КЛАССОВ D&D + КЛАССИКА)
+   ============================================================ */
+var FAE_THEME_STORAGE_KEY = 'ttc_fae_theme';
+
+var FAE_THEMES = [
+  {
+    id: 'faerun',
+    title: 'Побережье Мечей',
+    sub: 'Классическое золото и латунь Фаэруна',
+    icon: '🐉',
+    accent: '#c9a45c',
+    accentBright: '#fbbf24',
+    accentDim: 'rgba(201,164,92,0.40)',
+    accentSoft: 'rgba(201,164,92,0.14)',
+    glow: 'rgba(201,164,92,0.45)',
+    secondary: '#b8404c',
+    secondaryGlow: 'rgba(184,64,76,0.35)',
+    bg0: '#0c0f14',
+    bg1: 'rgba(20,24,32,0.90)',
+    bg2: 'rgba(28,34,45,0.95)',
+    radialTop: 'rgba(201,164,92,0.15)',
+    radialBot: 'rgba(184,64,76,0.10)',
+    ember1: '#fbbf24',
+    ember2: '#f87171',
+    spin: true,
+    toast: '🐉 Тема Фаэруна: Побережье Мечей • Классика D&D'
+  },
+  {
+    id: 'barbarian',
+    title: 'Варвар',
+    sub: 'Первобытная Ярость • Багровый уголь и секиры',
+    icon: '🪓',
+    accent: '#ef4444',
+    accentBright: '#f97316',
+    accentDim: 'rgba(239,68,68,0.42)',
+    accentSoft: 'rgba(239,68,68,0.15)',
+    glow: 'rgba(239,68,68,0.48)',
+    secondary: '#ea580c',
+    secondaryGlow: 'rgba(249,115,22,0.40)',
+    bg0: '#120808',
+    bg1: 'rgba(28,13,13,0.92)',
+    bg2: 'rgba(40,18,16,0.96)',
+    radialTop: 'rgba(239,68,68,0.20)',
+    radialBot: 'rgba(249,115,22,0.14)',
+    ember1: '#f97316',
+    ember2: '#ef4444',
+    spin: false,
+    toast: '🪓 Тема класса: Варвар • Первобытная Ярость'
+  },
+  {
+    id: 'bard',
+    title: 'Бард',
+    sub: 'Коллегия Вдохновения • Пурпурный бархат и ноты',
+    icon: '🎻',
+    accent: '#c084fc',
+    accentBright: '#f472b6',
+    accentDim: 'rgba(192,132,252,0.42)',
+    accentSoft: 'rgba(192,132,252,0.15)',
+    glow: 'rgba(192,132,252,0.48)',
+    secondary: '#fbbf24',
+    secondaryGlow: 'rgba(251,191,36,0.38)',
+    bg0: '#100a19',
+    bg1: 'rgba(25,16,38,0.91)',
+    bg2: 'rgba(36,22,54,0.96)',
+    radialTop: 'rgba(192,132,252,0.18)',
+    radialBot: 'rgba(244,114,182,0.13)',
+    ember1: '#f472b6',
+    ember2: '#fde047',
+    spin: false,
+    toast: '🎻 Тема класса: Бард • Симфония Вдохновения'
+  },
+  {
+    id: 'cleric',
+    title: 'Жрец',
+    sub: 'Божественное Сияние • Храмовое золото и перья света',
+    icon: '☀️',
+    accent: '#eab308',
+    accentBright: '#fef08a',
+    accentDim: 'rgba(234,179,8,0.44)',
+    accentSoft: 'rgba(250,204,21,0.15)',
+    glow: 'rgba(250,204,21,0.50)',
+    secondary: '#38bdf8',
+    secondaryGlow: 'rgba(56,189,248,0.35)',
+    bg0: '#111009',
+    bg1: 'rgba(27,24,14,0.91)',
+    bg2: 'rgba(38,34,19,0.96)',
+    radialTop: 'rgba(250,204,21,0.20)',
+    radialBot: 'rgba(254,240,138,0.12)',
+    ember1: '#fef08a',
+    ember2: '#fbbf24',
+    spin: true,
+    toast: '☀️ Тема класса: Жрец • Священный Свет Небожителей'
+  },
+  {
+    id: 'druid',
+    title: 'Друид',
+    sub: 'Круг Дикой Природы • Изумрудная чаща и листва',
+    icon: '🌿',
+    accent: '#10b981',
+    accentBright: '#4ade80',
+    accentDim: 'rgba(16,185,129,0.42)',
+    accentSoft: 'rgba(16,185,129,0.15)',
+    glow: 'rgba(16,185,129,0.48)',
+    secondary: '#a3e635',
+    secondaryGlow: 'rgba(163,230,53,0.36)',
+    bg0: '#07120d',
+    bg1: 'rgba(12,28,20,0.91)',
+    bg2: 'rgba(17,39,28,0.96)',
+    radialTop: 'rgba(16,185,129,0.18)',
+    radialBot: 'rgba(132,204,22,0.12)',
+    ember1: '#4ade80',
+    ember2: '#bef264',
+    spin: false,
+    toast: '🌿 Тема класса: Друид • Дыхание Древней Рощи'
+  },
+  {
+    id: 'fighter',
+    title: 'Воин',
+    sub: 'Мастер Боя • Воронёная сталь, бронза и клинки',
+    icon: '⚔️',
+    accent: '#94a3b8',
+    accentBright: '#e2e8f0',
+    accentDim: 'rgba(148,163,184,0.42)',
+    accentSoft: 'rgba(148,163,184,0.14)',
+    glow: 'rgba(226,232,240,0.42)',
+    secondary: '#dc2626',
+    secondaryGlow: 'rgba(220,38,38,0.38)',
+    bg0: '#0b0e13',
+    bg1: 'rgba(19,24,32,0.92)',
+    bg2: 'rgba(28,35,46,0.96)',
+    radialTop: 'rgba(148,163,184,0.17)',
+    radialBot: 'rgba(220,38,38,0.13)',
+    ember1: '#e2e8f0',
+    ember2: '#f87171',
+    spin: false,
+    toast: '⚔️ Тема класса: Воин • Сталь и Превосходство'
+  },
+  {
+    id: 'monk',
+    title: 'Монах',
+    sub: 'Путь Энергии Ци • Нефритовый лотос и потоки ветра',
+    icon: '👊',
+    accent: '#06b6d4',
+    accentBright: '#67e8f9',
+    accentDim: 'rgba(6,182,212,0.42)',
+    accentSoft: 'rgba(6,182,212,0.15)',
+    glow: 'rgba(34,211,238,0.48)',
+    secondary: '#2dd4bf',
+    secondaryGlow: 'rgba(45,212,191,0.38)',
+    bg0: '#061116',
+    bg1: 'rgba(11,26,34,0.91)',
+    bg2: 'rgba(16,37,48,0.96)',
+    radialTop: 'rgba(6,182,212,0.19)',
+    radialBot: 'rgba(45,212,191,0.13)',
+    ember1: '#67e8f9',
+    ember2: '#5eead4',
+    spin: true,
+    toast: '👊 Тема класса: Монах • Гармония Потоков Ци'
+  },
+  {
+    id: 'paladin',
+    title: 'Паладин',
+    sub: 'Священная Клятва • Платиновый щит и Божественная Кара',
+    icon: '🛡️',
+    accent: '#f59e0b',
+    accentBright: '#fde047',
+    accentDim: 'rgba(245,158,11,0.44)',
+    accentSoft: 'rgba(253,224,71,0.15)',
+    glow: 'rgba(253,224,71,0.50)',
+    secondary: '#60a5fa',
+    secondaryGlow: 'rgba(96,165,250,0.40)',
+    bg0: '#0a0f18',
+    bg1: 'rgba(16,24,38,0.92)',
+    bg2: 'rgba(24,34,52,0.96)',
+    radialTop: 'rgba(253,224,71,0.18)',
+    radialBot: 'rgba(96,165,250,0.15)',
+    ember1: '#fde047',
+    ember2: '#93c5fd',
+    spin: false,
+    toast: '🛡️ Тема класса: Паладин • Сияние Священной Клятвы'
+  },
+  {
+    id: 'ranger',
+    title: 'Следопыт',
+    sub: 'Охотник Пограничья • Хвойный туман и стрелы',
+    icon: '🏹',
+    accent: '#22c55e',
+    accentBright: '#86efac',
+    accentDim: 'rgba(34,197,94,0.40)',
+    accentSoft: 'rgba(34,197,94,0.14)',
+    glow: 'rgba(34,197,94,0.45)',
+    secondary: '#d97706',
+    secondaryGlow: 'rgba(217,119,6,0.38)',
+    bg0: '#08110a',
+    bg1: 'rgba(14,26,17,0.92)',
+    bg2: 'rgba(21,37,25,0.96)',
+    radialTop: 'rgba(34,197,94,0.17)',
+    radialBot: 'rgba(217,119,6,0.13)',
+    ember1: '#86efac',
+    ember2: '#fbbf24',
+    spin: false,
+    toast: '🏹 Тема класса: Следопыт • Тропа Дикого Охотника'
+  },
+  {
+    id: 'rogue',
+    title: 'Плут',
+    sub: 'Тень Гильдии • Полуночный клинок, яд и золото',
+    icon: '🗡️',
+    accent: '#a855f7',
+    accentBright: '#d8b4fe',
+    accentDim: 'rgba(168,85,247,0.42)',
+    accentSoft: 'rgba(168,85,247,0.14)',
+    glow: 'rgba(168,85,247,0.46)',
+    secondary: '#f43f5e',
+    secondaryGlow: 'rgba(244,63,94,0.38)',
+    bg0: '#09070f',
+    bg1: 'rgba(17,13,26,0.93)',
+    bg2: 'rgba(26,20,38,0.97)',
+    radialTop: 'rgba(168,85,247,0.17)',
+    radialBot: 'rgba(244,63,94,0.12)',
+    ember1: '#d8b4fe',
+    ember2: '#fb7185',
+    spin: false,
+    toast: '🗡️ Тема класса: Плут • Шёпот Ночных Теней'
+  },
+  {
+    id: 'sorcerer',
+    title: 'Чародей',
+    sub: 'Первородная Искра • Буря Дикой Магии и астрал',
+    icon: '🔥',
+    accent: '#ec4899',
+    accentBright: '#f472b6',
+    accentDim: 'rgba(236,72,153,0.44)',
+    accentSoft: 'rgba(236,72,153,0.15)',
+    glow: 'rgba(236,72,153,0.50)',
+    secondary: '#8b5cf6',
+    secondaryGlow: 'rgba(139,92,246,0.42)',
+    bg0: '#120714',
+    bg1: 'rgba(28,12,32,0.92)',
+    bg2: 'rgba(40,17,46,0.96)',
+    radialTop: 'rgba(236,72,153,0.20)',
+    radialBot: 'rgba(139,92,246,0.16)',
+    ember1: '#f472b6',
+    ember2: '#a78bfa',
+    spin: true,
+    toast: '🔥 Тема класса: Чародей • Всплеск Первородной Магии'
+  },
+  {
+    id: 'warlock',
+    title: 'Колдун',
+    sub: 'Договор Покровителя • Око Бездны и мистический огонь',
+    icon: '👁️',
+    accent: '#9333ea',
+    accentBright: '#c084fc',
+    accentDim: 'rgba(147,51,234,0.44)',
+    accentSoft: 'rgba(147,51,234,0.16)',
+    glow: 'rgba(168,85,247,0.50)',
+    secondary: '#10b981',
+    secondaryGlow: 'rgba(16,185,129,0.42)',
+    bg0: '#090612',
+    bg1: 'rgba(18,11,31,0.93)',
+    bg2: 'rgba(27,16,45,0.97)',
+    radialTop: 'rgba(147,51,234,0.20)',
+    radialBot: 'rgba(16,185,129,0.15)',
+    ember1: '#c084fc',
+    ember2: '#34d399',
+    spin: true,
+    toast: '👁️ Тема класса: Колдун • Тайный Пакт Покровителя'
+  },
+  {
+    id: 'wizard',
+    title: 'Волшебник',
+    sub: 'Плетение Мистры • Арканный сапфир, гримуар и руны',
+    icon: '📖',
+    accent: '#3b82f6',
+    accentBright: '#60a5fa',
+    accentDim: 'rgba(59,130,246,0.44)',
+    accentSoft: 'rgba(59,130,246,0.15)',
+    glow: 'rgba(59,130,246,0.50)',
+    secondary: '#818cf8',
+    secondaryGlow: 'rgba(129,140,248,0.40)',
+    bg0: '#070b16',
+    bg1: 'rgba(13,20,38,0.92)',
+    bg2: 'rgba(19,30,54,0.96)',
+    radialTop: 'rgba(59,130,246,0.20)',
+    radialBot: 'rgba(129,140,248,0.14)',
+    ember1: '#60a5fa',
+    ember2: '#a5b4fc',
+    spin: true,
+    toast: '📖 Тема класса: Волшебник • Высшее Плетение Мистры'
+  },
+  {
+    id: 'artificer',
+    title: 'Изобретатель',
+    sub: 'Эфирная Кузня • Медные шестерни и разряды инфузий',
+    icon: '⚙️',
+    accent: '#f59e0b',
+    accentBright: '#38bdf8',
+    accentDim: 'rgba(245,158,11,0.42)',
+    accentSoft: 'rgba(56,189,248,0.14)',
+    glow: 'rgba(56,189,248,0.48)',
+    secondary: '#06b6d4',
+    secondaryGlow: 'rgba(6,182,212,0.42)',
+    bg0: '#0a0f14',
+    bg1: 'rgba(17,24,33,0.92)',
+    bg2: 'rgba(25,35,47,0.96)',
+    radialTop: 'rgba(245,158,11,0.17)',
+    radialBot: 'rgba(6,182,212,0.16)',
+    ember1: '#38bdf8',
+    ember2: '#fbbf24',
+    spin: true,
+    toast: '⚙️ Тема класса: Изобретатель • Техномагия и Шестерни'
+  },
+  {
+    id: 'bloodhunter',
+    title: 'Кровавый охотник',
+    sub: 'Орден Гемокрафтии • Алый обряд, рубин и пепел',
+    icon: '🩸',
+    accent: '#e11d48',
+    accentBright: '#fb7185',
+    accentDim: 'rgba(225,29,72,0.44)',
+    accentSoft: 'rgba(225,29,72,0.16)',
+    glow: 'rgba(225,29,72,0.52)',
+    secondary: '#9f1239',
+    secondaryGlow: 'rgba(159,18,57,0.42)',
+    bg0: '#100609',
+    bg1: 'rgba(26,10,16,0.93)',
+    bg2: 'rgba(38,14,23,0.97)',
+    radialTop: 'rgba(225,29,72,0.21)',
+    radialBot: 'rgba(159,18,57,0.15)',
+    ember1: '#fb7185',
+    ember2: '#e11d48',
+    spin: false,
+    toast: '🩸 Тема класса: Кровавый охотник • Печать Алого Обряда'
+  }
+];
+
+function getFaerunTheme(){
+  try {
+    var saved = localStorage.getItem(FAE_THEME_STORAGE_KEY);
+    if(saved && FAE_THEMES.some(function(t){ return t.id === saved; })) return saved;
+  } catch(e){}
+  return 'faerun';
+}
+
+function resolveFaerunThemeId(raw){
+  var s = String(raw || '').trim().toLowerCase();
+  if(!s) return 'faerun';
+  var exact = FAE_THEMES.find(function(t){ return t.id === s; });
+  if(exact) return exact.id;
+  if(s.indexOf('варвар') !== -1 || s.indexOf('barbarian') !== -1) return 'barbarian';
+  if(s.indexOf('бард') !== -1 || s.indexOf('bard') !== -1) return 'bard';
+  if(s.indexOf('жрец') !== -1 || s.indexOf('клирик') !== -1 || s.indexOf('cleric') !== -1) return 'cleric';
+  if(s.indexOf('друид') !== -1 || s.indexOf('druid') !== -1) return 'druid';
+  if(s.indexOf('воин') !== -1 || s.indexOf('fighter') !== -1) return 'fighter';
+  if(s.indexOf('монах') !== -1 || s.indexOf('monk') !== -1) return 'monk';
+  if(s.indexOf('паладин') !== -1 || s.indexOf('paladin') !== -1) return 'paladin';
+  if(s.indexOf('следопыт') !== -1 || s.indexOf('рейнджер') !== -1 || s.indexOf('ranger') !== -1) return 'ranger';
+  if(s.indexOf('плут') !== -1 || s.indexOf('вор') !== -1 || s.indexOf('разбойник') !== -1 || s.indexOf('rogue') !== -1) return 'rogue';
+  if(s.indexOf('чародей') !== -1 || s.indexOf('sorcerer') !== -1) return 'sorcerer';
+  if(s.indexOf('колдун') !== -1 || s.indexOf('чернокнижник') !== -1 || s.indexOf('warlock') !== -1) return 'warlock';
+  if(s.indexOf('волшебник') !== -1 || s.indexOf('маг') !== -1 || s.indexOf('wizard') !== -1) return 'wizard';
+  if(s.indexOf('изобретатель') !== -1 || s.indexOf('артифисер') !== -1 || s.indexOf('artificer') !== -1) return 'artificer';
+  if(s.indexOf('кровав') !== -1 || s.indexOf('blood') !== -1) return 'bloodhunter';
+  return 'faerun';
+}
+
+function setFaerunTheme(themeName){
+  var id = resolveFaerunThemeId(themeName);
+  try {
+    localStorage.setItem(FAE_THEME_STORAGE_KEY, id);
+  } catch(e){}
+  applyFaerunTheme();
+  return id;
+}
+window.getFaerunTheme = getFaerunTheme;
+window.setFaerunTheme = setFaerunTheme;
+window.FAE_THEMES = FAE_THEMES;
+
+function buildFaerunClassCrestSvg(themeId){
+  switch(themeId){
+    case 'barbarian':
+      /* Двулезвийная боевая секира Варвара, руны Ярости и тотемное кольцо */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<circle cx="100" cy="100" r="86" stroke-dasharray="10 6" opacity="0.45"/>' +
+        '<polygon points="100,12 122,40 160,30 146,68 184,86 152,112 170,152 130,148 116,186 100,156 84,186 70,148 30,152 48,112 16,86 54,68 40,30 78,40" opacity="0.28" fill="currentColor" fill-opacity="0.05"/>' +
+        '<line x1="42" y1="158" x2="158" y2="42" stroke-width="5"/>' +
+        '<line x1="158" y1="158" x2="42" y2="42" stroke-width="5"/>' +
+        '<path d="M126 36 C152 20, 178 46, 164 74 C148 60, 138 50, 126 36 Z" fill="currentColor" fill-opacity="0.18" stroke-width="3"/>' +
+        '<path d="M74 36 C48 20, 22 46, 36 74 C52 60, 62 50, 74 36 Z" fill="currentColor" fill-opacity="0.18" stroke-width="3"/>' +
+        '<path d="M164 74 C180 60, 186 92, 152 104 C146 88, 152 80, 164 74 Z" fill="currentColor" fill-opacity="0.14"/>' +
+        '<path d="M36 74 C20 60, 14 92, 48 104 C54 88, 48 80, 36 74 Z" fill="currentColor" fill-opacity="0.14"/>' +
+        '<circle cx="100" cy="100" r="22" fill="currentColor" fill-opacity="0.16" stroke-width="3"/>' +
+        '<path d="M90 96 L96 102 M110 96 L104 102 M92 110 Q100 104 108 110" stroke-width="2.6"/>' +
+      '</svg>';
+    case 'bard':
+      /* Королевская Лира Арфистов, созвездия и скрипичный ключ */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<circle cx="100" cy="100" r="88" stroke-opacity="0.35" stroke-dasharray="4 6"/>' +
+        '<circle cx="100" cy="100" r="74" stroke-opacity="0.25"/>' +
+        '<path d="M62 152 L138 152 L128 166 L72 166 Z" fill="currentColor" fill-opacity="0.16"/>' +
+        '<path d="M68 152 C42 118, 46 62, 76 42 C64 70, 68 108, 84 152" stroke-width="3.2" fill="currentColor" fill-opacity="0.12"/>' +
+        '<path d="M132 152 C158 118, 154 62, 124 42 C136 70, 132 108, 116 152" stroke-width="3.2" fill="currentColor" fill-opacity="0.12"/>' +
+        '<path d="M66 56 Q100 40 134 56" stroke-width="3"/>' +
+        '<line x1="88" y1="52" x2="88" y2="152" stroke-opacity="0.65"/>' +
+        '<line x1="96" y1="50" x2="96" y2="152" stroke-opacity="0.65"/>' +
+        '<line x1="104" y1="50" x2="104" y2="152" stroke-opacity="0.65"/>' +
+        '<line x1="112" y1="52" x2="112" y2="152" stroke-opacity="0.65"/>' +
+        '<path d="M100 22 L104 32 L114 36 L104 40 L100 50 L96 40 L86 36 L96 32 Z" fill="currentColor" fill-opacity="0.25"/>' +
+      '</svg>';
+    case 'cleric':
+      /* Сияющий солнечный нимб и крылья небожителя */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<g class="fae-spin-ring">' +
+          '<circle cx="100" cy="100" r="86" stroke-dasharray="6 6" opacity="0.45"/>' +
+          '<polygon points="100,8 112,38 146,20 136,54 172,54 148,82 184,100 148,118 172,146 136,146 146,180 112,162 100,192 88,162 54,180 64,146 28,146 52,118 16,100 52,82 28,54 64,54 54,20 88,38" opacity="0.24" fill="currentColor" fill-opacity="0.06"/>' +
+        '</g>' +
+        '<path d="M82 106 C50 96, 26 70, 22 40 C44 54, 66 64, 86 78 C56 76, 34 62, 26 48" stroke-width="2.6" fill="currentColor" fill-opacity="0.14"/>' +
+        '<path d="M118 106 C150 96, 174 70, 178 40 C156 54, 134 64, 114 78 C144 76, 166 62, 174 48" stroke-width="2.6" fill="currentColor" fill-opacity="0.14"/>' +
+        '<circle cx="100" cy="100" r="30" fill="currentColor" fill-opacity="0.18" stroke-width="3"/>' +
+        '<path d="M100 46 L100 154 M54 100 L146 100" stroke-width="3.8"/>' +
+        '<circle cx="100" cy="100" r="10" fill="currentColor" fill-opacity="0.35"/>' +
+      '</svg>';
+    case 'druid':
+      /* Мировое Древо, полумесяц и круг природы */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<circle cx="100" cy="100" r="84" opacity="0.45"/>' +
+        '<circle cx="100" cy="100" r="76" stroke-dasharray="8 5" opacity="0.35"/>' +
+        '<path d="M100 166 L100 86" stroke-width="5"/>' +
+        '<path d="M100 144 C82 154, 64 166, 54 176 M100 144 C118 154, 136 166, 146 176 M100 156 C88 166, 78 176, 72 182 M100 156 C112 166, 122 176, 128 182" stroke-width="2.5"/>' +
+        '<path d="M100 96 C78 82, 58 64, 52 44 M100 96 C122 82, 142 64, 148 44 M100 80 C84 62, 76 44, 78 28 M100 80 C116 62, 124 44, 122 28" stroke-width="2.8"/>' +
+        '<circle cx="100" cy="68" r="44" fill="currentColor" fill-opacity="0.12" stroke-dasharray="5 4"/>' +
+        '<path d="M74 34 A34 34 0 1 0 126 34 A26 26 0 1 1 74 34 Z" fill="currentColor" fill-opacity="0.22"/>' +
+      '</svg>';
+    case 'fighter':
+      /* Рыцарский щит и скрещённые двуручные мечи Мастера Боя */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' +
+        '<circle cx="100" cy="100" r="86" stroke-opacity="0.3" stroke-dasharray="12 6"/>' +
+        '<line x1="34" y1="166" x2="166" y2="34" stroke-width="4.2"/>' +
+        '<line x1="166" y1="166" x2="34" y2="34" stroke-width="4.2"/>' +
+        '<line x1="42" y1="138" x2="62" y2="158" stroke-width="3.5"/>' +
+        '<line x1="158" y1="138" x2="138" y2="158" stroke-width="3.5"/>' +
+        '<path d="M56 46 L100 30 L144 46 L144 104 C144 138, 100 164, 100 172 C100 164, 56 138, 56 104 Z" fill="currentColor" fill-opacity="0.15" stroke-width="3"/>' +
+        '<path d="M68 56 L100 44 L132 56 L132 102 C132 128, 100 148, 100 154 C100 148, 68 128, 68 102 Z" stroke-opacity="0.55"/>' +
+        '<polygon points="100,62 110,92 130,92 114,108 120,134 100,118 80,134 86,108 70,92 90,92" fill="currentColor" fill-opacity="0.22"/>' +
+      '</svg>';
+    case 'monk':
+      /* Восьмиугольник Багуа, священный лотос и символ Ци */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<g class="fae-spin-ring">' +
+          '<polygon points="100,10 164,36 190,100 164,164 100,190 36,164 10,100 36,36" stroke-width="2.2" opacity="0.45"/>' +
+          '<circle cx="100" cy="100" r="76" stroke-dasharray="6 6" opacity="0.4"/>' +
+        '</g>' +
+        '<path d="M100 34 C116 58, 116 82, 100 100 C84 82, 84 58, 100 34 Z" fill="currentColor" fill-opacity="0.14"/>' +
+        '<path d="M100 166 C116 142, 116 118, 100 100 C84 118, 84 142, 100 166 Z" fill="currentColor" fill-opacity="0.14"/>' +
+        '<path d="M34 100 C58 84, 82 84, 100 100 C82 116, 58 116, 34 100 Z" fill="currentColor" fill-opacity="0.14"/>' +
+        '<path d="M166 100 C142 84, 118 84, 100 100 C118 116, 142 116, 166 100 Z" fill="currentColor" fill-opacity="0.14"/>' +
+        '<circle cx="100" cy="100" r="32" stroke-width="2.6" fill="currentColor" fill-opacity="0.10"/>' +
+        '<path d="M100 68 A16 16 0 0 1 100 100 A16 16 0 0 0 100 132 A32 32 0 0 0 100 68 Z" fill="currentColor" fill-opacity="0.26"/>' +
+        '<circle cx="100" cy="84" r="4" fill="currentColor"/>' +
+        '<circle cx="100" cy="116" r="4" stroke="currentColor" stroke-width="2"/>' +
+      '</svg>';
+    case 'paladin':
+      /* Крылатый щит Клятвы и меч Божественной Кары */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">' +
+        '<circle cx="100" cy="100" r="88" stroke-dasharray="10 5" opacity="0.38"/>' +
+        '<path d="M62 96 C36 86, 18 60, 16 32 C38 46, 54 60, 66 74 Z" fill="currentColor" fill-opacity="0.15"/>' +
+        '<path d="M138 96 C164 86, 182 60, 184 32 C162 46, 146 60, 134 74 Z" fill="currentColor" fill-opacity="0.15"/>' +
+        '<path d="M60 54 L100 38 L140 54 L140 106 C140 138, 100 162, 100 168 C100 162, 60 138, 60 106 Z" fill="currentColor" fill-opacity="0.16" stroke-width="3"/>' +
+        '<line x1="100" y1="14" x2="100" y2="186" stroke-width="4.5"/>' +
+        '<path d="M70 54 L130 54" stroke-width="4"/>' +
+        '<polygon points="100,72 110,96 134,104 110,112 100,136 90,112 66,104 90,96" fill="currentColor" fill-opacity="0.28"/>' +
+      '</svg>';
+    case 'ranger':
+      /* Эльфийский длинный лук, стрела и компас следопыта */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<circle cx="100" cy="100" r="84" stroke-dasharray="8 6" opacity="0.35"/>' +
+        '<path d="M58 26 C132 54, 132 146, 58 174" stroke-width="3.6" fill="none"/>' +
+        '<line x1="58" y1="26" x2="58" y2="174" stroke-width="1.8" opacity="0.75"/>' +
+        '<line x1="26" y1="100" x2="172" y2="100" stroke-width="3.2"/>' +
+        '<polyline points="148,86 174,100 148,114" fill="currentColor" fill-opacity="0.25" stroke-width="3"/>' +
+        '<polyline points="42,90 26,100 42,110"/>' +
+        '<polyline points="52,90 36,100 52,110"/>' +
+        '<polygon points="100,48 108,92 152,100 108,108 100,152 92,108 48,100 92,92" fill="currentColor" fill-opacity="0.12"/>' +
+      '</svg>';
+    case 'rogue':
+      /* Скрещённые кривые кинжалы Гильдии Воров и теневая метка */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<polygon points="100,12 188,100 100,188 12,100" stroke-dasharray="8 5" opacity="0.38"/>' +
+        '<polygon points="100,28 172,100 100,172 28,100" fill="currentColor" fill-opacity="0.08"/>' +
+        '<path d="M40 160 C72 120, 110 82, 158 38 C134 78, 96 122, 52 166 Z" fill="currentColor" fill-opacity="0.20" stroke-width="2.6"/>' +
+        '<path d="M160 160 C128 120, 90 82, 42 38 C66 78, 104 122, 148 166 Z" fill="currentColor" fill-opacity="0.20" stroke-width="2.6"/>' +
+        '<circle cx="100" cy="100" r="18" fill="currentColor" fill-opacity="0.22" stroke-width="2.8"/>' +
+        '<polygon points="100,86 108,100 100,114 92,100" fill="currentColor"/>' +
+      '</svg>';
+    case 'sorcerer':
+      /* Восьмилучевая Звезда Хаоса и вихрь Дикой Магии */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<g class="fae-spin-ring">' +
+          '<circle cx="100" cy="100" r="86" stroke-dasharray="5 7" opacity="0.45"/>' +
+          '<polygon points="100,10 116,72 164,36 128,84 190,100 128,116 164,164 116,128 100,190 84,128 36,164 72,116 10,100 72,84 36,36 84,72" fill="currentColor" fill-opacity="0.15" stroke-width="2.4"/>' +
+        '</g>' +
+        '<circle cx="100" cy="100" r="32" fill="currentColor" fill-opacity="0.18" stroke-width="3"/>' +
+        '<path d="M100 74 C108 88, 108 112, 100 126 C92 112, 92 88, 100 74 Z" fill="currentColor" fill-opacity="0.45"/>' +
+      '</svg>';
+    case 'warlock':
+      /* Всевидящее Око Покровителя и оккультная пентаграмма Пакта */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<g class="fae-spin-ring">' +
+          '<circle cx="100" cy="100" r="86" stroke-width="2.6" opacity="0.48"/>' +
+          '<circle cx="100" cy="100" r="78" stroke-dasharray="4 6" opacity="0.38"/>' +
+          '<polygon points="100,16 150,168 20,74 180,74 50,168" fill="currentColor" fill-opacity="0.08" stroke-width="2"/>' +
+        '</g>' +
+        '<path d="M28 100 Q100 46 172 100 Q100 154 28 100 Z" fill="currentColor" fill-opacity="0.18" stroke-width="3.2"/>' +
+        '<circle cx="100" cy="100" r="24" fill="currentColor" fill-opacity="0.25" stroke-width="2.8"/>' +
+        '<path d="M100 80 C106 92, 106 108, 100 120 C94 108, 94 92, 100 80 Z" fill="currentColor"/>' +
+      '</svg>';
+    case 'wizard':
+      /* Геомантический круг Восьми Школ Магии Плетения Мистры */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<g class="fae-spin-ring">' +
+          '<circle cx="100" cy="100" r="88" stroke-width="2.4" opacity="0.5"/>' +
+          '<circle cx="100" cy="100" r="76" stroke-dasharray="6 4" opacity="0.4"/>' +
+          '<rect x="38" y="38" width="124" height="124" fill="currentColor" fill-opacity="0.06"/>' +
+          '<rect x="38" y="38" width="124" height="124" transform="rotate(45 100 100)" fill="currentColor" fill-opacity="0.06"/>' +
+        '</g>' +
+        '<g class="fae-spin-ring-rev">' +
+          '<circle cx="100" cy="100" r="52" stroke-dasharray="10 5" opacity="0.45"/>' +
+        '</g>' +
+        '<path d="M64 126 L100 116 L136 126 L136 78 L100 68 L64 78 Z" fill="currentColor" fill-opacity="0.20" stroke-width="2.6"/>' +
+        '<line x1="100" y1="68" x2="100" y2="116" stroke-width="2.6"/>' +
+      '</svg>';
+    case 'artificer':
+      /* Часовой механизм из шестерён, колба и молния эфира */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<g class="fae-spin-ring">' +
+          '<circle cx="100" cy="100" r="72" stroke-width="10" stroke-dasharray="14 10" opacity="0.42"/>' +
+          '<circle cx="100" cy="100" r="62" stroke-width="2.4" opacity="0.5"/>' +
+        '</g>' +
+        '<g class="fae-spin-ring-rev">' +
+          '<circle cx="100" cy="100" r="42" stroke-width="6" stroke-dasharray="10 8" opacity="0.38"/>' +
+        '</g>' +
+        '<polygon points="108,44 74,104 102,104 90,156 128,94 100,94" fill="currentColor" fill-opacity="0.26" stroke-width="2.8"/>' +
+      '</svg>';
+    case 'bloodhunter':
+      /* Клеймо Ордена Гемокрафтии и багровый кристалл крови */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' +
+        '<circle cx="100" cy="100" r="86" stroke-dasharray="8 6" opacity="0.38"/>' +
+        '<polygon points="100,14 148,100 100,186 52,100" fill="currentColor" fill-opacity="0.14" stroke-width="3"/>' +
+        '<polygon points="100,36 132,100 100,164 68,100" stroke-opacity="0.6"/>' +
+        '<line x1="28" y1="100" x2="172" y2="100" stroke-width="3"/>' +
+        '<line x1="100" y1="14" x2="100" y2="186" stroke-width="3"/>' +
+        '<path d="M100 66 C118 90, 122 108, 100 128 C78 108, 82 90, 100 66 Z" fill="currentColor" fill-opacity="0.35"/>' +
+      '</svg>';
+    default:
+      /* Классический Фаэрун: Двадцатигранник D20 в кольце рун */
+      return '<svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<g class="fae-spin-ring">' +
+          '<circle cx="100" cy="100" r="88" stroke-dasharray="8 6" opacity="0.42"/>' +
+          '<circle cx="100" cy="100" r="78" opacity="0.3"/>' +
+        '</g>' +
+        '<polygon points="100,18 172,58 172,142 100,182 28,142 28,58" fill="currentColor" fill-opacity="0.12" stroke-width="3"/>' +
+        '<polygon points="100,18 172,58 100,66 28,58" opacity="0.6"/>' +
+        '<polygon points="100,66 172,58 144,132 56,132 28,58" opacity="0.6"/>' +
+        '<polygon points="100,66 144,132 56,132" fill="currentColor" fill-opacity="0.18" stroke-width="2.6"/>' +
+        '<line x1="100" y1="182" x2="56" y2="132"/><line x1="100" y1="182" x2="144" y2="132"/>' +
+        '<line x1="28" y1="142" x2="56" y2="132"/><line x1="172" y1="142" x2="144" y2="132"/>' +
+      '</svg>';
+  }
+}
+
+function getFaerunFlyingSymbolSvg(themeId, idx){
+  var v = idx % 3;
+  switch(themeId){
+    case 'barbarian':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="30" x2="30" y2="6"/><path d="M18 6 C26 2, 34 10, 30 18 C24 14, 22 12, 18 6 Z" fill="currentColor" fill-opacity="0.3"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 4 C26 14, 30 22, 18 32 C6 22, 10 14, 18 4 Z" fill="currentColor" fill-opacity="0.28"/><path d="M18 12 C22 18, 23 23, 18 28 C13 23, 14 18, 18 12 Z" fill="currentColor"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="18,3 24,14 19,16 26,33 11,19 17,17"/></svg>';
+    case 'bard':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><ellipse cx="12" cy="26" rx="5" ry="3.8" fill="currentColor" fill-opacity="0.35"/><line x1="17" y1="26" x2="17" y2="7"/><path d="M17 7 C24 9, 27 14, 24 19"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><ellipse cx="9" cy="27" rx="4" ry="3" fill="currentColor" fill-opacity="0.35"/><ellipse cx="25" cy="24" rx="4" ry="3" fill="currentColor" fill-opacity="0.35"/><polyline points="13,27 13,9 29,6 29,24"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><polygon points="18,4 21,14 32,18 21,22 18,32 15,22 4,18 15,14" fill="currentColor" fill-opacity="0.28"/></svg>';
+    case 'cleric':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 4 L18 32 M6 18 L30 18"/><circle cx="18" cy="18" r="7" fill="currentColor" fill-opacity="0.25"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><path d="M28 6 C16 8, 8 18, 6 30 C16 26, 26 18, 28 6 Z" fill="currentColor" fill-opacity="0.25"/><line x1="6" y1="30" x2="24" y2="12"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="6" fill="currentColor" fill-opacity="0.35"/><line x1="18" y1="3" x2="18" y2="8"/><line x1="18" y1="28" x2="18" y2="33"/><line x1="3" y1="18" x2="8" y2="18"/><line x1="28" y1="18" x2="33" y2="18"/></svg>';
+    case 'druid':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><path d="M28 6 C12 6, 6 18, 8 28 C18 30, 30 24, 28 6 Z" fill="currentColor" fill-opacity="0.28"/><path d="M8 28 L24 12"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M24 7 A12 12 0 1 0 24 29 A9 9 0 1 1 24 7 Z" fill="currentColor" fill-opacity="0.3"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 30 L18 10 M18 18 L11 12 M18 14 L25 9"/><circle cx="18" cy="8" r="3" fill="currentColor"/></svg>';
+    case 'fighter':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="30" x2="30" y2="6"/><line x1="9" y1="21" x2="15" y2="27"/><circle cx="6" cy="30" r="2" fill="currentColor"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 7 L18 4 L28 7 L28 18 C28 25, 18 31, 18 32 C18 31, 8 25, 8 18 Z" fill="currentColor" fill-opacity="0.25"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><polygon points="18,4 32,18 18,32 4,18" fill="currentColor" fill-opacity="0.22"/><line x1="4" y1="18" x2="32" y2="18"/></svg>';
+    case 'monk':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 C23 14, 23 22, 18 28 C13 22, 13 14, 18 6 Z" fill="currentColor" fill-opacity="0.28"/><path d="M18 28 C25 24, 30 18, 28 12 C22 14, 19 20, 18 28 Z" fill="currentColor" fill-opacity="0.18"/><path d="M18 28 C11 24, 6 18, 8 12 C14 14, 17 20, 18 28 Z" fill="currentColor" fill-opacity="0.18"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="12"/><path d="M18 6 A6 6 0 0 1 18 18 A6 6 0 0 0 18 30 A12 12 0 0 0 18 6 Z" fill="currentColor" fill-opacity="0.3"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="9" stroke-dasharray="4 3"/><circle cx="18" cy="18" r="3" fill="currentColor"/></svg>';
+    case 'paladin':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="4" x2="18" y2="32"/><line x1="10" y1="12" x2="26" y2="12"/><polygon points="18,4 21,10 15,10" fill="currentColor"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 8 L18 4 L28 8 L28 19 C28 26, 18 32, 18 32 C18 32, 8 26, 8 19 Z" fill="currentColor" fill-opacity="0.25"/><line x1="18" y1="9" x2="18" y2="27"/><line x1="12" y1="16" x2="24" y2="16"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><polygon points="18,3 22,14 33,18 22,22 18,33 14,22 3,18 14,14" fill="currentColor" fill-opacity="0.3"/></svg>';
+    case 'ranger':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="30" x2="30" y2="6"/><polyline points="20,6 30,6 30,16"/><line x1="6" y1="24" x2="12" y2="30"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><path d="M26 6 C12 8, 8 18, 8 28 C18 28, 28 22, 26 6 Z" fill="currentColor" fill-opacity="0.25"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="18" cy="22" rx="5" ry="6" fill="currentColor" fill-opacity="0.28"/><circle cx="11" cy="13" r="2.2" fill="currentColor"/><circle cx="16" cy="10" r="2.2" fill="currentColor"/><circle cx="21" cy="10" r="2.2" fill="currentColor"/><circle cx="26" cy="13" r="2.2" fill="currentColor"/></svg>';
+    case 'rogue':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 29 C14 20, 22 12, 30 6 C24 14, 16 22, 9 31 Z" fill="currentColor" fill-opacity="0.32"/><line x1="9" y1="21" x2="15" y2="27"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="10" fill="currentColor" fill-opacity="0.25"/><polygon points="18,12 22,18 18,24 14,18" fill="currentColor"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><polygon points="18,4 30,18 18,32 6,18" fill="currentColor" fill-opacity="0.22"/><circle cx="18" cy="18" r="3" fill="currentColor"/></svg>';
+    case 'sorcerer':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><polygon points="18,3 21,13 31,9 23,18 31,27 21,23 18,33 15,23 5,27 13,18 5,9 15,13" fill="currentColor" fill-opacity="0.28"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 4 C26 14, 28 22, 18 32 C8 22, 10 14, 18 4 Z" fill="currentColor" fill-opacity="0.28"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20,4 10,19 18,19 14,32 26,16 18,16"/></svg>';
+    case 'warlock':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 18 Q18 7 32 18 Q18 29 4 18 Z" fill="currentColor" fill-opacity="0.26"/><circle cx="18" cy="18" r="4.5" fill="currentColor"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="18" cy="18" r="13"/><polygon points="18,5 26,28 7,14 29,14 10,28" fill="currentColor" fill-opacity="0.2"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 28 C12 18, 24 18, 26 8"/><circle cx="26" cy="8" r="3" fill="currentColor"/></svg>';
+    case 'wizard':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="18" cy="18" r="13"/><rect x="9" y="9" width="18" height="18" transform="rotate(45 18 18)"/><circle cx="18" cy="18" r="3" fill="currentColor"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 26 L18 22 L30 26 L30 10 L18 6 L6 10 Z" fill="currentColor" fill-opacity="0.22"/><line x1="18" y1="6" x2="18" y2="22"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="12,6 24,12 12,18 24,24 12,30"/><line x1="18" y1="4" x2="18" y2="32"/></svg>';
+    case 'artificer':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="18" r="9" stroke-dasharray="4 3"/><circle cx="18" cy="18" r="4" fill="currentColor" fill-opacity="0.3"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 6 L22 6 M16 6 L16 14 L8 28 L28 28 L20 14 L20 6" fill="currentColor" fill-opacity="0.24"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="20,4 9,19 18,19 15,32 27,16 18,16" fill="currentColor" fill-opacity="0.28"/></svg>';
+    case 'bloodhunter':
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 5 C25 16, 27 22, 18 31 C9 22, 11 16, 18 5 Z" fill="currentColor" fill-opacity="0.38"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="18,4 28,18 18,32 8,18" fill="currentColor" fill-opacity="0.22"/><line x1="18" y1="4" x2="18" y2="32"/><line x1="6" y1="18" x2="30" y2="18"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="30" x2="30" y2="6"/><path d="M14 22 L22 14"/></svg>';
+    default:
+      if(v === 0) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><polygon points="18,4 30,11 30,25 18,32 6,25 6,11" fill="currentColor" fill-opacity="0.22"/><polygon points="18,10 25,23 11,23"/></svg>';
+      if(v === 1) return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"><polygon points="18,4 22,14 32,18 22,22 18,32 14,22 4,18 14,14" fill="currentColor" fill-opacity="0.25"/></svg>';
+      return '<svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="7" y1="29" x2="29" y2="7"/><line x1="10" y1="20" x2="16" y2="26"/></svg>';
+  }
+}
+
+function buildFaerunThemeFx(cont, themeObj){
+  if(!cont || !themeObj) return;
+  cont.innerHTML = '';
+  cont.setAttribute('data-fae-theme', themeObj.id);
+
+  var aura = document.createElement('div');
+  aura.className = 'fae-fx-aura';
+  cont.appendChild(aura);
+
+  var mist = document.createElement('div');
+  mist.className = 'fae-fx-mist';
+  cont.appendChild(mist);
+
+  /* 1. Крупный декоративный герб класса на заднем фоне + угловой водяной знак */
+  var crestWrap = document.createElement('div');
+  crestWrap.className = 'fae-bg-crest-wrap';
+  var crestSvg = buildFaerunClassCrestSvg(themeObj.id);
+  crestWrap.innerHTML =
+    '<div class="fae-bg-crest-main' + (themeObj.spin ? ' spin-slow' : '') + '">' + crestSvg + '</div>' +
+    '<div class="fae-bg-crest-corner">' + crestSvg + '</div>';
+  cont.appendChild(crestWrap);
+
+  /* 2. Летающие классовые элементы (ноты, клинки, листья, стрелы, руны, шестерни, капли крови и т.д.) */
+  var signsWrap = document.createElement('div');
+  signsWrap.className = 'fae-bg-signs';
+  var spots = [
+    { top: 74, left: 10, dir: 'up-right', dur: 22, delay: -4, size: 28 },
+    { top: 18, left: 84, dir: 'down-left', dur: 25, delay: -12, size: 26 },
+    { top: 78, left: 80, dir: 'up-left', dur: 21, delay: -7, size: 30 },
+    { top: 22, left: 14, dir: 'down-right', dur: 24, delay: -16, size: 25 },
+    { top: 48, left: 76, dir: 'wave', dur: 23, delay: -10, size: 27 },
+    { top: 68, left: 28, dir: 'cross', dur: 22, delay: -18, size: 24 },
+    { top: 14, left: 46, dir: 'down-right', dur: 26, delay: -5, size: 28 },
+    { top: 82, left: 54, dir: 'up-left', dur: 23, delay: -14, size: 26 },
+    { top: -5, left: 22, dir: 'fall-right', dur: 21, delay: -8, size: 24 },
+    { top: -5, left: 68, dir: 'fall-left', dur: 24, delay: -15, size: 25 },
+    { top: 58, left: 8, dir: 'up-right', dur: 27, delay: -20, size: 29 },
+    { top: 34, left: 90, dir: 'up-left', dur: 25, delay: -9, size: 26 }
+  ];
+
+  for(var i = 0; i < spots.length; i++){
+    var sp = spots[i];
+    var sym = document.createElement('div');
+    sym.className = 'fae-flying-symbol fae-dir-' + sp.dir + (i % 3 === 2 ? ' alt-color' : '');
+    sym.style.width = sp.size + 'px';
+    sym.style.height = sp.size + 'px';
+    sym.style.top = sp.top + '%';
+    sym.style.left = sp.left + '%';
+    sym.style.animationDuration = sp.dur + 's';
+    sym.style.animationDelay = sp.delay + 's';
+    sym.innerHTML = getFaerunFlyingSymbolSvg(themeObj.id, i);
+    signsWrap.appendChild(sym);
+  }
+  cont.appendChild(signsWrap);
+
+  /* 3. Парящие искры / частицы энергии класса */
+  var emberCount = 24;
+  for(var e = 0; e < emberCount; e++){
+    var ember = document.createElement('div');
+    ember.className = 'fae-ember';
+    var sz = (Math.random() * 3.4 + 2.0).toFixed(1);
+    var left = (Math.random() * 98 + 1).toFixed(1);
+    var dur = (Math.random() * 8 + 7).toFixed(1);
+    var delay = (-Math.random() * 16).toFixed(1);
+    ember.style.width = sz + 'px';
+    ember.style.height = sz + 'px';
+    ember.style.left = left + '%';
+    ember.style.animationDuration = dur + 's';
+    ember.style.animationDelay = delay + 's';
+    var cHex = (e % 2 === 0) ? (themeObj.ember1 || themeObj.accentBright) : (themeObj.ember2 || themeObj.accent);
+    ember.style.background = cHex;
+    ember.style.boxShadow = '0 0 8px ' + cHex + ', 0 0 16px ' + (themeObj.glow || cHex);
+    cont.appendChild(ember);
+  }
+}
+
+function applyFaerunTheme(){
+  if(typeof document === 'undefined' || !document.body) return;
+  var fx = document.getElementById('faeThemeFx');
+  var isFaerunMode = (typeof HB === 'undefined' || !HB.mode || HB.mode === 'faerun');
+  if(!isFaerunMode){
+    document.body.classList.remove('fae-theme');
+    FAE_THEMES.forEach(function(t){
+      document.body.classList.remove('fae-theme-' + t.id);
+    });
+    if(fx) fx.style.display = 'none';
+    return;
+  }
+
+  var curId = getFaerunTheme();
+  var tObj = FAE_THEMES.find(function(t){ return t.id === curId; }) || FAE_THEMES[0];
+
+  document.body.classList.add('fae-theme');
+  FAE_THEMES.forEach(function(t){
+    document.body.classList.toggle('fae-theme-' + t.id, t.id === tObj.id);
+  });
+
+  var st = document.body.style;
+  st.setProperty('--fae-accent', tObj.accent);
+  st.setProperty('--fae-accent-bright', tObj.accentBright);
+  st.setProperty('--fae-accent-dim', tObj.accentDim);
+  st.setProperty('--fae-accent-soft', tObj.accentSoft);
+  st.setProperty('--fae-accent-glow', tObj.glow);
+  st.setProperty('--fae-secondary', tObj.secondary);
+  st.setProperty('--fae-secondary-glow', tObj.secondaryGlow);
+  st.setProperty('--fae-bg-0', tObj.bg0);
+  st.setProperty('--fae-bg-1', tObj.bg1);
+  st.setProperty('--fae-bg-2', tObj.bg2);
+  st.setProperty('--fae-radial-top', tObj.radialTop);
+  st.setProperty('--fae-radial-bot', tObj.radialBot);
+
+  if(!fx){
+    fx = document.createElement('div');
+    fx.id = 'faeThemeFx';
+    fx.setAttribute('aria-hidden', 'true');
+    document.body.insertBefore(fx, document.body.firstChild);
+  }
+  if(fx.getAttribute('data-fae-theme') !== tObj.id || fx.children.length === 0){
+    buildFaerunThemeFx(fx, tObj);
+  }
+  fx.style.display = 'block';
+}
+window.applyFaerunTheme = applyFaerunTheme;
+
+function showFaerunToast(msg){
+  if(typeof GHSync !== 'undefined' && typeof GHSync.toast === 'function'){
+    GHSync.toast(msg, 'success');
+    return;
+  }
+  var t = document.createElement('div');
+  t.className = 'gh-sync-toast success show';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){
+    t.classList.remove('show');
+    setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 300);
+  }, 2800);
+}
+
 function renderFaeData(){
   var d = getActiveFaerunCharacter();
   var chars = Array.isArray(CHARACTERS) ? CHARACTERS : [d];
@@ -10239,12 +11017,51 @@ function renderFaeData(){
     '</div>';
 
   var curKey = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+  var curThemeId = getFaerunTheme();
+  var activeThemeObj = FAE_THEMES.find(function(t){ return t.id === curThemeId; }) || FAE_THEMES[0];
+  var isThemeCollapsed = false;
+  try {
+    isThemeCollapsed = localStorage.getItem('fae_theme_collapsed') === '1';
+  } catch(e){}
+
+  var themeCardsHtml = FAE_THEMES.map(function(t){
+    var isAct = (t.id === curThemeId);
+    return '<button type="button" class="fae-theme-option-card' + (isAct ? ' active' : '') + '" data-fae-theme-pick="' + escapeAttr(t.id) + '" style="--fae-chip-accent:' + escapeAttr(t.accentBright) + ';--fae-chip-glow:' + escapeAttr(t.glow) + ';">' +
+      '<span class="fae-theme-card-icon">' + t.icon + '</span>' +
+      '<span class="fae-theme-card-info">' +
+        '<span class="fae-theme-card-title">' + escapeHtml(t.title) + '</span>' +
+        '<span class="fae-theme-card-sub">' + escapeHtml(t.sub) + '</span>' +
+      '</span>' +
+      '<span class="fae-theme-card-dot">' + (isAct ? '●' : '') + '</span>' +
+    '</button>';
+  }).join('');
+
+  var themeSectionHtml =
+    '<div class="sheet-section fae-data-section">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+        '<div>' +
+          '<div class="section-label" style="margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+            '<span>🎨 ТЕМА ОФОРМЛЕНИЯ ФАЭРУНА (КЛАССЫ D&D)</span>' +
+            '<span class="fae-class-badge" style="font-size:11px;padding:2px 10px;">' + activeThemeObj.icon + ' ' + escapeHtml(activeThemeObj.title) + '</span>' +
+          '</div>' +
+          '<div class="desc" style="margin-top:4px;">Ручной выбор визуальной атмосферы раздела Фаэрун: цветовая палитра интерфейса, фоновый герб класса и парящие тематические элементы (независимо от выбранного героя).</div>' +
+        '</div>' +
+        '<button type="button" class="btn btn-ghost" id="faeThemeGridToggleBtn" style="font-size:12px;padding:5px 12px;">' +
+          (isThemeCollapsed ? '▼ Развернуть темы (15)' : '▲ Свернуть темы') +
+        '</button>' +
+      '</div>' +
+      '<div id="faeThemeGridBody" style="' + (isThemeCollapsed ? 'display:none;' : '') + '">' +
+        '<div class="fae-theme-grid">' + themeCardsHtml + '</div>' +
+      '</div>' +
+    '</div>';
 
   return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Данные & Кампания'}]) +
     '<button class="back" data-go="home">← На главную</button>' +
     '<h1>💾 Данные & Кампания</h1>' +
-    '<p class="subtitle">Ростер и полный лист персонажа D&D 5e / 2024, хроники приключения, интеграция Gemini AI, квота памяти и резервные копии.</p>' +
+    '<p class="subtitle">Ростер и полный лист персонажа D&D 5e / 2024, классовые темы оформления, хроники приключения, интеграция Gemini AI и резервные копии.</p>' +
     '<div class="fae-rule"></div>' +
+
+    themeSectionHtml +
 
     heroSectionHtml +
 
@@ -10311,6 +11128,7 @@ function exportAllFaerunData(){
       version: 2,
       exportedAt: new Date().toISOString(),
       activeCharId: localStorage.getItem('ttc_faerun_active_id') || '',
+      theme: getFaerunTheme(),
       campaign: loadFaerunCampaign(),
       characters: Array.isArray(CHARACTERS) ? CHARACTERS : [],
       spells: Array.isArray(SPELLS) ? SPELLS : [],
@@ -10370,6 +11188,9 @@ function importAllFaerunData(file){
       if(data.campaign && typeof data.campaign === 'object'){
         saveFaerunCampaign(data.campaign);
       }
+      if(data.theme){
+        setFaerunTheme(data.theme);
+      }
       if(data.activeCharId){
         setActiveFaerunCharacter(data.activeCharId);
       } else if(CHARACTERS.length > 0){
@@ -10392,6 +11213,28 @@ function wireFaeData(){
 
   if(typeof AppStorage !== 'undefined' && AppStorage.wireWidget) AppStorage.wireWidget('fae');
   if(typeof GHSync !== 'undefined' && typeof GHSync.wireUI === 'function') GHSync.wireUI();
+
+  var themeToggleBtn = g('faeThemeGridToggleBtn');
+  var themeGridBody = g('faeThemeGridBody');
+  if(themeToggleBtn && themeGridBody){
+    themeToggleBtn.addEventListener('click', function(){
+      var hidden = themeGridBody.style.display === 'none';
+      themeGridBody.style.display = hidden ? '' : 'none';
+      themeToggleBtn.textContent = hidden ? '▲ Свернуть темы' : '▼ Развернуть темы (15)';
+      try { localStorage.setItem('fae_theme_collapsed', hidden ? '0' : '1'); } catch(e){}
+    });
+  }
+
+  document.querySelectorAll('[data-fae-theme-pick]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var chosen = btn.getAttribute('data-fae-theme-pick') || 'faerun';
+      if(getFaerunTheme() === chosen) return;
+      var appliedId = setFaerunTheme(chosen);
+      render();
+      var tObj = FAE_THEMES.find(function(t){ return t.id === appliedId; });
+      showFaerunToast(tObj && tObj.toast ? tObj.toast : ('🎨 Включена тема: ' + appliedId));
+    });
+  });
 
   var sel = g('faeDataProfileSelect');
   if(sel){

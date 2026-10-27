@@ -150,6 +150,7 @@ function paintShBar(){
   if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
   if(typeof applyWizardTheme === 'function') applyWizardTheme();
   if(typeof applyStarWarsTheme === 'function') applyStarWarsTheme();
+  if(typeof applyFaerunTheme === 'function') applyFaerunTheme();
   if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
   if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(window.view ? window.view.screen : '');
 
@@ -249,6 +250,13 @@ function hideInactiveModeFx(activeMode){
     var swFx = document.getElementById('swThemeFx');
     if(swFx) swFx.style.display = 'none';
     document.body.classList.remove('sw-theme', 'sw-theme-sith', 'sw-theme-jedi');
+  }
+  if(activeMode && activeMode !== 'faerun'){
+    var faeFx = document.getElementById('faeThemeFx');
+    if(faeFx) faeFx.style.display = 'none';
+    document.body.classList.remove('fae-theme');
+  } else if(typeof applyFaerunTheme === 'function'){
+    applyFaerunTheme();
   }
 }
 
