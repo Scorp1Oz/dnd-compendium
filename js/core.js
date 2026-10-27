@@ -11,12 +11,266 @@ const DICE_COLORS = {
   coin: {light:'#fae078',dark:'#995810'}
 };
 const DICE_LABEL_Y = {2:60,4:76,6:62,8:60,10:54,12:64,20:60};
-let diceState = {dice:[], modifier:0, counter:0, customSides:7, labelCat:'', label:'', customLabel:'', history:[]};
+const FAE_DICE_SKIN_KEY = 'ttc_fae_dice_skin';
+const FAE_DICE_SKIN_COLLAPSED_KEY = 'ttc_fae_dice_skin_collapsed';
+
+const FAE_DICE_SKINS = [
+  {
+    id: 'classic',
+    title: 'Классика',
+    sub: 'Стандартные цвета',
+    accent: '#e09a45',
+    glow: 'rgba(224,154,69,0.55)',
+    bg: 'rgba(224,154,69,0.10)',
+    border: 'rgba(224,154,69,0.40)',
+    valColor: '#ffffff',
+    coinValColor: '#fff8db'
+  },
+  {
+    id: 'onyx',
+    title: 'Чёрный Оникс',
+    sub: 'Обсидиан и серебро',
+    accent: '#e4e4e7',
+    glow: 'rgba(228,228,231,0.55)',
+    bg: 'rgba(161,161,170,0.12)',
+    border: 'rgba(212,212,216,0.45)',
+    g0: '#3f3f46',
+    g1: '#18181b',
+    g2: '#09090b',
+    outerStroke: '#d4d4d8',
+    innerStroke: 'rgba(228,228,231,0.52)',
+    facetLight: 'rgba(255,255,255,0.14)',
+    facetDark: 'rgba(0,0,0,0.45)',
+    textFill: '#f4f4f5',
+    valColor: '#f4f4f5',
+    coinValColor: '#f4f4f5'
+  },
+  {
+    id: 'ruby',
+    title: 'Кровавый Рубин',
+    sub: 'Багрянец и золото',
+    accent: '#fbbf24',
+    glow: 'rgba(245,158,11,0.6)',
+    bg: 'rgba(185,28,28,0.16)',
+    border: 'rgba(251,191,36,0.5)',
+    g0: '#dc2626',
+    g1: '#881337',
+    g2: '#3b0410',
+    outerStroke: '#f5c451',
+    innerStroke: 'rgba(251,191,36,0.62)',
+    facetLight: 'rgba(254,202,202,0.20)',
+    facetDark: 'rgba(28,2,7,0.48)',
+    textFill: '#fef3c7',
+    valColor: '#fef3c7',
+    coinValColor: '#fef08a'
+  },
+  {
+    id: 'amethyst',
+    title: 'Астральный Аметист',
+    sub: 'Плетение и звёзды',
+    accent: '#e879f9',
+    glow: 'rgba(217,70,239,0.6)',
+    bg: 'rgba(147,51,234,0.16)',
+    border: 'rgba(232,121,249,0.48)',
+    g0: '#a855f7',
+    g1: '#581c87',
+    g2: '#1e0936',
+    outerStroke: '#e879f9',
+    innerStroke: 'rgba(240,171,252,0.58)',
+    facetLight: 'rgba(245,208,254,0.22)',
+    facetDark: 'rgba(15,4,28,0.50)',
+    textFill: '#fae8ff',
+    valColor: '#fae8ff',
+    coinValColor: '#fae8ff'
+  },
+  {
+    id: 'bone',
+    title: 'Древняя Кость',
+    sub: 'Резная слоновая кость',
+    accent: '#d6c19a',
+    glow: 'rgba(214,193,154,0.5)',
+    bg: 'rgba(214,193,154,0.12)',
+    border: 'rgba(180,153,108,0.5)',
+    g0: '#f5ebd6',
+    g1: '#d2be99',
+    g2: '#8c734b',
+    outerStroke: '#3e2b17',
+    innerStroke: 'rgba(62,43,23,0.55)',
+    facetLight: 'rgba(255,252,240,0.32)',
+    facetDark: 'rgba(62,43,23,0.22)',
+    textFill: '#291a0c',
+    valColor: '#291a0c',
+    valShadow: '0 1px 0 rgba(255,248,225,0.85), 0 2px 4px rgba(0,0,0,0.35)',
+    coinValColor: '#291a0c'
+  },
+  {
+    id: 'frost',
+    title: 'Ледяной Кристалл',
+    sub: 'Долина Ледяного Ветра',
+    accent: '#7dd3fc',
+    glow: 'rgba(56,189,248,0.65)',
+    bg: 'rgba(56,189,248,0.14)',
+    border: 'rgba(125,211,252,0.52)',
+    g0: '#bae6fd',
+    g1: '#0284c7',
+    g2: '#082f49',
+    outerStroke: '#e0f2fe',
+    innerStroke: 'rgba(224,242,254,0.68)',
+    facetLight: 'rgba(255,255,255,0.30)',
+    facetDark: 'rgba(8,47,73,0.42)',
+    textFill: '#f0f9ff',
+    valColor: '#f0f9ff',
+    coinValColor: '#f0f9ff'
+  },
+  {
+    id: 'holo',
+    title: 'Рунический Эфир',
+    sub: 'Неоновая геометрия',
+    accent: '#2dd4bf',
+    glow: 'rgba(45,212,191,0.65)',
+    bg: 'rgba(20,184,166,0.14)',
+    border: 'rgba(45,212,191,0.52)',
+    g0: '#134e4a',
+    g1: '#092226',
+    g2: '#030b0e',
+    outerStroke: '#2dd4bf',
+    innerStroke: 'rgba(94,234,212,0.75)',
+    facetLight: 'rgba(45,212,191,0.18)',
+    facetDark: 'rgba(0,0,0,0.55)',
+    textFill: '#5eead4',
+    valColor: '#5eead4',
+    coinValColor: '#5eead4',
+    monoFont: true
+  },
+  {
+    id: 'jade',
+    title: 'Изумрудный Нефрит',
+    sub: 'Нефрит и бронза',
+    accent: '#34d399',
+    glow: 'rgba(16,185,129,0.58)',
+    bg: 'rgba(16,185,129,0.14)',
+    border: 'rgba(52,211,153,0.48)',
+    g0: '#10b981',
+    g1: '#065f46',
+    g2: '#022c22',
+    outerStroke: '#d97706',
+    innerStroke: 'rgba(251,191,36,0.58)',
+    facetLight: 'rgba(167,243,208,0.22)',
+    facetDark: 'rgba(2,44,34,0.50)',
+    textFill: '#fef3c7',
+    valColor: '#fef3c7',
+    coinValColor: '#fef3c7'
+  }
+];
+
+function getSavedFaerunDiceSkin(){
+  try {
+    const s = localStorage.getItem(FAE_DICE_SKIN_KEY);
+    if(s && FAE_DICE_SKINS.some(k => k.id === s)) return s;
+  } catch(e){}
+  return 'classic';
+}
+
+function getSavedFaerunSkinCollapsed(){
+  try {
+    return localStorage.getItem(FAE_DICE_SKIN_COLLAPSED_KEY) === '1';
+  } catch(e){}
+  return false;
+}
+
+let diceState = {dice:[], modifier:0, unknownMod:false, skin:getSavedFaerunDiceSkin(), skinCollapsed:getSavedFaerunSkinCollapsed(), counter:0, customSides:7, labelCat:'', label:'', customLabel:'', history:[]};
+
+function isFaerunDiceSkinMode(){
+  return (typeof HB === 'undefined' || !HB.mode || HB.mode === 'faerun' || HB.mode === 'core');
+}
+
+function getActiveDiceSkin(){
+  if(!isFaerunDiceSkinMode()) return FAE_DICE_SKINS[0];
+  const id = diceState.skin || getSavedFaerunDiceSkin();
+  return FAE_DICE_SKINS.find(s => s.id === id) || FAE_DICE_SKINS[0];
+}
+
+function setFaerunDiceSkin(skinId){
+  const found = FAE_DICE_SKINS.find(s => s.id === skinId) || FAE_DICE_SKINS[0];
+  diceState.skin = found.id;
+  try { localStorage.setItem(FAE_DICE_SKIN_KEY, found.id); } catch(e){}
+  if(typeof render === 'function') render();
+}
+window.setFaerunDiceSkin = setFaerunDiceSkin;
+
+function toggleFaerunSkinDock(forceCollapsed){
+  const next = (typeof forceCollapsed === 'boolean') ? forceCollapsed : !diceState.skinCollapsed;
+  diceState.skinCollapsed = next;
+  try { localStorage.setItem(FAE_DICE_SKIN_COLLAPSED_KEY, next ? '1' : '0'); } catch(e){}
+  const dock = document.getElementById('faeDiceSkinDock');
+  if(dock){
+    dock.classList.toggle('collapsed', next);
+  }
+}
+window.toggleFaerunSkinDock = toggleFaerunSkinDock;
+
+function formatDiceModSuffix(m, unknownMod){
+  let s = '';
+  if(m > 0) s += ' + ' + m;
+  else if(m < 0) s += ' − ' + Math.abs(m);
+  if(unknownMod) s += ' + мод.';
+  return s;
+}
 const DICE_HISTORY_MAX = 16;
 
-function generateCoinSvg(uid, label){
+function generateCoinSvg(uid, label, skinOverride){
   const gid = 'grad_'+uid;
+  const skin = skinOverride
+    ? (FAE_DICE_SKINS.find(s => s.id === skinOverride) || FAE_DICE_SKINS[0])
+    : getActiveDiceSkin();
   const dispLabel = (label!==undefined && label!==null) ? label : 'C';
+
+  if(skin.id !== 'classic'){
+    const textFill = skin.textFill || '#fff8d6';
+    const textShadow = (skin.id === 'bone')
+      ? 'drop-shadow(0 1px 0 rgba(255,255,255,0.7))'
+      : 'drop-shadow(0 2px 4px rgba(0,0,0,0.75))';
+    const text = dispLabel
+      ? `<text x="50" y="60" text-anchor="middle" font-family="${skin.monoFont ? "'JetBrains Mono', monospace" : "'Cinzel', serif"}" font-weight="700" font-size="30" fill="${textFill}" filter="${textShadow}">${dispLabel}</text>`
+      : '';
+    let innerOrnament = '';
+    if(skin.id === 'onyx'){
+      innerOrnament = `<polygon points="50,11 61,39 89,50 61,61 50,89 39,61 11,50 39,39" fill="none" stroke="${skin.innerStroke}" stroke-width="1.3"/>
+        <circle cx="50" cy="50" r="32" fill="rgba(0,0,0,0.35)" stroke="${skin.outerStroke}" stroke-width="1.2"/>`;
+    } else if(skin.id === 'ruby'){
+      innerOrnament = `<polygon points="50,12 77,23 88,50 77,77 50,88 23,77 12,50 23,23" fill="rgba(0,0,0,0.22)" stroke="${skin.outerStroke}" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="30" fill="none" stroke="${skin.innerStroke}" stroke-width="1.2" stroke-dasharray="4,2"/>`;
+    } else if(skin.id === 'amethyst'){
+      innerOrnament = `<polygon points="50,12 83,31 83,69 50,88 17,69 17,31" fill="rgba(255,255,255,0.06)" stroke="${skin.innerStroke}" stroke-width="1.3"/>
+        <polygon points="50,88 83,31 17,31" fill="none" stroke="rgba(232,121,249,0.28)" stroke-width="1"/>
+        <circle cx="50" cy="50" r="28" fill="rgba(15,4,28,0.45)" stroke="${skin.outerStroke}" stroke-width="1.1"/>`;
+    } else if(skin.id === 'bone'){
+      innerOrnament = `<circle cx="50" cy="50" r="39" fill="none" stroke="${skin.outerStroke}" stroke-width="2" stroke-dasharray="2,4.5"/>
+        <circle cx="50" cy="50" r="32" fill="rgba(62,43,23,0.10)" stroke="${skin.outerStroke}" stroke-width="1.2"/>`;
+    } else if(skin.id === 'frost'){
+      innerOrnament = `<polygon points="50,11 58,36 83,27 65,50 83,73 58,64 50,89 42,64 17,73 35,50 17,27 42,36" fill="rgba(255,255,255,0.16)" stroke="${skin.outerStroke}" stroke-width="1.1"/>
+        <circle cx="50" cy="50" r="27" fill="rgba(8,47,73,0.42)" stroke="${skin.innerStroke}" stroke-width="1.2"/>`;
+    } else if(skin.id === 'holo'){
+      innerOrnament = `<circle cx="50" cy="50" r="39" fill="none" stroke="${skin.innerStroke}" stroke-width="1.4" stroke-dasharray="8,4"/>
+        <polygon points="50,16 79,33 79,67 50,84 21,67 21,33" fill="rgba(45,212,191,0.08)" stroke="${skin.outerStroke}" stroke-width="1.3"/>`;
+    } else if(skin.id === 'jade'){
+      innerOrnament = `<circle cx="50" cy="50" r="38" fill="none" stroke="${skin.innerStroke}" stroke-width="1.2"/>
+        <rect x="29" y="29" width="42" height="42" rx="4" fill="rgba(2,44,34,0.38)" stroke="${skin.outerStroke}" stroke-width="1.8"/>`;
+    }
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${skin.g0}"/>
+          <stop offset="52%" stop-color="${skin.g1}"/>
+          <stop offset="100%" stop-color="${skin.g2}"/>
+        </linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="45" fill="url(#${gid})" stroke="${skin.outerStroke}" stroke-width="2.4"/>
+      ${innerOrnament}
+      ${text}
+    </svg>`;
+  }
+
   const text = dispLabel
     ? `<text x="50" y="60" text-anchor="middle" font-family="'Cinzel', serif" font-weight="700" font-size="30" fill="#fff8d6" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))">${dispLabel}</text>`
     : '';
@@ -35,11 +289,23 @@ function generateCoinSvg(uid, label){
   </svg>`;
 }
 
-function renderCustomFacetShape(sides, uid, label){
-  if(sides === 'coin') return generateCoinSvg(uid, label);
-  if(sides === 2) return dieShapeSvg(2, uid, label);
+function renderCustomFacetShape(sides, uid, label, skinOverride){
+  if(sides === 'coin') return generateCoinSvg(uid, label, skinOverride);
+  if(sides === 2) return dieShapeSvg(2, uid, label, skinOverride);
   const s = Math.max(3, Math.min(100, parseInt(sides,10) || 7));
   const gid = 'grad_'+uid;
+  const skin = skinOverride
+    ? (FAE_DICE_SKINS.find(k => k.id === skinOverride) || FAE_DICE_SKINS[0])
+    : getActiveDiceSkin();
+  const useSkin = skin.id !== 'classic';
+  const gStart = useSkin ? skin.g0 : '#8c52ff';
+  const gMid = useSkin ? skin.g1 : '#622bd9';
+  const gEnd = useSkin ? skin.g2 : '#3d1475';
+  const outStroke = useSkin ? skin.outerStroke : 'rgba(0,0,0,0.4)';
+  const inStroke = useSkin ? skin.innerStroke : 'rgba(255,255,255,0.22)';
+  const fLight = useSkin ? skin.facetLight : 'rgba(255,255,255,0.15)';
+  const fDark = useSkin ? skin.facetDark : 'rgba(0,0,0,0.2)';
+  const tFill = useSkin ? skin.textFill : '#ffffff';
 
   if(s === 3){
     const pTop = [50, 7], pRight = [93, 89], pLeft = [7, 89];
@@ -48,26 +314,27 @@ function renderCustomFacetShape(sides, uid, label){
     const outerPoints = `${pTop.join(',')} ${pRight.join(',')} ${pLeft.join(',')}`;
     const innerPoints = `${ipTop.join(',')} ${ipRight.join(',')} ${ipLeft.join(',')}`;
     const facetPolys = `
-      <polygon points="${ipTop[0]},${ipTop[1]} ${pTop[0]},${pTop[1]} ${pRight[0]},${pRight[1]} ${ipRight[0]},${ipRight[1]}" fill="rgba(255,255,255,0.15)" stroke="rgba(0,0,0,0.28)" stroke-width="0.8"/>
-      <polygon points="${c[0]},${c[1]} ${ipTop[0]},${ipTop[1]} ${ipRight[0]},${ipRight[1]}" fill="rgba(0,0,0,0.12)" stroke="rgba(0,0,0,0.22)" stroke-width="0.7"/>
-      <polygon points="${ipRight[0]},${ipRight[1]} ${pRight[0]},${pRight[1]} ${pLeft[0]},${pLeft[1]} ${ipLeft[0]},${ipLeft[1]}" fill="rgba(0,0,0,0.2)" stroke="rgba(0,0,0,0.28)" stroke-width="0.8"/>
-      <polygon points="${c[0]},${c[1]} ${ipRight[0]},${ipRight[1]} ${ipLeft[0]},${ipLeft[1]}" fill="rgba(255,255,255,0.08)" stroke="rgba(0,0,0,0.22)" stroke-width="0.7"/>
-      <polygon points="${ipLeft[0]},${ipLeft[1]} ${pLeft[0]},${pLeft[1]} ${pTop[0]},${pTop[1]} ${ipTop[0]},${ipTop[1]}" fill="rgba(255,255,255,0.15)" stroke="rgba(0,0,0,0.28)" stroke-width="0.8"/>
-      <polygon points="${c[0]},${c[1]} ${ipLeft[0]},${ipLeft[1]} ${pTop[0]},${pTop[1]}" fill="rgba(0,0,0,0.12)" stroke="rgba(0,0,0,0.22)" stroke-width="0.7"/>
+      <polygon points="${ipTop[0]},${ipTop[1]} ${pTop[0]},${pTop[1]} ${pRight[0]},${pRight[1]} ${ipRight[0]},${ipRight[1]}" fill="${fLight}" stroke="${inStroke}" stroke-width="0.8"/>
+      <polygon points="${c[0]},${c[1]} ${ipTop[0]},${ipTop[1]} ${ipRight[0]},${ipRight[1]}" fill="${fDark}" stroke="${inStroke}" stroke-width="0.7"/>
+      <polygon points="${ipRight[0]},${ipRight[1]} ${pRight[0]},${pRight[1]} ${pLeft[0]},${pLeft[1]} ${ipLeft[0]},${ipLeft[1]}" fill="${fDark}" stroke="${inStroke}" stroke-width="0.8"/>
+      <polygon points="${c[0]},${c[1]} ${ipRight[0]},${ipRight[1]} ${ipLeft[0]},${ipLeft[1]}" fill="${fLight}" stroke="${inStroke}" stroke-width="0.7"/>
+      <polygon points="${ipLeft[0]},${ipLeft[1]} ${pLeft[0]},${pLeft[1]} ${pTop[0]},${pTop[1]} ${ipTop[0]},${ipTop[1]}" fill="${fLight}" stroke="${inStroke}" stroke-width="0.8"/>
+      <polygon points="${c[0]},${c[1]} ${ipLeft[0]},${ipLeft[1]} ${pTop[0]},${pTop[1]}" fill="${fDark}" stroke="${inStroke}" stroke-width="0.7"/>
     `;
     const text = (label!==undefined && label!==null)
-      ? `<text x="50" y="67" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="28" fill="#ffffff" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.8))">${label}</text>`
+      ? `<text x="50" y="67" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="28" fill="${tFill}" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.8))">${label}</text>`
       : '';
     return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#8c52ff"/>
-          <stop offset="100%" stop-color="#3d1475"/>
+          <stop offset="0%" stop-color="${gStart}"/>
+          <stop offset="50%" stop-color="${gMid}"/>
+          <stop offset="100%" stop-color="${gEnd}"/>
         </linearGradient>
       </defs>
-      <polygon points="${outerPoints}" fill="url(#${gid})" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/>
+      <polygon points="${outerPoints}" fill="url(#${gid})" stroke="${outStroke}" stroke-width="1.8"/>
       ${facetPolys}
-      <polygon points="${innerPoints}" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>
+      <polygon points="${innerPoints}" fill="none" stroke="${inStroke}" stroke-width="1.1"/>
       ${text}
     </svg>`;
   }
@@ -94,27 +361,28 @@ function renderCustomFacetShape(sides, uid, label){
     const p2 = pts[(i+1)%s];
     const ip1 = innerPts[i];
     const ip2 = innerPts[(i+1)%s];
-    const shadeA = (i % 2 === 0) ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.2)';
-    const shadeB = ((i + 1) % 2 === 0) ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.12)';
-    facetPolys += `<polygon points="${ip1[0]},${ip1[1]} ${p1[0]},${p1[1]} ${p2[0]},${p2[1]} ${ip2[0]},${ip2[1]}" fill="${shadeA}" stroke="rgba(0,0,0,0.28)" stroke-width="0.8"/>`;
-    facetPolys += `<polygon points="50,50 ${ip1[0]},${ip1[1]} ${ip2[0]},${ip2[1]}" fill="${shadeB}" stroke="rgba(0,0,0,0.22)" stroke-width="0.7"/>`;
+    const shadeA = (i % 2 === 0) ? fLight : fDark;
+    const shadeB = ((i + 1) % 2 === 0) ? fLight : fDark;
+    facetPolys += `<polygon points="${ip1[0]},${ip1[1]} ${p1[0]},${p1[1]} ${p2[0]},${p2[1]} ${ip2[0]},${ip2[1]}" fill="${shadeA}" stroke="${inStroke}" stroke-width="0.8"/>`;
+    facetPolys += `<polygon points="50,50 ${ip1[0]},${ip1[1]} ${ip2[0]},${ip2[1]}" fill="${shadeB}" stroke="${inStroke}" stroke-width="0.7"/>`;
   }
 
   const fontSize = s > 99 ? 20 : (s > 20 ? 24 : 28);
   const text = (label!==undefined && label!==null)
-    ? `<text x="50" y="58" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="${fontSize}" fill="#ffffff" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.8))">${label}</text>`
+    ? `<text x="50" y="58" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="${fontSize}" fill="${tFill}" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.8))">${label}</text>`
     : '';
 
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#8c52ff"/>
-        <stop offset="100%" stop-color="#3d1475"/>
+        <stop offset="0%" stop-color="${gStart}"/>
+        <stop offset="52%" stop-color="${gMid}"/>
+        <stop offset="100%" stop-color="${gEnd}"/>
       </linearGradient>
     </defs>
-    <polygon points="${outerPoints}" fill="url(#${gid})" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/>
+    <polygon points="${outerPoints}" fill="url(#${gid})" stroke="${outStroke}" stroke-width="1.8"/>
     ${facetPolys}
-    <polygon points="${innerPoints}" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>
+    <polygon points="${innerPoints}" fill="none" stroke="${inStroke}" stroke-width="1.1"/>
     ${text}
   </svg>`;
 }
@@ -130,6 +398,14 @@ const CUST_THEMES = {
   default: { color:'#b78aff', glow:'rgba(140,82,255,0.55)', bg:'rgba(140,82,255,0.09)', border:'rgba(140,82,255,0.35)' }
 };
 
+function getCustomDieThemeFor(n){
+  const skin = getActiveDiceSkin();
+  if(skin && skin.id !== 'classic'){
+    return { color: skin.accent, glow: skin.glow, bg: skin.bg, border: skin.border };
+  }
+  return CUST_THEMES[n] || CUST_THEMES.default;
+}
+
 function getCustomPreviewSvg(n, uid){
   if(n === 'coin') return generateCoinSvg(uid, '🪙');
   if(n === 2) return dieShapeSvg(2, uid, 'd2');
@@ -137,42 +413,104 @@ function getCustomPreviewSvg(n, uid){
   return renderCustomFacetShape(n, uid, 'd' + n);
 }
 
-function dieShapeSvg(sides, uid, label){
-  if(sides==='coin') return generateCoinSvg(uid, label);
+function dieShapeSvg(sides, uid, label, skinOverride){
+  if(sides==='coin') return generateCoinSvg(uid, label, skinOverride);
+  const skin = skinOverride
+    ? (FAE_DICE_SKINS.find(k => k.id === skinOverride) || FAE_DICE_SKINS[0])
+    : getActiveDiceSkin();
+  const useSkin = skin.id !== 'classic';
+
   if(sides===2){
     const gid = 'grad_'+uid;
     const c = DICE_COLORS[2];
+    const g0 = useSkin ? skin.g0 : c.light;
+    const g1 = useSkin ? skin.g1 : c.light;
+    const g2 = useSkin ? skin.g2 : c.dark;
+    const outStroke = useSkin ? skin.outerStroke : 'rgba(0,0,0,0.35)';
+    const inStroke = useSkin ? skin.innerStroke : 'rgba(255,255,255,0.4)';
+    const tFill = useSkin ? skin.textFill : '#ffffff';
     const text = (label!==undefined && label!==null)
-      ? `<text x="50" y="61" text-anchor="middle" font-family="'Cinzel', serif" font-weight="700" font-size="28" fill="#ffffff" filter="drop-shadow(0 1px 3px rgba(0,0,0,0.85))">${label}</text>`
+      ? `<text x="50" y="61" text-anchor="middle" font-family="'Cinzel', serif" font-weight="700" font-size="28" fill="${tFill}" filter="drop-shadow(0 1px 3px rgba(0,0,0,0.85))">${label}</text>`
       : '';
     return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="${c.light}"/>
-          <stop offset="100%" stop-color="${c.dark}"/>
+          <stop offset="0%" stop-color="${g0}"/>
+          <stop offset="50%" stop-color="${g1}"/>
+          <stop offset="100%" stop-color="${g2}"/>
         </linearGradient>
       </defs>
-      <path d="M 50,7 C 84,26 84,74 50,93 C 16,74 16,26 50,7 Z" fill="url(#${gid})" stroke="rgba(0,0,0,0.35)" stroke-width="1.8"/>
-      <path d="M 50,7 C 22,26 22,74 50,93 Z" fill="rgba(255,255,255,0.18)" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
-      <path d="M 50,7 C 78,26 78,74 50,93 Z" fill="rgba(0,0,0,0.18)" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
-      <line x1="50" y1="7" x2="50" y2="93" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/>
+      <path d="M 50,7 C 84,26 84,74 50,93 C 16,74 16,26 50,7 Z" fill="url(#${gid})" stroke="${outStroke}" stroke-width="2"/>
+      <path d="M 50,7 C 22,26 22,74 50,93 Z" fill="${useSkin ? skin.facetLight : 'rgba(255,255,255,0.18)'}" stroke="${inStroke}" stroke-width="0.9"/>
+      <path d="M 50,7 C 78,26 78,74 50,93 Z" fill="${useSkin ? skin.facetDark : 'rgba(0,0,0,0.18)'}" stroke="${inStroke}" stroke-width="0.9"/>
+      <line x1="50" y1="7" x2="50" y2="93" stroke="${inStroke}" stroke-width="1.3"/>
       ${text}
     </svg>`;
   }
-  if(!DICE_COLORS[sides]) return renderCustomFacetShape(sides, uid, label);
+  if(!DICE_COLORS[sides]) return renderCustomFacetShape(sides, uid, label, skinOverride);
   const c = DICE_COLORS[sides];
   const gid = 'grad_'+uid;
+  const outStroke = useSkin ? skin.outerStroke : 'rgba(0,0,0,0.28)';
+  const inStroke = useSkin ? skin.innerStroke : 'rgba(0,0,0,0.22)';
+  const fLight = useSkin ? skin.facetLight : 'rgba(255,255,255,0.12)';
+  const fDark = useSkin ? skin.facetDark : 'rgba(0,0,0,0.14)';
+
   let shape='';
-  if(sides===4) shape = `<polygon points="50,6 96,90 4,90" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/>`;
-  else if(sides===6) shape = `<rect x="9" y="9" width="82" height="82" rx="14" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/>`;
-  else if(sides===8) shape = `<polygon points="50,4 96,50 50,96 4,50" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/><line x1="50" y1="4" x2="50" y2="96" stroke="rgba(0,0,0,.14)"/>`;
-  else if(sides===10) shape = `<polygon points="50,4 93,42 50,96 7,42" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/><polyline points="7,42 50,58 93,42" fill="none" stroke="rgba(0,0,0,.14)"/><line x1="50" y1="58" x2="50" y2="96" stroke="rgba(0,0,0,.14)"/>`;
-  else if(sides===12) shape = `<polygon points="50,4 95,38 78,94 22,94 5,38" fill="url(#${gid})" stroke="rgba(0,0,0,.25)"/>`;
-  else {
-    const strokeColor = 'rgba(0,0,0,0.28)';
-    const facetFill = 'rgba(255,255,255,0.12)';
-    shape = `<polygon points="50,3 91,26 91,74 50,97 9,74 9,26" fill="url(#${gid})" stroke="${strokeColor}" stroke-width="1.6"/>
-    <polygon points="50,24 75,63 25,63" fill="${facetFill}" stroke="${strokeColor}" stroke-width="1.2"/>
+  if(sides===4){
+    shape = `<polygon points="50,6 96,90 4,90" fill="url(#${gid})" stroke="${outStroke}" stroke-width="${useSkin?2.1:1.2}"/>`;
+    if(useSkin){
+      shape += `<polygon points="50,6 96,90 50,64" fill="${fDark}" stroke="${inStroke}" stroke-width="1.1"/>
+        <polygon points="50,6 4,90 50,64" fill="${fLight}" stroke="${inStroke}" stroke-width="1.1"/>
+        <line x1="50" y1="64" x2="96" y2="90" stroke="${inStroke}" stroke-width="1.1"/>
+        <line x1="50" y1="64" x2="4" y2="90" stroke="${inStroke}" stroke-width="1.1"/>`;
+    }
+  } else if(sides===6){
+    shape = `<rect x="9" y="9" width="82" height="82" rx="14" fill="url(#${gid})" stroke="${outStroke}" stroke-width="${useSkin?2.1:1.2}"/>`;
+    if(useSkin){
+      shape += `<rect x="22" y="22" width="56" height="56" rx="7" fill="${fLight}" stroke="${inStroke}" stroke-width="1.2"/>
+        <line x1="13" y1="13" x2="24" y2="24" stroke="${inStroke}" stroke-width="1.1"/>
+        <line x1="87" y1="13" x2="76" y2="24" stroke="${inStroke}" stroke-width="1.1"/>
+        <line x1="87" y1="87" x2="76" y2="76" stroke="${inStroke}" stroke-width="1.1"/>
+        <line x1="13" y1="87" x2="24" y2="76" stroke="${inStroke}" stroke-width="1.1"/>`;
+    }
+  } else if(sides===8){
+    shape = `<polygon points="50,4 96,50 50,96 4,50" fill="url(#${gid})" stroke="${outStroke}" stroke-width="${useSkin?2.1:1.2}"/>`;
+    if(useSkin){
+      shape += `<polygon points="50,4 96,50 50,50" fill="${fLight}" stroke="${inStroke}" stroke-width="1.1"/>
+        <polygon points="96,50 50,96 50,50" fill="${fDark}" stroke="${inStroke}" stroke-width="1.1"/>
+        <line x1="4" y1="50" x2="96" y2="50" stroke="${inStroke}" stroke-width="1.2"/>
+        <line x1="50" y1="4" x2="50" y2="96" stroke="${inStroke}" stroke-width="1.2"/>`;
+    } else {
+      shape += `<line x1="50" y1="4" x2="50" y2="96" stroke="rgba(0,0,0,.14)"/>`;
+    }
+  } else if(sides===10){
+    shape = `<polygon points="50,4 93,42 50,96 7,42" fill="url(#${gid})" stroke="${outStroke}" stroke-width="${useSkin?2.1:1.2}"/>`;
+    if(useSkin){
+      shape += `<polygon points="50,4 93,42 50,58" fill="${fDark}" stroke="${inStroke}" stroke-width="1.1"/>
+        <polygon points="50,4 7,42 50,58" fill="${fLight}" stroke="${inStroke}" stroke-width="1.1"/>
+        <polyline points="7,42 50,58 93,42" fill="none" stroke="${inStroke}" stroke-width="1.3"/>
+        <line x1="50" y1="58" x2="50" y2="96" stroke="${inStroke}" stroke-width="1.3"/>`;
+    } else {
+      shape += `<polyline points="7,42 50,58 93,42" fill="none" stroke="rgba(0,0,0,.14)"/><line x1="50" y1="58" x2="50" y2="96" stroke="rgba(0,0,0,.14)"/>`;
+    }
+  } else if(sides===12){
+    shape = `<polygon points="50,4 95,38 78,94 22,94 5,38" fill="url(#${gid})" stroke="${outStroke}" stroke-width="${useSkin?2.1:1.2}"/>`;
+    if(useSkin){
+      shape += `<polygon points="50,23 76,42 66,74 34,74 24,42" fill="${fLight}" stroke="${inStroke}" stroke-width="1.2"/>
+        <line x1="50" y1="4" x2="50" y2="23" stroke="${inStroke}" stroke-width="1.1"/>
+        <line x1="95" y1="38" x2="76" y2="42" stroke="${inStroke}" stroke-width="1.1"/>
+        <line x1="78" y1="94" x2="66" y2="74" stroke="${inStroke}" stroke-width="1.1"/>
+        <line x1="22" y1="94" x2="34" y2="74" stroke="${inStroke}" stroke-width="1.1"/>
+        <line x1="5" y1="38" x2="24" y2="42" stroke="${inStroke}" stroke-width="1.1"/>`;
+    }
+  } else {
+    const strokeColor = useSkin ? inStroke : 'rgba(0,0,0,0.28)';
+    const facetFill = fLight;
+    shape = `<polygon points="50,3 91,26 91,74 50,97 9,74 9,26" fill="url(#${gid})" stroke="${outStroke}" stroke-width="${useSkin?2.2:1.6}"/>
+    <polygon points="50,3 91,26 50,24" fill="${fDark}"/>
+    <polygon points="91,26 91,74 75,63" fill="${fDark}"/>
+    <polygon points="9,74 50,97 25,63" fill="${fDark}"/>
+    <polygon points="50,24 75,63 25,63" fill="${facetFill}" stroke="${strokeColor}" stroke-width="1.3"/>
     <line x1="50" y1="24" x2="50" y2="3" stroke="${strokeColor}" stroke-width="1.2"/>
     <line x1="50" y1="24" x2="91" y2="26" stroke="${strokeColor}" stroke-width="1.2"/>
     <line x1="50" y1="24" x2="9" y2="26" stroke="${strokeColor}" stroke-width="1.2"/>
@@ -183,18 +521,64 @@ function dieShapeSvg(sides, uid, label){
     <line x1="25" y1="63" x2="9" y2="74" stroke="${strokeColor}" stroke-width="1.2"/>
     <line x1="25" y1="63" x2="9" y2="26" stroke="${strokeColor}" stroke-width="1.2"/>`;
   }
+  const tFill = useSkin ? skin.textFill : '#fff';
+  const tFont = useSkin ? (skin.monoFont ? "'JetBrains Mono', monospace" : "'Cinzel', serif") : 'Arial, sans-serif';
+  const tFilter = (useSkin && skin.id === 'bone')
+    ? ' filter="drop-shadow(0 1px 0 rgba(255,255,255,0.65))"'
+    : (useSkin ? ' filter="drop-shadow(0 2px 3px rgba(0,0,0,0.85))"' : '');
   const text = (label!==undefined && label!==null)
-    ? `<text x="50" y="${DICE_LABEL_Y[sides]}" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="32" fill="#fff">${label}</text>`
+    ? `<text x="50" y="${DICE_LABEL_Y[sides]}" text-anchor="middle" font-family="${tFont}" font-weight="700" font-size="${useSkin?30:32}" fill="${tFill}"${tFilter}>${label}</text>`
     : '';
-  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c.light}"/><stop offset="1" stop-color="${c.dark}"/></linearGradient></defs>${shape}${text}</svg>`;
+  const gradStops = useSkin
+    ? `<stop offset="0%" stop-color="${skin.g0}"/><stop offset="52%" stop-color="${skin.g1}"/><stop offset="100%" stop-color="${skin.g2}"/>`
+    : `<stop offset="0%" stop-color="${c.light}"/><stop offset="1" stop-color="${c.dark}"/>`;
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">${gradStops}</linearGradient></defs>${shape}${text}</svg>`;
 }
 
-function trayDieHtml(d){
+function getDieCritState(sides, value){
+  if(!isFaerunDiceSkinMode() || sides !== 20) return '';
+  if(value === 20) return 'crit';
+  if(value === 1) return 'fumble';
+  return '';
+}
+
+function applyDieCritFumbleDom(el, sides, value){
+  if(!el) return;
+  el.classList.remove('is-crit', 'is-fumble');
+  const oldBadge = el.querySelector('.die-crit-badge');
+  if(oldBadge) oldBadge.remove();
+  const state = getDieCritState(sides, value);
+  if(state === 'crit'){
+    el.classList.add('is-crit');
+    const b = document.createElement('div');
+    b.className = 'die-crit-badge crit';
+    b.textContent = '★ КРИТ';
+    el.appendChild(b);
+  } else if(state === 'fumble'){
+    el.classList.add('is-fumble');
+    const b = document.createElement('div');
+    b.className = 'die-crit-badge fumble';
+    b.textContent = '💀 ПРОВАЛ';
+    el.appendChild(b);
+  }
+}
+
+function trayDieHtml(d, hideCritNow){
   const isCoin = (d.sides === 'coin');
   const valText = isCoin ? (d.value === 2 ? 'W' : 'L') : d.value;
-  return `<div class="die s${d.sides}" data-id="${d.id}" title="Убрать ${isCoin?'монету':'кость'}">
+  const skin = getActiveDiceSkin();
+  const critState = hideCritNow ? '' : getDieCritState(d.sides, d.value);
+  const critCls = critState === 'crit' ? ' is-crit' : (critState === 'fumble' ? ' is-fumble' : '');
+  const badgeHtml = critState === 'crit'
+    ? `<div class="die-crit-badge crit">★ КРИТ</div>`
+    : (critState === 'fumble' ? `<div class="die-crit-badge fumble">💀 ПРОВАЛ</div>` : '');
+  const valColor = isCoin ? (skin.coinValColor || '#fff8db') : (skin.valColor || '#ffffff');
+  const valShadow = skin.valShadow || '0 2px 4px rgba(0,0,0,.65)';
+  const valFont = skin.monoFont ? "'JetBrains Mono',monospace" : "'Cinzel',serif";
+  return `<div class="die s${d.sides} skin-${skin.id}${critCls}" data-id="${d.id}" title="Убрать ${isCoin?'монету':'кость'}">
     ${dieShapeSvg(d.sides, d.id, isCoin ? '' : null)}
-    <div class="val">${valText}</div>
+    <div class="val" style="color:${valColor};text-shadow:${valShadow};font-family:${valFont};">${valText}</div>
+    ${badgeHtml}
   </div>`;
 }
 
@@ -208,11 +592,12 @@ function currentDiceTotal(){
   }
 
   const numSum = numDice.reduce((s,d)=>s+d.value,0) + diceState.modifier;
+  const sumDisp = diceState.unknownMod ? `${numSum} + мод.` : numSum;
   if(coinDice.length){
     const coinStr = coinDice.map(c => c.value === 2 ? 'W' : 'L').join(', ');
-    return `${numSum} · ${coinStr}`;
+    return `${sumDisp} · ${coinStr}`;
   }
-  return numSum;
+  return sumDisp;
 }
 
 function diceNotation(compact){
@@ -229,6 +614,7 @@ function diceNotation(compact){
   const m=diceState.modifier;
   if(m>0) n+=(compact?'+':' + ')+m;
   else if(m<0) n+=(compact? String(m) : ' − '+Math.abs(m));
+  if(diceState.unknownMod) n+=(compact?'+мод.':' + мод.');
   return n;
 }
 
@@ -236,6 +622,9 @@ function animateDie(el, sides, finalValue, dur){
   const valEl = el.querySelector('.val');
   if(!valEl) return;
   if(el._diceIv) clearInterval(el._diceIv);
+  el.classList.remove('is-crit', 'is-fumble');
+  const oldBadge = el.querySelector('.die-crit-badge');
+  if(oldBadge) oldBadge.remove();
   el.classList.add('rolling');
   const isCoin = (sides === 'coin');
   const start = performance.now();
@@ -249,6 +638,7 @@ function animateDie(el, sides, finalValue, dur){
       clearInterval(el._diceIv); el._diceIv=null;
       el.classList.remove('rolling');
       valEl.textContent = isCoin ? (finalValue === 2 ? 'W' : 'L') : finalValue;
+      applyDieCritFumbleDom(el, sides, finalValue);
     }
   },70);
 }
@@ -258,8 +648,7 @@ function updateLabelPreview(){
   if(!el) return;
   if(!diceState.dice.length){
     const label = currentDiceLabel();
-    const m = diceState.modifier;
-    const modStr = m ? (m > 0 ? (' + ' + m) : (' − ' + Math.abs(m))) : '';
+    const modStr = formatDiceModSuffix(diceState.modifier, diceState.unknownMod);
     el.textContent = `*[Результат броска ${label?label+' ':''}1d20: … ]*${modStr}`;
     return;
   }
@@ -313,12 +702,18 @@ function pushDiceHistory(entries){
 function histDieHtml(h, isNew){
   const isCoin = (h.sides === 'coin');
   const valText = isCoin ? (h.value === 2 ? 'W' : 'L') : h.value;
+  const skin = getActiveDiceSkin();
+  const critState = getDieCritState(h.sides, h.value);
+  const critCls = critState === 'crit' ? ' is-crit' : (critState === 'fumble' ? ' is-fumble' : '');
+  const critTag = critState === 'crit' ? ' · ★ КРИТ!' : (critState === 'fumble' ? ' · 💀 ПРОВАЛ!' : '');
   const tip = isCoin
     ? `${h.emoji?h.emoji+' ':''}${h.label ? h.label+' · ' : ''}Монета C = ${valText}`
-    : `${h.emoji?h.emoji+' ':''}${h.label ? h.label+' · ' : ''}d${h.sides} = ${h.value}`;
-  return `<div class="hist-die${isNew?' hist-new':''}" data-tip="${escapeAttr(tip)}">
+    : `${h.emoji?h.emoji+' ':''}${h.label ? h.label+' · ' : ''}d${h.sides} = ${h.value}${critTag}`;
+  const hvColor = isCoin ? (skin.coinValColor || '#fff8d6') : (skin.valColor || '#ffffff');
+  const hvShadow = skin.valShadow || '0 1px 2px rgba(0,0,0,.6)';
+  return `<div class="hist-die${isNew?' hist-new':''}${critCls}" data-tip="${escapeAttr(tip)}">
     ${dieShapeSvg(h.sides, 'h'+h.uid, isCoin ? '' : null)}
-    <div class="hv" style="${isCoin?'font-size:14px;font-family:Cinzel,serif;font-weight:700;color:#fff8d6;':''}">${valText}</div>
+    <div class="hv" style="color:${hvColor};text-shadow:${hvShadow};${isCoin?'font-size:14px;font-family:Cinzel,serif;font-weight:700;':''}">${valText}</div>
     ${h.emoji?`<div class="he">${h.emoji}</div>`:''}
   </div>`;
 }
@@ -351,7 +746,7 @@ function addDie(sides){
   if(hint) hint.remove();
 
   const holder = document.createElement('div');
-  holder.innerHTML = trayDieHtml({id,sides,value});
+  holder.innerHTML = trayDieHtml({id,sides,value}, true);
   const el = holder.firstElementChild || holder;
   tray.appendChild(el);
   el.addEventListener('click', ()=>removeDie(id));
@@ -444,9 +839,8 @@ function buildDiceResultLines(){
     lines.push(`*[Результат броска ${prefix}${coinName}: ${coinVals.join(' | ')} ]*`);
   }
 
-  if(diceState.modifier && lines.length && sidesDesc.length){
-    const m = diceState.modifier;
-    const modStr = m > 0 ? (' + ' + m) : (' − ' + Math.abs(m));
+  if((diceState.modifier || diceState.unknownMod) && lines.length && sidesDesc.length){
+    const modStr = formatDiceModSuffix(diceState.modifier, diceState.unknownMod);
     const targetIdx = (std !== null && sidesDesc.includes(std)) ? sidesDesc.indexOf(std) : (lines.length - (groups['coin'] ? 2 : 1));
     if(lines[targetIdx]) lines[targetIdx] += modStr;
   }
@@ -695,17 +1089,53 @@ function diceItemOptionsHtml(){
 
 function renderDice(){
   const hasDice = diceState.dice.length>0;
+  const isFaeSkinMode = isFaerunDiceSkinMode();
+  const activeSkin = getActiveDiceSkin();
   const trayContent = hasDice
-    ? diceState.dice.map(trayDieHtml).join('')
+    ? diceState.dice.map(d => trayDieHtml(d, false)).join('')
     : `<div class="empty-hint">Нажмите на кость внизу — она появится здесь и сразу будет брошена.<br>Клик по кости на поле убирает её.</div>`;
   const pick = DICE_TYPES.map(s=>
     `<button class="die-btn ${s==='coin'?'die-coin-btn':''}" data-sides="${s}" title="${s==='coin'?'Бросить монету (C)':'Добавить d'+s}">${dieShapeSvg(s,'pick'+s,s==='coin'?'C':s)}</button>`
   ).join('');
   const m = diceState.modifier;
   const label = currentDiceLabel();
-  const modPreviewStr = m ? (m > 0 ? (' + ' + m) : (' − ' + Math.abs(m))) : '';
-  const custTheme = CUST_THEMES[diceState.customSides] || CUST_THEMES.default;
+  const modPreviewStr = formatDiceModSuffix(m, diceState.unknownMod);
+  const custTheme = getCustomDieThemeFor(diceState.customSides);
   const custThemeStyles = `--cust-color:${custTheme.color};--cust-glow:${custTheme.glow};--cust-bg-tint:${custTheme.bg};--cust-border-tint:${custTheme.border};`;
+
+  const faeSkinBarHtml = isFaeSkinMode ? `
+    <aside class="fae-dice-skin-dock${diceState.skinCollapsed ? ' collapsed' : ''}" id="faeDiceSkinDock" style="--sk-active-accent:${activeSkin.accent};--sk-active-glow:${activeSkin.glow};">
+      <div class="fae-dice-skin-panel">
+        <div class="fae-dice-skin-head">
+          <div class="fae-dice-skin-head-info">
+            <span class="fae-dice-skin-label">🎨 Скины костей</span>
+            <span class="fae-dice-skin-active-name" style="color:${activeSkin.accent};">${escapeHtml(activeSkin.title)}</span>
+          </div>
+          <button type="button" class="fae-dice-skin-collapse-btn" id="faeDiceSkinCollapseBtn" title="Свернуть панель скинов влево">‹ Свернуть</button>
+        </div>
+        <div class="fae-dice-skin-grid">
+          ${FAE_DICE_SKINS.map(sk => {
+            const isAct = sk.id === activeSkin.id;
+            return `<button type="button" class="fae-dice-skin-chip${isAct ? ' active' : ''}" data-fae-dice-skin="${sk.id}" style="--sk-accent:${sk.accent};--sk-glow:${sk.glow};--sk-bg:${sk.bg};--sk-border:${sk.border};" title="${escapeAttr(sk.title + ' — ' + sk.sub)}">
+              <span class="fae-dice-skin-icons">
+                <span class="fae-dice-skin-mini">${dieShapeSvg(20, 'skp20_' + sk.id, 20, sk.id)}</span>
+                <span class="fae-dice-skin-mini coin">${generateCoinSvg('skpc_' + sk.id, 'C', sk.id)}</span>
+              </span>
+              <span class="fae-dice-skin-text">
+                <span class="fae-dice-skin-title">${escapeHtml(sk.title)}</span>
+                <span class="fae-dice-skin-sub">${escapeHtml(sk.sub)}</span>
+              </span>
+            </button>`;
+          }).join('')}
+        </div>
+      </div>
+      <button type="button" class="fae-dice-skin-tab" id="faeDiceSkinTabBtn" title="Развернуть / свернуть скины костей">
+        <span class="fae-dice-skin-tab-die">${dieShapeSvg(20, 'sktab20_' + activeSkin.id, 20, activeSkin.id)}</span>
+        <span class="fae-dice-skin-tab-label">Скины</span>
+        <span class="fae-dice-skin-tab-arrow">›</span>
+      </button>
+    </aside>
+  ` : '';
 
   return `
     ${(function(){
@@ -751,6 +1181,7 @@ function renderDice(){
         '<p class="subtitle">КОСТИ ФАЭРУНА // D&D 5E БРОСОК КОСТЕЙ</p>';
     })()}
     <div class="rule"></div>
+    ${faeSkinBarHtml}
     <div class="dice-tray">${trayContent}</div>
     <div class="dice-total-row">
       <div class="hist-tip" id="histTip"></div>
@@ -766,6 +1197,10 @@ function renderDice(){
         <button class="mod-btn" id="modMinus">−</button>
         <span class="mod-val">${m>0?'+':''}${m}</span>
         <button class="mod-btn" id="modPlus">+</button>
+        <label class="mod-unknown-chk${diceState.unknownMod ? ' active' : ''}" title="Добавить приписку « + мод.», если точный модификатор неизвестен">
+          <input type="checkbox" id="modUnknownChk" ${diceState.unknownMod ? 'checked' : ''}>
+          <span>+ мод.</span>
+        </label>
       </div>
     </div>
 
@@ -11681,6 +12116,34 @@ function wireEvents(){
     if(mv) mv.textContent=(diceState.modifier>0?'+':'')+diceState.modifier;
     updateDiceReadout();
   });
+  const modUnknownChk=document.getElementById('modUnknownChk');
+  if(modUnknownChk) modUnknownChk.addEventListener('change', ()=>{
+    diceState.unknownMod = !!modUnknownChk.checked;
+    const lbl = modUnknownChk.closest('.mod-unknown-chk');
+    if(lbl) lbl.classList.toggle('active', diceState.unknownMod);
+    updateDiceReadout();
+  });
+
+  document.querySelectorAll('[data-fae-dice-skin]').forEach(btn=>{
+    if(btn._wiredSkin) return;
+    btn._wiredSkin = true;
+    btn.addEventListener('click', ()=>{
+      const skId = btn.getAttribute('data-fae-dice-skin') || 'classic';
+      if(getActiveDiceSkin().id === skId) return;
+      setFaerunDiceSkin(skId);
+    });
+  });
+
+  const skinCollapseBtn = document.getElementById('faeDiceSkinCollapseBtn');
+  if(skinCollapseBtn && !skinCollapseBtn._wired){
+    skinCollapseBtn._wired = true;
+    skinCollapseBtn.addEventListener('click', ()=>toggleFaerunSkinDock(true));
+  }
+  const skinTabBtn = document.getElementById('faeDiceSkinTabBtn');
+  if(skinTabBtn && !skinTabBtn._wired){
+    skinTabBtn._wired = true;
+    skinTabBtn.addEventListener('click', ()=>toggleFaerunSkinDock());
+  }
 
   function setCustomSides(val){
     let n = parseInt(val, 10);
@@ -11691,7 +12154,7 @@ function wireEvents(){
     const svgWrap = document.getElementById('customDieSvgWrap');
     if(svgWrap) svgWrap.innerHTML = getCustomPreviewSvg(n, 'custPick');
 
-    const theme = CUST_THEMES[n] || CUST_THEMES.default;
+    const theme = getCustomDieThemeFor(n);
     const box = document.querySelector('.custom-die-box');
     if(box){
       box.style.setProperty('--cust-color', theme.color);

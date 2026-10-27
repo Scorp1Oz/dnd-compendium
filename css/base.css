@@ -282,7 +282,7 @@
   }
   .die{width:88px;height:88px;position:relative;cursor:pointer;transition:transform .15s, filter .15s;}
   .die:hover{transform:scale(1.07);filter:brightness(1.12);}
-  .die svg{width:100%;height:100%;display:block;filter:drop-shadow(0 5px 10px rgba(0,0,0,.45));}
+  .die svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 5px 10px rgba(0,0,0,.45));}
   .die .val{
     position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     font-family:'Cinzel',serif;font-weight:700;font-size:27px;color:#fff;
@@ -293,6 +293,219 @@
   .die.s3 .val, .die.s4 .val{padding-top:22px;font-size:22px;}
   .die.s10 .val{padding-bottom:12px;}
   .die.rolling{animation:diceshake .14s linear infinite;}
+
+  /* Эффекты крита (20) и критического провала (1) на d20 */
+  .die.is-crit svg{
+    filter:drop-shadow(0 0 12px rgba(251,191,36,0.95)) drop-shadow(0 0 24px rgba(245,158,11,0.65));
+  }
+  .die.is-crit{
+    animation:critBurst .45s cubic-bezier(.18,1.5,.4,1);
+  }
+  .die.is-fumble svg{
+    filter:drop-shadow(0 0 12px rgba(239,68,68,0.95)) drop-shadow(0 0 22px rgba(153,27,27,0.75));
+  }
+  .die.is-fumble{
+    animation:fumblePulse .42s ease-out;
+  }
+  @keyframes critBurst{
+    0%{transform:scale(0.85);}
+    55%{transform:scale(1.16);}
+    100%{transform:scale(1);}
+  }
+  @keyframes fumblePulse{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-5px) rotate(-4deg);}
+    75%{transform:translateX(5px) rotate(4deg);}
+  }
+  .die-crit-badge{
+    position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);
+    font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:800;letter-spacing:.06em;
+    padding:2px 7px;border-radius:10px;white-space:nowrap;pointer-events:none;z-index:4;
+    box-shadow:0 2px 8px rgba(0,0,0,0.75);
+  }
+  .die-crit-badge.crit{
+    background:linear-gradient(135deg, #fef08a 0%, #f59e0b 100%);
+    color:#1c1917;border:1px solid #fffbeb;
+  }
+  .die-crit-badge.fumble{
+    background:linear-gradient(135deg, #991b1b 0%, #450a0a 100%);
+    color:#fecaca;border:1px solid #f87171;
+  }
+  .hist-die.is-crit svg{
+    filter:drop-shadow(0 0 6px rgba(251,191,36,0.9));
+  }
+  .hist-die.is-fumble svg{
+    filter:drop-shadow(0 0 6px rgba(239,68,68,0.9));
+  }
+
+  /* Боковая сворачиваемая панель скинов костей слева (Эксклюзивно для Фаэруна) */
+  .fae-dice-skin-dock{
+    position:fixed;
+    left:0;
+    top:50%;
+    transform:translate3d(0, -50%, 0);
+    display:flex;
+    align-items:center;
+    z-index:88;
+    pointer-events:none;
+    transition:transform .28s cubic-bezier(.22, 1, .36, 1);
+  }
+  .fae-dice-skin-dock.collapsed{
+    transform:translate3d(-236px, -50%, 0);
+  }
+  .fae-dice-skin-panel{
+    width:236px;
+    box-sizing:border-box;
+    max-height:84vh;
+    overflow-y:auto;
+    pointer-events:auto;
+    background:linear-gradient(155deg, rgba(18,21,27,0.96) 0%, rgba(10,12,16,0.98) 100%);
+    border:1px solid var(--line);
+    border-left:none;
+    border-right:1px solid var(--sk-active-accent, var(--brass-dim));
+    border-radius:0 8px 8px 0;
+    padding:12px 10px;
+    box-shadow:10px 0 30px rgba(0,0,0,0.8), 0 0 16px var(--sk-active-glow, rgba(0,0,0,0.3));
+    backdrop-filter:blur(8px);
+    scrollbar-width:thin;
+    scrollbar-color:var(--line) transparent;
+    transition:box-shadow .25s ease, opacity .25s ease;
+  }
+  .fae-dice-skin-dock.collapsed .fae-dice-skin-panel{
+    box-shadow:none;
+    opacity:0;
+    pointer-events:none;
+  }
+  .fae-dice-skin-head{
+    display:flex;align-items:center;justify-content:space-between;gap:6px;
+    margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);
+  }
+  .fae-dice-skin-head-info{
+    display:flex;flex-direction:column;min-width:0;
+  }
+  .fae-dice-skin-label{
+    font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);
+  }
+  .fae-dice-skin-active-name{
+    font-family:'Cinzel',serif;font-size:12.5px;font-weight:700;margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .fae-dice-skin-collapse-btn{
+    background:var(--steel-1);border:1px solid var(--line);color:var(--ink-dim);
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:4px 8px;
+    border-radius:4px;cursor:pointer;flex-shrink:0;transition:all .15s;
+  }
+  .fae-dice-skin-collapse-btn:hover{
+    border-color:var(--sk-active-accent, var(--brass));color:var(--ink);
+  }
+  .fae-dice-skin-grid{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .fae-dice-skin-chip{
+    display:flex;align-items:center;gap:9px;
+    width:100%;box-sizing:border-box;
+    background:var(--steel-1);
+    border:1px solid var(--line);
+    border-radius:5px;
+    padding:6px 8px;
+    cursor:pointer;
+    text-align:left;
+    transition:all .16s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .fae-dice-skin-chip:hover{
+    border-color:var(--sk-border, var(--brass-dim));
+    background:var(--steel-2);
+    transform:translateX(2px);
+  }
+  .fae-dice-skin-chip.active{
+    background:linear-gradient(135deg, var(--sk-bg, rgba(201,164,92,0.14)) 0%, rgba(16,18,24,0.95) 100%);
+    border-color:var(--sk-accent, var(--brass));
+    box-shadow:0 0 12px var(--sk-glow, rgba(201,164,92,0.25)), inset 0 0 0 1px rgba(255,255,255,0.06);
+  }
+  .fae-dice-skin-icons{
+    display:inline-flex;align-items:center;flex-shrink:0;position:relative;width:42px;height:28px;
+  }
+  .fae-dice-skin-mini{
+    width:27px;height:27px;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+  }
+  .fae-dice-skin-mini.coin{
+    width:21px;height:21px;margin-left:-8px;margin-top:6px;
+  }
+  .fae-dice-skin-mini svg{width:100%;height:100%;display:block;}
+  .fae-dice-skin-text{display:flex;flex-direction:column;min-width:0;flex:1;}
+  .fae-dice-skin-title{
+    font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;
+  }
+  .fae-dice-skin-chip.active .fae-dice-skin-title{
+    color:var(--sk-accent, var(--brass));
+  }
+  .fae-dice-skin-sub{
+    font-size:10.5px;color:var(--ink-dim);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;line-height:1.15;
+  }
+  .fae-dice-skin-tab{
+    pointer-events:auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    padding:10px 7px;
+    background:linear-gradient(155deg, rgba(20,24,31,0.96) 0%, rgba(11,13,18,0.98) 100%);
+    border:1px solid var(--sk-active-accent, var(--brass-dim));
+    border-left:none;
+    border-radius:0 8px 8px 0;
+    color:var(--ink);
+    cursor:pointer;
+    box-shadow:4px 0 16px rgba(0,0,0,0.7), 0 0 12px var(--sk-active-glow, rgba(0,0,0,0.25));
+    transition:all .2s ease;
+  }
+  .fae-dice-skin-dock.collapsed .fae-dice-skin-tab{
+    opacity:0.35;
+    border-color:var(--line);
+    box-shadow:none;
+  }
+  .fae-dice-skin-tab:hover,
+  .fae-dice-skin-dock.collapsed .fae-dice-skin-tab:hover{
+    opacity:1;
+    padding-left:10px;
+    border-color:var(--sk-active-accent, var(--brass));
+    box-shadow:6px 0 20px rgba(0,0,0,0.85), 0 0 16px var(--sk-active-glow, rgba(201,164,92,0.45));
+  }
+  .fae-dice-skin-tab-die{
+    width:26px;height:26px;display:block;
+    filter:drop-shadow(0 2px 5px rgba(0,0,0,0.7));
+  }
+  .fae-dice-skin-tab-die svg{width:100%;height:100%;display:block;}
+  .fae-dice-skin-tab-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:9.5px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--sk-active-accent, var(--brass));
+    writing-mode:vertical-rl;
+    text-orientation:mixed;
+    transform:rotate(180deg);
+  }
+  .fae-dice-skin-tab-arrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    font-weight:700;
+    color:var(--ink-dim);
+    line-height:1;
+    transition:transform .25s ease;
+    transform:rotate(180deg);
+  }
+  .fae-dice-skin-dock.collapsed .fae-dice-skin-tab-arrow{
+    transform:rotate(0deg);
+  }
   @keyframes diceshake{
     0%{transform:rotate(-10deg) scale(1.06);}
     50%{transform:rotate(10deg) scale(.96);}
@@ -306,7 +519,9 @@
   .dice-total-row .sum{font-family:'Cinzel',serif;font-weight:700;font-size:44px;color:var(--ink);line-height:1;}
 
   .dice-history{
-    flex:1;min-width:0;height:46px;
+    flex:1;min-width:0;height:68px;
+    padding:11px 22px 11px 0;
+    margin:-11px -12px -11px 0;
     display:flex;align-items:center;justify-content:flex-end;gap:9px;
     overflow:hidden;
     -webkit-mask-image:linear-gradient(90deg, transparent 0, rgba(0,0,0,.35) 40px, #000 110px, #000 100%);
@@ -315,7 +530,7 @@
   .hist-die{
     width:34px;height:34px;position:relative;flex-shrink:0;
   }
-  .hist-die svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.45));}
+  .hist-die svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 2px 4px rgba(0,0,0,.45));}
   .hist-die .hv{
     position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     font-family:'Cinzel',serif;font-weight:700;font-size:13px;color:#fff;
@@ -365,6 +580,21 @@
   }
   .mod-btn:hover{border-color:var(--brass-dim);color:var(--brass);}
   .mod-val{font-family:'JetBrains Mono',monospace;font-size:15px;min-width:36px;text-align:center;color:var(--ink);}
+  .mod-unknown-chk{
+    display:inline-flex;align-items:center;gap:6px;margin-left:6px;
+    padding:4px 10px;height:30px;box-sizing:border-box;
+    border:1px solid var(--line);background:var(--steel-1);color:var(--ink-dim);
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;
+    border-radius:2px;cursor:pointer;user-select:none;transition:all .15s;
+  }
+  .mod-unknown-chk:hover{border-color:var(--brass-dim);color:var(--ink);}
+  .mod-unknown-chk input[type=checkbox]{
+    margin:0;width:13px;height:13px;accent-color:var(--brass);cursor:pointer;
+  }
+  .mod-unknown-chk.active{
+    border-color:var(--brass);background:rgba(201,164,92,0.14);color:var(--brass);
+    box-shadow:0 0 10px rgba(201,164,92,0.18);
+  }
   .custom-die-box{
     --cust-color: #b78aff;
     --cust-glow: rgba(140,82,255,0.45);
