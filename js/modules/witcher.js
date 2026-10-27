@@ -9,6 +9,7 @@
   var WI_ACTIVE_ID_KEY = 'ttc_wi_active_id';
   var WI_META_KEY = 'ttc_wi_meta';
   var WI_THEME_KEY = 'ttc_wi_theme';
+  var WI_DRAGON_SWALLOW_KEY = 'ttc_wi_dragon_swallow';
 
   function defaultWitcherProfile(){
     return {
@@ -394,12 +395,40 @@
         id: 'dragon',
         title: 'Ониксовый Дракон',
         sub: 'Чёрный Оникс • Обсидиан и Пепел',
-        icon: 'symbols/Witcher/onyx_dragon_crest.png?v=165',
+        icon: 'symbols/Witcher/onyx_dragon_crest.png?v=189',
         accent: '#d4d4d8',
         glow: 'rgba(212,212,216,0.45)',
         toast: '🐉 Тема: Ониксовый Дракон (Чёрный Оникс и Обсидиан)'
       }
     ],
+
+    isDragonSwallowEnabled: function(){
+      try {
+        var raw = localStorage.getItem(WI_DRAGON_SWALLOW_KEY);
+        if(raw === '0' || raw === 'false') return false;
+        if(raw === '1' || raw === 'true') return true;
+      } catch(e){}
+      if(WI.meta && typeof WI.meta.dragonSwallow === 'boolean') return WI.meta.dragonSwallow;
+      return true;
+    },
+
+    setDragonSwallow: function(enabled){
+      var val = !!enabled;
+      try {
+        localStorage.setItem(WI_DRAGON_SWALLOW_KEY, val ? '1' : '0');
+      } catch(e){}
+      var m = WI.getMeta();
+      m.dragonSwallow = val;
+      WI.saveMeta(m);
+      WI.applyWitcherTheme();
+      return val;
+    },
+
+    getDragonCrestUrl: function(){
+      return WI.isDragonSwallowEnabled()
+        ? 'symbols/Witcher/onyx_dragon_crest.png?v=189'
+        : 'symbols/Witcher/onyx_dragon_crest_empty.png?v=189';
+    },
 
     getTheme: function(){
       var valid = function(id){
@@ -548,9 +577,10 @@
     },
 
     buildOnyxDragonEmblemSvg: function(){
+      var crestUrl = WI.getDragonCrestUrl();
       return '<div class="wi-bg-dragon-wrap" aria-hidden="true">' +
         '<div class="wi-bg-dragon-crest">' +
-          '<img src="symbols/Witcher/onyx_dragon_crest.png?v=165" alt="" draggable="false" />' +
+          '<img src="' + crestUrl + '" alt="" draggable="false" />' +
         '</div>' +
       '</div>';
     },
@@ -560,6 +590,7 @@
       cont.innerHTML = '';
       var theme = WI.getTheme();
       cont.setAttribute('data-wi-theme', theme);
+      cont.setAttribute('data-wi-dragon-swallow', WI.isDragonSwallowEnabled() ? '1' : '0');
 
       // 1. Фоновая геральдика активной темы
       var medallionWrap = document.createElement('div');
@@ -772,7 +803,8 @@
         document.body.insertBefore(cont, document.body.firstChild);
       }
       var curTheme = WI.getTheme();
-      if(cont.children.length === 0 || !cont.querySelector('.wi-sign-particle') || cont.getAttribute('data-wi-theme') !== curTheme){
+      var swallowAttr = WI.isDragonSwallowEnabled() ? '1' : '0';
+      if(cont.children.length === 0 || !cont.querySelector('.wi-sign-particle') || cont.getAttribute('data-wi-theme') !== curTheme || (curTheme === 'dragon' && cont.getAttribute('data-wi-dragon-swallow') !== swallowAttr)){
         WI.buildThemeFx(cont);
       }
       cont.style.display = 'block';
@@ -1196,18 +1228,39 @@
     var schoolIcon = getSchoolIcon(p.school);
     var curTheme = WI.getTheme();
     var activeThemeObj = WI.THEMES.find(function(t){ return t.id === curTheme; }) || WI.THEMES[0];
+    var swallowOn = WI.isDragonSwallowEnabled();
 
     var themeChipsHtml = WI.THEMES.map(function(t){
       var isAct = (t.id === curTheme);
+      var iconSrc = (t.id === 'dragon') ? WI.getDragonCrestUrl() : t.icon;
+      var subText = (t.id === 'dragon')
+        ? (swallowOn ? 'Чёрный Оникс • Символ Ласточки' : 'Чёрный Оникс • Обсидиан и Пепел')
+        : t.sub;
       return '<button type="button" class="wi-theme-option-card wi-theme-card-' + escA(t.id) + (isAct ? ' active' : '') + '" data-wi-theme-pick="' + escA(t.id) + '" style="--wi-chip-accent:' + escA(t.accent) + ';--wi-chip-glow:' + escA(t.glow) + ';">' +
-        '<span class="wi-theme-card-icon"><img src="' + escA(t.icon) + '" alt="" draggable="false" /></span>' +
+        '<span class="wi-theme-card-icon"><img src="' + escA(iconSrc) + '" alt="" draggable="false" /></span>' +
         '<span class="wi-theme-card-info">' +
           '<span class="wi-theme-card-title">' + esc(t.title) + '</span>' +
-          '<span class="wi-theme-card-sub">' + esc(t.sub) + '</span>' +
+          '<span class="wi-theme-card-sub">' + esc(subText) + '</span>' +
         '</span>' +
         '<span class="wi-theme-card-dot">' + (isAct ? '✓' : '') + '</span>' +
       '</button>';
     }).join('');
+
+    var dragonSwallowControlHtml = (curTheme === 'dragon')
+      ? '<div class="wi-dragon-swallow-bar">' +
+          '<div class="wi-dragon-swallow-info">' +
+            '<span class="wi-dragon-swallow-preview"><img src="' + escA(WI.getDragonCrestUrl()) + '" alt="" draggable="false" /></span>' +
+            '<div>' +
+              '<div class="wi-dragon-swallow-title">🕊️ Символ Ласточки (Zireael) внутри дракона</div>' +
+              '<div class="wi-dragon-swallow-sub">' + (swallowOn ? 'Включён — внутри кольца хвоста отображается знак Ласточки' : 'Выключен — внутри кольца хвоста пустое пространство') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="wi-dragon-swallow-switch" role="group" aria-label="Символ Ласточки Вкл/Выкл">' +
+            '<button type="button" class="wi-dragon-swallow-btn' + (swallowOn ? ' active' : '') + '" data-wi-dragon-swallow-btn="1">Вкл</button>' +
+            '<button type="button" class="wi-dragon-swallow-btn' + (!swallowOn ? ' active' : '') + '" data-wi-dragon-swallow-btn="0">Выкл</button>' +
+          '</div>' +
+        '</div>'
+      : '';
 
     return crumbWi([{ label: 'Ведьмак', nav: 'wiHome' }, { label: 'Данные' }]) +
       '<button class="back" data-nav="wiHome" onclick="if(typeof window.navigate===\'function\') window.navigate(\'wiHome\');">← Назад</button>' +
@@ -1221,6 +1274,7 @@
         '<div class="wi-theme-picker-grid">' +
           themeChipsHtml +
         '</div>' +
+        dragonSwallowControlHtml +
       '</div>' +
 
       '<div class="sheet-section wi-data-section">' +
@@ -1361,6 +1415,17 @@
         if(typeof render === 'function') render();
         var tObj = WI.THEMES.find(function(t){ return t.id === chosen; });
         WI.toast(tObj && tObj.toast ? tObj.toast : ('✓ Включена тема «' + chosen + '»'), 'success');
+      });
+    });
+
+    // Переключение символа Ласточки внутри темы «Ониксовый Дракон»
+    document.querySelectorAll('[data-wi-dragon-swallow-btn]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var nextState = btn.getAttribute('data-wi-dragon-swallow-btn') === '1';
+        if(WI.isDragonSwallowEnabled() === nextState) return;
+        WI.setDragonSwallow(nextState);
+        if(typeof render === 'function') render();
+        WI.toast(nextState ? '🕊️ Символ Ласточки: Вкл' : '🐉 Символ Ласточки: Выкл (пустое кольцо)', 'success');
       });
     });
 
