@@ -640,6 +640,20 @@ function getAvailableDiceCategories(){
           items: moveItems
         });
       }
+      if(hero && Array.isArray(hero.customSkills) && hero.customSkills.length > 0){
+        extraCats.push({
+          key: 'fae_custom_skills',
+          icon: '🛠️',
+          ru: 'Навыки и знания героя',
+          items: hero.customSkills.map(function(sk){
+            return {
+              icon: '🛠️',
+              ru: (sk.name || 'Навык') + (sk.mod ? (' (' + sk.mod + ')') : ''),
+              std: 20
+            };
+          })
+        });
+      }
       if(extraCats.length > 0){
         return extraCats.concat(baseCats);
       }
@@ -844,7 +858,8 @@ const FAE_CLASS_DEFAULTS = {
   'Чародей':    { hd:'d6',  saves:['con','cha'], spell:true,  spellAb:'cha', armor:'Без доспехов', weapons:'Простое оружие' },
   'Колдун':     { hd:'d8',  saves:['wis','cha'], spell:true,  spellAb:'cha', armor:'Лёгкие доспехи', weapons:'Простое оружие' },
   'Волшебник':  { hd:'d6',  saves:['int','wis'], spell:true,  spellAb:'int', armor:'Без доспехов', weapons:'Простое оружие' },
-  'Изобретатель':{ hd:'d8', saves:['con','int'], spell:true,  spellAb:'int', armor:'Лёгкие, средние доспехи, щиты', weapons:'Простое оружие, огнестрельное' }
+  'Изобретатель':{ hd:'d8', saves:['con','int'], spell:true,  spellAb:'int', armor:'Лёгкие, средние доспехи, щиты', weapons:'Простое оружие, огнестрельное' },
+  'Кровавый охотник':{ hd:'d10', saves:['dex','int'], spell:false, spellAb:'int', armor:'Лёгкие, средние доспехи, щиты', weapons:'Простое и воинское оружие' }
 };
 
 function newCharacter(overrides){
@@ -863,7 +878,7 @@ function newCharacter(overrides){
     ac:16, initMisc:0, speed:30, hpMax:12, hpCurrent:12, hpTemp:0, hitDiceTotal:1, hitDiceType:'d10',
     deathSuccess:0, deathFail:0,
     attacks:[{name:'Длинный меч',bonus:'+5',damage:'1d8+3',type:'рубящий',mastery:'Подрыв (Sap)'}],
-    techs:[], moves:[],
+    techs:[], moves:[], customSkills:[],
     cp:0,sp:0,ep:0,gp:15,pp:0,
     equipment:'Кольчуга, щит, длинный меч, набор путешественника, 15 зм',
     features:'Второе дыхание (1d10 + ур. бонусным действием)\nМастерство оружия (3 вида оружия)',
@@ -966,6 +981,22 @@ function normalizeFaerunCharacter(c){
       };
     });
   }
+  if(!Array.isArray(c.customSkills)){
+    c.customSkills = Array.isArray(c.skills) ? c.skills : [];
+  }
+  c.customSkills = c.customSkills.filter(Boolean).map(function(s, idx){
+    return {
+      id: s.id || ('fae_skill_' + Date.now() + '_' + idx),
+      name: s.name || 'Навык',
+      kind: s.kind || 'Ремесло',
+      level: s.level || 'Начатки',
+      abil: s.abil || '',
+      mod: s.mod != null ? String(s.mod) : '',
+      src: s.src || '',
+      gives: s.gives || '',
+      desc: s.desc || ''
+    };
+  });
   ['cp','sp','ep','gp','pp'].forEach(k=>{ c[k] = Number(c[k]) || 0; });
   ['playerName','subclass','background','alignment','equipment','features','profArmor','profWeapons','profTools','languages','traits','ideals','bonds','flaws','age','height','weight','eyes','skin','hair','backstory','spellNotes','activeCondition'].forEach(k=>{
     if(c[k] == null) c[k] = '';
@@ -1965,47 +1996,61 @@ function schoolIconSvg(key){
   return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${path}</svg>`;
 }
 function levelLabel(lvl){
-  return lvl===0 ? 'Заговор' : ('Ур. '+lvl);
+  return Number(lvl)===0 ? 'Заговор' : (lvl + ' круг');
 }
 function newSpell(schoolKey){
-  return { id:null, name:'', school:schoolKey||'evocation', level:1, effect:'', isCustom:true };
+  return {
+    id: null,
+    name: '',
+    en: '',
+    school: schoolKey || 'evocation',
+    level: 1,
+    classes: 'Волшебник, Чародей',
+    meta: '1 действие • 60 фт • Мгновенно',
+    effect: '',
+    isCustom: true
+  };
 }
 function seedSpells(){
-  const s = [
-    ['Щит','abjuration',1,'Реакция на попадание или Волшебную стрелу: +5 к КД до начала следующего хода, отменяет попадание Волшебной стрелы.'],
-    ['Контрзаклинание','abjuration',3,'Реакцией прерываете каст заклинания существом в 60 футах, если оно видит или слышит вас.'],
-    ['Свобода передвижения','abjuration',4,'Цель игнорирует опутывание и обездвиживание, а сложная местность не замедляет её передвижение.'],
-    ['Туманное облако','conjuration',1,'Создаёт сферу густого тумана радиусом 20 футов, сильно ограничивающую обзор внутри себя.'],
-    ['Паутина','conjuration',2,'Заполняет область липкой паутиной, опутывающей существ и затрудняющей передвижение.'],
-    ['Телепортация','conjuration',7,'Мгновенно переносит вас и спутников в знакомое место, даже на другом плане бытия.'],
-    ['Обнаружение магии','divination',1,'10 минут ощущаете присутствие магии в 30 футах от себя и видите её слабую ауру.'],
-    ['Ясновидение','divination',3,'Создаёт невидимый сенсор зрения или слуха в знакомом месте на 10 минут.'],
-    ['Гадание','divination',5,'Позволяет видеть и слышать выбранное существо на расстоянии, если оно провалит спасбросок.'],
-    ['Очарование личности','enchantment',1,'Гуманоид, проваливший спасбросок Мудрости, считает вас другом в течение часа.'],
-    ['Удержание личности','enchantment',2,'Гуманоид, проваливший спасбросок Мудрости, получает состояние «Парализован» до конца заклинания.'],
-    ['Доминирование над личностью','enchantment',5,'Берёте под ментальный контроль гуманоида, провалившего спасбросок Мудрости.'],
-    ['Малая иллюзия','illusion',0,'Создаёт небольшой беззвучный образ или звук без образа в пределах 30 футов.'],
-    ['Незримость','illusion',2,'Существо становится невидимым на час или пока не атакует либо не скастует заклинание.'],
-    ['Большая иллюзия','illusion',3,'Создаёт реалистичный образ со звуком, запахом и движением, живущий до 10 минут.'],
-    ['Ложная жизнь','necromancy',1,'Даёт 1к4+4 временных хитов в дополнение к обычным.'],
-    ['Оживление мертвецов','necromancy',3,'Поднимает скелет или зомби из останков, подчиняющегося вашим приказам.'],
-    ['Перст смерти','necromancy',7,'Наносит тяжёлый некротический урон; убитый им гуманоид восстаёт зомби на вашей стороне.'],
-    ['Полёт','transmutation',3,'Даёт цели скорость полёта 60 футов на 10 минут.'],
-    ['Ускорение','transmutation',3,'Удваивает скорость цели, +2 к КД, преимущество на спасброски Ловкости, доп. действие.'],
-    ['Полиморф','transmutation',4,'Превращает цель в выбранное животное; её игровые характеристики заменяются характеристиками зверя.'],
-    ['Волшебная стрела','evocation',1,'Три силовых снаряда наносят по 1к4+1 урона каждый и попадают автоматически.'],
-    ['Обжигающие руки','evocation',1,'Конус пламени наносит урон огнём существам в области и поджигает горючие предметы.'],
-    ['Огненный шар','evocation',3,'Взрыв пламени в области радиусом 20 футов наносит крупный урон огнём всем внутри.']
-  ];
-  return s.map(([name,school,level,effect])=>({id:genId(), name, school, level, effect, isCustom:false}));
+  if(typeof DND_SPELLS_DB !== 'undefined' && Array.isArray(DND_SPELLS_DB) && DND_SPELLS_DB.length){
+    return DND_SPELLS_DB.map(function(row, idx){
+      return {
+        id: 'std_spell_' + idx,
+        name: row[0] || '',
+        en: row[1] || '',
+        school: row[2] || 'evocation',
+        level: Number(row[3]) || 0,
+        classes: row[4] || '',
+        meta: row[5] || '',
+        effect: row[6] || '',
+        isCustom: false
+      };
+    });
+  }
+  return [];
 }
 function loadSpells(){
+  const canonical = seedSpells();
   try{
     const raw = localStorage.getItem('ttc_spells');
-    if(!raw) return seedSpells();
+    if(!raw) return canonical;
     const arr = JSON.parse(raw);
-    return Array.isArray(arr) && arr.length ? arr : seedSpells();
-  }catch(e){ return seedSpells(); }
+    if(!Array.isArray(arr) || !arr.length) return canonical;
+    // Сохраняем пользовательские (isCustom) и изменённые заклинания, объединяя их с полной базой DND_SPELLS_DB
+    const canonicalByName = new Map();
+    canonical.forEach(function(sp){
+      canonicalByName.set((sp.name || '').toLowerCase(), sp);
+    });
+    const customList = [];
+    arr.forEach(function(saved){
+      if(!saved || !saved.name) return;
+      const key = saved.name.toLowerCase();
+      if(saved.isCustom && !canonicalByName.has(key)){
+        customList.push(saved);
+      }
+    });
+    return customList.concat(canonical);
+  }catch(e){ return canonical; }
 }
 function saveSpellsToStorage(){
   try{ localStorage.setItem('ttc_spells', JSON.stringify(SPELLS)); }catch(e){}
@@ -2137,10 +2182,15 @@ function render(){
   else if(view.screen === 'faeMoveView') app.innerHTML = renderFaeMoveView();
   else if(view.screen === 'faeMoveEdit') app.innerHTML = renderFaeMoveEdit();
   else if(view.screen === 'faeMoveGen') app.innerHTML = renderFaeMoveGen();
+  else if(view.screen === 'faeSkills') app.innerHTML = renderFaeSkills();
+  else if(view.screen === 'faeSkillView') app.innerHTML = renderFaeSkillView();
+  else if(view.screen === 'faeSkillEdit') app.innerHTML = renderFaeSkillEdit();
+  else if(view.screen === 'faeSkillGen') app.innerHTML = renderFaeSkillGen();
   else if(view.screen === 'subclass') app.innerHTML = renderSubclassFeatures();
   else if(view.screen === 'magic') app.innerHTML = renderMagicHub();
   else if(view.screen === 'schoolSpells') app.innerHTML = renderSchoolSpells();
   else if(view.screen === 'spellForm') app.innerHTML = renderSpellForm();
+  else if(view.screen === 'classes') app.innerHTML = renderClassesHub();
   else if(view.screen === 'class') app.innerHTML = renderClass();
   else if(view.screen === 'glossary') app.innerHTML = renderGlossaryHub();
   else if(view.screen === 'weapons') app.innerHTML = renderWeapons();
@@ -2176,6 +2226,7 @@ function getFaerunClassIcon(className){
   if(c.indexOf('монах')!==-1 || c.indexOf('monk')!==-1) return '🥋';
   if(c.indexOf('колдун')!==-1 || c.indexOf('warlock')!==-1) return '👁️';
   if(c.indexOf('изобретатель')!==-1 || c.indexOf('artificer')!==-1) return '⚙️';
+  if(c.indexOf('кровав')!==-1 || c.indexOf('blood')!==-1) return '🩸';
   return '🐉';
 }
 
@@ -2190,6 +2241,9 @@ function renderHome(){
   var pbVal = fmtMod(profBonus(lvlVal));
   var techsCount = (c && Array.isArray(c.techs)) ? c.techs.length : 0;
   var movesCount = (c && Array.isArray(c.moves)) ? c.moves.length : 0;
+  var skillsCount = (c && Array.isArray(c.customSkills)) ? c.customSkills.length : 0;
+  var profSkillsCount = (c && c.skillProf) ? Object.keys(c.skillProf).filter(function(k){ return Number(c.skillProf[k]) > 0; }).length : 0;
+  var totalSkillsBadge = skillsCount + profSkillsCount;
 
   var hudHtml = '<div class="fae-hud" data-go="faeData" role="button" tabindex="0" title="Открыть лист персонажа и ростер отряда в разделе Данные" style="cursor:pointer;">' +
     '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">' +
@@ -2234,10 +2288,10 @@ function renderHome(){
       '</div>' +
       '<div class="fae-card-arrow">›</div>' +
     '</div>' +
-    '<div class="fae-card fae-card-clickable" data-go="map" role="button" tabindex="0">' +
+    '<div class="fae-card fae-card-clickable" data-go="faeSkills" role="button" tabindex="0">' +
       '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>🗺️</span> Карта Фаэруна</div>' +
-        '<div class="fae-card-desc">Интерактивная карта Королевств, масштаб, Побережье Мечей, Врата Балдура и Невервинтер</div>' +
+        '<div class="fae-card-title"><span>🛠️</span> Навыки и знания ' + (totalSkillsBadge ? '<span class="fae-ref-header-badge" style="margin-left:6px;padding:1px 8px;font-size:11px;">' + totalSkillsBadge + '</span>' : '') + '</div>' +
+        '<div class="fae-card-desc">Ремёсла, инструменты, ступени мастерства, языки, лор, быт и 18 базовых навыков D&D 5e / 2024 + AI-генератор</div>' +
       '</div>' +
       '<div class="fae-card-arrow">›</div>' +
     '</div>' +
@@ -2251,7 +2305,7 @@ function renderHome(){
     '<div class="fae-card fae-card-clickable" data-go="faeRef" role="button" tabindex="0">' +
       '<div style="flex:1;min-width:0;">' +
         '<div class="fae-card-title"><span>📚</span> Справочник Фаэруна</div>' +
-        '<div class="fae-card-desc">Классы D&D, Книга заклинаний, Правила 2024, Алхимия и зелья, Оружие и Глоссарий терминов</div>' +
+        '<div class="fae-card-desc">Классы D&D, Книга заклинаний, Карта Фаэруна, Правила 2024, Алхимия и зелья, Оружие и Глоссарий терминов</div>' +
       '</div>' +
       '<div class="fae-card-arrow">›</div>' +
     '</div>' +
@@ -2297,56 +2351,115 @@ function renderGlossaryHub(){
   `;
 }
 
-function termCard(item){
+function isItemInHeroTechsByName(hero, nameStr){
+  if(!hero || !Array.isArray(hero.techs) || !nameStr) return false;
+  var low = String(nameStr).trim().toLowerCase();
+  return hero.techs.some(function(t){
+    if(!t || !t.name) return false;
+    var tn = String(t.name).trim().toLowerCase();
+    return tn === low || tn === ('✨ ' + low) || tn.indexOf(low + ' (') === 0 || tn.indexOf('✨ ' + low + ' (') === 0;
+  });
+}
+
+function isItemInHeroMovesByName(hero, nameStr){
+  if(!hero || !Array.isArray(hero.moves) || !nameStr) return false;
+  var low = String(nameStr).trim().toLowerCase();
+  return hero.moves.some(function(m){
+    if(!m || !m.name) return false;
+    var mn = String(m.name).trim().toLowerCase();
+    return mn === low || mn === ('⚔️ ' + low) || mn.indexOf(low + ' (') === 0 || mn.indexOf('⚔️ ' + low + ' (') === 0;
+  });
+}
+
+function renderAddTechAndMoveBtns(opts){
+  var hero = getActiveFaerunCharacter();
+  var heroName = (hero && hero.name) ? hero.name : 'Герой';
+  var titleFull = opts.title + (opts.en ? (' (' + opts.en + ')') : '');
+  var inTech = isItemInHeroTechsByName(hero, opts.title) || isItemInHeroTechsByName(hero, titleFull);
+  var inMove = isItemInHeroMovesByName(hero, opts.title) || isItemInHeroMovesByName(hero, titleFull);
+
+  var techBtn = inTech
+    ? `<button type="button" class="rc-btn" disabled style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.45);color:#6ee7b7;font-weight:600;">✓ В способностях (${escapeHtml(heroName)})</button>`
+    : `<button type="button" class="rc-btn" data-add-class-tech-name="${escapeAttr(titleFull)}" data-add-class-tech-cat="${escapeAttr(opts.techCat || 'Классовые умения')}" data-add-class-tech-src="${escapeAttr(opts.source || 'Справочник D&D')}" data-add-class-tech-desc="${escapeAttr(opts.desc || '')}" data-add-class-tech-roll="${escapeAttr(opts.roll || '')}" style="background:rgba(201,164,92,0.14);border-color:rgba(201,164,92,0.5);color:#f3e5ab;font-weight:600;">✨ + В способности (${escapeHtml(heroName)})</button>`;
+
+  var moveBtn = inMove
+    ? `<button type="button" class="rc-btn" disabled style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.45);color:#6ee7b7;font-weight:600;">✓ В приёмах (${escapeHtml(heroName)})</button>`
+    : `<button type="button" class="rc-btn" data-add-class-move-name="${escapeAttr(titleFull)}" data-add-class-move-cat="${escapeAttr(opts.moveCat || 'Особые удары, Захваты и Толчки')}" data-add-class-move-weapon="${escapeAttr(opts.weapon || 'Любое оружие')}" data-add-class-move-bonus="${escapeAttr(opts.bonus || '')}" data-add-class-move-mastery="${escapeAttr(opts.mastery || '')}" data-add-class-move-desc="${escapeAttr(opts.desc || '')}" style="background:rgba(56,189,248,0.12);border-color:rgba(56,189,248,0.45);color:#bae6fd;font-weight:600;">⚔️ + В приёмы (${escapeHtml(heroName)})</button>`;
+
+  if(opts.moveFirst) return moveBtn + techBtn;
+  return techBtn + moveBtn;
+}
+
+function termCard(item, opts){
+  var buttonsHtml = '';
+  if(opts && opts.withActions){
+    buttonsHtml = `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,164,92,0.14);">` +
+      renderAddTechAndMoveBtns({
+        title: item.ru,
+        en: item.orig || item.en || '',
+        desc: item.desc || '',
+        source: opts.source || 'Бой оружием',
+        weapon: opts.weapon || 'Оружие ближнего боя',
+        mastery: opts.mastery || '',
+        techCat: opts.techCat || 'Классовые умения',
+        moveCat: opts.moveCat || 'Оружейные атаки и Мастерство (2024)',
+        moveFirst: true
+      }) +
+    `</div>`;
+  }
   return `
     <div class="card term" data-copy="${escapeAttr(item.ru)}">
       <div class="name">${item.ru}</div>
       ${item.orig ? `<div class="eng">${item.orig}</div>` : ''}
       <div class="desc">${item.desc}</div>
+      ${buttonsHtml}
       <div class="stamp"><span>Скопировано</span></div>
     </div>`;
 }
 
-function stanceBlock(stance){
+function stanceBlock(stance, wpnRu){
   return `
     <div class="stance-block">
-      ${termCard(stance)}
+      ${termCard(stance, {withActions:true, source:'Стойка (' + (wpnRu||'Оружие') + ')', weapon:wpnRu||'Оружие', moveCat:'Защитные стойки и Реакции'})}
       ${stance.attacks && stance.attacks.length ? `
         <div class="stance-attacks-label">↳ Атаки из этой стойки</div>
-        <div class="grid attacks-grid">${stance.attacks.map(termCard).join('')}</div>
+        <div class="grid attacks-grid">${stance.attacks.map(a => termCard(a, {withActions:true, source:'Атака из стойки «' + stance.ru + '»', weapon:wpnRu||'Оружие', moveCat:'Оружейные атаки и Мастерство (2024)'})).join('')}</div>
       ` : ''}
     </div>
   `;
 }
 
-function termSection(title, items){
+function termSection(title, items, opts){
   if(!items || !items.length) return '';
   return `
     <div class="section-label">${title}</div>
-    <div class="grid">${items.map(termCard).join('')}</div>
+    <div class="grid">${items.map(it => termCard(it, opts)).join('')}</div>
   `;
 }
 
 function renderWeapons(){
   if(!view.weapon) view.weapon = 'longsword';
   const data = GLOSSARY[view.weapon] || {};
+  const wpnObj = WEAPONS.find(w=>w.id===view.weapon) || WEAPONS[0];
+  const wpnRu = wpnObj ? wpnObj.ru : 'Оружие';
   const pills = WEAPONS.map(w=>
     `<button class="pill ${w.id===view.weapon?'active':''}" data-weapon="${w.id}">${w.ru}</button>`
   ).join('');
 
   const stancesHtml = (data.stances && data.stances.length)
-    ? `<div class="section-label">Стойки и атаки</div>${data.stances.map(stanceBlock).join('')}`
+    ? `<div class="section-label">Стойки и атаки (${escapeHtml(wpnRu)})</div>${data.stances.map(s=>stanceBlock(s, wpnRu)).join('')}`
     : '';
 
   return `
     ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Глоссарий', nav:'glossary'},{label:'Бой оружием'}])}
-    <button class="back" data-go="glossary">← В глоссарий</button>
-    <h1>Бой оружием</h1>
-    <p class="subtitle">Выберите оружие — набор стоек, атак и терминов изменится под него.</p>
+    <button class="back" data-go="faeRef">← В справочник</button>
+    <h1>🗡️ Бой оружием и Фехтовальные стойки</h1>
+    <p class="subtitle">Выберите оружие — любую стойку или удар можно сразу добавить в «Боевые приёмы» или «Способности» вашего героя.</p>
     <div class="rule"></div>
+    ${renderSpellHeroTargetBar()}
     <div class="pill-row">${pills}</div>
     ${stancesHtml}
-    ${termSection('Термины', data.terms)}
+    ${termSection('Фехтовальные приёмы и термины (' + wpnRu + ')', data.terms, {withActions:true, source:'Фехтование (' + wpnRu + ')', weapon:wpnRu, moveCat:'Оружейные атаки и Мастерство (2024)'})}
   `;
 }
 
@@ -2362,10 +2475,10 @@ function renderMap(){
     `<button class="pill map-source-pill ${m.id===view.mapId?'active':''}" data-map-src="${m.id}">${m.label}</button>`
   ).join('');
   return `
-    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Карта Фаэруна'}])}
-    <button class="back" data-go="home">← Назад</button>
-    <h1>Карта Фаэруна</h1>
-    <p class="subtitle">Выбери источник карты — встроена прямо на странице.</p>
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Карта Фаэруна'}])}
+    <button class="back" data-go="faeRef">← В справочник</button>
+    <h1>🗺️ Карта Фаэруна</h1>
+    <p class="subtitle">Выбери источник интерактивной карты Забытых Королевств — встроена прямо на странице.</p>
     <div class="rule"></div>
     <div class="pill-row" style="margin-bottom:14px;">${pills}</div>
     <div class="map-controls-row">
@@ -2390,7 +2503,7 @@ const FAE_SPECIES_LIST = [
 ];
 const FAE_CLASSES_LIST = [
   'Воин', 'Варвар', 'Плут', 'Монах', 'Паладин', 'Следопыт',
-  'Жрец', 'Друид', 'Бард', 'Чародей', 'Колдун', 'Волшебник', 'Изобретатель'
+  'Жрец', 'Друид', 'Бард', 'Чародей', 'Колдун', 'Волшебник', 'Изобретатель', 'Кровавый охотник'
 ];
 const FAE_BACKGROUNDS_LIST = [
   'Аколит', 'Артист', 'Благородный', 'Гильдейский ремесленник', 'Моряк', 'Мудрец',
@@ -2607,23 +2720,24 @@ function renderRules2024(){
     ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Правила 2024'}])}
     <button class="back" data-go="faeRef">← В справочник</button>
     <h1>Правила 2024</h1>
-    <p class="subtitle">Ключевые механики редакции 2024 года. Клик по карточке копирует название в буфер.</p>
+    <p class="subtitle">Ключевые механики редакции 2024 года. Свойства Мастерства оружия можно сразу добавить в приёмы или способности героя.</p>
     <div class="rule"></div>
+    ${renderSpellHeroTargetBar()}
 
-    <div class="section-label">Мастерство оружия</div>
-    <div class="grid">${WEAPON_MASTERY.map(termCard).join('')}</div>
+    <div class="section-label">Мастерство оружия (Weapon Mastery 2024)</div>
+    <div class="grid">${WEAPON_MASTERY.map(wm => termCard(wm, {withActions:true, source:'Мастерство оружия D&D 2024', weapon:'Оружие со свойством «' + wm.ru + '»', mastery:wm.ru + (wm.orig ? (' ('+wm.orig+')') : ''), moveCat:'Оружейные атаки и Мастерство (2024)'})).join('')}</div>
 
     <div class="section-label">Состояния</div>
-    <div class="grid">${CONDITIONS_2024.map(termCard).join('')}</div>
+    <div class="grid">${CONDITIONS_2024.map(c => termCard(c)).join('')}</div>
 
     <div class="section-label">Истощение</div>
-    <div class="grid">${EXHAUSTION_LEVELS.map(termCard).join('')}</div>
+    <div class="grid">${EXHAUSTION_LEVELS.map(c => termCard(c)).join('')}</div>
 
     <div class="section-label">Укрытие</div>
-    <div class="grid">${COVER_RULES.map(termCard).join('')}</div>
+    <div class="grid">${COVER_RULES.map(c => termCard(c)).join('')}</div>
 
     <div class="section-label">Прочее</div>
-    <div class="grid">${MISC_RULES_2024.map(termCard).join('')}</div>
+    <div class="grid">${MISC_RULES_2024.map(c => termCard(c)).join('')}</div>
   `;
 }
 
@@ -3442,6 +3556,9 @@ function renderFaeAbilitiesTabBar(activeTab){
   var chars = Array.isArray(CHARACTERS) ? CHARACTERS : [c];
   var tCount = (c && Array.isArray(c.techs)) ? c.techs.length : 0;
   var mCount = (c && Array.isArray(c.moves)) ? c.moves.length : 0;
+  var sCount = (c && Array.isArray(c.customSkills)) ? c.customSkills.length : 0;
+  var pCount = (c && c.skillProf) ? Object.keys(c.skillProf).filter(function(k){ return Number(c.skillProf[k]) > 0; }).length : 0;
+  var totSkills = sCount + pCount;
 
   var charOpts = chars.map(function(ch){
     var isSel = c && ch.id === c.id;
@@ -3453,10 +3570,13 @@ function renderFaeAbilitiesTabBar(activeTab){
   return '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">' +
     '<div class="fae-nav-tabs" style="margin-bottom:0;flex:1;min-width:280px;">' +
       '<button type="button" class="fae-nav-tab ' + (activeTab==='techs'?'active':'') + '" data-go="faeTechs">' +
-        '✨ Способности и Умения (' + tCount + ')' +
+        '✨ Способности (' + tCount + ')' +
       '</button>' +
       '<button type="button" class="fae-nav-tab ' + (activeTab==='moves'?'active':'') + '" data-go="faeMoves">' +
         '⚔️ Боевые приёмы (' + mCount + ')' +
+      '</button>' +
+      '<button type="button" class="fae-nav-tab ' + (activeTab==='skills'?'active':'') + '" data-go="faeSkills">' +
+        '🛠️ Навыки и знания (' + totSkills + ')' +
       '</button>' +
     '</div>' +
     '<div style="display:flex;align-items:center;gap:8px;">' +
@@ -3471,9 +3591,553 @@ function wireFaeAbilitiesHeroSelect(){
   if(sel){
     sel.addEventListener('change', function(){
       setActiveFaerunCharacter(this.value);
+      if(window._faeTechLauncher) window._faeTechLauncher.techId = '';
+      if(window._faeMoveLauncher) window._faeMoveLauncher.moveId = '';
+      if(window._faeSkillLauncher) window._faeSkillLauncher.skillRef = '';
       render();
     });
   }
+}
+
+/* ---------- БОЕВОЙ РАСЧЁТ СПОСОБНОСТЕЙ, ПРИЁМОВ И НАВЫКОВ ФАЭРУНА (по образцу раздела Шиноби) ---------- */
+
+function formatFaeLauncherMod(m){
+  var n = parseInt(m, 10) || 0;
+  if(!n) return '';
+  return n > 0 ? '+ ' + n : '− ' + Math.abs(n);
+}
+
+function parseFaeDiceFormula(str){
+  if(!str || typeof str !== 'string') return null;
+  var clean = str.replace(/\s+/g, '');
+  var m = clean.match(/(\d*)[dдкk](\d+)([+-]\d+)?/i);
+  if(m){
+    var n = Math.max(1, Math.min(12, parseInt(m[1], 10) || 1));
+    var sides = parseInt(m[2], 10) || 6;
+    if([4, 6, 8, 10, 12, 20, 100].indexOf(sides) === -1) sides = 6;
+    var mod = m[3] ? parseInt(m[3], 10) : 0;
+    return { n: n, sides: sides, mod: mod };
+  }
+  return null;
+}
+
+function parseFaeSignedMod(str){
+  if(!str || typeof str !== 'string') return 0;
+  var withoutDice = str.replace(/\d*[dдкk]\d+([+-]\d+)?/gi, '');
+  var m = withoutDice.match(/([+-]\s*\d+)/);
+  if(m) return parseInt(m[1].replace(/\s+/g, ''), 10) || 0;
+  var nOnly = str.trim().match(/^(\d+)$/);
+  if(nOnly) return parseInt(nOnly[1], 10) || 0;
+  return 0;
+}
+
+/* --- 1. БОЕВОЙ РАСЧЁТ СПОСОБНОСТИ (faeTechs) --- */
+function buildFaeTechComboText(t, isConc, rolledValues, mods){
+  var catStr = t.category || 'Классовые умения';
+  var actStr = t.actionCost || '1 действие';
+  var cdStr = t.cooldown ? (' | Перезарядка: ' + t.cooldown) : '';
+  var header = '*[Способность: ' + (t.name || 'Без названия') + ' | Категория: ' + catStr + ' | Действие: ' + actStr + cdStr + ']*';
+  var lines = [header];
+
+  if(isConc && rolledValues && rolledValues.conc){
+    var cMod = parseInt(mods.conc, 10) || 0;
+    var cModStr = cMod > 0 ? ' + ' + cMod : (cMod < 0 ? ' − ' + Math.abs(cMod) : '');
+    lines.push('*[Результат броска Концентрация / Спасбросок 1d20: ' + rolledValues.conc + ' ]*' + cModStr);
+  }
+
+  if(rolledValues && rolledValues.atk){
+    var aMod = parseInt(mods.atk, 10) || 0;
+    var aModStr = aMod > 0 ? ' + ' + aMod : (aMod < 0 ? ' − ' + Math.abs(aMod) : '');
+    lines.push('*[Результат броска Попадание / Проверка 1d20: ' + rolledValues.atk + ' ]*' + aModStr);
+  }
+
+  var pDmg = parseFaeDiceFormula(t.checkOrSave || t.desc || '');
+  if(pDmg && rolledValues && rolledValues.dmgRolls && rolledValues.dmgRolls.length){
+    var n = rolledValues.dmgRolls.length;
+    var dSides = rolledValues.dmgSides || pDmg.sides;
+    var dMod = parseInt(mods.dmg, 10) || 0;
+    var dModStr = dMod > 0 ? ' + ' + dMod : (dMod < 0 ? ' − ' + Math.abs(dMod) : '');
+    lines.push('*[Результат броска Эффект / Урон ' + n + 'd' + dSides + ': ' + rolledValues.dmgRolls.join(' | ') + ' ]*' + dModStr);
+  } else if(t.checkOrSave){
+    lines.push('*[Параметр / СЛ: ' + t.checkOrSave + ']*');
+  }
+
+  return lines.join('\n');
+}
+
+function renderFaeTechLauncherDiceHtml(tech, isConc, selTarget, mods, rolledValues){
+  if(!tech) return '<div class="sh-scr-no-dmg">Выберите способность для расчёта</div>';
+  mods = mods || { conc: 0, atk: 0, dmg: 0 };
+  rolledValues = rolledValues || {};
+
+  var concDieHtml = '';
+  if(isConc){
+    var cModStr = formatFaeLauncherMod(mods.conc);
+    concDieHtml =
+      '<div class="sh-scr-col ' + (selTarget === 'conc' ? 'selected' : '') + '" data-select-fae-tech-roll="conc" title="Кликните для выбора кубика и настройки модификатора">' +
+        '<div class="sh-scr-label" style="color:#ff9085;">Концентрация</div>' +
+        '<div class="sh-scr-die die s20" id="faeScrDieTechConc">' +
+          (typeof dieShapeSvg === 'function' ? dieShapeSvg(20, 'faetconc', null) : '') +
+          '<div class="val">' + (rolledValues.conc || 20) + '</div>' +
+        '</div>' +
+        '<div class="sh-scr-sub" id="faeScrSub_techConc">1d20' + (cModStr ? ' ' + cModStr : '') + '</div>' +
+      '</div>';
+  }
+
+  var aModStr = formatFaeLauncherMod(mods.atk);
+  var atkDieHtml =
+    '<div class="sh-scr-col ' + (selTarget === 'atk' ? 'selected' : '') + '" data-select-fae-tech-roll="atk" title="Кликните для выбора кубика и настройки модификатора">' +
+      '<div class="sh-scr-label">Попадание / Проверка</div>' +
+      '<div class="sh-scr-die die s20" id="faeScrDieTechAtk">' +
+        (typeof dieShapeSvg === 'function' ? dieShapeSvg(20, 'faetatk', null) : '') +
+        '<div class="val">' + (rolledValues.atk || 20) + '</div>' +
+      '</div>' +
+      '<div class="sh-scr-sub" id="faeScrSub_techAtk">1d20' + (aModStr ? ' ' + aModStr : '') + '</div>' +
+    '</div>';
+
+  var pDmg = parseFaeDiceFormula(tech.checkOrSave || tech.desc || '');
+  var dmgBlockHtml = '';
+  if(pDmg){
+    var n = pDmg.n;
+    var dSides = pDmg.sides;
+    var dModStr = formatFaeLauncherMod(mods.dmg);
+    var dmgDiceList = [];
+    var rolls = rolledValues.dmgRolls || [];
+    for(var i = 0; i < n; i++){
+      var curVal = rolls[i] || dSides;
+      dmgDiceList.push(
+        '<div class="sh-scr-die die s' + dSides + '" id="faeScrDieTechDmg_' + i + '">' +
+          (typeof dieShapeSvg === 'function' ? dieShapeSvg(dSides, 'faetdmg' + i, null) : '') +
+          '<div class="val">' + curVal + '</div>' +
+        '</div>'
+      );
+    }
+    var baseFormula = n + 'd' + dSides + (pDmg.mod ? (pDmg.mod > 0 ? '+' + pDmg.mod : pDmg.mod) : '');
+    dmgBlockHtml =
+      '<div class="sh-scr-dmg-group ' + (selTarget === 'dmg' ? 'selected' : '') + '" data-select-fae-tech-roll="dmg" title="Кликните для выбора кубиков и настройки модификатора">' +
+        '<div class="sh-scr-label">Урон / Исцеление (' + baseFormula + ')</div>' +
+        '<div class="sh-scr-dmg-dice">' + dmgDiceList.join('') + '</div>' +
+        '<div class="sh-scr-sub" id="faeScrSub_techDmg">' + n + 'd' + dSides + (dModStr ? ' ' + dModStr : '') + '</div>' +
+      '</div>';
+  } else {
+    var efNote = tech.checkOrSave ? ('Параметр / СЛ: <b>' + escapeHtml(tech.checkOrSave) + '</b>') : ('Действие: <b>' + escapeHtml(tech.actionCost || '1 действие') + '</b> (без броска костей урона)');
+    dmgBlockHtml = '<div class="sh-scr-no-dmg">' + efNote + '</div>';
+  }
+
+  return '<div class="sh-screen-dice-tray">' + concDieHtml + atkDieHtml + dmgBlockHtml + '</div>';
+}
+
+function renderFaeTechLauncher(c){
+  var techs = (c && Array.isArray(c.techs)) ? c.techs : [];
+  if(!techs.length){
+    return '<div class="sh-launcher" style="margin-bottom:16px;">' +
+      '<div class="sh-launcher-title">⚔️ Боевой расчёт способности <span class="sh-badge-tag">AI Studio</span></div>' +
+      '<div class="char-empty" style="margin:10px 0 0;padding:12px;">Способности ещё не добавлены. Добавьте способность кнопкой выше или из Книги заклинаний / Классов, чтобы использовать боевой расчёт.</div>' +
+    '</div>';
+  }
+
+  if(!window._faeTechLauncher) window._faeTechLauncher = {};
+  var L = window._faeTechLauncher;
+  if(L.isOpen === undefined) L.isOpen = false;
+  if(!L.mods) L.mods = { conc: 0, atk: 0, dmg: 0 };
+  if(!L.rolledValues) L.rolledValues = {};
+  if(!L.selectedTarget) L.selectedTarget = 'atk';
+
+  var selTech = techs.find(function(x){ return x.id === L.techId; }) || techs[0];
+  if(L.techId !== selTech.id){
+    L.techId = selTech.id;
+    var initDmg = parseFaeDiceFormula(selTech.checkOrSave || selTech.desc || '');
+    L.mods.dmg = initDmg ? (initDmg.mod || 0) : 0;
+    L.mods.atk = parseFaeSignedMod(selTech.checkOrSave);
+  }
+
+  var isConc = !!L.isConc;
+  var pDmg = parseFaeDiceFormula(selTech.checkOrSave || selTech.desc || '');
+  var selTarget = L.selectedTarget;
+  if(selTarget === 'conc' && !isConc) selTarget = 'atk';
+  if(selTarget === 'dmg' && !pDmg) selTarget = 'atk';
+  L.selectedTarget = selTarget;
+
+  var targetNames = { conc: '🔮 Концентрация / Спасбросок', atk: '🎯 Попадание / Проверка', dmg: '💥 Урон / Исцеление' };
+  var targetTitle = targetNames[selTarget] || '🎯 Попадание / Проверка';
+  var curModVal = L.mods[selTarget] || 0;
+
+  var techOpts = techs.map(function(t){
+    var act = t.actionCost ? (' (' + t.actionCost + ')') : '';
+    var sav = t.checkOrSave ? (' [' + t.checkOrSave + ']') : '';
+    return '<option value="' + escapeAttr(t.id) + '" ' + (t.id === selTech.id ? 'selected' : '') + '>' +
+      escapeHtml(t.category || 'Умение') + ' · ' + escapeHtml(t.name || 'Без названия') + act + sav +
+    '</option>';
+  }).join('');
+
+  var screenHtml = renderFaeTechLauncherDiceHtml(selTech, isConc, selTarget, L.mods, L.rolledValues);
+
+  var modBarHtml =
+    '<div class="sh-mod-bar">' +
+      '<div class="sh-mod-target-info">' +
+        '<span>Выбран кубик:</span>' +
+        '<span class="sh-mod-target-tag" id="faeTechModTargetName">' + targetTitle + '</span>' +
+      '</div>' +
+      '<div class="sh-mod-controls">' +
+        '<button type="button" class="sh-mod-step" data-fae-tech-mod-delta="-5" title="Уменьшить на 5">−5</button>' +
+        '<button type="button" class="sh-mod-step" data-fae-tech-mod-delta="-1" title="Уменьшить на 1">−</button>' +
+        '<input type="number" id="faeTechActiveModInput" class="sh-active-mod-input" value="' + curModVal + '">' +
+        '<button type="button" class="sh-mod-step" data-fae-tech-mod-delta="1" title="Увеличить на 1">+</button>' +
+        '<button type="button" class="sh-mod-step" data-fae-tech-mod-delta="5" title="Увеличить на 5">+5</button>' +
+        '<button type="button" class="sh-mod-reset" id="faeTechModResetBtn" title="Сбросить модификатор в 0">Сброс</button>' +
+      '</div>' +
+      '<label class="sh-exp-check">' +
+        '<input type="checkbox" id="faeTechLauncherConc"' + (isConc ? ' checked' : '') + '> 🔮 Концентрация / Спасбросок' +
+      '</label>' +
+    '</div>';
+
+  var actionsHtml =
+    '<div class="sh-launcher-actions">' +
+      '<button type="button" class="sh-btn-launch" id="faeLaunchTechComboBtn" title="Бросить все кости способности и зафиксировать результат">⚔️ Применить способность</button>' +
+      '<button type="button" class="sh-btn-copy-all" id="faeCopyAllTechBtn" title="Скопировать готовый блок в буфер обмена для AI Studio">📋 Скопировать всё</button>' +
+      '<button type="button" class="sh-micro-btn" id="faeLaunchTechAtkBtn" title="Бросить и скопировать только попадание/проверку">🎯 Попадание</button>' +
+      (pDmg ? '<button type="button" class="sh-micro-btn" id="faeLaunchTechDmgBtn" title="Бросить и скопировать только урон/исцеление">💥 Урон / Эффект</button>' : '') +
+      (isConc ? '<button type="button" class="sh-micro-btn" id="faeLaunchTechConcBtn" title="Бросить и скопировать Концентрацию">🔮 Концентрация</button>' : '') +
+      '<button type="button" class="sh-micro-btn" id="faeLaunchTechClaimBtn" title="Скопировать только заголовок заявки">📜 Только заявка</button>' +
+    '</div>';
+
+  var hasRes = !!(L.lastResult);
+  var resultBoxHtml =
+    '<div class="sh-launcher-result ' + (hasRes ? 'has-result' : '') + '" id="faeTechLauncherResultBox">' +
+      '<div class="sh-launcher-result-text" id="faeTechLauncherResultText">' + escapeHtml(L.lastResult || '') + '</div>' +
+      '<div class="sh-copy-badge" id="faeTechLauncherCopyBadge" style="display:' + (hasRes ? 'inline-flex' : 'none') + ';">' +
+        '<span>' + (L.lastResultCopied ? '✓ Скопировано в буфер обмена для AI Studio' : '🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»') + '</span>' +
+      '</div>' +
+    '</div>';
+
+  var isOpen = !!L.isOpen;
+  var toggleHeadHtml =
+    '<div class="sh-launcher-toggle-head" id="faeTechLauncherToggle" role="button" tabindex="0" title="Нажмите, чтобы развернуть или свернуть боевой расчёт способности">' +
+      '<div class="sh-launcher-title">' +
+        '<span>⚔️ Боевой расчёт способности</span>' +
+        '<span class="sh-badge-tag">AI Studio</span>' +
+      '</div>' +
+      '<div class="sh-launcher-toggle-btn">' +
+        '<span class="sh-launcher-toggle-text">' + (isOpen ? 'Свернуть' : 'Развернуть') + '</span>' +
+        '<span class="sh-launcher-toggle-arrow">' + (isOpen ? '▲' : '▼') + '</span>' +
+      '</div>' +
+    '</div>';
+
+  var bodyHtml =
+    '<div class="sh-launcher-body" id="faeTechLauncherBody">' +
+      '<div class="sh-launcher-head">' +
+        '<div class="sh-launcher-sel-wrap">' +
+          '<div class="sh-launcher-sel-label">Способность для броска:</div>' +
+          '<select class="sh-launcher-sel" id="faeTechLauncherSelect">' + techOpts + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sh-launcher-screen" id="faeTechLauncherScreen">' + screenHtml + '</div>' +
+      modBarHtml +
+      actionsHtml +
+      resultBoxHtml +
+    '</div>';
+
+  return '<div class="sh-launcher ' + (isOpen ? '' : 'collapsed') + '" id="faeTechLauncherContainer">' +
+    toggleHeadHtml +
+    bodyHtml +
+  '</div>';
+}
+
+function wireFaeTechLauncher(){
+  var c = getActiveFaerunCharacter();
+  var techs = (c && Array.isArray(c.techs)) ? c.techs : [];
+  if(!window._faeTechLauncher) window._faeTechLauncher = { isOpen: false, mods: { conc: 0, atk: 0, dmg: 0 }, rolledValues: {}, selectedTarget: 'atk' };
+  var L = window._faeTechLauncher;
+
+  var tHead = document.getElementById('faeTechLauncherToggle');
+  if(tHead){
+    var toggleFn = function(){
+      L.isOpen = !L.isOpen;
+      var cont = document.getElementById('faeTechLauncherContainer');
+      if(cont){
+        cont.classList.toggle('collapsed', !L.isOpen);
+        var txt = cont.querySelector('.sh-launcher-toggle-text');
+        var arr = cont.querySelector('.sh-launcher-toggle-arrow');
+        if(txt) txt.textContent = L.isOpen ? 'Свернуть' : 'Развернуть';
+        if(arr) arr.textContent = L.isOpen ? '▲' : '▼';
+      }
+    };
+    tHead.addEventListener('click', toggleFn);
+  }
+
+  var getSelTech = function(){
+    return techs.find(function(x){ return x.id === L.techId; }) || techs[0] || null;
+  };
+
+  var updateModUI = function(){
+    var targetNames = { conc: '🔮 Концентрация / Спасбросок', atk: '🎯 Попадание / Проверка', dmg: '💥 Урон / Исцеление' };
+    var nameEl = document.getElementById('faeTechModTargetName');
+    if(nameEl) nameEl.textContent = targetNames[L.selectedTarget] || '🎯 Попадание / Проверка';
+    var inp = document.getElementById('faeTechActiveModInput');
+    if(inp) inp.value = (L.mods && L.mods[L.selectedTarget]) || 0;
+  };
+
+  var wireDiceClicks = function(){
+    var scr = document.getElementById('faeTechLauncherScreen');
+    if(!scr) return;
+    var els = scr.querySelectorAll('[data-select-fae-tech-roll]');
+    els.forEach(function(el){
+      el.addEventListener('click', function(){
+        var target = el.getAttribute('data-select-fae-tech-roll');
+        if(!target) return;
+        L.selectedTarget = target;
+        els.forEach(function(s){ s.classList.remove('selected'); });
+        el.classList.add('selected');
+        updateModUI();
+      });
+    });
+  };
+  wireDiceClicks();
+
+  var setTargetMod = function(newVal){
+    var target = L.selectedTarget || 'atk';
+    L.mods[target] = newVal;
+    updateModUI();
+    var t = getSelTech();
+    if(target === 'conc'){
+      var subC = document.getElementById('faeScrSub_techConc');
+      if(subC) subC.textContent = '1d20' + (formatFaeLauncherMod(newVal) ? ' ' + formatFaeLauncherMod(newVal) : '');
+    } else if(target === 'atk'){
+      var subA = document.getElementById('faeScrSub_techAtk');
+      if(subA) subA.textContent = '1d20' + (formatFaeLauncherMod(newVal) ? ' ' + formatFaeLauncherMod(newVal) : '');
+    } else if(target === 'dmg' && t){
+      var pDmg = parseFaeDiceFormula(t.checkOrSave || t.desc || '');
+      if(pDmg){
+        var subD = document.getElementById('faeScrSub_techDmg');
+        if(subD) subD.textContent = pDmg.n + 'd' + pDmg.sides + (formatFaeLauncherMod(newVal) ? ' ' + formatFaeLauncherMod(newVal) : '');
+      }
+    }
+    if(L.lastResult && t){
+      L.lastResult = buildFaeTechComboText(t, !!L.isConc, L.rolledValues, L.mods);
+      var rTxt = document.getElementById('faeTechLauncherResultText');
+      if(rTxt) rTxt.textContent = L.lastResult;
+    }
+  };
+
+  document.querySelectorAll('[data-fae-tech-mod-delta]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var delta = parseInt(btn.getAttribute('data-fae-tech-mod-delta'), 10) || 0;
+      var cur = parseInt(L.mods[L.selectedTarget], 10) || 0;
+      setTargetMod(cur + delta);
+    });
+  });
+
+  var resetBtn = document.getElementById('faeTechModResetBtn');
+  if(resetBtn) resetBtn.addEventListener('click', function(){ setTargetMod(0); });
+
+  var modInp = document.getElementById('faeTechActiveModInput');
+  if(modInp){
+    modInp.addEventListener('input', function(){
+      var v = parseInt(this.value, 10);
+      if(isNaN(v)) v = 0;
+      setTargetMod(v);
+    });
+  }
+
+  var selEl = document.getElementById('faeTechLauncherSelect');
+  if(selEl){
+    selEl.addEventListener('change', function(){
+      L.techId = this.value;
+      var t = getSelTech();
+      if(t){
+        var pDmg = parseFaeDiceFormula(t.checkOrSave || t.desc || '');
+        L.mods.dmg = pDmg ? (pDmg.mod || 0) : 0;
+        L.mods.atk = parseFaeSignedMod(t.checkOrSave);
+      }
+      L.rolledValues = {};
+      L.lastResult = '';
+      L.lastResultCopied = false;
+      render();
+    });
+  }
+
+  var concCb = document.getElementById('faeTechLauncherConc');
+  if(concCb){
+    concCb.addEventListener('change', function(){
+      L.isConc = !!this.checked;
+      if(!L.isConc && L.selectedTarget === 'conc') L.selectedTarget = 'atk';
+      render();
+    });
+  }
+
+  var finishTechLaunch = function(t, mode, autoCopy){
+    var catStr = t.category || 'Классовые умения';
+    var actStr = t.actionCost || '1 действие';
+    var cdStr = t.cooldown ? (' | Перезарядка: ' + t.cooldown) : '';
+    var header = '*[Способность: ' + (t.name || 'Без названия') + ' | Категория: ' + catStr + ' | Действие: ' + actStr + cdStr + ']*';
+    var lines = [];
+    var mods = L.mods || { conc: 0, atk: 0, dmg: 0 };
+    var pDmg = parseFaeDiceFormula(t.checkOrSave || t.desc || '');
+
+    if(mode === 'claim'){
+      lines.push(header);
+      if(t.checkOrSave) lines.push('*[Параметр / СЛ: ' + t.checkOrSave + ']*');
+    } else if(mode === 'atk'){
+      var atkVal = 1 + Math.floor(Math.random() * 20);
+      L.rolledValues.atk = atkVal;
+      var atDie = document.getElementById('faeScrDieTechAtk');
+      if(atDie){ var vEl = atDie.querySelector('.val'); if(vEl) vEl.textContent = atkVal; }
+      var aMod = parseInt(mods.atk, 10) || 0;
+      var aModStr = aMod > 0 ? ' + ' + aMod : (aMod < 0 ? ' − ' + Math.abs(aMod) : '');
+      lines.push(header);
+      lines.push('*[Результат броска Попадание / Проверка 1d20: ' + atkVal + ' ]*' + aModStr);
+    } else if(mode === 'conc'){
+      var cVal = 1 + Math.floor(Math.random() * 20);
+      L.rolledValues.conc = cVal;
+      var cDie = document.getElementById('faeScrDieTechConc');
+      if(cDie){ var vEl = cDie.querySelector('.val'); if(vEl) vEl.textContent = cVal; }
+      var cMod = parseInt(mods.conc, 10) || 0;
+      var cModStr = cMod > 0 ? ' + ' + cMod : (cMod < 0 ? ' − ' + Math.abs(cMod) : '');
+      lines.push(header);
+      lines.push('*[Результат броска Концентрация / Спасбросок 1d20: ' + cVal + ' ]*' + cModStr);
+    } else if(mode === 'dmg' && pDmg){
+      var rolls = [];
+      for(var i = 0; i < pDmg.n; i++){
+        var r = 1 + Math.floor(Math.random() * pDmg.sides);
+        rolls.push(r);
+        var dmDie = document.getElementById('faeScrDieTechDmg_' + i);
+        if(dmDie){ var vEl = dmDie.querySelector('.val'); if(vEl) vEl.textContent = r; }
+      }
+      L.rolledValues.dmgRolls = rolls;
+      L.rolledValues.dmgSides = pDmg.sides;
+      var dMod = parseInt(mods.dmg, 10) || 0;
+      var dModStr = dMod > 0 ? ' + ' + dMod : (dMod < 0 ? ' − ' + Math.abs(dMod) : '');
+      lines.push(header);
+      lines.push('*[Результат броска Эффект / Урон ' + pDmg.n + 'd' + pDmg.sides + ': ' + rolls.join(' | ') + ' ]*' + dModStr);
+    } else {
+      if(L.isConc){
+        var cValAll = 1 + Math.floor(Math.random() * 20);
+        L.rolledValues.conc = cValAll;
+        var cDieAll = document.getElementById('faeScrDieTechConc');
+        if(cDieAll){ var vEl = cDieAll.querySelector('.val'); if(vEl) vEl.textContent = cValAll; }
+      }
+      var atkValAll = 1 + Math.floor(Math.random() * 20);
+      L.rolledValues.atk = atkValAll;
+      var atDieAll = document.getElementById('faeScrDieTechAtk');
+      if(atDieAll){ var vEl = atDieAll.querySelector('.val'); if(vEl) vEl.textContent = atkValAll; }
+      if(pDmg){
+        var rollsAll = [];
+        for(var j = 0; j < pDmg.n; j++){
+          var rAll = 1 + Math.floor(Math.random() * pDmg.sides);
+          rollsAll.push(rAll);
+          var dmDieAll = document.getElementById('faeScrDieTechDmg_' + j);
+          if(dmDieAll){ var vEl = dmDieAll.querySelector('.val'); if(vEl) vEl.textContent = rAll; }
+        }
+        L.rolledValues.dmgRolls = rollsAll;
+        L.rolledValues.dmgSides = pDmg.sides;
+      }
+      lines = buildFaeTechComboText(t, !!L.isConc, L.rolledValues, mods).split('\n');
+    }
+
+    var output = lines.join('\n');
+    L.lastResult = output;
+    var rBox = document.getElementById('faeTechLauncherResultBox');
+    var rTxt = document.getElementById('faeTechLauncherResultText');
+    var rBdg = document.getElementById('faeTechLauncherCopyBadge');
+    if(rTxt) rTxt.textContent = output;
+    if(rBox) rBox.classList.add('has-result');
+    if(autoCopy){
+      copyText(output);
+      L.lastResultCopied = true;
+      if(rBdg){
+        rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio (' + lines.length + ' стр.)</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    } else {
+      L.lastResultCopied = false;
+      if(rBdg){
+        rBdg.innerHTML = '<span>🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    }
+  };
+
+  var executeTechLaunch = function(mode, autoCopy){
+    var t = getSelTech();
+    if(!t) return;
+    var pDmg = parseFaeDiceFormula(t.checkOrSave || t.desc || '');
+    if(mode !== 'claim'){
+      var diceToRoll = [];
+      if(mode === 'all' || mode === 'atk'){
+        var atDie = document.getElementById('faeScrDieTechAtk'); if(atDie) diceToRoll.push(atDie);
+      }
+      if((mode === 'all' || mode === 'conc') && L.isConc){
+        var cDie = document.getElementById('faeScrDieTechConc'); if(cDie) diceToRoll.push(cDie);
+      }
+      if((mode === 'all' || mode === 'dmg') && pDmg){
+        for(var i = 0; i < pDmg.n; i++){
+          var dmDie = document.getElementById('faeScrDieTechDmg_' + i); if(dmDie) diceToRoll.push(dmDie);
+        }
+      }
+      diceToRoll.forEach(function(el){ el.classList.add('rolling'); });
+      var rollInterval = setInterval(function(){
+        diceToRoll.forEach(function(el){
+          var vEl = el.querySelector('.val');
+          if(vEl) vEl.textContent = Math.floor(Math.random() * 20) + 1;
+        });
+      }, 50);
+      setTimeout(function(){
+        clearInterval(rollInterval);
+        diceToRoll.forEach(function(el){ el.classList.remove('rolling'); });
+        finishTechLaunch(t, mode, autoCopy);
+      }, 350);
+    } else {
+      finishTechLaunch(t, mode, autoCopy);
+    }
+  };
+
+  var bCombo = document.getElementById('faeLaunchTechComboBtn');
+  if(bCombo) bCombo.addEventListener('click', function(){ executeTechLaunch('all', false); });
+
+  var bCopyAll = document.getElementById('faeCopyAllTechBtn');
+  if(bCopyAll){
+    bCopyAll.addEventListener('click', function(){
+      if(!L.lastResult) executeTechLaunch('all', true);
+      else {
+        copyText(L.lastResult);
+        L.lastResultCopied = true;
+        var rBdg = document.getElementById('faeTechLauncherCopyBadge');
+        if(rBdg){
+          rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio (' + L.lastResult.split('\n').length + ' стр.)</span>';
+          rBdg.style.display = 'inline-flex';
+        }
+      }
+    });
+  }
+
+  var bAtk = document.getElementById('faeLaunchTechAtkBtn'); if(bAtk) bAtk.addEventListener('click', function(){ executeTechLaunch('atk', true); });
+  var bDmg = document.getElementById('faeLaunchTechDmgBtn'); if(bDmg) bDmg.addEventListener('click', function(){ executeTechLaunch('dmg', true); });
+  var bConc = document.getElementById('faeLaunchTechConcBtn'); if(bConc) bConc.addEventListener('click', function(){ executeTechLaunch('conc', true); });
+  var bClaim = document.getElementById('faeLaunchTechClaimBtn'); if(bClaim) bClaim.addEventListener('click', function(){ executeTechLaunch('claim', true); });
+
+  document.querySelectorAll('[data-fae-tech-to-calc]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var id = btn.getAttribute('data-fae-tech-to-calc');
+      if(!id) return;
+      L.isOpen = true;
+      L.techId = id;
+      var t = techs.find(function(x){ return x.id === id; });
+      if(t){
+        var pDmg = parseFaeDiceFormula(t.checkOrSave || t.desc || '');
+        L.mods.dmg = pDmg ? (pDmg.mod || 0) : 0;
+        L.mods.atk = parseFaeSignedMod(t.checkOrSave);
+      }
+      L.rolledValues = {};
+      L.lastResult = '';
+      if(view.screen !== 'faeTechs') navigate('faeTechs');
+      else render();
+      setTimeout(function(){
+        var cont = document.getElementById('faeTechLauncherContainer');
+        if(cont) cont.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 60);
+    });
+  });
 }
 
 function renderFaeTechs(){
@@ -3517,6 +4181,7 @@ function renderFaeTechs(){
             '<div class="fae-ref-card-v" style="margin-bottom:12px;">' + escapeHtml(t.desc || '') + '</div>' +
           '</div>' +
           '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(201,164,92,0.18);">' +
+            '<button type="button" class="rc-btn" data-fae-tech-to-calc="' + escapeAttr(t.id) + '" style="border-color:rgba(200,67,55,0.5);color:#ff9085;">⚔️ В расчёт</button>' +
             '<button type="button" class="rc-btn" data-fae-tech-copy="' + escapeAttr(copyStr) + '">📋 Копировать</button>' +
             '<button type="button" class="rc-btn" data-go="faeTechEdit:' + escapeAttr(t.id) + '">✏️ Изменить</button>' +
             '<button type="button" class="rc-btn" data-fae-tech-del="' + escapeAttr(t.id) + '" style="color:#f87171;">🗑️</button>' +
@@ -3536,10 +4201,14 @@ function renderFaeTechs(){
       '</div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
         '<button type="button" class="btn btn-primary" data-go="faeTechEdit:new">+ Добавить способность</button>' +
+        '<button type="button" class="btn btn-ghost" data-go="classes" style="border-color:rgba(201,164,92,0.5);color:#f3e5ab;">🏛️ Из Классов и Подклассов</button>' +
+        '<button type="button" class="btn btn-ghost" data-go="magic" style="border-color:rgba(201,164,92,0.5);color:#f3e5ab;">📖 Из Книги заклинаний</button>' +
         '<button type="button" class="ai-gen-btn" data-go="faeTechGen" style="padding:9px 16px;font-size:13px;">🤖 Создать с ИИ</button>' +
       '</div>' +
     '</div>' +
     '<div class="fae-rule"></div>' +
+
+    renderFaeTechLauncher(c) +
 
     '<div class="fae-ref-search-wrap" style="margin-bottom:14px;">' +
       '<span class="fae-ref-search-icon">🔍</span>' +
@@ -3564,7 +4233,8 @@ function renderFaeTechView(){
           '<span class="fae-ref-item-tag">✨ ' + escapeHtml(t.category || 'Классовые умения') + '</span>' +
           '<h1 style="margin:8px 0 0 0;font-size:24px;">' + escapeHtml(t.name || 'Способность') + '</h1>' +
         '</div>' +
-        '<div style="display:flex;gap:8px;">' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button type="button" class="btn btn-ghost" data-fae-tech-to-calc="' + escapeAttr(t.id) + '" style="border-color:rgba(200,67,55,0.6);color:#ff9085;">⚔️ В боевой расчёт</button>' +
           '<button type="button" class="btn btn-primary" data-go="faeTechEdit:' + escapeAttr(t.id) + '">✏️ Редактировать</button>' +
         '</div>' +
       '</div>' +
@@ -3708,6 +4378,7 @@ function renderFaeTechGen(){
 
 function wireFaeTechs(){
   wireFaeAbilitiesHeroSelect();
+  wireFaeTechLauncher();
 
   document.querySelectorAll('[data-fae-tech-cat]').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -3875,6 +4546,519 @@ function wireFaeTechs(){
 
 /* ---------- БОЕВЫЕ ПРИЁМЫ ФАЭРУНА (faeMoves) ---------- */
 
+function buildFaeMoveComboText(m, isSup, rolledValues, mods){
+  var wpStr = m.weaponOrStyle ? (' | Оружие: ' + m.weaponOrStyle) : '';
+  var actStr = m.actionCost ? (' | Действие: ' + m.actionCost) : '';
+  var mastStr = m.mastery ? (' | Мастерство: ' + m.mastery) : '';
+  var header = '*[Приём: ' + (m.name || 'Без названия') + wpStr + actStr + mastStr + ']*';
+  var lines = [header];
+
+  if(rolledValues && rolledValues.atk){
+    var aMod = parseInt(mods.atk, 10) || 0;
+    var aModStr = aMod > 0 ? ' + ' + aMod : (aMod < 0 ? ' − ' + Math.abs(aMod) : '');
+    lines.push('*[Результат броска Попадание 1d20: ' + rolledValues.atk + ' ]*' + aModStr);
+  }
+
+  var pDmg = parseFaeDiceFormula(m.damageOrSave || '');
+  if(pDmg && rolledValues && rolledValues.dmgRolls && rolledValues.dmgRolls.length){
+    var n = rolledValues.dmgRolls.length;
+    var dSides = rolledValues.dmgSides || pDmg.sides;
+    var dMod = parseInt(mods.dmg, 10) || 0;
+    var dModStr = dMod > 0 ? ' + ' + dMod : (dMod < 0 ? ' − ' + Math.abs(dMod) : '');
+    lines.push('*[Результат броска Урон ' + n + 'd' + dSides + ': ' + rolledValues.dmgRolls.join(' | ') + ' ]*' + dModStr);
+  }
+
+  if(isSup && rolledValues && rolledValues.sup){
+    var sMod = parseInt(mods.sup, 10) || 0;
+    var sModStr = sMod > 0 ? ' + ' + sMod : (sMod < 0 ? ' − ' + Math.abs(sMod) : '');
+    lines.push('*[Результат броска Кость превосходства 1d8: ' + rolledValues.sup + ' ]*' + sModStr);
+  }
+
+  if(m.mastery){
+    lines.push('*[Эффект Мастерства 2024: ' + m.mastery + ']*');
+  }
+
+  return lines.join('\n');
+}
+
+function renderFaeMoveLauncherDiceHtml(move, isSup, selTarget, mods, rolledValues){
+  if(!move) return '<div class="sh-scr-no-dmg">Выберите приём для расчёта</div>';
+  mods = mods || { atk: 0, dmg: 0, sup: 0 };
+  rolledValues = rolledValues || {};
+
+  var aModStr = formatFaeLauncherMod(mods.atk);
+  var atkDieHtml =
+    '<div class="sh-scr-col ' + (selTarget === 'atk' ? 'selected' : '') + '" data-select-fae-move-roll="atk" title="Кликните для выбора кубика и настройки модификатора">' +
+      '<div class="sh-scr-label">Попадание</div>' +
+      '<div class="sh-scr-die die s20" id="faeScrDieMoveAtk">' +
+        (typeof dieShapeSvg === 'function' ? dieShapeSvg(20, 'faemvatk', null) : '') +
+        '<div class="val">' + (rolledValues.atk || 20) + '</div>' +
+      '</div>' +
+      '<div class="sh-scr-sub" id="faeScrSub_moveAtk">1d20' + (aModStr ? ' ' + aModStr : '') + '</div>' +
+    '</div>';
+
+  var pDmg = parseFaeDiceFormula(move.damageOrSave || '');
+  var dmgBlockHtml = '';
+  if(pDmg){
+    var n = pDmg.n;
+    var dSides = pDmg.sides;
+    var dModStr = formatFaeLauncherMod(mods.dmg);
+    var dmgDiceList = [];
+    var rolls = rolledValues.dmgRolls || [];
+    for(var i = 0; i < n; i++){
+      var curVal = rolls[i] || dSides;
+      dmgDiceList.push(
+        '<div class="sh-scr-die die s' + dSides + '" id="faeScrDieMoveDmg_' + i + '">' +
+          (typeof dieShapeSvg === 'function' ? dieShapeSvg(dSides, 'faemvdmg' + i, null) : '') +
+          '<div class="val">' + curVal + '</div>' +
+        '</div>'
+      );
+    }
+    var baseDmgFormula = n + 'd' + dSides + (pDmg.mod ? (pDmg.mod > 0 ? '+' + pDmg.mod : pDmg.mod) : '');
+    dmgBlockHtml =
+      '<div class="sh-scr-dmg-group ' + (selTarget === 'dmg' ? 'selected' : '') + '" data-select-fae-move-roll="dmg" title="Кликните для выбора кубиков и настройки модификатора">' +
+        '<div class="sh-scr-label">Урон (' + baseDmgFormula + ')</div>' +
+        '<div class="sh-scr-dmg-dice">' + dmgDiceList.join('') + '</div>' +
+        '<div class="sh-scr-sub" id="faeScrSub_moveDmg">' + n + 'd' + dSides + (dModStr ? ' ' + dModStr : '') + '</div>' +
+      '</div>';
+  } else {
+    var stText = move.damageOrSave ? ('Эффект / СЛ: <b>' + escapeHtml(move.damageOrSave) + '</b>') : ('Мастерство: <b>' + escapeHtml(move.mastery || 'Тактический манёвр') + '</b>');
+    dmgBlockHtml = '<div class="sh-scr-no-dmg">' + stText + '</div>';
+  }
+
+  var supDieHtml = '';
+  if(isSup){
+    var sModStr = formatFaeLauncherMod(mods.sup);
+    supDieHtml =
+      '<div class="sh-scr-col ' + (selTarget === 'sup' ? 'selected' : '') + '" data-select-fae-move-roll="sup" title="Кликните для выбора кости превосходства">' +
+        '<div class="sh-scr-label" style="color:#fde68a;">Кость манёвра</div>' +
+        '<div class="sh-scr-die die s8" id="faeScrDieMoveSup">' +
+          (typeof dieShapeSvg === 'function' ? dieShapeSvg(8, 'faemvsup', null) : '') +
+          '<div class="val">' + (rolledValues.sup || 8) + '</div>' +
+        '</div>' +
+        '<div class="sh-scr-sub" id="faeScrSub_moveSup">1d8' + (sModStr ? ' ' + sModStr : '') + '</div>' +
+      '</div>';
+  }
+
+  return '<div class="sh-screen-dice-tray">' + atkDieHtml + dmgBlockHtml + supDieHtml + '</div>';
+}
+
+function renderFaeMoveLauncher(c){
+  var moves = (c && Array.isArray(c.moves)) ? c.moves : [];
+  if(!moves.length){
+    return '<div class="sh-launcher" style="margin-bottom:16px;">' +
+      '<div class="sh-launcher-title">🥋 Боевой расчёт приёма <span class="sh-badge-tag">AI Studio</span></div>' +
+      '<div class="char-empty" style="margin:10px 0 0;padding:12px;">Приёмы ещё не добавлены. Добавьте первый приём кнопкой выше или из Стоек и Мастерства 2024, чтобы использовать боевой расчёт.</div>' +
+    '</div>';
+  }
+
+  if(!window._faeMoveLauncher) window._faeMoveLauncher = {};
+  var L = window._faeMoveLauncher;
+  if(L.isOpen === undefined) L.isOpen = false;
+  if(!L.mods) L.mods = { atk: 0, dmg: 0, sup: 0 };
+  if(!L.rolledValues) L.rolledValues = {};
+  if(!L.selectedTarget) L.selectedTarget = 'atk';
+
+  var selMove = moves.find(function(x){ return x.id === L.moveId; }) || moves[0];
+  if(L.moveId !== selMove.id){
+    L.moveId = selMove.id;
+    L.mods.atk = parseFaeSignedMod(selMove.attackBonus);
+    var initDmg = parseFaeDiceFormula(selMove.damageOrSave || '');
+    L.mods.dmg = initDmg ? (initDmg.mod || 0) : 0;
+    L.isSup = (selMove.category || '').indexOf('Боевого Мастера') !== -1 || (selMove.attackBonus || '').toLowerCase().indexOf('превосходств') !== -1;
+  }
+
+  var isSup = !!L.isSup;
+  var pDmg = parseFaeDiceFormula(selMove.damageOrSave || '');
+  var selTarget = L.selectedTarget;
+  if(selTarget === 'dmg' && !pDmg) selTarget = 'atk';
+  if(selTarget === 'sup' && !isSup) selTarget = 'atk';
+  L.selectedTarget = selTarget;
+
+  var targetNames = { atk: '🎯 Попадание', dmg: '💥 Урон', sup: '🎲 Кость превосходства' };
+  var targetTitle = targetNames[selTarget] || '🎯 Попадание';
+  var curModVal = L.mods[selTarget] || 0;
+
+  var moveOpts = moves.map(function(m){
+    var wp = m.weaponOrStyle ? (' [' + m.weaponOrStyle + ']') : '';
+    var dm = m.damageOrSave ? (' (' + m.damageOrSave + ')') : '';
+    var ms = m.mastery ? (' · ' + m.mastery) : '';
+    return '<option value="' + escapeAttr(m.id) + '" ' + (m.id === selMove.id ? 'selected' : '') + '>' +
+      escapeHtml(m.name || 'Без названия') + wp + dm + ms +
+    '</option>';
+  }).join('');
+
+  var screenHtml = renderFaeMoveLauncherDiceHtml(selMove, isSup, selTarget, L.mods, L.rolledValues);
+
+  var modBarHtml =
+    '<div class="sh-mod-bar">' +
+      '<div class="sh-mod-target-info">' +
+        '<span>Выбран кубик:</span>' +
+        '<span class="sh-mod-target-tag" id="faeMoveModTargetName">' + targetTitle + '</span>' +
+      '</div>' +
+      '<div class="sh-mod-controls">' +
+        '<button type="button" class="sh-mod-step" data-fae-move-mod-delta="-5" title="Уменьшить на 5">−5</button>' +
+        '<button type="button" class="sh-mod-step" data-fae-move-mod-delta="-1" title="Уменьшить на 1">−</button>' +
+        '<input type="number" id="faeMoveActiveModInput" class="sh-active-mod-input" value="' + curModVal + '">' +
+        '<button type="button" class="sh-mod-step" data-fae-move-mod-delta="1" title="Увеличить на 1">+</button>' +
+        '<button type="button" class="sh-mod-step" data-fae-move-mod-delta="5" title="Увеличить на 5">+5</button>' +
+        '<button type="button" class="sh-mod-reset" id="faeMoveModResetBtn" title="Сбросить модификатор в 0">Сброс</button>' +
+      '</div>' +
+      '<label class="sh-exp-check">' +
+        '<input type="checkbox" id="faeMoveLauncherSup"' + (isSup ? ' checked' : '') + '> 🎲 Кость манёвра (1d8)' +
+      '</label>' +
+    '</div>';
+
+  var actionsHtml =
+    '<div class="sh-launcher-actions">' +
+      '<button type="button" class="sh-btn-launch" id="faeLaunchMoveComboBtn" title="Бросить все кости приёма и зафиксировать результат">⚔️ Применить приём</button>' +
+      '<button type="button" class="sh-btn-copy-all" id="faeCopyAllMoveBtn" title="Скопировать готовый блок в буфер обмена для AI Studio">📋 Скопировать всё</button>' +
+      '<button type="button" class="sh-micro-btn" id="faeLaunchMoveAtkBtn" title="Бросить и скопировать только попадание">🎯 Попадание</button>' +
+      (pDmg ? '<button type="button" class="sh-micro-btn" id="faeLaunchMoveDmgBtn" title="Бросить и скопировать только урон">💥 Урон</button>' : '') +
+      (isSup ? '<button type="button" class="sh-micro-btn" id="faeLaunchMoveSupBtn" title="Бросить и скопировать кость превосходства">🎲 Кость 1d8</button>' : '') +
+      '<button type="button" class="sh-micro-btn" id="faeLaunchMoveClaimBtn" title="Скопировать только заголовок заявки">📜 Только заявка</button>' +
+    '</div>';
+
+  var hasRes = !!(L.lastResult);
+  var resultBoxHtml =
+    '<div class="sh-launcher-result ' + (hasRes ? 'has-result' : '') + '" id="faeMoveLauncherResultBox">' +
+      '<div class="sh-launcher-result-text" id="faeMoveLauncherResultText">' + escapeHtml(L.lastResult || '') + '</div>' +
+      '<div class="sh-copy-badge" id="faeMoveLauncherCopyBadge" style="display:' + (hasRes ? 'inline-flex' : 'none') + ';">' +
+        '<span>' + (L.lastResultCopied ? '✓ Скопировано в буфер обмена для AI Studio' : '🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»') + '</span>' +
+      '</div>' +
+    '</div>';
+
+  var isOpen = !!L.isOpen;
+  var toggleHeadHtml =
+    '<div class="sh-launcher-toggle-head" id="faeMoveLauncherToggle" role="button" tabindex="0" title="Нажмите, чтобы развернуть или свернуть боевой расчёт приёма">' +
+      '<div class="sh-launcher-title">' +
+        '<span>🥋 Боевой расчёт приёма</span>' +
+        '<span class="sh-badge-tag">AI Studio</span>' +
+      '</div>' +
+      '<div class="sh-launcher-toggle-btn">' +
+        '<span class="sh-launcher-toggle-text">' + (isOpen ? 'Свернуть' : 'Развернуть') + '</span>' +
+        '<span class="sh-launcher-toggle-arrow">' + (isOpen ? '▲' : '▼') + '</span>' +
+      '</div>' +
+    '</div>';
+
+  var bodyHtml =
+    '<div class="sh-launcher-body" id="faeMoveLauncherBody">' +
+      '<div class="sh-launcher-head">' +
+        '<div class="sh-launcher-sel-wrap">' +
+          '<div class="sh-launcher-sel-label">Приём для броска:</div>' +
+          '<select class="sh-launcher-sel" id="faeMoveLauncherSelect">' + moveOpts + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sh-launcher-screen" id="faeMoveLauncherScreen">' + screenHtml + '</div>' +
+      modBarHtml +
+      actionsHtml +
+      resultBoxHtml +
+    '</div>';
+
+  return '<div class="sh-launcher ' + (isOpen ? '' : 'collapsed') + '" id="faeMoveLauncherContainer">' +
+    toggleHeadHtml +
+    bodyHtml +
+  '</div>';
+}
+
+function wireFaeMoveLauncher(){
+  var c = getActiveFaerunCharacter();
+  var moves = (c && Array.isArray(c.moves)) ? c.moves : [];
+  if(!window._faeMoveLauncher) window._faeMoveLauncher = { isOpen: false, mods: { atk: 0, dmg: 0, sup: 0 }, rolledValues: {}, selectedTarget: 'atk' };
+  var L = window._faeMoveLauncher;
+
+  var tHead = document.getElementById('faeMoveLauncherToggle');
+  if(tHead){
+    tHead.addEventListener('click', function(){
+      L.isOpen = !L.isOpen;
+      var cont = document.getElementById('faeMoveLauncherContainer');
+      if(cont){
+        cont.classList.toggle('collapsed', !L.isOpen);
+        var txt = cont.querySelector('.sh-launcher-toggle-text');
+        var arr = cont.querySelector('.sh-launcher-toggle-arrow');
+        if(txt) txt.textContent = L.isOpen ? 'Свернуть' : 'Развернуть';
+        if(arr) arr.textContent = L.isOpen ? '▲' : '▼';
+      }
+    });
+  }
+
+  var getSelMove = function(){
+    return moves.find(function(x){ return x.id === L.moveId; }) || moves[0] || null;
+  };
+
+  var updateModUI = function(){
+    var targetNames = { atk: '🎯 Попадание', dmg: '💥 Урон', sup: '🎲 Кость превосходства' };
+    var nameEl = document.getElementById('faeMoveModTargetName');
+    if(nameEl) nameEl.textContent = targetNames[L.selectedTarget] || '🎯 Попадание';
+    var inp = document.getElementById('faeMoveActiveModInput');
+    if(inp) inp.value = (L.mods && L.mods[L.selectedTarget]) || 0;
+  };
+
+  var wireDiceClicks = function(){
+    var scr = document.getElementById('faeMoveLauncherScreen');
+    if(!scr) return;
+    var els = scr.querySelectorAll('[data-select-fae-move-roll]');
+    els.forEach(function(el){
+      el.addEventListener('click', function(){
+        var target = el.getAttribute('data-select-fae-move-roll');
+        if(!target) return;
+        L.selectedTarget = target;
+        els.forEach(function(s){ s.classList.remove('selected'); });
+        el.classList.add('selected');
+        updateModUI();
+      });
+    });
+  };
+  wireDiceClicks();
+
+  var setTargetMod = function(newVal){
+    var target = L.selectedTarget || 'atk';
+    L.mods[target] = newVal;
+    updateModUI();
+    var m = getSelMove();
+    if(target === 'atk'){
+      var subA = document.getElementById('faeScrSub_moveAtk');
+      if(subA) subA.textContent = '1d20' + (formatFaeLauncherMod(newVal) ? ' ' + formatFaeLauncherMod(newVal) : '');
+    } else if(target === 'sup'){
+      var subS = document.getElementById('faeScrSub_moveSup');
+      if(subS) subS.textContent = '1d8' + (formatFaeLauncherMod(newVal) ? ' ' + formatFaeLauncherMod(newVal) : '');
+    } else if(target === 'dmg' && m){
+      var pDmg = parseFaeDiceFormula(m.damageOrSave || '');
+      if(pDmg){
+        var subD = document.getElementById('faeScrSub_moveDmg');
+        if(subD) subD.textContent = pDmg.n + 'd' + pDmg.sides + (formatFaeLauncherMod(newVal) ? ' ' + formatFaeLauncherMod(newVal) : '');
+      }
+    }
+    if(L.lastResult && m){
+      L.lastResult = buildFaeMoveComboText(m, !!L.isSup, L.rolledValues, L.mods);
+      var rTxt = document.getElementById('faeMoveLauncherResultText');
+      if(rTxt) rTxt.textContent = L.lastResult;
+    }
+  };
+
+  document.querySelectorAll('[data-fae-move-mod-delta]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var delta = parseInt(btn.getAttribute('data-fae-move-mod-delta'), 10) || 0;
+      var cur = parseInt(L.mods[L.selectedTarget], 10) || 0;
+      setTargetMod(cur + delta);
+    });
+  });
+
+  var resetBtn = document.getElementById('faeMoveModResetBtn');
+  if(resetBtn) resetBtn.addEventListener('click', function(){ setTargetMod(0); });
+
+  var modInp = document.getElementById('faeMoveActiveModInput');
+  if(modInp){
+    modInp.addEventListener('input', function(){
+      var v = parseInt(this.value, 10);
+      if(isNaN(v)) v = 0;
+      setTargetMod(v);
+    });
+  }
+
+  var selEl = document.getElementById('faeMoveLauncherSelect');
+  if(selEl){
+    selEl.addEventListener('change', function(){
+      L.moveId = this.value;
+      var m = getSelMove();
+      if(m){
+        L.mods.atk = parseFaeSignedMod(m.attackBonus);
+        var pDmg = parseFaeDiceFormula(m.damageOrSave || '');
+        L.mods.dmg = pDmg ? (pDmg.mod || 0) : 0;
+        L.isSup = (m.category || '').indexOf('Боевого Мастера') !== -1 || (m.attackBonus || '').toLowerCase().indexOf('превосходств') !== -1;
+      }
+      L.rolledValues = {};
+      L.lastResult = '';
+      L.lastResultCopied = false;
+      render();
+    });
+  }
+
+  var supCb = document.getElementById('faeMoveLauncherSup');
+  if(supCb){
+    supCb.addEventListener('change', function(){
+      L.isSup = !!this.checked;
+      if(!L.isSup && L.selectedTarget === 'sup') L.selectedTarget = 'atk';
+      render();
+    });
+  }
+
+  var finishMoveLaunch = function(m, mode, autoCopy){
+    var wpStr = m.weaponOrStyle ? (' | Оружие: ' + m.weaponOrStyle) : '';
+    var actStr = m.actionCost ? (' | Действие: ' + m.actionCost) : '';
+    var mastStr = m.mastery ? (' | Мастерство: ' + m.mastery) : '';
+    var header = '*[Приём: ' + (m.name || 'Без названия') + wpStr + actStr + mastStr + ']*';
+    var lines = [];
+    var mods = L.mods || { atk: 0, dmg: 0, sup: 0 };
+    var pDmg = parseFaeDiceFormula(m.damageOrSave || '');
+
+    if(mode === 'claim'){
+      lines.push(header);
+      if(m.mastery) lines.push('*[Эффект Мастерства 2024: ' + m.mastery + ']*');
+    } else if(mode === 'atk'){
+      var atkVal = 1 + Math.floor(Math.random() * 20);
+      L.rolledValues.atk = atkVal;
+      var atDie = document.getElementById('faeScrDieMoveAtk');
+      if(atDie){ var vEl = atDie.querySelector('.val'); if(vEl) vEl.textContent = atkVal; }
+      var aMod = parseInt(mods.atk, 10) || 0;
+      var aModStr = aMod > 0 ? ' + ' + aMod : (aMod < 0 ? ' − ' + Math.abs(aMod) : '');
+      lines.push(header);
+      lines.push('*[Результат броска Попадание 1d20: ' + atkVal + ' ]*' + aModStr);
+    } else if(mode === 'sup'){
+      var supVal = 1 + Math.floor(Math.random() * 8);
+      L.rolledValues.sup = supVal;
+      var sDie = document.getElementById('faeScrDieMoveSup');
+      if(sDie){ var vEl = sDie.querySelector('.val'); if(vEl) vEl.textContent = supVal; }
+      var sMod = parseInt(mods.sup, 10) || 0;
+      var sModStr = sMod > 0 ? ' + ' + sMod : (sMod < 0 ? ' − ' + Math.abs(sMod) : '');
+      lines.push(header);
+      lines.push('*[Результат броска Кость превосходства 1d8: ' + supVal + ' ]*' + sModStr);
+    } else if(mode === 'dmg' && pDmg){
+      var rolls = [];
+      for(var i = 0; i < pDmg.n; i++){
+        var r = 1 + Math.floor(Math.random() * pDmg.sides);
+        rolls.push(r);
+        var dmDie = document.getElementById('faeScrDieMoveDmg_' + i);
+        if(dmDie){ var vEl = dmDie.querySelector('.val'); if(vEl) vEl.textContent = r; }
+      }
+      L.rolledValues.dmgRolls = rolls;
+      L.rolledValues.dmgSides = pDmg.sides;
+      var dMod = parseInt(mods.dmg, 10) || 0;
+      var dModStr = dMod > 0 ? ' + ' + dMod : (dMod < 0 ? ' − ' + Math.abs(dMod) : '');
+      lines.push(header);
+      lines.push('*[Результат броска Урон ' + pDmg.n + 'd' + pDmg.sides + ': ' + rolls.join(' | ') + ' ]*' + dModStr);
+    } else {
+      var atkValAll = 1 + Math.floor(Math.random() * 20);
+      L.rolledValues.atk = atkValAll;
+      var atDieAll = document.getElementById('faeScrDieMoveAtk');
+      if(atDieAll){ var vEl = atDieAll.querySelector('.val'); if(vEl) vEl.textContent = atkValAll; }
+      if(pDmg){
+        var rollsAll = [];
+        for(var j = 0; j < pDmg.n; j++){
+          var rAll = 1 + Math.floor(Math.random() * pDmg.sides);
+          rollsAll.push(rAll);
+          var dmDieAll = document.getElementById('faeScrDieMoveDmg_' + j);
+          if(dmDieAll){ var vEl = dmDieAll.querySelector('.val'); if(vEl) vEl.textContent = rAll; }
+        }
+        L.rolledValues.dmgRolls = rollsAll;
+        L.rolledValues.dmgSides = pDmg.sides;
+      }
+      if(L.isSup){
+        var supValAll = 1 + Math.floor(Math.random() * 8);
+        L.rolledValues.sup = supValAll;
+        var sDieAll = document.getElementById('faeScrDieMoveSup');
+        if(sDieAll){ var vEl = sDieAll.querySelector('.val'); if(vEl) vEl.textContent = supValAll; }
+      }
+      lines = buildFaeMoveComboText(m, !!L.isSup, L.rolledValues, mods).split('\n');
+    }
+
+    var output = lines.join('\n');
+    L.lastResult = output;
+    var rBox = document.getElementById('faeMoveLauncherResultBox');
+    var rTxt = document.getElementById('faeMoveLauncherResultText');
+    var rBdg = document.getElementById('faeMoveLauncherCopyBadge');
+    if(rTxt) rTxt.textContent = output;
+    if(rBox) rBox.classList.add('has-result');
+    if(autoCopy){
+      copyText(output);
+      L.lastResultCopied = true;
+      if(rBdg){
+        rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio (' + lines.length + ' стр.)</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    } else {
+      L.lastResultCopied = false;
+      if(rBdg){
+        rBdg.innerHTML = '<span>🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    }
+  };
+
+  var executeMoveLaunch = function(mode, autoCopy){
+    var m = getSelMove();
+    if(!m) return;
+    var pDmg = parseFaeDiceFormula(m.damageOrSave || '');
+    if(mode !== 'claim'){
+      var diceToRoll = [];
+      if(mode === 'all' || mode === 'atk'){
+        var atDie = document.getElementById('faeScrDieMoveAtk'); if(atDie) diceToRoll.push(atDie);
+      }
+      if((mode === 'all' || mode === 'dmg') && pDmg){
+        for(var i = 0; i < pDmg.n; i++){
+          var dmDie = document.getElementById('faeScrDieMoveDmg_' + i); if(dmDie) diceToRoll.push(dmDie);
+        }
+      }
+      if((mode === 'all' || mode === 'sup') && L.isSup){
+        var sDie = document.getElementById('faeScrDieMoveSup'); if(sDie) diceToRoll.push(sDie);
+      }
+      diceToRoll.forEach(function(el){ el.classList.add('rolling'); });
+      var rollInterval = setInterval(function(){
+        diceToRoll.forEach(function(el){
+          var vEl = el.querySelector('.val');
+          if(vEl) vEl.textContent = Math.floor(Math.random() * 20) + 1;
+        });
+      }, 50);
+      setTimeout(function(){
+        clearInterval(rollInterval);
+        diceToRoll.forEach(function(el){ el.classList.remove('rolling'); });
+        finishMoveLaunch(m, mode, autoCopy);
+      }, 350);
+    } else {
+      finishMoveLaunch(m, mode, autoCopy);
+    }
+  };
+
+  var bCombo = document.getElementById('faeLaunchMoveComboBtn');
+  if(bCombo) bCombo.addEventListener('click', function(){ executeMoveLaunch('all', false); });
+
+  var bCopyAll = document.getElementById('faeCopyAllMoveBtn');
+  if(bCopyAll){
+    bCopyAll.addEventListener('click', function(){
+      if(!L.lastResult) executeMoveLaunch('all', true);
+      else {
+        copyText(L.lastResult);
+        L.lastResultCopied = true;
+        var rBdg = document.getElementById('faeMoveLauncherCopyBadge');
+        if(rBdg){
+          rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio (' + L.lastResult.split('\n').length + ' стр.)</span>';
+          rBdg.style.display = 'inline-flex';
+        }
+      }
+    });
+  }
+
+  var bAtk = document.getElementById('faeLaunchMoveAtkBtn'); if(bAtk) bAtk.addEventListener('click', function(){ executeMoveLaunch('atk', true); });
+  var bDmg = document.getElementById('faeLaunchMoveDmgBtn'); if(bDmg) bDmg.addEventListener('click', function(){ executeMoveLaunch('dmg', true); });
+  var bSup = document.getElementById('faeLaunchMoveSupBtn'); if(bSup) bSup.addEventListener('click', function(){ executeMoveLaunch('sup', true); });
+  var bClaim = document.getElementById('faeLaunchMoveClaimBtn'); if(bClaim) bClaim.addEventListener('click', function(){ executeMoveLaunch('claim', true); });
+
+  document.querySelectorAll('[data-fae-move-to-calc]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var id = btn.getAttribute('data-fae-move-to-calc');
+      if(!id) return;
+      L.isOpen = true;
+      L.moveId = id;
+      var m = moves.find(function(x){ return x.id === id; });
+      if(m){
+        L.mods.atk = parseFaeSignedMod(m.attackBonus);
+        var pDmg = parseFaeDiceFormula(m.damageOrSave || '');
+        L.mods.dmg = pDmg ? (pDmg.mod || 0) : 0;
+        L.isSup = (m.category || '').indexOf('Боевого Мастера') !== -1 || (m.attackBonus || '').toLowerCase().indexOf('превосходств') !== -1;
+      }
+      L.rolledValues = {};
+      L.lastResult = '';
+      if(view.screen !== 'faeMoves') navigate('faeMoves');
+      else render();
+      setTimeout(function(){
+        var cont = document.getElementById('faeMoveLauncherContainer');
+        if(cont) cont.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 60);
+    });
+  });
+}
+
 function renderFaeMoves(){
   var c = getActiveFaerunCharacter();
   var moves = (c && Array.isArray(c.moves)) ? c.moves : [];
@@ -3916,6 +5100,7 @@ function renderFaeMoves(){
             '<div class="fae-ref-card-v" style="margin-bottom:12px;">' + escapeHtml(m.desc || '') + '</div>' +
           '</div>' +
           '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(201,164,92,0.18);">' +
+            '<button type="button" class="rc-btn" data-fae-move-to-calc="' + escapeAttr(m.id) + '" style="border-color:rgba(200,67,55,0.5);color:#ff9085;">⚔️ В расчёт</button>' +
             '<button type="button" class="rc-btn" data-fae-move-copy="' + escapeAttr(copyStr) + '">📋 Копировать</button>' +
             '<button type="button" class="rc-btn" data-go="faeMoveEdit:' + escapeAttr(m.id) + '">✏️ Изменить</button>' +
             '<button type="button" class="rc-btn" data-fae-move-del="' + escapeAttr(m.id) + '" style="color:#f87171;">🗑️</button>' +
@@ -3935,10 +5120,15 @@ function renderFaeMoves(){
       '</div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
         '<button type="button" class="btn btn-primary" data-go="faeMoveEdit:new">+ Добавить приём</button>' +
+        '<button type="button" class="btn btn-ghost" data-go="classes" style="border-color:rgba(201,164,92,0.5);color:#f3e5ab;">🏛️ Из Классов и Подклассов</button>' +
+        '<button type="button" class="btn btn-ghost" data-go="weapons" style="border-color:rgba(56,189,248,0.45);color:#bae6fd;">🗡️ Из Стоек и Оружия</button>' +
+        '<button type="button" class="btn btn-ghost" data-go="rules2024" style="border-color:rgba(201,164,92,0.45);color:#fde68a;">📜 Из Мастерства 2024</button>' +
         '<button type="button" class="ai-gen-btn" data-go="faeMoveGen" style="padding:9px 16px;font-size:13px;">🤖 Создать приём с ИИ</button>' +
       '</div>' +
     '</div>' +
     '<div class="fae-rule"></div>' +
+
+    renderFaeMoveLauncher(c) +
 
     '<div class="fae-ref-search-wrap" style="margin-bottom:14px;">' +
       '<span class="fae-ref-search-icon">🔍</span>' +
@@ -3963,7 +5153,8 @@ function renderFaeMoveView(){
           '<span class="fae-ref-item-tag">⚔️ ' + escapeHtml(m.category || 'Боевой приём') + '</span>' +
           '<h1 style="margin:8px 0 0 0;font-size:24px;">' + escapeHtml(m.name || 'Приём') + '</h1>' +
         '</div>' +
-        '<div style="display:flex;gap:8px;">' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button type="button" class="btn btn-ghost" data-fae-move-to-calc="' + escapeAttr(m.id) + '" style="border-color:rgba(200,67,55,0.6);color:#ff9085;">⚔️ В боевой расчёт</button>' +
           '<button type="button" class="btn btn-primary" data-go="faeMoveEdit:' + escapeAttr(m.id) + '">✏️ Редактировать</button>' +
         '</div>' +
       '</div>' +
@@ -4107,6 +5298,7 @@ function renderFaeMoveGen(){
 
 function wireFaeMoves(){
   wireFaeAbilitiesHeroSelect();
+  wireFaeMoveLauncher();
 
   document.querySelectorAll('[data-fae-move-cat]').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -4279,90 +5471,1446 @@ function wireFaeMoves(){
   }
 }
 
+/* ============================================================
+   НАВЫКИ И ЗНАНИЯ ГЕРОЯ (faeSkills) ФАЭРУНА
+   (по образцу экрана Навыков раздела Шиноби shSkills / shSkillView / shSkillEdit / shSkillGen + 18 навыков D&D 5e / 2024)
+   ============================================================ */
 
-function subclassFeatureCard(f){
-  if(f.isLink){
-    return `
-      <div class="card" data-go="${f.linkTo}">
-        <div class="top-row">
-          <div class="name">${f.ru}</div>
-          <div class="die-badge">Ур. ${f.level}</div>
-        </div>
-        <div class="desc">${f.desc}</div>
-      </div>`;
+var FAE_SKILL_KINDS = [
+  'Ремесло',
+  'Инструменты',
+  'Знание',
+  'Языки',
+  'Выживание',
+  'Быт',
+  'Искусство',
+  'Общение',
+  'Другое'
+];
+
+var FAE_SKILL_KIND_ICONS = {
+  'Ремесло': '🔨',
+  'Инструменты': '🧰',
+  'Знание': '📜',
+  'Языки': '🗣️',
+  'Выживание': '🏕️',
+  'Быт': '🍲',
+  'Искусство': '🪕',
+  'Общение': '👑',
+  'Другое': '✨'
+};
+
+var FAE_SKILL_LEVELS = [
+  'Начатки',
+  'Ученик',
+  'Подмастерье',
+  'Умелец',
+  'Мастер'
+];
+
+var FAE_SKILL_TEMPLATES = [
+  {
+    name: 'Воровские инструменты и тайники',
+    kind: 'Инструменты',
+    level: 'Подмастерье',
+    abil: 'Ловкость / Интеллект',
+    mod: '+5',
+    src: 'Уличная школа гильдии воров Врат Балдура',
+    gives: 'Взлом замков (СЛ 15), обезвреживание механических ловушек, обнаружение двойного дна в сундуках и тайных знаков Воровского жаргона без броска.',
+    desc: 'Набор отмычек, зеркальце на рукояти, узкие щипцы и флакон машинного масла для бесшумных петель.'
+  },
+  {
+    name: 'Кузнечное и оружейное дело',
+    kind: 'Ремесло',
+    level: 'Подмастерье',
+    abil: 'Сила / Телосложение',
+    mod: '+4',
+    src: 'Кузница дварфийского мастера в Невервинтере',
+    gives: 'Починка повреждённых доспехов и клинков на коротком отдыхе, оценка качества стали и клейма мастера на глаз, ковка оружия и подков.',
+    desc: 'Требуются Инструменты кузнеца и доступ к горну или походной наковальне.'
+  },
+  {
+    name: 'Травничество и полевая алхимия',
+    kind: 'Ремесло',
+    level: 'Умелец',
+    abil: 'Интеллект / Мудрость',
+    mod: '+5',
+    src: 'Обучение у друидов Изумрудного Анклава',
+    gives: 'Безошибочное распознавание целебных и ядовитых трав Фаэруна без броска, варка Зелий лечения (2d4+2) и Противоядий за 1 рабочий день.',
+    desc: 'Набор травника: секатор, ступка с пестиком, стеклянные фиалы и справочник флоры Побережья Мечей.'
+  },
+  {
+    name: 'География и лор Побережья Мечей',
+    kind: 'Знание',
+    level: 'Подмастерье',
+    abil: 'Интеллект',
+    mod: '+4',
+    src: 'Странствия с караванами и изучение хроник Кэндлкипа',
+    gives: 'Знание основных торговых трактов, гербов благородных домов, законов городов Альянса Лордов и безопасных постоялых дворов без броска.',
+    desc: 'Помогает избегать пошлинных засад и находить нужных информаторов в крупных портах.'
+  },
+  {
+    name: 'Эльфийский и Дварфийский языки (Чтение рун)',
+    kind: 'Языки',
+    level: 'Умелец',
+    abil: 'Интеллект',
+    mod: '+4',
+    src: 'Древние манускрипты и общение со старейшинами кланов',
+    gives: 'Свободная речь, чтение эльфийской вязи (Эспруар) и дварфийских клинописных рун (Детhek), понимание древних эпитафий на гробницах.',
+    desc: 'Позволяет читать предупреждения на вратах заброшенных твердынь без магического перевода.'
+  },
+  {
+    name: 'Следопытство и походный лагерь',
+    kind: 'Выживание',
+    level: 'Подмастерье',
+    abil: 'Мудрость',
+    mod: '+5',
+    src: 'Годы жизни в диких землях Долины Ледяного Ветра',
+    gives: 'Чтение следов зверя и гуманоидов, обустройство защищённого от ветра и хищников ночлега, ориентирование по звёздам и мху без броска.',
+    desc: 'Отряд в походе не блуждает в тумане и находит пресную воду даже в засушливых пустошах.'
   }
-  const genBtn = f.roll ? `<button class="gen-btn" data-template="${escapeAttr('*[Результат броска '+f.ru+' 1d'+f.roll.sides+': ]*')}" data-count="1" data-sides="${f.roll.sides}" data-mode="sum">Сгенерировать и скопировать результат</button>` : '';
-  const genOverlay = f.roll ? `<div class="gen-stamp"><div class="gen-die"></div></div>` : '';
-  return `
-    <div class="card" data-copy="${escapeAttr(f.ru)}">
-      <div class="top-row">
-        <div class="name">${f.ru}</div>
-        <div class="die-badge">Ур. ${f.level}</div>
-      </div>
-      <div class="desc">${f.desc}</div>
-      ${genBtn}
-      <div class="stamp"><span>Скопировано</span></div>
-      ${genOverlay}
-    </div>`;
+];
+
+function faeSkillById(c, id){
+  if(!c || !Array.isArray(c.customSkills)) return null;
+  for(var i = 0; i < c.customSkills.length; i++){
+    if(c.customSkills[i].id === id) return c.customSkills[i];
+  }
+  return null;
 }
 
-function renderSubclassFeatures(){
-  const clsKey = view.clsKey, subKey = view.subKey;
-  const cls = DATA[clsKey];
-  const sub = cls ? cls.subclasses[subKey] : null;
-  if(!sub){
-    view = {screen:'class', cls:clsKey};
-    return renderClass();
-  }
-  const features = [...sub.features].sort((a,b)=>a.level-b.level);
-  return `
-    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:cls.name, nav:'class:'+clsKey},{label:sub.name}])}
-    <button class="back" data-go="class:${clsKey}">← Назад</button>
-    <h1>${sub.name}</h1>
-    <p class="subtitle">Умения архетипа по уровням получения.</p>
-    <div class="rule"></div>
-    <div class="grid">${features.map(subclassFeatureCard).join('')}</div>
-  `;
+/* --- 3. РАСЧЁТ ПРОВЕРКИ НАВЫКА И ЗНАНИЯ (faeSkills) --- */
+function getFaeLauncherSkillItems(c){
+  var list = [];
+  var arr = (c && Array.isArray(c.customSkills)) ? c.customSkills : [];
+  arr.forEach(function(s){
+    list.push({
+      ref: 'custom:' + s.id,
+      group: 'custom',
+      name: s.name || 'Навык',
+      kind: s.kind || 'Ремесло',
+      level: s.level || 'Начатки',
+      abil: s.abil || '',
+      modStr: s.mod || '',
+      modNum: parseFaeSignedMod(s.mod || ''),
+      gives: s.gives || s.desc || ''
+    });
+  });
+
+  var pb = profBonus(c ? c.level : 1);
+  SKILL_DEFS.forEach(function(def){
+    var state = Number(c && c.skillProf ? c.skillProf[def.key] : 0) || 0;
+    var mod = abilityMod(c && c.abilities ? c.abilities[def.ability] : 10) + state * pb;
+    var abRu = ABILITY_RU[def.ability] || '';
+    var stLvl = state === 2 ? 'Экспертиза' : (state === 1 ? 'Владение' : 'Начатки');
+    list.push({
+      ref: 'dnd18:' + def.key,
+      group: 'dnd18',
+      name: def.ru,
+      kind: 'Базовый навык D&D',
+      level: stLvl,
+      abil: abRu,
+      modStr: fmtMod(mod),
+      modNum: mod,
+      gives: 'Пассивное значение: ' + (10 + mod)
+    });
+  });
+  return list;
 }
+
+function buildFaeSkillComboText(sk, isGuidance, rolledValues, mods){
+  var abStr = sk.abil ? (' | Хар-ка: ' + sk.abil) : '';
+  var header = '*[Навык: ' + (sk.name || 'Навык') + ' | Тип: ' + (sk.kind || 'Ремесло') + ' | Ступень: ' + (sk.level || 'Начатки') + abStr + ']*';
+  var lines = [header];
+
+  if(rolledValues && rolledValues.chk){
+    var cMod = parseInt(mods.chk, 10) || 0;
+    var cModStr = cMod > 0 ? ' + ' + cMod : (cMod < 0 ? ' − ' + Math.abs(cMod) : '');
+    lines.push('*[Результат броска Проверка навыка 1d20: ' + rolledValues.chk + ' ]*' + cModStr);
+  }
+
+  if(isGuidance && rolledValues && rolledValues.gui){
+    var gMod = parseInt(mods.gui, 10) || 0;
+    var gModStr = gMod > 0 ? ' + ' + gMod : (gMod < 0 ? ' − ' + Math.abs(gMod) : '');
+    lines.push('*[Результат броска Бонус Указания / Мастерства 1d4: ' + rolledValues.gui + ' ]*' + gModStr);
+  }
+
+  if(sk.gives){
+    lines.push('*[Что даёт: ' + sk.gives + ']*');
+  }
+
+  return lines.join('\n');
+}
+
+function renderFaeSkillLauncherDiceHtml(sk, isGuidance, selTarget, mods, rolledValues){
+  if(!sk) return '<div class="sh-scr-no-dmg">Выберите навык для расчёта</div>';
+  mods = mods || { chk: 0, gui: 0 };
+  rolledValues = rolledValues || {};
+
+  var cModStr = formatFaeLauncherMod(mods.chk);
+  var chkDieHtml =
+    '<div class="sh-scr-col ' + (selTarget === 'chk' ? 'selected' : '') + '" data-select-fae-skill-roll="chk" title="Кликните для выбора кубика проверки и настройки модификатора">' +
+      '<div class="sh-scr-label">Проверка (' + escapeHtml(sk.abil || 'd20') + ')</div>' +
+      '<div class="sh-scr-die die s20" id="faeScrDieSkillChk">' +
+        (typeof dieShapeSvg === 'function' ? dieShapeSvg(20, 'faeskchk', null) : '') +
+        '<div class="val">' + (rolledValues.chk || 20) + '</div>' +
+      '</div>' +
+      '<div class="sh-scr-sub" id="faeScrSub_skillChk">1d20' + (cModStr ? ' ' + cModStr : '') + '</div>' +
+    '</div>';
+
+  var guiDieHtml = '';
+  if(isGuidance){
+    var gModStr = formatFaeLauncherMod(mods.gui);
+    guiDieHtml =
+      '<div class="sh-scr-col ' + (selTarget === 'gui' ? 'selected' : '') + '" data-select-fae-skill-roll="gui" title="Кликните для выбора бонусной кости Указания / Помощи">' +
+        '<div class="sh-scr-label" style="color:#fde68a;">Указание / Бонус</div>' +
+        '<div class="sh-scr-die die s4" id="faeScrDieSkillGui">' +
+          (typeof dieShapeSvg === 'function' ? dieShapeSvg(4, 'faeskgui', null) : '') +
+          '<div class="val">' + (rolledValues.gui || 4) + '</div>' +
+        '</div>' +
+        '<div class="sh-scr-sub" id="faeScrSub_skillGui">1d4' + (gModStr ? ' ' + gModStr : '') + '</div>' +
+      '</div>';
+  }
+
+  var infoHtml =
+    '<div class="sh-scr-no-dmg" style="max-width:340px;text-align:left;font-style:normal;">' +
+      '<div style="margin-bottom:4px;">Ступень: <b>' + escapeHtml(sk.level || 'Начатки') + '</b>' + (sk.modStr ? (' · Мод: <b>' + escapeHtml(sk.modStr) + '</b>') : ' · <b>без обязательного броска</b>') + '</div>' +
+      (sk.gives ? '<div style="font-size:12px;color:var(--ink-dim);line-height:1.4;">' + escapeHtml(sk.gives.length > 120 ? (sk.gives.slice(0, 120) + '…') : sk.gives) + '</div>' : '') +
+    '</div>';
+
+  return '<div class="sh-screen-dice-tray">' + chkDieHtml + guiDieHtml + infoHtml + '</div>';
+}
+
+function renderFaeSkillLauncher(c){
+  var allItems = getFaeLauncherSkillItems(c);
+  if(!window._faeSkillLauncher) window._faeSkillLauncher = {};
+  var L = window._faeSkillLauncher;
+  if(L.isOpen === undefined) L.isOpen = false;
+  if(!L.mods) L.mods = { chk: 0, gui: 0 };
+  if(!L.rolledValues) L.rolledValues = {};
+  if(!L.selectedTarget) L.selectedTarget = 'chk';
+
+  var selSk = allItems.find(function(x){ return x.ref === L.skillRef; }) || allItems[0];
+  if(selSk && L.skillRef !== selSk.ref){
+    L.skillRef = selSk.ref;
+    L.mods.chk = selSk.modNum || 0;
+  }
+
+  var isGuidance = !!L.isGuidance;
+  var selTarget = L.selectedTarget;
+  if(selTarget === 'gui' && !isGuidance) selTarget = 'chk';
+  L.selectedTarget = selTarget;
+
+  var targetNames = { chk: '🎯 Проверка навыка (1d20)', gui: '✨ Бонус Указания (1d4)' };
+  var targetTitle = targetNames[selTarget] || '🎯 Проверка навыка (1d20)';
+  var curModVal = L.mods[selTarget] || 0;
+
+  var customGroup = allItems.filter(function(x){ return x.group === 'custom'; });
+  var dnd18Group = allItems.filter(function(x){ return x.group === 'dnd18'; });
+
+  var selectOptsHtml = '';
+  if(customGroup.length){
+    selectOptsHtml += '<optgroup label="🛠️ Особые навыки, ремёсла и знания героя">' +
+      customGroup.map(function(x){
+        var mStr = x.modStr ? (' (' + x.modStr + ')') : ' (без броска)';
+        return '<option value="' + escapeAttr(x.ref) + '" ' + (selSk && x.ref === selSk.ref ? 'selected' : '') + '>' +
+          escapeHtml(x.level) + ' · ' + escapeHtml(x.name) + mStr +
+        '</option>';
+      }).join('') +
+    '</optgroup>';
+  }
+  selectOptsHtml += '<optgroup label="🎯 18 базовых навыков D&D 5e / 2024">' +
+    dnd18Group.map(function(x){
+      return '<option value="' + escapeAttr(x.ref) + '" ' + (selSk && x.ref === selSk.ref ? 'selected' : '') + '>' +
+        escapeHtml(x.name) + ' [' + escapeHtml(x.abil) + ' ' + escapeHtml(x.modStr) + ' · ' + escapeHtml(x.level) + ']' +
+      '</option>';
+    }).join('') +
+  '</optgroup>';
+
+  var screenHtml = renderFaeSkillLauncherDiceHtml(selSk, isGuidance, selTarget, L.mods, L.rolledValues);
+
+  var modBarHtml =
+    '<div class="sh-mod-bar">' +
+      '<div class="sh-mod-target-info">' +
+        '<span>Выбран кубик:</span>' +
+        '<span class="sh-mod-target-tag" id="faeSkillModTargetName">' + targetTitle + '</span>' +
+      '</div>' +
+      '<div class="sh-mod-controls">' +
+        '<button type="button" class="sh-mod-step" data-fae-skill-mod-delta="-5" title="Уменьшить на 5">−5</button>' +
+        '<button type="button" class="sh-mod-step" data-fae-skill-mod-delta="-1" title="Уменьшить на 1">−</button>' +
+        '<input type="number" id="faeSkillActiveModInput" class="sh-active-mod-input" value="' + curModVal + '">' +
+        '<button type="button" class="sh-mod-step" data-fae-skill-mod-delta="1" title="Увеличить на 1">+</button>' +
+        '<button type="button" class="sh-mod-step" data-fae-skill-mod-delta="5" title="Увеличить на 5">+5</button>' +
+        '<button type="button" class="sh-mod-reset" id="faeSkillModResetBtn" title="Сбросить модификатор в 0">Сброс</button>' +
+      '</div>' +
+      '<label class="sh-exp-check">' +
+        '<input type="checkbox" id="faeSkillLauncherGui"' + (isGuidance ? ' checked' : '') + '> ✨ Указание / Помощь (+1d4)' +
+      '</label>' +
+    '</div>';
+
+  var actionsHtml =
+    '<div class="sh-launcher-actions">' +
+      '<button type="button" class="sh-btn-launch" id="faeLaunchSkillComboBtn" title="Бросить проверку навыка и зафиксировать результат">🎲 Проверить навык</button>' +
+      '<button type="button" class="sh-btn-copy-all" id="faeCopyAllSkillBtn" title="Скопировать готовый блок в буфер обмена для AI Studio">📋 Скопировать всё</button>' +
+      '<button type="button" class="sh-micro-btn" id="faeLaunchSkillChkBtn" title="Бросить и скопировать только 1d20">🎯 Бросок 1d20</button>' +
+      (isGuidance ? '<button type="button" class="sh-micro-btn" id="faeLaunchSkillGuiBtn" title="Бросить и скопировать бонус 1d4">✨ Бонус 1d4</button>' : '') +
+      '<button type="button" class="sh-micro-btn" id="faeLaunchSkillClaimBtn" title="Скопировать заявку применения навыка без броска костей">📜 Только заявка (без броска)</button>' +
+    '</div>';
+
+  var hasRes = !!(L.lastResult);
+  var resultBoxHtml =
+    '<div class="sh-launcher-result ' + (hasRes ? 'has-result' : '') + '" id="faeSkillLauncherResultBox">' +
+      '<div class="sh-launcher-result-text" id="faeSkillLauncherResultText">' + escapeHtml(L.lastResult || '') + '</div>' +
+      '<div class="sh-copy-badge" id="faeSkillLauncherCopyBadge" style="display:' + (hasRes ? 'inline-flex' : 'none') + ';">' +
+        '<span>' + (L.lastResultCopied ? '✓ Скопировано в буфер обмена для AI Studio' : '🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»') + '</span>' +
+      '</div>' +
+    '</div>';
+
+  var isOpen = !!L.isOpen;
+  var toggleHeadHtml =
+    '<div class="sh-launcher-toggle-head" id="faeSkillLauncherToggle" role="button" tabindex="0" title="Нажмите, чтобы развернуть или свернуть расчёт проверки навыка">' +
+      '<div class="sh-launcher-title">' +
+        '<span>🎲 Расчёт проверки навыка и ремесла</span>' +
+        '<span class="sh-badge-tag">AI Studio</span>' +
+      '</div>' +
+      '<div class="sh-launcher-toggle-btn">' +
+        '<span class="sh-launcher-toggle-text">' + (isOpen ? 'Свернуть' : 'Развернуть') + '</span>' +
+        '<span class="sh-launcher-toggle-arrow">' + (isOpen ? '▲' : '▼') + '</span>' +
+      '</div>' +
+    '</div>';
+
+  var bodyHtml =
+    '<div class="sh-launcher-body" id="faeSkillLauncherBody">' +
+      '<div class="sh-launcher-head">' +
+        '<div class="sh-launcher-sel-wrap">' +
+          '<div class="sh-launcher-sel-label">Навык или знание для расчёта:</div>' +
+          '<select class="sh-launcher-sel" id="faeSkillLauncherSelect">' + selectOptsHtml + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sh-launcher-screen" id="faeSkillLauncherScreen">' + screenHtml + '</div>' +
+      modBarHtml +
+      actionsHtml +
+      resultBoxHtml +
+    '</div>';
+
+  return '<div class="sh-launcher ' + (isOpen ? '' : 'collapsed') + '" id="faeSkillLauncherContainer">' +
+    toggleHeadHtml +
+    bodyHtml +
+  '</div>';
+}
+
+function wireFaeSkillLauncher(){
+  var c = getActiveFaerunCharacter();
+  var allItems = getFaeLauncherSkillItems(c);
+  if(!window._faeSkillLauncher) window._faeSkillLauncher = { isOpen: false, mods: { chk: 0, gui: 0 }, rolledValues: {}, selectedTarget: 'chk' };
+  var L = window._faeSkillLauncher;
+
+  var tHead = document.getElementById('faeSkillLauncherToggle');
+  if(tHead){
+    tHead.addEventListener('click', function(){
+      L.isOpen = !L.isOpen;
+      var cont = document.getElementById('faeSkillLauncherContainer');
+      if(cont){
+        cont.classList.toggle('collapsed', !L.isOpen);
+        var txt = cont.querySelector('.sh-launcher-toggle-text');
+        var arr = cont.querySelector('.sh-launcher-toggle-arrow');
+        if(txt) txt.textContent = L.isOpen ? 'Свернуть' : 'Развернуть';
+        if(arr) arr.textContent = L.isOpen ? '▲' : '▼';
+      }
+    });
+  }
+
+  var getSelSkill = function(){
+    return allItems.find(function(x){ return x.ref === L.skillRef; }) || allItems[0] || null;
+  };
+
+  var updateModUI = function(){
+    var targetNames = { chk: '🎯 Проверка навыка (1d20)', gui: '✨ Бонус Указания (1d4)' };
+    var nameEl = document.getElementById('faeSkillModTargetName');
+    if(nameEl) nameEl.textContent = targetNames[L.selectedTarget] || '🎯 Проверка навыка (1d20)';
+    var inp = document.getElementById('faeSkillActiveModInput');
+    if(inp) inp.value = (L.mods && L.mods[L.selectedTarget]) || 0;
+  };
+
+  var wireDiceClicks = function(){
+    var scr = document.getElementById('faeSkillLauncherScreen');
+    if(!scr) return;
+    var els = scr.querySelectorAll('[data-select-fae-skill-roll]');
+    els.forEach(function(el){
+      el.addEventListener('click', function(){
+        var target = el.getAttribute('data-select-fae-skill-roll');
+        if(!target) return;
+        L.selectedTarget = target;
+        els.forEach(function(s){ s.classList.remove('selected'); });
+        el.classList.add('selected');
+        updateModUI();
+      });
+    });
+  };
+  wireDiceClicks();
+
+  var setTargetMod = function(newVal){
+    var target = L.selectedTarget || 'chk';
+    L.mods[target] = newVal;
+    updateModUI();
+    var sk = getSelSkill();
+    if(target === 'chk'){
+      var subC = document.getElementById('faeScrSub_skillChk');
+      if(subC) subC.textContent = '1d20' + (formatFaeLauncherMod(newVal) ? ' ' + formatFaeLauncherMod(newVal) : '');
+    } else if(target === 'gui'){
+      var subG = document.getElementById('faeScrSub_skillGui');
+      if(subG) subG.textContent = '1d4' + (formatFaeLauncherMod(newVal) ? ' ' + formatFaeLauncherMod(newVal) : '');
+    }
+    if(L.lastResult && sk){
+      L.lastResult = buildFaeSkillComboText(sk, !!L.isGuidance, L.rolledValues, L.mods);
+      var rTxt = document.getElementById('faeSkillLauncherResultText');
+      if(rTxt) rTxt.textContent = L.lastResult;
+    }
+  };
+
+  document.querySelectorAll('[data-fae-skill-mod-delta]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var delta = parseInt(btn.getAttribute('data-fae-skill-mod-delta'), 10) || 0;
+      var cur = parseInt(L.mods[L.selectedTarget], 10) || 0;
+      setTargetMod(cur + delta);
+    });
+  });
+
+  var resetBtn = document.getElementById('faeSkillModResetBtn');
+  if(resetBtn) resetBtn.addEventListener('click', function(){ setTargetMod(0); });
+
+  var modInp = document.getElementById('faeSkillActiveModInput');
+  if(modInp){
+    modInp.addEventListener('input', function(){
+      var v = parseInt(this.value, 10);
+      if(isNaN(v)) v = 0;
+      setTargetMod(v);
+    });
+  }
+
+  var selEl = document.getElementById('faeSkillLauncherSelect');
+  if(selEl){
+    selEl.addEventListener('change', function(){
+      L.skillRef = this.value;
+      var sk = getSelSkill();
+      if(sk) L.mods.chk = sk.modNum || 0;
+      L.rolledValues = {};
+      L.lastResult = '';
+      L.lastResultCopied = false;
+      render();
+    });
+  }
+
+  var guiCb = document.getElementById('faeSkillLauncherGui');
+  if(guiCb){
+    guiCb.addEventListener('change', function(){
+      L.isGuidance = !!this.checked;
+      if(!L.isGuidance && L.selectedTarget === 'gui') L.selectedTarget = 'chk';
+      render();
+    });
+  }
+
+  var finishSkillLaunch = function(sk, mode, autoCopy){
+    var abStr = sk.abil ? (' | Хар-ка: ' + sk.abil) : '';
+    var header = '*[Навык: ' + (sk.name || 'Навык') + ' | Тип: ' + (sk.kind || 'Ремесло') + ' | Ступень: ' + (sk.level || 'Начатки') + abStr + ']*';
+    var lines = [];
+    var mods = L.mods || { chk: 0, gui: 0 };
+
+    if(mode === 'claim'){
+      lines.push(header);
+      if(sk.gives) lines.push('*[Применение без броска / Что даёт: ' + sk.gives + ']*');
+    } else if(mode === 'chk'){
+      var chkVal = 1 + Math.floor(Math.random() * 20);
+      L.rolledValues.chk = chkVal;
+      var cDie = document.getElementById('faeScrDieSkillChk');
+      if(cDie){ var vEl = cDie.querySelector('.val'); if(vEl) vEl.textContent = chkVal; }
+      var cMod = parseInt(mods.chk, 10) || 0;
+      var cModStr = cMod > 0 ? ' + ' + cMod : (cMod < 0 ? ' − ' + Math.abs(cMod) : '');
+      lines.push(header);
+      lines.push('*[Результат броска Проверка навыка 1d20: ' + chkVal + ' ]*' + cModStr);
+    } else if(mode === 'gui'){
+      var guiVal = 1 + Math.floor(Math.random() * 4);
+      L.rolledValues.gui = guiVal;
+      var gDie = document.getElementById('faeScrDieSkillGui');
+      if(gDie){ var vEl = gDie.querySelector('.val'); if(vEl) vEl.textContent = guiVal; }
+      var gMod = parseInt(mods.gui, 10) || 0;
+      var gModStr = gMod > 0 ? ' + ' + gMod : (gMod < 0 ? ' − ' + Math.abs(gMod) : '');
+      lines.push(header);
+      lines.push('*[Результат броска Бонус Указания / Мастерства 1d4: ' + guiVal + ' ]*' + gModStr);
+    } else {
+      var chkValAll = 1 + Math.floor(Math.random() * 20);
+      L.rolledValues.chk = chkValAll;
+      var cDieAll = document.getElementById('faeScrDieSkillChk');
+      if(cDieAll){ var vEl = cDieAll.querySelector('.val'); if(vEl) vEl.textContent = chkValAll; }
+      if(L.isGuidance){
+        var guiValAll = 1 + Math.floor(Math.random() * 4);
+        L.rolledValues.gui = guiValAll;
+        var gDieAll = document.getElementById('faeScrDieSkillGui');
+        if(gDieAll){ var vEl = gDieAll.querySelector('.val'); if(vEl) vEl.textContent = guiValAll; }
+      }
+      lines = buildFaeSkillComboText(sk, !!L.isGuidance, L.rolledValues, mods).split('\n');
+    }
+
+    var output = lines.join('\n');
+    L.lastResult = output;
+    var rBox = document.getElementById('faeSkillLauncherResultBox');
+    var rTxt = document.getElementById('faeSkillLauncherResultText');
+    var rBdg = document.getElementById('faeSkillLauncherCopyBadge');
+    if(rTxt) rTxt.textContent = output;
+    if(rBox) rBox.classList.add('has-result');
+    if(autoCopy){
+      copyText(output);
+      L.lastResultCopied = true;
+      if(rBdg){
+        rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio (' + lines.length + ' стр.)</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    } else {
+      L.lastResultCopied = false;
+      if(rBdg){
+        rBdg.innerHTML = '<span>🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    }
+  };
+
+  var executeSkillLaunch = function(mode, autoCopy){
+    var sk = getSelSkill();
+    if(!sk) return;
+    if(mode !== 'claim'){
+      var diceToRoll = [];
+      if(mode === 'all' || mode === 'chk'){
+        var cDie = document.getElementById('faeScrDieSkillChk'); if(cDie) diceToRoll.push(cDie);
+      }
+      if((mode === 'all' || mode === 'gui') && L.isGuidance){
+        var gDie = document.getElementById('faeScrDieSkillGui'); if(gDie) diceToRoll.push(gDie);
+      }
+      diceToRoll.forEach(function(el){ el.classList.add('rolling'); });
+      var rollInterval = setInterval(function(){
+        diceToRoll.forEach(function(el){
+          var vEl = el.querySelector('.val');
+          if(vEl) vEl.textContent = Math.floor(Math.random() * 20) + 1;
+        });
+      }, 50);
+      setTimeout(function(){
+        clearInterval(rollInterval);
+        diceToRoll.forEach(function(el){ el.classList.remove('rolling'); });
+        finishSkillLaunch(sk, mode, autoCopy);
+      }, 350);
+    } else {
+      finishSkillLaunch(sk, mode, autoCopy);
+    }
+  };
+
+  var bCombo = document.getElementById('faeLaunchSkillComboBtn');
+  if(bCombo) bCombo.addEventListener('click', function(){ executeSkillLaunch('all', false); });
+
+  var bCopyAll = document.getElementById('faeCopyAllSkillBtn');
+  if(bCopyAll){
+    bCopyAll.addEventListener('click', function(){
+      if(!L.lastResult) executeSkillLaunch('all', true);
+      else {
+        copyText(L.lastResult);
+        L.lastResultCopied = true;
+        var rBdg = document.getElementById('faeSkillLauncherCopyBadge');
+        if(rBdg){
+          rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio (' + L.lastResult.split('\n').length + ' стр.)</span>';
+          rBdg.style.display = 'inline-flex';
+        }
+      }
+    });
+  }
+
+  var bChk = document.getElementById('faeLaunchSkillChkBtn'); if(bChk) bChk.addEventListener('click', function(){ executeSkillLaunch('chk', true); });
+  var bGui = document.getElementById('faeLaunchSkillGuiBtn'); if(bGui) bGui.addEventListener('click', function(){ executeSkillLaunch('gui', true); });
+  var bClaim = document.getElementById('faeLaunchSkillClaimBtn'); if(bClaim) bClaim.addEventListener('click', function(){ executeSkillLaunch('claim', true); });
+
+  document.querySelectorAll('[data-fae-skill-to-calc]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var ref = btn.getAttribute('data-fae-skill-to-calc');
+      if(!ref) return;
+      L.isOpen = true;
+      L.skillRef = ref;
+      var sk = allItems.find(function(x){ return x.ref === ref; });
+      if(sk) L.mods.chk = sk.modNum || 0;
+      L.rolledValues = {};
+      L.lastResult = '';
+      if(view.screen !== 'faeSkills') navigate('faeSkills');
+      else render();
+      setTimeout(function(){
+        var cont = document.getElementById('faeSkillLauncherContainer');
+        if(cont) cont.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 60);
+    });
+  });
+}
+
+function renderFaeSkills(){
+  var c = getActiveFaerunCharacter();
+  var arr = (c && Array.isArray(c.customSkills)) ? c.customSkills : [];
+  var activeKind = window._faeSkillKindFilter || 'all';
+  var searchQ = (window._faeSkillSearch || '').trim().toLowerCase();
+  var showDnd18 = window._faeShowDnd18Skills !== false;
+
+  var pb = profBonus(c ? c.level : 1);
+  var profCount = 0;
+  var expCount = 0;
+  SKILL_DEFS.forEach(function(def){
+    var st = Number(c && c.skillProf ? c.skillProf[def.key] : 0) || 0;
+    if(st === 1) profCount++;
+    else if(st === 2) expCount++;
+  });
+
+  var kindPillsHtml = '<button type="button" class="fae-pill ' + (activeKind === 'all' ? 'active' : '') + '" data-fae-skill-kind="all">🛠️ Все навыки <span style="opacity:0.75;font-size:11px;">(' + arr.length + ')</span></button>' +
+    FAE_SKILL_KINDS.map(function(k){
+      var cnt = arr.filter(function(s){ return (s.kind || 'Другое') === k; }).length;
+      var ic = FAE_SKILL_KIND_ICONS[k] || '🛠️';
+      return '<button type="button" class="fae-pill ' + (activeKind === k ? 'active' : '') + '" data-fae-skill-kind="' + escapeAttr(k) + '">' +
+        ic + ' ' + escapeHtml(k) + ' <span style="opacity:0.75;font-size:11px;">(' + cnt + ')</span>' +
+      '</button>';
+    }).join('');
+
+  var filtered = arr.filter(function(s){
+    var k = s.kind || 'Другое';
+    if(activeKind !== 'all' && k !== activeKind) return false;
+    if(searchQ){
+      var hay = [s.name, s.kind, s.level, s.abil, s.mod, s.src, s.gives, s.desc].join(' ').toLowerCase();
+      if(hay.indexOf(searchQ) === -1) return false;
+    }
+    return true;
+  });
+
+  var groups = {};
+  filtered.forEach(function(s){
+    var k = s.kind || 'Другое';
+    if(!groups[k]) groups[k] = [];
+    groups[k].push(s);
+  });
+
+  var orderedKinds = FAE_SKILL_KINDS.slice();
+  Object.keys(groups).forEach(function(k){
+    if(orderedKinds.indexOf(k) === -1) orderedKinds.push(k);
+  });
+
+  var bodyHtml = filtered.length ? orderedKinds.filter(function(k){ return groups[k] && groups[k].length; }).map(function(k){
+    var ic = FAE_SKILL_KIND_ICONS[k] || '🛠️';
+    return '<div class="section-label">' + ic + ' ' + escapeHtml(k) + ' (' + groups[k].length + ')</div>' +
+      '<div class="fae-ref-cards-grid" style="margin-bottom:18px;">' +
+      groups[k].map(function(s){
+        var lvlBadge = '<span class="sh-lvl-badge lvl-' + escapeAttr(s.level || 'Начатки') + '">' + escapeHtml(s.level || 'Начатки') + '</span>';
+        var metaLine = [(s.abil || ''), (s.mod ? ('модификатор ' + s.mod) : 'без броска')].filter(Boolean).join(' · ');
+        var copyStr = '🛠️ ' + (s.name || 'Навык') + ' [' + (s.kind || 'Ремесло') + ' · ' + (s.level || 'Начатки') + (s.abil ? (', ' + s.abil) : '') + (s.mod ? (' ' + s.mod) : '') + ']: ' + (s.gives || s.desc || '');
+        return '<div class="card fae-ref-card" data-fae-skill-open="' + escapeAttr(s.id) + '" style="display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;margin-bottom:0;">' +
+          '<div>' +
+            '<div class="top-row" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
+              '<div class="name fae-ref-card-k" style="margin-bottom:0;">' + ic + ' ' + escapeHtml(s.name || 'Без названия') + '</div>' +
+              lvlBadge +
+            '</div>' +
+            '<div class="desc" style="font-size:12px;color:#c9a45c;font-family:\'JetBrains Mono\',monospace;margin-bottom:8px;">' + escapeHtml(metaLine) + '</div>' +
+            (s.src ? '<div style="font-size:12px;color:#cbd5e1;margin-bottom:6px;"><b>🎓 Откуда:</b> ' + escapeHtml(s.src) + '</div>' : '') +
+            (s.gives ? '<div class="fae-ref-card-v" style="margin-bottom:8px;"><b>✨ Что даёт:</b> ' + escapeHtml(s.gives) + '</div>' : '') +
+            (s.desc ? '<div style="font-size:12.5px;color:#94a3b8;margin-bottom:10px;font-style:italic;">' + escapeHtml(s.desc) + '</div>' : '') +
+          '</div>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(201,164,92,0.18);">' +
+            '<button type="button" class="rc-btn" data-fae-skill-to-calc="custom:' + escapeAttr(s.id) + '" style="border-color:rgba(200,67,55,0.5);color:#ff9085;">🎲 В расчёт</button>' +
+            '<button type="button" class="rc-btn" data-fae-skill-copy="' + escapeAttr(copyStr) + '">📋 Копировать</button>' +
+            '<button type="button" class="rc-btn" data-go="faeSkillEdit:' + escapeAttr(s.id) + '">✏️ Править</button>' +
+            '<button type="button" class="rc-btn" data-fae-skill-del="' + escapeAttr(s.id) + '" style="color:#f87171;">🗑️</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+      '</div>';
+  }).join('') : (
+    '<div class="char-empty" style="margin-bottom:18px;">' +
+      'Пусто. Сюда идёт всё, что персонаж умеет помимо боя: ремесло, кузнечное и травническое дело, воровские инструменты, быт, языки, руны, счёт, навигация и лор Фаэруна. Навык появляется от того, что персонаж этим занимался в предыстории или кампании!<br><br>' +
+      '<span style="color:#c9a45c;">Нажмите «+ Добавить навык», выберите быстрый шаблон ниже или откройте «✨ AI Генератор навыков».</span>' +
+    '</div>'
+  );
+
+  var templatesBarHtml =
+    '<div class="fae-ref-card" style="padding:14px 16px;margin-bottom:18px;border-color:rgba(201,164,92,0.28);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">' +
+        '<span style="font-size:12px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;">⚡ БЫСТРЫЕ ШАБЛОНЫ НАВЫКОВ И РЕМЁСЕЛ ФАЭРУНА (В 1 КЛИК):</span>' +
+        '<span style="font-size:11.5px;color:#94a3b8;">Нажмите на шаблон, чтобы сразу добавить его герою</span>' +
+      '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:7px;">' +
+        FAE_SKILL_TEMPLATES.map(function(tpl, idx){
+          var exists = arr.some(function(x){ return (x.name || '').toLowerCase() === tpl.name.toLowerCase(); });
+          return '<button type="button" class="rc-btn" data-fae-skill-tpl="' + idx + '" ' + (exists ? 'disabled' : '') + ' style="' + (exists ? 'opacity:0.55;color:#6ee7b7;border-color:rgba(16,185,129,0.4);' : 'border-color:rgba(201,164,92,0.4);color:#f3e5ab;') + '">' +
+            (exists ? '✓ ' : '+ ') + escapeHtml(tpl.name) + ' <span style="opacity:0.75;font-size:10.5px;">[' + escapeHtml(tpl.level) + ']</span>' +
+          '</button>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+
+  var dnd18GridHtml = SKILL_DEFS.map(function(def){
+    var state = Number(c && c.skillProf ? c.skillProf[def.key] : 0) || 0;
+    var mod = abilityMod(c && c.abilities ? c.abilities[def.ability] : 10) + state * pb;
+    var pass = 10 + mod;
+    var abRu = ABILITY_RU[def.ability] || '';
+    var stateLabel = state === 2 ? 'Экспертиза' : (state === 1 ? 'Владение' : 'Начатки');
+    var stateBadgeColor = state === 2
+      ? 'background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.55);color:#fde68a;'
+      : (state === 1 ? 'background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.45);color:#6ee7b7;' : 'background:rgba(15,23,42,0.6);border:1px solid rgba(148,163,184,0.25);color:#94a3b8;');
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;background:rgba(15,23,42,0.65);border:1px solid ' + (state > 0 ? 'rgba(201,164,92,0.38)' : 'rgba(255,255,255,0.07)') + ';border-radius:6px;">' +
+      '<div style="display:flex;align-items:center;gap:8px;min-width:0;">' +
+        '<button type="button" class="prof-toggle" data-fae-sk18-toggle="' + escapeAttr(def.key) + '" data-state="' + state + '" title="Клик: Нет владения → Владение (+БМ) → Экспертиза (+2×БМ)"></button>' +
+        '<div style="min-width:0;cursor:pointer;" data-fae-skill-to-calc="dnd18:' + escapeAttr(def.key) + '" title="Нажмите, чтобы выбрать в расчёте проверки навыка">' +
+          '<div style="font-size:13px;font-weight:' + (state > 0 ? '700' : '500') + ';color:' + (state > 0 ? '#f8fafc' : '#cbd5e1') + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(def.ru) + '</div>' +
+          '<div style="font-size:10.5px;color:#94a3b8;">' + escapeHtml(abRu) + ' · Пасс. ' + pass + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">' +
+        '<span style="font-size:10px;padding:1px 6px;border-radius:4px;' + stateBadgeColor + '">' + stateLabel + '</span>' +
+        '<button type="button" class="rc-btn" data-fae-skill-to-calc="dnd18:' + escapeAttr(def.key) + '" style="padding:2px 7px;font-family:\'JetBrains Mono\',monospace;font-size:12.5px;font-weight:700;color:#c9a45c;" title="Рассчитать бросок ' + escapeAttr(def.ru) + '">🎲 ' + fmtMod(mod) + '</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  var dnd18SectionHtml =
+    '<div class="fae-ref-card" style="padding:14px 16px;margin-bottom:20px;border-color:rgba(201,164,92,0.35);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;cursor:pointer;" id="faeToggleDnd18Btn">' +
+        '<div>' +
+          '<div style="font-family:\'Cinzel\',serif;font-weight:700;font-size:14.5px;color:#f3e5ab;">🎯 18 базовых навыков D&D 5e / 2024 (Бонус мастерства ' + fmtMod(pb) + ')</div>' +
+          '<div style="font-size:12px;color:#94a3b8;">Владение: <b style="color:#6ee7b7;">' + profCount + '</b> · Экспертиза: <b style="color:#fde68a;">' + expCount + '</b> · Клик по кружку меняет владение, клик по бонусу 🎲 открывает расчёт</div>' +
+        '</div>' +
+        '<button type="button" class="rc-btn" style="pointer-events:none;">' + (showDnd18 ? '▼ Свернуть 18 навыков' : '▶ Развернуть 18 навыков') + '</button>' +
+      '</div>' +
+      (showDnd18 ? (
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(255px, 1fr));gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(201,164,92,0.2);">' +
+          dnd18GridHtml +
+        '</div>'
+      ) : '') +
+    '</div>';
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Навыки и знания'}]) +
+    '<button class="back" data-go="home">← На главную</button>' +
+    renderFaeAbilitiesTabBar('skills') +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">' +
+      '<div>' +
+        '<h1>🛠️ Навыки и знания</h1>' +
+        '<p class="subtitle">Ремёсла, ступени мастерства (Начатки → Мастер), владение инструментами, языки, быт, лор и 18 базовых навыков D&D.</p>' +
+      '</div>' +
+      '<div class="sheet-actions" style="margin:0;display:flex;gap:10px;flex-wrap:wrap;">' +
+        '<button type="button" class="btn btn-primary" data-go="faeSkillEdit:new">+ Добавить навык</button>' +
+        '<button type="button" class="ai-gen-btn" data-go="faeSkillGen" style="padding:9px 16px;font-size:13px;">✨ AI Генератор навыков</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="fae-rule"></div>' +
+
+    renderFaeSkillLauncher(c) +
+    dnd18SectionHtml +
+    templatesBarHtml +
+
+    '<div class="fae-ref-search-wrap" style="margin-bottom:14px;">' +
+      '<span class="fae-ref-search-icon">🔍</span>' +
+      '<input type="text" id="faeSkillSearchInp" class="fae-ref-search-input" value="' + escapeAttr(window._faeSkillSearch || '') + '" placeholder="Поиск по названию навыка, ремеслу, инструменту, языку или источнику..." autocomplete="off">' +
+    '</div>' +
+
+    '<div class="pill-row" style="margin-bottom:18px;">' + kindPillsHtml + '</div>' +
+    bodyHtml;
+}
+
+function renderFaeSkillView(){
+  var c = getActiveFaerunCharacter();
+  var s = faeSkillById(c, view.skillId);
+  if(!s) return renderFaeSkills();
+  var ic = FAE_SKILL_KIND_ICONS[s.kind] || '🛠️';
+  var rows = [
+    { k: 'Тип', v: ic + ' ' + (s.kind || 'Ремесло') },
+    { k: 'Уровень', v: '<span class="sh-lvl-badge lvl-' + escapeAttr(s.level || 'Начатки') + '">' + escapeHtml(s.level || 'Начатки') + '</span>', raw: true },
+    { k: 'Характеристика', v: s.abil || '—' },
+    { k: 'Модификатор', v: s.mod || 'без броска' },
+    { k: 'Откуда', v: s.src || '—' },
+    { k: 'Что даёт', v: s.gives || '—' },
+    { k: 'Заметки', v: s.desc || '—' }
+  ];
+  var copyStr = '🛠️ ' + (s.name || 'Навык') + ' [' + (s.kind || 'Ремесло') + ' · ' + (s.level || 'Начатки') + (s.abil ? (', ' + s.abil) : '') + (s.mod ? (' ' + s.mod) : '') + ']\n' +
+    (s.src ? ('• Откуда: ' + s.src + '\n') : '') +
+    (s.gives ? ('• Что даёт: ' + s.gives + '\n') : '') +
+    (s.desc ? ('• Заметки: ' + s.desc) : '');
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Навыки и знания', nav:'faeSkills'}, {label:s.name || 'Навык'}]) +
+    '<button class="back" data-go="faeSkills">← К списку навыков</button>' +
+    renderFaeAbilitiesTabBar('skills') +
+    '<h1>' + ic + ' ' + escapeHtml(s.name || 'Навык') + '</h1>' +
+    '<div class="fae-ref-card" style="padding:18px 22px;margin-bottom:16px;">' +
+      rows.map(function(x){
+        return '<div class="hb-row"><div class="hb-row-k">' + escapeHtml(x.k) + '</div><div class="hb-row-v">' + (x.raw ? x.v : escapeHtml(x.v).replace(/\n/g, '<br>')) + '</div></div>';
+      }).join('') +
+    '</div>' +
+    '<div class="sheet-actions" style="display:flex;gap:10px;flex-wrap:wrap;">' +
+      '<button type="button" class="btn btn-ghost" data-fae-skill-to-calc="custom:' + escapeAttr(s.id) + '" style="border-color:rgba(200,67,55,0.6);color:#ff9085;">🎲 В расчёт проверки</button>' +
+      '<button type="button" class="btn btn-primary" data-go="faeSkillEdit:' + escapeAttr(s.id) + '">✏️ Править</button>' +
+      '<button type="button" class="btn btn-ghost" data-fae-skill-copy="' + escapeAttr(copyStr) + '">📋 Скопировать</button>' +
+      '<button type="button" class="btn btn-ghost" id="faeSkillDelV" data-fae-skill-del="' + escapeAttr(s.id) + '" style="color:#f87171;">🗑️ Удалить</button>' +
+    '</div>';
+}
+
+function renderFaeSkillEdit(){
+  var c = getActiveFaerunCharacter();
+  var isNew = !view.skillId || view.skillId === 'new';
+  var existing = (!isNew && c) ? faeSkillById(c, view.skillId) : null;
+  var d = existing ? JSON.parse(JSON.stringify(existing)) : {
+    id: '',
+    name: '',
+    kind: 'Ремесло',
+    level: 'Начатки',
+    abil: 'Интеллект',
+    mod: '+4',
+    src: '',
+    gives: '',
+    desc: ''
+  };
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Навыки и знания', nav:'faeSkills'}, {label:isNew ? 'Новый навык' : (d.name || 'Правка')}]) +
+    '<button class="back" data-go="' + (isNew ? 'faeSkills' : ('faeSkillView:' + d.id)) + '">← Назад</button>' +
+    renderFaeAbilitiesTabBar('skills') +
+    '<h1>' + escapeHtml(isNew ? 'Новый навык или знание' : ('Редактирование: ' + d.name)) + '</h1>' +
+    '<div class="fae-rule"></div>' +
+    '<div class="fae-ref-card" style="padding:20px;">' +
+      '<input type="hidden" id="faeSkillEditId" value="' + escapeAttr(d.id || '') + '">' +
+      '<div class="fae-edit-grid">' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Название навыка, ремесла, инструмента или языка</label>' +
+          '<input type="text" class="fae-input" id="faeSName" value="' + escapeAttr(d.name) + '" placeholder="Ковка, травничество, воровские инструменты, эльфийский язык, навигация, знание Подземья...">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Тип (Категория)</label>' +
+          '<select class="fae-input" id="faeSKind">' +
+            FAE_SKILL_KINDS.map(function(k){
+              var ic = FAE_SKILL_KIND_ICONS[k] || '🛠️';
+              return '<option value="' + escapeAttr(k) + '" ' + (d.kind === k ? 'selected' : '') + '>' + ic + ' ' + escapeHtml(k) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Уровень (Ступень мастерства)</label>' +
+          '<select class="fae-input" id="faeSLvl">' +
+            FAE_SKILL_LEVELS.map(function(lvl){
+              return '<option value="' + escapeAttr(lvl) + '" ' + (d.level === lvl ? 'selected' : '') + '>' + escapeHtml(lvl) + '</option>';
+            }).join('') +
+          '</select>' +
+          '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">Начатки — видел и повторит под присмотром. Мастер — учит других и делает то, чего не умеют прочие.</div>' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Характеристика</label>' +
+          '<input type="text" class="fae-input" id="faeSAbil" value="' + escapeAttr(d.abil) + '" placeholder="На чём держится: Ловкость, Сила, Интеллект, Мудрость, Харизма">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Модификатор</label>' +
+          '<input type="text" class="fae-input" id="faeSMod" value="' + escapeAttr(d.mod) + '" placeholder="Напр. +5 (или оставьте пустым, если работает без броска)">' +
+        '</div>' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Откуда (Кто научил, где и когда — зацепка для Мастера)</label>' +
+          '<input type="text" class="fae-input" id="faeSSrc" value="' + escapeAttr(d.src) + '" placeholder="Напр. Обучение в кузнице клана Боевого Молота / Предыстория Гильдейского ремесленника">' +
+        '</div>' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Что даёт (Что персонаж благодаря этому МОЖЕТ сделать и что узнаёт без броска)</label>' +
+          '<textarea class="fae-input" id="faeSGives" rows="3" placeholder="Конкретные возможности, рецепты, преимущества и автоматические знания...">' + escapeHtml(d.gives) + '</textarea>' +
+        '</div>' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Заметки и необходимые инструменты</label>' +
+          '<textarea class="fae-input" id="faeSDesc" rows="3" placeholder="Дополнительные детали, необходимые наборы инструментов и особенности применения...">' + escapeHtml(d.desc) + '</textarea>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;">' +
+        '<button type="button" class="btn btn-primary" id="faeSkillSave">💾 Сохранить</button>' +
+        (isNew ? '' : '<button type="button" class="btn btn-ghost" data-fae-skill-del="' + escapeAttr(d.id) + '" style="color:#f87171;">🗑️ Удалить</button>') +
+        '<button type="button" class="btn btn-ghost" data-go="faeSkills">Отмена</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function renderFaeSkillGen(){
+  var c = getActiveFaerunCharacter();
+  var hasKey = !!((typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '');
+  var heroCtx = c ? (c.name + ' (' + (c.species || 'Человек') + ', ' + (c.className || 'Воин') + ' ' + (c.level || 1) + ' ур.' + (c.background ? (', ' + c.background) : '') + ')') : 'Герой Фаэруна';
+
+  var presets = [
+    { label: 'Рунная кузница дварфов', theme: 'Ковка и гравировка защитных дварфийских рун на оружии и доспехах', kind: 'Ремесло', level: 'Умелец' },
+    { label: 'Шифры и тайнопись Арфистов', theme: 'Чтение тайных меток, взлом дипломатических шифров и подделка печатей', kind: 'Языки', level: 'Подмастерье' },
+    { label: 'Анатомия чудовищ и трофеи', theme: 'Сцеживание ядов, снятие драконьей чешуи и знание уязвимостей бестиария Фаэруна', kind: 'Знание', level: 'Умелец' },
+    { label: 'Ювелирное и чародейское огранение', theme: 'Огранка драгоценных камней для магических фокусировок и оценка реликвий', kind: 'Инструменты', level: 'Мастер' },
+    { label: 'Полевая хирургия и травы', theme: 'Сшивание тяжёлых ран, прижигание и приготовление целебных припарок на привале', kind: 'Быт', level: 'Подмастерье' }
+  ];
+
+  var hist = [];
+  try { hist = JSON.parse(localStorage.getItem('fae_ai_hist_skill') || '[]'); } catch(e){}
+  var histHtml = hist.length ? (
+    '<div style="margin-top:22px;">' +
+      '<div class="section-label">🕘 ИСТОРИЯ СГЕНЕРИРОВАННЫХ НАВЫКОВ (' + hist.length + ')</div>' +
+      '<div class="menu-list">' +
+        hist.map(function(item, i){
+          return '<div class="card fae-ref-card" data-fae-skill-hist-load="' + i + '" style="cursor:pointer;margin-bottom:0;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;">' +
+            '<div style="flex:1;">' +
+              '<div class="name" style="font-size:15px;margin-bottom:2px;"><span class="sh-lvl-badge lvl-' + escapeAttr(item.level || 'Подмастерье') + '" style="margin-right:6px;">' + escapeHtml(item.level || 'Подмастерье') + '</span> ' + escapeHtml(item.name || 'Навык') + '</div>' +
+              '<div style="font-size:12px;color:#94a3b8;">' + escapeHtml(item.kind || 'Ремесло') + ' · ' + escapeHtml(item.abil || 'Интеллект') + (item.mod ? (' (' + escapeHtml(item.mod) + ')') : '') + '</div>' +
+            '</div>' +
+            '<button type="button" class="btn-ghost" data-fae-skill-hist-del="' + i + '" style="padding:6px 10px;color:#f87171;border-color:transparent;flex-shrink:0;" title="Удалить из истории">🗑️</button>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>'
+  ) : '';
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Навыки и знания', nav:'faeSkills'}, {label:'AI Генератор навыков'}]) +
+    '<button class="back" data-go="faeSkills">← К списку навыков</button>' +
+    renderFaeAbilitiesTabBar('skills') +
+    '<h1>✨ AI Генератор Навыков и Ремёсел</h1>' +
+    '<p class="subtitle">Создание ремёсел, мирных профессий, инструментальных владений, языков и тайных знаний для героя: <b style="color:#c9a45c;">' + escapeHtml(heroCtx) + '</b></p>' +
+    '<div class="fae-rule"></div>' +
+
+    '<div class="ai-gen-box" id="faeSgFormSection">' +
+      '<div class="fae-gen-preset-wrap" style="margin-bottom:14px;">' +
+        '<div style="font-size:11.5px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;margin-bottom:6px;">⚡ БЫСТРЫЕ ИДЕИ НАВЫКОВ И ЗНАНИЙ:</div>' +
+        '<div class="fae-gen-preset-row">' +
+          presets.map(function(p){
+            return '<button type="button" class="fae-gen-preset-chip" data-fae-skill-preset="' + escapeAttr(p.theme) + '" data-kind="' + escapeAttr(p.kind) + '" data-lvl="' + escapeAttr(p.level) + '">💡 ' + escapeHtml(p.label) + '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="fae-edit-grid">' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label>Тема или идея навыка / профессии / знания</label>' +
+          '<input type="text" class="fae-input" id="faeSgTheme" placeholder="Напр. Картография Подземья, Оружейная ковка, Древний нетерийский язык, Полевая кулинария...">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Тип навыка</label>' +
+          '<select class="fae-input" id="faeSgKind">' +
+            FAE_SKILL_KINDS.map(function(k){
+              var ic = FAE_SKILL_KIND_ICONS[k] || '🛠️';
+              return '<option value="' + escapeAttr(k) + '">' + ic + ' ' + escapeHtml(k) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>Ступень мастерства</label>' +
+          '<select class="fae-input" id="faeSgLevel">' +
+            FAE_SKILL_LEVELS.map(function(lvl){
+              return '<option value="' + escapeAttr(lvl) + '" ' + (lvl === 'Подмастерье' ? 'selected' : '') + '>' + escapeHtml(lvl) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:16px;">' +
+        '<button type="button" class="btn-ghost" id="faeSkillGenKeyBtn" style="font-size:12.5px;">🔑 API ключ: ' + (hasKey ? '<span style="color:#4ade80;">✓ Установлен</span>' : '<span style="color:#fbbf24;">⚠️ Не задан</span>') + '</button>' +
+        '<button type="button" class="ai-gen-btn" id="btnFaeSkillAiRun">✨ Сгенерировать навык</button>' +
+      '</div>' +
+    '</div>' +
+    '<div id="faeSgResultWrap" style="display:none;margin-top:20px;"></div>' +
+    histHtml;
+}
+
+function wireFaeSkills(){
+  wireFaeAbilitiesHeroSelect();
+  wireFaeSkillLauncher();
+
+  var toggle18 = document.getElementById('faeToggleDnd18Btn');
+  if(toggle18){
+    toggle18.addEventListener('click', function(){
+      window._faeShowDnd18Skills = (window._faeShowDnd18Skills === false) ? true : false;
+      render();
+    });
+  }
+
+  document.querySelectorAll('[data-fae-sk18-toggle]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var key = btn.getAttribute('data-fae-sk18-toggle');
+      var c = getActiveFaerunCharacter();
+      if(!c || !key) return;
+      if(!c.skillProf) c.skillProf = {};
+      var cur = Number(c.skillProf[key]) || 0;
+      c.skillProf[key] = (cur + 1) % 3;
+      saveCharactersToStorage();
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-fae-skill-tpl]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var idx = parseInt(btn.getAttribute('data-fae-skill-tpl'), 10);
+      var tpl = FAE_SKILL_TEMPLATES[idx];
+      var c = getActiveFaerunCharacter();
+      if(!tpl || !c) return;
+      if(!Array.isArray(c.customSkills)) c.customSkills = [];
+      c.customSkills.unshift({
+        id: 'fae_skill_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6),
+        name: tpl.name,
+        kind: tpl.kind,
+        level: tpl.level,
+        abil: tpl.abil,
+        mod: tpl.mod,
+        src: tpl.src,
+        gives: tpl.gives,
+        desc: tpl.desc
+      });
+      saveCharactersToStorage();
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-fae-skill-kind]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window._faeSkillKindFilter = btn.getAttribute('data-fae-skill-kind') || 'all';
+      render();
+    });
+  });
+
+  var sInp = document.getElementById('faeSkillSearchInp');
+  if(sInp){
+    sInp.addEventListener('input', function(){
+      window._faeSkillSearch = this.value;
+      var pos = this.selectionStart;
+      render();
+      var next = document.getElementById('faeSkillSearchInp');
+      if(next){ next.focus(); try{ next.setSelectionRange(pos, pos); }catch(e){} }
+    });
+  }
+
+  document.querySelectorAll('[data-fae-skill-open]').forEach(function(card){
+    card.addEventListener('click', function(e){
+      if(e.target.closest('button') || e.target.closest('[data-go]')) return;
+      navigate('faeSkillView:' + card.getAttribute('data-fae-skill-open'));
+    });
+  });
+
+  document.querySelectorAll('[data-fae-skill-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      copyText(btn.getAttribute('data-fae-skill-copy') || '');
+      var old = btn.textContent;
+      btn.textContent = '✓ Скопировано';
+      setTimeout(function(){ btn.textContent = old; }, 1100);
+    });
+  });
+
+  document.querySelectorAll('[data-fae-skill-del]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var id = btn.getAttribute('data-fae-skill-del');
+      var c = getActiveFaerunCharacter();
+      if(!c || !Array.isArray(c.customSkills)) return;
+      var found = faeSkillById(c, id);
+      if(!confirm('Удалить навык «' + (found ? found.name : '') + '»?')) return;
+      c.customSkills = c.customSkills.filter(function(x){ return x.id !== id; });
+      saveCharactersToStorage();
+      navigate('faeSkills');
+    });
+  });
+
+  var saveBtn = document.getElementById('faeSkillSave');
+  if(saveBtn){
+    saveBtn.addEventListener('click', function(){
+      var c = getActiveFaerunCharacter();
+      if(!c) return;
+      if(!Array.isArray(c.customSkills)) c.customSkills = [];
+      var existingId = (document.getElementById('faeSkillEditId')?.value || '').trim();
+      var id = existingId || ('fae_skill_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6));
+      var item = {
+        id: id,
+        name: (document.getElementById('faeSName')?.value || '').trim() || 'Новый навык',
+        kind: document.getElementById('faeSKind')?.value || 'Ремесло',
+        level: document.getElementById('faeSLvl')?.value || 'Начатки',
+        abil: (document.getElementById('faeSAbil')?.value || '').trim(),
+        mod: (document.getElementById('faeSMod')?.value || '').trim(),
+        src: (document.getElementById('faeSSrc')?.value || '').trim(),
+        gives: (document.getElementById('faeSGives')?.value || '').trim(),
+        desc: (document.getElementById('faeSDesc')?.value || '').trim()
+      };
+      var idx = c.customSkills.findIndex(function(x){ return x.id === id; });
+      if(idx >= 0) c.customSkills[idx] = item;
+      else c.customSkills.unshift(item);
+      saveCharactersToStorage();
+      navigate('faeSkillView:' + id);
+    });
+  }
+
+  document.querySelectorAll('[data-fae-skill-preset]').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var tInp = document.getElementById('faeSgTheme');
+      var kSel = document.getElementById('faeSgKind');
+      var lSel = document.getElementById('faeSgLevel');
+      if(tInp) tInp.value = chip.getAttribute('data-fae-skill-preset') || '';
+      if(kSel && chip.getAttribute('data-kind')) kSel.value = chip.getAttribute('data-kind');
+      if(lSel && chip.getAttribute('data-lvl')) lSel.value = chip.getAttribute('data-lvl');
+    });
+  });
+
+  var keyBtn = document.getElementById('faeSkillGenKeyBtn');
+  if(keyBtn){
+    keyBtn.addEventListener('click', function(){
+      var cur = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+      var inp = prompt('Введите Google Gemini API ключ (gemini-4-argon):', cur || '');
+      if(inp !== null && typeof window.saveGeminiApiKey === 'function'){
+        window.saveGeminiApiKey(inp.trim());
+        render();
+      }
+    });
+  }
+
+  function showFaeSkillAiPreview(res){
+    window._lastFaeGenSkill = res;
+    var wrap = document.getElementById('faeSgResultWrap');
+    if(!wrap) return;
+    wrap.style.display = 'block';
+    var ic = FAE_SKILL_KIND_ICONS[res.kind] || '🛠️';
+    wrap.innerHTML =
+      '<div class="fae-ref-card" style="padding:20px;border-color:#c9a45c;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">' +
+          '<div class="fae-ref-card-k" style="font-size:19px;margin:0;">' + ic + ' ' + escapeHtml(res.name || 'Навык') + '</div>' +
+          '<span class="sh-lvl-badge lvl-' + escapeAttr(res.level || 'Подмастерье') + '">' + escapeHtml(res.level || 'Подмастерье') + '</span>' +
+        '</div>' +
+        '<div style="font-size:12.5px;color:#c9a45c;font-family:\'JetBrains Mono\',monospace;margin-bottom:10px;">' +
+          'Тип: <b>' + escapeHtml(res.kind || 'Ремесло') + '</b> · Характеристика: <b>' + escapeHtml(res.abil || 'Интеллект') + '</b>' + (res.mod ? (' · Модификатор: <b>' + escapeHtml(res.mod) + '</b>') : '') +
+        '</div>' +
+        (res.src ? '<div style="font-size:13px;color:#cbd5e1;margin-bottom:8px;"><b>🎓 Откуда:</b> ' + escapeHtml(res.src) + '</div>' : '') +
+        (res.gives ? '<div class="fae-ref-card-v" style="white-space:pre-line;margin-bottom:10px;"><b>✨ Что даёт:</b> ' + escapeHtml(res.gives) + '</div>' : '') +
+        (res.desc ? '<div style="font-size:13px;color:#94a3b8;white-space:pre-line;margin-bottom:14px;"><b>📝 Заметки:</b> ' + escapeHtml(res.desc) + '</div>' : '') +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+          '<button type="button" class="btn btn-primary" id="btnFaeSkillAiSave">💾 Добавить навык герою</button>' +
+        '</div>' +
+      '</div>';
+
+    var sv = document.getElementById('btnFaeSkillAiSave');
+    if(sv){
+      sv.addEventListener('click', function(){
+        var hero = getActiveFaerunCharacter();
+        if(!hero) return;
+        if(!Array.isArray(hero.customSkills)) hero.customSkills = [];
+        var newId = 'fae_skill_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
+        hero.customSkills.unshift({
+          id: newId,
+          name: res.name || 'Навык',
+          kind: res.kind || 'Ремесло',
+          level: res.level || 'Подмастерье',
+          abil: res.abil || 'Интеллект',
+          mod: res.mod != null ? String(res.mod) : '+4',
+          src: res.src || '',
+          gives: res.gives || '',
+          desc: res.desc || ''
+        });
+        saveCharactersToStorage();
+        navigate('faeSkillView:' + newId);
+      });
+    }
+  }
+
+  document.querySelectorAll('[data-fae-skill-hist-load]').forEach(function(card){
+    card.addEventListener('click', function(e){
+      if(e.target.closest('[data-fae-skill-hist-del]')) return;
+      var idx = parseInt(card.getAttribute('data-fae-skill-hist-load'), 10);
+      try {
+        var h = JSON.parse(localStorage.getItem('fae_ai_hist_skill') || '[]');
+        if(h[idx]){
+          showFaeSkillAiPreview(h[idx]);
+          var wrap = document.getElementById('faeSgResultWrap');
+          if(wrap) wrap.scrollIntoView({ behavior: 'smooth' });
+        }
+      } catch(err){}
+    });
+  });
+
+  document.querySelectorAll('[data-fae-skill-hist-del]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var idx = parseInt(btn.getAttribute('data-fae-skill-hist-del'), 10);
+      try {
+        var h = JSON.parse(localStorage.getItem('fae_ai_hist_skill') || '[]');
+        h.splice(idx, 1);
+        localStorage.setItem('fae_ai_hist_skill', JSON.stringify(h));
+        render();
+      } catch(err){}
+    });
+  });
+
+  var runAiBtn = document.getElementById('btnFaeSkillAiRun');
+  if(runAiBtn){
+    runAiBtn.addEventListener('click', function(){
+      var k = (typeof window.getGeminiApiKey === 'function') ? window.getGeminiApiKey() : '';
+      if(!k){
+        var inp = prompt('Введите Google Gemini API ключ:');
+        if(inp && inp.trim()){ k = inp.trim(); if(typeof window.saveGeminiApiKey === 'function') window.saveGeminiApiKey(k); }
+        else return;
+      }
+      var c = getActiveFaerunCharacter();
+      var theme = (document.getElementById('faeSgTheme')?.value || '').trim() || 'Полезное ремесло или знание искателя приключений Фаэруна';
+      var kind = document.getElementById('faeSgKind')?.value || 'Ремесло';
+      var level = document.getElementById('faeSgLevel')?.value || 'Подмастерье';
+
+      runAiBtn.disabled = true;
+      runAiBtn.textContent = '✨ Сотворение навыка...';
+
+      callGeminiFaeGenerator({
+        cat: 'skill',
+        theme: theme,
+        skillKind: kind,
+        skillLevel: level,
+        contextInfo: c ? (c.name + ', ' + (c.species || 'Человек') + ', ' + (c.className || 'Воин') + ' ' + (c.level || 1) + ' ур.') : ''
+      }, k, function(err, res){
+        runAiBtn.disabled = false;
+        runAiBtn.textContent = '✨ Сгенерировать навык';
+        if(err || !res){
+          alert('Ошибка генерации: ' + (err || 'Пустой ответ'));
+          return;
+        }
+        try {
+          var h = JSON.parse(localStorage.getItem('fae_ai_hist_skill') || '[]');
+          h.unshift(res);
+          if(h.length > 20) h.length = 20;
+          localStorage.setItem('fae_ai_hist_skill', JSON.stringify(h));
+        } catch(e){}
+        showFaeSkillAiPreview(res);
+      });
+    });
+  }
+}
+
 
 /* ---------- magic screens ---------- */
-function spellCardHtml(s){
+var FAE_SPELL_CLASSES = [
+  'Все классы',
+  'Бард',
+  'Волшебник',
+  'Друид',
+  'Жрец',
+  'Изобретатель',
+  'Колдун',
+  'Паладин',
+  'Следопыт',
+  'Чародей'
+];
+
+var FAE_SCHOOL_DESCRIPTIONS = {
+  abjuration: 'Защитные барьеры, обереги, контрзаклинания, изгнание потусторонних сущностей и снятие проклятий.',
+  conjuration: 'Призыв существ и духов из иных планов, телепортация сквозь пространство и сотворение материи.',
+  divination: 'Предвидение будущего, чтение мыслей, поиск скрытых тайн, истинное зрение и связь с божествами.',
+  enchantment: 'Власть над разумом и эмоциями: очарование, внушение, паралич, ментальное доминирование и слова силы.',
+  evocation: 'Управление чистой разрушительной энергией стихий (огонь, молния, холод, сила) и божественное исцеление.',
+  illusion: 'Обман чувств и разума: невидимость, зеркальные двойники, фантомы, гипнотические узоры и живые миражи.',
+  necromancy: 'Магия жизни, смерти и души: поднятие нежити, вытягивание жизненных сил, проклятия и воскрешение павших.',
+  transmutation: 'Изменение материи, времени и живых тел: ускорение, полёт, полиморф, телекинез, дезинтеграция и остановка времени.'
+};
+
+function extractSpellRoll(effectText){
+  if(!effectText) return null;
+  var m = String(effectText).match(/(\d{1,2})[dк](\d{1,3})/i);
+  if(!m) return null;
+  var cnt = parseInt(m[1], 10);
+  var sides = parseInt(m[2], 10);
+  if(!cnt || !sides || cnt > 40 || [4,6,8,10,12,20,100].indexOf(sides) === -1) return null;
+  return { count: cnt, sides: sides, formula: cnt + 'd' + sides };
+}
+
+function renderSpellHeroTargetBar(){
+  var c = getActiveFaerunCharacter();
+  var chars = Array.isArray(CHARACTERS) && CHARACTERS.length ? CHARACTERS : (c ? [c] : []);
+  var tCount = (c && Array.isArray(c.techs)) ? c.techs.length : 0;
+  var mCount = (c && Array.isArray(c.moves)) ? c.moves.length : 0;
+  var sCount = (c && Array.isArray(c.customSkills)) ? c.customSkills.length : 0;
+  var pCount = (c && c.skillProf) ? Object.keys(c.skillProf).filter(function(k){ return Number(c.skillProf[k]) > 0; }).length : 0;
+  var totSkills = sCount + pCount;
+
+  var charOpts = chars.map(function(ch){
+    var isSel = c && ch.id === c.id;
+    return '<option value="' + escapeAttr(ch.id) + '" ' + (isSel ? 'selected' : '') + '>' +
+      getFaerunClassIcon(ch.className) + ' ' + escapeHtml(ch.name || 'Герой') + ' (' + escapeHtml(ch.className || 'D&D') + ' ' + (ch.level||1) + ' ур.)' +
+    '</option>';
+  }).join('');
+
+  return '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 14px;margin-bottom:14px;background:rgba(22,26,34,0.85);border:1px solid rgba(201,164,92,0.32);border-radius:8px;">' +
+    '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+      '<span style="font-size:12px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;">🧙 АКТИВНЫЙ ГЕРОЙ:</span>' +
+      '<select id="faeSpellHeroSelect" class="fae-input" style="padding:6px 12px;font-size:13px;min-width:220px;">' + charOpts + '</select>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+      '<button type="button" class="rc-btn" data-go="faeTechs" style="border-color:rgba(201,164,92,0.45);color:#f3e5ab;">✨ Способности (' + tCount + ') →</button>' +
+      '<button type="button" class="rc-btn" data-go="faeMoves" style="border-color:rgba(56,189,248,0.45);color:#bae6fd;">⚔️ Приёмы (' + mCount + ') →</button>' +
+      '<button type="button" class="rc-btn" data-go="faeSkills" style="border-color:rgba(16,185,129,0.45);color:#6ee7b7;">🛠️ Навыки (' + totSkills + ') →</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function isSpellInHeroTechs(hero, spell){
+  if(!hero || !Array.isArray(hero.techs) || !spell) return false;
+  var targetName = ('✨ ' + spell.name).toLowerCase();
+  var rawName = (spell.name || '').toLowerCase();
+  return hero.techs.some(function(t){
+    if(!t) return false;
+    if(t.spellId && t.spellId === spell.id) return true;
+    var tn = (t.name || '').toLowerCase();
+    return tn === targetName || tn === rawName || tn.indexOf('✨ ' + rawName + ' (') === 0;
+  });
+}
+
+function spellCardHtml(s, showSchoolBadge){
+  var eff = s.effect || s.desc || '';
+  var isConc = (s.meta || '').toLowerCase().indexOf('концентрация') !== -1 && (s.meta || '').toLowerCase().indexOf('без концентрации') === -1;
+  var isRitual = (s.meta || '').toLowerCase().indexOf('ритуал') !== -1;
+  var scName = schoolName(s.school);
+  var hero = getActiveFaerunCharacter();
+  var heroName = (hero && hero.name) ? hero.name : 'Герой';
+  var alreadyAdded = isSpellInHeroTechs(hero, s);
+
+  var addBtnHtml = alreadyAdded
+    ? `<button type="button" class="rc-btn spell-add-hero-btn" data-spell-hero-id="${escapeAttr(s.id)}" disabled style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.45);color:#6ee7b7;font-weight:600;">✓ В способностях (${escapeHtml(heroName)})</button>`
+    : `<button type="button" class="rc-btn spell-add-hero-btn" data-spell-hero-id="${escapeAttr(s.id)}" style="background:rgba(201,164,92,0.16);border-color:rgba(201,164,92,0.55);color:#f3e5ab;font-weight:600;">✨ + В способности (${escapeHtml(heroName)})</button>`;
+
   return `
-    <div class="card" data-copy="${escapeAttr(s.name)}">
-      <div class="top-row with-icon">
+    <div class="card" data-copy="${escapeAttr(s.name + (s.en ? (' (' + s.en + ')') : ''))}">
+      <div class="top-row with-icon" style="align-items:flex-start;">
         <div class="spell-icon">${schoolIconSvg(s.school)}</div>
-        <div class="name">${escapeHtml(s.name)}</div>
-        <div class="die-badge">${levelLabel(s.level)}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="name">${escapeHtml(s.name)}</div>
+          ${s.en ? `<div class="eng" style="margin-top:2px;">${escapeHtml(s.en)}</div>` : ''}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+          ${showSchoolBadge ? `<span class="fae-ref-item-tag" style="font-size:11px;">${escapeHtml(scName)}</span>` : ''}
+          ${isRitual ? `<span class="fae-ref-item-tag" style="font-size:11px;border-color:rgba(96,165,250,0.45);color:#93c5fd;">🕯️ Ритуал</span>` : ''}
+          ${isConc ? `<span class="fae-ref-item-tag" style="font-size:11px;border-color:rgba(251,191,36,0.45);color:#fde68a;">🧠 Концентрация</span>` : ''}
+          <div class="die-badge">${levelLabel(s.level)}</div>
+        </div>
       </div>
-      <div class="desc">${escapeHtml(s.effect)}</div>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button type="button" class="rc-btn spell-edit-btn" data-spell-edit="${s.id}" data-spell-school="${s.school}">Изменить</button>
-        <button type="button" class="rc-btn spell-delete-btn" data-spell-delete="${s.id}" style="color:var(--crimson-bright);">Удалить</button>
+      ${(s.classes || s.meta) ? `
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px 0;font-size:11.5px;color:#cbd5e1;font-family:'JetBrains Mono',monospace;">
+        ${s.classes ? `<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.28);padding:2px 8px;border-radius:4px;color:#fde68a;">🧙 ${escapeHtml(s.classes)}</span>` : ''}
+        ${s.meta ? `<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(148,163,184,0.25);padding:2px 8px;border-radius:4px;color:#cbd5e1;">⏱️ ${escapeHtml(s.meta)}</span>` : ''}
+      </div>` : ''}
+      <div class="desc">${escapeHtml(eff)}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,164,92,0.14);">
+        ${addBtnHtml}
+        <button type="button" class="rc-btn spell-edit-btn" data-spell-edit="${escapeAttr(s.id)}" data-spell-school="${escapeAttr(s.school)}">✏️ Изменить</button>
+        ${s.isCustom ? `<button type="button" class="rc-btn spell-delete-btn" data-spell-delete="${escapeAttr(s.id)}" style="color:var(--crimson-bright);">🗑 Удалить</button>` : ''}
       </div>
       <div class="stamp"><span>Скопировано</span></div>
     </div>`;
+}
+
+function renderSpellsGroupedByLevel(spellsList, showSchoolBadge){
+  if(!spellsList || !spellsList.length){
+    return '<div class="char-empty">По выбранному фильтру заклинаний не найдено. Попробуйте сбросить фильтр круга, класса или поисковый запрос.</div>';
+  }
+  var byLvl = {};
+  spellsList.forEach(function(sp){
+    var l = Number(sp.level) || 0;
+    if(!byLvl[l]) byLvl[l] = [];
+    byLvl[l].push(sp);
+  });
+  var html = '';
+  Object.keys(byLvl).map(Number).sort(function(a,b){ return a-b; }).forEach(function(lvl){
+    var group = byLvl[lvl].sort(function(a,b){ return (a.name||'').localeCompare(b.name||'','ru'); });
+    var title = lvl === 0 ? '✨ Заговоры (0 круг — неограниченное сотворение)' : ('🔮 ' + lvl + '-й круг магии');
+    html += `
+      <div style="margin:20px 0 10px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,164,92,0.28);padding-bottom:6px;">
+        <h2 style="margin:0;font-size:17px;color:#f3e5ab;font-family:'Cinzel',serif;">${title}</h2>
+        <span class="fae-ref-item-tag">${group.length} закл.</span>
+      </div>
+      <div>${group.map(function(sp){ return spellCardHtml(sp, showSchoolBadge); }).join('')}</div>
+    `;
+  });
+  return html;
 }
 
 function renderMagicHub(){
+  var searchQ = (window._faeMagicSearchQ || '').trim().toLowerCase();
+  var lvlFilter = (window._faeMagicLvlFilter !== undefined && window._faeMagicLvlFilter !== null) ? window._faeMagicLvlFilter : 'all';
+  var clsFilter = window._faeMagicClsFilter || 'Все классы';
+
+  var cantripsTotal = SPELLS.filter(function(s){ return Number(s.level) === 0; }).length;
+  var leveledTotal = SPELLS.length - cantripsTotal;
+
   const items = MAGIC_SCHOOLS.map(sc=>{
-    const count = SPELLS.filter(s=>s.school===sc.key).length;
+    const scSpells = SPELLS.filter(s=>s.school===sc.key);
+    const count = scSpells.length;
+    const c0 = scSpells.filter(s=>Number(s.level)===0).length;
+    const desc = FAE_SCHOOL_DESCRIPTIONS[sc.key] || '';
     return `
-      <div class="menu-item" data-go="schoolSpells:${sc.key}">
-        <div class="school-icon">${schoolIconSvg(sc.key)}</div>
-        <div style="flex:1;">
-          <div class="name">${sc.ru}</div>
-          <div class="desc">${count} заклинани${count===1?'е':(count>=2&&count<=4?'я':'й')} в списке</div>
+      <div class="fae-ref-card fae-card-clickable" data-go="schoolSpells:${sc.key}" role="button" tabindex="0" style="display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="school-icon" style="width:36px;height:36px;flex-shrink:0;">${schoolIconSvg(sc.key)}</div>
+              <div>
+                <div class="fae-ref-card-k" style="margin:0;font-size:17px;">${escapeHtml(sc.ru)}</div>
+                <div style="font-size:11.5px;color:#94a3b8;font-style:italic;">Школа ${escapeHtml(sc.ru.toLowerCase())}</div>
+              </div>
+            </div>
+            <span class="fae-ref-item-tag">${count} закл.</span>
+          </div>
+          <div class="fae-ref-card-v" style="margin-bottom:10px;font-size:13px;color:#cbd5e1;">${escapeHtml(desc)}</div>
         </div>
-        <div class="arrow">→</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid rgba(201,164,92,0.18);font-size:12px;color:#c9a45c;">
+          <span>Заговоров: <b>${c0}</b> • Круги 1–9: <b>${count - c0}</b></span>
+          <span style="font-weight:700;">Открыть гримуар →</span>
+        </div>
       </div>`;
   }).join('');
+
+  var levelPills = [{k:'all', l:'Все круги (' + SPELLS.length + ')'}, {k:'0', l:'Заговоры (' + cantripsTotal + ')'}];
+  for(var lv=1; lv<=9; lv++){
+    var lCnt = SPELLS.filter(function(s){ return Number(s.level) === lv; }).length;
+    levelPills.push({k:String(lv), l:lv + ' круг (' + lCnt + ')'});
+  }
+  var levelPillsHtml = levelPills.map(function(p){
+    return `<button type="button" class="fae-pill ${String(lvlFilter)===p.k?'active':''}" data-magic-lvl="${p.k}">${p.l}</button>`;
+  }).join('');
+
+  var classPillsHtml = FAE_SPELL_CLASSES.map(function(cl){
+    return `<button type="button" class="fae-pill ${clsFilter===cl?'active':''}" data-magic-cls="${escapeAttr(cl)}">${cl === 'Все классы' ? '🧙 Все классы' : escapeHtml(cl)}</button>`;
+  }).join('');
+
+  var isFiltering = !!(searchQ || lvlFilter !== 'all' || clsFilter !== 'Все классы');
+  var filteredSpells = [];
+  if(isFiltering){
+    filteredSpells = SPELLS.filter(function(sp){
+      if(lvlFilter !== 'all' && String(sp.level) !== String(lvlFilter)) return false;
+      if(clsFilter !== 'Все классы' && (sp.classes || '').toLowerCase().indexOf(clsFilter.toLowerCase()) === -1) return false;
+      if(searchQ){
+        var hay = [sp.name, sp.en, sp.classes, sp.meta, sp.effect, schoolName(sp.school)].join(' ').toLowerCase();
+        if(hay.indexOf(searchQ) === -1) return false;
+      }
+      return true;
+    });
+  }
+
   return `
     ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Книга заклинаний'}])}
     <button class="back" data-go="faeRef">← В справочник</button>
-    <h1>Книга заклинаний</h1>
-    <p class="subtitle">Общая база заклинаний по школам — сюда ссылаются все заклинатели компендиума.</p>
-    <div class="rule"></div>
-    <div class="menu-list grid-2">${items}</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h1>✨ Книга заклинаний D&D 5e / 2024</h1>
+        <p class="subtitle">Полная энциклопедия заклинаний по всем 8 школам магии — от заговоров (0 круг) до легендарных чар 9-го круга.</p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <span class="fae-ref-header-badge">📖 8 школ • ${SPELLS.length} заклинаний (${cantripsTotal} заговоров + ${leveledTotal} кругов 1–9)</span>
+        <button type="button" class="btn btn-primary" data-go="spellForm:new:evocation" style="padding:7px 13px;font-size:12.5px;">+ Своё заклинание</button>
+      </div>
+    </div>
+    <div class="fae-rule"></div>
+    ${renderSpellHeroTargetBar()}
+
+    <div class="fae-ref-search-wrap" style="margin-bottom:12px;">
+      <span class="fae-ref-search-icon">🔍</span>
+      <input type="text" id="faeMagicHubSearch" class="fae-ref-search-input" value="${escapeAttr(window._faeMagicSearchQ || '')}" placeholder="Быстрый поиск любого заклинания по русскому или английскому названию (Fireball, Огненный шар, Wish, Туманный шаг), классу или урону..." autocomplete="off">
+    </div>
+
+    <div style="margin-bottom:8px;font-size:11.5px;color:#c9a45c;font-family:'Cinzel',serif;font-weight:700;">ФИЛЬТР ПО КРУГУ МАГИИ:</div>
+    <div class="pill-row" style="margin-bottom:12px;">${levelPillsHtml}</div>
+
+    <div style="margin-bottom:8px;font-size:11.5px;color:#c9a45c;font-family:'Cinzel',serif;font-weight:700;">ФИЛЬТР ПО КЛАССУ ЗАКЛИНАТЕЛЯ:</div>
+    <div class="pill-row" style="margin-bottom:18px;">${classPillsHtml}</div>
+
+    ${isFiltering ? `
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+        <div style="font-size:13px;color:#c9a45c;font-family:'Cinzel',serif;">Найдено заклинаний: <b>${filteredSpells.length}</b></div>
+        <button type="button" class="rc-btn" id="faeMagicResetFilters">✕ Сбросить фильтры и показать 8 школ</button>
+      </div>
+      ${renderSpellsGroupedByLevel(filteredSpells, true)}
+    ` : `
+      <div class="fae-ref-cards-grid">${items}</div>
+    `}
   `;
 }
 
@@ -4370,16 +6918,62 @@ function renderSchoolSpells(){
   const key = view.schoolKey;
   const school = MAGIC_SCHOOLS.find(s=>s.key===key);
   if(!school){ view = {screen:'magic'}; return renderMagicHub(); }
-  const spells = SPELLS.filter(s=>s.school===key).sort((a,b)=>a.level-b.level || a.name.localeCompare(b.name,'ru'));
-  const cards = spells.map(spellCardHtml).join('') || '<div class="char-empty">Пока нет заклинаний этой школы.</div>';
+
+  var searchQ = (window._faeSchoolSearchQ || '').trim().toLowerCase();
+  var lvlFilter = (window._faeSchoolLvlFilter !== undefined && window._faeSchoolLvlFilter !== null) ? window._faeSchoolLvlFilter : 'all';
+  var clsFilter = window._faeSchoolClsFilter || 'Все классы';
+
+  const allSchoolSpells = SPELLS.filter(s=>s.school===key);
+  const filtered = allSchoolSpells.filter(function(sp){
+    if(lvlFilter !== 'all' && String(sp.level) !== String(lvlFilter)) return false;
+    if(clsFilter !== 'Все классы' && (sp.classes || '').toLowerCase().indexOf(clsFilter.toLowerCase()) === -1) return false;
+    if(searchQ){
+      var hay = [sp.name, sp.en, sp.classes, sp.meta, sp.effect].join(' ').toLowerCase();
+      if(hay.indexOf(searchQ) === -1) return false;
+    }
+    return true;
+  });
+
+  var levelPills = [{k:'all', l:'Все (' + allSchoolSpells.length + ')'}];
+  for(var lv=0; lv<=9; lv++){
+    var cnt = allSchoolSpells.filter(function(s){ return Number(s.level) === lv; }).length;
+    if(cnt > 0){
+      levelPills.push({k:String(lv), l:(lv===0 ? 'Заговоры' : (lv + ' круг')) + ' (' + cnt + ')'});
+    }
+  }
+  var levelPillsHtml = levelPills.map(function(p){
+    return `<button type="button" class="fae-pill ${String(lvlFilter)===p.k?'active':''}" data-school-lvl="${p.k}">${p.l}</button>`;
+  }).join('');
+
+  var classPillsHtml = FAE_SPELL_CLASSES.map(function(cl){
+    return `<button type="button" class="fae-pill ${clsFilter===cl?'active':''}" data-school-cls="${escapeAttr(cl)}">${cl === 'Все классы' ? '🧙 Все классы' : escapeHtml(cl)}</button>`;
+  }).join('');
+
   return `
     ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Книга заклинаний', nav:'magic'},{label:school.ru}])}
-    <button class="back" data-go="magic">← Назад</button>
-    <h1><span class="h1-icon">${schoolIconSvg(key)}</span>${school.ru}</h1>
-    <p class="subtitle">Клик по карточке копирует название заклинания в буфер.</p>
-    <div class="rule"></div>
-    <button class="new-char-btn" data-go="spellForm:new:${key}">+ Добавить заклинание</button>
-    ${cards}
+    <button class="back" data-go="magic">← Ко всем школам магии</button>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h1><span class="h1-icon">${schoolIconSvg(key)}</span>Школа: ${school.ru}</h1>
+        <p class="subtitle">${escapeHtml(FAE_SCHOOL_DESCRIPTIONS[key] || 'Клик по карточке копирует название заклинания в буфер.')}</p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <span class="fae-ref-header-badge">Показано: ${filtered.length} из ${allSchoolSpells.length}</span>
+        <button class="btn btn-primary" data-go="spellForm:new:${key}" style="padding:7px 14px;font-size:12.5px;">+ Добавить заклинание</button>
+      </div>
+    </div>
+    <div class="fae-rule"></div>
+    ${renderSpellHeroTargetBar()}
+
+    <div class="fae-ref-search-wrap" style="margin-bottom:12px;">
+      <span class="fae-ref-search-icon">🔍</span>
+      <input type="text" id="faeSchoolSpellSearch" class="fae-ref-search-input" value="${escapeAttr(window._faeSchoolSearchQ || '')}" placeholder="Поиск внутри школы «${escapeAttr(school.ru)}» по названию, английскому оригиналу, классу или эффекту..." autocomplete="off">
+    </div>
+
+    <div class="pill-row" style="margin-bottom:10px;">${levelPillsHtml}</div>
+    <div class="pill-row" style="margin-bottom:18px;">${classPillsHtml}</div>
+
+    ${renderSpellsGroupedByLevel(filtered, false)}
   `;
 }
 
@@ -4397,80 +6991,397 @@ function renderSpellForm(){
   const s = spellDraft;
   const isExisting = !!(view.spellId && view.spellId!=='new' && SPELLS.find(x=>x.id===view.spellId));
   const schoolOptions = MAGIC_SCHOOLS.map(sc=>`<option value="${sc.key}" ${s.school===sc.key?'selected':''}>${sc.ru}</option>`).join('');
-  const levelOptions = Array.from({length:10},(_,i)=>i).map(l=>`<option value="${l}" ${s.level===l?'selected':''}>${levelLabel(l)}</option>`).join('');
+  const levelOptions = Array.from({length:10},(_,i)=>i).map(l=>`<option value="${l}" ${Number(s.level)===l?'selected':''}>${levelLabel(l)}</option>`).join('');
 
   return `
     ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Книга заклинаний', nav:'magic'},{label:schoolName(s.school), nav:'schoolSpells:'+s.school},{label:s.name||'Новое заклинание'}])}
     <button class="back" data-go="schoolSpells:${s.school}">← Назад</button>
     <h1>${escapeHtml(s.name || 'Новое заклинание')}</h1>
-    <p class="subtitle">Впиши заклинание, которое открылось в игре — сохранится в общей базе.</p>
+    <p class="subtitle">Впишите или отредактируйте заклинание — оно сохранится в общей Книге заклинаний.</p>
     <div class="rule"></div>
     <div class="sheet-actions">
       <button class="btn-primary" id="saveSpellBtn">💾 Сохранить</button>
       ${isExisting ? '<button class="btn-ghost" id="deleteSpellBtn" style="color:var(--crimson-bright);border-color:var(--crimson-bright);">🗑 Удалить</button>' : ''}
     </div>
     <div id="spellFormRoot">
-      <div class="field" style="margin-bottom:16px;">
-        <label>Название</label>
-        <input type="text" data-sfield="name" value="${escapeAttr(s.name)}" style="font-size:19px;padding:12px 14px;">
-      </div>
-      <div class="sheet-grid" style="margin-bottom:20px;">
+      <div class="sheet-grid" style="margin-bottom:16px;">
         <div class="field">
-          <label>Школа</label>
+          <label>Название (RU)</label>
+          <input type="text" data-sfield="name" value="${escapeAttr(s.name || '')}" placeholder="Напр. Огненный шар" style="font-size:17px;padding:10px 12px;">
+        </div>
+        <div class="field">
+          <label>Оригинальное название (EN)</label>
+          <input type="text" data-sfield="en" value="${escapeAttr(s.en || '')}" placeholder="Напр. Fireball" style="font-size:17px;padding:10px 12px;">
+        </div>
+      </div>
+      <div class="sheet-grid" style="margin-bottom:16px;">
+        <div class="field">
+          <label>Школа магии</label>
           <select data-sfield="school">${schoolOptions}</select>
         </div>
         <div class="field">
-          <label>Уровень</label>
+          <label>Круг (Уровень)</label>
           <select data-sfield="level">${levelOptions}</select>
         </div>
       </div>
-      <div class="field"><label>Эффект / описание</label><textarea data-sfield="effect" style="min-height:100px;">${escapeHtml(s.effect)}</textarea></div>
+      <div class="sheet-grid" style="margin-bottom:16px;">
+        <div class="field">
+          <label>Доступно классам</label>
+          <input type="text" data-sfield="classes" value="${escapeAttr(s.classes || '')}" placeholder="Напр. Волшебник, Чародей">
+        </div>
+        <div class="field">
+          <label>Время • Дистанция • Длительность</label>
+          <input type="text" data-sfield="meta" value="${escapeAttr(s.meta || '')}" placeholder="Напр. 1 действие • 150 фт • Мгновенно">
+        </div>
+      </div>
+      <div class="field"><label>Эффект и полное описание</label><textarea data-sfield="effect" style="min-height:110px;">${escapeHtml(s.effect || '')}</textarea></div>
     </div>
   `;
 }
 
-function renderClass(){
+function wireMagicScreens(){
+  var heroSel = document.getElementById('faeSpellHeroSelect');
+  if(heroSel){
+    heroSel.addEventListener('change', function(){
+      setActiveFaerunCharacter(this.value);
+      render();
+    });
+  }
+
+  var hubSearch = document.getElementById('faeMagicHubSearch');
+  if(hubSearch){
+    hubSearch.addEventListener('input', function(){
+      window._faeMagicSearchQ = this.value;
+      var pos = this.selectionStart;
+      render();
+      var next = document.getElementById('faeMagicHubSearch');
+      if(next){
+        next.focus();
+        try{ next.setSelectionRange(pos, pos); }catch(e){}
+      }
+    });
+  }
+
+  document.querySelectorAll('[data-magic-lvl]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window._faeMagicLvlFilter = btn.getAttribute('data-magic-lvl') || 'all';
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-magic-cls]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window._faeMagicClsFilter = btn.getAttribute('data-magic-cls') || 'Все классы';
+      render();
+    });
+  });
+
+  var resetBtn = document.getElementById('faeMagicResetFilters');
+  if(resetBtn){
+    resetBtn.addEventListener('click', function(){
+      window._faeMagicSearchQ = '';
+      window._faeMagicLvlFilter = 'all';
+      window._faeMagicClsFilter = 'Все классы';
+      render();
+    });
+  }
+
+  var schoolSearch = document.getElementById('faeSchoolSpellSearch');
+  if(schoolSearch){
+    schoolSearch.addEventListener('input', function(){
+      window._faeSchoolSearchQ = this.value;
+      var pos = this.selectionStart;
+      render();
+      var next = document.getElementById('faeSchoolSpellSearch');
+      if(next){
+        next.focus();
+        try{ next.setSelectionRange(pos, pos); }catch(e){}
+      }
+    });
+  }
+
+  document.querySelectorAll('[data-school-lvl]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window._faeSchoolLvlFilter = btn.getAttribute('data-school-lvl') || 'all';
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-school-cls]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window._faeSchoolClsFilter = btn.getAttribute('data-school-cls') || 'Все классы';
+      render();
+    });
+  });
+
+  document.querySelectorAll('.spell-add-hero-btn').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var spId = btn.getAttribute('data-spell-hero-id');
+      var sp = SPELLS.find(function(x){ return x.id === spId; });
+      var hero = getActiveFaerunCharacter();
+      if(!sp || !hero) return;
+      if(!Array.isArray(hero.techs)) hero.techs = [];
+      if(isSpellInHeroTechs(hero, sp)) return;
+      var rollInfo = extractSpellRoll(sp.effect || '');
+      hero.techs.unshift({
+        id: genId(),
+        spellId: sp.id,
+        name: '✨ ' + sp.name + (sp.en ? (' (' + sp.en + ')') : ''),
+        category: 'Магические и Сверхъестественные дары',
+        source: schoolName(sp.school) + ' • ' + levelLabel(sp.level) + (sp.classes ? (' (' + sp.classes + ')') : ''),
+        actionCost: (sp.meta || '').split('•')[0]?.trim() || '1 действие',
+        cooldown: Number(sp.level) === 0 ? 'Заговор (Неограниченно)' : ('Ячейка ' + sp.level + '-го круга'),
+        checkOrSave: rollInfo ? rollInfo.formula : '',
+        desc: (sp.meta ? ('[' + sp.meta + ']\n') : '') + (sp.effect || '')
+      });
+      saveCharactersToStorage();
+      btn.textContent = '✓ В способностях (' + (hero.name || 'Герой') + ')';
+      btn.style.background = 'rgba(16,185,129,0.15)';
+      btn.style.borderColor = 'rgba(16,185,129,0.45)';
+      btn.style.color = '#6ee7b7';
+      btn.disabled = true;
+    });
+  });
+}
+
+var FAE_CLASS_ROLES = [
+  { key: 'all', label: 'Все классы', icon: '⚔️' },
+  { key: 'martial', label: 'Воинские классы', icon: '🗡️' },
+  { key: 'caster', label: 'Полные заклинатели', icon: '✨' },
+  { key: 'halfcaster', label: 'Полузаклинатели и Пакт', icon: '🛡️' }
+];
+
+function subclassFeatureCard(f, sourceLabel){
+  if(f.isLink){
+    return `
+      <div class="card" data-go="${f.linkTo}" style="border-color:rgba(201,164,92,0.5);cursor:pointer;">
+        <div class="top-row">
+          <div class="name">✨ ${f.ru}</div>
+          <div class="die-badge">Ур. ${f.level}</div>
+        </div>
+        ${f.en ? `<div class="eng">${escapeHtml(f.en)}</div>` : ''}
+        <div class="desc">${f.desc}</div>
+      </div>`;
+  }
+  const srcText = (sourceLabel ? (sourceLabel + ' • ') : '') + 'Ур. ' + f.level;
+  const rollFormula = f.roll ? ('1d' + f.roll.sides) : '';
   return `
-    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Классы и Архетипы'}])}
-    <button class="back" data-go="faeRef">← В справочник</button>
-    <h1>Классы и Архетипы</h1>
-    <p class="subtitle">Выберите боевой архетип.</p>
-    <div class="rule"></div>
-    <div class="menu-list grid-2">
-      <div class="menu-item" data-go="sub:fighter:battlemaster">
-        <div>
-          <div class="name">Мастер боя</div>
-          <div class="desc">20 приёмов, питаемых костями превосходства</div>
-        </div>
-        <div class="arrow">→</div>
+    <div class="card" data-copy="${escapeAttr(f.ru)}">
+      <div class="top-row">
+        <div class="name">${f.ru}</div>
+        <div class="die-badge">Ур. ${f.level}</div>
       </div>
-      <div class="menu-item" data-go="subclass:fighter:champion">
-        <div>
-          <div class="name">Чемпион</div>
-          <div class="desc">Расширенные критические попадания, простота и надёжность</div>
-        </div>
-        <div class="arrow">→</div>
+      ${f.en ? `<div class="eng">${escapeHtml(f.en)}</div>` : ''}
+      <div class="desc">${f.desc}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,164,92,0.14);">
+        ${renderAddTechAndMoveBtns({
+          title: f.ru,
+          en: f.en || '',
+          desc: f.desc || '',
+          source: srcText,
+          roll: rollFormula,
+          bonus: rollFormula || 'По правилам класса',
+          weapon: sourceLabel || 'Классовая техника',
+          mastery: f.en || '',
+          techCat: 'Классовые умения',
+          moveCat: 'Особые удары, Захваты и Толчки',
+          moveFirst: false
+        })}
       </div>
-      <div class="menu-item" data-go="subclass:fighter:psiwarrior">
+      <div class="stamp"><span>Скопировано</span></div>
+    </div>`;
+}
+
+function renderClassesHub(){
+  var classKeys = Object.keys(DATA || {});
+  var activeRole = window._faeClassRoleFilter || 'all';
+  var searchQ = (window._faeClassSearchQ || '').trim().toLowerCase();
+
+  var totalSubs = 0;
+  classKeys.forEach(function(k){
+    var c = DATA[k];
+    if(c && c.subclasses) totalSubs += Object.keys(c.subclasses).length;
+  });
+
+  var pillsHtml = FAE_CLASS_ROLES.map(function(r){
+    var cnt = r.key === 'all'
+      ? classKeys.length
+      : classKeys.filter(function(k){ return DATA[k] && DATA[k].role === r.key; }).length;
+    return '<button type="button" class="fae-pill ' + (activeRole === r.key ? 'active' : '') + '" data-fae-cls-role="' + escapeAttr(r.key) + '">' +
+      r.icon + ' ' + escapeHtml(r.label) + ' <span style="opacity:0.75;font-size:11px;">(' + cnt + ')</span>' +
+    '</button>';
+  }).join('');
+
+  var filteredKeys = classKeys.filter(function(k){
+    var cls = DATA[k];
+    if(!cls) return false;
+    if(activeRole !== 'all' && cls.role !== activeRole) return false;
+    if(searchQ){
+      var subText = Object.keys(cls.subclasses || {}).map(function(sk){
+        var sb = cls.subclasses[sk];
+        return [sb.name, sb.en, sb.shortDesc, sb.lore].join(' ');
+      }).join(' ');
+      var featText = (cls.baseFeatures || []).map(function(bf){ return bf.ru + ' ' + (bf.en || ''); }).join(' ');
+      var hay = [cls.name, cls.en, cls.roleLabel, cls.primaryAbility, cls.saves, cls.summary, subText, featText].join(' ').toLowerCase();
+      if(hay.indexOf(searchQ) === -1) return false;
+    }
+    return true;
+  });
+
+  var cardsHtml = filteredKeys.length ? (
+    '<div class="fae-ref-cards-grid">' +
+      filteredKeys.map(function(k){
+        var cls = DATA[k];
+        var subKeys = Object.keys(cls.subclasses || {});
+        var subPills = subKeys.map(function(sk){
+          var sb = cls.subclasses[sk];
+          return '<button type="button" class="rc-btn" data-go="subclass:' + escapeAttr(k) + ':' + escapeAttr(sk) + '" style="font-size:11.5px;padding:4px 9px;background:rgba(15,23,42,0.85);border-color:rgba(201,164,92,0.32);" title="' + escapeAttr(sb.shortDesc || sb.name) + '">' +
+            (sb.icon ? (sb.icon + ' ') : '') + escapeHtml(sb.name) +
+          '</button>';
+        }).join('');
+
+        return '<div class="fae-ref-card" data-cls-card-open="' + escapeAttr(k) + '" style="display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;border-color:rgba(201,164,92,0.35);">' +
+          '<div>' +
+            '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;">' +
+              '<div class="fae-ref-card-k" style="font-size:20px;margin:0;">' + (cls.icon || '⚔️') + ' ' + escapeHtml(cls.name) + ' <span style="font-size:13px;color:#94a3b8;font-weight:400;">(' + escapeHtml(cls.en || k) + ')</span></div>' +
+              '<span class="fae-ref-item-tag">🎲 ' + escapeHtml(cls.hitDie || '1d8') + '</span>' +
+            '</div>' +
+            '<div style="font-size:11.5px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;margin-bottom:10px;letter-spacing:0.04em;">' +
+              escapeHtml(cls.roleLabel || 'Класс D&D 5e / 2024') +
+            '</div>' +
+            '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11.5px;color:#cbd5e1;font-family:\'JetBrains Mono\',monospace;">' +
+              '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;">⚡ Хар-ка: ' + escapeHtml(cls.primaryAbility || '—') + '</span>' +
+              '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#fde68a;">🛡️ Спас: ' + escapeHtml(cls.saves || '—') + '</span>' +
+              (cls.spellcasting && cls.spellcasting.enabled ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#7dd3fc;">✨ Заклинатель</span>' : '') +
+            '</div>' +
+            '<div class="fae-ref-card-v" style="margin-bottom:12px;">' + escapeHtml(cls.summary || '') + '</div>' +
+            '<div style="margin-bottom:12px;padding:10px 12px;background:rgba(10,14,22,0.65);border:1px solid rgba(201,164,92,0.2);border-radius:6px;">' +
+              '<div style="font-size:11px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;margin-bottom:6px;letter-spacing:0.05em;">🏛️ ПОДКЛАССЫ И АРХЕТИПЫ (' + subKeys.length + '):</div>' +
+              '<div style="display:flex;flex-wrap:wrap;gap:6px;">' + subPills + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(201,164,92,0.18);">' +
+            '<span style="font-size:12px;color:#94a3b8;">📜 Базовых умений: <b style="color:#e2e8f0;">' + ((cls.baseFeatures || []).length) + '</b> (1–20 ур.)</span>' +
+            '<button type="button" class="btn btn-primary" data-go="class:' + escapeAttr(k) + '" style="padding:6px 14px;font-size:12.5px;">Открыть класс →</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>'
+  ) : '<div class="char-empty">По вашему запросу классы не найдены. Попробуйте сбросить фильтр или изменить поисковый запрос.</div>';
+
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Справочник', nav:'faeRef'}, {label:'Классы и Архетипы D&D'}]) +
+    '<button class="back" data-go="faeRef">← В справочник Фаэруна</button>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">' +
+      '<div>' +
+        '<h1>⚔️ Классы и Подклассы D&D 5e / 2024</h1>' +
+        '<p class="subtitle">Полная энциклопедия всех ' + classKeys.length + ' классов и ' + totalSubs + ' архетипов: хиты, владения, базовые умения 1–20 уровня и способности каждого подкласса.</p>' +
+      '</div>' +
+      '<span class="fae-ref-header-badge">📚 ' + classKeys.length + ' классов • ' + totalSubs + ' подклассов</span>' +
+    '</div>' +
+    '<div class="fae-rule"></div>' +
+
+    '<div class="fae-ref-search-wrap" style="margin-bottom:14px;">' +
+      '<span class="fae-ref-search-icon">🔍</span>' +
+      '<input type="text" id="faeClassesSearchInp" class="fae-ref-search-input" value="' + escapeAttr(window._faeClassSearchQ || '') + '" placeholder="Поиск по названию класса, подкласса (напр. Паладин, Певец клинка, Домен Сумерек, Берсерк) или умению..." autocomplete="off">' +
+    '</div>' +
+
+    '<div class="pill-row" style="margin-bottom:18px;">' + pillsHtml + '</div>' +
+    cardsHtml;
+}
+
+function renderClass(){
+  const clsKey = view.cls;
+  if(!clsKey || !DATA[clsKey]){
+    return renderClassesHub();
+  }
+  const cls = DATA[clsKey];
+  const allClassKeys = Object.keys(DATA);
+  const subKeys = Object.keys(cls.subclasses || {});
+  const baseFeatures = [...(cls.baseFeatures || [])].sort((a,b)=>a.level-b.level);
+
+  const classSwitchPills = allClassKeys.map(k=>{
+    const c = DATA[k];
+    return `<button type="button" class="fae-pill ${k===clsKey?'active':''}" data-go="class:${k}">${c.icon||'⚔️'} ${escapeHtml(c.name)}</button>`;
+  }).join('');
+
+  const subclassCards = subKeys.map(sk=>{
+    const sb = cls.subclasses[sk];
+    const fCount = (sb.features || []).length;
+    const extraManBtn = (clsKey === 'fighter' && sk === 'battlemaster')
+      ? `<button type="button" class="rc-btn" data-go="sub:fighter:battlemaster" style="margin-top:8px;border-color:#c9a45c;color:#fde68a;">🎯 Открыть все 23 манёвра Мастера боя →</button>`
+      : '';
+    return `
+      <div class="fae-ref-card" data-sub-card-open="subclass:${clsKey}:${sk}" style="display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;border-color:rgba(201,164,92,0.4);">
         <div>
-          <div class="name">Псионический воин</div>
-          <div class="desc">Телекинез и силовые поля на костях психической энергии</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">
+            <div class="fae-ref-card-k" style="font-size:18px;margin:0;">${sb.icon || cls.icon || '⚔️'} ${escapeHtml(sb.name)}</div>
+            <span class="fae-ref-item-tag">${fCount} умений</span>
+          </div>
+          ${sb.en ? `<div style="font-size:12px;color:#94a3b8;font-style:italic;margin-bottom:8px;">${escapeHtml(sb.en)}</div>` : ''}
+          <div class="fae-ref-card-v" style="margin-bottom:8px;color:#f8fafc;font-weight:600;">${escapeHtml(sb.shortDesc || '')}</div>
+          ${sb.lore ? `<div style="font-size:13px;color:#cbd5e1;line-height:1.5;margin-bottom:10px;">${escapeHtml(sb.lore)}</div>` : ''}
+          ${extraManBtn}
         </div>
-        <div class="arrow">→</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;margin-top:6px;border-top:1px solid rgba(201,164,92,0.18);">
+          <span style="font-size:11.5px;color:#c9a45c;font-family:'Cinzel',serif;font-weight:700;">Архетип класса ${escapeHtml(cls.name)}</span>
+          <button type="button" class="btn btn-primary" data-go="subclass:${clsKey}:${sk}" style="padding:5px 12px;font-size:12px;">Умения подкласса →</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Классы D&D', nav:'classes'},{label:cls.name}])}
+    <button class="back" data-go="classes">← Ко всем классам D&D</button>
+    ${renderSpellHeroTargetBar()}
+
+    <div class="pill-row" style="margin-bottom:16px;">${classSwitchPills}</div>
+
+    <div class="fae-ref-card" style="padding:22px;border-color:rgba(201,164,92,0.5);margin-bottom:22px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <span class="fae-ref-item-tag">${escapeHtml(cls.roleLabel || 'Класс D&D 5e / 2024')}</span>
+          <h1 style="margin:8px 0 2px 0;font-size:28px;">${cls.icon || '⚔️'} ${escapeHtml(cls.name)} <span style="font-size:17px;color:#94a3b8;font-weight:400;">(${escapeHtml(cls.en || clsKey)})</span></h1>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="btn btn-primary" id="btnApplyClassToHero" data-apply-cls="${escapeAttr(cls.name)}" title="Установить этот класс, кость хитов, спасброски и владения активному герою">⚡ Выбрать класс для героя</button>
+        </div>
       </div>
-      <div class="menu-item" data-go="subclass:fighter:eldritchknight">
-        <div>
-          <div class="name">Мистический рыцарь</div>
-          <div class="desc">Боец с заклинаниями Волшебника и боевой магией</div>
-        </div>
-        <div class="arrow">→</div>
+
+      <p style="font-size:15px;color:#e2e8f0;line-height:1.6;margin:10px 0 16px 0;">${escapeHtml(cls.summary || '')}</p>
+
+      <div class="fae-gen-stat-grid" style="margin-bottom:14px;">
+        <div class="fae-gen-stat-box"><span class="lbl">🎲 Кость хитов</span><span class="val">${escapeHtml(cls.hitDie || '1d8')} за уровень</span></div>
+        <div class="fae-gen-stat-box"><span class="lbl">⚡ Осн. характеристика</span><span class="val">${escapeHtml(cls.primaryAbility || '—')}</span></div>
+        <div class="fae-gen-stat-box"><span class="lbl">🛡️ Спасброски</span><span class="val">${escapeHtml(cls.saves || '—')}</span></div>
+        <div class="fae-gen-stat-box"><span class="lbl">🥋 Владение бронёй</span><span class="val">${escapeHtml(cls.armorProf || '—')}</span></div>
+        <div class="fae-gen-stat-box"><span class="lbl">🗡️ Владение оружием</span><span class="val">${escapeHtml(cls.weaponProf || '—')}</span></div>
+        <div class="fae-gen-stat-box"><span class="lbl">✨ Колдовство / Магия</span><span class="val">${escapeHtml((cls.spellcasting && cls.spellcasting.label) || 'Нет')}</span></div>
+      </div>
+
+      <div style="font-size:13px;color:#cbd5e1;padding:10px 14px;background:rgba(10,14,22,0.7);border-left:3px solid #c9a45c;border-radius:4px;">
+        <b style="color:#c9a45c;">🎯 Навыки класса на 1 уровне:</b> ${escapeHtml(cls.skillsInfo || '—')}
+        ${cls.toolProf && cls.toolProf !== 'Нет' ? `<br><b style="color:#c9a45c;">🧰 Инструменты:</b> ${escapeHtml(cls.toolProf)}` : ''}
       </div>
     </div>
+
+    <div class="section-label">🏛️ Подклассы и Архетипы класса «${escapeHtml(cls.name)}» (${subKeys.length})</div>
+    <p style="font-size:13.5px;color:var(--ink-dim);margin:-6px 0 14px;">Нажмите на карточку любого подкласса, чтобы открыть все его уникальные умения по уровням.</p>
+    <div class="fae-ref-cards-grid" style="margin-bottom:28px;">
+      ${subclassCards}
+    </div>
+
+    <div class="section-label">📜 Базовые классовые умения: ${escapeHtml(cls.name)} (1–20 уровень)</div>
+    <p style="font-size:13.5px;color:var(--ink-dim);margin:-6px 0 14px;">Клик по карточке копирует название умения; кнопка «+ В способности героя» сразу сохраняет умение в профиль вашего персонажа.</p>
+    <div class="grid" style="margin-bottom:24px;">
+      ${baseFeatures.map(f=>subclassFeatureCard(f, cls.name)).join('')}
+    </div>
+
     <div class="section-label">Справочники</div>
     <div class="menu-list">
       <div class="menu-item util" data-go="glossary">
         <div>
-          <div class="name">Справочник терминов</div>
+          <div class="name">Справочник фехтовальных терминов и оружия</div>
           <div class="desc">Стойки, атаки и понятия боя разным оружием</div>
         </div>
         <div class="arrow">→</div>
@@ -4479,10 +7390,95 @@ function renderClass(){
   `;
 }
 
+function renderSubclassFeatures(){
+  const clsKey = view.clsKey, subKey = view.subKey;
+  const cls = DATA[clsKey];
+  const sub = cls && cls.subclasses ? cls.subclasses[subKey] : null;
+  if(!sub){
+    view = {screen:'class', cls:clsKey};
+    return renderClass();
+  }
+  const features = [...(sub.features || [])].sort((a,b)=>a.level-b.level);
+  const siblingPills = Object.keys(cls.subclasses || {}).map(sk=>{
+    const sb = cls.subclasses[sk];
+    return `<button type="button" class="fae-pill ${sk===subKey?'active':''}" data-go="subclass:${clsKey}:${sk}">${sb.icon||cls.icon||'⚔️'} ${escapeHtml(sb.name)}</button>`;
+  }).join('');
+
+  let extraManeuversHtml = '';
+  if(clsKey === 'fighter' && subKey === 'battlemaster' && Array.isArray(sub.maneuvers)){
+    const maneuverCard = (m)=>{
+      return `
+      <div class="card" data-copy="${escapeAttr(m.ru)}">
+        <div class="top-row">
+          <div class="name">${m.ru}</div>
+          <div class="die-badge">${m.die}</div>
+        </div>
+        <div class="eng">${m.en}</div>
+        <div class="desc">${m.desc}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,164,92,0.14);">
+          ${renderAddTechAndMoveBtns({
+            title: m.ru,
+            en: m.en || '',
+            desc: m.desc || '',
+            source: 'Воин (Мастер боя) • Кость ' + m.die,
+            roll: m.die,
+            bonus: '1 кость превосходства ' + m.die,
+            weapon: 'Любое оружие',
+            mastery: 'Боевое превосходство (' + m.die + ')',
+            techCat: 'Классовые умения',
+            moveCat: 'Приёмы Боевого Мастера (Maneuvers)',
+            moveFirst: true
+          })}
+        </div>
+        <div class="stamp"><span>Скопировано</span></div>
+      </div>`;
+    };
+    const groupSection = (title, cat, list)=>{
+      const items = (list || []).filter(m=>m.cat===cat);
+      if(!items.length) return '';
+      return `<div class="section-label">${title}</div><div class="grid">${items.map(maneuverCard).join('')}</div>`;
+    };
+    extraManeuversHtml = `
+      <div class="fae-rule" style="margin-top:26px;"></div>
+      <h2>🎯 Все 23 Боевых Приёма (Манёвры Мастера Боя)</h2>
+      <p class="subtitle">Клик по карточке копирует название приёма; кнопки ниже позволяют сразу добавить любой манёвр в «Боевые приёмы» или «Способности» активного героя.</p>
+      ${groupSection('Атакующие манёвры', 'offense', sub.maneuvers)}
+      ${groupSection('Защитные манёвры', 'defense', sub.maneuvers)}
+      ${groupSection('Тактические и социальные манёвры', 'tactics', sub.maneuvers)}
+      <div class="section-label">Дополнительно (Tasha's Cauldron of Everything)</div>
+      ${groupSection('Атакующие (Tasha)', 'offense', sub.extraManeuvers)}
+      ${groupSection('Защитные (Tasha)', 'defense', sub.extraManeuvers)}
+    `;
+  }
+
+  return `
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Классы D&D', nav:'classes'},{label:cls.name, nav:'class:'+clsKey},{label:sub.name}])}
+    <button class="back" data-go="class:${clsKey}">← Назад к классу «${escapeHtml(cls.name)}»</button>
+    ${renderSpellHeroTargetBar()}
+
+    <div class="pill-row" style="margin-bottom:16px;">${siblingPills}</div>
+
+    <div class="fae-ref-card" style="padding:22px;border-color:rgba(201,164,92,0.5);margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <span class="fae-ref-item-tag">${cls.icon || '⚔️'} Подкласс класса «${escapeHtml(cls.name)}»</span>
+          <h1 style="margin:8px 0 2px 0;font-size:26px;">${sub.icon || cls.icon || '⚔️'} ${escapeHtml(sub.name)} ${sub.en ? `<span style="font-size:16px;color:#94a3b8;font-weight:400;">(${escapeHtml(sub.en)})</span>` : ''}</h1>
+        </div>
+        <button type="button" class="btn btn-primary" id="btnApplySubclassToHero" data-apply-cls="${escapeAttr(cls.name)}" data-apply-sub="${escapeAttr(sub.name)}">⚡ Выбрать этот подкласс герою</button>
+      </div>
+      ${sub.shortDesc ? `<div style="font-size:14.5px;color:#fde68a;font-weight:600;margin-top:8px;">${escapeHtml(sub.shortDesc)}</div>` : ''}
+      ${sub.lore ? `<p style="font-size:14.5px;color:#cbd5e1;line-height:1.55;margin:8px 0 0 0;">${escapeHtml(sub.lore)}</p>` : ''}
+    </div>
+
+    <div class="section-label">✨ Умения архетипа «${escapeHtml(sub.name)}» по уровням</div>
+    <div class="grid">${features.map(f=>subclassFeatureCard(f, cls.name + ' (' + sub.name + ')')).join('')}</div>
+    ${extraManeuversHtml}
+  `;
+}
+
 function renderSub(){
   const sub = DATA.fighter.subclasses.battlemaster;
   const maneuverCard = (m)=>{
-    const genTemplate = `*[Результат броска ${m.ru} 1d8: ]*`;
     return `
     <div class="card" data-copy="${escapeAttr(m.ru)}">
       <div class="top-row">
@@ -4491,9 +7487,22 @@ function renderSub(){
       </div>
       <div class="eng">${m.en}</div>
       <div class="desc">${m.desc}</div>
-      <button class="gen-btn" data-template="${escapeAttr(genTemplate)}" data-count="1" data-sides="8" data-mode="sum">Сгенерировать и скопировать результат</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,164,92,0.14);">
+        ${renderAddTechAndMoveBtns({
+          title: m.ru,
+          en: m.en || '',
+          desc: m.desc || '',
+          source: 'Воин (Мастер боя) • Кость ' + m.die,
+          roll: m.die,
+          bonus: '1 кость превосходства ' + m.die,
+          weapon: 'Любое оружие',
+          mastery: 'Боевое превосходство (' + m.die + ')',
+          techCat: 'Классовые умения',
+          moveCat: 'Приёмы Боевого Мастера (Maneuvers)',
+          moveFirst: true
+        })}
+      </div>
       <div class="stamp"><span>Скопировано</span></div>
-      <div class="gen-stamp"><div class="gen-die"></div></div>
     </div>
   `;};
   const groupSection = (title, cat, list)=>{
@@ -4506,11 +7515,12 @@ function renderSub(){
   };
 
   return `
-    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Воин', nav:'class:fighter'},{label:'Мастер боя'}])}
-    <button class="back" data-go="class:fighter">← Назад</button>
-    <h1>Мастер боя</h1>
-    <p class="subtitle">Клик по карточке копирует название приёма; кнопка ниже — сразу бросает кость превосходства и копирует готовый результат.</p>
+    ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Классы D&D', nav:'classes'},{label:'Воин', nav:'class:fighter'},{label:'Мастер боя'}])}
+    <button class="back" data-go="subclass:fighter:battlemaster">← К описанию подкласса «Мастер боя»</button>
+    <h1>🎯 Приёмы Мастера боя (23 манёвра)</h1>
+    <p class="subtitle">Клик по карточке копирует название приёма; кнопки ниже позволяют сразу добавить манёвр в «Боевые приёмы» или «Способности» активного героя.</p>
     <div class="rule"></div>
+    ${renderSpellHeroTargetBar()}
     ${groupSection('Атакующие', 'offense', sub.maneuvers)}
     ${groupSection('Защитные', 'defense', sub.maneuvers)}
     ${groupSection('Тактические', 'tactics', sub.maneuvers)}
@@ -4520,6 +7530,162 @@ function renderSub(){
     ${groupSection('Защитные', 'defense', sub.extraManeuvers)}
     <div class="footnote">Правила 2024 г. · Player's Handbook · Combat Superiority</div>
   `;
+}
+
+function wireFaeClasses(){
+  var heroSel = document.getElementById('faeSpellHeroSelect');
+  if(heroSel){
+    heroSel.addEventListener('change', function(){
+      setActiveFaerunCharacter(this.value);
+      render();
+    });
+  }
+
+  document.querySelectorAll('[data-fae-cls-role]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window._faeClassRoleFilter = btn.getAttribute('data-fae-cls-role') || 'all';
+      render();
+    });
+  });
+
+  var sInp = document.getElementById('faeClassesSearchInp');
+  if(sInp){
+    sInp.addEventListener('input', function(){
+      window._faeClassSearchQ = this.value;
+      var pos = this.selectionStart;
+      render();
+      var nextInp = document.getElementById('faeClassesSearchInp');
+      if(nextInp){
+        nextInp.focus();
+        try{ nextInp.setSelectionRange(pos, pos); }catch(e){}
+      }
+    });
+  }
+
+  document.querySelectorAll('[data-cls-card-open]').forEach(function(card){
+    card.addEventListener('click', function(e){
+      if(e.target.closest('button') || e.target.closest('[data-go]')) return;
+      navigate('class:' + card.getAttribute('data-cls-card-open'));
+    });
+  });
+
+  document.querySelectorAll('[data-sub-card-open]').forEach(function(card){
+    card.addEventListener('click', function(e){
+      if(e.target.closest('button') || e.target.closest('[data-go]')) return;
+      navigate(card.getAttribute('data-sub-card-open'));
+    });
+  });
+
+  var applyClsBtn = document.getElementById('btnApplyClassToHero');
+  if(applyClsBtn){
+    applyClsBtn.addEventListener('click', function(){
+      var d = getActiveFaerunCharacter();
+      if(!d) return;
+      var clsName = applyClsBtn.getAttribute('data-apply-cls') || 'Воин';
+      d.className = clsName;
+      var def = FAE_CLASS_DEFAULTS[clsName];
+      if(def){
+        d.hitDiceType = def.hd;
+        d.hitDiceTotal = d.level || 1;
+        ABILITY_KEYS.forEach(function(k){ d.saveProf[k] = def.saves.indexOf(k) !== -1; });
+        d.profArmor = def.armor;
+        d.profWeapons = def.weapons;
+        d.spellEnabled = def.spell;
+        d.spellAbility = def.spellAb;
+      }
+      saveCharactersToStorage();
+      if(typeof paintShBar === 'function') paintShBar();
+      applyClsBtn.textContent = '✓ Класс «' + clsName + '» применён (' + (d.name || 'Герой') + ')!';
+    });
+  }
+
+  var applySubBtn = document.getElementById('btnApplySubclassToHero');
+  if(applySubBtn){
+    applySubBtn.addEventListener('click', function(){
+      var d = getActiveFaerunCharacter();
+      if(!d) return;
+      var clsName = applySubBtn.getAttribute('data-apply-cls') || d.className || 'Воин';
+      var subName = applySubBtn.getAttribute('data-apply-sub') || '';
+      d.className = clsName;
+      d.subclass = subName;
+      var def = FAE_CLASS_DEFAULTS[clsName];
+      if(def){
+        d.hitDiceType = def.hd;
+        d.hitDiceTotal = d.level || 1;
+        ABILITY_KEYS.forEach(function(k){ d.saveProf[k] = def.saves.indexOf(k) !== -1; });
+        d.profArmor = def.armor;
+        d.profWeapons = def.weapons;
+        d.spellEnabled = def.spell;
+        d.spellAbility = def.spellAb;
+      }
+      saveCharactersToStorage();
+      if(typeof paintShBar === 'function') paintShBar();
+      applySubBtn.textContent = '✓ Назначено: ' + clsName + ' — ' + subName + '!';
+    });
+  }
+
+  document.querySelectorAll('[data-add-class-tech-name]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var hero = getActiveFaerunCharacter();
+      if(!hero) return;
+      if(!Array.isArray(hero.techs)) hero.techs = [];
+      var name = btn.getAttribute('data-add-class-tech-name') || 'Классовое умение';
+      if(isItemInHeroTechsByName(hero, name)) return;
+      var cat = btn.getAttribute('data-add-class-tech-cat') || 'Классовые умения';
+      var src = btn.getAttribute('data-add-class-tech-src') || 'Класс D&D';
+      var desc = btn.getAttribute('data-add-class-tech-desc') || '';
+      var roll = btn.getAttribute('data-add-class-tech-roll') || '';
+      hero.techs.unshift({
+        id: genId(),
+        name: name,
+        category: cat,
+        source: src,
+        actionCost: 'По описанию умения',
+        cooldown: 'По правилам класса',
+        checkOrSave: roll,
+        desc: desc
+      });
+      saveCharactersToStorage();
+      btn.textContent = '✓ В способностях (' + (hero.name || 'Герой') + ')';
+      btn.style.background = 'rgba(16,185,129,0.15)';
+      btn.style.borderColor = 'rgba(16,185,129,0.45)';
+      btn.style.color = '#6ee7b7';
+      btn.disabled = true;
+    });
+  });
+
+  document.querySelectorAll('[data-add-class-move-name]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var hero = getActiveFaerunCharacter();
+      if(!hero) return;
+      if(!Array.isArray(hero.moves)) hero.moves = [];
+      var name = btn.getAttribute('data-add-class-move-name') || 'Боевой приём';
+      if(isItemInHeroMovesByName(hero, name)) return;
+      var cat = btn.getAttribute('data-add-class-move-cat') || 'Особые удары, Захваты и Толчки';
+      var wpn = btn.getAttribute('data-add-class-move-weapon') || 'Любое оружие';
+      var bonus = btn.getAttribute('data-add-class-move-bonus') || '';
+      var mastery = btn.getAttribute('data-add-class-move-mastery') || '';
+      hero.moves.unshift({
+        id: genId(),
+        name: name,
+        category: cat,
+        weaponOrStyle: wpn,
+        attackBonus: bonus || 'По характеристике',
+        damageOrSave: bonus || 'По описанию приёма',
+        mastery: mastery,
+        actionCost: 'При атаке / Бонусное / Реакция',
+        desc: btn.getAttribute('data-add-class-move-desc') || ''
+      });
+      saveCharactersToStorage();
+      btn.textContent = '✓ В приёмах (' + (hero.name || 'Герой') + ')';
+      btn.style.background = 'rgba(16,185,129,0.15)';
+      btn.style.borderColor = 'rgba(16,185,129,0.45)';
+      btn.style.color = '#6ee7b7';
+      btn.disabled = true;
+    });
+  });
 }
 
 function escapeAttr(s){
@@ -5132,6 +8298,24 @@ function callGeminiFaeGenerator(opts, apiKey, callback){
       '  "ingredients": [{"name": "Название редкого ингредиента 1", "qty": 1}, {"name": "Название ингредиента 2", "qty": 2}],\n' +
       '  "appearance": "Цвет жидкости, свечение, запах и вкус",\n' +
       '  "effect": "Точная игровая механика при применении: длительность, бонусы, урон или спасбросок"\n' +
+      '}';
+  } else if(cat === 'skill'){
+    prompt = 'Ты ведущий мастер подземелий Забытых Королевств (D&D 5e / 2024). ' +
+      'Создай прикладной навык, ремесло, владение инструментами, язык или лор-знание для персонажа Фаэруна (по образцу ступеней мастерства Начатки / Ученик / Подмастерье / Умелец / Мастер). ' +
+      'Тема / Идея: ' + theme + '. ' +
+      'Тип навыка: ' + (opts.skillKind || 'Ремесло') + '. ' +
+      'Ступень мастерства: ' + (opts.skillLevel || 'Подмастерье') + '. ' +
+      ctxStr + reqStr +
+      'Ответь ИСКЛЮЧИТЕЛЬНО валидным JSON-объектом без markdown форматирования (без ```json), со следующими полями:\n' +
+      '{\n' +
+      '  "name": "Название навыка, ремесла или знания",\n' +
+      '  "kind": "' + (opts.skillKind || 'Ремесло') + '",\n' +
+      '  "level": "' + (opts.skillLevel || 'Подмастерье') + '",\n' +
+      '  "abil": "Связанная характеристика (например: Интеллект, Ловкость, Мудрость, Сила или Харизма)",\n' +
+      '  "mod": "Модификатор к броску (например: +5, +6 или пусто, если работает без броска)",\n' +
+      '  "src": "Откуда навык: кто научил, в какой гильдии или регионе Фаэруна освоен (сюжетная зацепка для ДМа)",\n' +
+      '  "gives": "Что конкретно даёт: что персонаж благодаря этому МОЖЕТ сделать, скрафтить или узнать без броска костей",\n' +
+      '  "desc": "Заметки, необходимые инструменты и особенности применения в приключении"\n' +
       '}';
   } else {
     prompt = 'Ты ведущий геймдизайнер D&D 2024 (Player\'s Handbook 2024). ' +
@@ -6506,29 +9690,37 @@ function renderFaeRef(){
   return crumbHtml +
     '<button class="back" data-go="home">← На главную</button>' +
     '<h1>📚 Справочник Фаэруна</h1>' +
-    '<p class="subtitle">Единый компендиум D&D 5e: Классы и архетипы, Книга заклинаний по школам, Правила 2024, Алхимия, Оружие и Глоссарий терминов.</p>' +
+    '<p class="subtitle">Единый компендиум D&D 5e: Классы и архетипы, Книга заклинаний по школам, Карта Фаэруна, Правила 2024, Алхимия, Оружие и Глоссарий терминов.</p>' +
     '<div class="fae-rule"></div>' +
 
     '<div class="fae-ref-search-wrap">' +
       '<span class="fae-ref-search-icon">🔍</span>' +
-      '<input type="text" id="faeRefSearch" class="fae-ref-search-input" placeholder="Быстрый поиск по справочнику (классы, школы магии, заклинания, состояния, оружие, алхимия)..." autocomplete="off">' +
+      '<input type="text" id="faeRefSearch" class="fae-ref-search-input" placeholder="Быстрый поиск по справочнику (классы, школы магии, заклинания, карта, состояния, оружие, алхимия)..." autocomplete="off">' +
     '</div>' +
 
     '<div id="faeRefSearchResults" style="display:none;margin-bottom:20px;"></div>' +
 
     '<div class="menu-list grid-2" id="faeRefDefaultCards">' +
-      '<div class="fae-card fae-card-clickable" data-go="class:fighter" role="button" tabindex="0">' +
+      '<div class="fae-card fae-card-clickable" data-go="classes" role="button" tabindex="0">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="fae-card-title"><span>⚔️</span> Классы и Архетипы</div>' +
-          '<div class="fae-card-desc">Воин, стили боя, тактики превосходства, владение оружием и подклассы (Чемпион, Мастер, Пси-воин, Мистический рыцарь)</div>' +
+          '<div class="fae-card-title"><span>⚔️</span> Классы и Архетипы (14 классов • 140 подклассов)</div>' +
+          '<div class="fae-card-desc">Полный справочник всех 14 классов D&D 5e / 2024: умения 1–20 уровня, хиты, владения и все 140 существующих подклассов (архетипов)</div>' +
         '</div>' +
         '<div class="fae-card-arrow">→</div>' +
       '</div>' +
 
       '<div class="fae-card fae-card-clickable" data-go="magic" role="button" tabindex="0">' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="fae-card-title"><span>✨</span> Книга заклинаний</div>' +
-          '<div class="fae-card-desc">База заклинаний по 8 школам магии: заговоры, круги 1–9, ритуалы, концентрация и сотворение чар</div>' +
+          '<div class="fae-card-title"><span>✨</span> Книга заклинаний (8 школ • ' + (Array.isArray(SPELLS) ? SPELLS.length : 0) + ' заклинаний)</div>' +
+          '<div class="fae-card-desc">Полная энциклопедия заклинаний D&D 5e / 2024 по 8 школам магии: заговоры, круги 1–9, ритуалы, концентрация и фильтр по классам</div>' +
+        '</div>' +
+        '<div class="fae-card-arrow">→</div>' +
+      '</div>' +
+
+      '<div class="fae-card fae-card-clickable" data-go="map" role="button" tabindex="0">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="fae-card-title"><span>🗺️</span> Карта Фаэруна</div>' +
+          '<div class="fae-card-desc">Интерактивная карта Забытых Королевств: Побережье Мечей, Врата Балдура, Уотердип, Невервинтер и регионы</div>' +
         '</div>' +
         '<div class="fae-card-arrow">→</div>' +
       '</div>' +
@@ -6584,17 +9776,97 @@ function wireFaeRef(){
 
       var matches = [];
 
+      if('карта фаэруна побережье мечей врата балдура невервинтер уотердип забытые королевства map faerun'.indexOf(q) !== -1){
+        matches.push({
+          badge: '🗺️ География',
+          title: 'Карта Фаэруна (Interactive Map)',
+          desc: 'Интерактивная карта Забытых Королевств: Побережье Мечей, Врата Балдура, Уотердип, Невервинтер и регионы.',
+          go: 'map'
+        });
+      }
+
+      // 0. Classes, Base Features & Subclasses
+      if(typeof DATA !== 'undefined'){
+        Object.keys(DATA).forEach(function(clsKey){
+          var cls = DATA[clsKey];
+          if(!cls) return;
+          var cn = (cls.name || '').toLowerCase();
+          var ce = (cls.en || '').toLowerCase();
+          var cd = (cls.summary || '').toLowerCase();
+          if(cn.indexOf(q) !== -1 || ce.indexOf(q) !== -1 || cd.indexOf(q) !== -1){
+            matches.push({
+              badge: (cls.icon || '⚔️') + ' Класс',
+              title: cls.name + (cls.en ? (' (' + cls.en + ')') : ''),
+              desc: (cls.hitDie ? ('Кость хитов: ' + cls.hitDie + ' • ') : '') + (cls.summary ? cls.summary.slice(0, 140) : ''),
+              go: 'class:' + clsKey
+            });
+          }
+          if(Array.isArray(cls.baseFeatures)){
+            cls.baseFeatures.forEach(function(ft){
+              var fTitle = ft.ru || ft.name || '';
+              var fn = fTitle.toLowerCase();
+              var fe = (ft.en || '').toLowerCase();
+              var fd = (ft.desc || '').toLowerCase();
+              if(fn.indexOf(q) !== -1 || fe.indexOf(q) !== -1 || fd.indexOf(q) !== -1){
+                matches.push({
+                  badge: (cls.icon || '⚔️') + ' ' + cls.name + ' (Ур. ' + (ft.level || 1) + ')',
+                  title: fTitle + (ft.en ? (' (' + ft.en + ')') : ''),
+                  desc: ft.desc ? ft.desc.slice(0, 140) + '...' : '',
+                  go: 'class:' + clsKey
+                });
+              }
+            });
+          }
+          if(cls.subclasses){
+            Object.keys(cls.subclasses).forEach(function(sk){
+              var sub = cls.subclasses[sk];
+              if(!sub) return;
+              var sn = (sub.name || '').toLowerCase();
+              var se = (sub.en || '').toLowerCase();
+              var sd = ((sub.shortDesc || '') + ' ' + (sub.lore || '')).toLowerCase();
+              if(sn.indexOf(q) !== -1 || se.indexOf(q) !== -1 || sd.indexOf(q) !== -1){
+                matches.push({
+                  badge: (sub.icon || cls.icon || '🎖️') + ' Подкласс (' + cls.name + ')',
+                  title: sub.name + (sub.en ? (' (' + sub.en + ')') : ''),
+                  desc: (sub.shortDesc || sub.lore || '').slice(0, 140),
+                  go: 'subclass:' + clsKey + ':' + sk
+                });
+              }
+              if(Array.isArray(sub.features)){
+                sub.features.forEach(function(sft){
+                  var sfTitle = sft.ru || sft.name || '';
+                  var sfn = sfTitle.toLowerCase();
+                  var sfe = (sft.en || '').toLowerCase();
+                  var sfd = (sft.desc || '').toLowerCase();
+                  if(sfn.indexOf(q) !== -1 || sfe.indexOf(q) !== -1 || sfd.indexOf(q) !== -1){
+                    matches.push({
+                      badge: '🎖️ ' + sub.name + ' (Ур. ' + (sft.level || 3) + ')',
+                      title: sfTitle + (sft.en ? (' (' + sft.en + ')') : ''),
+                      desc: sft.desc ? sft.desc.slice(0, 140) + '...' : '',
+                      go: 'subclass:' + clsKey + ':' + sk
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+
       // 1. Spells
       if(Array.isArray(SPELLS)){
         SPELLS.forEach(function(sp){
           var n = (sp.name || '').toLowerCase();
-          var sc = (sp.school || '').toLowerCase();
-          var d = (sp.desc || '').toLowerCase();
-          if(n.indexOf(q) !== -1 || sc.indexOf(q) !== -1 || d.indexOf(q) !== -1){
+          var en = (sp.en || '').toLowerCase();
+          var sc = (schoolName(sp.school) + ' ' + (sp.school || '')).toLowerCase();
+          var cls = (sp.classes || '').toLowerCase();
+          var effText = sp.effect || sp.desc || '';
+          var d = effText.toLowerCase();
+          if(n.indexOf(q) !== -1 || en.indexOf(q) !== -1 || sc.indexOf(q) !== -1 || cls.indexOf(q) !== -1 || d.indexOf(q) !== -1){
             matches.push({
-              badge: '✨ Заклинание',
-              title: sp.name + (sp.level ? (' (' + sp.level + ' круг)') : ' (Заговор)'),
-              desc: (sp.school ? ('Школа: ' + sp.school + ' • ') : '') + (sp.desc ? sp.desc.slice(0, 140) + '...' : ''),
+              badge: '✨ Заклинание (' + schoolName(sp.school) + ')',
+              title: sp.name + (sp.en ? (' / ' + sp.en) : '') + ' — ' + (sp.level ? (sp.level + ' круг') : 'Заговор'),
+              desc: (sp.classes ? ('[' + sp.classes + '] ') : '') + (effText ? effText.slice(0, 140) + '...' : ''),
               go: 'schoolSpells:' + (sp.school || 'evocation')
             });
           }
@@ -7443,7 +10715,8 @@ function wireEvents(){
     if(val) el.addEventListener('click', ()=>navigate(val));
   });
   document.querySelectorAll('.card').forEach(el=>{
-    el.addEventListener('click', ()=>{
+    el.addEventListener('click', (e)=>{
+      if(e && e.target && e.target.closest && e.target.closest('button')) return;
       const text = el.getAttribute('data-copy');
       if(text===null) return; // карточка-ссылка (data-go) обрабатывается отдельно
       copyText(text);
@@ -7787,10 +11060,13 @@ function wireEvents(){
 
   if(view.screen === 'alchemyRef') wireAlchemyRef();
   if(view.screen === 'recipes' || view.screen === 'recipeView' || view.screen === 'alchemyAiGen') wireAlchemyCustom();
+  if(view.screen === 'magic' || view.screen === 'schoolSpells') wireMagicScreens();
   if(view.screen === 'faeTechs' || view.screen === 'faeTechView' || view.screen === 'faeTechEdit' || view.screen === 'faeTechGen') wireFaeTechs();
   if(view.screen === 'faeMoves' || view.screen === 'faeMoveView' || view.screen === 'faeMoveEdit' || view.screen === 'faeMoveGen') wireFaeMoves();
+  if(view.screen === 'faeSkills' || view.screen === 'faeSkillView' || view.screen === 'faeSkillEdit' || view.screen === 'faeSkillGen') wireFaeSkills();
   if(view.screen === 'faeGen') wireFaeGen();
   if(view.screen === 'faeRef' || view.screen === 'ref') wireFaeRef();
+  if(view.screen === 'classes' || view.screen === 'class' || view.screen === 'subclass' || view.screen === 'sub' || view.screen === 'weapons' || view.screen === 'rules2024') wireFaeClasses();
   if(view.screen === 'faeData' || view.screen === 'data') wireFaeData();
   enhanceAllCustomSelects();
 }
@@ -7815,9 +11091,20 @@ function navigate(val){
   else if(parts[0]==='faeMoveView') view = {screen:'faeMoveView', moveId: parts[1]};
   else if(parts[0]==='faeMoveEdit') view = {screen:'faeMoveEdit', moveId: parts[1]};
   else if(parts[0]==='faeMoveGen') view = {screen:'faeMoveGen'};
+  else if(parts[0]==='faeSkills') view = {screen:'faeSkills'};
+  else if(parts[0]==='faeSkillView') view = {screen:'faeSkillView', skillId: parts[1]};
+  else if(parts[0]==='faeSkillEdit') view = {screen:'faeSkillEdit', skillId: parts[1]};
+  else if(parts[0]==='faeSkillGen') view = {screen:'faeSkillGen'};
+  else if(parts[0]==='classes') view = {screen:'classes'};
   else if(parts[0]==='subclass') view = {screen:'subclass', clsKey:parts[1], subKey:parts[2]};
   else if(parts[0]==='magic') view = {screen:'magic'};
-  else if(parts[0]==='schoolSpells') view = {screen:'schoolSpells', schoolKey:parts[1]};
+  else if(parts[0]==='schoolSpells'){
+    if(view.schoolKey !== parts[1]){
+      window._faeSchoolSearchQ = '';
+      window._faeSchoolLvlFilter = 'all';
+    }
+    view = {screen:'schoolSpells', schoolKey:parts[1]};
+  }
   else if(parts[0]==='spellForm') view = {screen:'spellForm', spellId:parts[1], schoolKey:parts[2]};
   else if(parts[0]==='dice') view = {screen:'dice'};
   else if(parts[0]==='map') view = {screen:'map'};
@@ -7834,7 +11121,7 @@ function navigate(val){
   }
   else if(parts[0]==='glossary') view = {screen:'glossary'};
   else if(parts[0]==='weapons') view = {screen:'weapons', weapon: view.weapon || 'longsword'};
-  else if(parts[0]==='class') view = {screen:'class', cls:parts[1]};
+  else if(parts[0]==='class') view = parts[1] ? {screen:'class', cls:parts[1]} : {screen:'classes'};
   else if(parts[0]==='sub') view = {screen:'sub', cls:parts[1], sub:parts[2]};
   else if(parts[0]==='faeGen') view = {screen:'faeGen'};
   else if(parts[0]==='faeRef' || (HB.mode==='faerun' && parts[0]==='ref')) view = {screen:'faeRef'};

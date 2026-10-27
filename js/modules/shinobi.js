@@ -1955,6 +1955,137 @@ function shMoves(){
     body;
 }
 
+function buildSkillComboText(s, rolledValues, mods){
+  var abStr = s.abil ? (' | Хар-ка: ' + s.abil) : '';
+  var header = '*[Навык: ' + (s.name || 'Без названия') + ' | Тип: ' + (s.kind || 'Ремесло') + ' | Уровень: ' + (s.level || 'Начатки') + abStr + ']*';
+  var lines = [header];
+  if(rolledValues && rolledValues.chk){
+    var cMod = parseInt(mods.chk, 10) || 0;
+    var cModStr = cMod > 0 ? ' + ' + cMod : (cMod < 0 ? ' − ' + Math.abs(cMod) : '');
+    lines.push('*[Результат броска Проверка навыка 1d20: ' + rolledValues.chk + ' ]*' + cModStr);
+  }
+  if(s.gives){
+    lines.push('*[Что даёт: ' + s.gives + ']*');
+  }
+  return lines.join('\n');
+}
+
+function renderSkillLauncherDiceHtml(s, selTarget, mods, rolledValues){
+  if(!s) return '<div class="sh-scr-no-dmg">Выберите навык для расчёта</div>';
+  mods = mods || { chk: 0 };
+  rolledValues = rolledValues || {};
+  var cModStr = formatLauncherMod(mods.chk);
+  var chkDieHtml =
+    '<div class="sh-scr-col selected" data-select-skill-roll="chk" title="Кубик проверки навыка">' +
+      '<div class="sh-scr-label">Проверка (' + esc(s.abil || 'd20') + ')</div>' +
+      '<div class="sh-scr-die die s20" id="shScrDieSkillChk">' +
+        (typeof dieShapeSvg === 'function' ? dieShapeSvg(20, 'scrskchk', null) : '') +
+        '<div class="val">' + (rolledValues.chk || 20) + '</div>' +
+      '</div>' +
+      '<div class="sh-scr-sub" id="shScrSub_skillChk">1d20' + (cModStr ? ' ' + cModStr : '') + '</div>' +
+    '</div>';
+  var infoHtml =
+    '<div class="sh-scr-no-dmg" style="max-width:340px;text-align:left;font-style:normal;">' +
+      '<div style="margin-bottom:4px;">Уровень: <b>' + esc(s.level || 'Начатки') + '</b> · ' + (s.mod ? ('Модификатор: <b>' + esc(s.mod) + '</b>') : '<b>работает без броска</b>') + '</div>' +
+      (s.gives ? '<div style="font-size:12px;color:var(--ink-dim);line-height:1.4;">' + esc(s.gives.length > 110 ? (s.gives.slice(0, 110) + '…') : s.gives) + '</div>' : '') +
+    '</div>';
+  return '<div class="sh-screen-dice-tray">' + chkDieHtml + infoHtml + '</div>';
+}
+
+function renderSkillLauncher(){
+  if(!SH.skillLauncher) SH.skillLauncher = {};
+  if(SH.skillLauncher.isOpen === undefined) SH.skillLauncher.isOpen = false;
+  if(!SH.skillLauncher.rolledValues) SH.skillLauncher.rolledValues = {};
+  if(!SH.skillLauncher.mods) SH.skillLauncher.mods = { chk: 0 };
+
+  if(!SH.skills || !SH.skills.length){
+    return '<div class="sh-launcher">' +
+      '<div class="sh-launcher-title">🛠️ Расчёт навыка и ремесла <span class="sh-badge-tag">AI Studio</span></div>' +
+      '<div class="char-empty" style="margin:10px 0 0;padding:12px;">Навыки ещё не добавлены. Добавьте первый навык кнопкой выше, чтобы использовать расчёт проверки.</div>' +
+    '</div>';
+  }
+
+  var isOpen = !!SH.skillLauncher.isOpen;
+  var selSkill = skillById(SH.skillLauncher.skillId) || SH.skills[0];
+  if(SH.skillLauncher.skillId !== selSkill.id){
+    SH.skillLauncher.skillId = selSkill.id;
+    SH.skillLauncher.mods.chk = parseInt(String(selSkill.mod || '').replace(/\s+/g, ''), 10) || 0;
+  }
+
+  var curModVal = SH.skillLauncher.mods.chk || 0;
+  var skillOpts = SH.skills.map(function(s){
+    var mStr = s.mod ? (' (' + s.mod + ')') : ' (без броска)';
+    return '<option value="' + s.id + '" ' + (s.id === selSkill.id ? 'selected' : '') + '>' +
+      esc(s.level || 'Начатки') + ' · ' + esc(s.name || 'Без названия') + mStr +
+    '</option>';
+  }).join('');
+
+  var screenHtml = renderSkillLauncherDiceHtml(selSkill, 'chk', SH.skillLauncher.mods, SH.skillLauncher.rolledValues);
+
+  var modBarHtml =
+    '<div class="sh-mod-bar">' +
+      '<div class="sh-mod-target-info">' +
+        '<span>Выбран кубик:</span>' +
+        '<span class="sh-mod-target-tag">🎯 Проверка навыка (1d20)</span>' +
+      '</div>' +
+      '<div class="sh-mod-controls">' +
+        '<button class="sh-mod-step" data-skill-mod-delta="-5" title="Уменьшить на 5">−5</button>' +
+        '<button class="sh-mod-step" data-skill-mod-delta="-1" title="Уменьшить на 1">−</button>' +
+        '<input type="number" id="shSkillActiveModInput" class="sh-active-mod-input" value="' + curModVal + '">' +
+        '<button class="sh-mod-step" data-skill-mod-delta="1" title="Увеличить на 1">+</button>' +
+        '<button class="sh-mod-step" data-skill-mod-delta="5" title="Увеличить на 5">+5</button>' +
+        '<button class="sh-mod-reset" id="shSkillModResetBtn" title="Сбросить модификатор в 0">Сброс</button>' +
+      '</div>' +
+    '</div>';
+
+  var actionsHtml =
+    '<div class="sh-launcher-actions">' +
+      '<button class="sh-btn-launch" id="shLaunchSkillComboBtn" title="Бросить кость проверки навыка">🎲 Проверить навык</button>' +
+      '<button class="sh-btn-copy-all" id="shCopyAllSkillBtn" title="Скопировать готовый блок в буфер обмена для AI Studio">📋 Скопировать всё</button>' +
+      '<button class="sh-micro-btn" id="shLaunchSkillClaimBtn" title="Скопировать заявку навыка без броска">📜 Только заявка (без броска)</button>' +
+    '</div>';
+
+  var hasRes = !!(SH.skillLauncher.lastResult);
+  var resultBoxHtml =
+    '<div class="sh-launcher-result ' + (hasRes ? 'has-result' : '') + '" id="shSkillLauncherResultBox">' +
+      '<div class="sh-launcher-result-text" id="shSkillLauncherResultText">' + esc(SH.skillLauncher.lastResult || '') + '</div>' +
+      '<div class="sh-copy-badge" id="shSkillLauncherCopyBadge" style="display:' + (hasRes ? 'inline-flex' : 'none') + ';">' +
+        '<span>' + (SH.skillLauncher.lastResultCopied ? '✓ Скопировано в буфер обмена для AI Studio' : '🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»') + '</span>' +
+      '</div>' +
+    '</div>';
+
+  var toggleHeadHtml =
+    '<div class="sh-launcher-toggle-head" id="shSkillLauncherToggle" role="button" tabindex="0" title="Нажмите, чтобы развернуть или свернуть расчёт навыка">' +
+      '<div class="sh-launcher-title">' +
+        '<span>🛠️ Расчёт проверки навыка</span>' +
+        '<span class="sh-badge-tag">AI Studio</span>' +
+      '</div>' +
+      '<div class="sh-launcher-toggle-btn">' +
+        '<span class="sh-launcher-toggle-text">' + (isOpen ? 'Свернуть' : 'Развернуть') + '</span>' +
+        '<span class="sh-launcher-toggle-arrow">' + (isOpen ? '▲' : '▼') + '</span>' +
+      '</div>' +
+    '</div>';
+
+  var bodyHtml =
+    '<div class="sh-launcher-body" id="shSkillLauncherBody">' +
+      '<div class="sh-launcher-head">' +
+        '<div class="sh-launcher-sel-wrap">' +
+          '<div class="sh-launcher-sel-label">Навык для расчёта:</div>' +
+          '<select class="sh-launcher-sel" id="shSkillLauncherSelect">' + skillOpts + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sh-launcher-screen" id="shSkillLauncherScreen">' + screenHtml + '</div>' +
+      modBarHtml +
+      actionsHtml +
+      resultBoxHtml +
+    '</div>';
+
+  return '<div class="sh-launcher ' + (isOpen ? '' : 'collapsed') + '" id="shSkillLauncherContainer">' +
+    toggleHeadHtml +
+    bodyHtml +
+  '</div>';
+}
+
 function shSkills(){
   var arr = SH.skills||[];
   var groups = {};
@@ -1973,7 +2104,9 @@ function shSkills(){
   }).join('') : '<div class="char-empty">Пусто. Сюда идёт всё, что персонаж умеет помимо боя: ремесло, быт, языки, счёт, готовка, уход за животными. Навык появляется от того, что персонаж этим занимался, а не от уровня.</div>';
   return crumbSh([{label:'Шиноби',nav:'home'},{label:'Навыки'}])+
     '<button class="back" data-nav="home">← Назад</button>'+
-    '<h1>Навыки и знания</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shSkillEdit:new">Добавить навык</button>'+'<button class="btn-ghost" style="color:#d29bfa;border-color:rgba(155,89,182,0.4); margin-left:10px;" data-nav="shSkillGen">✨ AI Генератор навыков</button></div>'+body;
+    '<h1>Навыки и знания</h1><div class="sheet-actions"><button class="btn-primary" data-nav="shSkillEdit:new">Добавить навык</button>'+'<button class="btn-ghost" style="color:#d29bfa;border-color:rgba(155,89,182,0.4); margin-left:10px;" data-nav="shSkillGen">✨ AI Генератор навыков</button></div>'+
+    renderSkillLauncher() +
+    body;
 }
 
 function shSkillEdit(){
@@ -7372,6 +7505,155 @@ function wireSh(){
   var btnMoveAtk = g('shLaunchMoveAtkBtn'); if(btnMoveAtk) btnMoveAtk.addEventListener('click', function(){ executeMoveLaunch('atk', true); });
   var btnMoveDmg = g('shLaunchMoveDmgBtn'); if(btnMoveDmg) btnMoveDmg.addEventListener('click', function(){ executeMoveLaunch('dmg', true); });
   var btnMoveClaim = g('shLaunchMoveClaimBtn'); if(btnMoveClaim) btnMoveClaim.addEventListener('click', function(){ executeMoveLaunch('claim', true); });
+
+  /* тактический лаунчер навыков */
+  var tSkillHead = g('shSkillLauncherToggle');
+  if(tSkillHead){
+    tSkillHead.addEventListener('click', function(){
+      if(!SH.skillLauncher) SH.skillLauncher = {};
+      SH.skillLauncher.isOpen = !SH.skillLauncher.isOpen;
+      var c = g('shSkillLauncherContainer');
+      if(c){
+        c.classList.toggle('collapsed', !SH.skillLauncher.isOpen);
+        var txt = c.querySelector('.sh-launcher-toggle-text');
+        var arr = c.querySelector('.sh-launcher-toggle-arrow');
+        if(txt) txt.textContent = SH.skillLauncher.isOpen ? 'Свернуть' : 'Развернуть';
+        if(arr) arr.textContent = SH.skillLauncher.isOpen ? '▲' : '▼';
+      }
+    });
+  }
+
+  var setSkillTargetMod = function(newVal){
+    if(!SH.skillLauncher) SH.skillLauncher = { mods: { chk: 0 }, rolledValues: {} };
+    if(!SH.skillLauncher.mods) SH.skillLauncher.mods = { chk: 0 };
+    SH.skillLauncher.mods.chk = newVal;
+    var valIn = g('shSkillActiveModInput');
+    if(valIn) valIn.value = newVal;
+    var sub = g('shScrSub_skillChk');
+    if(sub) sub.textContent = '1d20' + (formatLauncherMod(newVal) ? ' ' + formatLauncherMod(newVal) : '');
+    var s = skillById(SH.skillLauncher.skillId) || (SH.skills && SH.skills[0]);
+    if(SH.skillLauncher.lastResult && SH.skillLauncher.rolledValues && SH.skillLauncher.rolledValues.chk && s){
+      SH.skillLauncher.lastResult = buildSkillComboText(s, SH.skillLauncher.rolledValues, SH.skillLauncher.mods);
+      var rTxt = g('shSkillLauncherResultText');
+      if(rTxt) rTxt.textContent = SH.skillLauncher.lastResult;
+    }
+  };
+
+  document.querySelectorAll('[data-skill-mod-delta]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var delta = parseInt(btn.getAttribute('data-skill-mod-delta'), 10) || 0;
+      var cur = (SH.skillLauncher && SH.skillLauncher.mods && SH.skillLauncher.mods.chk) || 0;
+      setSkillTargetMod(cur + delta);
+    });
+  });
+
+  var skModIn = g('shSkillActiveModInput');
+  if(skModIn){
+    skModIn.addEventListener('input', function(){
+      var v = parseInt(skModIn.value, 10);
+      if(isNaN(v)) v = 0;
+      setSkillTargetMod(v);
+    });
+  }
+
+  var skResetBtn = g('shSkillModResetBtn');
+  if(skResetBtn) skResetBtn.addEventListener('click', function(){ setSkillTargetMod(0); });
+
+  var skSel = g('shSkillLauncherSelect');
+  if(skSel){
+    skSel.addEventListener('change', function(){
+      if(!SH.skillLauncher) SH.skillLauncher = { mods: { chk: 0 }, rolledValues: {} };
+      SH.skillLauncher.skillId = this.value;
+      var s = skillById(this.value);
+      SH.skillLauncher.mods = { chk: s ? (parseInt(String(s.mod || '').replace(/\s+/g, ''), 10) || 0) : 0 };
+      SH.skillLauncher.rolledValues = {};
+      SH.skillLauncher.lastResult = '';
+      SH.skillLauncher.lastResultCopied = false;
+      render();
+    });
+  }
+
+  var finishSkillLaunchSh = function(s, mode, autoCopy){
+    if(!SH.skillLauncher) SH.skillLauncher = { mods: { chk: 0 }, rolledValues: {} };
+    var mods = SH.skillLauncher.mods || { chk: 0 };
+    var lines = [];
+    if(mode === 'claim'){
+      var abStr = s.abil ? (' | Хар-ка: ' + s.abil) : '';
+      lines.push('*[Навык: ' + (s.name || 'Без названия') + ' | Тип: ' + (s.kind || 'Ремесло') + ' | Уровень: ' + (s.level || 'Начатки') + abStr + ']*');
+      if(s.gives) lines.push('*[Что даёт: ' + s.gives + ']*');
+    } else {
+      var chkVal = 1 + Math.floor(Math.random() * 20);
+      SH.skillLauncher.rolledValues.chk = chkVal;
+      var cDie = g('shScrDieSkillChk');
+      if(cDie){ var vEl = cDie.querySelector('.val'); if(vEl) vEl.textContent = chkVal; }
+      lines = buildSkillComboText(s, SH.skillLauncher.rolledValues, mods).split('\n');
+    }
+    var output = lines.join('\n');
+    SH.skillLauncher.lastResult = output;
+    var rBox = g('shSkillLauncherResultBox');
+    var rTxt = g('shSkillLauncherResultText');
+    var rBdg = g('shSkillLauncherCopyBadge');
+    if(rTxt) rTxt.textContent = output;
+    if(rBox) rBox.classList.add('has-result');
+    if(autoCopy){
+      if(typeof copyText === 'function') copyText(output);
+      SH.skillLauncher.lastResultCopied = true;
+      if(rBdg){
+        rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio (' + lines.length + ' стр.)</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    } else {
+      SH.skillLauncher.lastResultCopied = false;
+      if(rBdg){
+        rBdg.innerHTML = '<span>🎲 Бросок зафиксирован. Нажмите «📋 Скопировать всё»</span>';
+        rBdg.style.display = 'inline-flex';
+      }
+    }
+  };
+
+  var executeSkillLaunchSh = function(mode, autoCopy){
+    var s = skillById(SH.skillLauncher && SH.skillLauncher.skillId) || (SH.skills && SH.skills[0]);
+    if(!s) return;
+    if(mode !== 'claim'){
+      var cDie = g('shScrDieSkillChk');
+      if(cDie) cDie.classList.add('rolling');
+      var rollInterval = setInterval(function(){
+        if(cDie){
+          var vEl = cDie.querySelector('.val');
+          if(vEl) vEl.textContent = Math.floor(Math.random() * 20) + 1;
+        }
+      }, 50);
+      setTimeout(function(){
+        clearInterval(rollInterval);
+        if(cDie) cDie.classList.remove('rolling');
+        finishSkillLaunchSh(s, mode, autoCopy);
+      }, 350);
+    } else {
+      finishSkillLaunchSh(s, mode, autoCopy);
+    }
+  };
+
+  var bSkCombo = g('shLaunchSkillComboBtn');
+  if(bSkCombo) bSkCombo.addEventListener('click', function(){ executeSkillLaunchSh('all', false); });
+
+  var bSkCopyAll = g('shCopyAllSkillBtn');
+  if(bSkCopyAll){
+    bSkCopyAll.addEventListener('click', function(){
+      if(!SH.skillLauncher || !SH.skillLauncher.lastResult) executeSkillLaunchSh('all', true);
+      else {
+        if(typeof copyText === 'function') copyText(SH.skillLauncher.lastResult);
+        SH.skillLauncher.lastResultCopied = true;
+        var rBdg = g('shSkillLauncherCopyBadge');
+        if(rBdg){
+          rBdg.innerHTML = '<span>✓ Скопировано в буфер обмена для AI Studio (' + SH.skillLauncher.lastResult.split('\n').length + ' стр.)</span>';
+          rBdg.style.display = 'inline-flex';
+        }
+      }
+    });
+  }
+
+  var bSkClaim = g('shLaunchSkillClaimBtn');
+  if(bSkClaim) bSkClaim.addEventListener('click', function(){ executeSkillLaunchSh('claim', true); });
 
 
   /* экран кнопок мастера */

@@ -552,10 +552,12 @@
     var faeC = (typeof window.getActiveFaerunCharacter === 'function') ? window.getActiveFaerunCharacter() : null;
     var faeTechs = (faeC && Array.isArray(faeC.techs)) ? faeC.techs : [];
     var faeMoves = (faeC && Array.isArray(faeC.moves)) ? faeC.moves : [];
+    var faeCustomSkills = (faeC && Array.isArray(faeC.customSkills)) ? faeC.customSkills : [];
     var faeRecipes = (typeof window.RECIPES !== 'undefined' && Array.isArray(window.RECIPES)) ? window.RECIPES : [];
     var cloneFae = Object.assign({}, faeC || {});
     delete cloneFae.techs;
     delete cloneFae.moves;
+    delete cloneFae.customSkills;
     return {
       mode: 'faerun',
       icon: '🐉',
@@ -567,6 +569,7 @@
         character: cloneFae,
         techs: faeTechs.map(function(t){ return { id: t.id, name: t.name, category: t.category, actionCost: t.actionCost }; }),
         moves: faeMoves.map(function(x){ return { id: x.id, name: x.name, category: x.category, damageOrSave: x.damageOrSave }; }),
+        customSkills: faeCustomSkills.map(function(s){ return { id: s.id, name: s.name, kind: s.kind, level: s.level, abil: s.abil, mod: s.mod }; }),
         recipes: faeRecipes.map(function(r){ return { id: r.id, name: r.name, category: r.category, rarity: r.rarity }; })
       }, null, 2)
     };
@@ -935,11 +938,11 @@
       data: m === 'wi' ? 'wiData' : m === 'sh' ? 'shData' : m === 'me' ? 'meData' : m === 'el' ? 'elData' : m === 'wz' ? 'wzData' : m === 'sw' ? 'swData' : m === 'hb' ? 'hbData' : 'characters',
       techs: m === 'wi' ? 'wiTechs' : m === 'sh' ? 'shTechs' : m === 'me' ? 'mePowers' : m === 'el' ? 'elTechs' : m === 'wz' ? 'wzSpells' : m === 'sw' ? 'swTechs' : m === 'hb' ? 'hbTechs' : 'abilities',
       moves: m === 'wi' ? 'wiMoves' : m === 'sh' ? 'shMoves' : m === 'me' ? 'meArsenal' : m === 'el' ? 'elMoves' : m === 'wz' ? 'wzDuels' : m === 'sw' ? 'swMoves' : m === 'hb' ? 'hbMoves' : 'combatMoves',
-      skills: m === 'wi' ? 'wiSkills' : m === 'sh' ? 'shSkills' : m === 'me' ? 'meSkills' : m === 'el' ? 'elSkills' : m === 'wz' ? 'wzSkills' : m === 'sw' ? 'swSkills' : m === 'hb' ? 'hbSkills' : 'skillsScreen',
+      skills: m === 'wi' ? 'wiSkills' : m === 'sh' ? 'shSkills' : m === 'me' ? 'meSkills' : m === 'el' ? 'elSkills' : m === 'wz' ? 'wzSkills' : m === 'sw' ? 'swSkills' : m === 'hb' ? 'hbSkills' : 'faeSkills',
       recipes: m === 'wz' ? 'wzPotions' : 'myRecipes',
       magic: m === 'wz' ? 'wzSpells' : 'magic',
-      ref: m === 'wi' ? 'wiRef' : m === 'sh' ? 'shRef' : m === 'me' ? 'meCodex' : m === 'el' ? 'elRef' : m === 'wz' ? 'wzRef' : m === 'sw' ? 'swRef' : m === 'hb' ? 'hbRef' : 'glossary',
-      map: m === 'wi' ? 'wiMap' : m === 'sh' ? 'shMap' : m === 'me' ? 'meMap' : m === 'el' ? 'elMap' : m === 'wz' ? 'wzMap' : m === 'sw' ? 'swMap' : m === 'hb' ? 'hbMap' : 'home',
+      ref: m === 'wi' ? 'wiRef' : m === 'sh' ? 'shRef' : m === 'me' ? 'meCodex' : m === 'el' ? 'elRef' : m === 'wz' ? 'wzRef' : m === 'sw' ? 'swRef' : m === 'hb' ? 'hbRef' : 'faeRef',
+      map: m === 'wi' ? 'wiMap' : m === 'sh' ? 'shMap' : m === 'me' ? 'meMap' : m === 'el' ? 'elMap' : m === 'wz' ? 'wzMap' : m === 'sw' ? 'swMap' : m === 'hb' ? 'hbMap' : 'map',
       games: 'wiGames',
       ship: 'swShip',
       dice: 'dice'
@@ -1006,12 +1009,12 @@
     }
     // 5. Экран Навыки
     else if(
-      low === 'skills' || low === 'skillsscreen' || low === 'wiskills' || low === 'shskills' ||
+      low === 'skills' || low === 'skillsscreen' || low === 'faeskills' || low === 'wiskills' || low === 'shskills' ||
       low === 'meskills' || low === 'elskills' || low === 'wzskills' || low === 'swskills' || low === 'hbskills' ||
-      low.indexOf('навык') !== -1
+      low.indexOf('навык') !== -1 || low.indexOf('знани') !== -1
     ){
       target = sm.skills;
-      title = 'Навыки';
+      title = 'Навыки и знания';
     }
     // 6. Экран Алхимия / Рецепты / Зелья
     else if(
@@ -1028,6 +1031,13 @@
       target = sm.magic;
       title = 'Магия и заклинания';
     }
+    // 7b. Экран Классы и Архетипы (Фаэрун)
+    else if(
+      low === 'classes' || low.indexOf('классы') !== -1 || low.indexOf('архетип') !== -1 || low.indexOf('подкласс') !== -1
+    ){
+      target = 'classes';
+      title = 'Классы и Архетипы D&D';
+    }
     // 8. Экран Карта
     else if(
       low === 'map' || low === 'wimap' || low === 'shmap' || low === 'memap' ||
@@ -1039,9 +1049,9 @@
     }
     // 9. Экран Справка / Кодекс / Глоссарий
     else if(
-      low === 'ref' || low === 'codex' || low === 'glossary' || low === 'wiref' || low === 'shref' ||
+      low === 'ref' || low === 'faeref' || low === 'codex' || low === 'glossary' || low === 'wiref' || low === 'shref' ||
       low === 'mecodex' || low === 'elref' || low === 'wzref' || low === 'swref' || low === 'hbref' ||
-      low.indexOf('справк') !== -1 || low.indexOf('кодекс') !== -1 || low.indexOf('глоссар') !== -1 || low.indexOf('бестиар') !== -1
+      low.indexOf('справк') !== -1 || low.indexOf('справочник') !== -1 || low.indexOf('кодекс') !== -1 || low.indexOf('глоссар') !== -1 || low.indexOf('бестиар') !== -1
     ){
       target = sm.ref;
       title = 'Справка и Кодекс';
@@ -1986,6 +1996,7 @@
         if(h){
           if(Array.isArray(h.techs)) h.techs = h.techs.filter(matchFn);
           if(Array.isArray(h.moves)) h.moves = h.moves.filter(matchFn);
+          if(Array.isArray(h.customSkills)) h.customSkills = h.customSkills.filter(matchFn);
           if(typeof window.saveCharactersToStorage === 'function') window.saveCharactersToStorage();
         }
         if(Array.isArray(window.RECIPES)){
