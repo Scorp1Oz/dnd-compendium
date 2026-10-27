@@ -2300,6 +2300,271 @@ body.hb-theme .ai-gen-result-card {
   color: #e2e8f0;
   line-height: 1.55;
 }
+.fae-gen-idea-textarea {
+  min-height: 158px;
+  font-size: 15.5px;
+  line-height: 1.58;
+  padding: 14px 16px;
+  resize: vertical;
+  background: linear-gradient(180deg, rgba(10, 14, 20, 0.96) 0%, rgba(15, 21, 31, 0.96) 100%);
+  border: 1px solid rgba(201, 164, 92, 0.38);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.55);
+}
+.fae-gen-idea-textarea::placeholder {
+  color: rgba(148, 163, 184, 0.68);
+  line-height: 1.52;
+}
+.fae-gen-thinking-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 8px;
+}
+@media (max-width: 860px) {
+  .fae-gen-thinking-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 520px) {
+  .fae-gen-thinking-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.fae-gen-thinking-card {
+  background: rgba(15, 21, 30, 0.85);
+  border: 1px solid rgba(201, 164, 92, 0.24);
+  border-radius: 8px;
+  padding: 10px 11px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #e2e8f0;
+}
+.fae-gen-thinking-card:hover {
+  border-color: rgba(251, 191, 36, 0.6);
+  background: rgba(24, 32, 46, 0.95);
+  transform: translateY(-1px);
+}
+.fae-gen-thinking-card.active {
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.48) 0%, rgba(20, 27, 40, 0.96) 100%);
+  border-color: #fbbf24;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.22);
+}
+.fae-gen-thinking-title {
+  font-family: 'Cinzel', serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #fde68a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.fae-gen-thinking-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+.fae-gen-opt-box {
+  margin-top: 16px;
+  background: rgba(11, 15, 22, 0.72);
+  border: 1px dashed rgba(201, 164, 92, 0.32);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.fae-gen-opt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.fae-gen-opt-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(201, 164, 92, 0.14);
+  border: 1px solid rgba(201, 164, 92, 0.35);
+  color: #fde68a;
+}
+
+/* Боковая панель подсказок AI Генератора (слева, сворачиваемая по аналогии с кубиками) */
+.fae-gen-hints-dock {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.fae-gen-hints-panel {
+  pointer-events: auto;
+  width: 296px;
+  max-height: 84vh;
+  overflow-y: auto;
+  padding: 14px 14px 14px 16px;
+  background: linear-gradient(145deg, rgba(24, 21, 18, 0.97), rgba(13, 12, 10, 0.98));
+  border: 1px solid var(--brass);
+  border-left: none;
+  border-radius: 0 12px 12px 0;
+  box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.75), 0 0 18px rgba(201, 164, 92, 0.14);
+  transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease;
+  transform: translateX(0);
+  opacity: 1;
+}
+.fae-gen-hints-dock.collapsed .fae-gen-hints-panel {
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.fae-gen-hints-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(201, 164, 92, 0.24);
+}
+.fae-gen-hints-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brass-hi);
+}
+.fae-gen-hints-collapse-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+.fae-gen-hints-collapse-btn:hover {
+  border-color: var(--brass);
+  color: var(--brass-hi);
+  background: rgba(201, 164, 92, 0.12);
+}
+.fae-gen-hints-tab {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 8px;
+  background: linear-gradient(145deg, rgba(28, 24, 19, 0.96), rgba(15, 13, 10, 0.98));
+  border: 1px solid var(--brass);
+  border-left: none;
+  border-radius: 0 10px 10px 0;
+  color: var(--brass-hi);
+  cursor: pointer;
+  box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.7), 0 0 12px rgba(201, 164, 92, 0.18);
+  transition: transform 0.2s ease, opacity 0.22s ease, background 0.2s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  margin-left: -1px;
+}
+.fae-gen-hints-dock:not(.collapsed) .fae-gen-hints-tab {
+  display: none;
+}
+.fae-gen-hints-dock.collapsed .fae-gen-hints-tab {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.35;
+  border-color: var(--line);
+  box-shadow: none;
+}
+.fae-gen-hints-dock.collapsed .fae-gen-hints-tab:hover {
+  opacity: 1;
+  border-color: var(--brass);
+  padding-left: 12px;
+  background: linear-gradient(145deg, rgba(44, 37, 27, 0.98), rgba(22, 19, 14, 0.99));
+  box-shadow: 6px 6px 22px rgba(0, 0, 0, 0.8), 0 0 16px rgba(240, 201, 122, 0.35);
+}
+.fae-gen-hints-tab-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+.fae-gen-hints-tab-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brass-hi);
+}
+.fae-gen-hints-sec-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fbbf24;
+  letter-spacing: 0.04em;
+  margin: 10px 0 6px;
+  text-transform: uppercase;
+}
+.fae-gen-hints-qlist {
+  margin: 0;
+  padding-left: 16px;
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.48;
+}
+.fae-gen-hints-qlist li {
+  margin-bottom: 5px;
+}
+.fae-gen-hint-chip {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: rgba(24, 32, 45, 0.82);
+  border: 1px solid rgba(201, 164, 92, 0.25);
+  border-radius: 7px;
+  padding: 7px 10px;
+  margin-bottom: 6px;
+  color: #e2e8f0;
+  font-size: 12px;
+  line-height: 1.38;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.fae-gen-hint-chip:hover {
+  border-color: #fbbf24;
+  background: rgba(120, 53, 15, 0.42);
+  color: #fef3c7;
+  transform: translateX(2px);
+}
+.fae-gen-hint-chip b {
+  color: #fde68a;
+  display: block;
+  font-size: 11.5px;
+  margin-bottom: 2px;
+}
+@media (max-width: 760px) {
+  .fae-gen-hints-dock {
+    top: auto;
+    bottom: 18px;
+    transform: none;
+  }
+  .fae-gen-hints-dock.collapsed .fae-gen-hints-tab {
+    top: auto;
+    bottom: 18px;
+    transform: none;
+  }
+}
 .fae-ai-hist-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
