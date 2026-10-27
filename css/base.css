@@ -3384,124 +3384,556 @@ body.tab-paused *::after {
 }
 
 /* ==========================================================================
-   ПЛАВАЮЩИЙ ИИ-АССИСТЕНТ И АГЕНТ ЗАДАЧ (FAB + FLOATING CHAT)
+   ПЛАВАЮЩИЙ ИИ-АССИСТЕНТ И МАСКОТ-ФАМИЛЬЯР (FAB + ROAMER + FLOATING CHAT)
    ========================================================================== */
 :root {
   --ai-accent: #c9a45c;
   --ai-accent-bright: #fbbf24;
   --ai-accent-glow: rgba(201, 164, 92, 0.42);
-  --ai-bg: rgba(15, 18, 25, 0.96);
-  --ai-bg-header: linear-gradient(135deg, rgba(28, 32, 44, 0.98) 0%, rgba(16, 19, 27, 0.98) 100%);
-  --ai-border: rgba(201, 164, 92, 0.36);
-  --ai-msg-user: linear-gradient(135deg, rgba(201, 164, 92, 0.24) 0%, rgba(146, 108, 42, 0.18) 100%);
-  --ai-msg-bot: rgba(24, 28, 38, 0.92);
+  --ai-bg: rgba(15, 18, 25, 0.82);
+  --ai-bg-header: linear-gradient(135deg, rgba(28, 32, 44, 0.86) 0%, rgba(16, 19, 27, 0.86) 100%);
+  --ai-border: rgba(201, 164, 92, 0.38);
+  --ai-msg-user: linear-gradient(135deg, rgba(201, 164, 92, 0.28) 0%, rgba(146, 108, 42, 0.20) 100%);
+  --ai-msg-bot: rgba(22, 26, 36, 0.76);
 }
 
 body.wi-theme {
   --ai-accent: var(--wi-amber, #f59e0b);
   --ai-accent-bright: #fbbf24;
   --ai-accent-glow: var(--wi-amber-glow, rgba(245, 158, 11, 0.42));
-  --ai-bg: rgba(12, 14, 19, 0.96);
-  --ai-bg-header: linear-gradient(135deg, rgba(26, 22, 18, 0.98) 0%, rgba(14, 16, 22, 0.98) 100%);
-  --ai-border: var(--wi-border, rgba(245, 158, 11, 0.35));
+  --ai-bg: rgba(12, 14, 19, 0.82);
+  --ai-bg-header: linear-gradient(135deg, rgba(26, 22, 18, 0.86) 0%, rgba(14, 16, 22, 0.86) 100%);
+  --ai-border: var(--wi-border, rgba(245, 158, 11, 0.36));
 }
 
 body.sh-theme {
   --ai-accent: #ef4444;
   --ai-accent-bright: #f87171;
   --ai-accent-glow: rgba(239, 68, 68, 0.42);
-  --ai-bg: rgba(14, 14, 20, 0.96);
-  --ai-bg-header: linear-gradient(135deg, rgba(34, 16, 22, 0.98) 0%, rgba(15, 15, 22, 0.98) 100%);
-  --ai-border: rgba(239, 68, 68, 0.36);
+  --ai-bg: rgba(14, 14, 20, 0.82);
+  --ai-bg-header: linear-gradient(135deg, rgba(34, 16, 22, 0.86) 0%, rgba(15, 15, 22, 0.86) 100%);
+  --ai-border: rgba(239, 68, 68, 0.38);
 }
 
 body.me-theme {
   --ai-accent: #38bdf8;
   --ai-accent-bright: #7dd3fc;
   --ai-accent-glow: rgba(56, 189, 248, 0.45);
-  --ai-bg: rgba(8, 16, 28, 0.96);
-  --ai-bg-header: linear-gradient(135deg, rgba(12, 28, 48, 0.98) 0%, rgba(8, 16, 28, 0.98) 100%);
-  --ai-border: rgba(56, 189, 248, 0.38);
+  --ai-bg: rgba(8, 16, 28, 0.82);
+  --ai-bg-header: linear-gradient(135deg, rgba(12, 28, 48, 0.86) 0%, rgba(8, 16, 28, 0.86) 100%);
+  --ai-border: rgba(56, 189, 248, 0.40);
 }
 
 body.el-theme {
   --ai-accent: #10b981;
   --ai-accent-bright: #34d399;
   --ai-accent-glow: rgba(16, 185, 129, 0.4);
-  --ai-bg: rgba(12, 18, 16, 0.96);
-  --ai-bg-header: linear-gradient(135deg, rgba(18, 32, 26, 0.98) 0%, rgba(12, 18, 16, 0.98) 100%);
-  --ai-border: rgba(16, 185, 129, 0.36);
+  --ai-bg: rgba(12, 18, 16, 0.82);
+  --ai-bg-header: linear-gradient(135deg, rgba(18, 32, 26, 0.86) 0%, rgba(12, 18, 16, 0.86) 100%);
+  --ai-border: rgba(16, 185, 129, 0.38);
 }
 
 body.wz-theme {
   --ai-accent: #eab308;
   --ai-accent-bright: #fde047;
   --ai-accent-glow: rgba(234, 179, 8, 0.42);
-  --ai-bg: rgba(14, 12, 22, 0.96);
-  --ai-bg-header: linear-gradient(135deg, rgba(28, 22, 42, 0.98) 0%, rgba(14, 12, 22, 0.98) 100%);
-  --ai-border: rgba(234, 179, 8, 0.36);
+  --ai-bg: rgba(14, 12, 22, 0.82);
+  --ai-bg-header: linear-gradient(135deg, rgba(28, 22, 42, 0.86) 0%, rgba(14, 12, 22, 0.86) 100%);
+  --ai-border: rgba(234, 179, 8, 0.38);
 }
 
 body.sw-theme {
   --ai-accent: #3b82f6;
   --ai-accent-bright: #60a5fa;
   --ai-accent-glow: rgba(59, 130, 246, 0.45);
-  --ai-bg: rgba(8, 12, 22, 0.96);
-  --ai-bg-header: linear-gradient(135deg, rgba(16, 24, 42, 0.98) 0%, rgba(8, 12, 22, 0.98) 100%);
-  --ai-border: rgba(59, 130, 246, 0.38);
+  --ai-bg: rgba(8, 12, 22, 0.82);
+  --ai-bg-header: linear-gradient(135deg, rgba(16, 24, 42, 0.86) 0%, rgba(8, 12, 22, 0.86) 100%);
+  --ai-border: rgba(59, 130, 246, 0.40);
 }
 
 body.sw-theme.sw-theme-sith {
   --ai-accent: #ef4444;
   --ai-accent-bright: #f87171;
   --ai-accent-glow: rgba(239, 68, 68, 0.45);
-  --ai-border: rgba(239, 68, 68, 0.38);
+  --ai-border: rgba(239, 68, 68, 0.40);
 }
 
 body.hb-theme {
   --ai-accent: #a855f7;
   --ai-accent-bright: #c084fc;
   --ai-accent-glow: rgba(168, 85, 247, 0.42);
-  --ai-bg: rgba(14, 12, 22, 0.96);
-  --ai-bg-header: linear-gradient(135deg, rgba(28, 18, 44, 0.98) 0%, rgba(14, 12, 22, 0.98) 100%);
-  --ai-border: rgba(168, 85, 247, 0.38);
+  --ai-bg: rgba(14, 12, 22, 0.82);
+  --ai-bg-header: linear-gradient(135deg, rgba(28, 18, 44, 0.86) 0%, rgba(14, 12, 22, 0.86) 100%);
+  --ai-border: rgba(168, 85, 247, 0.40);
 }
 
+/* Гнездо-сфера Маскота справа внизу */
 .ttc-ai-fab {
   position: fixed;
   right: 22px;
   bottom: 22px;
-  width: 58px;
-  height: 58px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background: var(--ai-bg-header);
+  background: radial-gradient(circle at 38% 32%, #192132 0%, #090c14 72%, #05070b 100%);
   border: 2px solid var(--ai-accent);
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.65), 0 0 18px var(--ai-accent-glow);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.68), 0 0 18px var(--ai-accent-glow), inset 0 0 14px rgba(0, 0, 0, 0.85);
   color: #f8fafc;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 9998;
-  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+  transition:
+    transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.32s ease,
+    border-color 0.28s ease,
+    opacity 0.38s ease,
+    filter 0.35s ease;
   user-select: none;
   padding: 0;
+  overflow: visible;
 }
 
 .ttc-ai-fab:hover {
-  transform: translateY(-3px) scale(1.05);
+  transform: translateY(-3px) scale(1.06);
   border-color: var(--ai-accent-bright);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.78), 0 0 24px var(--ai-accent-glow);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.80), 0 0 26px var(--ai-accent-glow);
+  opacity: 1 !important;
+  filter: none !important;
 }
 
 .ttc-ai-fab:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
-.ttc-ai-fab-icon {
-  font-size: 25px;
-  line-height: 1;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+/* Режим сна: полупрозрачный и без свечения, чтобы не бросался в глаза */
+.ttc-ai-fab.state-sleep {
+  opacity: 0.38;
+  border-color: rgba(148, 163, 184, 0.26);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  filter: saturate(0.45);
+}
+
+/* Резкое пробуждение (Startle) */
+.ttc-ai-fab.state-startle {
+  opacity: 1;
+  border-color: var(--ai-accent-bright);
+  box-shadow: 0 0 28px var(--ai-accent-glow), 0 8px 24px rgba(0, 0, 0, 0.75);
+  animation: ttcMascotStartleShake 0.48s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Радость / Крит 20 */
+.ttc-ai-fab.state-happy {
+  animation: ttcMascotHappyBounce 0.65s ease;
+  box-shadow: 0 0 32px var(--ai-accent-bright), 0 8px 26px rgba(0, 0, 0, 0.7);
+}
+
+/* Режим Стелс / Плут */
+.ttc-ai-fab.mode-stealth,
+.ttc-ai-roamer.mode-stealth {
+  opacity: 0.56;
+  filter: contrast(1.15) brightness(0.82);
+}
+
+/* Режим Магическое Плетение (Архимаг) */
+.ttc-ai-fab.mode-mage {
+  box-shadow: 0 0 32px var(--ai-accent-bright), 0 0 54px var(--ai-accent-glow), inset 0 0 18px var(--ai-accent-glow);
+}
+.ttc-ai-roamer.mode-mage .ttc-roamer-svg {
+  filter: drop-shadow(0 0 16px var(--ai-accent-bright)) drop-shadow(0 0 28px var(--ai-accent-glow));
+}
+
+/* Режим Бард / Мелодия (ритмичное покачивание) */
+.ttc-ai-fab.mode-bard .ttc-mascot-dock-svg,
+.ttc-ai-roamer.mode-bard .ttc-roamer-body-wrap {
+  animation: ttcMascotBardSway 1.1s ease-in-out infinite alternate !important;
+}
+
+/* Режим Боевая стойка (Дуэль) */
+.ttc-ai-fab.mode-combat .ttc-mascot-dock-svg,
+.ttc-ai-roamer.mode-combat .ttc-roamer-body-wrap {
+  animation: ttcMascotCombatPulse 0.75s ease-in-out infinite alternate !important;
+}
+
+/* Режим Головокружение (Dizzy) */
+.ttc-ai-fab.mode-dizzy .ttc-mascot-dock-svg,
+.ttc-ai-roamer.mode-dizzy .ttc-roamer-body-wrap {
+  animation: ttcMascotDizzyWobble 0.9s linear infinite !important;
+}
+
+/* Режим Кибер-Глитч / Перегрузка */
+.ttc-ai-fab.mode-glitch .ttc-mascot-dock-svg,
+.ttc-ai-roamer.mode-glitch .ttc-roamer-body-wrap {
+  animation: ttcMascotGlitchJitter 0.28s steps(2, end) infinite !important;
+}
+
+/* Сальто / Бочка на 360 градусов (Acrobatics / Barrel Roll) */
+.ttc-ai-fab.barrel-roll .ttc-mascot-dock-svg,
+.ttc-ai-roamer.barrel-roll .ttc-roamer-body-wrap {
+  animation: ttcMascotBarrelRoll 0.68s cubic-bezier(0.22, 0.85, 0.36, 1.15) !important;
+}
+
+/* Плавное дыхание во сне */
+.ttc-ai-fab.state-sleep .ttc-mascot-dock-svg {
+  animation: ttcMascotSleepBreathe 3.6s ease-in-out infinite;
+}
+
+@keyframes ttcMascotSleepBreathe {
+  0%, 100% { transform: scale(0.96) translateY(1px); }
+  50% { transform: scale(1.03) translateY(-1px); }
+}
+
+@keyframes ttcMascotBardSway {
+  0% { transform: rotate(-10deg) translateY(-2px) scale(1.03); }
+  100% { transform: rotate(10deg) translateY(-5px) scale(1.03); }
+}
+
+@keyframes ttcMascotCombatPulse {
+  0% { transform: translateY(0) scale(1.02) rotate(-3deg); }
+  100% { transform: translateY(-6px) scale(1.08) rotate(3deg); }
+}
+
+@keyframes ttcMascotDizzyWobble {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  25%  { transform: translate(-4px, -2px) rotate(-10deg); }
+  50%  { transform: translate(0, 3px) rotate(0deg); }
+  75%  { transform: translate(4px, -2px) rotate(10deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes ttcMascotGlitchJitter {
+  0%   { transform: translate(0, 0) skewX(0deg); filter: hue-rotate(0deg); }
+  25%  { transform: translate(-2px, 1px) skewX(-6deg); filter: hue-rotate(45deg) brightness(1.3); }
+  50%  { transform: translate(2px, -1px) skewX(6deg); filter: hue-rotate(-45deg); }
+  75%  { transform: translate(-1px, -2px) skewX(3deg); filter: brightness(1.4); }
+  100% { transform: translate(0, 0) skewX(0deg); filter: hue-rotate(0deg); }
+}
+
+@keyframes ttcMascotBarrelRoll {
+  0%   { transform: translateY(0) rotate(0deg) scale(1); }
+  45%  { transform: translateY(-18px) rotate(180deg) scale(1.16); }
+  100% { transform: translateY(0) rotate(360deg) scale(1); }
+}
+
+/* Внутренние SVG-детали: брови, румянец, ушки, реквизит режимов */
+.ttc-mascot-brow {
+  stroke: var(--ai-accent-bright);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  fill: none;
+  transition: d 0.18s ease, opacity 0.18s ease;
+}
+
+.ttc-mascot-ear {
+  fill: var(--ai-accent-bright);
+  opacity: 0.9;
+  transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+  transform-origin: 32px 12px;
+}
+
+.ttc-ai-fab.state-sleep .ttc-mascot-ear,
+.ttc-ai-roamer.state-sleep .ttc-mascot-ear {
+  transform: translateY(3px) scaleY(0.72);
+  opacity: 0.5;
+}
+
+.ttc-ai-fab.state-startle .ttc-mascot-ear,
+.ttc-ai-roamer.state-startle .ttc-mascot-ear {
+  transform: translateY(-3px) scale(1.15);
+}
+
+.ttc-mascot-blush {
+  fill: #fb7185;
+  opacity: 0;
+  filter: blur(1px);
+  transition: opacity 0.25s ease;
+}
+
+.ttc-mascot-blush.visible {
+  opacity: 0.58;
+}
+
+/* Вращающаяся печать Архимага */
+.ttc-prop-sigil {
+  transform-origin: 32px 32px;
+  animation: ttcAiSpin 6s linear infinite;
+}
+
+/* Луч сканера Сыщика */
+.ttc-prop-scanbeam {
+  transform-origin: 32px 28px;
+  animation: ttcScannerSweep 1.6s ease-in-out infinite alternate;
+}
+@keyframes ttcScannerSweep {
+  0%   { transform: rotate(-22deg) scaleY(0.92); opacity: 0.45; }
+  100% { transform: rotate(22deg) scaleY(1.08); opacity: 0.85; }
+}
+
+/* Жонглирование кубиками d20 */
+.ttc-prop-d20-a {
+  animation: ttcJuggleOrbA 0.95s ease-in-out infinite alternate;
+}
+.ttc-prop-d20-b {
+  animation: ttcJuggleOrbB 0.95s ease-in-out infinite alternate;
+}
+@keyframes ttcJuggleOrbA {
+  0%   { transform: translate(-12px, 6px) rotate(0deg); }
+  50%  { transform: translate(0px, -14px) rotate(90deg) scale(1.12); }
+  100% { transform: translate(12px, 6px) rotate(180deg); }
+}
+@keyframes ttcJuggleOrbB {
+  0%   { transform: translate(12px, 6px) rotate(180deg); }
+  50%  { transform: translate(0px, -10px) rotate(270deg) scale(0.92); }
+  100% { transform: translate(-12px, 6px) rotate(360deg); }
+}
+
+/* Звёздочки головокружения над головой */
+.ttc-prop-dizzy-stars {
+  transform-origin: 32px 8px;
+  animation: ttcDizzyOrbit 1.4s linear infinite;
+}
+@keyframes ttcDizzyOrbit {
+  0%   { transform: translateX(-5px) scale(0.92); }
+  50%  { transform: translateX(5px) scale(1.08); }
+  100% { transform: translateX(-5px) scale(0.92); }
+}
+
+/* Плавающие ноты/сердечки/искры вокруг маскота */
+.ttc-mascot-fx-wrap {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 28px;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.ttc-mascot-note {
+  position: absolute;
+  font-size: 13px;
+  color: var(--ai-accent-bright);
+  text-shadow: 0 0 8px var(--ai-accent-glow);
+  opacity: 0;
+  animation: ttcMascotNoteRise 2.4s ease-in-out infinite;
+}
+.ttc-mascot-note:nth-child(1) { left: 6px; bottom: 0; animation-delay: 0s; }
+.ttc-mascot-note:nth-child(2) { left: 28px; bottom: 4px; animation-delay: 0.8s; }
+.ttc-mascot-note:nth-child(3) { left: 48px; bottom: 0; animation-delay: 1.6s; }
+
+@keyframes ttcMascotNoteRise {
+  0%   { transform: translate(0, 6px) scale(0.6) rotate(-12deg); opacity: 0; }
+  30%  { opacity: 0.95; }
+  100% { transform: translate(6px, -22px) scale(1.15) rotate(14deg); opacity: 0; }
+}
+
+/* Летящие за маскотом искры в полёте */
+.ttc-mascot-spark-trail {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ai-accent-bright);
+  box-shadow: 0 0 8px var(--ai-accent-bright), 0 0 14px var(--ai-accent-glow);
+  pointer-events: none;
+  z-index: 9996;
+  animation: ttcSparkTrailFade 0.65s ease-out forwards;
+}
+
+@keyframes ttcSparkTrailFade {
+  0%   { transform: scale(1) translateY(0); opacity: 0.9; }
+  100% { transform: scale(0.1) translateY(10px); opacity: 0; }
+}
+
+/* Полоса выбора режимов и трюков маскота внутри чата */
+.ttc-ai-modes-strip {
+  display: flex;
+  gap: 5px;
+  padding: 6px 12px;
+  overflow-x: auto;
+  background: rgba(5, 8, 15, 0.42);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.ttc-ai-modes-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.ttc-ai-mode-pill {
+  white-space: nowrap;
+  font-size: 10.8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+.ttc-ai-mode-pill:hover {
+  border-color: var(--ai-accent);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.09);
+}
+.ttc-ai-mode-pill.active {
+  border-color: var(--ai-accent-bright);
+  background: rgba(251, 191, 36, 0.16);
+  color: var(--ai-accent-bright);
+  font-weight: 700;
+  box-shadow: 0 0 10px var(--ai-accent-glow);
+}
+
+/* Когда маскот вылетел гулять по экрану — в углу остаётся тихое гнездо-портал */
+.ttc-ai-fab.state-roaming {
+  opacity: 0.52;
+  border-style: dashed;
+  border-color: var(--ai-accent);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 0 18px var(--ai-accent-glow);
+}
+.ttc-ai-fab.state-roaming:hover {
+  opacity: 1;
+  border-style: solid;
+}
+
+/* Вспышка телепортации (на внутреннем контейнере, чтобы не сбрасывать translate3d координат) */
+.ttc-ai-fab.teleport-flash .ttc-mascot-dock-svg,
+.ttc-ai-roamer.teleport-flash .ttc-roamer-body-wrap {
+  animation: ttcMascotTeleportPop 0.44s cubic-bezier(0.2, 0.9, 0.3, 1.2) !important;
+}
+
+@keyframes ttcMascotTeleportPop {
+  0% { transform: scale(0.2) rotate(-25deg); filter: brightness(2.8) drop-shadow(0 0 24px var(--ai-accent-bright)); opacity: 0.2; }
+  60% { transform: scale(1.18) rotate(6deg); filter: brightness(1.7) drop-shadow(0 0 18px var(--ai-accent-bright)); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); filter: brightness(1); opacity: 1; }
+}
+
+@keyframes ttcMascotStartleShake {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  15% { transform: translate(-5px, -6px) scale(1.12) rotate(-7deg); }
+  30% { transform: translate(5px, -4px) scale(1.1) rotate(7deg); }
+  45% { transform: translate(-4px, 2px) scale(1.06) rotate(-5deg); }
+  65% { transform: translate(3px, -2px) scale(1.04) rotate(4deg); }
+  80% { transform: translate(-2px, 0) scale(1.01); }
+}
+
+@keyframes ttcMascotHappyBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-12px) scale(1.12) rotate(-5deg); }
+  55% { transform: translateY(-4px) scale(1.05) rotate(5deg); }
+  75% { transform: translateY(-8px) scale(1.08); }
+}
+
+.ttc-mascot-dock-svg {
+  width: 56px;
+  height: 56px;
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ttc-mascot-eye-glow {
+  fill: var(--ai-accent-bright);
+  filter: drop-shadow(0 0 5px var(--ai-accent-bright));
+  transition: d 0.16s ease, transform 0.14s ease, opacity 0.2s ease;
+}
+
+.ttc-mascot-pupil {
+  fill: #ffffff;
+  transition: transform 0.08s linear, opacity 0.16s ease;
+}
+
+.ttc-mascot-mouth {
+  stroke: var(--ai-accent-bright);
+  stroke-width: 2.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  filter: drop-shadow(0 0 4px var(--ai-accent-glow));
+  transition: d 0.18s ease, fill 0.18s ease;
+}
+
+.ttc-mascot-mouth.filled {
+  fill: rgba(251, 191, 36, 0.22);
+}
+
+.ttc-mascot-ring {
+  stroke: var(--ai-accent);
+  stroke-opacity: 0.45;
+  transform-origin: 32px 32px;
+  animation: ttcAiSpin 20s linear infinite;
+}
+
+.ttc-ai-fab.state-sleep .ttc-mascot-ring {
+  animation-play-state: paused;
+  stroke-opacity: 0.18;
+}
+
+/* Плавающие буквы Zzz во время сна */
+.ttc-mascot-zzz-wrap {
+  position: absolute;
+  top: -16px;
+  right: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.ttc-ai-fab.state-sleep .ttc-mascot-zzz-wrap,
+.ttc-ai-roamer.state-sleep .ttc-mascot-zzz-wrap {
+  opacity: 1;
+}
+
+.ttc-mascot-z {
+  position: absolute;
+  font-family: 'Cinzel', serif;
+  font-weight: 800;
+  color: var(--ai-accent-bright);
+  opacity: 0;
+  animation: ttcMascotZFloat 3.2s ease-in-out infinite;
+}
+.ttc-mascot-z:nth-child(1) { font-size: 9px; right: 0; bottom: 0; animation-delay: 0s; }
+.ttc-mascot-z:nth-child(2) { font-size: 11px; right: -6px; bottom: 6px; animation-delay: 1.05s; }
+.ttc-mascot-z:nth-child(3) { font-size: 13px; right: -2px; bottom: 12px; animation-delay: 2.1s; }
+
+@keyframes ttcMascotZFloat {
+  0% { transform: translate(0, 4px) scale(0.7); opacity: 0; }
+  35% { opacity: 0.78; }
+  100% { transform: translate(8px, -18px) scale(1.15); opacity: 0; }
+}
+
+/* Облачко реплики маскота (над сферой или над парящим фамильяром) */
+.ttc-mascot-bubble {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 0;
+  min-width: 150px;
+  max-width: 240px;
+  background: rgba(12, 16, 24, 0.90);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--ai-accent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 14px var(--ai-accent-glow);
+  color: #f8fafc;
+  font-size: 11.8px;
+  line-height: 1.38;
+  padding: 7px 11px;
+  border-radius: 11px 11px 3px 11px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px) scale(0.92);
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 10000;
+  text-align: left;
+  white-space: normal;
+}
+
+.ttc-mascot-bubble.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .ttc-ai-fab-badge {
@@ -3518,6 +3950,11 @@ body.hb-theme {
   border: 1.5px solid #090b10;
   letter-spacing: 0.04em;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  transition: opacity 0.25s ease;
+}
+
+.ttc-ai-fab.state-sleep .ttc-ai-fab-badge {
+  opacity: 0.45;
 }
 
 .ttc-ai-fab.is-busy::after {
@@ -3534,20 +3971,190 @@ body.hb-theme {
   100% { transform: rotate(360deg); }
 }
 
+/* ==========================================================================
+   ПАРЯЩИЙ ПО ЭКРАНУ МАСКОТ-ФАМИЛЬЯР (#ttcAiRoamer)
+   ========================================================================== */
+.ttc-ai-roamer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 78px;
+  height: 90px;
+  z-index: 9997;
+  pointer-events: auto;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  display: none;
+  will-change: transform;
+  transition: opacity 0.28s ease, filter 0.28s ease;
+}
+
+.ttc-ai-roamer.active {
+  display: block;
+}
+
+.ttc-ai-roamer.dragging {
+  cursor: grabbing;
+}
+
+.ttc-ai-roamer.state-sleep {
+  opacity: 0.45;
+  filter: saturate(0.5);
+}
+.ttc-ai-roamer.state-sleep:hover {
+  opacity: 1;
+  filter: none;
+}
+
+.ttc-roamer-body-wrap {
+  width: 100%;
+  height: 100%;
+  animation: ttcRoamerFloatBob 3.1s ease-in-out infinite;
+  transform-origin: center center;
+  transition: transform 0.2s ease;
+}
+
+.ttc-ai-roamer.state-startle .ttc-roamer-body-wrap {
+  animation: ttcMascotStartleShake 0.48s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.ttc-ai-roamer.state-happy .ttc-roamer-body-wrap {
+  animation: ttcMascotHappyBounce 0.65s ease;
+}
+
+@keyframes ttcRoamerFloatBob {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-7px); }
+}
+
+.ttc-roamer-svg {
+  width: 78px;
+  height: 90px;
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 10px var(--ai-accent-glow));
+}
+
+.ttc-ai-roamer.state-sleep .ttc-roamer-svg {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+}
+
+.ttc-roamer-hand-l {
+  animation: ttcRoamerHandL 2.4s ease-in-out infinite alternate;
+  transform-origin: 14px 58px;
+}
+.ttc-roamer-hand-r {
+  animation: ttcRoamerHandR 2.4s ease-in-out infinite alternate;
+  transform-origin: 64px 58px;
+}
+
+.ttc-ai-roamer.dragging .ttc-roamer-hand-l,
+.ttc-ai-roamer.state-startle .ttc-roamer-hand-l {
+  animation: ttcRoamerHandPanicL 0.22s ease-in-out infinite alternate;
+}
+.ttc-ai-roamer.dragging .ttc-roamer-hand-r,
+.ttc-ai-roamer.state-startle .ttc-roamer-hand-r {
+  animation: ttcRoamerHandPanicR 0.22s ease-in-out infinite alternate;
+}
+
+@keyframes ttcRoamerHandL {
+  0% { transform: translate(0, 0) rotate(-6deg); }
+  100% { transform: translate(-2px, -5px) rotate(8deg); }
+}
+@keyframes ttcRoamerHandR {
+  0% { transform: translate(0, -4px) rotate(6deg); }
+  100% { transform: translate(2px, 2px) rotate(-8deg); }
+}
+@keyframes ttcRoamerHandPanicL {
+  0% { transform: translate(-4px, -12px) rotate(-25deg); }
+  100% { transform: translate(2px, -4px) rotate(15deg); }
+}
+@keyframes ttcRoamerHandPanicR {
+  0% { transform: translate(4px, -4px) rotate(20deg); }
+  100% { transform: translate(-2px, -12px) rotate(-20deg); }
+}
+
+.ttc-roamer-tail {
+  transform-origin: 39px 68px;
+  animation: ttcRoamerTailWag 2.2s ease-in-out infinite alternate;
+}
+@keyframes ttcRoamerTailWag {
+  0% { transform: rotate(-6deg) scaleY(0.96); }
+  100% { transform: rotate(6deg) scaleY(1.04); }
+}
+
+/* Быстрые кнопки вокруг парящего маскота при наведении */
+.ttc-roamer-actions {
+  position: absolute;
+  top: calc(100% - 2px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  display: flex;
+  gap: 4px;
+  background: rgba(10, 14, 22, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--ai-border);
+  border-radius: 999px;
+  padding: 3px 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.ttc-ai-roamer:hover .ttc-roamer-actions {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.ttc-roamer-act-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 10.5px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+.ttc-roamer-act-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--ai-accent-bright);
+}
+
+.ttc-ai-roamer .ttc-mascot-bubble {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px) scale(0.92);
+  border-radius: 11px;
+  text-align: center;
+  min-width: 140px;
+}
+.ttc-ai-roamer .ttc-mascot-bubble.visible {
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* ==========================================================================
+   ПОЛУПРОЗРАЧНОЕ СТИЛЬНОЕ ОКНО ИИ-ЧАТА (.ttc-ai-chat)
+   ========================================================================== */
 .ttc-ai-chat {
   position: fixed;
   right: 22px;
-  bottom: 90px;
-  width: 430px;
+  bottom: 94px;
+  width: 435px;
   max-width: calc(100vw - 24px);
-  height: 600px;
-  max-height: calc(100vh - 116px);
+  height: 615px;
+  max-height: calc(100vh - 120px);
   background: var(--ai-bg);
   border: 1px solid var(--ai-border);
   border-radius: 16px;
-  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.82), 0 0 28px var(--ai-accent-glow);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.72), 0 0 28px var(--ai-accent-glow);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -3564,10 +4171,62 @@ body.hb-theme {
   pointer-events: auto;
 }
 
+/* Панель управления фамильяром внутри ИИ-чата */
+.ttc-ai-mascot-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 12px;
+  background: rgba(8, 12, 20, 0.48);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.ttc-ai-mascot-toggle-lbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: #cbd5e1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ttc-ai-mascot-toggle-lbl input[type="checkbox"] {
+  accent-color: var(--ai-accent);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.ttc-ai-roam-btn {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ai-border);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ai-accent-bright);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+}
+
+.ttc-ai-roam-btn:hover {
+  background: var(--ai-accent);
+  color: #090b10;
+  border-color: var(--ai-accent-bright);
+}
+
 .ttc-ai-header {
   background: var(--ai-bg-header);
   border-bottom: 1px solid var(--ai-border);
-  padding: 12px 14px;
+  padding: 11px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3584,16 +4243,24 @@ body.hb-theme {
 }
 
 .ttc-ai-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--ai-border);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #1c2436 0%, #090c14 80%);
+  border: 1.5px solid var(--ai-border);
+  box-shadow: 0 0 10px var(--ai-accent-glow);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 19px;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.ttc-ai-avatar svg {
+  width: 34px;
+  height: 34px;
+  display: block;
 }
 
 .ttc-ai-title-wrap {

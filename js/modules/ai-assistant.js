@@ -2550,6 +2550,995 @@
       });
   }
 
+  /* ==========================================================================
+     МАСКОТ-ФАМИЛЬЯР «ОРБИС» (МНОГОРЕЖИМНЫЙ SVG-ДВИЖОК, ЭМОЦИИ, РЕКВИЗИТ И ПОЛЁТ)
+     ========================================================================== */
+  var AUTO_ROAM_STORAGE_KEY = 'ttc_ai_mascot_autoroam';
+  var mascotState = 'idle';
+  // Режимы: 'idle' | 'yawn' | 'sleep' | 'startle' | 'happy' | 'thinking' |
+  //         'mage' | 'combat' | 'bard' | 'scanner' | 'reading' | 'juggle' |
+  //         'stealth' | 'glitch' | 'dizzy' | 'petted'
+  var lockedShowMode = 'auto'; // 'auto' или конкретный выбранный пользователем режим
+  var isRoaming = false;
+  var manualRoam = false;
+  var autoRoamEnabled = true;
+  try {
+    var savedRoam = localStorage.getItem(AUTO_ROAM_STORAGE_KEY);
+    if(savedRoam === '0' || savedRoam === 'false') autoRoamEnabled = false;
+  } catch(e){}
+
+  var mouseX = window.innerWidth ? window.innerWidth - 60 : 800;
+  var mouseY = window.innerHeight ? window.innerHeight - 60 : 600;
+  var lastMouseMoveTs = Date.now();
+  var lastNearMascotTs = Date.now();
+  var lookX = 0, lookY = 0;
+  var targetLookX = 0, targetLookY = 0;
+  var isBlinking = false;
+  var currentMouth = 'smile';
+  var currentEyes = 'open';
+  var currentBrows = 'neutral'; // 'neutral' | 'angry' | 'curious' | 'sad' | 'surprised' | 'smug'
+  var showBlush = false;
+
+  // Детектор поглаживания курсором и тряски при перетаскивании
+  var petStrokeCount = 0;
+  var lastPetDirX = 0;
+  var lastPetStrokeTs = 0;
+  var dragShakeScore = 0;
+  var lastDragDX = 0;
+
+  // Координаты полёта по экрану
+  var roamX = 0, roamY = 0;
+  var roamTargetX = 0, roamTargetY = 0;
+  var roamVX = 0, roamVY = 0;
+  var isDraggingRoamer = false;
+  var dragOffsetX = 0, dragOffsetY = 0;
+  var roamStartedTs = 0;
+  var roamWaypointWaitUntil = 0;
+  var bubbleTimeout = null;
+  var modeExpireTs = 0;
+
+  var MASCOT_MODES_LIST = [
+    { id: 'auto',    label: '🎭 Авто-жизнь' },
+    { id: 'mage',    label: '🔮 Архимаг' },
+    { id: 'combat',  label: '⚔️ Дуэлянт' },
+    { id: 'bard',    label: '🎵 Бард' },
+    { id: 'reading', label: '📖 Гримуар' },
+    { id: 'scanner', label: '🔍 Сыщик' },
+    { id: 'juggle',  label: '🎲 Жонглёр' },
+    { id: 'stealth', label: '🕵️ Стелс' },
+    { id: 'glitch',  label: '⚡ Глитч' },
+    { id: 'sleep',   label: '💤 Сон' },
+    { id: 'flip',    label: '🤸 Сальто!' }
+  ];
+
+  var MASCOT_QUIPS = {
+    wake: [
+      'Я не спал! Я перебирал заклинания в уме...',
+      'О! Курсор! Что колдуем сегодня?',
+      'А?! Кто тут? Я на посту!',
+      'Моргнул на секунду — уже приключения!'
+    ],
+    startle: [
+      'Ух! Приснилась натуральная единица!',
+      'А?! Клянусь Плетением, показалось — мимик!',
+      'Тревога?! Инициативу уже кидали?!',
+      'Фух... Мне снилось, что Мастер улыбается!'
+    ],
+    poke: [
+      'Эй, щекотно же! Я эфирный фамильяр!',
+      'Пиу-пиу! Мои руны заряжены на 100%!',
+      'Кликни ещё раз — наколдую крит на d20!',
+      'Слежу за твоим листом в оба глаза 👀',
+      'Погладь меня курсором — я замурчу!'
+    ],
+    petted: [
+      'Мррр... То есть, вжух-вжух! Приятно же! ✨',
+      'О да, почеши за эфирным ушком! ^‿^',
+      'Бафф «Любимый фамильяр»: +1d4 к удаче на весь день!',
+      'Уиии! Я самый счастливый дух компендиума!'
+    ],
+    dizzy: [
+      'Ой-ой-ой... Сейчас все заклинания в голове перемешаются! 🌀',
+      'Полегче! У меня гироскоп заклинило! @_@',
+      'Кажется, я вижу сразу три одинаковых кубика d20...'
+    ],
+    drag: [
+      'Эй-эй! Полегче с гравитацией!',
+      'Уииии! Ручной полёт!',
+      'Только не тряси слишком сильно — укачает!',
+      'Лечу куда прикажешь, капитан!'
+    ],
+    roamStart: [
+      'Телепортируюсь размять эфирные крылышки! ✨',
+      'Полечу осмотрю твой экран поближе!',
+      'В сфере тесновато — вылетаю на патруль!',
+      'Вжух! Свободный полёт активирован!'
+    ],
+    roamReturn: [
+      'Пойду подзаряжу ядро в своей сфере ↩',
+      'Патруль окончен, возвращаюсь в гнездо!',
+      'Телепортация домой!'
+    ],
+    roamIdle: [
+      'Хм, интересные тут у тебя записи...',
+      'Парить над страницей куда веселее!',
+      'Если что — двойной клик по мне откроет чат!',
+      'Проверяю баланс характеристик... полёт нормальный!'
+    ],
+    mage: [
+      '🔮 Плету нити магии... Чувствуешь резонанс?',
+      '✨ Концентрирую арканический импульс 9-го круга!',
+      '🔮 Истинное зрение активировано!'
+    ],
+    combat: [
+      '⚔️ Ан-гард! Мои эфирные клинки всегда наготове!',
+      '⚔️ Проверка боевой готовности: крит с разворота!',
+      '🛡️ Защищаю твой лист от проклятых бросков!'
+    ],
+    bard: [
+      '🎵 Насвистываю балладу о двадцатигранной судьбе~ ♫',
+      '🎶 Вдохновение барда (+1d8) этому господину!',
+      '🎵 Таверна гудит, лютня играет, кубы летят! ♬'
+    ],
+    reading: [
+      '📖 Так-так, что тут написано мелким шрифтом в правилах...',
+      '📖 Листаю древний гримуар... Ага, нашёл комбо!',
+      '📖 Ученье — свет, а неученье — спасбросок с помехой!'
+    ],
+    scanner: [
+      '🔍 Сканирую сектор... Уровень эпичности зашкаливает!',
+      '🔍 Анализ DOM-структуры и экипировки: всё чётко!',
+      '🔍 Ищу скрытые двери, ловушки и нераспределённые статы...'
+    ],
+    juggle: [
+      '🎲 Смотри без рук! Жонглирую судьбой!',
+      '🎲 Главное — уронить кубик строго двадцаткой вверх!',
+      '🎲 Ловкость рук: Натуральная 20!'
+    ],
+    stealth: [
+      '🕵️ Спасбросок Скрытности: 28. Меня тут нет...',
+      '🕵️ Сливаюсь с тенями интерфейса...',
+      '🕵️ Тише... Крадусь за спиной у Мастера!'
+    ],
+    glitch: [
+      '⚡ ВЖЖ-БЗЗТ! Перегрузка магического ядра!',
+      '⚡ 01000100&D... Сбой матрицы Плетения!',
+      '⚡ Слишком много эпических идей одновременно!'
+    ],
+    crit20: [
+      '🔥 НАТУРАЛЬНАЯ 20! Легендарный бросок!',
+      '✨ КРИТ! Даже боги аплодируют!'
+    ],
+    crit1: [
+      '💀 Ой-ой... Натуральная единица! Держись!',
+      '😱 Кубик явно проклят! Надо его переплавить!'
+    ]
+  };
+
+  function pickQuip(cat){
+    var arr = MASCOT_QUIPS[cat] || MASCOT_QUIPS.poke;
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function spawnMascotSparkles(x, y, count){
+    var n = count || 4;
+    for(var i = 0; i < n; i++){
+      var sp = document.createElement('div');
+      sp.className = 'ttc-mascot-spark-trail';
+      var ox = (Math.random() - 0.5) * 38;
+      var oy = (Math.random() - 0.5) * 38;
+      sp.style.left = (x + ox) + 'px';
+      sp.style.top = (y + oy) + 'px';
+      document.body.appendChild(sp);
+      (function(el){
+        setTimeout(function(){
+          if(el && el.parentNode) el.parentNode.removeChild(el);
+        }, 680);
+      })(sp);
+    }
+  }
+
+  function triggerBarrelRoll(customQuip){
+    var fab = document.getElementById('ttcAiFab');
+    var roamer = document.getElementById('ttcAiRoamer');
+    var targetEl = isRoaming ? roamer : fab;
+    if(targetEl){
+      targetEl.classList.remove('barrel-roll');
+      void targetEl.offsetWidth;
+      targetEl.classList.add('barrel-roll');
+      setTimeout(function(){ targetEl.classList.remove('barrel-roll'); }, 720);
+    }
+    var sx = isRoaming ? (roamX + 39) : ((window.innerWidth || 800) - 54);
+    var sy = isRoaming ? (roamY + 45) : ((window.innerHeight || 600) - 54);
+    spawnMascotSparkles(sx, sy, 7);
+    if(customQuip) showMascotBubble(customQuip, 2800);
+  }
+
+  function showMascotBubble(text, durationMs){
+    if(!text) return;
+    var dur = durationMs || 3400;
+    var dockBub = document.getElementById('ttcMascotDockBubble');
+    var roamBub = document.getElementById('ttcRoamerBubble');
+    if(bubbleTimeout) clearTimeout(bubbleTimeout);
+
+    if(isRoaming && roamBub){
+      roamBub.textContent = text;
+      roamBub.classList.add('visible');
+      if(dockBub) dockBub.classList.remove('visible');
+    } else if(dockBub && !isOpen){
+      dockBub.textContent = text;
+      dockBub.classList.add('visible');
+      if(roamBub) roamBub.classList.remove('visible');
+    }
+
+    bubbleTimeout = setTimeout(function(){
+      if(dockBub) dockBub.classList.remove('visible');
+      if(roamBub) roamBub.classList.remove('visible');
+    }, dur);
+  }
+
+  function buildMascotPropsSvg(prefix){
+    return '' +
+      /* 🔮 Печать Архимага */
+      '<g id="' + prefix + 'PropMage" style="display:none;">' +
+        '<g class="ttc-prop-sigil">' +
+          '<polygon points="32,5 55,45 9,45" fill="none" stroke="var(--ai-accent-bright)" stroke-width="1.1" opacity="0.55"/>' +
+          '<polygon points="32,59 55,19 9,19" fill="none" stroke="var(--ai-accent-bright)" stroke-width="1.1" opacity="0.55"/>' +
+        '</g>' +
+        '<polygon points="32,14 35,19 32,23 29,19" fill="#ffffff" stroke="var(--ai-accent-bright)" stroke-width="1"/>' +
+      '</g>' +
+      /* 🔍 Сканер Сыщика */
+      '<g id="' + prefix + 'PropScanner" style="display:none;">' +
+        '<polygon class="ttc-prop-scanbeam" points="20,28 44,28 58,62 6,62" fill="var(--ai-accent-bright)" opacity="0.22"/>' +
+        '<rect x="11" y="22" width="42" height="11" rx="4" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5 2"/>' +
+      '</g>' +
+      /* 📖 Открытый Гримуар */
+      '<g id="' + prefix + 'PropReading" style="display:none;" transform="translate(0, 2)">' +
+        '<path d="M16,46 Q24,43 32,47 Q40,43 48,46 L48,57 Q40,54 32,58 Q24,54 16,57 Z" fill="#1e293b" stroke="var(--ai-accent-bright)" stroke-width="1.5"/>' +
+        '<line x1="32" y1="47" x2="32" y2="58" stroke="var(--ai-accent-bright)" stroke-width="1.4"/>' +
+        '<line x1="20" y1="49" x2="29" y2="50" stroke="#94a3b8" stroke-width="1"/>' +
+        '<line x1="20" y1="52" x2="29" y2="53" stroke="#94a3b8" stroke-width="1"/>' +
+        '<line x1="35" y1="50" x2="44" y2="49" stroke="#94a3b8" stroke-width="1"/>' +
+        '<line x1="35" y1="53" x2="44" y2="52" stroke="#94a3b8" stroke-width="1"/>' +
+      '</g>' +
+      /* ⚔️ Боевые Эфирные Клинки */
+      '<g id="' + prefix + 'PropCombat" style="display:none;">' +
+        '<path d="M6,44 L18,22 L21,25 L9,47 Z" fill="#ffffff" stroke="var(--ai-accent-bright)" stroke-width="1.3"/>' +
+        '<path d="M58,44 L46,22 L43,25 L55,47 Z" fill="#ffffff" stroke="var(--ai-accent-bright)" stroke-width="1.3"/>' +
+      '</g>' +
+      /* 🎲 Жонглирование Кубами d20 */
+      '<g id="' + prefix + 'PropJuggle" style="display:none;">' +
+        '<g class="ttc-prop-d20-a" transform="translate(32, 16)">' +
+          '<polygon points="0,-6 5.5,-2 3.5,5 -3.5,5 -5.5,-2" fill="var(--ai-accent-bright)" stroke="#ffffff" stroke-width="1"/>' +
+        '</g>' +
+        '<g class="ttc-prop-d20-b" transform="translate(32, 16)">' +
+          '<polygon points="0,-6 5.5,-2 3.5,5 -3.5,5 -5.5,-2" fill="#38bdf8" stroke="#ffffff" stroke-width="1"/>' +
+        '</g>' +
+      '</g>' +
+      /* 🕵️ Повязка Стелса (Плут/Шиноби) */
+      '<g id="' + prefix + 'PropStealth" style="display:none;">' +
+        '<path d="M9,22 Q32,19 55,22 L54,34 Q32,31 10,34 Z" fill="#020617" opacity="0.88" stroke="var(--ai-accent)" stroke-width="1"/>' +
+        '<path d="M54,25 L63,20 L61,28 L64,32 L54,31 Z" fill="var(--ai-accent)"/>' +
+      '</g>' +
+      /* 🌀 Звёздочки Головокружения */
+      '<g id="' + prefix + 'PropDizzy" class="ttc-prop-dizzy-stars" style="display:none;">' +
+        '<polygon points="18,6 20,10 24,10 21,12 22,16 18,13 14,16 15,12 12,10 16,10" fill="#fde047"/>' +
+        '<polygon points="46,6 48,10 52,10 49,12 50,16 46,13 42,16 43,12 40,10 44,10" fill="#fde047"/>' +
+        '<ellipse cx="32" cy="11" rx="18" ry="4" fill="none" stroke="#fde047" stroke-width="1" stroke-dasharray="3 3"/>' +
+      '</g>';
+  }
+
+  function buildMascotFaceSvgInner(prefix){
+    return '' +
+      buildMascotPropsSvg(prefix) +
+      '<g id="' + prefix + 'FaceGroup" transform="translate(0,0)">' +
+        '<ellipse id="' + prefix + 'BlushL" class="ttc-mascot-blush" cx="13.5" cy="34.5" rx="4.2" ry="2.2"/>' +
+        '<ellipse id="' + prefix + 'BlushR" class="ttc-mascot-blush" cx="50.5" cy="34.5" rx="4.2" ry="2.2"/>' +
+        '<path id="' + prefix + 'BrowL" class="ttc-mascot-brow" d="M14,20 Q20,18 26,20"/>' +
+        '<path id="' + prefix + 'BrowR" class="ttc-mascot-brow" d="M38,20 Q44,18 50,20"/>' +
+        '<path id="' + prefix + 'EyeL" class="ttc-mascot-eye-glow" d="M15,28 C15,22 25,22 25,28 C25,34 15,34 15,28 Z"/>' +
+        '<path id="' + prefix + 'EyeR" class="ttc-mascot-eye-glow" d="M39,28 C39,22 49,22 49,28 C49,34 39,34 39,28 Z"/>' +
+        '<circle id="' + prefix + 'PupilL" class="ttc-mascot-pupil" cx="20" cy="28" r="2.2"/>' +
+        '<circle id="' + prefix + 'PupilR" class="ttc-mascot-pupil" cx="44" cy="28" r="2.2"/>' +
+        '<path id="' + prefix + 'Mouth" class="ttc-mascot-mouth" d="M25,41 Q32,46 39,41"/>' +
+      '</g>';
+  }
+
+  function renderMascotDockSvg(prefix){
+    var p = prefix || 'dock';
+    return '' +
+      '<svg class="ttc-mascot-dock-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">' +
+        '<circle class="ttc-mascot-ring" cx="32" cy="32" r="28" fill="none" stroke-width="1.3" stroke-dasharray="7 4 2 4"/>' +
+        '<path class="ttc-mascot-ear" d="M17,12 L11,2 L23,9 Z"/>' +
+        '<path class="ttc-mascot-ear" d="M47,12 L53,2 L41,9 Z"/>' +
+        '<g id="' + p + 'PortalNest" style="display:none;" opacity="0.78">' +
+          '<circle cx="32" cy="32" r="14" fill="none" stroke="var(--ai-accent-bright)" stroke-width="1.5" stroke-dasharray="4 4"/>' +
+          '<text x="32" y="37" text-anchor="middle" fill="var(--ai-accent-bright)" font-size="15" font-weight="bold">↩</text>' +
+        '</g>' +
+        '<g id="' + p + 'LiveCore">' +
+          buildMascotFaceSvgInner(p) +
+        '</g>' +
+      '</svg>';
+  }
+
+  function renderMascotRoamerSvg(){
+    return '' +
+      '<svg class="ttc-roamer-svg" viewBox="0 0 78 90" xmlns="http://www.w3.org/2000/svg">' +
+        '<ellipse cx="39" cy="84" rx="15" ry="3.2" fill="var(--ai-accent)" opacity="0.26"/>' +
+        '<g class="ttc-roamer-tail">' +
+          '<path d="M26,45 C24,58 30,69 39,78 C48,69 54,58 52,45 Z" fill="#090d16" stroke="var(--ai-accent)" stroke-width="1.6"/>' +
+          '<polygon points="39,51 43.5,57 39,63 34.5,57" fill="var(--ai-accent-bright)" opacity="0.9"/>' +
+        '</g>' +
+        '<g class="ttc-roamer-hand-l">' +
+          '<circle cx="11" cy="54" r="5.2" fill="#090d16" stroke="var(--ai-accent-bright)" stroke-width="1.6"/>' +
+          '<circle cx="11" cy="54" r="2" fill="var(--ai-accent-bright)"/>' +
+        '</g>' +
+        '<g class="ttc-roamer-hand-r">' +
+          '<circle cx="67" cy="54" r="5.2" fill="#090d16" stroke="var(--ai-accent-bright)" stroke-width="1.6"/>' +
+          '<circle cx="67" cy="54" r="2" fill="var(--ai-accent-bright)"/>' +
+        '</g>' +
+        '<g transform="translate(7, 2)">' +
+          '<path class="ttc-mascot-ear" d="M16,11 L9,0 L23,8 Z"/>' +
+          '<path class="ttc-mascot-ear" d="M48,11 L55,0 L41,8 Z"/>' +
+          '<circle cx="32" cy="28" r="21" fill="#080b12" stroke="var(--ai-accent)" stroke-width="2"/>' +
+          '<circle cx="32" cy="28" r="18.5" fill="none" stroke="var(--ai-accent-bright)" stroke-opacity="0.22" stroke-width="1"/>' +
+          buildMascotFaceSvgInner('roam') +
+        '</g>' +
+      '</svg>';
+  }
+
+  function getBrowPaths(browMode){
+    if(browMode === 'angry'){
+      return { l: 'M13,18 L26,23', r: 'M51,18 L38,23', show: true };
+    }
+    if(browMode === 'curious'){
+      return { l: 'M14,21 Q20,21 26,21', r: 'M38,17 Q44,13 50,17', show: true };
+    }
+    if(browMode === 'sad'){
+      return { l: 'M13,23 Q20,19 26,18', r: 'M38,18 Q44,19 51,23', show: true };
+    }
+    if(browMode === 'surprised'){
+      return { l: 'M14,16 Q20,12 26,16', r: 'M38,16 Q44,12 50,16', show: true };
+    }
+    if(browMode === 'smug'){
+      return { l: 'M14,19 L26,21', r: 'M38,18 Q44,15 50,18', show: true };
+    }
+    return { l: 'M14,20 Q20,18 26,20', r: 'M38,20 Q44,18 50,20', show: false };
+  }
+
+  function getEyePaths(eyeMode){
+    if(eyeMode === 'closed'){
+      return {
+        l: 'M14,29 Q20,32 26,29 Q20,30.5 14,29 Z',
+        r: 'M38,29 Q44,32 50,29 Q44,30.5 38,29 Z',
+        showPupils: false
+      };
+    }
+    if(eyeMode === 'happy'){
+      return {
+        l: 'M14,30 Q20,20 26,30 Q20,24.5 14,30 Z',
+        r: 'M38,30 Q44,20 50,30 Q44,24.5 38,30 Z',
+        showPupils: false
+      };
+    }
+    if(eyeMode === 'squint'){
+      return {
+        l: 'M14,26.5 L26,27.5 C26,32.5 14,32.5 14,26.5 Z',
+        r: 'M38,27.5 L50,26.5 C50,32.5 38,32.5 38,27.5 Z',
+        showPupils: true
+      };
+    }
+    if(eyeMode === 'angry'){
+      return {
+        l: 'M14,24 L26,28 C26,33.5 14,33.5 14,24 Z',
+        r: 'M38,28 L50,24 C50,33.5 38,33.5 38,28 Z',
+        showPupils: true
+      };
+    }
+    if(eyeMode === 'star'){
+      return {
+        l: 'M20,20 L22,26 L28,28 L22,30 L20,36 L18,30 L12,28 L18,26 Z',
+        r: 'M44,20 L46,26 L52,28 L46,30 L44,36 L42,30 L36,28 L42,26 Z',
+        showPupils: false
+      };
+    }
+    if(eyeMode === 'dizzy'){
+      return {
+        l: 'M14,24 L25,28 L14,32 L16,28 Z',
+        r: 'M50,24 L39,28 L50,32 L48,28 Z',
+        showPupils: false
+      };
+    }
+    if(eyeMode === 'visor'){
+      return {
+        l: 'M13,25.5 L27,25.5 L27,30 L13,30 Z',
+        r: 'M37,25.5 L51,25.5 L51,30 L37,30 Z',
+        showPupils: true
+      };
+    }
+    if(eyeMode === 'startle'){
+      return {
+        l: 'M13.5,28 C13.5,20 26.5,20 26.5,28 C26.5,36 13.5,36 13.5,28 Z',
+        r: 'M37.5,28 C37.5,20 50.5,20 50.5,28 C50.5,36 37.5,36 37.5,28 Z',
+        showPupils: true
+      };
+    }
+    if(eyeMode === 'asym'){
+      return {
+        l: 'M13.5,28 C13.5,20 26.5,20 26.5,28 C26.5,36 13.5,36 13.5,28 Z',
+        r: 'M38,26.5 L50,26.5 C50,32 38,32 38,26.5 Z',
+        showPupils: true
+      };
+    }
+    return {
+      l: 'M15,28 C15,22 25,22 25,28 C25,34 15,34 15,28 Z',
+      r: 'M39,28 C39,22 49,22 49,28 C49,34 39,34 39,28 Z',
+      showPupils: true
+    };
+  }
+
+  function getMouthPath(mouthMode){
+    if(mouthMode === 'neutral') return { d: 'M27,42 Q32,43 37,42', filled: false };
+    if(mouthMode === 'happy')   return { d: 'M24,40 Q32,49 40,40 Z', filled: true };
+    if(mouthMode === 'smirk')   return { d: 'M25,42 Q28.5,45.5 32,41.5 Q35.5,45.5 39,42', filled: false };
+    if(mouthMode === 'sleep')   return { d: 'M30.2,42.5 A1.8,1.8 0 1,0 33.8,42.5 A1.8,1.8 0 1,0 30.2,42.5 Z', filled: true };
+    if(mouthMode === 'yawn')    return { d: 'M28,40.5 A4,5 0 1,0 36,40.5 A4,5 0 1,0 28,40.5 Z', filled: true };
+    if(mouthMode === 'whistle') return { d: 'M33,42 A2.2,2.4 0 1,0 37.4,42 A2.2,2.4 0 1,0 33,42 Z', filled: true };
+    if(mouthMode === 'angry')   return { d: 'M25,44 L29,41 L32,43.5 L35,41 L39,44', filled: false };
+    if(mouthMode === 'dizzy')   return { d: 'M24,42 Q27,39 30,42 Q33,45 36,42 Q38,40 40,42', filled: false };
+    if(mouthMode === 'startle') return { d: 'M26,43 Q29,39.5 32,43 Q35,46.5 38,43', filled: false };
+    if(mouthMode === 'talk1')   return { d: 'M25,40.5 Q32,47.5 39,40.5 Z', filled: true };
+    if(mouthMode === 'talk2')   return { d: 'M27,41.5 Q32,44.5 37,41.5', filled: false };
+    return { d: 'M25,41 Q32,46 39,41', filled: false }; // 'smile'
+  }
+
+  function applyPropsVisibility(prefix){
+    var map = {
+      PropMage:    mascotState === 'mage',
+      PropScanner: mascotState === 'scanner',
+      PropReading: mascotState === 'reading',
+      PropCombat:  mascotState === 'combat',
+      PropJuggle:  mascotState === 'juggle',
+      PropStealth: mascotState === 'stealth',
+      PropDizzy:   mascotState === 'dizzy'
+    };
+    Object.keys(map).forEach(function(k){
+      var el = document.getElementById(prefix + k);
+      if(el) el.style.display = map[k] ? 'block' : 'none';
+    });
+  }
+
+  function applyFaceToPrefix(prefix, lx, ly){
+    var fg = document.getElementById(prefix + 'FaceGroup');
+    var eyeL = document.getElementById(prefix + 'EyeL');
+    var eyeR = document.getElementById(prefix + 'EyeR');
+    var browL = document.getElementById(prefix + 'BrowL');
+    var browR = document.getElementById(prefix + 'BrowR');
+    var blushL = document.getElementById(prefix + 'BlushL');
+    var blushR = document.getElementById(prefix + 'BlushR');
+    var pupL = document.getElementById(prefix + 'PupilL');
+    var pupR = document.getElementById(prefix + 'PupilR');
+    var mouth = document.getElementById(prefix + 'Mouth');
+    if(!fg || !eyeL || !eyeR || !mouth) return;
+
+    applyPropsVisibility(prefix);
+
+    var effEyes = isBlinking ? 'closed' : currentEyes;
+    var ep = getEyePaths(effEyes);
+    var bp = getBrowPaths(currentBrows);
+    var mp = getMouthPath(currentMouth);
+
+    fg.setAttribute('transform', 'translate(' + lx.toFixed(2) + ',' + ly.toFixed(2) + ')');
+    eyeL.setAttribute('d', ep.l);
+    eyeR.setAttribute('d', ep.r);
+
+    if(browL && browR){
+      browL.setAttribute('d', bp.l);
+      browR.setAttribute('d', bp.r);
+      browL.style.opacity = bp.show ? '1' : '0';
+      browR.style.opacity = bp.show ? '1' : '0';
+    }
+
+    if(blushL && blushR){
+      blushL.classList.toggle('visible', !!showBlush);
+      blushR.classList.toggle('visible', !!showBlush);
+    }
+
+    if(pupL && pupR){
+      pupL.style.opacity = ep.showPupils ? '1' : '0';
+      pupR.style.opacity = ep.showPupils ? '1' : '0';
+      pupL.setAttribute('cx', (20 + lx * 0.48).toFixed(2));
+      pupL.setAttribute('cy', (28 + ly * 0.48).toFixed(2));
+      pupR.setAttribute('cx', (44 + lx * 0.48).toFixed(2));
+      pupR.setAttribute('cy', (28 + ly * 0.48).toFixed(2));
+    }
+
+    mouth.setAttribute('d', mp.d);
+    mouth.classList.toggle('filled', !!mp.filled);
+  }
+
+  function syncMascotDomClasses(){
+    var fab = document.getElementById('ttcAiFab');
+    var roamer = document.getElementById('ttcAiRoamer');
+    var dockPortal = document.getElementById('dockPortalNest');
+    var dockCore = document.getElementById('dockLiveCore');
+    var dockNotes = document.getElementById('ttcDockNotesWrap');
+    var roamNotes = document.getElementById('ttcRoamNotesWrap');
+
+    var modeClasses = ['mode-stealth', 'mode-mage', 'mode-bard', 'mode-combat', 'mode-dizzy', 'mode-glitch'];
+
+    [fab, roamer].forEach(function(el){
+      if(!el) return;
+      modeClasses.forEach(function(mc){ el.classList.remove(mc); });
+      if(mascotState === 'stealth') el.classList.add('mode-stealth');
+      if(mascotState === 'mage')    el.classList.add('mode-mage');
+      if(mascotState === 'bard')    el.classList.add('mode-bard');
+      if(mascotState === 'combat')  el.classList.add('mode-combat');
+      if(mascotState === 'dizzy')   el.classList.add('mode-dizzy');
+      if(mascotState === 'glitch')  el.classList.add('mode-glitch');
+    });
+
+    if(fab){
+      fab.classList.toggle('state-sleep', !isRoaming && mascotState === 'sleep');
+      fab.classList.toggle('state-startle', !isRoaming && mascotState === 'startle');
+      fab.classList.toggle('state-happy', !isRoaming && (mascotState === 'happy' || mascotState === 'petted'));
+      fab.classList.toggle('state-roaming', isRoaming);
+    }
+    if(dockPortal && dockCore){
+      dockPortal.style.display = isRoaming ? 'block' : 'none';
+      dockCore.style.display = isRoaming ? 'none' : 'block';
+    }
+    if(roamer){
+      roamer.classList.toggle('active', isRoaming);
+      roamer.classList.toggle('state-sleep', isRoaming && mascotState === 'sleep');
+      roamer.classList.toggle('state-startle', isRoaming && mascotState === 'startle');
+      roamer.classList.toggle('state-happy', isRoaming && (mascotState === 'happy' || mascotState === 'petted'));
+    }
+    if(dockNotes) dockNotes.style.display = (!isRoaming && mascotState === 'bard') ? 'block' : 'none';
+    if(roamNotes) roamNotes.style.display = (isRoaming && mascotState === 'bard') ? 'block' : 'none';
+
+    updateMascotControlBar();
+  }
+
+  function setMascotMood(state, durationMs){
+    mascotState = state;
+    showBlush = false;
+    currentBrows = 'neutral';
+
+    if(durationMs){
+      modeExpireTs = Date.now() + durationMs;
+    } else if(lockedShowMode === 'auto'){
+      modeExpireTs = 0;
+    }
+
+    if(state === 'sleep'){
+      currentEyes = 'closed';
+      currentMouth = 'sleep';
+    } else if(state === 'yawn'){
+      currentEyes = 'squint';
+      currentMouth = 'yawn';
+    } else if(state === 'startle'){
+      currentEyes = 'startle';
+      currentMouth = 'startle';
+      currentBrows = 'surprised';
+    } else if(state === 'happy'){
+      currentEyes = 'star';
+      currentMouth = 'happy';
+      showBlush = true;
+    } else if(state === 'petted'){
+      currentEyes = 'happy';
+      currentMouth = 'smirk';
+      showBlush = true;
+    } else if(state === 'thinking'){
+      currentEyes = 'squint';
+      currentMouth = 'talk1';
+      currentBrows = 'curious';
+    } else if(state === 'mage'){
+      currentEyes = 'star';
+      currentMouth = 'smirk';
+      currentBrows = 'smug';
+    } else if(state === 'combat'){
+      currentEyes = 'angry';
+      currentMouth = 'angry';
+      currentBrows = 'angry';
+    } else if(state === 'bard'){
+      currentEyes = 'happy';
+      currentMouth = 'whistle';
+      showBlush = true;
+    } else if(state === 'scanner'){
+      currentEyes = 'visor';
+      currentMouth = 'neutral';
+      currentBrows = 'curious';
+    } else if(state === 'reading'){
+      currentEyes = 'open';
+      currentMouth = 'neutral';
+      currentBrows = 'curious';
+    } else if(state === 'juggle'){
+      currentEyes = 'star';
+      currentMouth = 'happy';
+      currentBrows = 'surprised';
+    } else if(state === 'stealth'){
+      currentEyes = 'squint';
+      currentMouth = 'neutral';
+      currentBrows = 'angry';
+    } else if(state === 'glitch'){
+      currentEyes = 'visor';
+      currentMouth = 'dizzy';
+      currentBrows = 'surprised';
+    } else if(state === 'dizzy'){
+      currentEyes = 'dizzy';
+      currentMouth = 'dizzy';
+      currentBrows = 'sad';
+    } else {
+      currentEyes = 'open';
+      currentMouth = (Math.random() < 0.35) ? 'smirk' : 'smile';
+      currentBrows = (Math.random() < 0.25) ? 'smug' : 'neutral';
+    }
+    syncMascotDomClasses();
+  }
+
+  function triggerStartleWake(customQuip){
+    setMascotMood('startle', 800);
+    showMascotBubble(customQuip || pickQuip('startle'), 3200);
+    targetLookX = -5.5;
+    targetLookY = -2;
+    setTimeout(function(){ targetLookX = 5.5; targetLookY = 1; }, 160);
+    setTimeout(function(){ targetLookX = 0; targetLookY = 0; }, 340);
+    setTimeout(function(){
+      if(mascotState === 'startle'){
+        lastNearMascotTs = Date.now();
+        setMascotMood(lockedShowMode !== 'auto' ? lockedShowMode : 'idle');
+      }
+    }, 750);
+  }
+
+  function triggerHappyReaction(customQuip){
+    lastNearMascotTs = Date.now();
+    setMascotMood('happy', 1800);
+    if(customQuip) showMascotBubble(customQuip, 3600);
+    setTimeout(function(){
+      if(mascotState === 'happy'){
+        setMascotMood(lockedShowMode !== 'auto' ? lockedShowMode : 'idle');
+      }
+    }, 1800);
+  }
+
+  function triggerRandomAutonomousShowMode(){
+    var showModes = ['mage', 'combat', 'bard', 'reading', 'scanner', 'juggle', 'stealth', 'glitch'];
+    var picked = showModes[Math.floor(Math.random() * showModes.length)];
+    setMascotMood(picked, 6200);
+    if(!isOpen && Math.random() < 0.65){
+      showMascotBubble(pickQuip(picked), 3400);
+    }
+    if(picked === 'juggle' || picked === 'mage'){
+      var sx = isRoaming ? (roamX + 39) : ((window.innerWidth || 800) - 54);
+      var sy = isRoaming ? (roamY + 45) : ((window.innerHeight || 600) - 54);
+      spawnMascotSparkles(sx, sy, 5);
+    }
+  }
+
+  function pickNewRoamWaypoint(){
+    var vw = Math.max(window.innerWidth || 800, 360);
+    var vh = Math.max(window.innerHeight || 600, 400);
+
+    // 45% шанс подлететь к реальному заголовку или карточке на странице, чтобы «осмотреть» её!
+    if(Math.random() < 0.45){
+      var candidates = document.querySelectorAll('#app h1, #app .section-label, #app .fae-card, #app .wi-card, #app .me-card, #app .sh-card, #app .ai-gen-card');
+      if(candidates && candidates.length > 0){
+        var el = candidates[Math.floor(Math.random() * candidates.length)];
+        var rect = el.getBoundingClientRect();
+        if(rect.top > 60 && rect.bottom < vh - 80 && rect.left > 40 && rect.right < vw - 60){
+          roamTargetX = Math.max(45, Math.min(vw - 95, rect.right - 65));
+          roamTargetY = Math.max(55, Math.min(vh - 105, rect.top - 32));
+          return;
+        }
+      }
+    }
+
+    var padX = 55;
+    var padTop = 70;
+    var padBot = 110;
+    roamTargetX = padX + Math.random() * Math.max(120, vw - padX * 2 - 80);
+    roamTargetY = padTop + Math.random() * Math.max(120, vh - padTop - padBot - 80);
+  }
+
+  function playTeleportFlash(el){
+    if(!el) return;
+    el.classList.remove('teleport-flash');
+    void el.offsetWidth;
+    el.classList.add('teleport-flash');
+    setTimeout(function(){
+      el.classList.remove('teleport-flash');
+    }, 460);
+  }
+
+  function startRoaming(isManual){
+    var fab = document.getElementById('ttcAiFab');
+    var roamer = document.getElementById('ttcAiRoamer');
+    if(!roamer) return;
+
+    var vw = window.innerWidth || 800;
+    var vh = window.innerHeight || 600;
+
+    // Вспышка искр в точке отправления (у сферы внизу справа)
+    spawnMascotSparkles(vw - 54, vh - 54, 8);
+
+    // Выбираем точку назначения на экране и сразу телепортируем маскота туда!
+    pickNewRoamWaypoint();
+    roamX = roamTargetX;
+    roamY = roamTargetY;
+    roamer.style.transform = 'translate3d(' + roamX.toFixed(1) + 'px,' + roamY.toFixed(1) + 'px,0) rotate(0deg)';
+
+    // Небольшая пауза после материализации перед началом плавного полёта к следующей точке
+    roamWaypointWaitUntil = Date.now() + 950;
+    pickNewRoamWaypoint();
+
+    // Вспышка искр в точке прибытия на экране
+    spawnMascotSparkles(roamX + 39, roamY + 45, 9);
+
+    isRoaming = true;
+    manualRoam = !!isManual;
+    roamStartedTs = Date.now();
+    lastNearMascotTs = Date.now();
+    setMascotMood(lockedShowMode !== 'auto' ? lockedShowMode : 'idle');
+
+    playTeleportFlash(fab);
+    playTeleportFlash(roamer);
+
+    syncMascotDomClasses();
+    showMascotBubble(pickQuip('roamStart'), 3200);
+  }
+
+  function stopRoaming(silent){
+    if(!isRoaming) return;
+    var vw = window.innerWidth || 800;
+    var vh = window.innerHeight || 600;
+    spawnMascotSparkles(roamX + 39, roamY + 45, 7);
+    spawnMascotSparkles(vw - 54, vh - 54, 7);
+    isRoaming = false;
+    manualRoam = false;
+    lastNearMascotTs = Date.now();
+    var fab = document.getElementById('ttcAiFab');
+    playTeleportFlash(fab);
+    setMascotMood(lockedShowMode !== 'auto' ? lockedShowMode : 'idle');
+    if(!silent) showMascotBubble(pickQuip('roamReturn'), 2600);
+  }
+
+  function updateMascotControlBar(){
+    var chk = document.getElementById('ttcAiAutoRoamChk');
+    var roamBtn = document.getElementById('ttcAiRoamNowBtn');
+    var statusSpan = document.getElementById('ttcAiMascotStateBadge');
+    if(chk) chk.checked = !!autoRoamEnabled;
+    if(roamBtn){
+      roamBtn.innerHTML = isRoaming ? '↩ Вернуть в сферу' : '✨ Выпустить на экран';
+    }
+    if(statusSpan){
+      var modeLabels = {
+        idle: 'Бодрствует',
+        sleep: 'Спит 💤',
+        yawn: 'Зевает 🥱',
+        startle: 'Вздрогнул! ⚡',
+        happy: 'В восторге ✨',
+        petted: 'Мурчит ^‿^',
+        thinking: 'Колдует ответ ⚡',
+        mage: 'Плетёт магию 🔮',
+        combat: 'Боевая стойка ⚔️',
+        bard: 'Насвистывает 🎵',
+        reading: 'Читает гримуар 📖',
+        scanner: 'Сканирует 🔍',
+        juggle: 'Жонглирует d20 🎲',
+        stealth: 'В скрытности 🕵️',
+        glitch: 'Перегрузка ⚡',
+        dizzy: 'Укачало 🌀'
+      };
+      var stText = modeLabels[mascotState] || 'Бодрствует';
+      if(isRoaming && mascotState === 'idle') stText = 'Парит по экрану ✨';
+      statusSpan.textContent = stText;
+    }
+    document.querySelectorAll('[data-mascot-mode-btn]').forEach(function(btn){
+      var m = btn.getAttribute('data-mascot-mode-btn');
+      btn.classList.toggle('active', m === lockedShowMode);
+    });
+  }
+
+  function startMascotLoops(){
+    if(window.__ttcMascotLoopsStarted) return;
+    window.__ttcMascotLoopsStarted = true;
+
+    window.addEventListener('mousemove', function(e){
+      var dx = e.clientX - mouseX;
+      var dy = e.clientY - mouseY;
+      var speed = Math.hypot(dx, dy);
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      lastMouseMoveTs = Date.now();
+
+      var refX = isRoaming ? (roamX + 39) : ((window.innerWidth || 800) - 54);
+      var refY = isRoaming ? (roamY + 45) : ((window.innerHeight || 600) - 54);
+      var distToMascot = Math.hypot(mouseX - refX, mouseY - refY);
+
+      if(distToMascot < 140){
+        lastNearMascotTs = Date.now();
+        if(mascotState === 'sleep' || mascotState === 'yawn'){
+          if(speed > 26){
+            triggerStartleWake();
+          } else {
+            setMascotMood(lockedShowMode !== 'auto' ? lockedShowMode : 'idle');
+            showMascotBubble(pickQuip('wake'), 2800);
+          }
+        }
+      }
+
+      // Распознавание поглаживания курсором прямо по маскоту (влево-вправо)
+      if(distToMascot < 44 && !isDraggingRoamer && Math.abs(dx) > 3){
+        var dir = dx > 0 ? 1 : -1;
+        var now = Date.now();
+        if(dir !== lastPetDirX && (now - lastPetStrokeTs < 650)){
+          petStrokeCount++;
+          lastPetDirX = dir;
+          lastPetStrokeTs = now;
+          if(petStrokeCount >= 4 && mascotState !== 'petted'){
+            petStrokeCount = 0;
+            setMascotMood('petted', 3600);
+            showMascotBubble(pickQuip('petted'), 3400);
+            spawnMascotSparkles(refX, refY, 5);
+          }
+        } else if(now - lastPetStrokeTs >= 650){
+          petStrokeCount = 1;
+          lastPetDirX = dir;
+          lastPetStrokeTs = now;
+        }
+      }
+    }, { passive: true });
+
+    // Плавный цикл физики взгляда, спец-режимов и полёта (30 FPS)
+    setInterval(function(){
+      if(document.body && document.body.classList.contains('tab-paused')) return;
+
+      var now = Date.now();
+      var refX = isRoaming ? (roamX + 39) : ((window.innerWidth || 800) - 54);
+      var refY = isRoaming ? (roamY + 45) : ((window.innerHeight || 600) - 54);
+
+      // Возврат из временного шоу-режима в обычный
+      if(modeExpireTs > 0 && now >= modeExpireTs && lockedShowMode === 'auto' && !isBusy){
+        modeExpireTs = 0;
+        setMascotMood('idle');
+      }
+
+      if(mascotState === 'sleep'){
+        targetLookX = 0;
+        targetLookY = 1.5;
+      } else if(isBusy){
+        var t = now / 180;
+        targetLookX = Math.cos(t) * 3.5;
+        targetLookY = Math.sin(t * 1.3) * 2.5;
+        currentMouth = (Math.floor(now / 220) % 2 === 0) ? 'talk1' : 'talk2';
+      } else if(mascotState === 'reading'){
+        // Глаза бегают по строчкам открытого гримуара слева направо
+        targetLookX = Math.sin(now / 260) * 4.2;
+        targetLookY = 3.2;
+      } else if(mascotState === 'juggle'){
+        // Следит взглядом за подбрасываемыми кубиками d20
+        targetLookX = Math.sin(now / 150) * 4.5;
+        targetLookY = -3.8 + Math.abs(Math.cos(now / 150)) * 2.5;
+      } else if(mascotState === 'scanner'){
+        targetLookX = Math.sin(now / 320) * 5.0;
+        targetLookY = 2.0;
+      } else if(mascotState === 'stealth'){
+        targetLookX = (Math.floor(now / 900) % 2 === 0) ? -4.8 : 4.8;
+        targetLookY = 0;
+      } else if(now - lastMouseMoveTs < 6000){
+        var ang = Math.atan2(mouseY - refY, mouseX - refX);
+        var dist = Math.min(Math.hypot(mouseX - refX, mouseY - refY), 260) / 260;
+        targetLookX = Math.cos(ang) * dist * 5.2;
+        targetLookY = Math.sin(ang) * dist * 4.4;
+      }
+
+      lookX += (targetLookX - lookX) * 0.24;
+      lookY += (targetLookY - lookY) * 0.24;
+
+      if(!isRoaming){
+        applyFaceToPrefix('dock', lookX, lookY);
+      } else {
+        applyFaceToPrefix('roam', lookX, lookY);
+      }
+      if(isOpen){
+        applyFaceToPrefix('hdr', lookX * 0.65, lookY * 0.65);
+      }
+
+      // Перемещение парящего маскота по экрану
+      if(isRoaming && !isDraggingRoamer && mascotState !== 'sleep'){
+        if(now >= roamWaypointWaitUntil){
+          var dx = roamTargetX - roamX;
+          var dy = roamTargetY - roamY;
+          var d = Math.hypot(dx, dy);
+          if(d < 14){
+            roamWaypointWaitUntil = now + 3200 + Math.random() * 3800;
+            pickNewRoamWaypoint();
+            // На остановке может включить режим чтения, сканера или барда!
+            if(lockedShowMode === 'auto' && mascotState === 'idle' && Math.random() < 0.42){
+              triggerRandomAutonomousShowMode();
+            } else if(Math.random() < 0.22 && !isOpen){
+              showMascotBubble(pickQuip('roamIdle'), 3000);
+            }
+          } else {
+            var step = Math.min(d * 0.038, 3.4);
+            roamVX = (dx / d) * step;
+            roamVY = (dy / d) * step;
+            roamX += roamVX;
+            roamY += roamVY;
+            var roamer = document.getElementById('ttcAiRoamer');
+            if(roamer){
+              var tilt = Math.max(-13, Math.min(13, roamVX * 2.9));
+              roamer.style.transform = 'translate3d(' + roamX.toFixed(1) + 'px,' + roamY.toFixed(1) + 'px,0) rotate(' + tilt.toFixed(1) + 'deg)';
+            }
+            if(Math.random() < 0.06){
+              spawnMascotSparkles(roamX + 39, roamY + 72, 1);
+            }
+          }
+        }
+      }
+    }, 33);
+
+    // Цикл моргания, смены эмоций, шоу-режимов, сна, резкого пробуждения и авто-вылетов
+    setInterval(function(){
+      if(document.body && document.body.classList.contains('tab-paused')) return;
+      var now = Date.now();
+
+      // Моргание
+      if((mascotState === 'idle' || mascotState === 'reading' || mascotState === 'mage') && !isBlinking && Math.random() < 0.45){
+        isBlinking = true;
+        setTimeout(function(){ isBlinking = false; }, 150);
+      }
+
+      // Случайное движение глазами и смена мимики в покое
+      if(mascotState === 'idle' && now - lastMouseMoveTs >= 6000){
+        targetLookX = (Math.random() - 0.5) * 7;
+        targetLookY = (Math.random() - 0.5) * 5;
+        if(Math.random() < 0.35){
+          currentMouth = ['smile', 'neutral', 'smirk'][Math.floor(Math.random() * 3)];
+          currentBrows = ['neutral', 'curious', 'smug'][Math.floor(Math.random() * 3)];
+        }
+      }
+
+      // Спонтанное включение интересного режима (Маг, Бард, Чтение, Жонглёр, Сальто и т.д.)
+      if(lockedShowMode === 'auto' && mascotState === 'idle' && !isBusy && (now - lastNearMascotTs < 19000) && Math.random() < 0.18){
+        if(Math.random() < 0.22){
+          triggerBarrelRoll();
+        } else {
+          triggerRandomAutonomousShowMode();
+        }
+        return;
+      }
+
+      // Переход в сон (через 24 сек бездействия рядом, если чат закрыт и выбран Авто-режим)
+      if(lockedShowMode === 'auto' && mascotState === 'idle' && !isBusy && !isOpen && !isDraggingRoamer && (now - lastNearMascotTs > 24000)){
+        setMascotMood('yawn');
+        setTimeout(function(){
+          if(mascotState === 'yawn') setMascotMood('sleep');
+        }, 1350);
+        return;
+      }
+
+      // Во время сна: шанс резко проснуться (Startle) и снова бодрствовать/задремать
+      if(mascotState === 'sleep' && lockedShowMode === 'auto' && !isBusy){
+        if(Math.random() < 0.16){
+          triggerStartleWake();
+          return;
+        }
+      }
+
+      // Автономный вылет из иконки на экран и возврат обратно
+      if(autoRoamEnabled && !isBusy && !isOpen){
+        if(!isRoaming && mascotState === 'idle' && (now - roamStartedTs > 42000) && Math.random() < 0.15){
+          startRoaming(false);
+        } else if(isRoaming && !manualRoam && (now - roamStartedTs > 40000) && Math.random() < 0.22){
+          stopRoaming(false);
+        }
+      }
+    }, 2700);
+  }
+
   /* ---------- Хранение истории чата по разделам ---------- */
   function loadChatHistory(mode){
     try {
@@ -2577,10 +3566,49 @@
     fab.id = 'ttcAiFab';
     fab.type = 'button';
     fab.className = 'ttc-ai-fab';
-    fab.title = 'Открыть ИИ-Ассистента и Агента задач';
+    fab.title = 'Фамильяр Орбис: клик — открыть чат, погладь курсором — замурчит!';
     fab.innerHTML =
-      '<span class="ttc-ai-fab-icon" id="ttcAiFabIcon">🐉</span>' +
-      '<span class="ttc-ai-fab-badge">ИИ</span>';
+      '<div class="ttc-mascot-bubble" id="ttcMascotDockBubble"></div>' +
+      '<div class="ttc-mascot-zzz-wrap">' +
+        '<span class="ttc-mascot-z">z</span>' +
+        '<span class="ttc-mascot-z">Z</span>' +
+        '<span class="ttc-mascot-z">Z</span>' +
+      '</div>' +
+      '<div class="ttc-mascot-fx-wrap" id="ttcDockNotesWrap" style="display:none;">' +
+        '<span class="ttc-mascot-note">♪</span>' +
+        '<span class="ttc-mascot-note">♫</span>' +
+        '<span class="ttc-mascot-note">♬</span>' +
+      '</div>' +
+      renderMascotDockSvg('dock');
+
+    var roamer = document.createElement('div');
+    roamer.id = 'ttcAiRoamer';
+    roamer.className = 'ttc-ai-roamer';
+    roamer.innerHTML =
+      '<div class="ttc-mascot-bubble" id="ttcRoamerBubble"></div>' +
+      '<div class="ttc-mascot-zzz-wrap" style="right:10px;top:-10px;">' +
+        '<span class="ttc-mascot-z">z</span>' +
+        '<span class="ttc-mascot-z">Z</span>' +
+        '<span class="ttc-mascot-z">Z</span>' +
+      '</div>' +
+      '<div class="ttc-mascot-fx-wrap" id="ttcRoamNotesWrap" style="display:none;top:-20px;">' +
+        '<span class="ttc-mascot-note">♪</span>' +
+        '<span class="ttc-mascot-note">♫</span>' +
+        '<span class="ttc-mascot-note">♬</span>' +
+      '</div>' +
+      '<div class="ttc-roamer-body-wrap">' +
+        renderMascotRoamerSvg() +
+      '</div>' +
+      '<div class="ttc-roamer-actions">' +
+        '<button type="button" class="ttc-roamer-act-btn" id="ttcRoamerOpenChatBtn" title="Открыть чат">💬 Чат</button>' +
+        '<button type="button" class="ttc-roamer-act-btn" id="ttcRoamerFlipBtn" title="Сделать кувырок-сальто">🤸 Трюк</button>' +
+        '<button type="button" class="ttc-roamer-act-btn" id="ttcRoamerRollBtn" title="Быстрый бросок d20">🎲 d20</button>' +
+        '<button type="button" class="ttc-roamer-act-btn" id="ttcRoamerDockBtn" title="Вернуть в сферу">↩ В сферу</button>' +
+      '</div>';
+
+    var modesStripHtml = MASCOT_MODES_LIST.map(function(m){
+      return '<button type="button" class="ttc-ai-mode-pill' + (m.id === lockedShowMode ? ' active' : '') + '" data-mascot-mode-btn="' + m.id + '">' + m.label + '</button>';
+    }).join('');
 
     var chat = document.createElement('div');
     chat.id = 'ttcAiChat';
@@ -2588,7 +3616,7 @@
     chat.innerHTML =
       '<div class="ttc-ai-header">' +
         '<div class="ttc-ai-header-left">' +
-          '<div class="ttc-ai-avatar" id="ttcAiHdrIcon">🐉</div>' +
+          '<div class="ttc-ai-avatar" id="ttcAiHdrIcon">' + renderMascotDockSvg('hdr') + '</div>' +
           '<div class="ttc-ai-title-wrap">' +
             '<div class="ttc-ai-title" id="ttcAiHdrTitle">ИИ-Ассистент</div>' +
             '<div class="ttc-ai-subtitle" id="ttcAiHdrSub">Фаэрун</div>' +
@@ -2599,6 +3627,16 @@
           '<button type="button" class="ttc-ai-hdr-btn" id="ttcAiClearBtn" title="Очистить историю чата">🗑️</button>' +
           '<button type="button" class="ttc-ai-hdr-btn" id="ttcAiCloseBtn" title="Свернуть чат">✕</button>' +
         '</div>' +
+      '</div>' +
+      '<div class="ttc-ai-mascot-bar">' +
+        '<label class="ttc-ai-mascot-toggle-lbl" title="Разрешить фамильяру самому периодически вылетать из сферы и парить по экрану">' +
+          '<input type="checkbox" id="ttcAiAutoRoamChk" ' + (autoRoamEnabled ? 'checked' : '') + '>' +
+          '<span>🦋 Авто-вылет (<b id="ttcAiMascotStateBadge" style="color:var(--ai-accent-bright);font-weight:600;">Бодрствует</b>)</span>' +
+        '</label>' +
+        '<button type="button" class="ttc-ai-roam-btn" id="ttcAiRoamNowBtn">✨ Выпустить на экран</button>' +
+      '</div>' +
+      '<div class="ttc-ai-modes-strip" title="Режимы и анимации фамильяра Орбиса">' +
+        modesStripHtml +
       '</div>' +
       '<div class="ttc-ai-quick-bar">' +
         '<button type="button" class="ttc-ai-chip" data-ai-prefill="Измени параметры персонажа: ">✏️ Изменить статы...</button>' +
@@ -2613,17 +3651,180 @@
       '</div>';
 
     document.body.appendChild(fab);
+    document.body.appendChild(roamer);
     document.body.appendChild(chat);
 
+    // События сферы-дока
     fab.addEventListener('click', function(){
+      lastNearMascotTs = Date.now();
+      if(mascotState === 'sleep' || mascotState === 'yawn'){
+        setMascotMood(lockedShowMode !== 'auto' ? lockedShowMode : 'idle');
+      }
       isOpen = !isOpen;
       chat.classList.toggle('open', isOpen);
       if(isOpen){
         renderChatHeader();
         renderMessages();
+        updateMascotControlBar();
         var inp = document.getElementById('ttcAiInput');
         if(inp) setTimeout(function(){ inp.focus(); }, 80);
       }
+    });
+
+    // Переключатель режимов и трюков маскота в чате
+    chat.querySelectorAll('[data-mascot-mode-btn]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var m = btn.getAttribute('data-mascot-mode-btn') || 'auto';
+        lastNearMascotTs = Date.now();
+        if(m === 'flip'){
+          triggerBarrelRoll('🤸 Бочка на 360 градусов! Ву-ху!');
+          return;
+        }
+        lockedShowMode = m;
+        if(m === 'auto'){
+          setMascotMood('idle');
+          showMascotBubble('🎭 Режим живой автономии включён!', 2400);
+        } else {
+          setMascotMood(m);
+          showMascotBubble(pickQuip(m), 3200);
+        }
+        updateMascotControlBar();
+      });
+    });
+
+    // Управление вылетом маскота из шапки чата
+    var autoRoamChk = document.getElementById('ttcAiAutoRoamChk');
+    if(autoRoamChk){
+      autoRoamChk.addEventListener('change', function(){
+        autoRoamEnabled = !!autoRoamChk.checked;
+        try { localStorage.setItem(AUTO_ROAM_STORAGE_KEY, autoRoamEnabled ? '1' : '0'); } catch(e){}
+        if(!autoRoamEnabled && isRoaming && !manualRoam){
+          stopRoaming(false);
+        }
+        updateMascotControlBar();
+      });
+    }
+
+    var roamNowBtn = document.getElementById('ttcAiRoamNowBtn');
+    if(roamNowBtn){
+      roamNowBtn.addEventListener('click', function(){
+        if(isRoaming){
+          stopRoaming(false);
+        } else {
+          startRoaming(true);
+        }
+      });
+    }
+
+    // Drag & Drop, распознавание тряски и клики по парящему на экране маскоту
+    var dragMoved = false;
+    roamer.addEventListener('pointerdown', function(e){
+      if(e.target.closest('.ttc-roamer-actions')) return;
+      isDraggingRoamer = true;
+      dragMoved = false;
+      dragShakeScore = 0;
+      lastDragDX = 0;
+      roamer.classList.add('dragging');
+      roamer.setPointerCapture(e.pointerId);
+      dragOffsetX = e.clientX - roamX;
+      dragOffsetY = e.clientY - roamY;
+      lastNearMascotTs = Date.now();
+      currentEyes = 'asym';
+      currentMouth = 'startle';
+      currentBrows = 'surprised';
+      showMascotBubble(pickQuip('drag'), 2400);
+    });
+
+    roamer.addEventListener('pointermove', function(e){
+      if(!isDraggingRoamer) return;
+      var nx = e.clientX - dragOffsetX;
+      var ny = e.clientY - dragOffsetY;
+      var ddx = nx - roamX;
+      if(Math.hypot(ddx, ny - roamY) > 5) dragMoved = true;
+
+      // Проверяем резкую тряску из стороны в сторону во время перетаскивания
+      if(Math.abs(ddx) > 8){
+        var sDir = ddx > 0 ? 1 : -1;
+        if(sDir !== lastDragDX){
+          dragShakeScore++;
+          lastDragDX = sDir;
+        }
+      }
+
+      var vw = window.innerWidth || 800;
+      var vh = window.innerHeight || 600;
+      roamX = Math.max(8, Math.min(vw - 84, nx));
+      roamY = Math.max(8, Math.min(vh - 96, ny));
+      roamTargetX = roamX;
+      roamTargetY = roamY;
+      roamWaypointWaitUntil = Date.now() + 3500;
+      roamer.style.transform = 'translate3d(' + roamX.toFixed(1) + 'px,' + roamY.toFixed(1) + 'px,0)';
+    });
+
+    function endRoamerDrag(){
+      if(!isDraggingRoamer) return;
+      isDraggingRoamer = false;
+      roamer.classList.remove('dragging');
+      if(dragShakeScore >= 6){
+        // Если сильно потрясли — кружится голова!
+        setMascotMood('dizzy', 4200);
+        showMascotBubble(pickQuip('dizzy'), 3600);
+      } else if(!dragMoved){
+        // Одиночный клик по парящему маскоту — случайный трюк или эмоция!
+        if(Math.random() < 0.35){
+          triggerBarrelRoll(pickQuip('poke'));
+        } else {
+          triggerRandomAutonomousShowMode();
+        }
+      } else {
+        setMascotMood(lockedShowMode !== 'auto' ? lockedShowMode : 'idle');
+      }
+    }
+    roamer.addEventListener('pointerup', endRoamerDrag);
+    roamer.addEventListener('pointercancel', endRoamerDrag);
+
+    roamer.addEventListener('dblclick', function(e){
+      if(e.target.closest('.ttc-roamer-actions')) return;
+      isOpen = true;
+      chat.classList.add('open');
+      renderChatHeader();
+      renderMessages();
+      updateMascotControlBar();
+    });
+
+    document.getElementById('ttcRoamerOpenChatBtn').addEventListener('click', function(e){
+      e.stopPropagation();
+      isOpen = !isOpen;
+      chat.classList.toggle('open', isOpen);
+      if(isOpen){
+        renderChatHeader();
+        renderMessages();
+        updateMascotControlBar();
+      }
+    });
+
+    document.getElementById('ttcRoamerFlipBtn').addEventListener('click', function(e){
+      e.stopPropagation();
+      triggerBarrelRoll('🤸 Эфирное сальто! +10 к стилю!');
+    });
+
+    document.getElementById('ttcRoamerRollBtn').addEventListener('click', function(e){
+      e.stopPropagation();
+      var roll = Math.floor(Math.random() * 20) + 1;
+      if(roll === 20){
+        triggerBarrelRoll();
+        triggerHappyReaction('🎲 d20 = 20! НАТУРАЛЬНЫЙ КРИТ! 🔥');
+      } else if(roll === 1){
+        triggerStartleWake('🎲 d20 = 1... Ой-ой, крит-провал! 💀');
+      } else {
+        setMascotMood('juggle', 2600);
+        showMascotBubble('🎲 Бросок фамильяра: d20 = ' + roll + '!', 3000);
+      }
+    });
+
+    document.getElementById('ttcRoamerDockBtn').addEventListener('click', function(e){
+      e.stopPropagation();
+      stopRoaming(false);
     });
 
     document.getElementById('ttcAiCloseBtn').addEventListener('click', function(){
@@ -2679,30 +3880,35 @@
       });
     });
 
+    startMascotLoops();
     renderChatHeader();
     renderMessages();
+    syncMascotDomClasses();
   }
 
   function updateBusyState(){
     var fab = document.getElementById('ttcAiFab');
     var sendBtn = document.getElementById('ttcAiSendBtn');
     if(fab) fab.classList.toggle('is-busy', isBusy);
+    if(isBusy){
+      setMascotMood('mage');
+    } else {
+      triggerHappyReaction();
+    }
     if(sendBtn){
       sendBtn.disabled = isBusy;
       sendBtn.textContent = isBusy ? '⏳' : '➤';
     }
+    updateMascotControlBar();
   }
 
   function renderChatHeader(){
     var ctx = getModeContext(getActiveMode());
-    var fabIcon = document.getElementById('ttcAiFabIcon');
-    var hdrIcon = document.getElementById('ttcAiHdrIcon');
     var hdrTitle = document.getElementById('ttcAiHdrTitle');
     var hdrSub = document.getElementById('ttcAiHdrSub');
-    if(fabIcon) fabIcon.textContent = ctx.icon;
-    if(hdrIcon) hdrIcon.textContent = ctx.icon;
-    if(hdrTitle) hdrTitle.textContent = ctx.title;
+    if(hdrTitle) hdrTitle.textContent = ctx.title + ' • Орбис';
     if(hdrSub) hdrSub.textContent = ctx.heroName + ' • ' + ctx.heroSub;
+    updateMascotControlBar();
   }
 
   function renderMessages(){
@@ -2866,6 +4072,13 @@
     open: function(){ ensureDom(); isOpen = true; document.getElementById('ttcAiChat').classList.add('open'); renderChatHeader(); renderMessages(); },
     close: function(){ isOpen = false; var c = document.getElementById('ttcAiChat'); if(c) c.classList.remove('open'); },
     refresh: function(){ renderChatHeader(); if(isOpen) renderMessages(); },
+    roam: function(){ ensureDom(); startRoaming(true); },
+    dock: function(){ stopRoaming(false); },
+    reactDice: function(val){
+      if(val === 20) triggerHappyReaction(pickQuip('crit20'));
+      else if(val === 1) triggerStartleWake(pickQuip('crit1'));
+      else triggerHappyReaction();
+    },
     send: sendPromptToGemini
   };
 })();
