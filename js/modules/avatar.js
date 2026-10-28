@@ -2199,7 +2199,7 @@ function finalizeElTechLaunch(mode, t, autoCopy){
   if(mode === 'claim' || mode === 'all'){
     var scale = t.scale !== undefined && t.scale !== null && t.scale !== '' ? t.scale : '1';
     var cost = t.cost || '1 МВН';
-    out.push('*[Форма стихии: ' + t.name + ' | Степень: ' + scale + ' | Затраты: ' + cost + ']*');
+    out.push('*[Форма стихии: ' + ((typeof window.stripCalcEmojis === 'function') ? window.stripCalcEmojis(t.name) : t.name) + ' | Степень: ' + scale + ' | Затраты: ' + cost + ' ]*');
   }
   
   if((mode === 'all' || mode === 'exp') && isExp){
@@ -2316,7 +2316,7 @@ function finalizeElMoveLaunch(mode, m, autoCopy){
   
   if(mode === 'claim' || mode === 'all'){
     var cost = m.cost || '1 ФВН';
-    out.push('*[Боевой приём: ' + m.name + ' | Тип: ' + m.kind + ' | Затраты: ' + cost + ']*');
+    out.push('*[Боевой приём: ' + ((typeof window.stripCalcEmojis === 'function') ? window.stripCalcEmojis(m.name) : m.name) + ' | Тип: ' + ((typeof window.stripCalcEmojis === 'function') ? window.stripCalcEmojis(m.kind) : m.kind) + ' | Затраты: ' + cost + ' ]*');
   }
   
   if((mode === 'all' || mode === 'exp') && isExp){
@@ -2334,7 +2334,7 @@ function finalizeElMoveLaunch(mode, m, autoCopy){
       sum += (vals.dmgRolls && vals.dmgRolls[i]) ? vals.dmgRolls[i] : Math.ceil(pDmg.sides/2);
     }
     var totalMod = mods.dmg + pDmg.mod;
-    out.push(formatRoll('Урон/Эффект', pDmg.n + 'd' + pDmg.sides, sum, totalMod));
+    out.push(formatRoll('Урон', pDmg.n + 'd' + pDmg.sides, sum, totalMod));
   }
   
   var output = out.join('\n').trim();

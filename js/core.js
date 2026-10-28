@@ -801,10 +801,19 @@ function rollAllDice(){
   }, maxDur+90);
 }
 
+function stripCalcEmojis(str){
+  if(str == null) return '';
+  return String(str)
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B50}\u{2B55}\u{200D}\u{FE0E}\u{FE0F}]/gu, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+window.stripCalcEmojis = stripCalcEmojis;
+
 function currentDiceLabel(){
-  if(diceState.labelCat==='custom') return (diceState.customLabel||'').trim();
+  if(diceState.labelCat==='custom') return stripCalcEmojis(diceState.customLabel||'');
   if(!diceState.labelCat) return '';
-  return diceState.label || '';
+  return stripCalcEmojis(diceState.label || '');
 }
 
 function buildDiceResultLines(){
@@ -4310,22 +4319,22 @@ function parseFaeSignedMod(str){
 
 /* --- 1. БОЕВОЙ РАСЧЁТ СПОСОБНОСТИ (faeTechs) --- */
 function buildFaeTechComboText(t, isConc, rolledValues, mods){
-  var catStr = t.category || 'Классовые умения';
-  var actStr = t.actionCost || '1 действие';
-  var cdStr = t.cooldown ? (' | Перезарядка: ' + t.cooldown) : '';
-  var header = '*[Способность: ' + (t.name || 'Без названия') + ' | Категория: ' + catStr + ' | Действие: ' + actStr + cdStr + ']*';
+  var nameStr = stripCalcEmojis(t.name || 'Без названия');
+  var catStr = stripCalcEmojis(t.category || 'Классовые умения');
+  var actStr = stripCalcEmojis(t.actionCost || '1 действие');
+  var header = '*[Способность: ' + nameStr + ' | Категория: ' + catStr + ' | Действие: ' + actStr + ' ]*';
   var lines = [header];
 
   if(isConc && rolledValues && rolledValues.conc){
     var cMod = parseInt(mods.conc, 10) || 0;
     var cModStr = cMod > 0 ? ' + ' + cMod : (cMod < 0 ? ' − ' + Math.abs(cMod) : '');
-    lines.push('*[Результат броска Концентрация / Спасбросок 1d20: ' + rolledValues.conc + ' ]*' + cModStr);
+    lines.push('*[Результат броска Концентрация 1d20: ' + rolledValues.conc + ' ]*' + cModStr);
   }
 
   if(rolledValues && rolledValues.atk){
     var aMod = parseInt(mods.atk, 10) || 0;
     var aModStr = aMod > 0 ? ' + ' + aMod : (aMod < 0 ? ' − ' + Math.abs(aMod) : '');
-    lines.push('*[Результат броска Попадание / Проверка 1d20: ' + rolledValues.atk + ' ]*' + aModStr);
+    lines.push('*[Результат броска Попадание 1d20: ' + rolledValues.atk + ' ]*' + aModStr);
   }
 
   var pDmg = parseFaeDiceFormula(t.checkOrSave || t.desc || '');
@@ -4334,9 +4343,9 @@ function buildFaeTechComboText(t, isConc, rolledValues, mods){
     var dSides = rolledValues.dmgSides || pDmg.sides;
     var dMod = parseInt(mods.dmg, 10) || 0;
     var dModStr = dMod > 0 ? ' + ' + dMod : (dMod < 0 ? ' − ' + Math.abs(dMod) : '');
-    lines.push('*[Результат броска Эффект / Урон ' + n + 'd' + dSides + ': ' + rolledValues.dmgRolls.join(' | ') + ' ]*' + dModStr);
+    lines.push('*[Результат броска Урон ' + n + 'd' + dSides + ': ' + rolledValues.dmgRolls.join(' | ') + ' ]*' + dModStr);
   } else if(t.checkOrSave){
-    lines.push('*[Параметр / СЛ: ' + t.checkOrSave + ']*');
+    lines.push('*[Параметр / СЛ: ' + stripCalcEmojis(t.checkOrSave) + ']*');
   }
 
   return lines.join('\n');
@@ -4643,17 +4652,17 @@ function wireFaeTechLauncher(){
   }
 
   var finishTechLaunch = function(t, mode, autoCopy){
-    var catStr = t.category || 'Классовые умения';
-    var actStr = t.actionCost || '1 действие';
-    var cdStr = t.cooldown ? (' | Перезарядка: ' + t.cooldown) : '';
-    var header = '*[Способность: ' + (t.name || 'Без названия') + ' | Категория: ' + catStr + ' | Действие: ' + actStr + cdStr + ']*';
+    var nameStr = stripCalcEmojis(t.name || 'Без названия');
+    var catStr = stripCalcEmojis(t.category || 'Классовые умения');
+    var actStr = stripCalcEmojis(t.actionCost || '1 действие');
+    var header = '*[Способность: ' + nameStr + ' | Категория: ' + catStr + ' | Действие: ' + actStr + ' ]*';
     var lines = [];
     var mods = L.mods || { conc: 0, atk: 0, dmg: 0 };
     var pDmg = parseFaeDiceFormula(t.checkOrSave || t.desc || '');
 
     if(mode === 'claim'){
       lines.push(header);
-      if(t.checkOrSave) lines.push('*[Параметр / СЛ: ' + t.checkOrSave + ']*');
+      if(t.checkOrSave) lines.push('*[Параметр / СЛ: ' + stripCalcEmojis(t.checkOrSave) + ']*');
     } else if(mode === 'atk'){
       var atkVal = 1 + Math.floor(Math.random() * 20);
       L.rolledValues.atk = atkVal;
@@ -4662,7 +4671,7 @@ function wireFaeTechLauncher(){
       var aMod = parseInt(mods.atk, 10) || 0;
       var aModStr = aMod > 0 ? ' + ' + aMod : (aMod < 0 ? ' − ' + Math.abs(aMod) : '');
       lines.push(header);
-      lines.push('*[Результат броска Попадание / Проверка 1d20: ' + atkVal + ' ]*' + aModStr);
+      lines.push('*[Результат броска Попадание 1d20: ' + atkVal + ' ]*' + aModStr);
     } else if(mode === 'conc'){
       var cVal = 1 + Math.floor(Math.random() * 20);
       L.rolledValues.conc = cVal;
@@ -4671,7 +4680,7 @@ function wireFaeTechLauncher(){
       var cMod = parseInt(mods.conc, 10) || 0;
       var cModStr = cMod > 0 ? ' + ' + cMod : (cMod < 0 ? ' − ' + Math.abs(cMod) : '');
       lines.push(header);
-      lines.push('*[Результат броска Концентрация / Спасбросок 1d20: ' + cVal + ' ]*' + cModStr);
+      lines.push('*[Результат броска Концентрация 1d20: ' + cVal + ' ]*' + cModStr);
     } else if(mode === 'dmg' && pDmg){
       var rolls = [];
       for(var i = 0; i < pDmg.n; i++){
@@ -4685,7 +4694,7 @@ function wireFaeTechLauncher(){
       var dMod = parseInt(mods.dmg, 10) || 0;
       var dModStr = dMod > 0 ? ' + ' + dMod : (dMod < 0 ? ' − ' + Math.abs(dMod) : '');
       lines.push(header);
-      lines.push('*[Результат броска Эффект / Урон ' + pDmg.n + 'd' + pDmg.sides + ': ' + rolls.join(' | ') + ' ]*' + dModStr);
+      lines.push('*[Результат броска Урон ' + pDmg.n + 'd' + pDmg.sides + ': ' + rolls.join(' | ') + ' ]*' + dModStr);
     } else {
       if(L.isConc){
         var cValAll = 1 + Math.floor(Math.random() * 20);
@@ -5224,10 +5233,10 @@ function wireFaeTechs(){
 /* ---------- БОЕВЫЕ ПРИЁМЫ ФАЭРУНА (faeMoves) ---------- */
 
 function buildFaeMoveComboText(m, isSup, rolledValues, mods){
-  var wpStr = m.weaponOrStyle ? (' | Оружие: ' + m.weaponOrStyle) : '';
-  var actStr = m.actionCost ? (' | Действие: ' + m.actionCost) : '';
-  var mastStr = m.mastery ? (' | Мастерство: ' + m.mastery) : '';
-  var header = '*[Приём: ' + (m.name || 'Без названия') + wpStr + actStr + mastStr + ']*';
+  var nameStr = stripCalcEmojis(m.name || 'Без названия');
+  var wpStr = m.weaponOrStyle ? (' | Оружие: ' + stripCalcEmojis(m.weaponOrStyle)) : '';
+  var actStr = m.actionCost ? (' | Действие: ' + stripCalcEmojis(m.actionCost)) : '';
+  var header = '*[Приём: ' + nameStr + wpStr + actStr + ' ]*';
   var lines = [header];
 
   if(rolledValues && rolledValues.atk){
@@ -5252,7 +5261,7 @@ function buildFaeMoveComboText(m, isSup, rolledValues, mods){
   }
 
   if(m.mastery){
-    lines.push('*[Эффект Мастерства 2024: ' + m.mastery + ']*');
+    lines.push('*[Эффект Мастерства 2024: ' + stripCalcEmojis(m.mastery) + ']*');
   }
 
   return lines.join('\n');
@@ -5561,17 +5570,17 @@ function wireFaeMoveLauncher(){
   }
 
   var finishMoveLaunch = function(m, mode, autoCopy){
-    var wpStr = m.weaponOrStyle ? (' | Оружие: ' + m.weaponOrStyle) : '';
-    var actStr = m.actionCost ? (' | Действие: ' + m.actionCost) : '';
-    var mastStr = m.mastery ? (' | Мастерство: ' + m.mastery) : '';
-    var header = '*[Приём: ' + (m.name || 'Без названия') + wpStr + actStr + mastStr + ']*';
+    var nameStr = stripCalcEmojis(m.name || 'Без названия');
+    var wpStr = m.weaponOrStyle ? (' | Оружие: ' + stripCalcEmojis(m.weaponOrStyle)) : '';
+    var actStr = m.actionCost ? (' | Действие: ' + stripCalcEmojis(m.actionCost)) : '';
+    var header = '*[Приём: ' + nameStr + wpStr + actStr + ' ]*';
     var lines = [];
     var mods = L.mods || { atk: 0, dmg: 0, sup: 0 };
     var pDmg = parseFaeDiceFormula(m.damageOrSave || '');
 
     if(mode === 'claim'){
       lines.push(header);
-      if(m.mastery) lines.push('*[Эффект Мастерства 2024: ' + m.mastery + ']*');
+      if(m.mastery) lines.push('*[Эффект Мастерства 2024: ' + stripCalcEmojis(m.mastery) + ']*');
     } else if(mode === 'atk'){
       var atkVal = 1 + Math.floor(Math.random() * 20);
       L.rolledValues.atk = atkVal;
@@ -6296,8 +6305,11 @@ function getFaeLauncherSkillItems(c){
 }
 
 function buildFaeSkillComboText(sk, isGuidance, rolledValues, mods){
-  var abStr = sk.abil ? (' | Хар-ка: ' + sk.abil) : '';
-  var header = '*[Навык: ' + (sk.name || 'Навык') + ' | Тип: ' + (sk.kind || 'Ремесло') + ' | Ступень: ' + (sk.level || 'Начатки') + abStr + ']*';
+  var nameStr = stripCalcEmojis(sk.name || 'Навык');
+  var kindStr = stripCalcEmojis(sk.kind || 'Ремесло');
+  var lvlStr = stripCalcEmojis(sk.level || 'Начатки');
+  var abStr = sk.abil ? (' | Хар-ка: ' + stripCalcEmojis(sk.abil)) : '';
+  var header = '*[Навык: ' + nameStr + ' | Тип: ' + kindStr + ' | Ступень: ' + lvlStr + abStr + ' ]*';
   var lines = [header];
 
   if(rolledValues && rolledValues.chk){
@@ -6309,11 +6321,11 @@ function buildFaeSkillComboText(sk, isGuidance, rolledValues, mods){
   if(isGuidance && rolledValues && rolledValues.gui){
     var gMod = parseInt(mods.gui, 10) || 0;
     var gModStr = gMod > 0 ? ' + ' + gMod : (gMod < 0 ? ' − ' + Math.abs(gMod) : '');
-    lines.push('*[Результат броска Бонус Указания / Мастерства 1d4: ' + rolledValues.gui + ' ]*' + gModStr);
+    lines.push('*[Результат броска Бонус Указания 1d4: ' + rolledValues.gui + ' ]*' + gModStr);
   }
 
   if(sk.gives){
-    lines.push('*[Что даёт: ' + sk.gives + ']*');
+    lines.push('*[Что даёт: ' + stripCalcEmojis(sk.gives) + ']*');
   }
 
   return lines.join('\n');
@@ -6588,14 +6600,17 @@ function wireFaeSkillLauncher(){
   }
 
   var finishSkillLaunch = function(sk, mode, autoCopy){
-    var abStr = sk.abil ? (' | Хар-ка: ' + sk.abil) : '';
-    var header = '*[Навык: ' + (sk.name || 'Навык') + ' | Тип: ' + (sk.kind || 'Ремесло') + ' | Ступень: ' + (sk.level || 'Начатки') + abStr + ']*';
+    var nameStr = stripCalcEmojis(sk.name || 'Навык');
+    var kindStr = stripCalcEmojis(sk.kind || 'Ремесло');
+    var lvlStr = stripCalcEmojis(sk.level || 'Начатки');
+    var abStr = sk.abil ? (' | Хар-ка: ' + stripCalcEmojis(sk.abil)) : '';
+    var header = '*[Навык: ' + nameStr + ' | Тип: ' + kindStr + ' | Ступень: ' + lvlStr + abStr + ' ]*';
     var lines = [];
     var mods = L.mods || { chk: 0, gui: 0 };
 
     if(mode === 'claim'){
       lines.push(header);
-      if(sk.gives) lines.push('*[Применение без броска / Что даёт: ' + sk.gives + ']*');
+      if(sk.gives) lines.push('*[Что даёт: ' + stripCalcEmojis(sk.gives) + ']*');
     } else if(mode === 'chk'){
       var chkVal = 1 + Math.floor(Math.random() * 20);
       L.rolledValues.chk = chkVal;
@@ -6613,7 +6628,7 @@ function wireFaeSkillLauncher(){
       var gMod = parseInt(mods.gui, 10) || 0;
       var gModStr = gMod > 0 ? ' + ' + gMod : (gMod < 0 ? ' − ' + Math.abs(gMod) : '');
       lines.push(header);
-      lines.push('*[Результат броска Бонус Указания / Мастерства 1d4: ' + guiVal + ' ]*' + gModStr);
+      lines.push('*[Результат броска Бонус Указания 1d4: ' + guiVal + ' ]*' + gModStr);
     } else {
       var chkValAll = 1 + Math.floor(Math.random() * 20);
       L.rolledValues.chk = chkValAll;
@@ -7804,7 +7819,7 @@ function wireMagicScreens(){
       hero.techs.unshift({
         id: genId(),
         spellId: sp.id,
-        name: '✨ ' + sp.name + (sp.en ? (' (' + sp.en + ')') : ''),
+        name: sp.name + (sp.en ? (' (' + sp.en + ')') : ''),
         category: 'Магические и Сверхъестественные дары',
         source: schoolName(sp.school) + ' • ' + levelLabel(sp.level) + (sp.classes ? (' (' + sp.classes + ')') : ''),
         actionCost: (sp.meta || '').split('•')[0]?.trim() || '1 действие',

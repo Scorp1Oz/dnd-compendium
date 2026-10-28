@@ -1036,10 +1036,15 @@ function formatLauncherMod(m){
   return n > 0 ? '+ ' + n : '− ' + Math.abs(n);
 }
 
+function cleanShCalcStr(s){
+  if(typeof window.stripCalcEmojis === 'function') return window.stripCalcEmojis(s);
+  return String(s || '').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B50}\u{2B55}\u{200D}\u{FE0E}\u{FE0F}]/gu, '').replace(/\s{2,}/g, ' ').trim();
+}
+
 function buildComboText(t, isExp, rolledValues, mods){
   var costStr = t.cost ? (t.cost + (t.cost.toLowerCase().indexOf('чакр')>=0 ? '' : ' чакры')) : 'без затрат';
   if(t.upkeep) costStr += ' +' + t.upkeep + '/рнд';
-  var header = '*[Техника: '+(t.name||'Без названия')+' | Ранг: '+(t.rank||'D')+' | Затраты: '+costStr+']*';
+  var header = '*[Техника: '+cleanShCalcStr(t.name||'Без названия')+' | Ранг: '+cleanShCalcStr(t.rank||'D')+' | Затраты: '+cleanShCalcStr(costStr)+' ]*';
   var lines = [header];
 
   // 1. Контроль чакры идёт первым!
@@ -1270,17 +1275,15 @@ function parseMoveDmg(str){
 }
 
 function buildMoveComboText(m, rolledValues, mods){
-  var wpStr = m.weapon ? (' (' + m.weapon + ')') : '';
-  var payStr = m.pay ? (' | Оплата: ' + m.pay) : '';
-  var header = '*[Приём: ' + (m.name || 'Без названия') + ' | Вид: ' + (m.kind || 'Рукопашный') + wpStr + ' | Тип: ' + (m.mtype || 'Урон') + payStr + ']*';
+  var wpStr = m.weapon ? (' (' + cleanShCalcStr(m.weapon) + ')') : '';
+  var header = '*[Приём: ' + cleanShCalcStr(m.name || 'Без названия') + ' | Вид: ' + cleanShCalcStr(m.kind || 'Рукопашный') + wpStr + ' | Тип: ' + cleanShCalcStr(m.mtype || 'Урон') + ' ]*';
   var lines = [header];
 
   // 1. Бросок приёма / атака
   if(rolledValues && rolledValues.atk){
     var aMod = parseInt(mods.atk, 10) || 0;
     var aModStr = aMod > 0 ? ' + ' + aMod : (aMod < 0 ? ' − ' + Math.abs(aMod) : '');
-    var abilStr = m.atk ? (' (' + m.atk + ')') : '';
-    lines.push('*[Результат броска Приём' + abilStr + ' 1d20: ' + rolledValues.atk + ' ]*' + aModStr);
+    lines.push('*[Результат броска Попадание 1d20: ' + rolledValues.atk + ' ]*' + aModStr);
   }
 
   // 2. Урон
@@ -1956,8 +1959,8 @@ function shMoves(){
 }
 
 function buildSkillComboText(s, rolledValues, mods){
-  var abStr = s.abil ? (' | Хар-ка: ' + s.abil) : '';
-  var header = '*[Навык: ' + (s.name || 'Без названия') + ' | Тип: ' + (s.kind || 'Ремесло') + ' | Уровень: ' + (s.level || 'Начатки') + abStr + ']*';
+  var abStr = s.abil ? (' | Хар-ка: ' + cleanShCalcStr(s.abil)) : '';
+  var header = '*[Навык: ' + cleanShCalcStr(s.name || 'Без названия') + ' | Тип: ' + cleanShCalcStr(s.kind || 'Ремесло') + ' | Уровень: ' + cleanShCalcStr(s.level || 'Начатки') + abStr + ' ]*';
   var lines = [header];
   if(rolledValues && rolledValues.chk){
     var cMod = parseInt(mods.chk, 10) || 0;
@@ -1965,7 +1968,7 @@ function buildSkillComboText(s, rolledValues, mods){
     lines.push('*[Результат броска Проверка навыка 1d20: ' + rolledValues.chk + ' ]*' + cModStr);
   }
   if(s.gives){
-    lines.push('*[Что даёт: ' + s.gives + ']*');
+    lines.push('*[Что даёт: ' + cleanShCalcStr(s.gives) + ']*');
   }
   return lines.join('\n');
 }
@@ -7024,7 +7027,7 @@ function wireSh(){
   var finishLaunch = function(t, mode, autoCopy){
     var costStr = t.cost ? (t.cost + (t.cost.toLowerCase().indexOf('чакр')>=0 ? '' : ' чакры')) : 'без затрат';
     if(t.upkeep) costStr += ' +' + t.upkeep + '/рнд';
-    var header = '*[Техника: '+(t.name||'Без названия')+' | Ранг: '+(t.rank||'D')+' | Затраты: '+costStr+']*';
+    var header = '*[Техника: '+cleanShCalcStr(t.name||'Без названия')+' | Ранг: '+cleanShCalcStr(t.rank||'D')+' | Затраты: '+cleanShCalcStr(costStr)+' ]*';
     var lines = [];
 
     if(!SH.launcher.rolledValues) SH.launcher.rolledValues = {};
@@ -7356,9 +7359,8 @@ function wireSh(){
     if(!SH.moveLauncher.rolledValues) SH.moveLauncher.rolledValues = {};
     if(!SH.moveLauncher.mods) SH.moveLauncher.mods = { atk: 0, dmg: 0 };
     var mods = SH.moveLauncher.mods;
-    var wpStr = m.weapon ? (' (' + m.weapon + ')') : '';
-    var payStr = m.pay ? (' | Оплата: ' + m.pay) : '';
-    var header = '*[Приём: ' + (m.name || 'Без названия') + ' | Вид: ' + (m.kind || 'Рукопашный') + wpStr + ' | Тип: ' + (m.mtype || 'Урон') + payStr + ']*';
+    var wpStr = m.weapon ? (' (' + cleanShCalcStr(m.weapon) + ')') : '';
+    var header = '*[Приём: ' + cleanShCalcStr(m.name || 'Без названия') + ' | Вид: ' + cleanShCalcStr(m.kind || 'Рукопашный') + wpStr + ' | Тип: ' + cleanShCalcStr(m.mtype || 'Урон') + ' ]*';
     var lines = [];
 
     if(mode === 'claim'){
@@ -7370,9 +7372,8 @@ function wireSh(){
       if(atDie){ var vEl = atDie.querySelector('.val'); if(vEl) vEl.textContent = atkVal; }
       var aMod = parseInt(mods.atk, 10) || 0;
       var aModStr = aMod > 0 ? ' + ' + aMod : (aMod < 0 ? ' − ' + Math.abs(aMod) : '');
-      var abilStr = m.atk ? (' (' + m.atk + ')') : '';
       lines.push(header);
-      lines.push('*[Результат броска Приём' + abilStr + ' 1d20: ' + atkVal + ' ]*' + aModStr);
+      lines.push('*[Результат броска Попадание 1d20: ' + atkVal + ' ]*' + aModStr);
     } else if(mode === 'dmg'){
       var pDmg = parseMoveDmg(m.dmg);
       if(pDmg){
@@ -7578,9 +7579,9 @@ function wireSh(){
     var mods = SH.skillLauncher.mods || { chk: 0 };
     var lines = [];
     if(mode === 'claim'){
-      var abStr = s.abil ? (' | Хар-ка: ' + s.abil) : '';
-      lines.push('*[Навык: ' + (s.name || 'Без названия') + ' | Тип: ' + (s.kind || 'Ремесло') + ' | Уровень: ' + (s.level || 'Начатки') + abStr + ']*');
-      if(s.gives) lines.push('*[Что даёт: ' + s.gives + ']*');
+      var abStr = s.abil ? (' | Хар-ка: ' + cleanShCalcStr(s.abil)) : '';
+      lines.push('*[Навык: ' + cleanShCalcStr(s.name || 'Без названия') + ' | Тип: ' + cleanShCalcStr(s.kind || 'Ремесло') + ' | Уровень: ' + cleanShCalcStr(s.level || 'Начатки') + abStr + ' ]*');
+      if(s.gives) lines.push('*[Что даёт: ' + cleanShCalcStr(s.gives) + ']*');
     } else {
       var chkVal = 1 + Math.floor(Math.random() * 20);
       SH.skillLauncher.rolledValues.chk = chkVal;
