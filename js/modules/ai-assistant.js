@@ -3002,8 +3002,9 @@
   var mouseY = window.innerHeight ? window.innerHeight - 60 : 600;
   var lastMouseMoveTs = Date.now();
   var lastNearMascotTs = Date.now();
-  var lastShowModeTs = Date.now();
+  var lastShowModeTs = Date.now() - 10000;
   var sleepStartedTs = 0;
+  var lastFrameTs = 0;
   var lookX = 0, lookY = 0;
   var targetLookX = 0, targetLookY = 0;
   var isBlinking = false;
@@ -3703,6 +3704,8 @@
       currentBrows = (Math.random() < 0.2) ? 'smug' : 'neutral';
     }
     syncMascotDomClasses();
+    applyFaceToPrefix(isRoaming ? 'roam' : 'dock', lookX, lookY);
+    if(isOpen) applyFaceToPrefix('hdr', lookX * 0.65, lookY * 0.65);
   }
 
   function triggerStretchWake(customQuip){
@@ -4023,15 +4026,15 @@
           var dy = roamTargetY - roamY;
           var d = Math.hypot(dx, dy);
           if(d < 12){
-            // Долгая спокойная пауза на точке (10–18 секунд вместо суетливых 3 секунд)
-            roamWaypointWaitUntil = now + 10000 + Math.random() * 8000;
+            // Спокойная пауза на точке (6–11 секунд)
+            roamWaypointWaitUntil = now + 6000 + Math.random() * 5000;
             roamVX *= 0.2;
             roamVY *= 0.2;
             pickNewRoamWaypoint();
-            // Редко и ненавязчиво включает шоу-режим на остановке (не чаще чем раз в 48 сек)
-            if(lockedShowMode === 'auto' && mascotState === 'idle' && (now - lastShowModeTs > 48000) && Math.random() < 0.22){
+            // Включает шоу-режим на остановке (не чаще чем раз в 18 сек)
+            if(lockedShowMode === 'auto' && mascotState === 'idle' && (now - lastShowModeTs > 18000) && Math.random() < 0.45){
               triggerRandomAutonomousShowMode();
-            } else if(Math.random() < 0.12 && !isOpen){
+            } else if(Math.random() < 0.18 && !isOpen){
               showMascotBubble(pickQuip('roamIdle'), 3200);
             }
           } else {
@@ -4075,35 +4078,35 @@
     }
     requestAnimationFrame(tickMascotFrame);
 
-    // Спокойный цикл моргания, редких шоу-режимов, сна и авто-вылетов (каждые 5.5 секунд вместо 2.7 сек)
+    // Размеренный цикл моргания, шоу-режимов, сна и авто-вылетов (каждые 3.8 сек)
     setInterval(function(){
       if(document.body && document.body.classList.contains('tab-paused')) return;
       var now = Date.now();
 
       // Моргание (спокойное и естественное)
       var canBlink = (mascotState === 'idle' || mascotState === 'reading' || mascotState === 'mage' || mascotState === 'alchemy' || mascotState === 'campfire' || mascotState === 'shield' || mascotState === 'cosmos');
-      if(canBlink && !isBlinking && Math.random() < 0.48){
+      if(canBlink && !isBlinking && Math.random() < 0.5){
         isBlinking = true;
         setTimeout(function(){ isBlinking = false; }, 165);
       }
 
-      // Плавное движение глазами и лёгкая смена мимики в покое
-      if(mascotState === 'idle' && now - lastMouseMoveTs >= 10000){
-        targetLookX = (Math.random() - 0.5) * 4.2;
-        targetLookY = (Math.random() - 0.5) * 3.0;
-        if(Math.random() < 0.22){
-          currentMouth = ['smile', 'neutral', 'smirk', 'cat'][Math.floor(Math.random() * 4)];
-          currentBrows = ['neutral', 'curious', 'zen'][Math.floor(Math.random() * 3)];
+      // Плавное движение глазами и лёгкая смена мимики в покое (когда мышь не двигается > 5 сек)
+      if(mascotState === 'idle' && now - lastMouseMoveTs >= 5000){
+        targetLookX = (Math.random() - 0.5) * 5.2;
+        targetLookY = (Math.random() - 0.5) * 3.6;
+        if(Math.random() < 0.3){
+          currentMouth = ['smile', 'neutral', 'smirk'][Math.floor(Math.random() * 3)];
+          currentBrows = ['neutral', 'curious', 'smug'][Math.floor(Math.random() * 3)];
         }
       }
 
-      // Спонтанное включение шоу-режима — теперь намного реже (не чаще чем раз в 52 секунды и только с шансом 22%)
-      if(lockedShowMode === 'auto' && mascotState === 'idle' && !isBusy && (now - lastNearMascotTs < 40000) && (now - lastShowModeTs > 52000) && Math.random() < 0.22){
+      // Спонтанное включение шоу-режима (раз в ~18–28 секунд, без блокировки по расстоянию курсора)
+      if(lockedShowMode === 'auto' && mascotState === 'idle' && !isBusy && (now - lastShowModeTs > 18000) && Math.random() < 0.38){
         var rollTrick = Math.random();
-        if(rollTrick < 0.12){
+        if(rollTrick < 0.14){
           lastShowModeTs = now;
           triggerBarrelRoll();
-        } else if(rollTrick < 0.24){
+        } else if(rollTrick < 0.28){
           lastShowModeTs = now;
           triggerWaltzSpin();
         } else {
@@ -4112,19 +4115,19 @@
         return;
       }
 
-      // Переход в сон — теперь через 65 секунд тишины (вместо слишком частых 24 секунд)
-      if(lockedShowMode === 'auto' && mascotState === 'idle' && !isBusy && !isOpen && !isDraggingRoamer && (now - lastNearMascotTs > 65000)){
+      // Переход в сон (через 50 секунд тишины рядом с маскотом, если не идёт шоу-режим)
+      if(lockedShowMode === 'auto' && mascotState === 'idle' && !isBusy && !isOpen && !isDraggingRoamer && (now - lastNearMascotTs > 50000) && (now - lastShowModeTs > 14000)){
         setMascotMood('yawn');
         setTimeout(function(){
           if(mascotState === 'yawn') setMascotMood('sleep');
-        }, 1600);
+        }, 1500);
         return;
       }
 
-      // Во время сна: спит крепко минимум 90 секунд, после чего лишь с малым шансом просыпается (чаще мягко потягиваясь)
-      if(mascotState === 'sleep' && lockedShowMode === 'auto' && !isBusy && (now - sleepEnteredTs > 90000)){
-        if(Math.random() < 0.06){
-          if(Math.random() < 0.75){
+      // Во время сна: спит ~35 секунд, после чего периодически просыпается (потягиваясь или вздрагивая)
+      if(mascotState === 'sleep' && lockedShowMode === 'auto' && !isBusy && (now - sleepStartedTs > 35000)){
+        if(Math.random() < 0.18){
+          if(Math.random() < 0.7){
             triggerStretchWake();
           } else {
             triggerStartleWake();
@@ -4133,15 +4136,15 @@
         }
       }
 
-      // Автономный вылет из иконки на экран и возврат обратно (размеренный тайминг: не чаще чем раз в 75–95 секунд)
+      // Автономный вылет из иконки на экран и возврат обратно
       if(autoRoamEnabled && !isBusy && !isOpen){
-        if(!isRoaming && mascotState === 'idle' && (now - roamStartedTs > 95000) && Math.random() < 0.12){
+        if(!isRoaming && mascotState === 'idle' && (now - roamStartedTs > 55000) && Math.random() < 0.16){
           startRoaming(false);
-        } else if(isRoaming && !manualRoam && (now - roamStartedTs > 75000) && Math.random() < 0.18){
+        } else if(isRoaming && !manualRoam && (now - roamStartedTs > 50000) && Math.random() < 0.22){
           stopRoaming(false);
         }
       }
-    }, 5500);
+    }, 3800);
   }
 
   /* ---------- Хранение истории чата по разделам ---------- */
