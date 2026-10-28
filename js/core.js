@@ -3151,6 +3151,7 @@ function renderWeapons(){
 
 const MAP_SOURCES = [
   {id:'loremaps', label:'LoreMaps', url:'https://loremaps.azurewebsites.net/Maps/Faerun'},
+  {id:'aidedd', label:'AideDD Atlas (Интерактивный атлас)', url:'https://www.aidedd.org/public/atlas/'},
   {id:'frwiki', label:'Forgotten Realms Wiki', url:'https://forgottenrealms.fandom.com/wiki/Map:Faer%C3%BBn_%E2%80%93_Full_Map'}
 ];
 
