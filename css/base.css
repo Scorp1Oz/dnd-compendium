@@ -3381,15 +3381,6 @@ body.is-home-screen .el-card-desc {
   backface-visibility: hidden;
 }
 
-/* Автоматическая пауза тяжёлых фоновых частиц во время активного скролла страницы */
-body.is-scrolling #faeThemeFx *,
-body.is-scrolling #wiThemeFx *,
-body.is-scrolling #wzThemeFx *,
-body.is-scrolling #swThemeFx *,
-body.is-scrolling #elThemeFx * {
-  animation-play-state: paused !important;
-}
-
 /* Оптимизация рендеринга длинных списков карточек при прокрутке */
 .grid > .card,
 .fae-ref-cards-grid > .fae-ref-card {
@@ -4895,67 +4886,67 @@ body.fae-theme .sh-launcher-title {
 .fae-dir-fall-left { animation-name: faeFallLeft; }
 
 @keyframes faeDriftUpRight {
-  0% { transform: translate(0, 0) scale(0.88) rotate(0deg); opacity: 0; }
+  0% { transform: translate3d(0, 0, 0) scale(0.88) rotate(0deg); opacity: 0; }
   16% { opacity: 0.62; }
-  50% { transform: translate(72px, -38vh) scale(1.05) rotate(14deg); opacity: 0.78; }
+  50% { transform: translate3d(72px, -38vh, 0) scale(1.05) rotate(14deg); opacity: 0.78; }
   84% { opacity: 0.58; }
-  100% { transform: translate(145px, -78vh) scale(0.88) rotate(26deg); opacity: 0; }
+  100% { transform: translate3d(145px, -78vh, 0) scale(0.88) rotate(26deg); opacity: 0; }
 }
 
 @keyframes faeDriftUpLeft {
-  0% { transform: translate(0, 0) scale(0.88) rotate(0deg); opacity: 0; }
+  0% { transform: translate3d(0, 0, 0) scale(0.88) rotate(0deg); opacity: 0; }
   16% { opacity: 0.62; }
-  50% { transform: translate(-75px, -40vh) scale(1.05) rotate(-15deg); opacity: 0.78; }
+  50% { transform: translate3d(-75px, -40vh, 0) scale(1.05) rotate(-15deg); opacity: 0.78; }
   84% { opacity: 0.58; }
-  100% { transform: translate(-150px, -80vh) scale(0.88) rotate(-28deg); opacity: 0; }
+  100% { transform: translate3d(-150px, -80vh, 0) scale(0.88) rotate(-28deg); opacity: 0; }
 }
 
 @keyframes faeDriftDownRight {
-  0% { transform: translate(0, 0) scale(0.88) rotate(0deg); opacity: 0; }
+  0% { transform: translate3d(0, 0, 0) scale(0.88) rotate(0deg); opacity: 0; }
   16% { opacity: 0.60; }
-  50% { transform: translate(68px, 38vh) scale(1.04) rotate(-12deg); opacity: 0.75; }
+  50% { transform: translate3d(68px, 38vh, 0) scale(1.04) rotate(-12deg); opacity: 0.75; }
   84% { opacity: 0.56; }
-  100% { transform: translate(136px, 76vh) scale(0.88) rotate(-22deg); opacity: 0; }
+  100% { transform: translate3d(136px, 76vh, 0) scale(0.88) rotate(-22deg); opacity: 0; }
 }
 
 @keyframes faeDriftDownLeft {
-  0% { transform: translate(0, 0) scale(0.88) rotate(0deg); opacity: 0; }
+  0% { transform: translate3d(0, 0, 0) scale(0.88) rotate(0deg); opacity: 0; }
   16% { opacity: 0.60; }
-  50% { transform: translate(-68px, 40vh) scale(1.04) rotate(14deg); opacity: 0.75; }
+  50% { transform: translate3d(-68px, 40vh, 0) scale(1.04) rotate(14deg); opacity: 0.75; }
   84% { opacity: 0.56; }
-  100% { transform: translate(-138px, 78vh) scale(0.88) rotate(24deg); opacity: 0; }
+  100% { transform: translate3d(-138px, 78vh, 0) scale(0.88) rotate(24deg); opacity: 0; }
 }
 
 @keyframes faeDriftCross {
-  0% { transform: translate(0, 0) scale(0.86) rotate(-8deg); opacity: 0; }
+  0% { transform: translate3d(0, 0, 0) scale(0.86) rotate(-8deg); opacity: 0; }
   18% { opacity: 0.64; }
-  50% { transform: translate(92px, -28vh) scale(1.06) rotate(10deg); opacity: 0.80; }
+  50% { transform: translate3d(92px, -28vh, 0) scale(1.06) rotate(10deg); opacity: 0.80; }
   82% { opacity: 0.60; }
-  100% { transform: translate(180px, -56vh) scale(0.90) rotate(22deg); opacity: 0; }
+  100% { transform: translate3d(180px, -56vh, 0) scale(0.90) rotate(22deg); opacity: 0; }
 }
 
 @keyframes faeDriftWave {
-  0% { transform: translate(0, 0) scale(0.90) rotate(0deg); opacity: 0; }
-  20% { transform: translate(-34px, -18vh) scale(1.02) rotate(-10deg); opacity: 0.68; }
-  50% { transform: translate(28px, -42vh) scale(1.06) rotate(12deg); opacity: 0.80; }
-  80% { transform: translate(-26px, -66vh) scale(0.96) rotate(-8deg); opacity: 0.62; }
-  100% { transform: translate(18px, -88vh) scale(0.88) rotate(6deg); opacity: 0; }
+  0% { transform: translate3d(0, 0, 0) scale(0.90) rotate(0deg); opacity: 0; }
+  20% { transform: translate3d(-34px, -18vh, 0) scale(1.02) rotate(-10deg); opacity: 0.68; }
+  50% { transform: translate3d(28px, -42vh, 0) scale(1.06) rotate(12deg); opacity: 0.80; }
+  80% { transform: translate3d(-26px, -66vh, 0) scale(0.96) rotate(-8deg); opacity: 0.62; }
+  100% { transform: translate3d(18px, -88vh, 0) scale(0.88) rotate(6deg); opacity: 0; }
 }
 
 @keyframes faeFallRight {
-  0% { transform: translate(0, 0) rotate(0deg) scale(0.90); opacity: 0; }
+  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.90); opacity: 0; }
   14% { opacity: 0.68; }
-  50% { transform: translate(32px, 52vh) rotate(140deg) scale(1.02); opacity: 0.78; }
+  50% { transform: translate3d(32px, 52vh, 0) rotate(140deg) scale(1.02); opacity: 0.78; }
   86% { opacity: 0.64; }
-  100% { transform: translate(-14px, 108vh) rotate(290deg) scale(0.90); opacity: 0; }
+  100% { transform: translate3d(-14px, 108vh, 0) rotate(290deg) scale(0.90); opacity: 0; }
 }
 
 @keyframes faeFallLeft {
-  0% { transform: translate(0, 0) rotate(0deg) scale(0.90); opacity: 0; }
+  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.90); opacity: 0; }
   14% { opacity: 0.68; }
-  50% { transform: translate(-34px, 52vh) rotate(-140deg) scale(1.02); opacity: 0.78; }
+  50% { transform: translate3d(-34px, 52vh, 0) rotate(-140deg) scale(1.02); opacity: 0.78; }
   86% { opacity: 0.64; }
-  100% { transform: translate(16px, 108vh) rotate(-290deg) scale(0.90); opacity: 0; }
+  100% { transform: translate3d(16px, 108vh, 0) rotate(-290deg) scale(0.90); opacity: 0; }
 }
 
 /* Парящие искры / частицы стихии класса */
@@ -4965,26 +4956,27 @@ body.fae-theme .sh-launcher-title {
   border-radius: 50%;
   pointer-events: none;
   opacity: 0;
+  will-change: transform, opacity;
   animation: faeEmberRise linear infinite;
 }
 
 @keyframes faeEmberRise {
   0% {
-    transform: translateY(0) translateX(0) scale(0.7);
+    transform: translate3d(0, 0, 0) scale(0.7);
     opacity: 0;
   }
   15% {
     opacity: 0.85;
   }
   55% {
-    transform: translateY(-52vh) translateX(22px) scale(1.05);
+    transform: translate3d(22px, -52vh, 0) scale(1.05);
     opacity: 0.75;
   }
   85% {
     opacity: 0.45;
   }
   100% {
-    transform: translateY(-106vh) translateX(-18px) scale(0.4);
+    transform: translate3d(-18px, -106vh, 0) scale(0.4);
     opacity: 0;
   }
 }

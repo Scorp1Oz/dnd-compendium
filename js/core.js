@@ -11820,20 +11820,10 @@ function applyFaerunTheme(){
 }
 window.applyFaerunTheme = applyFaerunTheme;
 
-/* Глобальный пассивный детектор скролла и свёрнутой вкладки для разгрузки GPU */
+/* Глобальный детектор свёрнутой вкладки для разгрузки GPU в фоне */
 (function(){
   if(typeof window === 'undefined' || window.__ttcPerfScrollBound) return;
   window.__ttcPerfScrollBound = true;
-  var scrollIdleTimer = null;
-  window.addEventListener('scroll', function(){
-    if(document.body && !document.body.classList.contains('is-scrolling')){
-      document.body.classList.add('is-scrolling');
-    }
-    if(scrollIdleTimer) clearTimeout(scrollIdleTimer);
-    scrollIdleTimer = setTimeout(function(){
-      if(document.body) document.body.classList.remove('is-scrolling');
-    }, 140);
-  }, { passive: true });
   document.addEventListener('visibilitychange', function(){
     if(document.body) document.body.classList.toggle('tab-paused', !!document.hidden);
   });

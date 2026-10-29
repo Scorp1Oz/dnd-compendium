@@ -4000,7 +4000,7 @@
     // Плавный цикл физики взгляда, спец-режимов и полёта на базе requestAnimationFrame (60 FPS с delta-time)
     function tickMascotFrame(perfNow){
       requestAnimationFrame(tickMascotFrame);
-      if(document.body && (document.body.classList.contains('tab-paused') || document.body.classList.contains('is-scrolling'))){
+      if(document.body && document.body.classList.contains('tab-paused')){
         lastFrameTs = perfNow;
         return;
       }
