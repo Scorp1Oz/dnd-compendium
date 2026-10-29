@@ -3484,75 +3484,133 @@
     return { d: 'M25,41 Q32,46 39,41', filled: false }; // 'smile'
   }
 
-  function applyPropsVisibility(prefix){
-    var map = {
-      PropMage:     mascotState === 'mage',
-      PropScanner:  mascotState === 'scanner',
-      PropReading:  mascotState === 'reading',
-      PropCombat:   mascotState === 'combat',
-      PropJuggle:   mascotState === 'juggle',
-      PropStealth:  mascotState === 'stealth',
-      PropDizzy:    mascotState === 'dizzy',
-      PropMeditate: mascotState === 'meditate',
-      PropAlchemy:  mascotState === 'alchemy',
-      PropCampfire: mascotState === 'campfire',
-      PropShield:   mascotState === 'shield',
-      PropCurious:  mascotState === 'curious',
-      PropCosmos:   mascotState === 'cosmos'
-    };
-    Object.keys(map).forEach(function(k){
-      var el = document.getElementById(prefix + k);
-      if(el) el.style.display = map[k] ? 'block' : 'none';
-    });
-  }
+  var prefixDomCache = {};
+  var PROP_STATE_MAP = {
+    PropMage:     'mage',
+    PropScanner:  'scanner',
+    PropReading:  'reading',
+    PropCombat:   'combat',
+    PropJuggle:   'juggle',
+    PropStealth:  'stealth',
+    PropDizzy:    'dizzy',
+    PropMeditate: 'meditate',
+    PropAlchemy:  'alchemy',
+    PropCampfire: 'campfire',
+    PropShield:   'shield',
+    PropCurious:  'curious',
+    PropCosmos:   'cosmos'
+  };
+  var PROP_KEYS = Object.keys(PROP_STATE_MAP);
 
-  function applyFaceToPrefix(prefix, lx, ly){
+  function getPrefixCache(prefix){
+    var c = prefixDomCache[prefix];
+    if(c && c.fg && c.fg.isConnected) return c;
     var fg = document.getElementById(prefix + 'FaceGroup');
     var eyeL = document.getElementById(prefix + 'EyeL');
     var eyeR = document.getElementById(prefix + 'EyeR');
-    var browL = document.getElementById(prefix + 'BrowL');
-    var browR = document.getElementById(prefix + 'BrowR');
-    var blushL = document.getElementById(prefix + 'BlushL');
-    var blushR = document.getElementById(prefix + 'BlushR');
-    var pupL = document.getElementById(prefix + 'PupilL');
-    var pupR = document.getElementById(prefix + 'PupilR');
     var mouth = document.getElementById(prefix + 'Mouth');
-    if(!fg || !eyeL || !eyeR || !mouth) return;
+    if(!fg || !eyeL || !eyeR || !mouth) return null;
+    var props = {};
+    for(var i = 0; i < PROP_KEYS.length; i++){
+      var pk = PROP_KEYS[i];
+      props[pk] = document.getElementById(prefix + pk);
+    }
+    c = {
+      fg: fg,
+      eyeL: eyeL,
+      eyeR: eyeR,
+      browL: document.getElementById(prefix + 'BrowL'),
+      browR: document.getElementById(prefix + 'BrowR'),
+      blushL: document.getElementById(prefix + 'BlushL'),
+      blushR: document.getElementById(prefix + 'BlushR'),
+      pupL: document.getElementById(prefix + 'PupilL'),
+      pupR: document.getElementById(prefix + 'PupilR'),
+      mouth: mouth,
+      props: props,
+      lastState: null,
+      lastEyes: null,
+      lastBrows: null,
+      lastMouth: null,
+      lastBlush: null,
+      lastLx: -999,
+      lastLy: -999
+    };
+    prefixDomCache[prefix] = c;
+    return c;
+  }
+
+  function applyPropsVisibility(prefix){
+    var c = getPrefixCache(prefix);
+    if(!c) return;
+    if(c.lastState === mascotState) return;
+    c.lastState = mascotState;
+    for(var i = 0; i < PROP_KEYS.length; i++){
+      var pk = PROP_KEYS[i];
+      var el = c.props[pk];
+      if(el) el.style.display = (mascotState === PROP_STATE_MAP[pk]) ? 'block' : 'none';
+    }
+  }
+
+  function applyFaceToPrefix(prefix, lx, ly){
+    var c = getPrefixCache(prefix);
+    if(!c) return;
 
     applyPropsVisibility(prefix);
 
     var effEyes = isBlinking ? 'closed' : currentEyes;
-    var ep = getEyePaths(effEyes);
-    var bp = getBrowPaths(currentBrows);
-    var mp = getMouthPath(currentMouth);
-
-    fg.setAttribute('transform', 'translate(' + lx.toFixed(2) + ',' + ly.toFixed(2) + ')');
-    eyeL.setAttribute('d', ep.l);
-    eyeR.setAttribute('d', ep.r);
-
-    if(browL && browR){
-      browL.setAttribute('d', bp.l);
-      browR.setAttribute('d', bp.r);
-      browL.style.opacity = bp.show ? '1' : '0';
-      browR.style.opacity = bp.show ? '1' : '0';
+    if(c.lastEyes !== effEyes){
+      c.lastEyes = effEyes;
+      var ep = getEyePaths(effEyes);
+      c.eyeL.setAttribute('d', ep.l);
+      c.eyeR.setAttribute('d', ep.r);
+      if(c.pupL && c.pupR){
+        var pupOp = ep.showPupils ? '1' : '0';
+        c.pupL.style.opacity = pupOp;
+        c.pupR.style.opacity = pupOp;
+      }
     }
 
-    if(blushL && blushR){
-      blushL.classList.toggle('visible', !!showBlush);
-      blushR.classList.toggle('visible', !!showBlush);
+    if(c.lastBrows !== currentBrows){
+      c.lastBrows = currentBrows;
+      if(c.browL && c.browR){
+        var bp = getBrowPaths(currentBrows);
+        c.browL.setAttribute('d', bp.l);
+        c.browR.setAttribute('d', bp.r);
+        var brOp = bp.show ? '1' : '0';
+        c.browL.style.opacity = brOp;
+        c.browR.style.opacity = brOp;
+      }
     }
 
-    if(pupL && pupR){
-      pupL.style.opacity = ep.showPupils ? '1' : '0';
-      pupR.style.opacity = ep.showPupils ? '1' : '0';
-      pupL.setAttribute('cx', (20 + lx * 0.48).toFixed(2));
-      pupL.setAttribute('cy', (28 + ly * 0.48).toFixed(2));
-      pupR.setAttribute('cx', (44 + lx * 0.48).toFixed(2));
-      pupR.setAttribute('cy', (28 + ly * 0.48).toFixed(2));
+    var blushBool = !!showBlush;
+    if(c.lastBlush !== blushBool){
+      c.lastBlush = blushBool;
+      if(c.blushL && c.blushR){
+        c.blushL.classList.toggle('visible', blushBool);
+        c.blushR.classList.toggle('visible', blushBool);
+      }
     }
 
-    mouth.setAttribute('d', mp.d);
-    mouth.classList.toggle('filled', !!mp.filled);
+    if(c.lastMouth !== currentMouth){
+      c.lastMouth = currentMouth;
+      var mp = getMouthPath(currentMouth);
+      c.mouth.setAttribute('d', mp.d);
+      c.mouth.classList.toggle('filled', !!mp.filled);
+    }
+
+    if(Math.abs(lx - c.lastLx) >= 0.015 || Math.abs(ly - c.lastLy) >= 0.015){
+      c.lastLx = lx;
+      c.lastLy = ly;
+      c.fg.setAttribute('transform', 'translate(' + lx.toFixed(2) + ',' + ly.toFixed(2) + ')');
+      if(c.pupL && c.pupR){
+        var px = (lx * 0.48);
+        var py = (28 + ly * 0.48).toFixed(2);
+        c.pupL.setAttribute('cx', (20 + px).toFixed(2));
+        c.pupL.setAttribute('cy', py);
+        c.pupR.setAttribute('cx', (44 + px).toFixed(2));
+        c.pupR.setAttribute('cy', py);
+      }
+    }
   }
 
   function syncMascotDomClasses(){
@@ -3937,10 +3995,12 @@
       }
     }, { passive: true });
 
+    var roamerDomEl = null;
+
     // Плавный цикл физики взгляда, спец-режимов и полёта на базе requestAnimationFrame (60 FPS с delta-time)
     function tickMascotFrame(perfNow){
       requestAnimationFrame(tickMascotFrame);
-      if(document.body && document.body.classList.contains('tab-paused')){
+      if(document.body && (document.body.classList.contains('tab-paused') || document.body.classList.contains('is-scrolling'))){
         lastFrameTs = perfNow;
         return;
       }
@@ -4006,9 +4066,14 @@
       }
 
       // Экспоненциальное сглаживание взгляда (плавное и не зависит от герцовки монитора)
-      var lerpFactor = 1 - Math.exp(-dt * 6.5);
-      lookX += (targetLookX - lookX) * lerpFactor;
-      lookY += (targetLookY - lookY) * lerpFactor;
+      if(Math.abs(targetLookX - lookX) < 0.005 && Math.abs(targetLookY - lookY) < 0.005){
+        lookX = targetLookX;
+        lookY = targetLookY;
+      } else {
+        var lerpFactor = 1 - Math.exp(-dt * 6.5);
+        lookX += (targetLookX - lookX) * lerpFactor;
+        lookY += (targetLookY - lookY) * lerpFactor;
+      }
 
       if(!isRoaming){
         applyFaceToPrefix('dock', lookX, lookY);
@@ -4021,6 +4086,7 @@
 
       // Плавное перемещение парящего маскота по экрану с инерцией и мягким торможением
       if(isRoaming && !isDraggingRoamer && mascotState !== 'sleep'){
+        if(!roamerDomEl) roamerDomEl = document.getElementById('ttcAiRoamer');
         if(now >= roamWaypointWaitUntil){
           var dx = roamTargetX - roamX;
           var dy = roamTargetY - roamY;
@@ -4056,9 +4122,8 @@
             var targetTilt = Math.max(-9, Math.min(9, roamVX * 0.11));
             roamTilt += (targetTilt - roamTilt) * (1 - Math.exp(-dt * 5.0));
 
-            var roamer = document.getElementById('ttcAiRoamer');
-            if(roamer){
-              roamer.style.transform = 'translate3d(' + roamX.toFixed(2) + 'px,' + (roamY + hoverBob).toFixed(2) + 'px,0) rotate(' + roamTilt.toFixed(2) + 'deg)';
+            if(roamerDomEl){
+              roamerDomEl.style.transform = 'translate3d(' + roamX.toFixed(2) + 'px,' + (roamY + hoverBob).toFixed(2) + 'px,0) rotate(' + roamTilt.toFixed(2) + 'deg)';
             }
             if(Math.random() < 0.018){
               spawnMascotSparkles(roamX + 39, roamY + 72, 1);
@@ -4068,9 +4133,8 @@
           // Плавное выравнивание наклона во время отдыха на точке
           if(Math.abs(roamTilt) > 0.05){
             roamTilt *= Math.exp(-dt * 4.5);
-            var roamerRest = document.getElementById('ttcAiRoamer');
-            if(roamerRest){
-              roamerRest.style.transform = 'translate3d(' + roamX.toFixed(2) + 'px,' + roamY.toFixed(2) + 'px,0) rotate(' + roamTilt.toFixed(2) + 'deg)';
+            if(roamerDomEl){
+              roamerDomEl.style.transform = 'translate3d(' + roamX.toFixed(2) + 'px,' + roamY.toFixed(2) + 'px,0) rotate(' + roamTilt.toFixed(2) + 'deg)';
             }
           }
         }

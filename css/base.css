@@ -3361,8 +3361,10 @@ body.is-home-screen .el-card-desc {
 /* ==========================================================================
    Оптимизация производительности фоновых эффектов (GPU / Paint Isolation)
    ========================================================================== */
+#faeThemeFx,
 #wiThemeFx,
 #wzThemeFx,
+#swThemeFx,
 #elThemeFx,
 .el-theme-fx,
 #meCitadelParticles,
@@ -3375,6 +3377,24 @@ body.is-home-screen .el-card-desc {
 #shDzankuParticles {
   contain: layout style paint;
   pointer-events: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Автоматическая пауза тяжёлых фоновых частиц во время активного скролла страницы */
+body.is-scrolling #faeThemeFx *,
+body.is-scrolling #wiThemeFx *,
+body.is-scrolling #wzThemeFx *,
+body.is-scrolling #swThemeFx *,
+body.is-scrolling #elThemeFx * {
+  animation-play-state: paused !important;
+}
+
+/* Оптимизация рендеринга длинных списков карточек при прокрутке */
+.grid > .card,
+.fae-ref-cards-grid > .fae-ref-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 190px;
 }
 
 body.tab-paused *,
@@ -3717,7 +3737,7 @@ body.hb-theme {
 
 /* Внутренние SVG-детали: брови, румянец, ушки, реквизит режимов */
 .ttc-mascot-face-group {
-  transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
 .ttc-mascot-brow {
@@ -3725,7 +3745,7 @@ body.hb-theme {
   stroke-width: 2.2;
   stroke-linecap: round;
   fill: none;
-  transition: d 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.26s ease;
+  transition: opacity 0.22s ease;
 }
 
 .ttc-mascot-ear {
@@ -3953,13 +3973,12 @@ body.hb-theme {
 
 .ttc-mascot-eye-glow {
   fill: var(--ai-accent-bright);
-  filter: drop-shadow(0 0 5px var(--ai-accent-bright));
-  transition: d 0.26s cubic-bezier(0.22, 1, 0.36, 1), transform 0.22s ease, opacity 0.24s ease;
+  transition: opacity 0.2s ease;
 }
 
 .ttc-mascot-pupil {
   fill: #ffffff;
-  transition: cx 0.14s cubic-bezier(0.22, 1, 0.36, 1), cy 0.14s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease;
+  transition: opacity 0.2s ease;
 }
 
 .ttc-mascot-mouth {
@@ -3968,8 +3987,7 @@ body.hb-theme {
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
-  filter: drop-shadow(0 0 4px var(--ai-accent-glow));
-  transition: d 0.28s cubic-bezier(0.22, 1, 0.36, 1), fill 0.26s ease;
+  transition: fill 0.22s ease;
 }
 
 .ttc-mascot-mouth.filled {
@@ -4028,9 +4046,7 @@ body.hb-theme {
   right: 0;
   min-width: 150px;
   max-width: 240px;
-  background: rgba(12, 16, 24, 0.90);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(12, 16, 24, 0.94);
   border: 1px solid var(--ai-accent);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 14px var(--ai-accent-glow);
   color: #f8fafc;
@@ -4040,8 +4056,9 @@ body.hb-theme {
   border-radius: 11px 11px 3px 11px;
   pointer-events: none;
   opacity: 0;
+  visibility: hidden;
   transform: translateY(8px) scale(0.94);
-  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s;
   z-index: 10000;
   text-align: left;
   white-space: normal;
@@ -4049,6 +4066,7 @@ body.hb-theme {
 
 .ttc-mascot-bubble.visible {
   opacity: 1;
+  visibility: visible;
   transform: translateY(0) scale(1);
 }
 
@@ -4128,12 +4146,10 @@ body.hb-theme {
   height: 90px;
   display: block;
   overflow: visible;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 10px var(--ai-accent-glow));
-  transition: filter 0.35s ease;
 }
 
 .ttc-ai-roamer.state-sleep .ttc-roamer-svg {
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+  opacity: 0.85;
 }
 
 .ttc-roamer-hand-l {
@@ -4207,24 +4223,28 @@ body.hb-theme {
   border: 1px solid var(--ai-border);
   border-radius: 16px;
   box-shadow: 0 20px 55px rgba(0, 0, 0, 0.72), 0 0 28px var(--ai-accent-glow);
-  backdrop-filter: blur(18px) saturate(135%);
-  -webkit-backdrop-filter: blur(18px) saturate(135%);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   z-index: 9999;
   opacity: 0;
+  visibility: hidden;
   transform: translateY(14px) scale(0.96);
   pointer-events: none;
+  contain: layout style paint;
   transition:
-    opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0.28s;
 }
 
 .ttc-ai-chat.open {
   opacity: 1;
+  visibility: visible;
   transform: translateY(0) scale(1);
   pointer-events: auto;
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
 }
 
 /* Лаконичная строка статуса фамильяра и переключатель авто-вылета */
@@ -4631,10 +4651,7 @@ body.fae-theme {
   background-image:
     radial-gradient(ellipse at 50% -8%, var(--fae-radial-top) 0%, transparent 62%),
     radial-gradient(ellipse at 85% 88%, var(--fae-radial-bot) 0%, transparent 55%),
-    radial-gradient(ellipse at 12% 78%, var(--fae-accent-soft) 0%, transparent 50%),
-    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.012) 0px, rgba(255, 255, 255, 0.012) 1px, transparent 1px, transparent 28px),
     linear-gradient(180deg, var(--fae-bg-0) 0%, #06080c 100%) !important;
-  transition: background-color 0.4s ease, color 0.3s ease;
 }
 
 /* Привязка компонентов Фаэруна к палитре выбранного класса */
@@ -4747,14 +4764,16 @@ body.fae-theme .sh-launcher-title {
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
-  transition: opacity 0.45s ease;
+  contain: strict;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .fae-fx-aura {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 38%, var(--fae-accent-soft) 0%, transparent 58%),
+    radial-gradient(circle at 50% 42%, var(--fae-accent-soft) 0%, transparent 56%),
     radial-gradient(circle at 82% 18%, var(--fae-secondary-glow) 0%, transparent 45%);
   opacity: 0.85;
   pointer-events: none;
@@ -4762,17 +4781,17 @@ body.fae-theme .sh-launcher-title {
 
 .fae-fx-mist {
   position: absolute;
-  inset: -15% -25%;
-  background: radial-gradient(ellipse at 50% 65%, var(--fae-accent-soft) 0%, transparent 65%);
-  opacity: 0.45;
-  filter: blur(36px);
-  animation: faeMistDrift 22s ease-in-out infinite alternate;
+  inset: -10% -15%;
+  background: radial-gradient(ellipse at 50% 65%, var(--fae-accent-soft) 0%, transparent 62%);
+  opacity: 0.42;
+  will-change: transform;
+  animation: faeMistDrift 24s ease-in-out infinite alternate;
   pointer-events: none;
 }
 
 @keyframes faeMistDrift {
-  0% { transform: translate3d(-3%, -2%, 0) scale(0.98); }
-  100% { transform: translate3d(3%, 2%, 0) scale(1.04); }
+  0% { transform: translate3d(-2.5%, -1.5%, 0) scale(0.98); }
+  100% { transform: translate3d(2.5%, 1.5%, 0) scale(1.03); }
 }
 
 /* Центральная и угловая декоративная эмблема класса на заднем фоне */
@@ -4787,14 +4806,14 @@ body.fae-theme .sh-launcher-title {
   position: absolute;
   top: 44%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 550px;
-  max-width: 88vw;
-  height: 550px;
+  transform: translate3d(-50%, -50%, 0);
+  width: 540px;
+  max-width: 86vw;
+  height: 540px;
   opacity: 0.085;
   color: var(--fae-accent-bright);
-  filter: drop-shadow(0 0 32px var(--fae-accent-glow)) drop-shadow(0 0 64px var(--fae-secondary-glow));
-  animation: faeCrestPulse 9s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+  animation: faeCrestPulse 11s ease-in-out infinite alternate;
 }
 
 .fae-bg-crest-main svg,
@@ -4806,29 +4825,28 @@ body.fae-theme .sh-launcher-title {
 
 .fae-bg-crest-main.spin-slow svg .fae-spin-ring {
   transform-origin: 100px 100px;
-  animation: faeCrestSpinSlow 48s linear infinite;
+  animation: faeCrestSpinSlow 56s linear infinite;
 }
 
 .fae-bg-crest-main.spin-slow svg .fae-spin-ring-rev {
   transform-origin: 100px 100px;
-  animation: faeCrestSpinSlow 36s linear infinite reverse;
+  animation: faeCrestSpinSlow 42s linear infinite reverse;
 }
 
 .fae-bg-crest-corner {
   position: absolute;
   bottom: -40px;
   right: -40px;
-  width: 310px;
-  height: 310px;
+  width: 300px;
+  height: 300px;
   opacity: 0.05;
   color: var(--fae-accent);
-  filter: drop-shadow(0 0 24px var(--fae-accent-glow));
   transform: rotate(-14deg);
 }
 
 @keyframes faeCrestPulse {
-  0% { transform: translate(-50%, -50%) scale(0.97); opacity: 0.065; }
-  100% { transform: translate(-50%, -50%) scale(1.03); opacity: 0.11; }
+  0% { transform: translate3d(-50%, -50%, 0) scale(0.97); opacity: 0.065; }
+  100% { transform: translate3d(-50%, -50%, 0) scale(1.03); opacity: 0.105; }
 }
 
 @keyframes faeCrestSpinSlow {
@@ -4855,12 +4873,10 @@ body.fae-theme .sh-launcher-title {
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   color: var(--fae-accent-bright);
-  filter: drop-shadow(0 0 4px var(--fae-accent)) drop-shadow(0 0 10px var(--fae-accent-glow));
 }
 
 .fae-flying-symbol.alt-color {
   color: var(--fae-secondary);
-  filter: drop-shadow(0 0 4px var(--fae-secondary)) drop-shadow(0 0 10px var(--fae-secondary-glow));
 }
 
 .fae-flying-symbol svg {

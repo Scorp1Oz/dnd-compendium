@@ -11722,18 +11722,12 @@ function buildFaerunThemeFx(cont, themeObj){
   var signsWrap = document.createElement('div');
   signsWrap.className = 'fae-bg-signs';
   var spots = [
-    { top: 74, left: 10, dir: 'up-right', dur: 22, delay: -4, size: 28 },
-    { top: 18, left: 84, dir: 'down-left', dur: 25, delay: -12, size: 26 },
-    { top: 78, left: 80, dir: 'up-left', dur: 21, delay: -7, size: 30 },
-    { top: 22, left: 14, dir: 'down-right', dur: 24, delay: -16, size: 25 },
-    { top: 48, left: 76, dir: 'wave', dur: 23, delay: -10, size: 27 },
-    { top: 68, left: 28, dir: 'cross', dur: 22, delay: -18, size: 24 },
-    { top: 14, left: 46, dir: 'down-right', dur: 26, delay: -5, size: 28 },
-    { top: 82, left: 54, dir: 'up-left', dur: 23, delay: -14, size: 26 },
-    { top: -5, left: 22, dir: 'fall-right', dur: 21, delay: -8, size: 24 },
-    { top: -5, left: 68, dir: 'fall-left', dur: 24, delay: -15, size: 25 },
-    { top: 58, left: 8, dir: 'up-right', dur: 27, delay: -20, size: 29 },
-    { top: 34, left: 90, dir: 'up-left', dur: 25, delay: -9, size: 26 }
+    { top: 74, left: 10, dir: 'up-right', dur: 24, delay: -4, size: 27 },
+    { top: 18, left: 84, dir: 'down-left', dur: 26, delay: -12, size: 25 },
+    { top: 78, left: 80, dir: 'up-left', dur: 23, delay: -7, size: 28 },
+    { top: 22, left: 14, dir: 'down-right', dur: 25, delay: -16, size: 24 },
+    { top: 48, left: 76, dir: 'wave', dur: 24, delay: -10, size: 26 },
+    { top: 68, left: 28, dir: 'cross', dur: 25, delay: -18, size: 24 }
   ];
 
   for(var i = 0; i < spots.length; i++){
@@ -11751,14 +11745,14 @@ function buildFaerunThemeFx(cont, themeObj){
   }
   cont.appendChild(signsWrap);
 
-  /* 3. Парящие искры / частицы энергии класса */
-  var emberCount = 24;
+  /* 3. Парящие искры / частицы энергии класса (облегчённый пул для 60 FPS) */
+  var emberCount = 10;
   for(var e = 0; e < emberCount; e++){
     var ember = document.createElement('div');
     ember.className = 'fae-ember';
-    var sz = (Math.random() * 3.4 + 2.0).toFixed(1);
-    var left = (Math.random() * 98 + 1).toFixed(1);
-    var dur = (Math.random() * 8 + 7).toFixed(1);
+    var sz = (Math.random() * 3.0 + 2.0).toFixed(1);
+    var left = (Math.random() * 96 + 2).toFixed(1);
+    var dur = (Math.random() * 8 + 8).toFixed(1);
     var delay = (-Math.random() * 16).toFixed(1);
     ember.style.width = sz + 'px';
     ember.style.height = sz + 'px';
@@ -11767,7 +11761,7 @@ function buildFaerunThemeFx(cont, themeObj){
     ember.style.animationDelay = delay + 's';
     var cHex = (e % 2 === 0) ? (themeObj.ember1 || themeObj.accentBright) : (themeObj.ember2 || themeObj.accent);
     ember.style.background = cHex;
-    ember.style.boxShadow = '0 0 8px ' + cHex + ', 0 0 16px ' + (themeObj.glow || cHex);
+    ember.style.boxShadow = '0 0 6px ' + cHex;
     cont.appendChild(ember);
   }
 }
@@ -11777,35 +11771,41 @@ function applyFaerunTheme(){
   var fx = document.getElementById('faeThemeFx');
   var isFaerunMode = (typeof HB === 'undefined' || !HB.mode || HB.mode === 'faerun');
   if(!isFaerunMode){
-    document.body.classList.remove('fae-theme');
-    FAE_THEMES.forEach(function(t){
-      document.body.classList.remove('fae-theme-' + t.id);
-    });
-    if(fx) fx.style.display = 'none';
+    if(document.body.classList.contains('fae-theme')){
+      document.body.classList.remove('fae-theme');
+      document.body.removeAttribute('data-fae-theme-active');
+      FAE_THEMES.forEach(function(t){
+        document.body.classList.remove('fae-theme-' + t.id);
+      });
+    }
+    if(fx && fx.style.display !== 'none') fx.style.display = 'none';
     return;
   }
 
   var curId = getFaerunTheme();
   var tObj = FAE_THEMES.find(function(t){ return t.id === curId; }) || FAE_THEMES[0];
 
-  document.body.classList.add('fae-theme');
-  FAE_THEMES.forEach(function(t){
-    document.body.classList.toggle('fae-theme-' + t.id, t.id === tObj.id);
-  });
+  if(!document.body.classList.contains('fae-theme') || document.body.getAttribute('data-fae-theme-active') !== tObj.id){
+    document.body.classList.add('fae-theme');
+    document.body.setAttribute('data-fae-theme-active', tObj.id);
+    FAE_THEMES.forEach(function(t){
+      document.body.classList.toggle('fae-theme-' + t.id, t.id === tObj.id);
+    });
 
-  var st = document.body.style;
-  st.setProperty('--fae-accent', tObj.accent);
-  st.setProperty('--fae-accent-bright', tObj.accentBright);
-  st.setProperty('--fae-accent-dim', tObj.accentDim);
-  st.setProperty('--fae-accent-soft', tObj.accentSoft);
-  st.setProperty('--fae-accent-glow', tObj.glow);
-  st.setProperty('--fae-secondary', tObj.secondary);
-  st.setProperty('--fae-secondary-glow', tObj.secondaryGlow);
-  st.setProperty('--fae-bg-0', tObj.bg0);
-  st.setProperty('--fae-bg-1', tObj.bg1);
-  st.setProperty('--fae-bg-2', tObj.bg2);
-  st.setProperty('--fae-radial-top', tObj.radialTop);
-  st.setProperty('--fae-radial-bot', tObj.radialBot);
+    var st = document.body.style;
+    st.setProperty('--fae-accent', tObj.accent);
+    st.setProperty('--fae-accent-bright', tObj.accentBright);
+    st.setProperty('--fae-accent-dim', tObj.accentDim);
+    st.setProperty('--fae-accent-soft', tObj.accentSoft);
+    st.setProperty('--fae-accent-glow', tObj.glow);
+    st.setProperty('--fae-secondary', tObj.secondary);
+    st.setProperty('--fae-secondary-glow', tObj.secondaryGlow);
+    st.setProperty('--fae-bg-0', tObj.bg0);
+    st.setProperty('--fae-bg-1', tObj.bg1);
+    st.setProperty('--fae-bg-2', tObj.bg2);
+    st.setProperty('--fae-radial-top', tObj.radialTop);
+    st.setProperty('--fae-radial-bot', tObj.radialBot);
+  }
 
   if(!fx){
     fx = document.createElement('div');
@@ -11816,9 +11816,28 @@ function applyFaerunTheme(){
   if(fx.getAttribute('data-fae-theme') !== tObj.id || fx.children.length === 0){
     buildFaerunThemeFx(fx, tObj);
   }
-  fx.style.display = 'block';
+  if(fx.style.display !== 'block') fx.style.display = 'block';
 }
 window.applyFaerunTheme = applyFaerunTheme;
+
+/* Глобальный пассивный детектор скролла и свёрнутой вкладки для разгрузки GPU */
+(function(){
+  if(typeof window === 'undefined' || window.__ttcPerfScrollBound) return;
+  window.__ttcPerfScrollBound = true;
+  var scrollIdleTimer = null;
+  window.addEventListener('scroll', function(){
+    if(document.body && !document.body.classList.contains('is-scrolling')){
+      document.body.classList.add('is-scrolling');
+    }
+    if(scrollIdleTimer) clearTimeout(scrollIdleTimer);
+    scrollIdleTimer = setTimeout(function(){
+      if(document.body) document.body.classList.remove('is-scrolling');
+    }, 140);
+  }, { passive: true });
+  document.addEventListener('visibilitychange', function(){
+    if(document.body) document.body.classList.toggle('tab-paused', !!document.hidden);
+  });
+})();
 
 function showFaerunToast(msg){
   if(typeof GHSync !== 'undefined' && typeof GHSync.toast === 'function'){
