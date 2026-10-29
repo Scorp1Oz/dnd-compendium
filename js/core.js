@@ -1006,6 +1006,22 @@ function getAvailableDiceCategories(){
       const hero = (typeof getActiveFaerunCharacter === 'function') ? getActiveFaerunCharacter() : null;
       const extraCats = [];
       if(hero && Array.isArray(hero.techs) && hero.techs.length > 0){
+        const prepTechs = hero.techs.filter(function(t){ return t && t.prepared; });
+        if(prepTechs.length > 0){
+          extraCats.push({
+            key: 'fae_techs_prepared',
+            icon: '🌟',
+            ru: 'Выбранное (Подготовлено)',
+            items: prepTechs.map(function(t){
+              var dNum = parseInt(String(t.dmgD || '').replace(/\D+/g, ''), 10);
+              return {
+                icon: '🌟',
+                ru: t.name || 'Способность',
+                std: (!isNaN(dNum) && dNum >= 2) ? dNum : 20
+              };
+            })
+          });
+        }
         extraCats.push({
           key: 'fae_techs',
           icon: '✨',
@@ -1013,7 +1029,7 @@ function getAvailableDiceCategories(){
           items: hero.techs.map(function(t){
             var dNum = parseInt(String(t.dmgD || '').replace(/\D+/g, ''), 10);
             return {
-              icon: t.icon || '✨',
+              icon: t.prepared ? '🌟' : (t.icon || '✨'),
               ru: t.name || 'Способность',
               std: (!isNaN(dNum) && dNum >= 2) ? dNum : 20
             };
@@ -1386,6 +1402,8 @@ function normalizeFaerunCharacter(c){
     c.techs = c.techs.filter(Boolean).map(function(t, idx){
       return {
         id: t.id || ('fae_tech_' + Date.now() + '_' + idx),
+        spellId: t.spellId || '',
+        prepared: !!t.prepared,
         name: t.name || 'Способность',
         icon: t.icon || '✨',
         category: t.category || t.cat || 'Классовые умения',
@@ -2686,6 +2704,7 @@ function renderHome(){
   var lvlVal = c ? (c.level || 1) : 1;
   var pbVal = fmtMod(profBonus(lvlVal));
   var techsCount = (c && Array.isArray(c.techs)) ? c.techs.length : 0;
+  var prepTechsCount = (c && Array.isArray(c.techs)) ? c.techs.filter(function(t){ return t && t.prepared; }).length : 0;
   var movesCount = (c && Array.isArray(c.moves)) ? c.moves.length : 0;
   var skillsCount = (c && Array.isArray(c.customSkills)) ? c.customSkills.length : 0;
   var profSkillsCount = (c && c.skillProf) ? Object.keys(c.skillProf).filter(function(k){ return Number(c.skillProf[k]) > 0; }).length : 0;
@@ -2722,7 +2741,7 @@ function renderHome(){
   var cardsHtml = '<div class="menu-list grid-2">' +
     '<div class="fae-card fae-card-clickable" data-go="faeTechs" role="button" tabindex="0">' +
       '<div style="flex:1;min-width:0;">' +
-        '<div class="fae-card-title"><span>✨</span> Способности ' + (techsCount ? '<span class="fae-ref-header-badge" style="margin-left:6px;padding:1px 8px;font-size:11px;">' + techsCount + '</span>' : '') + '</div>' +
+        '<div class="fae-card-title"><span>✨</span> Способности ' + (techsCount ? '<span class="fae-ref-header-badge" style="margin-left:6px;padding:1px 8px;font-size:11px;">' + techsCount + '</span>' : '') + (prepTechsCount ? '<span class="fae-ref-header-badge" style="margin-left:5px;padding:1px 8px;font-size:11px;border-color:#fbbf24;color:#fde68a;background:rgba(251,191,36,0.16);" title="Выбранные (подготовленные) способности и заклинания">🌟 ' + prepTechsCount + ' выбр.</span>' : '') + '</div>' +
         '<div class="fae-card-desc">Классовые умения, особенности вида, черты (Feats), магические дары и AI-конструктор способностей героя</div>' +
       '</div>' +
       '<div class="fae-card-arrow">›</div>' +
@@ -4222,6 +4241,7 @@ function wireAlchemyCustom(){
 
 var FAE_TECH_CATEGORIES = [
   { key: 'all', label: 'Все способности', icon: '✨' },
+  { key: 'prepared', label: 'Выбранное', icon: '🌟' },
   { key: 'Классовые умения', label: 'Классовые умения', icon: '⚔️' },
   { key: 'Вид и Происхождение', label: 'Вид и Происхождение', icon: '🧬' },
   { key: 'Черты (Feats)', label: 'Черты (Feats)', icon: '⭐' },
@@ -4242,10 +4262,13 @@ function renderFaeAbilitiesTabBar(activeTab){
   var c = getActiveFaerunCharacter();
   var chars = Array.isArray(CHARACTERS) ? CHARACTERS : [c];
   var tCount = (c && Array.isArray(c.techs)) ? c.techs.length : 0;
+  var prepCount = (c && Array.isArray(c.techs)) ? c.techs.filter(function(t){ return t && t.prepared; }).length : 0;
   var mCount = (c && Array.isArray(c.moves)) ? c.moves.length : 0;
   var sCount = (c && Array.isArray(c.customSkills)) ? c.customSkills.length : 0;
   var pCount = (c && c.skillProf) ? Object.keys(c.skillProf).filter(function(k){ return Number(c.skillProf[k]) > 0; }).length : 0;
   var totSkills = sCount + pCount;
+  var isPrepActive = (activeTab === 'techs' && window._faeTechCat === 'prepared');
+  var isAllTechActive = (activeTab === 'techs' && window._faeTechCat !== 'prepared');
 
   var charOpts = chars.map(function(ch){
     var isSel = c && ch.id === c.id;
@@ -4256,8 +4279,11 @@ function renderFaeAbilitiesTabBar(activeTab){
 
   return '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">' +
     '<div class="fae-nav-tabs" style="margin-bottom:0;flex:1;min-width:280px;">' +
-      '<button type="button" class="fae-nav-tab ' + (activeTab==='techs'?'active':'') + '" data-go="faeTechs">' +
+      '<button type="button" class="fae-nav-tab ' + (isAllTechActive?'active':'') + '" data-go="faeTechs:all">' +
         '✨ Способности (' + tCount + ')' +
+      '</button>' +
+      '<button type="button" class="fae-nav-tab ' + (isPrepActive?'active':'') + '" data-go="faeTechs:prepared" style="' + (isPrepActive ? 'border-color:#fbbf24;color:#fde68a;box-shadow:0 0 14px rgba(251,191,36,0.28);' : 'border-color:rgba(251,191,36,0.42);color:#fde68a;') + '" title="Подготовленные заклинания и выбранные умения, готовые к применению прямо сейчас">' +
+        '🌟 Выбранное (' + prepCount + ')' +
       '</button>' +
       '<button type="button" class="fae-nav-tab ' + (activeTab==='moves'?'active':'') + '" data-go="faeMoves">' +
         '⚔️ Боевые приёмы (' + mCount + ')' +
@@ -4430,7 +4456,11 @@ function renderFaeTechLauncher(c){
   if(!L.rolledValues) L.rolledValues = {};
   if(!L.selectedTarget) L.selectedTarget = 'atk';
 
-  var selTech = techs.find(function(x){ return x.id === L.techId; }) || techs[0];
+  var prepTechs = techs.filter(function(x){ return x && x.prepared; });
+  var onlyPrep = !!(L.onlyPrepared && prepTechs.length > 0);
+  var poolTechs = onlyPrep ? prepTechs : (prepTechs.length ? prepTechs.concat(techs.filter(function(x){ return !x.prepared; })) : techs);
+
+  var selTech = poolTechs.find(function(x){ return x.id === L.techId; }) || poolTechs[0];
   if(L.techId !== selTech.id){
     L.techId = selTech.id;
     var initDmg = parseFaeDiceFormula(selTech.checkOrSave || selTech.desc || '');
@@ -4449,13 +4479,27 @@ function renderFaeTechLauncher(c){
   var targetTitle = targetNames[selTarget] || '🎯 Попадание / Проверка';
   var curModVal = L.mods[selTarget] || 0;
 
-  var techOpts = techs.map(function(t){
+  var buildTechOpt = function(t){
     var act = t.actionCost ? (' (' + t.actionCost + ')') : '';
     var sav = t.checkOrSave ? (' [' + t.checkOrSave + ']') : '';
+    var pref = t.prepared ? '🌟 ' : '';
     return '<option value="' + escapeAttr(t.id) + '" ' + (t.id === selTech.id ? 'selected' : '') + '>' +
-      escapeHtml(t.category || 'Умение') + ' · ' + escapeHtml(t.name || 'Без названия') + act + sav +
+      pref + escapeHtml(t.category || 'Умение') + ' · ' + escapeHtml(t.name || 'Без названия') + act + sav +
     '</option>';
-  }).join('');
+  };
+
+  var techOpts = '';
+  if(onlyPrep){
+    techOpts = prepTechs.map(buildTechOpt).join('');
+  } else if(prepTechs.length > 0){
+    var restTechs = techs.filter(function(t){ return !t.prepared; });
+    techOpts = '<optgroup label="🌟 ВЫБРАННОЕ (Подготовлено — ' + prepTechs.length + ')">' +
+      prepTechs.map(buildTechOpt).join('') +
+      '</optgroup>' +
+      (restTechs.length ? ('<optgroup label="📖 Остальные способности (' + restTechs.length + ')">' + restTechs.map(buildTechOpt).join('') + '</optgroup>') : '');
+  } else {
+    techOpts = techs.map(buildTechOpt).join('');
+  }
 
   var screenHtml = renderFaeTechLauncherDiceHtml(selTech, isConc, selTarget, L.mods, L.rolledValues);
 
@@ -4512,11 +4556,16 @@ function renderFaeTechLauncher(c){
 
   var bodyHtml =
     '<div class="sh-launcher-body" id="faeTechLauncherBody">' +
-      '<div class="sh-launcher-head">' +
-        '<div class="sh-launcher-sel-wrap">' +
+      '<div class="sh-launcher-head" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;">' +
+        '<div class="sh-launcher-sel-wrap" style="flex:1;min-width:240px;">' +
           '<div class="sh-launcher-sel-label">Способность для броска:</div>' +
           '<select class="sh-launcher-sel" id="faeTechLauncherSelect">' + techOpts + '</select>' +
         '</div>' +
+        (prepTechs.length > 0 ? (
+          '<label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#fde68a;cursor:pointer;user-select:none;background:rgba(251,191,36,0.14);border:1px solid rgba(251,191,36,0.45);padding:7px 12px;border-radius:6px;font-family:\'Cinzel\',serif;font-weight:700;" title="Оставить в списке боевого расчёта только подготовленные заклинания и выбранные умения">' +
+            '<input type="checkbox" id="faeTechLauncherOnlyPrep"' + (onlyPrep ? ' checked' : '') + ' style="accent-color:#fbbf24;"> 🌟 Только выбранное (' + prepTechs.length + ')' +
+          '</label>'
+        ) : '') +
       '</div>' +
       '<div class="sh-launcher-screen" id="faeTechLauncherScreen">' + screenHtml + '</div>' +
       modBarHtml +
@@ -4639,6 +4688,18 @@ function wireFaeTechLauncher(){
       L.rolledValues = {};
       L.lastResult = '';
       L.lastResultCopied = false;
+      render();
+    });
+  }
+
+  var onlyPrepCb = document.getElementById('faeTechLauncherOnlyPrep');
+  if(onlyPrepCb){
+    onlyPrepCb.addEventListener('change', function(){
+      L.onlyPrepared = !!this.checked;
+      var prepList = techs.filter(function(x){ return x && x.prepared; });
+      if(L.onlyPrepared && prepList.length > 0 && !prepList.some(function(x){ return x.id === L.techId; })){
+        L.techId = prepList[0].id;
+      }
       render();
     });
   }
@@ -4832,16 +4893,28 @@ function renderFaeTechs(){
   var techs = (c && Array.isArray(c.techs)) ? c.techs : [];
   var activeCat = window._faeTechCat || 'all';
   var searchQ = (window._faeTechSearch || '').trim().toLowerCase();
+  var prepTechs = techs.filter(function(t){ return t && t.prepared; });
+  var prepCount = prepTechs.length;
 
   var pillsHtml = FAE_TECH_CATEGORIES.map(function(cat){
-    var cnt = cat.key === 'all' ? techs.length : techs.filter(function(t){ return t.category === cat.key; }).length;
-    return '<button type="button" class="fae-pill ' + (activeCat === cat.key ? 'active' : '') + '" data-fae-tech-cat="' + escapeAttr(cat.key) + '">' +
+    var cnt = 0;
+    if(cat.key === 'all') cnt = techs.length;
+    else if(cat.key === 'prepared') cnt = prepCount;
+    else cnt = techs.filter(function(t){ return t.category === cat.key; }).length;
+    var prepPillStyle = (cat.key === 'prepared' && activeCat !== 'prepared')
+      ? ' style="border-color:rgba(251,191,36,0.5);color:#fde68a;background:rgba(251,191,36,0.10);"'
+      : (cat.key === 'prepared' && activeCat === 'prepared' ? ' style="border-color:#fbbf24;color:#fde68a;background:rgba(251,191,36,0.24);box-shadow:0 0 12px rgba(251,191,36,0.28);"' : '');
+    return '<button type="button" class="fae-pill ' + (activeCat === cat.key ? 'active' : '') + '" data-fae-tech-cat="' + escapeAttr(cat.key) + '"' + prepPillStyle + '>' +
       cat.icon + ' ' + escapeHtml(cat.label) + ' <span style="opacity:0.75;font-size:11px;">(' + cnt + ')</span>' +
     '</button>';
   }).join('');
 
   var filtered = techs.filter(function(t){
-    if(activeCat !== 'all' && t.category !== activeCat) return false;
+    if(activeCat === 'prepared'){
+      if(!t.prepared) return false;
+    } else if(activeCat !== 'all' && t.category !== activeCat){
+      return false;
+    }
     if(searchQ){
       var hay = [t.name, t.category, t.source, t.actionCost, t.cooldown, t.checkOrSave, t.desc].join(' ').toLowerCase();
       if(hay.indexOf(searchQ) === -1) return false;
@@ -4849,15 +4922,69 @@ function renderFaeTechs(){
     return true;
   });
 
+  if(activeCat !== 'prepared'){
+    filtered = filtered.slice().sort(function(a, b){
+      var pa = a && a.prepared ? 1 : 0;
+      var pb = b && b.prepared ? 1 : 0;
+      return pb - pa;
+    });
+  }
+
+  var prepSubmenuBannerHtml = '';
+  if(activeCat === 'prepared'){
+    var lvl = c ? (Number(c.level) || 1) : 1;
+    var pbVal = profBonus(lvl);
+    var spAbKey = (c && c.spellAbility) ? c.spellAbility : 'int';
+    var spMod = c && c.abilities ? abilityMod(c.abilities[spAbKey]) : 0;
+    var spDc = 8 + pbVal + spMod;
+    var spAtk = fmtMod(pbVal + spMod);
+    var recPrep = Math.max(1, lvl + spMod);
+    prepSubmenuBannerHtml =
+      '<div class="fae-ref-card" style="margin-bottom:16px;padding:14px 18px;border-color:rgba(251,191,36,0.55);background:linear-gradient(135deg,rgba(36,29,16,0.92),rgba(16,20,28,0.95));box-shadow:0 4px 18px rgba(0,0,0,0.45),0 0 14px rgba(251,191,36,0.12);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">' +
+          '<div>' +
+            '<div style="font-family:\'Cinzel\',serif;font-weight:700;font-size:15px;color:#fde68a;display:flex;align-items:center;gap:8px;">' +
+              '<span>🌟 Подменю «Выбранное» — Подготовленные заклинания и активные умения</span>' +
+              '<span class="fae-ref-item-tag" style="background:rgba(251,191,36,0.22);border-color:#fbbf24;color:#fde68a;">Выбрано: ' + prepCount + ' из ' + techs.length + '</span>' +
+            '</div>' +
+            '<div style="font-size:12.5px;color:#cbd5e1;margin-top:4px;line-height:1.45;">' +
+              'Сюда попадают заклинания и способности, которые герой подготовил после отдыха и готов применить прямо сейчас. ' +
+              '<span style="color:#fde68a;font-family:\'JetBrains Mono\',monospace;font-size:11.5px;">Ориентир D&D (Ур. ' + lvl + ' + Мод. ' + (ABILITY_RU[spAbKey] || 'ИНТ') + '): ~' + recPrep + ' подг. • СЛ закл. ' + spDc + ' • Атака закл. ' + spAtk + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+            '<button type="button" class="rc-btn" data-fae-tech-cat="all" style="border-color:rgba(201,164,92,0.5);color:#f3e5ab;">✨ Выбрать из всех (' + techs.length + ')</button>' +
+            '<button type="button" class="rc-btn" data-go="magic" style="border-color:rgba(96,165,250,0.5);color:#bae6fd;">📖 Книга заклинаний</button>' +
+            (prepCount > 0 ? '<button type="button" class="rc-btn" id="faeClearAllPreparedBtn" style="border-color:rgba(248,113,113,0.45);color:#fca5a5;" title="Снять отметку «Выбрано» со всех способностей (например, перед новой подготовкой после долгого отдыха)">🧹 Снять выбор со всех</button>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  var emptyMsg = activeCat === 'prepared'
+    ? '<div class="char-empty">В подменю «🌟 Выбранное» пока нет подготовленных заклинаний или способностей.<br><span style="font-size:13px;color:#cbd5e1;">Нажмите кнопку <b>«📌 В выбранное»</b> на любой карточке во вкладке «Все способности» или кнопку <b>«🌟 Подготовить»</b> прямо в Книге заклинаний!</span></div>'
+    : '<div class="char-empty">У героя пока нет способностей в этой категории. Нажмите «+ Добавить способность» или «🤖 Создать с ИИ»!</div>';
+
   var cardsHtml = filtered.length ? (
     '<div class="fae-ref-cards-grid">' +
       filtered.map(function(t){
-        var copyStr = '✨ ' + (t.name || 'Способность') + ' [' + (t.category || 'Умение') + ', ' + (t.actionCost || 'Пассивно') + (t.cooldown ? (', ' + t.cooldown) : '') + ']: ' + (t.desc || '');
-        return '<div class="fae-ref-card" data-fae-tech-open="' + escapeAttr(t.id) + '" style="display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;">' +
+        var isPrep = !!t.prepared;
+        var copyStr = (isPrep ? '🌟 ' : '✨ ') + (t.name || 'Способность') + ' [' + (t.category || 'Умение') + ', ' + (t.actionCost || 'Пассивно') + (t.cooldown ? (', ' + t.cooldown) : '') + ']: ' + (t.desc || '');
+        var cardBorderStyle = isPrep
+          ? 'border-color:rgba(251,191,36,0.62);background:linear-gradient(145deg,rgba(32,27,18,0.92),rgba(18,22,30,0.94));box-shadow:0 4px 16px rgba(0,0,0,0.45),0 0 12px rgba(251,191,36,0.12);'
+          : '';
+        var prepBtnHtml = isPrep
+          ? '<button type="button" class="rc-btn" data-fae-tech-prep="' + escapeAttr(t.id) + '" style="background:rgba(251,191,36,0.22);border-color:#fbbf24;color:#fde68a;font-weight:700;" title="Убрать из подменю «Выбранное» (снять подготовку)">🌟 Выбрано ✓</button>'
+          : '<button type="button" class="rc-btn" data-fae-tech-prep="' + escapeAttr(t.id) + '" style="border-color:rgba(251,191,36,0.45);color:#fde68a;" title="Добавить в подменю «Выбранное» (подготовить к применению)">📌 В выбранное</button>';
+
+        return '<div class="fae-ref-card" data-fae-tech-open="' + escapeAttr(t.id) + '" style="display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;' + cardBorderStyle + '">' +
           '<div>' +
             '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">' +
-              '<div class="fae-ref-card-k" style="margin-bottom:0;">✨ ' + escapeHtml(t.name || 'Без названия') + '</div>' +
-              '<span class="fae-ref-item-tag">' + escapeHtml(t.actionCost || '1 действие') + '</span>' +
+              '<div class="fae-ref-card-k" style="margin-bottom:0;">' + (isPrep ? '🌟 ' : '✨ ') + escapeHtml(t.name || 'Без названия') + '</div>' +
+              '<div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">' +
+                (isPrep ? '<span class="fae-ref-item-tag" style="background:rgba(251,191,36,0.2);border-color:#fbbf24;color:#fde68a;">🌟 Подготовлено</span>' : '') +
+                '<span class="fae-ref-item-tag">' + escapeHtml(t.actionCost || '1 действие') + '</span>' +
+              '</div>' +
             '</div>' +
             '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11.5px;color:#cbd5e1;font-family:\'JetBrains Mono\',monospace;">' +
               '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;">📂 ' + escapeHtml(t.category || 'Классовые умения') + '</span>' +
@@ -4868,6 +4995,7 @@ function renderFaeTechs(){
             '<div class="fae-ref-card-v" style="margin-bottom:12px;">' + escapeHtml(t.desc || '') + '</div>' +
           '</div>' +
           '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(201,164,92,0.18);">' +
+            prepBtnHtml +
             '<button type="button" class="rc-btn" data-fae-tech-to-calc="' + escapeAttr(t.id) + '" style="border-color:rgba(200,67,55,0.5);color:#ff9085;">⚔️ В расчёт</button>' +
             '<button type="button" class="rc-btn" data-fae-tech-copy="' + escapeAttr(copyStr) + '">📋 Копировать</button>' +
             '<button type="button" class="rc-btn" data-go="faeTechEdit:' + escapeAttr(t.id) + '">✏️ Изменить</button>' +
@@ -4876,15 +5004,17 @@ function renderFaeTechs(){
         '</div>';
       }).join('') +
     '</div>'
-  ) : '<div class="char-empty">У героя пока нет способностей в этой категории. Нажмите «+ Добавить способность» или «🤖 Создать с ИИ»!</div>';
+  ) : emptyMsg;
 
-  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Способности героя'}]) +
+  return renderCrumb([{label:'Фаэрун', nav:'home'}, {label: activeCat === 'prepared' ? 'Выбранное (Подготовлено)' : 'Способности героя'}]) +
     '<button class="back" data-go="home">← На главную</button>' +
     renderFaeAbilitiesTabBar('techs') +
     '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">' +
       '<div>' +
-        '<h1>✨ Способности и Умения Героя</h1>' +
-        '<p class="subtitle">Классовые умения, особенности вида, черты (Feats) и сверхъестественные таланты персонажа. Доступны для выбора при броске костей.</p>' +
+        '<h1>' + (activeCat === 'prepared' ? '🌟 Выбранное: Подготовленные Заклинания и Способности' : '✨ Способности и Умения Героя') + '</h1>' +
+        '<p class="subtitle">' + (activeCat === 'prepared'
+          ? 'Готовые к немедленному применению заклинания и активные умения героя. Выберите карточку и нажмите «⚔️ В расчёт» для броска.'
+          : 'Классовые умения, особенности вида, черты (Feats) и заклинания персонажа. Отмечайте подготовленные чары кнопкой «📌 В выбранное».') + '</p>' +
       '</div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
         '<button type="button" class="btn btn-primary" data-go="faeTechEdit:new">+ Добавить способность</button>' +
@@ -4899,10 +5029,11 @@ function renderFaeTechs(){
 
     '<div class="fae-ref-search-wrap" style="margin-bottom:14px;">' +
       '<span class="fae-ref-search-icon">🔍</span>' +
-      '<input type="text" id="faeTechSearchInp" class="fae-ref-search-input" value="' + escapeAttr(window._faeTechSearch || '') + '" placeholder="Поиск по названию способности, классу, черте или эффекту..." autocomplete="off">' +
+      '<input type="text" id="faeTechSearchInp" class="fae-ref-search-input" value="' + escapeAttr(window._faeTechSearch || '') + '" placeholder="Поиск по названию способности, заклинанию, классу, черте или эффекту..." autocomplete="off">' +
     '</div>' +
 
     '<div class="pill-row" style="margin-bottom:18px;">' + pillsHtml + '</div>' +
+    prepSubmenuBannerHtml +
     cardsHtml;
 }
 
@@ -4910,17 +5041,22 @@ function renderFaeTechView(){
   var c = getActiveFaerunCharacter();
   var t = (c && Array.isArray(c.techs)) ? c.techs.find(function(x){ return x.id === view.techId; }) : null;
   if(!t) return renderFaeTechs();
+  var isPrep = !!t.prepared;
 
   return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Способности', nav:'faeTechs'}, {label:t.name || 'Способность'}]) +
     '<button class="back" data-go="faeTechs">← К списку способностей</button>' +
     renderFaeAbilitiesTabBar('techs') +
-    '<div class="fae-ref-card" style="padding:22px;border-color:rgba(201,164,92,0.45);">' +
+    '<div class="fae-ref-card" style="padding:22px;border-color:' + (isPrep ? 'rgba(251,191,36,0.65)' : 'rgba(201,164,92,0.45)') + ';">' +
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">' +
         '<div>' +
-          '<span class="fae-ref-item-tag">✨ ' + escapeHtml(t.category || 'Классовые умения') + '</span>' +
+          '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
+            '<span class="fae-ref-item-tag">✨ ' + escapeHtml(t.category || 'Классовые умения') + '</span>' +
+            (isPrep ? '<span class="fae-ref-item-tag" style="background:rgba(251,191,36,0.2);border-color:#fbbf24;color:#fde68a;">🌟 В выбранном (Подготовлено)</span>' : '') +
+          '</div>' +
           '<h1 style="margin:8px 0 0 0;font-size:24px;">' + escapeHtml(t.name || 'Способность') + '</h1>' +
         '</div>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button type="button" class="btn btn-ghost" data-fae-tech-prep="' + escapeAttr(t.id) + '" style="' + (isPrep ? 'background:rgba(251,191,36,0.22);border-color:#fbbf24;color:#fde68a;' : 'border-color:rgba(251,191,36,0.5);color:#fde68a;') + '">' + (isPrep ? '🌟 Выбрано ✓' : '📌 В выбранное') + '</button>' +
           '<button type="button" class="btn btn-ghost" data-fae-tech-to-calc="' + escapeAttr(t.id) + '" style="border-color:rgba(200,67,55,0.6);color:#ff9085;">⚔️ В боевой расчёт</button>' +
           '<button type="button" class="btn btn-primary" data-go="faeTechEdit:' + escapeAttr(t.id) + '">✏️ Редактировать</button>' +
         '</div>' +
@@ -4943,6 +5079,7 @@ function renderFaeTechEdit(){
     : null;
   var d = existing ? JSON.parse(JSON.stringify(existing)) : {
     id: '',
+    prepared: window._faeTechCat === 'prepared',
     name: '',
     category: 'Классовые умения',
     source: (c && c.className ? (c.className + ' ' + (c.level||1) + ' ур.') : 'Уровень 1'),
@@ -4961,13 +5098,19 @@ function renderFaeTechEdit(){
       '<input type="hidden" id="faeTechEditId" value="' + escapeAttr(d.id || '') + '">' +
       '<div class="fae-edit-grid">' +
         '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
-          '<label>Название способности / черты / дара</label>' +
-          '<input type="text" class="fae-input" id="faeTechName" value="' + escapeAttr(d.name) + '" placeholder="Напр. Всплеск действий (Action Surge), Божественная кара, Черта: Бдительный">' +
+          '<label>Название способности / черты / дара / заклинания</label>' +
+          '<input type="text" class="fae-input" id="faeTechName" value="' + escapeAttr(d.name) + '" placeholder="Напр. Всплеск действий (Action Surge), Огненный шар, Черта: Бдительный">' +
+        '</div>' +
+        '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
+          '<label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;color:#fde68a;font-weight:700;padding:8px 12px;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.4);border-radius:6px;">' +
+            '<input type="checkbox" id="faeTechPrepared"' + (d.prepared ? ' checked' : '') + ' style="width:16px;height:16px;accent-color:#fbbf24;">' +
+            '<span>🌟 Добавить в подменю «Выбранное» (заклинание подготовлено и готово к применению прямо сейчас)</span>' +
+          '</label>' +
         '</div>' +
         '<div class="fae-edit-item">' +
           '<label>Категория</label>' +
           '<select class="fae-input" id="faeTechCat">' +
-            FAE_TECH_CATEGORIES.filter(function(x){ return x.key !== 'all'; }).map(function(cat){
+            FAE_TECH_CATEGORIES.filter(function(x){ return x.key !== 'all' && x.key !== 'prepared'; }).map(function(cat){
               return '<option value="' + escapeAttr(cat.key) + '" ' + (d.category === cat.key ? 'selected' : '') + '>' + cat.icon + ' ' + escapeHtml(cat.label) + '</option>';
             }).join('') +
           '</select>' +
@@ -5040,7 +5183,7 @@ function renderFaeTechGen(){
         '<div class="fae-edit-item">' +
           '<label>Категория способности</label>' +
           '<select class="fae-input" id="faeTechGenCat">' +
-            FAE_TECH_CATEGORIES.filter(function(x){ return x.key !== 'all'; }).map(function(cat){
+            FAE_TECH_CATEGORIES.filter(function(x){ return x.key !== 'all' && x.key !== 'prepared'; }).map(function(cat){
               return '<option value="' + escapeAttr(cat.key) + '">' + cat.icon + ' ' + escapeHtml(cat.label) + '</option>';
             }).join('') +
           '</select>' +
@@ -5070,9 +5213,43 @@ function wireFaeTechs(){
   document.querySelectorAll('[data-fae-tech-cat]').forEach(function(btn){
     btn.addEventListener('click', function(){
       window._faeTechCat = btn.getAttribute('data-fae-tech-cat') || 'all';
+      if(window._faeTechCat === 'prepared' && window._faeTechLauncher){
+        var cHero = getActiveFaerunCharacter();
+        var pList = (cHero && Array.isArray(cHero.techs)) ? cHero.techs.filter(function(x){ return x && x.prepared; }) : [];
+        if(pList.length > 0 && !pList.some(function(x){ return x.id === window._faeTechLauncher.techId; })){
+          window._faeTechLauncher.techId = pList[0].id;
+        }
+      }
       render();
     });
   });
+
+  document.querySelectorAll('[data-fae-tech-prep]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var id = btn.getAttribute('data-fae-tech-prep');
+      var c = getActiveFaerunCharacter();
+      if(!c || !Array.isArray(c.techs)) return;
+      var found = c.techs.find(function(x){ return x.id === id; });
+      if(!found) return;
+      found.prepared = !found.prepared;
+      saveCharactersToStorage();
+      render();
+    });
+  });
+
+  var clearPrepBtn = document.getElementById('faeClearAllPreparedBtn');
+  if(clearPrepBtn){
+    clearPrepBtn.addEventListener('click', function(){
+      var c = getActiveFaerunCharacter();
+      if(!c || !Array.isArray(c.techs)) return;
+      if(!confirm('Снять отметку «Выбрано (Подготовлено)» со всех способностей и заклинаний героя? Сами способности останутся в вашем общем списке.')) return;
+      c.techs.forEach(function(t){ if(t) t.prepared = false; });
+      if(window._faeTechLauncher) window._faeTechLauncher.onlyPrepared = false;
+      saveCharactersToStorage();
+      render();
+    });
+  }
 
   var sInp = document.getElementById('faeTechSearchInp');
   if(sInp){
@@ -5123,8 +5300,12 @@ function wireFaeTechs(){
       if(!c) return;
       if(!Array.isArray(c.techs)) c.techs = [];
       var id = document.getElementById('faeTechEditId')?.value || genId();
+      var idx = c.techs.findIndex(function(x){ return x.id === id; });
+      var prev = idx >= 0 ? c.techs[idx] : null;
       var item = {
         id: id,
+        spellId: prev && prev.spellId ? prev.spellId : '',
+        prepared: !!document.getElementById('faeTechPrepared')?.checked,
         name: (document.getElementById('faeTechName')?.value || '').trim() || 'Новая способность',
         category: document.getElementById('faeTechCat')?.value || 'Классовые умения',
         source: (document.getElementById('faeTechSource')?.value || '').trim() || 'Умение героя',
@@ -5133,7 +5314,6 @@ function wireFaeTechs(){
         checkOrSave: (document.getElementById('faeTechSave')?.value || '').trim(),
         desc: (document.getElementById('faeTechDesc')?.value || '').trim()
       };
-      var idx = c.techs.findIndex(function(x){ return x.id === id; });
       if(idx >= 0) c.techs[idx] = item;
       else c.techs.unshift(item);
       saveCharactersToStorage();
@@ -7401,6 +7581,7 @@ function renderSpellHeroTargetBar(){
   var c = getActiveFaerunCharacter();
   var chars = Array.isArray(CHARACTERS) && CHARACTERS.length ? CHARACTERS : (c ? [c] : []);
   var tCount = (c && Array.isArray(c.techs)) ? c.techs.length : 0;
+  var prepCount = (c && Array.isArray(c.techs)) ? c.techs.filter(function(t){ return t && t.prepared; }).length : 0;
   var mCount = (c && Array.isArray(c.moves)) ? c.moves.length : 0;
   var sCount = (c && Array.isArray(c.customSkills)) ? c.customSkills.length : 0;
   var pCount = (c && c.skillProf) ? Object.keys(c.skillProf).filter(function(k){ return Number(c.skillProf[k]) > 0; }).length : 0;
@@ -7419,23 +7600,28 @@ function renderSpellHeroTargetBar(){
       '<select id="faeSpellHeroSelect" class="fae-input" style="padding:6px 12px;font-size:13px;min-width:220px;">' + charOpts + '</select>' +
     '</div>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-      '<button type="button" class="rc-btn" data-go="faeTechs" style="border-color:rgba(201,164,92,0.45);color:#f3e5ab;">✨ Способности (' + tCount + ') →</button>' +
+      '<button type="button" class="rc-btn" data-go="faeTechs:prepared" style="background:rgba(245,158,11,0.14);border-color:rgba(245,158,11,0.55);color:#fde68a;font-weight:700;">🌟 Выбранное (' + prepCount + ') →</button>' +
+      '<button type="button" class="rc-btn" data-go="faeTechs:all" style="border-color:rgba(201,164,92,0.45);color:#f3e5ab;">✨ Способности (' + tCount + ') →</button>' +
       '<button type="button" class="rc-btn" data-go="faeMoves" style="border-color:rgba(56,189,248,0.45);color:#bae6fd;">⚔️ Приёмы (' + mCount + ') →</button>' +
       '<button type="button" class="rc-btn" data-go="faeSkills" style="border-color:rgba(16,185,129,0.45);color:#6ee7b7;">🛠️ Навыки (' + totSkills + ') →</button>' +
     '</div>' +
   '</div>';
 }
 
-function isSpellInHeroTechs(hero, spell){
-  if(!hero || !Array.isArray(hero.techs) || !spell) return false;
+function findSpellInHeroTechs(hero, spell){
+  if(!hero || !Array.isArray(hero.techs) || !spell) return null;
   var targetName = ('✨ ' + spell.name).toLowerCase();
   var rawName = (spell.name || '').toLowerCase();
-  return hero.techs.some(function(t){
+  return hero.techs.find(function(t){
     if(!t) return false;
     if(t.spellId && t.spellId === spell.id) return true;
     var tn = (t.name || '').toLowerCase();
-    return tn === targetName || tn === rawName || tn.indexOf('✨ ' + rawName + ' (') === 0;
-  });
+    return tn === targetName || tn === rawName || tn.indexOf('✨ ' + rawName + ' (') === 0 || tn.indexOf(rawName + ' (') === 0;
+  }) || null;
+}
+
+function isSpellInHeroTechs(hero, spell){
+  return !!findSpellInHeroTechs(hero, spell);
 }
 
 function spellCardHtml(s, showSchoolBadge){
@@ -7445,14 +7631,20 @@ function spellCardHtml(s, showSchoolBadge){
   var scName = schoolName(s.school);
   var hero = getActiveFaerunCharacter();
   var heroName = (hero && hero.name) ? hero.name : 'Герой';
-  var alreadyAdded = isSpellInHeroTechs(hero, s);
+  var heroTech = findSpellInHeroTechs(hero, s);
+  var alreadyAdded = !!heroTech;
+  var isPrepared = !!(heroTech && heroTech.prepared);
 
   var addBtnHtml = alreadyAdded
     ? `<button type="button" class="rc-btn spell-add-hero-btn" data-spell-hero-id="${escapeAttr(s.id)}" disabled style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.45);color:#6ee7b7;font-weight:600;">✓ В способностях (${escapeHtml(heroName)})</button>`
     : `<button type="button" class="rc-btn spell-add-hero-btn" data-spell-hero-id="${escapeAttr(s.id)}" style="background:rgba(201,164,92,0.16);border-color:rgba(201,164,92,0.55);color:#f3e5ab;font-weight:600;">✨ + В способности (${escapeHtml(heroName)})</button>`;
 
+  var prepBtnHtml = isPrepared
+    ? `<button type="button" class="rc-btn spell-prep-hero-btn" data-spell-prep-id="${escapeAttr(s.id)}" style="background:rgba(245,158,11,0.22);border-color:rgba(245,158,11,0.65);color:#fde68a;font-weight:700;">🌟 Подготовлено ✓</button>`
+    : `<button type="button" class="rc-btn spell-prep-hero-btn" data-spell-prep-id="${escapeAttr(s.id)}" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.4);color:#fcd34d;font-weight:600;">🌟 ${alreadyAdded ? 'Подготовить' : '+ Подготовить в Выбранное'}</button>`;
+
   return `
-    <div class="card" data-copy="${escapeAttr(s.name + (s.en ? (' (' + s.en + ')') : ''))}">
+    <div class="card" data-copy="${escapeAttr(s.name + (s.en ? (' (' + s.en + ')') : ''))}" style="${isPrepared ? 'border-color:rgba(245,158,11,0.65);box-shadow:0 0 14px rgba(245,158,11,0.12);' : ''}">
       <div class="top-row with-icon" style="align-items:flex-start;">
         <div class="spell-icon">${schoolIconSvg(s.school)}</div>
         <div style="flex:1;min-width:0;">
@@ -7460,6 +7652,7 @@ function spellCardHtml(s, showSchoolBadge){
           ${s.en ? `<div class="eng" style="margin-top:2px;">${escapeHtml(s.en)}</div>` : ''}
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+          ${isPrepared ? `<span class="fae-ref-item-tag" style="font-size:11px;background:rgba(245,158,11,0.18);border-color:rgba(245,158,11,0.55);color:#fde68a;font-weight:700;">🌟 Подготовлено</span>` : ''}
           ${showSchoolBadge ? `<span class="fae-ref-item-tag" style="font-size:11px;">${escapeHtml(scName)}</span>` : ''}
           ${isRitual ? `<span class="fae-ref-item-tag" style="font-size:11px;border-color:rgba(96,165,250,0.45);color:#93c5fd;">🕯️ Ритуал</span>` : ''}
           ${isConc ? `<span class="fae-ref-item-tag" style="font-size:11px;border-color:rgba(251,191,36,0.45);color:#fde68a;">🧠 Концентрация</span>` : ''}
@@ -7473,6 +7666,7 @@ function spellCardHtml(s, showSchoolBadge){
       </div>` : ''}
       <div class="desc">${escapeHtml(eff)}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,164,92,0.14);">
+        ${prepBtnHtml}
         ${addBtnHtml}
         <button type="button" class="rc-btn spell-edit-btn" data-spell-edit="${escapeAttr(s.id)}" data-spell-school="${escapeAttr(s.school)}">✏️ Изменить</button>
         ${s.isCustom ? `<button type="button" class="rc-btn spell-delete-btn" data-spell-delete="${escapeAttr(s.id)}" style="color:var(--crimson-bright);">🗑 Удалить</button>` : ''}
@@ -7820,6 +8014,7 @@ function wireMagicScreens(){
       hero.techs.unshift({
         id: genId(),
         spellId: sp.id,
+        prepared: false,
         name: sp.name + (sp.en ? (' (' + sp.en + ')') : ''),
         category: 'Магические и Сверхъестественные дары',
         source: schoolName(sp.school) + ' • ' + levelLabel(sp.level) + (sp.classes ? (' (' + sp.classes + ')') : ''),
@@ -7829,11 +8024,38 @@ function wireMagicScreens(){
         desc: (sp.meta ? ('[' + sp.meta + ']\n') : '') + (sp.effect || '')
       });
       saveCharactersToStorage();
-      btn.textContent = '✓ В способностях (' + (hero.name || 'Герой') + ')';
-      btn.style.background = 'rgba(16,185,129,0.15)';
-      btn.style.borderColor = 'rgba(16,185,129,0.45)';
-      btn.style.color = '#6ee7b7';
-      btn.disabled = true;
+      render();
+    });
+  });
+
+  document.querySelectorAll('.spell-prep-hero-btn').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var spId = btn.getAttribute('data-spell-prep-id');
+      var sp = SPELLS.find(function(x){ return x.id === spId; });
+      var hero = getActiveFaerunCharacter();
+      if(!sp || !hero) return;
+      if(!Array.isArray(hero.techs)) hero.techs = [];
+      var existing = findSpellInHeroTechs(hero, sp);
+      if(existing){
+        existing.prepared = !existing.prepared;
+      } else {
+        var rollInfo = extractSpellRoll(sp.effect || '');
+        hero.techs.unshift({
+          id: genId(),
+          spellId: sp.id,
+          prepared: true,
+          name: sp.name + (sp.en ? (' (' + sp.en + ')') : ''),
+          category: 'Магические и Сверхъестественные дары',
+          source: schoolName(sp.school) + ' • ' + levelLabel(sp.level) + (sp.classes ? (' (' + sp.classes + ')') : ''),
+          actionCost: (sp.meta || '').split('•')[0]?.trim() || '1 действие',
+          cooldown: Number(sp.level) === 0 ? 'Заговор (Неограниченно)' : ('Ячейка ' + sp.level + '-го круга'),
+          checkOrSave: rollInfo ? rollInfo.formula : '',
+          desc: (sp.meta ? ('[' + sp.meta + ']\n') : '') + (sp.effect || '')
+        });
+      }
+      saveCharactersToStorage();
+      render();
     });
   });
 }
@@ -13017,7 +13239,11 @@ function navigate(val){
   else if(parts[0]==='recipeForm') view = {screen:'recipeForm', recipeId: parts[1]};
   else if(parts[0]==='alchemyAiGen') view = {screen:'alchemyAiGen'};
   else if(parts[0]==='stock') view = {screen:'alchemy'};
-  else if(parts[0]==='faeTechs') view = {screen:'faeTechs'};
+  else if(parts[0]==='faeTechs'){
+    if(parts[1] === 'prepared') window._faeTechCat = 'prepared';
+    else if(parts[1] === 'all') window._faeTechCat = 'all';
+    view = {screen:'faeTechs'};
+  }
   else if(parts[0]==='faeTechView') view = {screen:'faeTechView', techId: parts[1]};
   else if(parts[0]==='faeTechEdit') view = {screen:'faeTechEdit', techId: parts[1]};
   else if(parts[0]==='faeTechGen') view = {screen:'faeTechGen'};
