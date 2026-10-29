@@ -384,7 +384,7 @@
       return {
         mode: 'wi',
         icon: '🐺',
-        title: 'Хронист Континента',
+        title: 'Орбис',
         worldName: 'Ведьмак (Неверлэнд)',
         heroName: (wiP && wiP.name) ? wiP.name : 'Безымянный ведьмак',
         heroSub: [wiP && wiP.school, wiP && wiP.title, wiP && wiP.level ? (wiP.level + ' ур.') : ''].filter(Boolean).join(' • ') || 'Ведьмак',
@@ -417,7 +417,7 @@
       return {
         mode: 'sh',
         icon: '🌀',
-        title: 'Тактический советник Шиноби',
+        title: 'Орбис',
         worldName: 'Мир Шиноби',
         heroName: shMeta.charName || shP.charName || 'Шиноби',
         heroSub: [shMeta.clan, shMeta.rank, shMeta.level ? (shMeta.level + ' ур.') : ''].filter(Boolean).join(' • ') || 'Ниндзя',
@@ -450,7 +450,7 @@
       return {
         mode: 'me',
         icon: '🚀',
-        title: 'Тактический ВИ «Омни-Узел»',
+        title: 'Орбис',
         worldName: 'Mass Effect',
         heroName: (meC && meC.name) ? meC.name : 'Оперативник N7',
         heroSub: [meC && meC.role, meC && meC.level ? (meC.level + ' ур.') : ''].filter(Boolean).join(' • ') || 'Спектр',
@@ -470,7 +470,7 @@
       return {
         mode: 'el',
         icon: '🌊',
-        title: 'Мудрец Белого Лотоса',
+        title: 'Орбис',
         worldName: 'Стихия (Аватар)',
         heroName: fullName,
         heroSub: (elP.element || 'Земля') + ' • ' + (elP.level || 1) + ' ур.',
@@ -492,7 +492,7 @@
       return {
         mode: 'wz',
         icon: '🪄',
-        title: 'Архивариус Хогвартса',
+        title: 'Орбис',
         worldName: 'Волшебный мир',
         heroName: (wzP && wzP.name) ? wzP.name : 'Волшебник',
         heroSub: [wzP && wzP.house, wzP && wzP.year].filter(Boolean).join(' • ') || 'Хогвартс',
@@ -516,7 +516,7 @@
       return {
         mode: 'sw',
         icon: '⚔️',
-        title: 'Голокрон Архивов',
+        title: 'Орбис',
         worldName: 'Звёздные войны',
         heroName: (swP && swP.name) ? swP.name : 'Адепт Силы',
         heroSub: [swP && swP.path, swP && swP.level ? (swP.level + ' ур.') : ''].filter(Boolean).join(' • ') || 'Джедай / Ситх',
@@ -536,7 +536,7 @@
       return {
         mode: 'hb',
         icon: '🦾',
-        title: 'Нейро-Ассистент',
+        title: 'Орбис',
         worldName: (window.HB && window.HB.world && window.HB.world.name) ? window.HB.world.name : 'Технологии',
         heroName: (hbChar && hbChar.name) ? hbChar.name : 'Оператор сети',
         heroSub: (hbChar && hbChar.f && hbChar.f.job) ? hbChar.f.job : ('Записей: ' + hbRecs.length),
@@ -561,7 +561,7 @@
     return {
       mode: 'faerun',
       icon: '🐉',
-      title: 'Советник Кэндлкипа',
+      title: 'Орбис',
       worldName: 'Фаэрун (D&D 2024)',
       heroName: (faeC && faeC.name) ? faeC.name : 'Искатель приключений',
       heroSub: [faeC && faeC.species, faeC && faeC.className ? (faeC.className + ' ' + (faeC.level || 1) + ' ур.') : '', faeC && faeC.subclass].filter(Boolean).join(' • ') || 'Герой D&D 5e',
@@ -2985,6 +2985,67 @@
      МАСКОТ-ФАМИЛЬЯР «ОРБИС» (МНОГОРЕЖИМНЫЙ SVG-ДВИЖОК, 20+ АНИМАЦИЙ, ПЛАВНАЯ ФИЗИКА)
      ========================================================================== */
   var AUTO_ROAM_STORAGE_KEY = 'ttc_ai_mascot_autoroam';
+  var FAB_POS_STORAGE_KEY = 'ttc_ai_fab_pos_v1';
+  var fabCustomPos = null;
+  var isDraggingFab = false;
+  var fabSuppressNextClick = false;
+  try {
+    var rawFabPos = localStorage.getItem(FAB_POS_STORAGE_KEY);
+    if(rawFabPos){
+      var parsedFabPos = JSON.parse(rawFabPos);
+      if(parsedFabPos && typeof parsedFabPos.right === 'number' && typeof parsedFabPos.bottom === 'number'){
+        fabCustomPos = parsedFabPos;
+      }
+    }
+  } catch(e){}
+
+  function getFabCenter(){
+    var fab = document.getElementById('ttcAiFab');
+    if(fab){
+      var r = fab.getBoundingClientRect();
+      if(r.width > 0 && r.height > 0){
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      }
+    }
+    var vw = window.innerWidth || 800;
+    var vh = window.innerHeight || 600;
+    var rOff = (fabCustomPos && typeof fabCustomPos.right === 'number') ? fabCustomPos.right : 22;
+    var bOff = (fabCustomPos && typeof fabCustomPos.bottom === 'number') ? fabCustomPos.bottom : 22;
+    return { x: vw - rOff - 32, y: vh - bOff - 32 };
+  }
+
+  function applyFabPosition(){
+    var fab = document.getElementById('ttcAiFab');
+    if(!fab || !fabCustomPos) return;
+    var vw = window.innerWidth || 800;
+    var vh = window.innerHeight || 600;
+    var fabW = fab.offsetWidth || 64;
+    var fabH = fab.offsetHeight || 64;
+    var clampedRight = Math.round(Math.max(8, Math.min(vw - fabW - 8, Number(fabCustomPos.right) || 22)));
+    var clampedBottom = Math.round(Math.max(8, Math.min(vh - fabH - 8, Number(fabCustomPos.bottom) || 22)));
+    fab.style.right = clampedRight + 'px';
+    fab.style.bottom = clampedBottom + 'px';
+    fab.style.left = 'auto';
+    fab.style.top = 'auto';
+
+    var centerX = vw - clampedRight - (fabW / 2);
+    var centerY = vh - clampedBottom - (fabH / 2);
+    fab.classList.toggle('bubble-right', centerX < 230);
+    fab.classList.toggle('bubble-below', centerY < 110);
+
+    var chat = document.getElementById('ttcAiChat');
+    if(chat){
+      var chatW = Math.min(435, vw - 24);
+      var chatH = Math.min(605, vh - 120);
+      var chatRight = Math.round(Math.max(12, Math.min(vw - chatW - 12, clampedRight)));
+      var chatBottom = clampedBottom + fabH + 10;
+      if(chatBottom + chatH > vh - 12){
+        chatBottom = Math.max(12, vh - chatH - 12);
+      }
+      chat.style.right = chatRight + 'px';
+      chat.style.bottom = Math.round(chatBottom) + 'px';
+    }
+  }
   var mascotState = 'idle';
   // Режимы: 'idle' | 'yawn' | 'sleep' | 'startle' | 'stretch' | 'happy' | 'petted' | 'thinking' |
   //         'mage' | 'combat' | 'bard' | 'scanner' | 'reading' | 'juggle' | 'stealth' |
@@ -3863,10 +3924,8 @@
     var roamer = document.getElementById('ttcAiRoamer');
     if(!roamer) return;
 
-    var vw = window.innerWidth || 800;
-    var vh = window.innerHeight || 600;
-
-    spawnMascotSparkles(vw - 54, vh - 54, 7);
+    var fc = getFabCenter();
+    spawnMascotSparkles(fc.x, fc.y, 7);
 
     pickNewRoamWaypoint();
     roamX = roamTargetX;
@@ -3896,10 +3955,9 @@
 
   function stopRoaming(silent){
     if(!isRoaming) return;
-    var vw = window.innerWidth || 800;
-    var vh = window.innerHeight || 600;
+    var fc = getFabCenter();
     spawnMascotSparkles(roamX + 39, roamY + 45, 6);
-    spawnMascotSparkles(vw - 54, vh - 54, 6);
+    spawnMascotSparkles(fc.x, fc.y, 6);
     isRoaming = false;
     manualRoam = false;
     roamStartedTs = Date.now();
@@ -3958,8 +4016,9 @@
       mouseY = e.clientY;
       lastMouseMoveTs = Date.now();
 
-      var refX = isRoaming ? (roamX + 39) : ((window.innerWidth || 800) - 54);
-      var refY = isRoaming ? (roamY + 45) : ((window.innerHeight || 600) - 54);
+      var fc = isRoaming ? null : getFabCenter();
+      var refX = isRoaming ? (roamX + 39) : fc.x;
+      var refY = isRoaming ? (roamY + 45) : fc.y;
       var distToMascot = Math.hypot(mouseX - refX, mouseY - refY);
 
       if(distToMascot < 130){
@@ -3974,7 +4033,7 @@
       }
 
       // Распознавание поглаживания курсором прямо по маскоту (влево-вправо)
-      if(distToMascot < 44 && !isDraggingRoamer && Math.abs(dx) > 3){
+      if(distToMascot < 44 && !isDraggingRoamer && !isDraggingFab && Math.abs(dx) > 3){
         var dir = dx > 0 ? 1 : -1;
         var now = Date.now();
         if(dir !== lastPetDirX && (now - lastPetStrokeTs < 650)){
@@ -4009,8 +4068,9 @@
       lastFrameTs = perfNow;
 
       var now = Date.now();
-      var refX = isRoaming ? (roamX + 39) : ((window.innerWidth || 800) - 54);
-      var refY = isRoaming ? (roamY + 45) : ((window.innerHeight || 600) - 54);
+      var fc = isRoaming ? null : getFabCenter();
+      var refX = isRoaming ? (roamX + 39) : fc.x;
+      var refY = isRoaming ? (roamY + 45) : fc.y;
 
       // Возврат из временного шоу-режима в обычный
       if(modeExpireTs > 0 && now >= modeExpireTs && lockedShowMode === 'auto' && !isBusy){
@@ -4238,7 +4298,7 @@
     fab.id = 'ttcAiFab';
     fab.type = 'button';
     fab.className = 'ttc-ai-fab';
-    fab.title = 'Фамильяр Орбис: клик — открыть чат, погладь курсором — замурчит!';
+    fab.title = 'Орбис: клик — открыть чат, зажми ЛКМ и тяни — переместить сферу!';
     fab.innerHTML =
       '<div class="ttc-mascot-bubble" id="ttcMascotDockBubble"></div>' +
       '<div class="ttc-mascot-zzz-wrap">' +
@@ -4281,7 +4341,7 @@
         '<div class="ttc-ai-header-left">' +
           '<div class="ttc-ai-avatar" id="ttcAiHdrIcon">' + renderMascotDockSvg('hdr') + '</div>' +
           '<div class="ttc-ai-title-wrap">' +
-            '<div class="ttc-ai-title" id="ttcAiHdrTitle">ИИ-Ассистент</div>' +
+            '<div class="ttc-ai-title" id="ttcAiHdrTitle">Орбис</div>' +
             '<div class="ttc-ai-subtitle" id="ttcAiHdrSub">Фаэрун</div>' +
           '</div>' +
         '</div>' +
@@ -4308,13 +4368,104 @@
     document.body.appendChild(roamer);
     document.body.appendChild(chat);
 
-    // События сферы-дока
-    fab.addEventListener('click', function(){
+    applyFabPosition();
+    window.addEventListener('resize', applyFabPosition, { passive: true });
+
+    // Перетаскивание сферы Орбиса зажатием левой кнопки мыши (или тачем)
+    var fabDragMoved = false;
+    var fabStartClientX = 0;
+    var fabStartClientY = 0;
+    var fabStartRight = 22;
+    var fabStartBottom = 22;
+    var fabPrevClientX = 0;
+    var fabShakeScore = 0;
+    var fabLastShakeDir = 0;
+
+    fab.addEventListener('pointerdown', function(e){
+      if(e.pointerType === 'mouse' && e.button !== 0) return;
+      isDraggingFab = true;
+      fabDragMoved = false;
+      fabShakeScore = 0;
+      fabLastShakeDir = 0;
+      fabStartClientX = e.clientX;
+      fabStartClientY = e.clientY;
+      fabPrevClientX = e.clientX;
+      var vw = window.innerWidth || 800;
+      var vh = window.innerHeight || 600;
+      var rect = fab.getBoundingClientRect();
+      fabStartRight = vw - rect.right;
+      fabStartBottom = vh - rect.bottom;
+      try { fab.setPointerCapture(e.pointerId); } catch(err){}
+    });
+
+    fab.addEventListener('pointermove', function(e){
+      if(!isDraggingFab) return;
+      var dx = e.clientX - fabStartClientX;
+      var dy = e.clientY - fabStartClientY;
+      if(!fabDragMoved && Math.hypot(dx, dy) > 5){
+        fabDragMoved = true;
+        fab.classList.add('dragging');
+        lastNearMascotTs = Date.now();
+        currentEyes = 'asym';
+        currentMouth = 'startle';
+        currentBrows = 'surprised';
+      }
+      if(!fabDragMoved) return;
+
+      var stepDX = e.clientX - fabPrevClientX;
+      fabPrevClientX = e.clientX;
+      if(Math.abs(stepDX) > 8){
+        var sDir = stepDX > 0 ? 1 : -1;
+        if(sDir !== fabLastShakeDir){
+          fabShakeScore++;
+          fabLastShakeDir = sDir;
+        }
+      }
+
+      var vw = window.innerWidth || 800;
+      var vh = window.innerHeight || 600;
+      var fabW = fab.offsetWidth || 64;
+      var fabH = fab.offsetHeight || 64;
+      var nextRight = Math.round(Math.max(8, Math.min(vw - fabW - 8, fabStartRight - dx)));
+      var nextBottom = Math.round(Math.max(8, Math.min(vh - fabH - 8, fabStartBottom - dy)));
+      fabCustomPos = { right: nextRight, bottom: nextBottom };
+      applyFabPosition();
+    });
+
+    function endFabDrag(e){
+      if(!isDraggingFab) return;
+      isDraggingFab = false;
+      fab.classList.remove('dragging');
+      try { if(e && e.pointerId != null) fab.releasePointerCapture(e.pointerId); } catch(err){}
+      if(fabDragMoved){
+        fabSuppressNextClick = true;
+        setTimeout(function(){ fabSuppressNextClick = false; }, 260);
+        try { localStorage.setItem(FAB_POS_STORAGE_KEY, JSON.stringify(fabCustomPos)); } catch(err){}
+        if(fabShakeScore >= 6){
+          setMascotMood('dizzy', 5000);
+          showMascotBubble(pickQuip('dizzy'), 3800);
+        } else {
+          setMascotMood(lockedShowMode !== 'auto' ? lockedShowMode : 'idle');
+        }
+      }
+    }
+    fab.addEventListener('pointerup', endFabDrag);
+    fab.addEventListener('pointercancel', endFabDrag);
+
+    // События сферы-дока (клик без перетаскивания открывает/закрывает чат)
+    fab.addEventListener('click', function(e){
+      if(fabSuppressNextClick){
+        fabSuppressNextClick = false;
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       lastNearMascotTs = Date.now();
       if(mascotState === 'sleep' || mascotState === 'yawn'){
         setMascotMood(lockedShowMode !== 'auto' ? lockedShowMode : 'idle');
       }
       isOpen = !isOpen;
+      applyFabPosition();
       chat.classList.toggle('open', isOpen);
       if(isOpen){
         renderChatHeader();
@@ -4479,7 +4630,7 @@
     var ctx = getModeContext(getActiveMode());
     var hdrTitle = document.getElementById('ttcAiHdrTitle');
     var hdrSub = document.getElementById('ttcAiHdrSub');
-    if(hdrTitle) hdrTitle.textContent = ctx.title + ' • Орбис';
+    if(hdrTitle) hdrTitle.textContent = 'Орбис';
     if(hdrSub) hdrSub.textContent = ctx.heroName + ' • ' + ctx.heroSub;
     updateMascotControlBar();
   }
@@ -4496,7 +4647,7 @@
       html +=
         '<div class="ttc-ai-msg bot">' +
           '<div class="ttc-ai-msg-text">' +
-            '<p>Приветствую! Я <b>' + escHtml(ctx.title) + '</b> (' + escHtml(ctx.worldName) + ').</p>' +
+            '<p>Приветствую! Я <b>Орбис</b>.</p>' +
             '<p>Быстрые команды выполняются <b>мгновенно прямо из чата</b> (без обращения к ИИ), а сложные задачи и генерацию билдов я решаю через нейросеть.</p>' +
             '<p style="color:#94a3b8;font-size:12px;">Примеры команд в чате:<br>' +
             '• 🎲 <i>«брось 1d20+5»</i>, <i>«2d6+3»</i>, <i>«инициатива»</i>, <i>«спасбросок мудрости»</i><br>' +

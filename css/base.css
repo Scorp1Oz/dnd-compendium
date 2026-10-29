@@ -3499,7 +3499,8 @@ body.hb-theme {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
   z-index: 9998;
   transition:
     transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -3510,6 +3511,15 @@ body.hb-theme {
   user-select: none;
   padding: 0;
   overflow: visible;
+}
+
+.ttc-ai-fab.dragging {
+  cursor: grabbing;
+  transform: scale(1.06) !important;
+  border-color: var(--ai-accent-bright);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.85), 0 0 28px var(--ai-accent-glow);
+  opacity: 1 !important;
+  filter: none !important;
 }
 
 .ttc-ai-fab:hover {
@@ -4065,6 +4075,17 @@ body.hb-theme {
   opacity: 1;
   visibility: visible;
   transform: translateY(0) scale(1);
+}
+
+.ttc-ai-fab.bubble-right .ttc-mascot-bubble {
+  right: auto;
+  left: 0;
+  border-radius: 11px 11px 11px 3px;
+}
+
+.ttc-ai-fab.bubble-below .ttc-mascot-bubble {
+  bottom: auto;
+  top: calc(100% + 12px);
 }
 
 .ttc-ai-fab.is-busy::after {
