@@ -1681,6 +1681,10 @@ function normalizeFaerunCharacter(c){
         actionCost: t.actionCost || t.cost || '1 действие',
         cooldown: t.cooldown || '',
         checkOrSave: t.checkOrSave || '',
+        components: t.components || '',
+        verbal: t.verbal || '',
+        somatic: t.somatic || '',
+        material: t.material || '',
         cost: t.cost || '',
         req: t.req || '',
         dmgN: Number(t.dmgN) || 0,
@@ -5192,7 +5196,12 @@ function renderFaeTechs(){
       return false;
     }
     if(searchQ){
-      var hay = [t.name, t.category, t.source, t.actionCost, t.cooldown, t.checkOrSave, t.desc].join(' ').toLowerCase();
+      var tVsmSearch = resolveTechSpellVsm(t);
+      var hay = [
+        t.name, t.category, t.source, t.actionCost, t.cooldown, t.checkOrSave, t.desc,
+        tVsmSearch ? tVsmSearch.code : '',
+        tVsmSearch ? tVsmSearch.material : ''
+      ].join(' ').toLowerCase();
       if(hay.indexOf(searchQ) === -1) return false;
     }
     return true;
@@ -5241,11 +5250,29 @@ function renderFaeTechs(){
     ? '<div class="char-empty">В подменю «🌟 Выбранное» пока нет подготовленных заклинаний или способностей.<br><span style="font-size:13px;color:#cbd5e1;">Нажмите кнопку <b>«📌 В выбранное»</b> на любой карточке во вкладке «Все способности» или кнопку <b>«🌟 Подготовить»</b> прямо в Книге заклинаний!</span></div>'
     : '<div class="char-empty">У героя пока нет способностей в этой категории. Нажмите «+ Добавить способность» или «🤖 Создать с ИИ»!</div>';
 
+  var hasAnySpellInFiltered = filtered.some(function(t){ return !!resolveTechSpellVsm(t); });
+  var techVsmLegendHtml = hasAnySpellInFiltered ? (
+    '<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px 12px;margin-bottom:14px;background:rgba(15,23,42,0.72);border:1px solid rgba(201,164,92,0.28);border-radius:8px;font-size:12px;color:#cbd5e1;">' +
+      '<span style="font-family:\'Cinzel\',serif;font-weight:700;color:#c9a45c;">ПАМЯТКА КОМПОНЕНТОВ ЗАКЛИНАНИЙ (В • С • М):</span>' +
+      '<span><b style="color:#bae6fd;">🗣 В (Вербальный)</b> — сказать слова силы вслух</span>' +
+      '<span>•</span>' +
+      '<span><b style="color:#6ee7b7;">✋ С (Соматический)</b> — магические знаки свободной рукой</span>' +
+      '<span>•</span>' +
+      '<span><b style="color:#e9d5ff;">🔮 М (Материальный)</b> — реагент ИЛИ аркан. фокус / свящ. символ</span>' +
+      '<span>•</span>' +
+      '<span><b style="color:#fde68a;">💎 М (зм)</b> — платный реагент (фокус НЕ заменяет!)</span>' +
+    '</div>'
+  ) : '';
+
   var cardsHtml = filtered.length ? (
     '<div class="fae-ref-cards-grid">' +
       filtered.map(function(t){
         var isPrep = !!t.prepared;
-        var copyStr = (isPrep ? '🌟 ' : '✨ ') + (t.name || 'Способность') + ' [' + (t.category || 'Умение') + ', ' + (t.actionCost || 'Пассивно') + (t.cooldown ? (', ' + t.cooldown) : '') + ']: ' + (t.desc || '');
+        var tVsm = resolveTechSpellVsm(t);
+        var vsmCopySuffix = (tVsm && String(t.desc || '').indexOf('Компоненты:') === -1)
+          ? (' | Компоненты: ' + tVsm.code + (tVsm.m && tVsm.material ? (' (' + tVsm.material + ')') : ''))
+          : '';
+        var copyStr = (isPrep ? '🌟 ' : '✨ ') + (t.name || 'Способность') + ' [' + (t.category || 'Умение') + ', ' + (t.actionCost || 'Пассивно') + (t.cooldown ? (', ' + t.cooldown) : '') + vsmCopySuffix + ']: ' + (t.desc || '');
         var cardBorderStyle = isPrep
           ? 'border-color:rgba(251,191,36,0.62);background:linear-gradient(145deg,rgba(32,27,18,0.92),rgba(18,22,30,0.94));box-shadow:0 4px 16px rgba(0,0,0,0.45),0 0 12px rgba(251,191,36,0.12);'
           : '';
@@ -5262,12 +5289,13 @@ function renderFaeTechs(){
                 '<span class="fae-ref-item-tag">' + escapeHtml(t.actionCost || '1 действие') + '</span>' +
               '</div>' +
             '</div>' +
-            '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11.5px;color:#cbd5e1;font-family:\'JetBrains Mono\',monospace;">' +
+            '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;font-size:11.5px;color:#cbd5e1;font-family:\'JetBrains Mono\',monospace;">' +
               '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;">📂 ' + escapeHtml(t.category || 'Классовые умения') + '</span>' +
               (t.source ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#fde68a;">🎓 ' + escapeHtml(t.source) + '</span>' : '') +
               (t.cooldown ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;">🔄 ' + escapeHtml(t.cooldown) + '</span>' : '') +
               (t.checkOrSave ? '<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.25);padding:2px 7px;border-radius:4px;color:#fca5a5;">🎲 ' + escapeHtml(t.checkOrSave) + '</span>' : '') +
             '</div>' +
+            (tVsm ? renderSpellVsmSection(tVsm) : '') +
             '<div class="fae-ref-card-v" style="margin-bottom:12px;">' + escapeHtml(t.desc || '') + '</div>' +
           '</div>' +
           '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(201,164,92,0.18);">' +
@@ -5305,11 +5333,12 @@ function renderFaeTechs(){
 
     '<div class="fae-ref-search-wrap" style="margin-bottom:14px;">' +
       '<span class="fae-ref-search-icon">🔍</span>' +
-      '<input type="text" id="faeTechSearchInp" class="fae-ref-search-input" value="' + escapeAttr(window._faeTechSearch || '') + '" placeholder="Поиск по названию способности, заклинанию, классу, черте или эффекту..." autocomplete="off">' +
+      '<input type="text" id="faeTechSearchInp" class="fae-ref-search-input" value="' + escapeAttr(window._faeTechSearch || '') + '" placeholder="Поиск по названию способности, заклинанию, компонентам (В, С, М), классу, черте или эффекту..." autocomplete="off">' +
     '</div>' +
 
     '<div class="pill-row" style="margin-bottom:18px;">' + pillsHtml + '</div>' +
     prepSubmenuBannerHtml +
+    techVsmLegendHtml +
     cardsHtml;
 }
 
@@ -5318,6 +5347,7 @@ function renderFaeTechView(){
   var t = (c && Array.isArray(c.techs)) ? c.techs.find(function(x){ return x.id === view.techId; }) : null;
   if(!t) return renderFaeTechs();
   var isPrep = !!t.prepared;
+  var tVsm = resolveTechSpellVsm(t);
 
   return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Способности', nav:'faeTechs'}, {label:t.name || 'Способность'}]) +
     '<button class="back" data-go="faeTechs">← К списку способностей</button>' +
@@ -5328,6 +5358,7 @@ function renderFaeTechView(){
           '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
             '<span class="fae-ref-item-tag">✨ ' + escapeHtml(t.category || 'Классовые умения') + '</span>' +
             (isPrep ? '<span class="fae-ref-item-tag" style="background:rgba(251,191,36,0.2);border-color:#fbbf24;color:#fde68a;">🌟 В выбранном (Подготовлено)</span>' : '') +
+            (tVsm ? '<span class="fae-ref-item-tag" style="background:rgba(168,85,247,0.16);border-color:rgba(168,85,247,0.48);color:#e9d5ff;">🔮 Компоненты: ' + escapeHtml(tVsm.code) + '</span>' : '') +
           '</div>' +
           '<h1 style="margin:8px 0 0 0;font-size:24px;">' + escapeHtml(t.name || 'Способность') + '</h1>' +
         '</div>' +
@@ -5344,6 +5375,7 @@ function renderFaeTechView(){
         '<div class="fae-gen-stat-box"><span class="lbl">🔄 Перезарядка</span><span class="val">' + escapeHtml(t.cooldown || 'Короткий / Долгий отдых') + '</span></div>' +
         '<div class="fae-gen-stat-box"><span class="lbl">🎲 Бросок / СЛ</span><span class="val">' + escapeHtml(t.checkOrSave || '—') + '</span></div>' +
       '</div>' +
+      (tVsm ? renderSpellVsmSection(tVsm) : '') +
       '<div class="fae-gen-block"><b>📜 Описание и игровая механика:</b><br><span style="white-space:pre-line;">' + escapeHtml(t.desc || '') + '</span></div>' +
     '</div>';
 }
@@ -5353,6 +5385,7 @@ function renderFaeTechEdit(){
   var existing = (c && Array.isArray(c.techs) && view.techId && view.techId !== 'new')
     ? c.techs.find(function(x){ return x.id === view.techId; })
     : null;
+  var existingVsm = existing ? resolveTechSpellVsm(existing) : null;
   var d = existing ? JSON.parse(JSON.stringify(existing)) : {
     id: '',
     prepared: window._faeTechCat === 'prepared',
@@ -5362,8 +5395,33 @@ function renderFaeTechEdit(){
     actionCost: '1 бонусное действие',
     cooldown: '1 раз за короткий или долгий отдых',
     checkOrSave: '',
+    components: '',
+    verbal: '',
+    somatic: '',
+    material: '',
     desc: ''
   };
+  if(existing && !d.components && existingVsm){
+    d.components = existingVsm.code;
+    if(!d.material && existingVsm.m) d.material = existingVsm.material;
+  }
+  if(existing && existingVsm){
+    if(!d.verbal && existingVsm.v) d.verbal = existingVsm.verbal || '';
+    if(!d.somatic && existingVsm.s) d.somatic = existingVsm.somatic || '';
+  }
+
+  var compSelectOpts = [
+    { val: '', lbl: '— Не заклинание (без компонентов В/С/М) —' },
+    { val: 'В, С, М', lbl: '🗣✋🔮 В, С, М (Вербальный, Соматический и Материальный)' },
+    { val: 'В, С', lbl: '🗣✋ В, С (Вербальный и Соматический)' },
+    { val: 'В, М', lbl: '🗣🔮 В, М (Вербальный и Материальный)' },
+    { val: 'С, М', lbl: '✋🔮 С, М (Соматический и Материальный)' },
+    { val: 'В', lbl: '🗣 В (Только Вербальный)' },
+    { val: 'С', lbl: '✋ С (Только Соматический)' },
+    { val: 'М', lbl: '🔮 М (Только Материальный)' }
+  ].map(function(o){
+    return '<option value="' + escapeAttr(o.val) + '" ' + ((d.components || '') === o.val ? 'selected' : '') + '>' + escapeHtml(o.lbl) + '</option>';
+  }).join('');
 
   return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Способности', nav:'faeTechs'}, {label:existing ? d.name : 'Новая способность'}]) +
     '<button class="back" data-go="faeTechs">← К списку способностей</button>' +
@@ -5406,6 +5464,22 @@ function renderFaeTechEdit(){
         '<div class="fae-edit-item">' +
           '<label>Перезарядка / Заряды</label>' +
           '<input type="text" class="fae-input" id="faeTechCooldown" value="' + escapeAttr(d.cooldown) + '" placeholder="Напр. Постоянно / Короткий отдых / БМ раз в день">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>🔮 Компоненты заклинания (для заклинаний и заговоров)</label>' +
+          '<select class="fae-input" id="faeTechComponents">' + compSelectOpts + '</select>' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>💎 Материальный компонент / Арканический фокус (М)</label>' +
+          '<input type="text" class="fae-input" id="faeTechMaterial" value="' + escapeAttr(d.material || '') + '" placeholder="Напр. щепотка серы / алмаз за 300 зм / арканический фокус">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>🗣 Заклинание / Слова силы (В — если пусто, подберётся автоматически)</label>' +
+          '<input type="text" class="fae-input" id="faeTechVerbal" value="' + escapeAttr(d.verbal || '') + '" placeholder="Напр. «Игнис Валькор!» — формула стихии Огня...">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>✋ Магический знак / Жест руки (С — если пусто, подберётся автоматически)</label>' +
+          '<input type="text" class="fae-input" id="faeTechSomatic" value="' + escapeAttr(d.somatic || '') + '" placeholder="Напр. Начертание треугольной руны Воплощения и резкий выброс пальца...">' +
         '</div>' +
         '<div class="fae-edit-item" style="grid-column:1 / -1;">' +
           '<label>Формула броска, исцеления или СЛ спасброска (необязательно)</label>' +
@@ -5588,6 +5662,10 @@ function wireFaeTechs(){
         actionCost: document.getElementById('faeTechAction')?.value || '1 действие',
         cooldown: (document.getElementById('faeTechCooldown')?.value || '').trim() || 'Короткий отдых',
         checkOrSave: (document.getElementById('faeTechSave')?.value || '').trim(),
+        components: (document.getElementById('faeTechComponents')?.value || '').trim(),
+        verbal: (document.getElementById('faeTechVerbal')?.value || '').trim(),
+        somatic: (document.getElementById('faeTechSomatic')?.value || '').trim(),
+        material: (document.getElementById('faeTechMaterial')?.value || '').trim(),
         desc: (document.getElementById('faeTechDesc')?.value || '').trim()
       };
       if(idx >= 0) c.techs[idx] = item;
@@ -7900,8 +7978,445 @@ function isSpellInHeroTechs(hero, spell){
   return !!findSpellInHeroTechs(hero, spell);
 }
 
+function findSpellForHeroTech(t){
+  if(!t || !Array.isArray(SPELLS) || !SPELLS.length) return null;
+  if(t.spellId){
+    var byId = SPELLS.find(function(s){ return s.id === t.spellId; });
+    if(byId) return byId;
+  }
+  var rawName = String(t.name || '').replace(/^[✨🌟🔮🔥⚡❄️🛡️🌀🎭💜👁️⚗️💀\s]+/, '').trim();
+  if(!rawName) return null;
+  var lowerFull = rawName.toLowerCase();
+  var parenMatch = rawName.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+  var ruCandidate = parenMatch ? parenMatch[1].trim().toLowerCase() : lowerFull;
+  var enCandidate = parenMatch ? parenMatch[2].trim().toLowerCase() : '';
+  return SPELLS.find(function(s){
+    var sRu = (s.name || '').trim().toLowerCase();
+    var sEn = (s.en || '').trim().toLowerCase();
+    if(sRu && (sRu === lowerFull || sRu === ruCandidate)) return true;
+    if(sEn && (sEn === lowerFull || (enCandidate && sEn === enCandidate))) return true;
+    if(sRu && sEn && (sRu + ' (' + sEn + ')') === lowerFull) return true;
+    return false;
+  }) || null;
+}
+
+var SPELL_ICONIC_VS_LORE = {
+  "Fireball": [
+    "«Игнис Валькор!» — гортанная формула стихии Огня на Драконьем наречии, вводящая нити Плетения в взрывной резонанс",
+    "Начертание в воздухе треугольной руны Воплощения и резкий срывающий выброс указательного пальца к точке детонации"
+  ],
+  "Shield": [
+    "«Кхал-Аэгис!» — мгновенный отрывистый слог-ключ защиты на выдохе навстречу удару",
+    "Выброс раскрытой ладони веером с резким поворотом кисти по часовой стрелке (сплетение шестигранной решётки барьера)"
+  ],
+  "Counterspell": [
+    "",
+    "Резкий перекрёстный росчерк двумя сложенными пальцами («ножницы Мистры»), рассекающий незамкнутый узор чужих чар"
+  ],
+  "Misty Step": [
+    "«Вель'Шарен Силь!» — короткий певучий шёпот на Сильване, размыкающий пространственный шаг в серебристом тумане",
+    ""
+  ],
+  "Magic Missile": [
+    "«Аркана Триас!» — чёткая чеканная формула на древнем Лорассе с ударением на каждый выпускаемый силовой дротик",
+    "Веерный росчерк тремя пальцами от груди вперёд с фиксацией кончиков пальцев на целях"
+  ],
+  "Eldritch Blast": [
+    "«Кхаз'Улрат!» — вибрирующий потусторонний возглас на наречии Покровителя, пробивающий ткань реальности",
+    "Сжатие ладони в полусферу («захват ядра») и резкий толчок основанием кисти вперёд по линии луча"
+  ],
+  "Cure Wounds": [
+    "«Вита Люмен Сальве!» — тёплая распевная молитва созидания на Небесном наречии",
+    "Наложение раскрытой ладони на рану с мягким круговым начертанием солнечной спирали жизни"
+  ],
+  "Healing Word": [
+    "«Сурге ин Люкс!» — звонкое ободряющее слово силы на Небесном языке, несущее золотую искру через поле боя",
+    ""
+  ],
+  "Revivify": [
+    "«Анима Редитус!» — напряжённый властный зов к уходящей душе на грани Эфирного плана",
+    "Прижатие обеих ладоней с алмазом к груди павшего и резкий рывок кистями вверх, «втягивающий» искру жизни обратно"
+  ],
+  "Wish": [
+    "«Фиат Воuntas Аркана!» — первородная формула Девятого Круга на языке Творения, переписывающая само Плетение Мистры",
+    "Возведение обеих рук к небу с переплетением всех десяти пальцев в корону Великого Узора и размыканием ладоней"
+  ],
+  "Haste": [
+    "«Темпус Велокс!» — стремительная скороговорка на Нетерильском, ускоряющая ритм нитей времени вокруг цели",
+    "Вращательный жест двумя указательными пальцами («ускорение часовой стрелки») и щелчок пальцами в сторону союзника"
+  ],
+  "Slow": [
+    "«Мортис Гравас...» — тягучая, низкая гортанная фраза с замедляющимися паузами между слогами",
+    "Плавное давящее движение обеими раскрытыми ладонями сверху вниз, словно погружение пространства в густой янтарь"
+  ],
+  "Polymorph": [
+    "«Корпус Мутацио!» — переливчатая формула Преобразования, распускающая прежний телесный узор цели",
+    "Спиральное переплетение кистей («выворачивание кокона») с финальным жестом, очерчивающим силуэт нового зверя"
+  ],
+  "Hold Person": [
+    "«Стазис Винкулум!» — холодный приказной возглас, сковывающий двигательные струны жертвы",
+    "Резкое сжатие растопыренных пальцев в железный кулак с поворотом запястья («запирание замка»)"
+  ],
+  "Fire Bolt": [
+    "«Игнис Спикулум!» — короткий хлесткий слог Огня на Драконьем",
+    "Оттягивание большого пальца у виска или груди и резкий прицельный выпад двумя сложенными пальцами"
+  ],
+  "Ray of Frost": [
+    "«Глациэс Вектор!» — ледяной свистящий выдох на Первичном наречии стихии Воды и Льда",
+    "Прямой выпад вытянутой ладонью ребром вперёд, вычерчивающий в воздухе морозную грань кристалла"
+  ],
+  "Shocking Grasp": [
+    "«Фульгур Тактус!» — трескучий отрывистый слог стихии Воздуха",
+    "Сведение напряжённых полусогнутых пальцев («коготь грозы»), между которыми проскакивают синие дуги молний"
+  ],
+  "Sacred Flame": [
+    "«Санктус Игнис!» — чистая звенящая нота молитвы на Небесном языке",
+    "Вертикальный жест ладонью сверху вниз с небес на цель, направляющий столб золотого сияния"
+  ],
+  "Toll the Dead": [
+    "«Мортис Кампана!» — глухой погребальный речитатив в такт удару незримого колокола",
+    "Плавный качающий жест кистью из стороны в сторону («раскачивание языка колокола») с указанием на раненого врага"
+  ],
+  "Guidance": [
+    "«Виа Сапиенс!» — короткое благословение мудрости и ясности ума",
+    "Лёгкое касание плеча или лба союзника двумя пальцами с начертанием малого знака путеводной звезды"
+  ],
+  "Mage Hand": [
+    "«Манус Спектра!» — негромкая формула Вызова эфирной проекции",
+    "Плавный подъём раскрытой кисти ладонью вверх; пальцы мага синхронно управляют парящей призрачной рукой"
+  ],
+  "Prestidigitation": [
+    "«Миракулум Левис!» — лёгкая игривая формула ученического практикума",
+    "Изящный щелчок пальцами или быстрый фокуснический проворот кисти в воздухе"
+  ],
+  "Thaumaturgy": [
+    "«Вокс Империум!» — громогласный храмовый возглас, умноженный эхом божественной воли",
+    ""
+  ],
+  "Druidcraft": [
+    "«Натура Спиритус!» — мягкий шелестящий напев на тайном Друидическом наречии",
+    "Плавное раскрытие сложенных лодочкой ладоней, словно распускающийся бутон цветка"
+  ],
+  "Vicious Mockery": [
+    "Язвительная колкость или куплет, в который вплетена диссонирующая нота Песни Творения, бьющая прямо по разуму врага",
+    ""
+  ],
+  "Hex": [
+    "«Маледиктус Умбра!» — зловещий шипящий заговор на Инфернальном или наречии Царства Теней",
+    "Начертание в воздухе перевёрнутого ока или когтя с резким «прокалывающим» жестом пальца в сторону жертвы"
+  ],
+  "Hunter's Mark": [
+    "«Венатус Сигнум!» — тихий сосредоточенный клич следопыта на Первородном наречии",
+    ""
+  ],
+  "Bless": [
+    "«Бенедикцио Фортис!» — торжественный гимн единства и доблести на Небесном языке",
+    "Троекратное осенение соратников знаком святого ореола и окропляющий жест кистью"
+  ],
+  "Guiding Bolt": [
+    "«Люкс Венатор!» — звонкий молитвенный возглас, призывающий путеводный луч света",
+    "Прицельный жест вытянутой рукой, словно спуск невидимой световой стрелы с тетивы"
+  ],
+  "Spiritual Weapon": [
+    "«Арма Сакра!» — боевой молитвенный клич божеству войны и правосудия",
+    "Резкий взмах рукой в воздухе, повторяющий боевой замах призываемого эфирного клинка или молота"
+  ],
+  "Spirit Guardians": [
+    "«Кустодес Этерни, Адвена!» — величественный призыв небесного или потустороннего воинства вокруг себя",
+    "Широкий круговой обвод обеими руками вокруг корпуса, очерчивающий границу вихря духов-хранителей"
+  ],
+  "Mage Armor": [
+    "«Лорика Аркана!» — размеренная формула Ограждения, уплотняющая эфир вокруг тела",
+    "Перекрёстное касание плеч и груди кончиками пальцев, «застёгивающее» незримый силовой доспех"
+  ],
+  "Armor of Agathys": [
+    "«Гелус Агатис!» — ледяной шёпот пакта с морозными глубинами Стигии",
+    "Обхватывающий жест руками вокруг груди, покрывающий доспех белым астральным инеем"
+  ],
+  "Hellish Rebuke": [
+    "«Инферно Талион!» — яростный ответный выкрик на Инфернальном в миг получения раны",
+    "Резкий указующий жест пальцем прямо в лицо атакующему, выпускающий столб адского пламени"
+  ],
+  "Scorching Ray": [
+    "«Радиус Арденс!» — трёхсложная формула Воплощения (по слогу на каждый огненный луч)",
+    "Последовательные резкие выбросы указательного и среднего пальцев по целям, словно выстрелы огненными копьями"
+  ],
+  "Lightning Bolt": [
+    "«Фульмен Линеа!» — оглушительный грозовой возглас на Драконьем наречии",
+    "Сведение обеих ладоней у груди и прямой пробивной выброс вытянутых рук вперёд вдоль линии разряда"
+  ],
+  "Call Lightning": [
+    "«Темпестас Цели, Десценде!» — раскатистый зов к грозовому небу на языке Первичных бурь",
+    "Подъём обеих рук к тучам и резкое опускание сжатого кулака вертикально вниз в точку удара молнии"
+  ],
+  "Darkness": [
+    "«Нокс Абсолюта!» — глухой гортанный напев, гасящий световые волны в ткани Плетения",
+    "Накрывающий жест округлённой ладонью сверху вниз, словно гашение пламени свечи колпаком"
+  ],
+  "Silence": [
+    "«Силенциум Пленум!» — формула, переходящая из полного голоса в беззвучный выдох на последнем слоге",
+    "Прикладывание указательного пальца к губам с последующим разведением ладоней, «обрезающим» звуковые волны"
+  ],
+  "Detect Magic": [
+    "«Аура Визио!» — тихая формула настройки восприятия на частоту Плетения Мистры",
+    "Прикосновение двумя пальцами к векам и плавный пасс ладонью перед глазами, открывающий «второе зрение»"
+  ],
+  "Identify": [
+    "«Веритас Объектум!» — размеренный аналитический речитатив на древнем Лорассе",
+    "Медленное обведение контура предмета жемчужиной и пером совы с прощупыванием каждого эфирного узла"
+  ],
+  "Invisibility": [
+    "«Велум Спектри!» — шёпот Иллюзии, преломляющий лучи света вокруг цели",
+    "Плавное движение раскрытой ладонью сверху вниз вдоль фигуры от макушки до пят («набрасывание вуали»)"
+  ],
+  "Mirror Image": [
+    "«Спекулум Кватер!» — ритмичная зеркальная скороговорка, двоящаяся в воздухе",
+    "Скрещивание запястий перед грудью и резкое разведение ладоней в стороны, «отслаивающее» трёх иллюзорных двойников"
+  ],
+  "Fly": [
+    "«Аэрис Асценцио!» — возвышенная формула Преобразования на наречии Первичного Воздуха",
+    "Плавный взмах обеими кистями снизу вверх («крылья сокола»), отрывающий тело от земного притяжения"
+  ],
+  "Feather Fall": [
+    "«Плюма Левис!» — мгновенный возглас на выдохе в миг срыва в пропасть",
+    ""
+  ],
+  "Dispel Magic": [
+    "«Диссипацио Аркана!» — властная формула размыкания эфирных матриц",
+    "Захват воздуха растопыренными пальцами и резкое движение кистями в стороны («разрыв узла Плетения»)"
+  ],
+  "Dimension Door": [
+    "«Януа Астралис!» — пространственный ключ на Глубинном или Драконьем наречии, сшивающий две точки мира",
+    ""
+  ]
+};
+
+function buildSpellComponentLore(s, hasV, hasS, hasM, matRaw, costly){
+  var en = (s && s.en) ? String(s.en).trim() : '';
+  var name = (s && s.name) ? String(s.name).trim() : '';
+  var school = (s && s.school) ? String(s.school).toLowerCase() : 'evocation';
+  var classes = (s && s.classes) ? String(s.classes) : '';
+  var meta = (s && s.meta) ? String(s.meta) : '';
+  var eff = (s && (s.effect || s.desc)) ? String(s.effect || s.desc) : '';
+  var combined = (name + ' ' + eff + ' ' + meta).toLowerCase();
+
+  var customV = (s && s.verbal) ? String(s.verbal).trim() : '';
+  var customS = (s && s.somatic) ? String(s.somatic).trim() : '';
+
+  var iconic = (en && SPELL_ICONIC_VS_LORE[en]) ? SPELL_ICONIC_VS_LORE[en] : null;
+  var verbalDesc = '';
+  var somaticDesc = '';
+
+  if(!hasV){
+    verbalDesc = 'Безмолвное сотворение — слова силы не произносятся (можно творить скрытно или внутри зоны «Тишины»).';
+  } else if(customV){
+    verbalDesc = customV;
+  } else if(iconic && iconic[0]){
+    verbalDesc = iconic[0];
+  } else {
+    // Определяем традицию и тональный ключ по стихии / эффекту / школе
+    var isReaction = /реакци/i.test(meta);
+    var isBonus = /бонусн/i.test(meta);
+    var isRitual = /ритуал/i.test(meta);
+    var speedTone = isReaction
+      ? 'мгновенный отрывистый слог-ключ на выдохе'
+      : (isBonus ? 'короткая стремительная боевая формула' : (isRitual ? 'размеренный распевный речитатив' : 'отчётливая резонансная формула'));
+
+    var phrase = '«Аркана Нексус!»';
+    var flavor = 'настраивающая струны Плетения';
+
+    if(/огон|огнен|плам|жар|ожог|пепел|лав/i.test(combined)){
+      phrase = '«Игнис Ардор!»';
+      flavor = 'на Драконьем наречии, высекающая высокотемпературный огненный резонанс в Плетении';
+    } else if(/холод|мороз|лед|льда|снеж|иней|вьюг/i.test(combined)){
+      phrase = '«Глациэс Фригус!»';
+      flavor = 'на Первичном наречии Льда, мгновенно вымораживающая тепло из окружающего эфира';
+    } else if(/молн|электр|гроз|шоков/i.test(combined)){
+      phrase = '«Фульгур Целерис!»';
+      flavor = 'на языке Первичных бурь, стягивающая статический разряд по нитям Плетения';
+    } else if(/гром|звук|оглуш|волн/i.test(combined)){
+      phrase = '«Тонитрус Резонанс!»';
+      flavor = 'с мощной гортанной вибрацией, порождающей акустическую ударную волну';
+    } else if(/исцел|лечен|восстанавливает.*хит|жизн|воскреш|возрожд/i.test(combined)){
+      phrase = '«Вита Санктус!»';
+      flavor = 'на Небесном наречии, вплетающая свет созидания в раны и жизненную силу цели';
+    } else if(/излучен|священн|свет|солнечн|сияни/i.test(combined)){
+      phrase = '«Люмен Соларис!»';
+      flavor = 'на Небесном языке, низводящая чистый ослепительный свет сквозь Плетение';
+    } else if(/некрот|смерт|нежит|труп|кост|гниени|иссуш|проклят/i.test(combined)){
+      phrase = '«Мортис Энтропия!»';
+      flavor = 'на холодном наречии Царства Теней, затрагивающая изнаночные струны угасания';
+    } else if(/психич|разум|мысл|страх|испуг|очаров|внушен|подчин|смех|безум/i.test(combined) || school === 'enchantment'){
+      phrase = '«Менс Империум!»';
+      flavor = 'с гипнотической модуляцией голоса, напрямую вплетающейся в сознание и волю цели';
+    } else if(/яд|отрав|токсин|болезн/i.test(combined)){
+      phrase = '«Вененум Вирус!»';
+      flavor = 'шипящая гортанная формула, сгущающая едкие испарения в ткани Плетения';
+    } else if(/кислот|разъед/i.test(combined)){
+      phrase = '«Ацидум Коррозио!»';
+      flavor = 'резкая формула стихии Земли и Воды, расщепляющая материальные связи';
+    } else if(/телепорт|пространств|план|врата|портал|туманн|шаг/i.test(combined)){
+      phrase = '«Спациум Транзитус!»';
+      flavor = 'пространственный ключ, на мгновение сшивающий две точки реальности';
+    } else if(/призыв|вызыв|дух|фея|исчади|элементал|звер|фамильяр/i.test(combined) || school === 'conjuration'){
+      phrase = '«Коньюрацио Вокаре!»';
+      flavor = 'формула призыва на древнем Лорассе, открывающая эфирный канал сквозь планы';
+    } else if(/щит|барьер|защит|оберег|доспех|преград|устойчив|неуязвим/i.test(combined) || school === 'abjuration'){
+      phrase = '«Эгида Вальлум!»';
+      flavor = 'чеканная защитная формула Ограждения, скрепляющая нити Плетения в прочный щит';
+    } else if(/иллюз|невидим|образ|мираж|фантом|двойник|маскир/i.test(combined) || school === 'illusion'){
+      phrase = '«Фантазма Велум!»';
+      flavor = 'полушёпот Иллюзии, расщепляющий световые и звуковые нити вокруг цели';
+    } else if(/прорицан|обнаруж|поиск|видени|предсказ|истинн|глаз/i.test(combined) || school === 'divination'){
+      phrase = '«Окулус Веритас!»';
+      flavor = 'певучая мантра Прорицания, настраивающая разум на тончайшие колебания паутины Плетения';
+    } else if(/ветер|воздух|полёт|левит|парен|буря/i.test(combined)){
+      phrase = '«Аэрис Вентус!»';
+      flavor = 'певучая формула на языке Первичного Воздуха, подчиняющая воздушные потоки';
+    } else if(/земл|камн|скал|стен|шипы|растен|корн|лоз|дерев/i.test(combined)){
+      phrase = '«Терра Сильва!»';
+      flavor = 'глубокий гортанный зов на Друидическом наречии, пробуждающий живую мощь Торила';
+    } else if(/преобразов|измен|превращ|увеличен|уменьшен|оживл|ускорен/i.test(combined) || school === 'transmutation'){
+      phrase = '«Мутацио Форма!»';
+      flavor = 'ритмичная формула Преобразования, перевязывающая внутренние узлы материи';
+    } else if(school === 'evocation'){
+      phrase = '«Виртус Эвокацио!»';
+      flavor = 'энергичная формула Воплощения на Драконьем наречии, высвобождающая чистый силовой импульс';
+    }
+
+    verbalDesc = phrase + ' — ' + speedTone + ' ' + flavor + '.';
+  }
+
+  if(!hasS){
+    somaticDesc = 'Магический знак рукой не требуется — узор чар замыкается одним лишь голосом и волей (доступно даже со связанными или занятыми руками).';
+  } else if(customS){
+    somaticDesc = customS;
+  } else if(iconic && iconic[1]){
+    somaticDesc = iconic[1];
+  } else {
+    if(school === 'abjuration' || /щит|барьер|защит|оберег|купол|круг/i.test(combined)){
+      somaticDesc = 'Начертание в воздухе шестигранной руны Ограждения раскрытой ладонью с фиксирующим поворотом запястья («замок барьера»).';
+    } else if(school === 'conjuration' || /телепорт|призыв|вызыв|портал|пространств/i.test(combined)){
+      somaticDesc = 'Вертикальный «рассекающий» росчерк двумя сложенными пальцами и стягивающий жест кистью, открывающий пространственный шов в Плетении.';
+    } else if(school === 'divination' || /обнаруж|видени|мысл|глаз|поиск/i.test(combined)){
+      somaticDesc = 'Прикосновение указательным и средним пальцами к виску или векам с последующим плавным наведением ладони-линзы в сторону поиска.';
+    } else if(school === 'enchantment' || /очаров|внушен|подчин|приказ|разум|сон|смех/i.test(combined)){
+      somaticDesc = 'Плавный волнообразный пасс пальцами от губ к цели («плетение шёлковых поводьев разума») с мягким смыканием фаланг.';
+    } else if(school === 'illusion' || /иллюз|невидим|образ|мираж|тень/i.test(combined)){
+      somaticDesc = 'Восьмёркообразное переплетение кистей в воздухе («ткацкий узор миража»), рассеивающее и перекраивающее световые блики.';
+    } else if(school === 'necromancy' || /некрот|смерт|нежит|иссуш|проклят/i.test(combined)){
+      somaticDesc = 'Начертание перевёрнутой руны убывающей луны полусогнутыми пальцами («коготь энтропии») и резкое срывание нити на себя.';
+    } else if(school === 'transmutation' || /превращ|измен|ускорен|полёт|камн|металл/i.test(combined)){
+      somaticDesc = 'Спиральное вращение ладоней друг вокруг друга («перекройка матрицы материи») с финальным касанием или щелчком пальцев.';
+    } else if(/исцел|лечен|жизн|воскреш/i.test(combined)){
+      somaticDesc = 'Начертание светящегося знака солнечной спирали раскрытой ладонью над раной или соратником.';
+    } else if(/конус|волн|взрыв|шар|сфер/i.test(combined)){
+      somaticDesc = 'Начертание треугольного сигила Воплощения с резким раскрытием сжатого кулака веером навстречу области поражения.';
+    } else {
+      somaticDesc = 'Начертание рунического знака Воплощения двумя пальцами в воздухе и прямой прицельный выброс кисти в сторону цели.';
+    }
+  }
+
+  // Материалы и тип фокусировки по классам заклинателя
+  var focusTypes = [];
+  if(/волшебник|чародей|колдун/i.test(classes) || !classes){
+    focusTypes.push('арканический фокус (посох, жезл, кристалл, волшебная палочка или сфера)');
+  }
+  if(/жрец|паладин/i.test(classes)){
+    focusTypes.push('священный символ (амулет, реликварий или герб божества на щите)');
+  }
+  if(/друид|следопыт/i.test(classes)){
+    focusTypes.push('друидический фокус (ветвь омелы, тотем или тисовый посох)');
+  }
+  if(/бард/i.test(classes)){
+    focusTypes.push('музыкальный инструмент барда');
+  }
+  if(/изобретатель/i.test(classes)){
+    focusTypes.push('инструменты ремесленника или инфузированный предмет');
+  }
+  var focusSummary = focusTypes.length ? focusTypes.join(' / ') : 'арканический фокус, священный символ или мешочек с компонентами';
+
+  var materialDesc = '';
+  if(hasM){
+    if(costly){
+      materialDesc = matRaw || 'Особый ценный реагент с указанной стоимостью в золотых (фокусировка его НЕ заменяет!).';
+    } else if(matRaw){
+      if(/заменяется|фокус/i.test(matRaw)){
+        materialDesc = matRaw + ' — либо используется ' + focusSummary + '.';
+      } else {
+        materialDesc = matRaw + ' (из мешочка с компонентами) ИЛИ заменяется на ' + focusSummary + '.';
+      }
+    } else {
+      materialDesc = 'Реагент из мешочка с компонентами ИЛИ ' + focusSummary + '.';
+    }
+  } else {
+    materialDesc = 'Отдельные материальные реагенты не требуются — поток Плетения направляется напрямую через свободную руку или ' + focusSummary + '.';
+  }
+
+  return {
+    verbalDesc: verbalDesc,
+    somaticDesc: somaticDesc,
+    materialDesc: materialDesc
+  };
+}
+
+function resolveTechSpellVsm(t){
+  if(!t) return null;
+  var matchedSpell = findSpellForHeroTech(t);
+  var explicitComp = (t.components || '').trim();
+  var explicitMat = (t.material || '').trim();
+
+  var descStr = String(t.desc || '');
+  var srcStr = String(t.source || '');
+  var cdStr = String(t.cooldown || '');
+  var parsedComp = '';
+  var parsedMat = '';
+  var mDesc = descStr.match(/Компоненты:\s*([ВVСSМM,\s•/]+?)(?:\s*\(([^)\]]+)\))?(?:\s*[\]|\n]|$)/i);
+  if(mDesc){
+    parsedComp = (mDesc[1] || '').trim();
+    if(mDesc[2]) parsedMat = mDesc[2].trim();
+  } else {
+    var mSrc = srcStr.match(/(?:•|\|)\s*((?:[ВVСSМM]\s*,\s*)*[ВVСSМM])(?:\s*(?:•|\(|\||$))/i);
+    if(mSrc) parsedComp = (mSrc[1] || '').trim();
+  }
+
+  var isSpellLike = !!(
+    matchedSpell ||
+    explicitComp ||
+    parsedComp ||
+    /(заговор|\d+\s*(-й|-го)?\s*круг|ячейк[аи]\s*\d|школа\s+|воплощени|ограждени|вызов|иллюзи|очаровани|прорицани|преобразовани|некроманти)/i.test(srcStr + ' ' + cdStr)
+  );
+
+  if(!isSpellLike) return null;
+
+  var inferredSchool = matchedSpell ? matchedSpell.school : 'evocation';
+  if(!matchedSpell){
+    if(/ограждени/i.test(srcStr)) inferredSchool = 'abjuration';
+    else if(/вызов/i.test(srcStr)) inferredSchool = 'conjuration';
+    else if(/прорицани/i.test(srcStr)) inferredSchool = 'divination';
+    else if(/очаровани/i.test(srcStr)) inferredSchool = 'enchantment';
+    else if(/иллюзи/i.test(srcStr)) inferredSchool = 'illusion';
+    else if(/некроманти/i.test(srcStr)) inferredSchool = 'necromancy';
+    else if(/преобразовани/i.test(srcStr)) inferredSchool = 'transmutation';
+  }
+
+  var vsmInput = {
+    name: matchedSpell ? matchedSpell.name : (t.name || ''),
+    en: matchedSpell ? matchedSpell.en : (t.en || ''),
+    school: inferredSchool,
+    classes: matchedSpell ? matchedSpell.classes : srcStr,
+    meta: matchedSpell ? matchedSpell.meta : (t.actionCost || ''),
+    effect: matchedSpell ? matchedSpell.effect : descStr,
+    verbal: t.verbal || '',
+    somatic: t.somatic || '',
+    components: explicitComp || parsedComp || (matchedSpell ? matchedSpell.components : 'В, С'),
+    material: explicitMat || parsedMat || (matchedSpell ? matchedSpell.material : '')
+  };
+  return getSpellVsmInfo(vsmInput);
+}
+
 function getSpellVsmInfo(s){
-  if(!s) return { v: true, s: true, m: false, code: 'В, С', material: '', costly: false };
+  if(!s) return { v: true, s: true, m: false, code: 'В, С', material: '', verbalDesc: '', somaticDesc: '', materialDesc: '', costly: false };
   var compMap = (typeof DND_SPELL_COMPONENTS !== 'undefined' && DND_SPELL_COMPONENTS) ? DND_SPELL_COMPONENTS : {};
   var mapEntry = (s.en && compMap[s.en]) ? compMap[s.en] : null;
   var compRaw = s.components || (mapEntry ? mapEntry[0] : 'В, С');
@@ -7919,43 +8434,56 @@ function getSpellVsmInfo(s){
   if(hasM) parts.push('М');
   var costly = hasM && (/\b\d+[\s\u00A0]*(зм|см|мм|пм|gp|sp)\b|расходу|НЕ заменяет/i.test(matRaw));
   var defaultMat = 'арканический / друидический фокус, священный символ или мешочек с компонентами';
+  var loreDetails = buildSpellComponentLore(s, hasV, hasS, hasM, matRaw, costly);
   return {
     v: hasV,
     s: hasS,
     m: hasM,
     code: parts.join(', '),
     material: hasM ? (matRaw || defaultMat) : '',
+    verbalDesc: loreDetails.verbalDesc,
+    somaticDesc: loreDetails.somaticDesc,
+    materialDesc: loreDetails.materialDesc,
     costly: !!costly
   };
 }
 
 function renderSpellVsmSection(s){
-  var vsm = getSpellVsmInfo(s);
+  var vsm = (s && typeof s.v === 'boolean' && s.code && s.verbalDesc) ? s : getSpellVsmInfo(s);
   var vBadge = vsm.v
-    ? '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.45);color:#bae6fd;font-weight:700;font-size:11.5px;" title="Требуется произнести мистические слова вслух (нельзя в области Тишины или с кляпом)">🗣 В — Вербальный (сказать вслух)</span>'
+    ? '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.45);color:#bae6fd;font-weight:700;font-size:11.5px;" title="Требуется произнести мистические слова вслух (нельзя в области Тишины или с кляпом)">🗣 В — Заклинание (вслух)</span>'
     : '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(15,23,42,0.45);border:1px dashed rgba(148,163,184,0.2);color:#64748b;font-size:11px;" title="Слова не требуются — можно творить беззвучно и в зоне Тишины">🗣 В — не треб.</span>';
 
   var sBadge = vsm.s
-    ? '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.45);color:#6ee7b7;font-weight:700;font-size:11.5px;" title="Требуется свободная рука (или рука с фокусировкой) для магических пассов и знаков">✋ С — Соматический (жесты рукой)</span>'
+    ? '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.45);color:#6ee7b7;font-weight:700;font-size:11.5px;" title="Требуется свободная рука (или рука с фокусировкой) для магических пассов и знаков">✋ С — Знак рукой</span>'
     : '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(15,23,42,0.45);border:1px dashed rgba(148,163,184,0.2);color:#64748b;font-size:11px;" title="Жесты руками не требуются">✋ С — не треб.</span>';
 
   var mBadge = '';
   if(vsm.m){
     if(vsm.costly){
-      mBadge = '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.6);color:#fde68a;font-weight:700;font-size:11.5px;" title="Требуется особый/платный материальный компонент — обычная фокусировка его НЕ заменяет!">💎 М — Особый компонент (зм)</span>';
+      mBadge = '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.6);color:#fde68a;font-weight:700;font-size:11.5px;" title="Требуется особый/платный материальный компонент — обычная фокусировка его НЕ заменяет!">💎 М — Особый реагент (зм)</span>';
     } else {
       mBadge = '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.48);color:#e9d5ff;font-weight:700;font-size:11.5px;" title="Требуется материальный компонент ИЛИ арканический/друидический фокус / священный символ">🔮 М — Материал / Аркан. фокус</span>';
     }
   } else {
-    mBadge = '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(15,23,42,0.45);border:1px dashed rgba(148,163,184,0.2);color:#64748b;font-size:11px;" title="Материальные компоненты и фокус не требуются">🔮 М — не треб.</span>';
+    mBadge = '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(15,23,42,0.45);border:1px dashed rgba(148,163,184,0.2);color:#64748b;font-size:11px;" title="Отдельные реагенты не требуются (можно направлять через фокус или свободную руку)">🔮 М — без реагентов</span>';
   }
 
-  var matLine = vsm.m
-    ? '<div style="margin-top:6px;padding-top:5px;border-top:1px dashed rgba(201,164,92,0.2);font-size:12px;color:' + (vsm.costly ? '#fde68a' : '#cbd5e1') + ';line-height:1.4;">' +
-        '<b style="color:' + (vsm.costly ? '#fbbf24' : '#d8b4fe') + ';">' + (vsm.costly ? '💎 Компонент (обязателен): ' : '🔮 Компонент / Фокус: ') + '</b>' +
-        escapeHtml(vsm.material) +
-      '</div>'
-    : '';
+  var detailsHtml =
+    '<div style="margin-top:7px;padding-top:6px;border-top:1px dashed rgba(201,164,92,0.22);display:flex;flex-direction:column;gap:4px;font-size:12px;line-height:1.42;">' +
+      '<div style="color:' + (vsm.v ? '#e2e8f0' : '#94a3b8') + ';">' +
+        '<b style="color:' + (vsm.v ? '#7dd3fc' : '#64748b') + ';">🗣 Заклинание (В): </b>' +
+        escapeHtml(vsm.verbalDesc || '') +
+      '</div>' +
+      '<div style="color:' + (vsm.s ? '#e2e8f0' : '#94a3b8') + ';">' +
+        '<b style="color:' + (vsm.s ? '#6ee7b7' : '#64748b') + ';">✋ Магический знак (С): </b>' +
+        escapeHtml(vsm.somaticDesc || '') +
+      '</div>' +
+      '<div style="color:' + (vsm.costly ? '#fde68a' : (vsm.m ? '#e2e8f0' : '#94a3b8')) + ';">' +
+        '<b style="color:' + (vsm.costly ? '#fbbf24' : (vsm.m ? '#d8b4fe' : '#64748b')) + ';">' + (vsm.costly ? '💎 Материалы (обязательны, М): ' : '🔮 Материалы / Аркан. фокус (М): ') + '</b>' +
+        escapeHtml(vsm.materialDesc || vsm.material || '') +
+      '</div>' +
+    '</div>';
 
   return '<div style="margin:6px 0 10px 0;padding:8px 10px;background:rgba(15,23,42,0.65);border:1px solid rgba(201,164,92,0.24);border-left:3px solid ' + (vsm.costly ? '#f59e0b' : '#c9a45c') + ';border-radius:6px;">' +
     '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">' +
@@ -7964,7 +8492,7 @@ function renderSpellVsmSection(s){
         vBadge + sBadge + mBadge +
       '</div>' +
     '</div>' +
-    matLine +
+    detailsHtml +
   '</div>';
 }
 
@@ -8412,6 +8940,8 @@ function wireMagicScreens(){
         actionCost: (sp.meta || '').split('•')[0]?.trim() || '1 действие',
         cooldown: Number(sp.level) === 0 ? 'Заговор (Неограниченно)' : ('Ячейка ' + sp.level + '-го круга'),
         checkOrSave: rollInfo ? rollInfo.formula : '',
+        components: vsm.code,
+        material: vsm.m ? vsm.material : '',
         desc: (sp.meta ? ('[' + sp.meta + ' | ' + vsmHeader + ']\n') : ('[' + vsmHeader + ']\n')) + (sp.effect || '')
       });
       saveCharactersToStorage();
@@ -8444,6 +8974,8 @@ function wireMagicScreens(){
           actionCost: (sp.meta || '').split('•')[0]?.trim() || '1 действие',
           cooldown: Number(sp.level) === 0 ? 'Заговор (Неограниченно)' : ('Ячейка ' + sp.level + '-го круга'),
           checkOrSave: rollInfo ? rollInfo.formula : '',
+          components: vsm.code,
+          material: vsm.m ? vsm.material : '',
           desc: (sp.meta ? ('[' + sp.meta + ' | ' + vsmHeader + ']\n') : ('[' + vsmHeader + ']\n')) + (sp.effect || '')
         });
       }
@@ -10462,13 +10994,14 @@ function renderFaeGenCardPreview(data, cat){
         '<div class="fae-gen-stat-box"><span class="lbl">⏳ Длительность</span><span class="val">' + escapeHtml(data.duration || 'Мгновенная') + '</span></div>' +
         '<div class="fae-gen-stat-box"><span class="lbl">🔮 Компоненты</span><span class="val">' + escapeHtml(data.components || 'В, С') + '</span></div>' +
       '</div>' +
+      renderSpellVsmSection({ components: data.components || 'В, С', material: data.material || '' }) +
       (data.classes ? ('<div style="font-size:12.5px;color:#94a3b8;margin-bottom:10px;"><b>Доступно классам:</b> ' + escapeHtml(data.classes) + '</div>') : '') +
       '<div class="fae-gen-block"><span style="white-space:pre-line;">' + escapeHtml(data.effect || '') + '</span>' +
         (data.higherLevels ? ('<br><br><b>На больших уровнях:</b> ' + escapeHtml(data.higherLevels)) : '') +
       '</div>';
     actionButtons =
       '<button class="btn-primary" id="btnFaeSaveSpell">📖 В общую Книгу заклинаний</button>' +
-      (hero ? ('<button class="btn-ghost" id="btnFaeSaveSpellHero">✨ В лист заклинаний (' + heroName + ')</button>') : '');
+      (hero ? ('<button class="btn-ghost" id="btnFaeSaveSpellHero">✨ В способности и лист (' + heroName + ')</button>') : '');
 
   } else if(cat === 'item'){
     headerBadge = '<span class="fae-class-badge">💍 ' + escapeHtml(data.rarity || 'Редкий') + ' • ' + escapeHtml(data.type || 'Предмет') + '</span>';
@@ -11159,15 +11692,17 @@ function wireFaeGenResultActions(){
   var btnSaveSpell = document.getElementById('btnFaeSaveSpell');
   if(btnSaveSpell){
     btnSaveSpell.addEventListener('click', function(){
+      var vsmInfo = getSpellVsmInfo({ components: data.components || 'В, С', material: data.material || '' });
       var sp = {
         id: 'spell_' + Date.now().toString(36),
         name: data.name || 'Новое заклинание',
         school: data.school || 'evocation',
         level: parseInt(data.level, 10) || 0,
-        effect: (data.castingTime ? ('Время: ' + data.castingTime + ' | Дистанция: ' + data.range + ' | Длительность: ' + data.duration + '\n') : '') +
-                (data.components ? ('Компоненты: ' + data.components + '\n\n') : '') +
-                (data.effect || '') +
-                (data.higherLevels ? ('\n\nНа больших уровнях: ' + data.higherLevels) : ''),
+        classes: data.classes || '',
+        meta: [data.castingTime || '1 действие', data.range || '60 футов', data.duration || 'Мгновенная'].filter(Boolean).join(' • '),
+        components: vsmInfo.code,
+        material: vsmInfo.m ? vsmInfo.material : '',
+        effect: (data.effect || '') + (data.higherLevels ? ('\n\nНа больших уровнях: ' + data.higherLevels) : ''),
         isCustom: true
       };
       if(!Array.isArray(SPELLS)) SPELLS = [];
@@ -11183,12 +11718,31 @@ function wireFaeGenResultActions(){
     btnSaveSpellHero.addEventListener('click', function(){
       var hero = getActiveFaerunCharacter();
       if(!hero) return;
-      var spLine = '• ' + (data.name || 'Заклинание') + ' (' + (data.level === 0 ? 'Заговор' : (data.level + ' круг')) + ', ' + (data.schoolRu || data.school || '') + '): ' + (data.effect || '');
+      var vsmInfo = getSpellVsmInfo({ components: data.components || 'В, С', material: data.material || '' });
+      var vsmHdr = 'Компоненты: ' + vsmInfo.code + (vsmInfo.m && vsmInfo.material ? (' (' + vsmInfo.material + ')') : '');
+      var spMeta = [data.castingTime || '1 действие', data.range || '60 футов', data.duration || 'Мгновенная'].filter(Boolean).join(' • ');
+      var spLvl = parseInt(data.level, 10) || 0;
+      var rollInfo = extractSpellRoll(data.effect || '');
+      if(!Array.isArray(hero.techs)) hero.techs = [];
+      hero.techs.unshift({
+        id: genId(),
+        prepared: true,
+        name: data.name || 'Заклинание',
+        category: 'Магические и Сверхъестественные дары',
+        source: (data.schoolRu || schoolName(data.school || 'evocation')) + ' • ' + levelLabel(spLvl) + ' • ' + vsmInfo.code,
+        actionCost: data.castingTime || '1 действие',
+        cooldown: spLvl === 0 ? 'Заговор (Неограниченно)' : ('Ячейка ' + spLvl + '-го круга'),
+        checkOrSave: rollInfo ? rollInfo.formula : '',
+        components: vsmInfo.code,
+        material: vsmInfo.m ? vsmInfo.material : '',
+        desc: '[' + spMeta + ' | ' + vsmHdr + ']\n' + (data.effect || '') + (data.higherLevels ? ('\n\nНа больших уровнях: ' + data.higherLevels) : '')
+      });
+      var spLine = '• ' + (data.name || 'Заклинание') + ' (' + (spLvl === 0 ? 'Заговор' : (spLvl + ' круг')) + ', ' + (data.schoolRu || data.school || '') + ', ' + vsmHdr + '): ' + (data.effect || '');
       hero.spellNotes = hero.spellNotes ? (hero.spellNotes + '\n\n' + spLine) : spLine;
       hero.spellEnabled = true;
       saveCharactersToStorage();
       btnSaveSpellHero.disabled = true;
-      btnSaveSpellHero.textContent = '✓ Записано в лист героя!';
+      btnSaveSpellHero.textContent = '✓ Добавлено в Способности и лист!';
     });
   }
 
