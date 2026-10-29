@@ -2985,19 +2985,15 @@
      МАСКОТ-ФАМИЛЬЯР «ОРБИС» (МНОГОРЕЖИМНЫЙ SVG-ДВИЖОК, 20+ АНИМАЦИЙ, ПЛАВНАЯ ФИЗИКА)
      ========================================================================== */
   var AUTO_ROAM_STORAGE_KEY = 'ttc_ai_mascot_autoroam';
-  var FAB_POS_STORAGE_KEY = 'ttc_ai_fab_pos_v1';
   var fabCustomPos = null;
   var isDraggingFab = false;
   var fabSuppressNextClick = false;
-  try {
-    var rawFabPos = localStorage.getItem(FAB_POS_STORAGE_KEY);
-    if(rawFabPos){
-      var parsedFabPos = JSON.parse(rawFabPos);
-      if(parsedFabPos && typeof parsedFabPos.right === 'number' && typeof parsedFabPos.bottom === 'number'){
-        fabCustomPos = parsedFabPos;
-      }
-    }
-  } catch(e){}
+  try { localStorage.removeItem('ttc_ai_fab_pos_v1'); } catch(e){}
+
+  function getDefaultFabPos(){
+    var isMob = (window.innerWidth || 800) <= 600;
+    return { right: isMob ? 14 : 22, bottom: isMob ? 16 : 22 };
+  }
 
   function getFabCenter(){
     var fab = document.getElementById('ttcAiFab');
@@ -3009,22 +3005,34 @@
     }
     var vw = window.innerWidth || 800;
     var vh = window.innerHeight || 600;
-    var rOff = (fabCustomPos && typeof fabCustomPos.right === 'number') ? fabCustomPos.right : 22;
-    var bOff = (fabCustomPos && typeof fabCustomPos.bottom === 'number') ? fabCustomPos.bottom : 22;
+    var defPos = getDefaultFabPos();
+    var rOff = (fabCustomPos && typeof fabCustomPos.right === 'number') ? fabCustomPos.right : defPos.right;
+    var bOff = (fabCustomPos && typeof fabCustomPos.bottom === 'number') ? fabCustomPos.bottom : defPos.bottom;
     return { x: vw - rOff - 32, y: vh - bOff - 32 };
   }
 
   function applyFabPosition(){
     var fab = document.getElementById('ttcAiFab');
-    if(!fab || !fabCustomPos) return;
+    if(!fab) return;
+    if(!fabCustomPos){
+      fab.style.right = '';
+      fab.style.bottom = '';
+      fab.style.left = '';
+      fab.style.top = '';
+      fab.classList.remove('bubble-right', 'bubble-below');
+      return;
+    }
     var vw = window.innerWidth || 800;
     var vh = window.innerHeight || 600;
     var fabW = fab.offsetWidth || 64;
     var fabH = fab.offsetHeight || 64;
-    var clampedRight = Math.round(Math.max(8, Math.min(vw - fabW - 8, Number(fabCustomPos.right) || 22)));
-    var clampedBottom = Math.round(Math.max(8, Math.min(vh - fabH - 8, Number(fabCustomPos.bottom) || 22)));
-    fab.style.right = clampedRight + 'px';
-    fab.style.bottom = clampedBottom + 'px';
+    var defPos = getDefaultFabPos();
+    var clampedRight = Math.max(8, Math.min(vw - fabW - 8, Number(fabCustomPos.right) || defPos.right));
+    var clampedBottom = Math.max(8, Math.min(vh - fabH - 8, Number(fabCustomPos.bottom) || defPos.bottom));
+    fabCustomPos.right = clampedRight;
+    fabCustomPos.bottom = clampedBottom;
+    fab.style.right = clampedRight.toFixed(2) + 'px';
+    fab.style.bottom = clampedBottom.toFixed(2) + 'px';
     fab.style.left = 'auto';
     fab.style.top = 'auto';
 
@@ -3032,19 +3040,6 @@
     var centerY = vh - clampedBottom - (fabH / 2);
     fab.classList.toggle('bubble-right', centerX < 230);
     fab.classList.toggle('bubble-below', centerY < 110);
-
-    var chat = document.getElementById('ttcAiChat');
-    if(chat){
-      var chatW = Math.min(435, vw - 24);
-      var chatH = Math.min(605, vh - 120);
-      var chatRight = Math.round(Math.max(12, Math.min(vw - chatW - 12, clampedRight)));
-      var chatBottom = clampedBottom + fabH + 10;
-      if(chatBottom + chatH > vh - 12){
-        chatBottom = Math.max(12, vh - chatH - 12);
-      }
-      chat.style.right = chatRight + 'px';
-      chat.style.bottom = Math.round(chatBottom) + 'px';
-    }
   }
   var mascotState = 'idle';
   // Режимы: 'idle' | 'yawn' | 'sleep' | 'startle' | 'stretch' | 'happy' | 'petted' | 'thinking' |
@@ -4199,6 +4194,28 @@
           }
         }
       }
+
+      // Плавное возвращение сферы-дока (#ttcAiFab) на позицию по умолчанию после перетаскивания
+      if(!isDraggingFab && fabCustomPos){
+        var defFab = getDefaultFabPos();
+        var diffR = defFab.right - fabCustomPos.right;
+        var diffB = defFab.bottom - fabCustomPos.bottom;
+        var fabDist = Math.hypot(diffR, diffB);
+        if(fabDist <= 0.6){
+          fabCustomPos = null;
+          applyFabPosition();
+        } else {
+          // Если чат открыт — сфера быстро и анимировано возвращается на место по умолчанию;
+          // если чат закрыт — медленно и плавно плывёт обратно в угол
+          var stepSpeed = isOpen
+            ? (240 + fabDist * 8.5)
+            : (36 + fabDist * 0.45);
+          var moveStep = Math.min(fabDist, stepSpeed * dt);
+          fabCustomPos.right += (diffR / fabDist) * moveStep;
+          fabCustomPos.bottom += (diffB / fabDist) * moveStep;
+          applyFabPosition();
+        }
+      }
     }
     requestAnimationFrame(tickMascotFrame);
 
@@ -4440,7 +4457,6 @@
       if(fabDragMoved){
         fabSuppressNextClick = true;
         setTimeout(function(){ fabSuppressNextClick = false; }, 260);
-        try { localStorage.setItem(FAB_POS_STORAGE_KEY, JSON.stringify(fabCustomPos)); } catch(err){}
         if(fabShakeScore >= 6){
           setMascotMood('dizzy', 5000);
           showMascotBubble(pickQuip('dizzy'), 3800);
