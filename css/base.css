@@ -351,13 +351,15 @@
     transition:transform .28s cubic-bezier(.22, 1, .36, 1);
   }
   .fae-dice-skin-dock.collapsed{
-    transform:translate3d(-236px, -50%, 0);
+    transform:translate3d(-252px, -50%, 0);
   }
   .fae-dice-skin-panel{
-    width:236px;
+    width:252px;
     box-sizing:border-box;
     max-height:84vh;
-    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
     pointer-events:auto;
     background:linear-gradient(155deg, rgba(18,21,27,0.96) 0%, rgba(10,12,16,0.98) 100%);
     border:1px solid var(--line);
@@ -367,8 +369,6 @@
     padding:12px 10px;
     box-shadow:10px 0 30px rgba(0,0,0,0.8), 0 0 16px var(--sk-active-glow, rgba(0,0,0,0.3));
     backdrop-filter:blur(8px);
-    scrollbar-width:thin;
-    scrollbar-color:var(--line) transparent;
     transition:box-shadow .25s ease, opacity .25s ease;
   }
   .fae-dice-skin-dock.collapsed .fae-dice-skin-panel{
@@ -379,6 +379,7 @@
   .fae-dice-skin-head{
     display:flex;align-items:center;justify-content:space-between;gap:6px;
     margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);
+    flex-shrink:0;
   }
   .fae-dice-skin-head-info{
     display:flex;flex-direction:column;min-width:0;
@@ -403,6 +404,11 @@
     display:flex;
     flex-direction:column;
     gap:6px;
+    overflow-y:auto;
+    flex:1;
+    padding-right:3px;
+    scrollbar-width:thin;
+    scrollbar-color:var(--line) transparent;
   }
   .fae-dice-skin-chip{
     display:flex;align-items:center;gap:9px;

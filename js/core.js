@@ -160,6 +160,239 @@ const FAE_DICE_SKINS = [
     textFill: '#fef3c7',
     valColor: '#fef3c7',
     coinValColor: '#fef3c7'
+  },
+  {
+    id: 'solar',
+    title: 'Солнечный Аурум',
+    sub: 'Золото Латандера и лазурь',
+    accent: '#facc15',
+    glow: 'rgba(250,204,21,0.65)',
+    bg: 'rgba(234,179,8,0.16)',
+    border: 'rgba(250,204,21,0.55)',
+    g0: '#fef08a',
+    g1: '#ca8a04',
+    g2: '#422006',
+    outerStroke: '#fef9c3',
+    innerStroke: 'rgba(56,189,248,0.72)',
+    facetLight: 'rgba(254,249,195,0.30)',
+    facetDark: 'rgba(30,58,138,0.45)',
+    textFill: '#ffffff',
+    valColor: '#fef9c3',
+    coinValColor: '#ffffff'
+  },
+  {
+    id: 'hellfire',
+    title: 'Пепел Авернуса',
+    sub: 'Адская лава и базальт',
+    accent: '#fb923c',
+    glow: 'rgba(249,115,22,0.68)',
+    bg: 'rgba(234,88,12,0.16)',
+    border: 'rgba(251,146,60,0.55)',
+    g0: '#431407',
+    g1: '#1c1917',
+    g2: '#090706',
+    outerStroke: '#f97316',
+    innerStroke: 'rgba(251,146,60,0.78)',
+    facetLight: 'rgba(249,115,22,0.28)',
+    facetDark: 'rgba(0,0,0,0.62)',
+    textFill: '#ffedd5',
+    valColor: '#fdba74',
+    coinValColor: '#ffedd5'
+  },
+  {
+    id: 'feywild',
+    title: 'Цветение Фейвилда',
+    sub: 'Розовый кварц и лунный лист',
+    accent: '#f472b6',
+    glow: 'rgba(244,114,182,0.62)',
+    bg: 'rgba(219,39,119,0.15)',
+    border: 'rgba(244,114,182,0.52)',
+    g0: '#ec4899',
+    g1: '#701a75',
+    g2: '#1f0826',
+    outerStroke: '#6ee7b7',
+    innerStroke: 'rgba(251,207,232,0.65)',
+    facetLight: 'rgba(252,231,243,0.24)',
+    facetDark: 'rgba(6,78,59,0.42)',
+    textFill: '#fdf2f8',
+    valColor: '#fce7f3',
+    coinValColor: '#a7f3d0'
+  },
+  {
+    id: 'shadowfell',
+    title: 'Сумрак Шедоуфелла',
+    sub: 'Бездна и призрачный туман',
+    accent: '#94a3b8',
+    glow: 'rgba(148,163,184,0.55)',
+    bg: 'rgba(71,85,105,0.16)',
+    border: 'rgba(148,163,184,0.48)',
+    g0: '#334155',
+    g1: '#1e1b4b',
+    g2: '#020617',
+    outerStroke: '#cbd5e1',
+    innerStroke: 'rgba(165,180,252,0.52)',
+    facetLight: 'rgba(203,213,225,0.18)',
+    facetDark: 'rgba(2,6,23,0.65)',
+    textFill: '#e2e8f0',
+    valColor: '#e2e8f0',
+    coinValColor: '#c7d2fe'
+  },
+  {
+    id: 'dragonscale',
+    title: 'Чешуя Тиамат',
+    sub: 'Драконья бронза и пламя',
+    accent: '#f59e0b',
+    glow: 'rgba(245,158,11,0.62)',
+    bg: 'rgba(180,83,9,0.16)',
+    border: 'rgba(245,158,11,0.52)',
+    g0: '#b45309',
+    g1: '#7c2d12',
+    g2: '#2a0a06',
+    outerStroke: '#fcd34d',
+    innerStroke: 'rgba(252,211,77,0.62)',
+    facetLight: 'rgba(254,215,170,0.24)',
+    facetDark: 'rgba(69,10,10,0.55)',
+    textFill: '#fef3c7',
+    valColor: '#fde68a',
+    coinValColor: '#fef3c7'
+  },
+  {
+    id: 'mithral',
+    title: 'Звёздный Мифрил',
+    sub: 'Эльфийская сталь и серебро',
+    accent: '#93c5fd',
+    glow: 'rgba(147,197,253,0.6)',
+    bg: 'rgba(147,197,253,0.14)',
+    border: 'rgba(191,219,254,0.55)',
+    g0: '#f8fafc',
+    g1: '#cbd5e1',
+    g2: '#64748b',
+    outerStroke: '#1e3a8a',
+    innerStroke: 'rgba(30,58,138,0.52)',
+    facetLight: 'rgba(255,255,255,0.42)',
+    facetDark: 'rgba(30,58,138,0.20)',
+    textFill: '#0f172a',
+    valColor: '#0f172a',
+    valShadow: '0 1px 0 rgba(255,255,255,0.9), 0 2px 4px rgba(15,23,42,0.35)',
+    coinValColor: '#0f172a',
+    lightBody: true
+  },
+  {
+    id: 'necrotic',
+    title: 'Лич и Филактерия',
+    sub: 'Чёрный камень и некро-зелень',
+    accent: '#a3e635',
+    glow: 'rgba(163,230,53,0.65)',
+    bg: 'rgba(101,163,13,0.15)',
+    border: 'rgba(163,230,53,0.52)',
+    g0: '#1a2e05',
+    g1: '#0f172a',
+    g2: '#050804',
+    outerStroke: '#a3e635',
+    innerStroke: 'rgba(190,242,100,0.68)',
+    facetLight: 'rgba(163,230,53,0.22)',
+    facetDark: 'rgba(0,0,0,0.65)',
+    textFill: '#ecfccb',
+    valColor: '#bef264',
+    coinValColor: '#ecfccb'
+  },
+  {
+    id: 'abyssal',
+    title: 'Глубинный Кракен',
+    sub: 'Океан и биолюминесценция',
+    accent: '#22d3ee',
+    glow: 'rgba(34,211,238,0.65)',
+    bg: 'rgba(6,182,212,0.15)',
+    border: 'rgba(34,211,238,0.52)',
+    g0: '#0e7490',
+    g1: '#1e3a8a',
+    g2: '#040d21',
+    outerStroke: '#67e8f9',
+    innerStroke: 'rgba(103,232,249,0.68)',
+    facetLight: 'rgba(34,211,238,0.24)',
+    facetDark: 'rgba(4,13,33,0.62)',
+    textFill: '#cffafe',
+    valColor: '#a5f3fc',
+    coinValColor: '#cffafe'
+  },
+  {
+    id: 'celestial',
+    title: 'Небесный Перламутр',
+    sub: 'Ангельский жемчуг и аурум',
+    accent: '#fbbf24',
+    glow: 'rgba(251,191,36,0.58)',
+    bg: 'rgba(254,243,199,0.14)',
+    border: 'rgba(251,191,36,0.52)',
+    g0: '#fffbeb',
+    g1: '#fde68a',
+    g2: '#d97706',
+    outerStroke: '#78350f',
+    innerStroke: 'rgba(120,53,15,0.52)',
+    facetLight: 'rgba(255,255,255,0.45)',
+    facetDark: 'rgba(146,64,14,0.22)',
+    textFill: '#451a03',
+    valColor: '#451a03',
+    valShadow: '0 1px 0 rgba(255,251,235,0.92), 0 2px 4px rgba(69,26,3,0.35)',
+    coinValColor: '#451a03',
+    lightBody: true
+  },
+  {
+    id: 'copper',
+    title: 'Механикус Модронов',
+    sub: 'Заводная латунь и патина',
+    accent: '#5eead4',
+    glow: 'rgba(45,212,191,0.58)',
+    bg: 'rgba(180,83,9,0.16)',
+    border: 'rgba(94,234,212,0.50)',
+    g0: '#b45309',
+    g1: '#451a03',
+    g2: '#134e4a',
+    outerStroke: '#5eead4',
+    innerStroke: 'rgba(251,191,36,0.68)',
+    facetLight: 'rgba(45,212,191,0.22)',
+    facetDark: 'rgba(28,25,23,0.55)',
+    textFill: '#ccfbf1',
+    valColor: '#99f6e4',
+    coinValColor: '#fef3c7',
+    monoFont: true
+  },
+  {
+    id: 'bloodmoon',
+    title: 'Кровавое Затмение',
+    sub: 'Полуночный кармин и серп',
+    accent: '#fb7185',
+    glow: 'rgba(244,63,94,0.68)',
+    bg: 'rgba(190,18,60,0.16)',
+    border: 'rgba(251,113,133,0.54)',
+    g0: '#881337',
+    g1: '#2e0516',
+    g2: '#090206',
+    outerStroke: '#fb7185',
+    innerStroke: 'rgba(253,164,175,0.65)',
+    facetLight: 'rgba(244,63,94,0.25)',
+    facetDark: 'rgba(0,0,0,0.65)',
+    textFill: '#ffe4e6',
+    valColor: '#fecdd3',
+    coinValColor: '#ffe4e6'
+  },
+  {
+    id: 'voidstar',
+    title: 'Осколок Иллитида',
+    sub: 'Дальний Предел и псионика',
+    accent: '#c084fc',
+    glow: 'rgba(192,132,252,0.68)',
+    bg: 'rgba(126,34,206,0.16)',
+    border: 'rgba(192,132,252,0.55)',
+    g0: '#4c1d95',
+    g1: '#1e1b4b',
+    g2: '#070412',
+    outerStroke: '#f0abfc',
+    innerStroke: 'rgba(56,189,248,0.68)',
+    facetLight: 'rgba(232,121,249,0.24)',
+    facetDark: 'rgba(7,4,18,0.65)',
+    textFill: '#f5d0fe',
+    valColor: '#e9d5ff',
+    coinValColor: '#7dd3fc'
   }
 ];
 
@@ -181,7 +414,7 @@ function getSavedFaerunSkinCollapsed(){
 let diceState = {dice:[], modifier:0, unknownMod:false, skin:getSavedFaerunDiceSkin(), skinCollapsed:getSavedFaerunSkinCollapsed(), counter:0, customSides:7, labelCat:'', label:'', customLabel:'', history:[]};
 
 function isFaerunDiceSkinMode(){
-  return (typeof HB === 'undefined' || !HB.mode || HB.mode === 'faerun' || HB.mode === 'core');
+  return true;
 }
 
 function getActiveDiceSkin(){
@@ -227,8 +460,8 @@ function generateCoinSvg(uid, label, skinOverride){
 
   if(skin.id !== 'classic'){
     const textFill = skin.textFill || '#fff8d6';
-    const textShadow = (skin.id === 'bone')
-      ? 'drop-shadow(0 1px 0 rgba(255,255,255,0.7))'
+    const textShadow = (skin.id === 'bone' || skin.lightBody)
+      ? 'drop-shadow(0 1px 0 rgba(255,255,255,0.75))'
       : 'drop-shadow(0 2px 4px rgba(0,0,0,0.75))';
     const text = dispLabel
       ? `<text x="50" y="60" text-anchor="middle" font-family="${skin.monoFont ? "'JetBrains Mono', monospace" : "'Cinzel', serif"}" font-weight="700" font-size="30" fill="${textFill}" filter="${textShadow}">${dispLabel}</text>`
@@ -256,6 +489,42 @@ function generateCoinSvg(uid, label, skinOverride){
     } else if(skin.id === 'jade'){
       innerOrnament = `<circle cx="50" cy="50" r="38" fill="none" stroke="${skin.innerStroke}" stroke-width="1.2"/>
         <rect x="29" y="29" width="42" height="42" rx="4" fill="rgba(2,44,34,0.38)" stroke="${skin.outerStroke}" stroke-width="1.8"/>`;
+    } else if(skin.id === 'solar'){
+      innerOrnament = `<polygon points="50,8 59,34 86,24 68,46 92,58 65,64 74,90 50,72 26,90 35,64 8,58 32,46 14,24 41,34" fill="rgba(254,249,195,0.22)" stroke="${skin.innerStroke}" stroke-width="1.2"/>
+        <circle cx="50" cy="50" r="27" fill="rgba(30,58,138,0.48)" stroke="${skin.outerStroke}" stroke-width="1.5"/>`;
+    } else if(skin.id === 'hellfire'){
+      innerOrnament = `<polygon points="50,10 64,36 90,50 64,64 50,90 36,64 10,50 36,36" fill="rgba(249,115,22,0.18)" stroke="${skin.outerStroke}" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="29" fill="rgba(9,7,6,0.58)" stroke="${skin.innerStroke}" stroke-width="1.3" stroke-dasharray="6,3"/>`;
+    } else if(skin.id === 'feywild'){
+      innerOrnament = `<path d="M50,12 C68,26 84,32 88,50 C84,68 68,74 50,88 C32,74 16,68 12,50 C16,32 32,26 50,12 Z" fill="rgba(110,231,183,0.12)" stroke="${skin.outerStroke}" stroke-width="1.4"/>
+        <circle cx="50" cy="50" r="27" fill="rgba(31,8,38,0.48)" stroke="${skin.innerStroke}" stroke-width="1.2"/>`;
+    } else if(skin.id === 'shadowfell'){
+      innerOrnament = `<circle cx="50" cy="50" r="38" fill="none" stroke="${skin.innerStroke}" stroke-width="1.1" stroke-dasharray="3,3"/>
+        <polygon points="50,14 68,50 50,86 32,50" fill="rgba(2,6,23,0.55)" stroke="${skin.outerStroke}" stroke-width="1.3"/>`;
+    } else if(skin.id === 'dragonscale'){
+      innerOrnament = `<polygon points="50,11 84,30 84,70 50,89 16,70 16,30" fill="rgba(69,10,10,0.38)" stroke="${skin.outerStroke}" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="28" fill="rgba(42,10,6,0.45)" stroke="${skin.innerStroke}" stroke-width="1.3"/>`;
+    } else if(skin.id === 'mithral'){
+      innerOrnament = `<polygon points="50,10 60,38 88,50 60,62 50,90 40,62 12,50 40,38" fill="rgba(255,255,255,0.38)" stroke="${skin.outerStroke}" stroke-width="1.3"/>
+        <circle cx="50" cy="50" r="29" fill="rgba(248,250,252,0.55)" stroke="${skin.innerStroke}" stroke-width="1.4"/>`;
+    } else if(skin.id === 'necrotic'){
+      innerOrnament = `<polygon points="50,12 83,31 83,69 50,88 17,69 17,31" fill="rgba(5,8,4,0.58)" stroke="${skin.outerStroke}" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="27" fill="none" stroke="${skin.innerStroke}" stroke-width="1.3" stroke-dasharray="5,2.5"/>`;
+    } else if(skin.id === 'abyssal'){
+      innerOrnament = `<circle cx="50" cy="50" r="38" fill="rgba(34,211,238,0.10)" stroke="${skin.innerStroke}" stroke-width="1.3" stroke-dasharray="7,3"/>
+        <polygon points="50,15 75,38 66,78 34,78 25,38" fill="rgba(4,13,33,0.52)" stroke="${skin.outerStroke}" stroke-width="1.3"/>`;
+    } else if(skin.id === 'celestial'){
+      innerOrnament = `<circle cx="50" cy="50" r="39" fill="none" stroke="${skin.outerStroke}" stroke-width="1.4" stroke-dasharray="4,3"/>
+        <polygon points="50,14 63,37 86,50 63,63 50,86 37,63 14,50 37,37" fill="rgba(255,255,255,0.42)" stroke="${skin.innerStroke}" stroke-width="1.2"/>`;
+    } else if(skin.id === 'copper'){
+      innerOrnament = `<circle cx="50" cy="50" r="38" fill="none" stroke="${skin.outerStroke}" stroke-width="2.2" stroke-dasharray="6,4"/>
+        <circle cx="50" cy="50" r="28" fill="rgba(19,78,74,0.48)" stroke="${skin.innerStroke}" stroke-width="1.5"/>`;
+    } else if(skin.id === 'bloodmoon'){
+      innerOrnament = `<circle cx="50" cy="50" r="36" fill="rgba(9,2,6,0.55)" stroke="${skin.outerStroke}" stroke-width="1.5"/>
+        <path d="M56,18 A32,32 0 1,0 56,82 A26,26 0 1,1 56,18 Z" fill="rgba(251,113,133,0.28)" stroke="${skin.innerStroke}" stroke-width="1.1"/>`;
+    } else if(skin.id === 'voidstar'){
+      innerOrnament = `<polygon points="50,11 78,22 89,50 78,78 50,89 22,78 11,50 22,22" fill="rgba(7,4,18,0.52)" stroke="${skin.innerStroke}" stroke-width="1.3"/>
+        <circle cx="50" cy="50" r="26" fill="rgba(232,121,249,0.14)" stroke="${skin.outerStroke}" stroke-width="1.4"/>`;
     }
     return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -322,7 +591,7 @@ function renderCustomFacetShape(sides, uid, label, skinOverride){
       <polygon points="${c[0]},${c[1]} ${ipLeft[0]},${ipLeft[1]} ${pTop[0]},${pTop[1]}" fill="${fDark}" stroke="${inStroke}" stroke-width="0.7"/>
     `;
     const text = (label!==undefined && label!==null)
-      ? `<text x="50" y="67" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="28" fill="${tFill}" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.8))">${label}</text>`
+      ? `<text x="50" y="67" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="28" fill="${tFill}" filter="${useSkin && (skin.id === 'bone' || skin.lightBody) ? 'drop-shadow(0 1px 0 rgba(255,255,255,0.75))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))'}">${label}</text>`
       : '';
     return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -369,7 +638,7 @@ function renderCustomFacetShape(sides, uid, label, skinOverride){
 
   const fontSize = s > 99 ? 20 : (s > 20 ? 24 : 28);
   const text = (label!==undefined && label!==null)
-    ? `<text x="50" y="58" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="${fontSize}" fill="${tFill}" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.8))">${label}</text>`
+    ? `<text x="50" y="58" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="${fontSize}" fill="${tFill}" filter="${useSkin && (skin.id === 'bone' || skin.lightBody) ? 'drop-shadow(0 1px 0 rgba(255,255,255,0.75))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))'}">${label}</text>`
     : '';
 
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -430,7 +699,7 @@ function dieShapeSvg(sides, uid, label, skinOverride){
     const inStroke = useSkin ? skin.innerStroke : 'rgba(255,255,255,0.4)';
     const tFill = useSkin ? skin.textFill : '#ffffff';
     const text = (label!==undefined && label!==null)
-      ? `<text x="50" y="61" text-anchor="middle" font-family="'Cinzel', serif" font-weight="700" font-size="28" fill="${tFill}" filter="drop-shadow(0 1px 3px rgba(0,0,0,0.85))">${label}</text>`
+      ? `<text x="50" y="61" text-anchor="middle" font-family="'Cinzel', serif" font-weight="700" font-size="28" fill="${tFill}" filter="${useSkin && (skin.id === 'bone' || skin.lightBody) ? 'drop-shadow(0 1px 0 rgba(255,255,255,0.75))' : 'drop-shadow(0 1px 3px rgba(0,0,0,0.85))'}">${label}</text>`
       : '';
     return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -523,8 +792,8 @@ function dieShapeSvg(sides, uid, label, skinOverride){
   }
   const tFill = useSkin ? skin.textFill : '#fff';
   const tFont = useSkin ? (skin.monoFont ? "'JetBrains Mono', monospace" : "'Cinzel', serif") : 'Arial, sans-serif';
-  const tFilter = (useSkin && skin.id === 'bone')
-    ? ' filter="drop-shadow(0 1px 0 rgba(255,255,255,0.65))"'
+  const tFilter = (useSkin && (skin.id === 'bone' || skin.lightBody))
+    ? ' filter="drop-shadow(0 1px 0 rgba(255,255,255,0.75))"'
     : (useSkin ? ' filter="drop-shadow(0 2px 3px rgba(0,0,0,0.85))"' : '');
   const text = (label!==undefined && label!==null)
     ? `<text x="50" y="${DICE_LABEL_Y[sides]}" text-anchor="middle" font-family="${tFont}" font-weight="700" font-size="${useSkin?30:32}" fill="${tFill}"${tFilter}>${label}</text>`
@@ -1133,7 +1402,7 @@ function renderDice(){
       <div class="fae-dice-skin-panel">
         <div class="fae-dice-skin-head">
           <div class="fae-dice-skin-head-info">
-            <span class="fae-dice-skin-label">🎨 Скины костей</span>
+            <span class="fae-dice-skin-label">🎨 Скины костей (${FAE_DICE_SKINS.length})</span>
             <span class="fae-dice-skin-active-name" style="color:${activeSkin.accent};">${escapeHtml(activeSkin.title)}</span>
           </div>
           <button type="button" class="fae-dice-skin-collapse-btn" id="faeDiceSkinCollapseBtn" title="Свернуть панель скинов влево">‹ Свернуть</button>
