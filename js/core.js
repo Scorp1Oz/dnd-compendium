@@ -2469,21 +2469,28 @@ function newSpell(schoolKey){
     level: 1,
     classes: 'Волшебник, Чародей',
     meta: '1 действие • 60 фт • Мгновенно',
+    components: 'В, С',
+    material: '',
     effect: '',
     isCustom: true
   };
 }
 function seedSpells(){
   if(typeof DND_SPELLS_DB !== 'undefined' && Array.isArray(DND_SPELLS_DB) && DND_SPELLS_DB.length){
+    var compMap = (typeof DND_SPELL_COMPONENTS !== 'undefined' && DND_SPELL_COMPONENTS) ? DND_SPELL_COMPONENTS : {};
     return DND_SPELLS_DB.map(function(row, idx){
+      var enName = row[1] || '';
+      var compEntry = compMap[enName] || null;
       return {
         id: 'std_spell_' + idx,
         name: row[0] || '',
-        en: row[1] || '',
+        en: enName,
         school: row[2] || 'evocation',
         level: Number(row[3]) || 0,
         classes: row[4] || '',
         meta: row[5] || '',
+        components: compEntry ? compEntry[0] : (row[7] || 'В, С'),
+        material: compEntry ? compEntry[1] : (row[8] || ''),
         effect: row[6] || '',
         isCustom: false
       };
@@ -7624,6 +7631,74 @@ function isSpellInHeroTechs(hero, spell){
   return !!findSpellInHeroTechs(hero, spell);
 }
 
+function getSpellVsmInfo(s){
+  if(!s) return { v: true, s: true, m: false, code: 'В, С', material: '', costly: false };
+  var compMap = (typeof DND_SPELL_COMPONENTS !== 'undefined' && DND_SPELL_COMPONENTS) ? DND_SPELL_COMPONENTS : {};
+  var mapEntry = (s.en && compMap[s.en]) ? compMap[s.en] : null;
+  var compRaw = s.components || (mapEntry ? mapEntry[0] : 'В, С');
+  var matRaw = (s.material !== undefined && s.material !== null && s.material !== '') ? s.material : (mapEntry ? mapEntry[1] : '');
+  var upper = String(compRaw).toUpperCase();
+  var hasV = /(?:^|[\s,•/;])(В|V)(?:$|[\s,•/;])|ВЕРБАЛЬН|СЛОВ/i.test(upper);
+  var hasS = /(?:^|[\s,•/;])(С|S)(?:$|[\s,•/;])|СОМАТИЧ|СИМАНТИЧ|ЖЕСТ/i.test(upper);
+  var hasM = /(?:^|[\s,•/;])(М|M)(?:$|[\s,•/;])|МАТЕРИАЛЬН|ФОКУС/i.test(upper) || !!matRaw;
+  if(!hasV && !hasS && !hasM){
+    hasV = true; hasS = true;
+  }
+  var parts = [];
+  if(hasV) parts.push('В');
+  if(hasS) parts.push('С');
+  if(hasM) parts.push('М');
+  var costly = hasM && (/\b\d+[\s\u00A0]*(зм|см|мм|пм|gp|sp)\b|расходу|НЕ заменяет/i.test(matRaw));
+  var defaultMat = 'арканический / друидический фокус, священный символ или мешочек с компонентами';
+  return {
+    v: hasV,
+    s: hasS,
+    m: hasM,
+    code: parts.join(', '),
+    material: hasM ? (matRaw || defaultMat) : '',
+    costly: !!costly
+  };
+}
+
+function renderSpellVsmSection(s){
+  var vsm = getSpellVsmInfo(s);
+  var vBadge = vsm.v
+    ? '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.45);color:#bae6fd;font-weight:700;font-size:11.5px;" title="Требуется произнести мистические слова вслух (нельзя в области Тишины или с кляпом)">🗣 В — Вербальный (сказать вслух)</span>'
+    : '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(15,23,42,0.45);border:1px dashed rgba(148,163,184,0.2);color:#64748b;font-size:11px;" title="Слова не требуются — можно творить беззвучно и в зоне Тишины">🗣 В — не треб.</span>';
+
+  var sBadge = vsm.s
+    ? '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.45);color:#6ee7b7;font-weight:700;font-size:11.5px;" title="Требуется свободная рука (или рука с фокусировкой) для магических пассов и знаков">✋ С — Соматический (жесты рукой)</span>'
+    : '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(15,23,42,0.45);border:1px dashed rgba(148,163,184,0.2);color:#64748b;font-size:11px;" title="Жесты руками не требуются">✋ С — не треб.</span>';
+
+  var mBadge = '';
+  if(vsm.m){
+    if(vsm.costly){
+      mBadge = '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.6);color:#fde68a;font-weight:700;font-size:11.5px;" title="Требуется особый/платный материальный компонент — обычная фокусировка его НЕ заменяет!">💎 М — Особый компонент (зм)</span>';
+    } else {
+      mBadge = '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.48);color:#e9d5ff;font-weight:700;font-size:11.5px;" title="Требуется материальный компонент ИЛИ арканический/друидический фокус / священный символ">🔮 М — Материал / Аркан. фокус</span>';
+    }
+  } else {
+    mBadge = '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;background:rgba(15,23,42,0.45);border:1px dashed rgba(148,163,184,0.2);color:#64748b;font-size:11px;" title="Материальные компоненты и фокус не требуются">🔮 М — не треб.</span>';
+  }
+
+  var matLine = vsm.m
+    ? '<div style="margin-top:6px;padding-top:5px;border-top:1px dashed rgba(201,164,92,0.2);font-size:12px;color:' + (vsm.costly ? '#fde68a' : '#cbd5e1') + ';line-height:1.4;">' +
+        '<b style="color:' + (vsm.costly ? '#fbbf24' : '#d8b4fe') + ';">' + (vsm.costly ? '💎 Компонент (обязателен): ' : '🔮 Компонент / Фокус: ') + '</b>' +
+        escapeHtml(vsm.material) +
+      '</div>'
+    : '';
+
+  return '<div style="margin:6px 0 10px 0;padding:8px 10px;background:rgba(15,23,42,0.65);border:1px solid rgba(201,164,92,0.24);border-left:3px solid ' + (vsm.costly ? '#f59e0b' : '#c9a45c') + ';border-radius:6px;">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">' +
+      '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+        '<span style="font-size:11px;font-family:\'Cinzel\',serif;font-weight:700;color:#c9a45c;letter-spacing:0.04em;margin-right:2px;">КОМПОНЕНТЫ (' + escapeHtml(vsm.code) + '):</span>' +
+        vBadge + sBadge + mBadge +
+      '</div>' +
+    '</div>' +
+    matLine +
+  '</div>';
+}
+
 function spellCardHtml(s, showSchoolBadge){
   var eff = s.effect || s.desc || '';
   var isConc = (s.meta || '').toLowerCase().indexOf('концентрация') !== -1 && (s.meta || '').toLowerCase().indexOf('без концентрации') === -1;
@@ -7660,10 +7735,11 @@ function spellCardHtml(s, showSchoolBadge){
         </div>
       </div>
       ${(s.classes || s.meta) ? `
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px 0;font-size:11.5px;color:#cbd5e1;font-family:'JetBrains Mono',monospace;">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 6px 0;font-size:11.5px;color:#cbd5e1;font-family:'JetBrains Mono',monospace;">
         ${s.classes ? `<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(201,164,92,0.28);padding:2px 8px;border-radius:4px;color:#fde68a;">🧙 ${escapeHtml(s.classes)}</span>` : ''}
         ${s.meta ? `<span style="background:rgba(15,23,42,0.75);border:1px solid rgba(148,163,184,0.25);padding:2px 8px;border-radius:4px;color:#cbd5e1;">⏱️ ${escapeHtml(s.meta)}</span>` : ''}
       </div>` : ''}
+      ${renderSpellVsmSection(s)}
       <div class="desc">${escapeHtml(eff)}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(201,164,92,0.14);">
         ${prepBtnHtml}
@@ -7755,12 +7831,25 @@ function renderMagicHub(){
       if(lvlFilter !== 'all' && String(sp.level) !== String(lvlFilter)) return false;
       if(clsFilter !== 'Все классы' && (sp.classes || '').toLowerCase().indexOf(clsFilter.toLowerCase()) === -1) return false;
       if(searchQ){
-        var hay = [sp.name, sp.en, sp.classes, sp.meta, sp.effect, schoolName(sp.school)].join(' ').toLowerCase();
+        var vsm = getSpellVsmInfo(sp);
+        var hay = [sp.name, sp.en, sp.classes, sp.meta, sp.effect, schoolName(sp.school), vsm.code, vsm.material].join(' ').toLowerCase();
         if(hay.indexOf(searchQ) === -1) return false;
       }
       return true;
     });
   }
+
+  var vsmLegendHtml = `
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px 12px;margin-bottom:14px;background:rgba(15,23,42,0.72);border:1px solid rgba(201,164,92,0.28);border-radius:8px;font-size:12px;color:#cbd5e1;">
+      <span style="font-family:'Cinzel',serif;font-weight:700;color:#c9a45c;">ПАМЯТКА КОМПОНЕНТОВ (В • С • М):</span>
+      <span><b style="color:#bae6fd;">🗣 В (Вербальный)</b> — сказать слова силы вслух</span>
+      <span>•</span>
+      <span><b style="color:#6ee7b7;">✋ С (Соматический)</b> — магические знаки свободной рукой</span>
+      <span>•</span>
+      <span><b style="color:#e9d5ff;">🔮 М (Материальный)</b> — реагент ИЛИ аркан. фокус / свящ. символ</span>
+      <span>•</span>
+      <span><b style="color:#fde68a;">💎 М (зм)</b> — платный реагент (фокус НЕ заменяет!)</span>
+    </div>`;
 
   return `
     ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Книга заклинаний'}])}
@@ -7777,10 +7866,11 @@ function renderMagicHub(){
     </div>
     <div class="fae-rule"></div>
     ${renderSpellHeroTargetBar()}
+    ${vsmLegendHtml}
 
     <div class="fae-ref-search-wrap" style="margin-bottom:12px;">
       <span class="fae-ref-search-icon">🔍</span>
-      <input type="text" id="faeMagicHubSearch" class="fae-ref-search-input" value="${escapeAttr(window._faeMagicSearchQ || '')}" placeholder="Быстрый поиск любого заклинания по русскому или английскому названию (Fireball, Огненный шар, Wish, Туманный шаг), классу или урону..." autocomplete="off">
+      <input type="text" id="faeMagicHubSearch" class="fae-ref-search-input" value="${escapeAttr(window._faeMagicSearchQ || '')}" placeholder="Быстрый поиск любого заклинания по русскому или английскому названию (Fireball, Огненный шар, Wish, Туманный шаг), классу, компонентам (В, С, М, алмаз) или урону..." autocomplete="off">
     </div>
 
     <div style="margin-bottom:8px;font-size:11.5px;color:#c9a45c;font-family:'Cinzel',serif;font-weight:700;">ФИЛЬТР ПО КРУГУ МАГИИ:</div>
@@ -7815,7 +7905,8 @@ function renderSchoolSpells(){
     if(lvlFilter !== 'all' && String(sp.level) !== String(lvlFilter)) return false;
     if(clsFilter !== 'Все классы' && (sp.classes || '').toLowerCase().indexOf(clsFilter.toLowerCase()) === -1) return false;
     if(searchQ){
-      var hay = [sp.name, sp.en, sp.classes, sp.meta, sp.effect].join(' ').toLowerCase();
+      var vsm = getSpellVsmInfo(sp);
+      var hay = [sp.name, sp.en, sp.classes, sp.meta, sp.effect, vsm.code, vsm.material].join(' ').toLowerCase();
       if(hay.indexOf(searchQ) === -1) return false;
     }
     return true;
@@ -7836,6 +7927,18 @@ function renderSchoolSpells(){
     return `<button type="button" class="fae-pill ${clsFilter===cl?'active':''}" data-school-cls="${escapeAttr(cl)}">${cl === 'Все классы' ? '🧙 Все классы' : escapeHtml(cl)}</button>`;
   }).join('');
 
+  var vsmLegendHtml = `
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px 12px;margin-bottom:14px;background:rgba(15,23,42,0.72);border:1px solid rgba(201,164,92,0.28);border-radius:8px;font-size:12px;color:#cbd5e1;">
+      <span style="font-family:'Cinzel',serif;font-weight:700;color:#c9a45c;">ПАМЯТКА КОМПОНЕНТОВ (В • С • М):</span>
+      <span><b style="color:#bae6fd;">🗣 В (Вербальный)</b> — сказать слова силы вслух</span>
+      <span>•</span>
+      <span><b style="color:#6ee7b7;">✋ С (Соматический)</b> — магические знаки свободной рукой</span>
+      <span>•</span>
+      <span><b style="color:#e9d5ff;">🔮 М (Материальный)</b> — реагент ИЛИ аркан. фокус / свящ. символ</span>
+      <span>•</span>
+      <span><b style="color:#fde68a;">💎 М (зм)</b> — платный реагент (фокус НЕ заменяет!)</span>
+    </div>`;
+
   return `
     ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Книга заклинаний', nav:'magic'},{label:school.ru}])}
     <button class="back" data-go="magic">← Ко всем школам магии</button>
@@ -7851,10 +7954,11 @@ function renderSchoolSpells(){
     </div>
     <div class="fae-rule"></div>
     ${renderSpellHeroTargetBar()}
+    ${vsmLegendHtml}
 
     <div class="fae-ref-search-wrap" style="margin-bottom:12px;">
       <span class="fae-ref-search-icon">🔍</span>
-      <input type="text" id="faeSchoolSpellSearch" class="fae-ref-search-input" value="${escapeAttr(window._faeSchoolSearchQ || '')}" placeholder="Поиск внутри школы «${escapeAttr(school.ru)}» по названию, английскому оригиналу, классу или эффекту..." autocomplete="off">
+      <input type="text" id="faeSchoolSpellSearch" class="fae-ref-search-input" value="${escapeAttr(window._faeSchoolSearchQ || '')}" placeholder="Поиск внутри школы «${escapeAttr(school.ru)}» по названию, английскому оригиналу, классу, компонентам (В, С, М) или эффекту..." autocomplete="off">
     </div>
 
     <div class="pill-row" style="margin-bottom:10px;">${levelPillsHtml}</div>
@@ -7868,6 +7972,11 @@ function initSpellDraft(){
   if(view.spellId && view.spellId!=='new'){
     const existing = SPELLS.find(s=>s.id===view.spellId);
     spellDraft = existing ? JSON.parse(JSON.stringify(existing)) : newSpell(view.schoolKey);
+    if(spellDraft){
+      var vsm = getSpellVsmInfo(spellDraft);
+      if(!spellDraft.components) spellDraft.components = vsm.code;
+      if(spellDraft.material === undefined) spellDraft.material = vsm.material;
+    }
   } else {
     spellDraft = newSpell(view.schoolKey);
   }
@@ -7879,6 +7988,7 @@ function renderSpellForm(){
   const isExisting = !!(view.spellId && view.spellId!=='new' && SPELLS.find(x=>x.id===view.spellId));
   const schoolOptions = MAGIC_SCHOOLS.map(sc=>`<option value="${sc.key}" ${s.school===sc.key?'selected':''}>${sc.ru}</option>`).join('');
   const levelOptions = Array.from({length:10},(_,i)=>i).map(l=>`<option value="${l}" ${Number(s.level)===l?'selected':''}>${levelLabel(l)}</option>`).join('');
+  const compOpts = ['В, С, М', 'В, С', 'В, М', 'С, М', 'В', 'С', 'М'].map(c=>`<option value="${c}" ${(s.components||'В, С')===c?'selected':''}>${c}</option>`).join('');
 
   return `
     ${renderCrumb([{label:'Фаэрун', nav:'home'},{label:'Справочник', nav:'faeRef'},{label:'Книга заклинаний', nav:'magic'},{label:schoolName(s.school), nav:'schoolSpells:'+s.school},{label:s.name||'Новое заклинание'}])}
@@ -7919,6 +8029,16 @@ function renderSpellForm(){
         <div class="field">
           <label>Время • Дистанция • Длительность</label>
           <input type="text" data-sfield="meta" value="${escapeAttr(s.meta || '')}" placeholder="Напр. 1 действие • 150 фт • Мгновенно">
+        </div>
+      </div>
+      <div class="sheet-grid" style="margin-bottom:16px;">
+        <div class="field">
+          <label>Компоненты (В • С • М)</label>
+          <select data-sfield="components">${compOpts}</select>
+        </div>
+        <div class="field">
+          <label>Материальный компонент / Фокусировка (для М)</label>
+          <input type="text" data-sfield="material" value="${escapeAttr(s.material || '')}" placeholder="Напр. шарик гуано и сера (заменяется арканическим фокусом)">
         </div>
       </div>
       <div class="field"><label>Эффект и полное описание</label><textarea data-sfield="effect" style="min-height:110px;">${escapeHtml(s.effect || '')}</textarea></div>
@@ -8011,17 +8131,19 @@ function wireMagicScreens(){
       if(!Array.isArray(hero.techs)) hero.techs = [];
       if(isSpellInHeroTechs(hero, sp)) return;
       var rollInfo = extractSpellRoll(sp.effect || '');
+      var vsm = getSpellVsmInfo(sp);
+      var vsmHeader = 'Компоненты: ' + vsm.code + (vsm.m && vsm.material ? (' (' + vsm.material + ')') : '');
       hero.techs.unshift({
         id: genId(),
         spellId: sp.id,
         prepared: false,
         name: sp.name + (sp.en ? (' (' + sp.en + ')') : ''),
         category: 'Магические и Сверхъестественные дары',
-        source: schoolName(sp.school) + ' • ' + levelLabel(sp.level) + (sp.classes ? (' (' + sp.classes + ')') : ''),
+        source: schoolName(sp.school) + ' • ' + levelLabel(sp.level) + ' • ' + vsm.code + (sp.classes ? (' (' + sp.classes + ')') : ''),
         actionCost: (sp.meta || '').split('•')[0]?.trim() || '1 действие',
         cooldown: Number(sp.level) === 0 ? 'Заговор (Неограниченно)' : ('Ячейка ' + sp.level + '-го круга'),
         checkOrSave: rollInfo ? rollInfo.formula : '',
-        desc: (sp.meta ? ('[' + sp.meta + ']\n') : '') + (sp.effect || '')
+        desc: (sp.meta ? ('[' + sp.meta + ' | ' + vsmHeader + ']\n') : ('[' + vsmHeader + ']\n')) + (sp.effect || '')
       });
       saveCharactersToStorage();
       render();
@@ -8041,17 +8163,19 @@ function wireMagicScreens(){
         existing.prepared = !existing.prepared;
       } else {
         var rollInfo = extractSpellRoll(sp.effect || '');
+        var vsm = getSpellVsmInfo(sp);
+        var vsmHeader = 'Компоненты: ' + vsm.code + (vsm.m && vsm.material ? (' (' + vsm.material + ')') : '');
         hero.techs.unshift({
           id: genId(),
           spellId: sp.id,
           prepared: true,
           name: sp.name + (sp.en ? (' (' + sp.en + ')') : ''),
           category: 'Магические и Сверхъестественные дары',
-          source: schoolName(sp.school) + ' • ' + levelLabel(sp.level) + (sp.classes ? (' (' + sp.classes + ')') : ''),
+          source: schoolName(sp.school) + ' • ' + levelLabel(sp.level) + ' • ' + vsm.code + (sp.classes ? (' (' + sp.classes + ')') : ''),
           actionCost: (sp.meta || '').split('•')[0]?.trim() || '1 действие',
           cooldown: Number(sp.level) === 0 ? 'Заговор (Неограниченно)' : ('Ячейка ' + sp.level + '-го круга'),
           checkOrSave: rollInfo ? rollInfo.formula : '',
-          desc: (sp.meta ? ('[' + sp.meta + ']\n') : '') + (sp.effect || '')
+          desc: (sp.meta ? ('[' + sp.meta + ' | ' + vsmHeader + ']\n') : ('[' + vsmHeader + ']\n')) + (sp.effect || '')
         });
       }
       saveCharactersToStorage();
