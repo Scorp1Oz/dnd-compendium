@@ -36,6 +36,18 @@ function paintShBar(){
     bSw.className='hb-seg-btn'; bSw.setAttribute('data-hbmode','sw'); bSw.textContent='Звездные войны';
     seg.appendChild(bSw);
   }
+  /* [ОТКЛЮЧЕНО ДО УЛУЧШЕНИЯ] Раздел «Вестерос» временно убран из панели разделов:
+  if(!seg.querySelector('[data-hbmode="we"]')){
+    var bWe=document.createElement('button');
+    bWe.className='hb-seg-btn'; bWe.setAttribute('data-hbmode','we'); bWe.textContent='Вестерос';
+    seg.appendChild(bWe);
+  }
+  */
+  var oldWeBtn = seg.querySelector('[data-hbmode="we"]');
+  if(oldWeBtn && oldWeBtn.parentNode) oldWeBtn.parentNode.removeChild(oldWeBtn);
+  // [ОТКЛЮЧЕНО ДО УЛУЧШЕНИЯ] Раздел «Технологии» временно убран из панели разделов:
+  var oldHbBtn = seg.querySelector('[data-hbmode="hb"]');
+  if(oldHbBtn && oldHbBtn.parentNode) oldHbBtn.parentNode.removeChild(oldHbBtn);
 
   if(!seg.querySelector('.hb-seg-indicator')){
     var ind = document.createElement('div');
@@ -116,6 +128,17 @@ function paintShBar(){
     });
   }
 
+  var weBtn = seg.querySelector('[data-hbmode="we"]');
+  if(weBtn && !weBtn.__weBound){
+    weBtn.__weBound = true;
+    weBtn.addEventListener('click', function(){
+      HB.mode='we';
+      try{ localStorage.setItem('ttc_mode','we'); }catch(e){}
+      if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
+      view={screen:'weHome'}; render(); window.scrollTo(0,0);
+    });
+  }
+
   var hbBtn = seg.querySelector('[data-hbmode="hb"]');
   if(hbBtn && !hbBtn.__hbBound){
     hbBtn.__hbBound = true;
@@ -144,12 +167,14 @@ function paintShBar(){
   document.body.classList.toggle('wi-theme', HB.mode==='wi');
   document.body.classList.toggle('wz-theme', HB.mode==='wz');
   document.body.classList.toggle('sw-theme', HB.mode==='sw');
+  document.body.classList.toggle('we-theme', HB.mode==='we');
   document.body.classList.toggle('hb-theme', HB.mode==='hb');
   if(typeof updateShinobiTheme === 'function') updateShinobiTheme();
   if(typeof EL !== 'undefined' && typeof EL.applyTheme === 'function') EL.applyTheme();
   if(typeof applyWitcherTheme === 'function') applyWitcherTheme();
   if(typeof applyWizardTheme === 'function') applyWizardTheme();
   if(typeof applyStarWarsTheme === 'function') applyStarWarsTheme();
+  if(typeof applyWesterosTheme === 'function') applyWesterosTheme();
   if(typeof applyFaerunTheme === 'function') applyFaerunTheme();
   if(typeof updateHbSegIndicator === 'function') updateHbSegIndicator(false);
   if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(window.view ? window.view.screen : '');
@@ -198,6 +223,11 @@ function paintShBar(){
     var swP = (typeof SW !== 'undefined' && SW.getActiveProfile) ? SW.getActiveProfile() : null;
     var swName = (swP && swP.name) ? (' • ' + swP.name + (swP.path ? (' (' + swP.path + ')') : '')) : '';
     lab.textContent = 'Звездные войны' + swName;
+  } else if(HB.mode==='we'){
+    if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
+    var weC = (typeof WE !== 'undefined' && WE.getActiveCharacter) ? WE.getActiveCharacter() : null;
+    var weName = (weC && weC.name) ? (' • ' + weC.name + (weC.role ? (' (' + weC.role + ' ' + (weC.level||1) + ' ур.)') : '')) : '';
+    lab.textContent = 'Вестерос' + weName;
   } else if(HB.mode==='hb'){
     if(!lab){ lab=document.createElement('div'); lab.className='hb-bar-world'; bar.querySelector('.hb-bar-inner').appendChild(lab); }
     var hbChar = (typeof HB !== 'undefined' && HB.activeChar && typeof byId === 'function') ? byId(HB.activeChar) : ((typeof HB !== 'undefined' && HB.records && HB.records.find) ? HB.records.find(function(r){ return r.id === HB.activeChar; }) : null);
@@ -251,6 +281,11 @@ function hideInactiveModeFx(activeMode){
     if(swFx) swFx.style.display = 'none';
     document.body.classList.remove('sw-theme', 'sw-theme-sith', 'sw-theme-jedi');
   }
+  if(activeMode !== 'we'){
+    var weFx = document.getElementById('weThemeFx');
+    if(weFx) weFx.style.display = 'none';
+    document.body.classList.remove('we-theme');
+  }
   if(activeMode && activeMode !== 'faerun'){
     var faeFx = document.getElementById('faeThemeFx');
     if(faeFx) faeFx.style.display = 'none';
@@ -264,6 +299,66 @@ window.render=function(){
   window.view = view;
   if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view ? view.screen : '');
   hideInactiveModeFx(HB.mode);
+  if(HB.mode==='we'){
+    document.body.classList.remove('sh-theme', 'me-theme', 'el-theme', 'wi-theme', 'wz-theme', 'sw-theme', 'hb-theme', 'fae-theme');
+    document.body.classList.add('we-theme');
+    if(typeof applyWesterosTheme === 'function') applyWesterosTheme();
+    var s = view.screen || 'weHome';
+    if(s === 'dice'){
+      _r();
+      paintShBar();
+      return;
+    }
+    var app = document.getElementById('app');
+    app.classList.toggle('wide', s === 'weMap');
+    app.classList.toggle('home-wide', s !== 'weMap');
+    if(s === 'weMap'){
+      app.innerHTML = (typeof weMap === 'function') ? weMap() : '';
+      _w();
+      if(typeof wireWeMap === 'function') wireWeMap();
+      paintShBar();
+      return;
+    }
+    if(s === 'weTechs'){
+      app.innerHTML = (typeof weTechs === 'function') ? weTechs() : '';
+      _w();
+      if(typeof wireWeTechs === 'function') wireWeTechs();
+      paintShBar();
+      return;
+    }
+    if(s === 'weTechView'){
+      app.innerHTML = (typeof weTechView === 'function') ? weTechView() : '';
+      _w();
+      if(typeof wireWeTechs === 'function') wireWeTechs();
+      paintShBar();
+      return;
+    }
+    if(s === 'weTechEdit'){
+      app.innerHTML = (typeof weTechEdit === 'function') ? weTechEdit() : '';
+      _w();
+      if(typeof wireWeTechs === 'function') wireWeTechs();
+      paintShBar();
+      return;
+    }
+    if(s === 'weTechGen'){
+      app.innerHTML = (typeof weTechGen === 'function') ? weTechGen() : '';
+      _w();
+      if(typeof wireWeTechs === 'function') wireWeTechs();
+      paintShBar();
+      return;
+    }
+    if(s === 'weData'){
+      app.innerHTML = (typeof weData === 'function') ? weData() : '';
+      _w();
+      if(typeof wireWeData === 'function') wireWeData();
+      paintShBar();
+      return;
+    }
+    app.innerHTML = (typeof weHome === 'function') ? weHome() : '';
+    _w();
+    paintShBar();
+    return;
+  }
   if(HB.mode==='sw'){
     document.body.classList.remove('sh-theme', 'me-theme', 'el-theme', 'wi-theme', 'wz-theme', 'hb-theme');
     document.body.classList.add('sw-theme');
@@ -1220,6 +1315,33 @@ window.navigate=function(val){
       return;
     }
   }
+  if(HB.mode==='we'){
+    var weScreens = {
+      home: 'weHome',
+      weHome: 'weHome',
+      weData: 'weData',
+      data: 'weData',
+      weTechs: 'weTechs',
+      techs: 'weTechs',
+      abilities: 'weTechs',
+      weTechGen: 'weTechGen',
+      weMap: 'weMap',
+      map: 'weMap',
+      dice: 'dice'
+    };
+    if(weScreens[p[0]]){
+      window.view = view = { screen: weScreens[p[0]] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+    if(p[0] === 'weTechView' || p[0] === 'weTechEdit'){
+      window.view = view = { screen: p[0], techId: p[1], id: p[1], shId: p[1] };
+      render();
+      window.scrollTo(0,0);
+      return;
+    }
+  }
   if(HB.mode==='sh'){
     var map={home:'shHome',shHome:'shHome',shTechs:'shTechs',techs:'shTechs',abilities:'shTechs',shJutsuGen:'shJutsuGen',shMoveGen:'shMoveGen',shMoves:'shMoves',moves:'shMoves',shSkillGen:'shSkillGen',shSkills:'shSkills',skills:'shSkills',shCmds:'shCmds',shRef:'shRef',ref:'shRef',shMap:'shMap',map:'shMap',shData:'shData',data:'shData',dice:'dice'};
     if(map[p[0]]){ window.view = view = {screen:map[p[0]]}; SH.draft=null; render(); window.scrollTo(0,0); return; }
@@ -1308,6 +1430,11 @@ try {
     } else if (_urlScreen.indexOf('sw') === 0) {
       if (typeof HB !== 'undefined') HB.mode = 'sw';
       window.view = view = { screen: _urlScreen };
+    /* [ОТКЛЮЧЕНО ДО УЛУЧШЕНИЯ] Раздел «Вестерос» временно отключён:
+    } else if (_urlScreen.indexOf('we') === 0) {
+      if (typeof HB !== 'undefined') HB.mode = 'we';
+      window.view = view = { screen: _urlScreen };
+    */
     } else if (_urlScreen.indexOf('el') === 0) {
       if (typeof HB !== 'undefined') HB.mode = 'el';
       window.view = view = { screen: _urlScreen };
@@ -1337,9 +1464,25 @@ if(HB.mode==='sh'){
   document.body.classList.add('sw-theme');
   if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('sw')!==0)) view={screen:'swHome'};
   if(typeof applyStarWarsTheme === 'function') applyStarWarsTheme();
+} else if(HB.mode==='we'){
+  // [ОТКЛЮЧЕНО ДО УЛУЧШЕНИЯ] Раздел «Вестерос» временно скрыт из разделов до доработки
+  HB.mode = 'faerun';
+  try{ localStorage.setItem('ttc_mode', 'faerun'); }catch(e){}
+  view = {screen:'home'};
+  /*
+  document.body.classList.add('we-theme');
+  if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('we')!==0)) view={screen:'weHome'};
+  if(typeof applyWesterosTheme === 'function') applyWesterosTheme();
+  */
 } else if(HB.mode==='hb'){
+  // [ОТКЛЮЧЕНО ДО УЛУЧШЕНИЯ] Раздел «Технологии» временно скрыт из разделов до доработки
+  HB.mode = 'faerun';
+  try{ localStorage.setItem('ttc_mode', 'faerun'); }catch(e){}
+  view = {screen:'home'};
+  /*
   document.body.classList.add('hb-theme');
   if(!view.screen || (view.screen!=='dice' && String(view.screen).indexOf('hb')!==0)) view={screen:'hbHome'};
+  */
 }
 render();
 if(typeof updateHomeScreenLock === 'function') updateHomeScreenLock(view ? view.screen : '');

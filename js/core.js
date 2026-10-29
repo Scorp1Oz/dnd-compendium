@@ -2538,7 +2538,7 @@ function isHomeScreen(screenName){
     s = (window.view && window.view.screen) || '';
   }
   s = String(s);
-  return !s || s === 'home' || s === 'shHome' || s === 'meHome' || s === 'elHome' || s === 'wiHome' || s === 'wzHome' || s === 'hbHome';
+  return !s || s === 'home' || s === 'shHome' || s === 'meHome' || s === 'elHome' || s === 'wiHome' || s === 'wzHome' || s === 'swHome' || s === 'weHome' || s === 'hbHome';
 }
 
 function updateHomeScreenLock(screenName){

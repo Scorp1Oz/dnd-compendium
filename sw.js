@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v210';
+const CACHE_NAME = 'compendium-cache-v213';
 const APP_SHELL = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const APP_SHELL = [
   './css/witcher.css',
   './css/wizard.css',
   './css/star-wars.css',
+  './css/westeros.css',
   './js/dnd-data.js',
   './js/core.js',
   './js/modules/homebrew.js',
@@ -24,6 +25,7 @@ const APP_SHELL = [
   './js/modules/wizard.js',
   './js/sw-galaxy-atlas.js',
   './js/modules/star-wars.js',
+  './js/modules/westeros.js',
   './js/modules/github-sync.js',
   './js/app.js',
   './js/modules/ai-assistant.js',

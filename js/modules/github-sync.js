@@ -141,6 +141,12 @@ var GHSync = window.GHSync = {
         activeProfileId: (typeof SW !== 'undefined' && SW.activeProfileId) ? SW.activeProfileId : (localStorage.getItem('ttc_sw_active_id') || ''),
         meta: (typeof SW !== 'undefined' && SW.meta) ? SW.meta : GHSync._readJson('ttc_sw_meta', {})
       },
+      westeros: {
+        profiles: (typeof WE !== 'undefined' && Array.isArray(WE.profiles) && WE.profiles.length) ? WE.profiles : GHSync._readJson('ttc_we_profiles', []),
+        activeProfileId: (typeof WE !== 'undefined' && WE.activeProfileId) ? WE.activeProfileId : (localStorage.getItem('ttc_we_active_id') || ''),
+        campaign: (typeof WE !== 'undefined' && WE.loadCampaign) ? WE.loadCampaign() : GHSync._readJson('ttc_we_campaign', {}),
+        theme: (typeof WE !== 'undefined' && WE.getTheme) ? WE.getTheme() : (localStorage.getItem('ttc_we_theme') || 'iron_throne')
+      },
       homebrew: {
         world: (typeof HB !== 'undefined' && HB.world) ? HB.world : GHSync._readJson('ttc_hb_world', {}),
         records: (typeof HB !== 'undefined' && Array.isArray(HB.records)) ? HB.records : GHSync._readJson('ttc_hb_records', []),
@@ -311,6 +317,24 @@ var GHSync = window.GHSync = {
         }
         if(typeof SW !== 'undefined' && typeof SW.loadAll === 'function'){
           SW.loadAll();
+        }
+      }
+
+      if(bundle.westeros){
+        if(Array.isArray(bundle.westeros.profiles) && bundle.westeros.profiles.length){
+          localStorage.setItem('ttc_we_profiles', JSON.stringify(bundle.westeros.profiles));
+        }
+        if(bundle.westeros.activeProfileId){
+          localStorage.setItem('ttc_we_active_id', bundle.westeros.activeProfileId);
+        }
+        if(bundle.westeros.campaign){
+          localStorage.setItem('ttc_we_campaign', JSON.stringify(bundle.westeros.campaign));
+        }
+        if(bundle.westeros.theme){
+          localStorage.setItem('ttc_we_theme', bundle.westeros.theme);
+        }
+        if(typeof WE !== 'undefined' && typeof WE.loadProfiles === 'function'){
+          WE.loadProfiles();
         }
       }
 

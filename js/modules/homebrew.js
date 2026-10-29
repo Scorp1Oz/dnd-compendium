@@ -1,8 +1,11 @@
 /* ============================================================
-   РЕЖИМ «НОВЫЙ МИР» (homebrew) — дополнительный модуль.
+   РЕЖИМ «НОВЫЙ МИР / ТЕХНОЛОГИИ» (homebrew) — дополнительный модуль.
    Ничего из существующего кода не меняет: перехватывает
    render()/navigate() и добавляет свои экраны.
    Хранилище отдельное: ttc_hb_*  (данные Фаэруна не трогаются)
+   [ОТКЛЮЧЕНО ДО УЛУЧШЕНИЯ]: Раздел «Технологии» (hb) временно скрыт из
+   верхней панели миров (hbModeBar) до дальнейшей доработки и улучшения.
+   Весь код раздела сохранён.
    ============================================================ */
 (function(){
 
@@ -24,6 +27,11 @@ window.HB = HB;
 
 function load(){
   try{ HB.mode = localStorage.getItem('ttc_mode') || 'faerun'; }catch(e){}
+  // [ОТКЛЮЧЕНО ДО УЛУЧШЕНИЯ] Разделы «Вестерос» (we) и «Технологии» (hb) временно скрыты из разделов до доработки
+  if(HB.mode === 'we' || HB.mode === 'hb'){
+    HB.mode = 'faerun';
+    try{ localStorage.setItem('ttc_mode', 'faerun'); }catch(e){}
+  }
   try{ var r = JSON.parse(localStorage.getItem('ttc_hb_records')||'[]'); HB.records = Array.isArray(r)?r:[]; }catch(e){ HB.records=[]; }
   try{ var w = JSON.parse(localStorage.getItem('ttc_hb_world')||'null'); if(w) HB.world = w; }catch(e){}
   try{ HB.activeChar = localStorage.getItem('ttc_hb_active') || null; }catch(e){}
@@ -275,6 +283,9 @@ function bindBarButtons(bar){
       } else if(m === 'sw'){
         if(typeof window.navigate === 'function') window.navigate('swHome');
         else { view = {screen:'swHome'}; render(); }
+      } else if(m === 'we'){
+        if(typeof window.navigate === 'function') window.navigate('weHome');
+        else { view = {screen:'weHome'}; render(); }
       } else if(m === 'hb'){
         view = {screen:'hbHome'};
         if(typeof HB !== 'undefined') HB.draft=null;
@@ -315,6 +326,7 @@ function paintBar(){
   document.body.classList.toggle('wi-theme', curMode === 'wi');
   document.body.classList.toggle('wz-theme', curMode === 'wz');
   document.body.classList.toggle('sw-theme', curMode === 'sw');
+  document.body.classList.toggle('we-theme', curMode === 'we');
 
   var worldLabel = '';
   if(curMode === 'hb'){
@@ -349,6 +361,10 @@ function paintBar(){
     var swP = (typeof SW !== 'undefined' && SW.getActiveProfile) ? SW.getActiveProfile() : null;
     var swName = (swP && swP.name) ? (' • ' + swP.name + (swP.path ? (' (' + swP.path + ')') : '')) : '';
     worldLabel = 'Звездные войны' + swName;
+  } else if(curMode === 'we'){
+    var weP = (typeof WE !== 'undefined' && WE.getActiveCharacter) ? WE.getActiveCharacter() : null;
+    var weName = (weP && weP.name) ? (' • ' + weP.name + (weP.role ? (' (' + weP.role + ')') : '')) : '';
+    worldLabel = esc('Вестерос' + weName);
   }
 
   var seg = bar.querySelector('.hb-seg');
@@ -358,13 +374,18 @@ function paintBar(){
         '<div class="hb-seg has-indicator">'+
           '<div class="hb-seg-indicator" id="hbSegIndicator"></div>'+
           '<button class="hb-seg-btn ' + (curMode==='faerun'?'on':'') + '" data-hbmode="faerun">Фаэрун</button>'+
+          /* [ОТКЛЮЧЕНО ДО УЛУЧШЕНИЯ] Раздел «Технологии» временно скрыт из разделов:
           '<button class="hb-seg-btn ' + (curMode==='hb'?'on':'') + '" data-hbmode="hb">Технологии</button>'+
+          */
           '<button class="hb-seg-btn ' + (curMode==='sh'?'on':'') + '" data-hbmode="sh">Шиноби</button>'+
           '<button class="hb-seg-btn ' + (curMode==='me'?'on':'') + '" data-hbmode="me">Эффект Массы</button>'+
           '<button class="hb-seg-btn ' + (curMode==='el'?'on':'') + '" data-hbmode="el">Стихия</button>'+
           '<button class="hb-seg-btn ' + (curMode==='wi'?'on':'') + '" data-hbmode="wi">Ведьмак</button>'+
           '<button class="hb-seg-btn ' + (curMode==='wz'?'on':'') + '" data-hbmode="wz">Волшебник</button>'+
           '<button class="hb-seg-btn ' + (curMode==='sw'?'on':'') + '" data-hbmode="sw">Звездные войны</button>'+
+          /* [ОТКЛЮЧЕНО ДО УЛУЧШЕНИЯ] Раздел «Вестерос» временно скрыт из разделов:
+          '<button class="hb-seg-btn ' + (curMode==='we'?'on':'') + '" data-hbmode="we">Вестерос</button>'+
+          */
         '</div>'+
         (worldLabel ? '<div class="hb-bar-world">' + worldLabel + '</div>' : '')+
       '</div>';
