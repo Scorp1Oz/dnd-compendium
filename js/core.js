@@ -2905,6 +2905,7 @@ function render(){
     view.screen = 'alchemyRef';
   }
   updateHomeScreenLock(view.screen);
+  if(view.screen !== 'map' && typeof setMapWheelLock === 'function') setMapWheelLock(false);
   if(typeof applyFaerunTheme === 'function') applyFaerunTheme();
   const app = document.getElementById('app');
   app.classList.toggle('wide', view.screen === 'map');
@@ -3453,6 +3454,32 @@ const MAP_SOURCES = [
   {id:'aidedd', label:'AideDD Atlas (Интерактивный атлас)', url:'https://www.aidedd.org/public/atlas/'},
   {id:'frwiki', label:'Forgotten Realms Wiki', url:'https://forgottenrealms.fandom.com/wiki/Map:Faer%C3%BBn_%E2%80%93_Full_Map'}
 ];
+
+function setMapWheelLock(locked){
+  const docEl = document.documentElement;
+  const body = document.body;
+  if(!docEl || !body) return;
+  if(locked){
+    if(docEl.classList.contains('map-iframe-hover')) return;
+    const savedY = window.scrollY || docEl.scrollTop || 0;
+    const hadScrollbar = window.innerWidth > docEl.clientWidth;
+    body.dataset.mapLockScrollY = String(savedY);
+    body.style.top = (-savedY) + 'px';
+    body.style.overflowY = hadScrollbar ? 'scroll' : 'hidden';
+    docEl.classList.add('map-iframe-hover');
+    body.classList.add('map-iframe-hover');
+  } else {
+    if(!docEl.classList.contains('map-iframe-hover')) return;
+    const savedY = parseFloat(body.dataset.mapLockScrollY || '0') || 0;
+    docEl.classList.remove('map-iframe-hover');
+    body.classList.remove('map-iframe-hover');
+    body.style.top = '';
+    body.style.overflowY = '';
+    delete body.dataset.mapLockScrollY;
+    window.scrollTo(0, savedY);
+  }
+}
+window.setMapWheelLock = setMapWheelLock;
 
 function renderMap(){
   if(!view.mapId) view.mapId = 'loremaps';
@@ -13840,6 +13867,20 @@ function wireEvents(){
       mapToggle.classList.toggle('active', on);
       mapToggle.textContent = on ? '☀️ Вернуть обычные цвета' : '🌙 Тёмные цвета карты';
     });
+  }
+  const mapWrap = document.getElementById('mapFrameWrap');
+  if(mapWrap && !mapWrap._wheelLockBound){
+    mapWrap._wheelLockBound = true;
+    mapWrap.addEventListener('mouseenter', ()=>setMapWheelLock(true));
+    mapWrap.addEventListener('pointerenter', ()=>setMapWheelLock(true));
+    mapWrap.addEventListener('mousemove', ()=>setMapWheelLock(true));
+    mapWrap.addEventListener('mouseleave', ()=>setMapWheelLock(false));
+    mapWrap.addEventListener('pointerleave', ()=>setMapWheelLock(false));
+    mapWrap.addEventListener('touchstart', ()=>setMapWheelLock(true), {passive:true});
+    mapWrap.addEventListener('touchend', ()=>setMapWheelLock(false), {passive:true});
+    try {
+      if(mapWrap.matches && mapWrap.matches(':hover')) setMapWheelLock(true);
+    } catch(e){}
   }
   document.querySelectorAll('.die-btn[data-sides]').forEach(el=>{
     if(el._wiredSides) return;
