@@ -5195,10 +5195,32 @@ function wireFaeTechLauncher(){
   });
 }
 
+function resolveTechSpellLevel(t){
+  if(!t) return null;
+  if(t.spellLevel !== undefined && t.spellLevel !== null && t.spellLevel !== ''){
+    var explicitLvl = Number(t.spellLevel);
+    if(!isNaN(explicitLvl) && explicitLvl >= 0 && explicitLvl <= 9) return explicitLvl;
+  }
+  var matchedSpell = findSpellForHeroTech(t);
+  if(matchedSpell && matchedSpell.level !== undefined && matchedSpell.level !== null){
+    return Number(matchedSpell.level) || 0;
+  }
+  var combined = (String(t.source || '') + ' ' + String(t.cooldown || '') + ' ' + String(t.desc || '')).toLowerCase();
+  if(/(?:^|[\s•|(\[])(?:заговор|cantrip|0\s*(?:-й|-го)?\s*круг)/i.test(combined)){
+    return 0;
+  }
+  var mCircle = combined.match(/(?:^|[\s•|(\[])([1-9])\s*(?:-й|-го)?\s*круг/i) || combined.match(/ячейк[аиуе]\s*([1-9])(?:-го|\s*круга|\s*ур)/i);
+  if(mCircle){
+    return parseInt(mCircle[1], 10);
+  }
+  return null;
+}
+
 function renderFaeTechs(){
   var c = getActiveFaerunCharacter();
   var techs = (c && Array.isArray(c.techs)) ? c.techs : [];
   var activeCat = window._faeTechCat || 'all';
+  var activeLvl = (window._faeTechSpellLvl !== undefined && window._faeTechSpellLvl !== null) ? String(window._faeTechSpellLvl) : 'all';
   var searchQ = (window._faeTechSearch || '').trim().toLowerCase();
   var prepTechs = techs.filter(function(t){ return t && t.prepared; });
   var prepCount = prepTechs.length;
@@ -5216,16 +5238,57 @@ function renderFaeTechs(){
     '</button>';
   }).join('');
 
-  var filtered = techs.filter(function(t){
-    if(activeCat === 'prepared'){
-      if(!t.prepared) return false;
-    } else if(activeCat !== 'all' && t.category !== activeCat){
-      return false;
+  var catScopedTechs = techs.filter(function(t){
+    if(!t) return false;
+    if(activeCat === 'prepared') return !!t.prepared;
+    if(activeCat !== 'all' && t.category !== activeCat) return false;
+    return true;
+  });
+
+  var spellLvlCounts = { '0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0, 'nonspell': 0 };
+  catScopedTechs.forEach(function(t){
+    var sl = resolveTechSpellLevel(t);
+    if(sl !== null && sl >= 0 && sl <= 9){
+      spellLvlCounts[String(sl)] = (spellLvlCounts[String(sl)] || 0) + 1;
+    } else {
+      spellLvlCounts.nonspell++;
+    }
+  });
+
+  var spellLvlOptions = [
+    { key: 'all', label: '🔮 Все (' + catScopedTechs.length + ')' },
+    { key: '0', label: '✨ Заговоры (' + spellLvlCounts['0'] + ')' }
+  ];
+  for(var slv = 1; slv <= 9; slv++){
+    spellLvlOptions.push({ key: String(slv), label: slv + ' круг (' + spellLvlCounts[String(slv)] + ')' });
+  }
+  spellLvlOptions.push({ key: 'nonspell', label: '⚔️ Умения без круга (' + spellLvlCounts.nonspell + ')' });
+
+  var spellLvlPillsHtml = spellLvlOptions.map(function(opt){
+    var isAct = activeLvl === opt.key;
+    var isZeroCnt = opt.key !== 'all' && spellLvlCounts[opt.key] === 0;
+    var extraStyle = (!isAct && isZeroCnt) ? ' style="opacity:0.55;"' : '';
+    return '<button type="button" class="fae-pill ' + (isAct ? 'active' : '') + '" data-fae-tech-lvl="' + escapeAttr(opt.key) + '"' + extraStyle + '>' +
+      escapeHtml(opt.label) +
+    '</button>';
+  }).join('');
+
+  var filtered = catScopedTechs.filter(function(t){
+    if(activeLvl !== 'all'){
+      var tSl = resolveTechSpellLevel(t);
+      if(activeLvl === 'nonspell'){
+        if(tSl !== null) return false;
+      } else {
+        if(tSl === null || String(tSl) !== activeLvl) return false;
+      }
     }
     if(searchQ){
       var tVsmSearch = resolveTechSpellVsm(t);
+      var tSlSearch = resolveTechSpellLevel(t);
+      var slLabelSearch = tSlSearch === 0 ? 'заговор 0 круг cantrip' : (tSlSearch !== null ? (tSlSearch + ' круг ' + tSlSearch + '-й круг') : '');
       var hay = [
         t.name, t.category, t.source, t.actionCost, t.cooldown, t.checkOrSave, t.desc,
+        slLabelSearch,
         tVsmSearch ? tVsmSearch.code : '',
         tVsmSearch ? tVsmSearch.material : ''
       ].join(' ').toLowerCase();
@@ -5273,9 +5336,19 @@ function renderFaeTechs(){
       '</div>';
   }
 
-  var emptyMsg = activeCat === 'prepared'
-    ? '<div class="char-empty">В подменю «🌟 Выбранное» пока нет подготовленных заклинаний или способностей.<br><span style="font-size:13px;color:#cbd5e1;">Нажмите кнопку <b>«📌 В выбранное»</b> на любой карточке во вкладке «Все способности» или кнопку <b>«🌟 Подготовить»</b> прямо в Книге заклинаний!</span></div>'
-    : '<div class="char-empty">У героя пока нет способностей в этой категории. Нажмите «+ Добавить способность» или «🤖 Создать с ИИ»!</div>';
+  var emptyMsg = '';
+  if(activeLvl !== 'all'){
+    var lvlTitle = activeLvl === '0' ? 'заговоров (0 круг)' : (activeLvl === 'nonspell' ? 'обычных умений без круга магии' : ('заклинаний ' + activeLvl + '-го круга'));
+    emptyMsg = '<div class="char-empty">В текущей выборке нет ' + lvlTitle + '.<br>' +
+      '<div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">' +
+        '<button type="button" class="rc-btn" data-fae-tech-lvl="all" style="border-color:rgba(201,164,92,0.55);color:#f3e5ab;">🔮 Показать все уровни</button>' +
+        '<button type="button" class="rc-btn" data-go="magic" style="border-color:rgba(96,165,250,0.5);color:#bae6fd;">📖 Открыть Книгу заклинаний</button>' +
+      '</div></div>';
+  } else if(activeCat === 'prepared'){
+    emptyMsg = '<div class="char-empty">В подменю «🌟 Выбранное» пока нет подготовленных заклинаний или способностей.<br><span style="font-size:13px;color:#cbd5e1;">Нажмите кнопку <b>«📌 В выбранное»</b> на любой карточке во вкладке «Все способности» или кнопку <b>«🌟 Подготовить»</b> прямо в Книге заклинаний!</span></div>';
+  } else {
+    emptyMsg = '<div class="char-empty">У героя пока нет способностей в этой категории. Нажмите «+ Добавить способность» или «🤖 Создать с ИИ»!</div>';
+  }
 
   var hasAnySpellInFiltered = filtered.some(function(t){ return !!resolveTechSpellVsm(t); });
   var techVsmLegendHtml = hasAnySpellInFiltered ? (
@@ -5296,6 +5369,10 @@ function renderFaeTechs(){
       filtered.map(function(t){
         var isPrep = !!t.prepared;
         var tVsm = resolveTechSpellVsm(t);
+        var tSpellLvl = resolveTechSpellLevel(t);
+        var spellLvlTagHtml = tSpellLvl !== null
+          ? '<span class="fae-ref-item-tag" style="background:rgba(168,85,247,0.18);border-color:rgba(168,85,247,0.5);color:#e9d5ff;">' + (tSpellLvl === 0 ? '✨ Заговор' : ('🔮 ' + tSpellLvl + ' круг')) + '</span>'
+          : '';
         var vsmCopySuffix = (tVsm && String(t.desc || '').indexOf('Компоненты:') === -1)
           ? (' | Компоненты: ' + tVsm.code + (tVsm.m && tVsm.material ? (' (' + tVsm.material + ')') : ''))
           : '';
@@ -5313,6 +5390,7 @@ function renderFaeTechs(){
               '<div class="fae-ref-card-k" style="margin-bottom:0;">' + (isPrep ? '🌟 ' : '✨ ') + escapeHtml(t.name || 'Без названия') + '</div>' +
               '<div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">' +
                 (isPrep ? '<span class="fae-ref-item-tag" style="background:rgba(251,191,36,0.2);border-color:#fbbf24;color:#fde68a;">🌟 Подготовлено</span>' : '') +
+                spellLvlTagHtml +
                 '<span class="fae-ref-item-tag">' + escapeHtml(t.actionCost || '1 действие') + '</span>' +
               '</div>' +
             '</div>' +
@@ -5360,10 +5438,16 @@ function renderFaeTechs(){
 
     '<div class="fae-ref-search-wrap" style="margin-bottom:14px;">' +
       '<span class="fae-ref-search-icon">🔍</span>' +
-      '<input type="text" id="faeTechSearchInp" class="fae-ref-search-input" value="' + escapeAttr(window._faeTechSearch || '') + '" placeholder="Поиск по названию способности, заклинанию, компонентам (В, С, М), классу, черте или эффекту..." autocomplete="off">' +
+      '<input type="text" id="faeTechSearchInp" class="fae-ref-search-input" value="' + escapeAttr(window._faeTechSearch || '') + '" placeholder="Поиск по названию способности, заклинанию, заговору, кругу магии, компонентам (В, С, М), классу, черте или эффекту..." autocomplete="off">' +
     '</div>' +
 
-    '<div class="pill-row" style="margin-bottom:18px;">' + pillsHtml + '</div>' +
+    '<div style="margin-bottom:6px;font-size:11.5px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;">КАТЕГОРИИ СПОСОБНОСТЕЙ:</div>' +
+    '<div class="pill-row" style="margin-bottom:12px;">' + pillsHtml + '</div>' +
+    '<div style="margin-bottom:6px;font-size:11.5px;color:#c9a45c;font-family:\'Cinzel\',serif;font-weight:700;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
+      '<span>🔮 ФИЛЬТР ПО ЗАГОВОРАМ И КРУГАМ ЗАКЛИНАНИЙ:</span>' +
+      (activeLvl !== 'all' ? '<button type="button" class="rc-btn" data-fae-tech-lvl="all" style="padding:2px 8px;font-size:11px;">✕ Сбросить фильтр круга</button>' : '') +
+    '</div>' +
+    '<div class="pill-row" style="margin-bottom:18px;">' + spellLvlPillsHtml + '</div>' +
     prepSubmenuBannerHtml +
     techVsmLegendHtml +
     cardsHtml;
@@ -5375,6 +5459,7 @@ function renderFaeTechView(){
   if(!t) return renderFaeTechs();
   var isPrep = !!t.prepared;
   var tVsm = resolveTechSpellVsm(t);
+  var tSpellLvl = resolveTechSpellLevel(t);
 
   return renderCrumb([{label:'Фаэрун', nav:'home'}, {label:'Способности', nav:'faeTechs'}, {label:t.name || 'Способность'}]) +
     '<button class="back" data-go="faeTechs">← К списку способностей</button>' +
@@ -5385,6 +5470,7 @@ function renderFaeTechView(){
           '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
             '<span class="fae-ref-item-tag">✨ ' + escapeHtml(t.category || 'Классовые умения') + '</span>' +
             (isPrep ? '<span class="fae-ref-item-tag" style="background:rgba(251,191,36,0.2);border-color:#fbbf24;color:#fde68a;">🌟 В выбранном (Подготовлено)</span>' : '') +
+            (tSpellLvl !== null ? '<span class="fae-ref-item-tag" style="background:rgba(168,85,247,0.18);border-color:rgba(168,85,247,0.5);color:#e9d5ff;">' + (tSpellLvl === 0 ? '✨ Заговор (0 круг)' : ('🔮 ' + tSpellLvl + ' круг')) + '</span>' : '') +
             (tVsm ? '<span class="fae-ref-item-tag" style="background:rgba(168,85,247,0.16);border-color:rgba(168,85,247,0.48);color:#e9d5ff;">🔮 Компоненты: ' + escapeHtml(tVsm.code) + '</span>' : '') +
           '</div>' +
           '<h1 style="margin:8px 0 0 0;font-size:24px;">' + escapeHtml(t.name || 'Способность') + '</h1>' +
@@ -5413,6 +5499,7 @@ function renderFaeTechEdit(){
     ? c.techs.find(function(x){ return x.id === view.techId; })
     : null;
   var existingVsm = existing ? resolveTechSpellVsm(existing) : null;
+  var existingSpellLvl = existing ? resolveTechSpellLevel(existing) : null;
   var d = existing ? JSON.parse(JSON.stringify(existing)) : {
     id: '',
     prepared: window._faeTechCat === 'prepared',
@@ -5422,12 +5509,16 @@ function renderFaeTechEdit(){
     actionCost: '1 бонусное действие',
     cooldown: '1 раз за короткий или долгий отдых',
     checkOrSave: '',
+    spellLevel: '',
     components: '',
     verbal: '',
     somatic: '',
     material: '',
     desc: ''
   };
+  if(existing && (d.spellLevel === undefined || d.spellLevel === null || d.spellLevel === '') && existingSpellLvl !== null){
+    d.spellLevel = String(existingSpellLvl);
+  }
   if(existing && !d.components && existingVsm){
     d.components = existingVsm.code;
     if(!d.material && existingVsm.m) d.material = existingVsm.material;
@@ -5436,6 +5527,23 @@ function renderFaeTechEdit(){
     if(!d.verbal && existingVsm.v) d.verbal = existingVsm.verbal || '';
     if(!d.somatic && existingVsm.s) d.somatic = existingVsm.somatic || '';
   }
+
+  var spellLvlSelectOpts = [
+    { val: '', lbl: '— Не заклинание (обычное умение / черта) —' },
+    { val: '0', lbl: '✨ Заговор (0 круг)' },
+    { val: '1', lbl: '🔮 1 круг' },
+    { val: '2', lbl: '🔮 2 круг' },
+    { val: '3', lbl: '🔮 3 круг' },
+    { val: '4', lbl: '🔮 4 круг' },
+    { val: '5', lbl: '🔮 5 круг' },
+    { val: '6', lbl: '🔮 6 круг' },
+    { val: '7', lbl: '🔮 7 круг' },
+    { val: '8', lbl: '🔮 8 круг' },
+    { val: '9', lbl: '🔮 9 круг' }
+  ].map(function(o){
+    var curVal = (d.spellLevel !== undefined && d.spellLevel !== null && d.spellLevel !== '') ? String(d.spellLevel) : '';
+    return '<option value="' + escapeAttr(o.val) + '" ' + (curVal === o.val ? 'selected' : '') + '>' + escapeHtml(o.lbl) + '</option>';
+  }).join('');
 
   var compSelectOpts = [
     { val: '', lbl: '— Не заклинание (без компонентов В/С/М) —' },
@@ -5491,6 +5599,10 @@ function renderFaeTechEdit(){
         '<div class="fae-edit-item">' +
           '<label>Перезарядка / Заряды</label>' +
           '<input type="text" class="fae-input" id="faeTechCooldown" value="' + escapeAttr(d.cooldown) + '" placeholder="Напр. Постоянно / Короткий отдых / БМ раз в день">' +
+        '</div>' +
+        '<div class="fae-edit-item">' +
+          '<label>✨ Круг заклинания (для фильтра заговоров и 1–9 кругов)</label>' +
+          '<select class="fae-input" id="faeTechSpellLevel">' + spellLvlSelectOpts + '</select>' +
         '</div>' +
         '<div class="fae-edit-item">' +
           '<label>🔮 Компоненты заклинания (для заклинаний и заговоров)</label>' +
@@ -5601,6 +5713,13 @@ function wireFaeTechs(){
     });
   });
 
+  document.querySelectorAll('[data-fae-tech-lvl]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window._faeTechSpellLvl = btn.getAttribute('data-fae-tech-lvl') || 'all';
+      render();
+    });
+  });
+
   document.querySelectorAll('[data-fae-tech-prep]').forEach(function(btn){
     btn.addEventListener('click', function(e){
       e.stopPropagation();
@@ -5679,9 +5798,11 @@ function wireFaeTechs(){
       var id = document.getElementById('faeTechEditId')?.value || genId();
       var idx = c.techs.findIndex(function(x){ return x.id === id; });
       var prev = idx >= 0 ? c.techs[idx] : null;
+      var rawSpellLvl = (document.getElementById('faeTechSpellLevel')?.value ?? '').trim();
       var item = {
         id: id,
         spellId: prev && prev.spellId ? prev.spellId : '',
+        spellLevel: rawSpellLvl !== '' ? Number(rawSpellLvl) : '',
         prepared: !!document.getElementById('faeTechPrepared')?.checked,
         name: (document.getElementById('faeTechName')?.value || '').trim() || 'Новая способность',
         category: document.getElementById('faeTechCat')?.value || 'Классовые умения',
@@ -8960,6 +9081,7 @@ function wireMagicScreens(){
       hero.techs.unshift({
         id: genId(),
         spellId: sp.id,
+        spellLevel: Number(sp.level) || 0,
         prepared: false,
         name: sp.name + (sp.en ? (' (' + sp.en + ')') : ''),
         category: 'Магические и Сверхъестественные дары',
@@ -8994,6 +9116,7 @@ function wireMagicScreens(){
         hero.techs.unshift({
           id: genId(),
           spellId: sp.id,
+          spellLevel: Number(sp.level) || 0,
           prepared: true,
           name: sp.name + (sp.en ? (' (' + sp.en + ')') : ''),
           category: 'Магические и Сверхъестественные дары',
