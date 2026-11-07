@@ -1672,6 +1672,7 @@ function normalizeFaerunCharacter(c){
       return {
         id: t.id || ('fae_tech_' + Date.now() + '_' + idx),
         spellId: t.spellId || '',
+        spellLevel: (t.spellLevel !== undefined && t.spellLevel !== null && t.spellLevel !== '') ? t.spellLevel : '',
         prepared: !!t.prepared,
         name: t.name || 'Способность',
         icon: t.icon || '✨',
@@ -8114,11 +8115,19 @@ function findSpellInHeroTechs(hero, spell){
   if(!hero || !Array.isArray(hero.techs) || !spell) return null;
   var targetName = ('✨ ' + spell.name).toLowerCase();
   var rawName = (spell.name || '').toLowerCase();
-  return hero.techs.find(function(t){
+  var enName = (spell.en || '').toLowerCase();
+  var byName = hero.techs.find(function(t){
     if(!t) return false;
-    if(t.spellId && t.spellId === spell.id) return true;
     var tn = (t.name || '').toLowerCase();
-    return tn === targetName || tn === rawName || tn.indexOf('✨ ' + rawName + ' (') === 0 || tn.indexOf(rawName + ' (') === 0;
+    if(tn === targetName || tn === rawName || tn.indexOf('✨ ' + rawName + ' (') === 0 || tn.indexOf(rawName + ' (') === 0) return true;
+    if(enName && tn.indexOf('(' + enName + ')') !== -1) return true;
+    return false;
+  });
+  if(byName) return byName;
+  return hero.techs.find(function(t){
+    if(!t || !t.spellId || t.spellId !== spell.id) return false;
+    if(String(t.spellId).indexOf('std_spell_') === 0 && t.name) return false;
+    return true;
   }) || null;
 }
 
@@ -8128,24 +8137,32 @@ function isSpellInHeroTechs(hero, spell){
 
 function findSpellForHeroTech(t){
   if(!t || !Array.isArray(SPELLS) || !SPELLS.length) return null;
+  if(t.spellId && String(t.spellId).indexOf('std_spell_') !== 0){
+    var byCustomId = SPELLS.find(function(s){ return s.id === t.spellId; });
+    if(byCustomId) return byCustomId;
+  }
+  var rawName = String(t.name || '').replace(/^[✨🌟🔮🔥⚡❄️🛡️🌀🎭💜👁️⚗️💀\s]+/, '').trim();
+  if(rawName){
+    var lowerFull = rawName.toLowerCase();
+    var parenMatch = rawName.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+    var ruCandidate = parenMatch ? parenMatch[1].trim().toLowerCase() : lowerFull;
+    var enCandidate = parenMatch ? parenMatch[2].trim().toLowerCase() : '';
+    var byName = SPELLS.find(function(s){
+      var sRu = (s.name || '').trim().toLowerCase();
+      var sEn = (s.en || '').trim().toLowerCase();
+      if(sRu && (sRu === lowerFull || sRu === ruCandidate)) return true;
+      if(sEn && (sEn === lowerFull || (enCandidate && sEn === enCandidate))) return true;
+      if(sRu && sEn && (sRu + ' (' + sEn + ')') === lowerFull) return true;
+      if(sRu && ruCandidate && (sRu.indexOf(ruCandidate + ' (') === 0 || ruCandidate.indexOf(sRu + ' (') === 0)) return true;
+      return false;
+    });
+    if(byName) return byName;
+  }
   if(t.spellId){
     var byId = SPELLS.find(function(s){ return s.id === t.spellId; });
     if(byId) return byId;
   }
-  var rawName = String(t.name || '').replace(/^[✨🌟🔮🔥⚡❄️🛡️🌀🎭💜👁️⚗️💀\s]+/, '').trim();
-  if(!rawName) return null;
-  var lowerFull = rawName.toLowerCase();
-  var parenMatch = rawName.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
-  var ruCandidate = parenMatch ? parenMatch[1].trim().toLowerCase() : lowerFull;
-  var enCandidate = parenMatch ? parenMatch[2].trim().toLowerCase() : '';
-  return SPELLS.find(function(s){
-    var sRu = (s.name || '').trim().toLowerCase();
-    var sEn = (s.en || '').trim().toLowerCase();
-    if(sRu && (sRu === lowerFull || sRu === ruCandidate)) return true;
-    if(sEn && (sEn === lowerFull || (enCandidate && sEn === enCandidate))) return true;
-    if(sRu && sEn && (sRu + ' (' + sEn + ')') === lowerFull) return true;
-    return false;
-  }) || null;
+  return null;
 }
 
 var SPELL_ICONIC_VS_LORE = {
@@ -8336,6 +8353,10 @@ var SPELL_ICONIC_VS_LORE = {
   "Dimension Door": [
     "«Януа Астралис!» — пространственный ключ на Глубинном или Драконьем наречии, сшивающий две точки мира",
     ""
+  ],
+  "Tenser's Floating Disk": [
+    "«Дискус Тензери Гравас!» — размеренная формула архимага Тензера, уплотняющая горизонтальный срез эфира в силовую платформу",
+    "Горизонтальный круговой обвод раскрытыми ладонями с каплей ртути на уровне пояса, «выглаживающий» незримый парящий круг"
   ]
 };
 

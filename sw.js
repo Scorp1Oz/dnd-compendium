@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compendium-cache-v223';
+const CACHE_NAME = 'compendium-cache-v224';
 const APP_SHELL = [
   './',
   './index.html',
