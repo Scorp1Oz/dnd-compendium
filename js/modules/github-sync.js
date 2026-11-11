@@ -155,7 +155,7 @@ var GHSync = window.GHSync = {
       dnd: {
         characters: (typeof CHARACTERS !== 'undefined') ? CHARACTERS : GHSync._readJson('ttc_characters', []),
         activeId: localStorage.getItem('ttc_faerun_active_id') || '',
-        spells: (typeof SPELLS !== 'undefined') ? SPELLS : GHSync._readJson('ttc_spells', []),
+        spells: (typeof SPELLS !== 'undefined' && Array.isArray(SPELLS)) ? SPELLS.filter(function(s){ return s && (s.isCustom || s.isModified); }) : GHSync._readJson('ttc_spells', []),
         recipes: GHSync._readJson('ttc_recipes', []),
         ingredients: GHSync._readJson('ttc_ingredients', []),
         campaign: GHSync._readJson('ttc_faerun_campaign', null)
@@ -359,9 +359,14 @@ var GHSync = window.GHSync = {
           try{ localStorage.setItem('ttc_characters', JSON.stringify(bundle.dnd.characters)); }catch(e){}
         }
         if(bundle.dnd.activeId) localStorage.setItem('ttc_faerun_active_id', bundle.dnd.activeId);
-        if(Array.isArray(bundle.dnd.spells) && bundle.dnd.spells.length){
-          if(typeof SPELLS !== 'undefined') SPELLS = bundle.dnd.spells;
-          localStorage.setItem('ttc_spells', JSON.stringify(bundle.dnd.spells));
+        if(Array.isArray(bundle.dnd.spells)){
+          var customOrMod = bundle.dnd.spells.filter(function(s){ return s && (s.isCustom || s.isModified); });
+          localStorage.setItem('ttc_spells', JSON.stringify(customOrMod));
+          if(typeof window !== 'undefined' && typeof window.mergeSpellsWithCanonical === 'function'){
+            SPELLS = window.mergeSpellsWithCanonical(customOrMod);
+          } else if(typeof window !== 'undefined' && typeof window.loadSpells === 'function'){
+            SPELLS = window.loadSpells();
+          }
         }
         if(Array.isArray(bundle.dnd.recipes) && bundle.dnd.recipes.length){
           localStorage.setItem('ttc_recipes', JSON.stringify(bundle.dnd.recipes));

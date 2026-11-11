@@ -1669,6 +1669,16 @@ function normalizeFaerunCharacter(c){
     c.techs = [];
   } else {
     c.techs = c.techs.filter(Boolean).map(function(t, idx){
+      var rawSource = t.source || t.req || '';
+      try {
+        if(rawSource && Array.isArray(SPELLS) && typeof findSpellForHeroTech === 'function'){
+          var matchedSp = findSpellForHeroTech(t);
+          if(matchedSp && !matchedSp.isCustom && matchedSp.school){
+            var canonScRu = schoolName(matchedSp.school);
+            rawSource = rawSource.replace(/^(Ограждение|Вызов|Прорицание|Очарование|Иллюзия|Некромантия|Преобразование|Воплощение)(?=\s*•)/i, canonScRu);
+          }
+        }
+      } catch(e){}
       return {
         id: t.id || ('fae_tech_' + Date.now() + '_' + idx),
         spellId: t.spellId || '',
@@ -1678,7 +1688,7 @@ function normalizeFaerunCharacter(c){
         icon: t.icon || '✨',
         category: t.category || t.cat || 'Классовые умения',
         cat: t.category || t.cat || 'Классовые умения',
-        source: t.source || t.req || '',
+        source: rawSource,
         actionCost: t.actionCost || t.cost || '1 действие',
         cooldown: t.cooldown || '',
         checkOrSave: t.checkOrSave || '',
@@ -2772,32 +2782,87 @@ function seedSpells(){
   }
   return [];
 }
+function normSpellSearch(str){
+  return String(str || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/отилук/g, 'отилюк')
+    .replace(/мельф/g, 'мелф')
+    .replace(/рэри/g, 'рари')
+    .replace(/морденкейнен/g, 'морденкайнен')
+    .replace(/натэйр/g, 'натэр')
+    .replace(/силунэ/g, 'силуне')
+    .replace(/['’`«»"(),./\\:;—–\-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+function matchSpellQuery(haystack, rawQuery){
+  var qNorm = normSpellSearch(rawQuery);
+  if(!qNorm) return true;
+  var hNorm = normSpellSearch(haystack);
+  if(hNorm.indexOf(qNorm) !== -1) return true;
+  var tokens = qNorm.split(' ');
+  for(var i = 0; i < tokens.length; i++){
+    if(tokens[i] && hNorm.indexOf(tokens[i]) === -1) return false;
+  }
+  return true;
+}
+function mergeSpellsWithCanonical(savedArr){
+  const canonical = seedSpells();
+  if(!Array.isArray(savedArr) || !savedArr.length) return canonical;
+  const canonicalByNormRu = new Map();
+  const canonicalByEn = new Map();
+  canonical.forEach(function(sp, idx){
+    var nRu = normSpellSearch(sp.name || '');
+    if(nRu) canonicalByNormRu.set(nRu, idx);
+    var baseRu = normSpellSearch(String(sp.name || '').split('(')[0]);
+    if(baseRu && !canonicalByNormRu.has(baseRu)) canonicalByNormRu.set(baseRu, idx);
+    var nEn = String(sp.en || '').trim().toLowerCase();
+    if(nEn) canonicalByEn.set(nEn, idx);
+  });
+  const customList = [];
+  const seenCustom = new Set();
+  savedArr.forEach(function(saved){
+    if(!saved || !saved.name) return;
+    var sEn = String(saved.en || '').trim().toLowerCase();
+    var sRu = normSpellSearch(saved.name);
+    if(saved.isModified && !saved.isCustom){
+      var cIdx = (sEn && canonicalByEn.has(sEn)) ? canonicalByEn.get(sEn) : (canonicalByNormRu.has(sRu) ? canonicalByNormRu.get(sRu) : -1);
+      if(cIdx >= 0){
+        canonical[cIdx] = Object.assign({}, canonical[cIdx], saved, { id: canonical[cIdx].id, isCustom: false, isModified: true });
+      }
+      return;
+    }
+    if(saved.isCustom){
+      var isDupCanonical = (sEn && canonicalByEn.has(sEn)) || canonicalByNormRu.has(sRu);
+      var dedupKey = sEn || sRu;
+      if(!isDupCanonical && dedupKey && !seenCustom.has(dedupKey)){
+        seenCustom.add(dedupKey);
+        customList.push(saved);
+      }
+    }
+  });
+  return customList.concat(canonical);
+}
 function loadSpells(){
   const canonical = seedSpells();
   try{
     const raw = localStorage.getItem('ttc_spells');
     if(!raw) return canonical;
     const arr = JSON.parse(raw);
-    if(!Array.isArray(arr) || !arr.length) return canonical;
-    // Сохраняем пользовательские (isCustom) и изменённые заклинания, объединяя их с полной базой DND_SPELLS_DB
-    const canonicalByName = new Map();
-    canonical.forEach(function(sp){
-      canonicalByName.set((sp.name || '').toLowerCase(), sp);
-    });
-    const customList = [];
-    arr.forEach(function(saved){
-      if(!saved || !saved.name) return;
-      const key = saved.name.toLowerCase();
-      if(saved.isCustom && !canonicalByName.has(key)){
-        customList.push(saved);
-      }
-    });
-    return customList.concat(canonical);
+    return mergeSpellsWithCanonical(arr);
   }catch(e){ return canonical; }
 }
 function saveSpellsToStorage(){
-  try{ localStorage.setItem('ttc_spells', JSON.stringify(SPELLS)); }catch(e){}
+  try{
+    var toPersist = Array.isArray(SPELLS) ? SPELLS.filter(function(s){ return s && (s.isCustom || s.isModified); }) : [];
+    localStorage.setItem('ttc_spells', JSON.stringify(toPersist));
+  }catch(e){}
 }
+window.mergeSpellsWithCanonical = mergeSpellsWithCanonical;
+window.loadSpells = loadSpells;
+window.normSpellSearch = normSpellSearch;
+window.matchSpellQuery = matchSpellQuery;
 let SPELLS = loadSpells();
 let spellDraft = null;
 
@@ -8060,11 +8125,11 @@ var FAE_SPELL_CLASSES = [
 ];
 
 var FAE_SCHOOL_DESCRIPTIONS = {
-  abjuration: 'Защитные барьеры, обереги, контрзаклинания, изгнание потусторонних сущностей и снятие проклятий.',
+  abjuration: 'Защитные барьеры, обереги, целебная магия исцеления, контрзаклинания, изгнание сущностей и снятие проклятий.',
   conjuration: 'Призыв существ и духов из иных планов, телепортация сквозь пространство и сотворение материи.',
-  divination: 'Предвидение будущего, чтение мыслей, поиск скрытых тайн, истинное зрение и связь с божествами.',
+  divination: 'Предвидение будущего, чтение мыслей, поиск скрытых тайн, телепатия, истинное зрение и связь с божествами.',
   enchantment: 'Власть над разумом и эмоциями: очарование, внушение, паралич, ментальное доминирование и слова силы.',
-  evocation: 'Управление чистой разрушительной энергией стихий (огонь, молния, холод, сила) и божественное исцеление.',
+  evocation: 'Управление чистой разрушительной энергией стихий и эфира: огонь, молния, холод, гром, излучение и силовые поля.',
   illusion: 'Обман чувств и разума: невидимость, зеркальные двойники, фантомы, гипнотические узоры и живые миражи.',
   necromancy: 'Магия жизни, смерти и души: поднятие нежити, вытягивание жизненных сил, проклятия и воскрешение павших.',
   transmutation: 'Изменение материи, времени и живых тел: ускорение, полёт, полиморф, телекинез, дезинтеграция и остановка времени.'
@@ -8798,8 +8863,8 @@ function renderMagicHub(){
       if(clsFilter !== 'Все классы' && (sp.classes || '').toLowerCase().indexOf(clsFilter.toLowerCase()) === -1) return false;
       if(searchQ){
         var vsm = getSpellVsmInfo(sp);
-        var hay = [sp.name, sp.en, sp.classes, sp.meta, sp.effect, schoolName(sp.school), vsm.code, vsm.material].join(' ').toLowerCase();
-        if(hay.indexOf(searchQ) === -1) return false;
+        var hay = [sp.name, sp.en, sp.classes, sp.meta, sp.effect, schoolName(sp.school), vsm.code, vsm.material].join(' ');
+        if(!matchSpellQuery(hay, searchQ)) return false;
       }
       return true;
     });
@@ -8872,8 +8937,8 @@ function renderSchoolSpells(){
     if(clsFilter !== 'Все классы' && (sp.classes || '').toLowerCase().indexOf(clsFilter.toLowerCase()) === -1) return false;
     if(searchQ){
       var vsm = getSpellVsmInfo(sp);
-      var hay = [sp.name, sp.en, sp.classes, sp.meta, sp.effect, vsm.code, vsm.material].join(' ').toLowerCase();
-      if(hay.indexOf(searchQ) === -1) return false;
+      var hay = [sp.name, sp.en, sp.classes, sp.meta, sp.effect, vsm.code, vsm.material].join(' ');
+      if(!matchSpellQuery(hay, searchQ)) return false;
     }
     return true;
   });
@@ -12212,13 +12277,9 @@ function wireFaeRef(){
       // 1. Spells
       if(Array.isArray(SPELLS)){
         SPELLS.forEach(function(sp){
-          var n = (sp.name || '').toLowerCase();
-          var en = (sp.en || '').toLowerCase();
-          var sc = (schoolName(sp.school) + ' ' + (sp.school || '')).toLowerCase();
-          var cls = (sp.classes || '').toLowerCase();
           var effText = sp.effect || sp.desc || '';
-          var d = effText.toLowerCase();
-          if(n.indexOf(q) !== -1 || en.indexOf(q) !== -1 || sc.indexOf(q) !== -1 || cls.indexOf(q) !== -1 || d.indexOf(q) !== -1){
+          var hay = [sp.name, sp.en, schoolName(sp.school), sp.school, sp.classes, effText].join(' ');
+          if(matchSpellQuery(hay, q)){
             matches.push({
               badge: '✨ Заклинание (' + schoolName(sp.school) + ')',
               title: sp.name + (sp.en ? (' / ' + sp.en) : '') + ' — ' + (sp.level ? (sp.level + ' круг') : 'Заговор'),
@@ -13572,7 +13633,7 @@ function importAllFaerunData(file){
         countChars = CHARACTERS.length;
       }
       if(Array.isArray(data.spells)){
-        SPELLS = data.spells;
+        SPELLS = mergeSpellsWithCanonical(data.spells);
         saveSpellsToStorage();
         countSpells = SPELLS.length;
       }
@@ -14332,6 +14393,7 @@ function wireEvents(){
     if(!spellDraft.id) spellDraft.id = genId();
     const i = SPELLS.findIndex(x=>x.id===spellDraft.id);
     const copy = JSON.parse(JSON.stringify(spellDraft));
+    if(!copy.isCustom) copy.isModified = true;
     if(i>=0) SPELLS[i]=copy; else SPELLS.push(copy);
     saveSpellsToStorage();
     navigate('schoolSpells:'+spellDraft.school);
